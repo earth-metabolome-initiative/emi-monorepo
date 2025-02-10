@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS derived_samples (
     parent_sample_id UUID NOT NULL,
     child_sample_id UUID NOT NULL,
     quantity FLOAT NOT NULL,
-    unit_id INTEGER NOT NULL,
+    unit_id SMALLINT NOT NULL,
     PRIMARY KEY (parent_sample_id, child_sample_id),
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE CASCADE,

@@ -916,7 +916,9 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
         if !self.has_updated_by_column(conn)? {
-            return Err(WebCodeGenError::MissingUpdatedByColumn(Box::new(self.clone())));
+            return Err(WebCodeGenError::MissingUpdatedByColumn(Box::new(
+                self.clone(),
+            )));
         }
 
         let struct_name: Ident = Ident::new(&self.struct_name()?, proc_macro2::Span::call_site());
@@ -927,6 +929,18 @@ impl Table {
             .into_iter()
             .map(|column| column.column_name.clone())
             .collect::<Vec<String>>();
+
+        // We compose the filter expression based on the primary key columns.
+        let filter_expression = primary_key_names
+            .iter()
+            .map(|column_name| {
+                let column_name: Ident = Ident::new(column_name, proc_macro2::Span::call_site());
+                quote! {
+                    #table_name::#column_name.eq(&self.#column_name)
+                }
+            })
+            .reduce(|a, b| quote! { diesel::BoolExpressionMethods::and(#a, #b)})
+            .unwrap();
 
         let session_update_columns = columns
             .iter()
@@ -1049,7 +1063,7 @@ impl Table {
 
                 async fn update(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<Self::Row, diesel::result::Error> {
                     diesel::update(#table_name::table)
-                        .filter(#table_name::id.eq(self.id))
+                        .filter(#filter_expression)
                         .set(self)
                         .get_result(conn)
                         .await

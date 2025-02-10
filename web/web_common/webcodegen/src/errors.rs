@@ -19,6 +19,10 @@ pub enum WebCodeGenError {
     ConstraintError(ConstraintError),
     /// A column is of an unknown type.
     UnknownColumnType(Box<Column>),
+    /// Unknown PostgreSQL Diesel type.
+    UnknownDieselPostgresType(String),
+    /// Unknown PostgreSQL Rust type.
+    UnknownPostgresRustType(String),
     /// A type is not user-defined.
     NotUserDefinedType(String),
     /// A base type is missing.

@@ -108,8 +108,8 @@ pub struct PgType {
 /// # Panics
 /// 
 /// Panics if the type is not supported.
-pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> &'static str {
-    match type_name.as_ref() {
+pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> Result<&'static str, WebCodeGenError> {
+    Ok(match type_name.as_ref() {
         // Numeric types
         "integer" => "i32",
         "smallint" => "i16",
@@ -142,15 +142,17 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> &'static str {
         "macaddr" | "macaddr8" => "std::net::MacAddr",
 
         // GIS types
-        "point" => "Point",
-        "line" => "Line",
-        "lseg" => "LineSegment",
+        "point" => "postgis_diesel::types::Point",
+        "geometry" => panic!("Geometry type not supported"),
 
         // UUID type
         "uuid" => "uuid::Uuid",
+        
 
-        other => todo!("Unsupported data type: {}", other),
-    }
+        other =>  {
+            return Err(WebCodeGenError::UnknownPostgresRustType(other.to_owned()))
+        }
+    })
 }
 
 /// Converts a `PostgreSQL` type to a `Diesel` type.
@@ -163,7 +165,7 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> &'static str {
 /// # Returns
 ///
 /// A `Type` representing the corresponding Diesel type.
-pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Type {
+pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Result<Type, WebCodeGenError> {
     let rust_type_str = match postgres_type {
         // Numeric types
         "integer" | "int4" => "diesel::sql_types::Integer",
@@ -212,7 +214,9 @@ pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Type {
         // Other
         "uuid" => "diesel::sql_types::Uuid",
 
-        _ => todo!("Unsupported data type: '{postgres_type}'"),
+        _ => {
+            return Err(WebCodeGenError::UnknownDieselPostgresType(postgres_type.to_owned()));
+        }
     };
 
     let rust_type_str = if nullable {
@@ -221,8 +225,8 @@ pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Type {
         rust_type_str.to_string()
     };
 
-    parse_str::<Type>(&rust_type_str)
-        .expect(format!("Failed to parse rust type: '{rust_type_str}'").as_str())
+    Ok(parse_str::<Type>(&rust_type_str)
+        .expect(format!("Failed to parse rust type: '{rust_type_str}'").as_str()))
 }
 
 
@@ -242,16 +246,21 @@ impl PgType {
     /// * Returns an error if the provided database connection fails.
     /// 
     pub fn rust_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
-        if self.is_composite() {
-            let struct_name = Ident::new(&self.camelcased_name(), proc_macro2::Span::call_site());
-            Ok(parse_str::<Type>(&struct_name.to_string()).unwrap())
-        } else if self.is_user_defined(conn)? {
-            let Some(base_type) = self.base_type(conn)? else {
-                return Err(WebCodeGenError::MissingBaseType(Box::new(self.clone())));
-            };
-            base_type.rust_type(conn)
-        } else {
-            Ok(parse_str(rust_type_str(&self.typname)).unwrap())
+        match rust_type_str(&self.typname) {
+            Ok(rust_type) => Ok(parse_str::<Type>(rust_type).unwrap()),
+            Err(error) => {
+                if self.is_composite() {
+                    let struct_name = Ident::new(&self.camelcased_name(), proc_macro2::Span::call_site());
+                    Ok(parse_str::<Type>(&struct_name.to_string()).unwrap())
+                } else if self.is_user_defined(conn)? {
+                    let Some(base_type) = self.base_type(conn)? else {
+                        return Err(WebCodeGenError::MissingBaseType(Box::new(self.clone())));
+                    };
+                    base_type.rust_type(conn)
+                } else {
+                    Err(error)
+                }
+            }
         }
     }
 
@@ -275,17 +284,23 @@ impl PgType {
         nullable: bool,
         conn: &mut PgConnection,
     ) -> Result<Type, WebCodeGenError> {
-        if self.is_composite() {
-            Ok(parse_str::<Type>(&format!("crate::Pg{}", &self.camelcased_name())).unwrap())
-        } else if self.is_user_defined(conn)? {
-            let base_type = self.base_type(conn)?;
-            if let Some(base_type) = base_type {
-                base_type.diesel_type(nullable, conn)
-            } else {
-                return Err(WebCodeGenError::MissingBaseType(Box::new(self.clone())));
+        let diesel_type = postgres_type_to_diesel(&self.typname, nullable);
+        match diesel_type {
+            Ok(diesel_type) => Ok(diesel_type),
+            Err(error) => {
+                if self.is_composite() {
+                    Ok(parse_str::<Type>(&format!("crate::Pg{}", &self.camelcased_name())).unwrap())
+                } else if self.is_user_defined(conn)? {
+                    let base_type = self.base_type(conn)?;
+                    if let Some(base_type) = base_type {
+                        base_type.diesel_type(nullable, conn)
+                    } else {
+                        Err(WebCodeGenError::MissingBaseType(Box::new(self.clone())))
+                    }
+                } else {
+                    Err(error)
+                }
             }
-        } else {
-            Ok(postgres_type_to_diesel(&self.typname, nullable))
         }
     }
 
@@ -398,7 +413,7 @@ impl PgType {
                 .ok_or(WebCodeGenError::MissingBaseType(Box::new(self.clone())))
                 .and_then(|base_type| base_type.supports_copy(conn))
         } else {
-            Ok(COPY_TYPES.contains(&rust_type_str(&self.typname)))
+            Ok(COPY_TYPES.contains(&rust_type_str(&self.typname)?))
         }
     }
 
@@ -423,7 +438,7 @@ impl PgType {
                     attribute.supports_hash(conn).map(|b| acc && b)
                 })
         } else {
-            Ok(HASH_TYPES.contains(&rust_type_str(&self.typname)))
+            Ok(HASH_TYPES.contains(&rust_type_str(&self.typname)?))
         }
     }
 
@@ -448,7 +463,7 @@ impl PgType {
                     attribute.supports_eq(conn).map(|b| acc && b)
                 })
         } else {
-            Ok(EQ_TYPES.contains(&rust_type_str(&self.typname)))
+            Ok(EQ_TYPES.contains(&rust_type_str(&self.typname)?))
         }
     }
 

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS user_emails (
     email text NOT NULL,
     created_by INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    login_provider_id INTEGER NOT NULL REFERENCES login_providers (id) ON DELETE CASCADE,
+    login_provider_id SMALLINT NOT NULL REFERENCES login_providers (id) ON DELETE CASCADE,
     primary_email BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT unique_email_provider UNIQUE (email, login_provider_id)
 );
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS user_emails (
 -- SQL defining the check_email_unique function creation.
 -- This function is used to check if the email is unique per user, meaning that
 -- two distinct users may not have the same email, even with different login providers.
-CREATE FUNCTION check_email_unique() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION check_email_unique() RETURNS TRIGGER AS $$
 BEGIN
     IF EXISTS (
         SELECT 1 
@@ -31,14 +31,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER email_unique_trigger
+CREATE OR REPLACE TRIGGER email_unique_trigger
 BEFORE INSERT OR UPDATE ON user_emails
 FOR EACH ROW
 EXECUTE FUNCTION check_email_unique();
 
 -- SQL trigger making sure that when a user email is marked as primary, all other emails
 -- associated with the same user are marked as not primary.
-CREATE FUNCTION update_primary_email() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION update_primary_email() RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.primary_email THEN
         UPDATE user_emails
@@ -50,7 +50,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER primary_email_trigger
+CREATE OR REPLACE TRIGGER primary_email_trigger
 BEFORE INSERT OR UPDATE ON user_emails
 FOR EACH ROW
 EXECUTE FUNCTION update_primary_email();

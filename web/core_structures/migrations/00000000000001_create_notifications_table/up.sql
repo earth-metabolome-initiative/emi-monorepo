@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS notifications (
 -- Function to be called when a notification is inserted or updated
 -- in the notifications table to call a pg_notify function to notify the user
 -- with the serialized notification record.
--- CREATE FUNCTION custom_notification_change()
+-- CREATE OR REPLACE FUNCTION custom_notification_change()
 -- RETURNS TRIGGER AS $$
 -- BEGIN
 --     PERFORM pg_notify(
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS notifications (
 
 -- -- We create a function that notifies the user when a row is
 -- -- inserted, edited or deleted in the notifications table.
--- CREATE FUNCTION creation_user_notification()
+-- CREATE OR REPLACE FUNCTION creation_user_notification()
 -- RETURNS TRIGGER AS $$
 -- DECLARE
 --     serialized_record TEXT;

@@ -5,9 +5,9 @@ CREATE TABLE IF NOT EXISTS teams (
     name TEXT NOT NULL UNIQUE,
     -- a description of the team
     description TEXT NOT NULL,
-    icon_id INTEGER NOT NULL DEFAULT 1387,
-    color_id INTEGER NOT NULL DEFAULT 15,
-    state_id INTEGER NOT NULL DEFAULT 1,
+    icon_id SMALLINT NOT NULL DEFAULT 1387,
+    color_id SMALLINT NOT NULL DEFAULT 15,
+    state_id SMALLINT NOT NULL DEFAULT 1,
     parent_team_id INTEGER,
     -- The user who created the team
     created_by INTEGER NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS teams (
     updated_by INTEGER NOT NULL,
     -- The date the team was last updated
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (icon_id) REFERENCES font_awesome_icons(id),
+    FOREIGN KEY (icon_id) REFERENCES icons(id),
     FOREIGN KEY (color_id) REFERENCES colors(id),
     FOREIGN KEY (state_id) REFERENCES team_states(id),
     FOREIGN KEY (parent_team_id) REFERENCES teams(id) ON DELETE CASCADE,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS teams (
     CONSTRAINT parent_team_circularity CHECK (parent_team_id != id)
 );
 
-CREATE FUNCTION concat_teams_name_description(
+CREATE OR REPLACE FUNCTION concat_teams_name_description(
   name text,
   description text
 ) RETURNS text AS $$
@@ -39,6 +39,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql IMMUTABLE STRICT PARALLEL SAFE;
 
-CREATE INDEX teams_name_description_trgm_idx ON teams USING gin (
+CREATE INDEX IF NOT EXISTS teams_name_description_trgm_idx ON teams USING gin (
   concat_teams_name_description(name, description) gin_trgm_ops
 );

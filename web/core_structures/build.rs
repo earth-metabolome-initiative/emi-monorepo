@@ -8,18 +8,12 @@ use std::env;
 use std::path::Path;
 use taxonomy_fetcher::impls::ncbi::{NCBIRank, NCBITaxonomy, NCBITaxonomyBuilder};
 use taxonomy_fetcher::{Rank, Taxonomy, TaxonomyBuilder};
-use testcontainers::core::Mount;
-use testcontainers::{
-    core::{IntoContainerPort, WaitFor},
-    runners::AsyncRunner,
-    ContainerAsync, GenericImage, ImageExt,
-};
-use webcodegen::Codegen;
+use webcodegen::{Codegen, CompatibleForeignTypeConstraint, CustomColumnConstraint};
 
-const DATABASE_NAME: &str = "test_db";
+const DATABASE_NAME: &str = "development.db";
 const DATABASE_PASSWORD: &str = "password";
 const DATABASE_USER: &str = "user";
-const DATABASE_PORT: u16 = 33676;
+const DATABASE_PORT: u16 = 35432;
 
 fn establish_connection_to_postgres() -> PgConnection {
     let database_url = format!(
@@ -39,35 +33,6 @@ fn establish_connection_to_postgres() -> PgConnection {
     }
 
     PgConnection::establish(&database_url).unwrap()
-}
-
-async fn setup_postgres() -> ContainerAsync<GenericImage> {
-    let local_absolute_path = std::env::current_dir().unwrap();
-    let local_absolute_path = local_absolute_path.to_str().unwrap();
-
-    let container = GenericImage::new("postgres", "17-alpine")
-        .with_wait_for(WaitFor::message_on_stderr(
-            "database system is ready to accept connections",
-        ))
-        .with_network("bridge")
-        .with_env_var("DEBUG", "1")
-        .with_env_var("POSTGRES_USER", DATABASE_USER)
-        .with_env_var("POSTGRES_PASSWORD", DATABASE_PASSWORD)
-        .with_env_var("POSTGRES_DB", DATABASE_NAME)
-        .with_mapped_port(DATABASE_PORT, 5432.tcp())
-        .with_mount(Mount::bind_mount(
-            format!("{local_absolute_path}/"),
-            "/app/",
-        ))
-        .start()
-        .await;
-
-    if let Err(e) = container {
-        eprintln!("Failed to start container: {:?}", e);
-        std::process::exit(1);
-    }
-
-    container.unwrap()
 }
 
 #[tokio::main]
@@ -108,14 +73,30 @@ pub async fn main() {
     // We create the SQL to create the tables and populate them
     let sql: String = schema.to_postgres().unwrap();
 
-    // We initialize the database
-    let container = setup_postgres().await;
-
     // And obtain a connection to the database
     let mut conn = establish_connection_to_postgres();
 
     // We execute the SQL
-    conn.batch_execute(&sql).unwrap();
+    if let Err(error) = conn.batch_execute(&sql) {
+        // We write out to file the sql we have just executed that has failed.
+        std::fs::write("failed.sql", &sql).unwrap();
+
+        eprintln!("Failed to execute SQL: {:?}", error);
+        std::process::exit(1);
+    }
+
+    // We execute the migrations
+    for migration in extension_migrations.ups().unwrap() {
+        conn.batch_execute(&migration).unwrap();
+    }
+    for migration in migrations.ups().unwrap() {
+        conn.batch_execute(&migration).unwrap();
+    }
+
+    // We check that the database follows the expected constraints.
+    CompatibleForeignTypeConstraint::default()
+        .check_all(DATABASE_NAME, None, &mut conn)
+        .unwrap();
 
     // We write to the target directory the generated structs
 
@@ -130,7 +111,4 @@ pub async fn main() {
         .set_output_path(path.as_ref())
         .generate(&mut conn, DATABASE_NAME, None)
         .unwrap();
-
-    // And we stop the container
-    container.stop().await.unwrap();
 }

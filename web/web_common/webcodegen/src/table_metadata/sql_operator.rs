@@ -112,12 +112,12 @@ impl SQLOperator {
                                 left_operand_type: postgres_type_to_diesel(
                                     left_operand_type.as_str(),
                                     false,
-                                ),
+                                )?,
                                 right_operand_type: postgres_type_to_diesel(
                                     right_operand_type.as_str(),
                                     false,
-                                ),
-                                result_type: postgres_type_to_diesel(result_type.as_str(), false),
+                                )?,
+                                result_type: postgres_type_to_diesel(result_type.as_str(), false)?,
                                 name,
                             })
                         },

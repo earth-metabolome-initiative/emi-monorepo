@@ -1,2 +1,2 @@
 -- Enables the PostGIS extension in the database.
-CREATE EXTENSION postgis;
+CREATE EXTENSION IF NOT EXISTS postgis;

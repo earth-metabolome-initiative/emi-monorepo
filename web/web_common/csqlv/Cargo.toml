@@ -23,7 +23,7 @@ ipnetwork = "0.20.0"
 diesel_full_text_search = "2.2.0"
 diesel-async.workspace = true
 macaddr = "1.0.1"
-postgis_diesel = "2.4.1"
+postgis_diesel.workspace = true
 
 [features]
 default = [ "serde"]

@@ -1,6 +1,7 @@
 # Setting up the development environment to run the platform
 
 ## Adding the test domain to the hosts file
+
 Among the first things to do is to add the test domain to the hosts file.
 This is done by adding the following line to the file `/etc/hosts`:
 
@@ -46,16 +47,19 @@ mkcert -cert-file nginx/${DOMAIN}.pem -key-file nginx/${DOMAIN}-key.pem ${DOMAIN
 ```
 
 ## Setting up the environment variables
+
 You need to setup the environment variables `.env`, starting from the `default_docker_env` file.
 
 If you are in doubt about the values, you can ask the team for the correct values.
 
 ## Starting docker
+
 To start the platform, you need to have Docker & Docker-compose.
 
 Different platforms have different ways of installing Docker, so we will not cover that here.
 
 ## Starting Docker compose
+
 To start the docker compose, you need to run the following command:
 
 ```bash
@@ -77,6 +81,7 @@ docker compose -f docker-compose-switch.yml --env-file .env_switch up -d --build
 ```
 
 ## Stopping all dockers
+
 The following will stop ALL dockers in the system:
 
 ```bash
@@ -84,6 +89,7 @@ docker stop $(docker ps -a -q)
 ```
 
 ### Integrity errors
+
 Sometimes Trunk may start causing integrity errors. For example you may find in the console errors such as:
 
 ```bash
@@ -93,6 +99,7 @@ Failed to find a valid digest in the 'integrity' attribute for resource 'https:/
 In such cases, stop and restart the Yew/Trunk docker.
 
 ### Upon encountering very odd errors
+
 Sometimes it may happen that the Dockers lead to extremely odd errors. In those cases, to exclude the dockers, prune all the containers, images, and volumes. **DO THIS ON SYSTEMS WHERE YOU DO NOT HAVE OTHER DOCKERS**.
 
 ```bash

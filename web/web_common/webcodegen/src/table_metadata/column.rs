@@ -115,21 +115,37 @@ impl Column {
         &self.data_type
     }
 
+    /// Returns whether the column contains PostGIS geometry data
+    pub fn is_geometry(&self, conn: &mut PgConnection) -> bool {
+        self.geometry(conn).is_ok()
+    }
+
+    /// Returns the associated geometry column if the column is a geometry column
+    pub fn geometry(&self, conn: &mut PgConnection) -> Result<crate::GeometryColumn, WebCodeGenError> {
+        use crate::schema::geometry_columns;
+
+        Ok(geometry_columns::table
+            .filter(geometry_columns::f_table_name.eq(&self.table_name))
+            .filter(geometry_columns::f_table_schema.eq(&self.table_schema))
+            .filter(geometry_columns::f_geometry_column.eq(&self.column_name))
+            .first::<crate::GeometryColumn>(conn)?)
+    }
+
     /// Returns the data type associated with the column as repo
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `Result` containing the data type of the column if the operation was successful,
     /// or a `WebCodeGenError` if an error occurred
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while querying the database
-    pub fn data_type_str(&self, _conn: &mut PgConnection) -> Result<&str, WebCodeGenError> {
+    pub fn data_type_str(&self, conn: &mut PgConnection) -> Result<&str, WebCodeGenError> {
         Ok(if self.has_custom_type() {
             if let Some(udt_name) = &self.udt_name {
                 udt_name
@@ -142,34 +158,46 @@ impl Column {
     }
 
     /// Returns the string data type
-    fn str_data_type(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
-        Ok(if self.has_custom_type() {
-            PgType::from_name(self.data_type_str(conn)?, conn)?.camelcased_name()
-        } else {
-            rust_type_str(self.data_type_str(conn)?).to_string()
-        })
+    fn str_rust_data_type(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
+        if let Ok(geometry) = self.geometry(conn) {
+            return Ok(geometry.str_rust_type().to_owned());
+        }
+        match rust_type_str(self.data_type_str(conn)?) {
+            Ok(s) => Ok(s.to_string()),
+            Err(error) => {
+                if self.has_custom_type() {
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.camelcased_name())
+                } else {
+                    Err(error)
+                }
+            }
+        }
     }
 
     /// Returns whether the column is compatible with the provided column
-    pub fn has_compatible_data_type(&self, column: &Column, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(self.str_data_type(conn)? == column.str_data_type(conn)?)
+    pub fn has_compatible_data_type(
+        &self,
+        column: &Column,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        Ok(self.str_rust_data_type(conn)? == column.str_rust_data_type(conn)?)
     }
-    
+
     /// Returns the rust type of the column
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `Result` containing the rust `Type` of the column if the operation
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while querying the database
     pub fn rust_data_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
-        let rust_type = self.str_data_type(conn)?;
+        let rust_type = self.str_rust_data_type(conn)?;
 
         let rust_type = if self.is_nullable() {
             format!("Option<{rust_type}>")
@@ -181,18 +209,18 @@ impl Column {
     }
 
     /// Returns whether the column name is a reserved diesel word.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while sanitizing the column name
     pub fn requires_diesel_sanitization(&self) -> Result<bool, WebCodeGenError> {
         Ok(RESERVED_DIESEL_WORDS.contains(&self.snake_case_name()?.as_str()))
     }
 
     /// Returns the sanitized snake case name of the table.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while sanitizing the column name
     pub fn snake_case_name(&self) -> Result<String, WebCodeGenError> {
         let sanitizer = SnakeCaseSanizer::default()
@@ -203,18 +231,18 @@ impl Column {
     }
 
     /// Returns the sanitized snake case syn Ident of the table.
-    /// 
+    ///
     /// If the column name is a reserved diesel word, the returned ident will be prefixed with `__`.
     /// If the column name is a reserved rust word, the returned ident will be the raw ident.
     /// Otherwise, the returned ident will be the sanitized snake case ident.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `Result` containing the sanitized snake case `Ident` if the operation was successful,
     /// or a `WebCodeGenError` if an error occurred
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while sanitizing the column name
     pub fn sanitized_snake_case_ident(&self) -> Result<Ident, WebCodeGenError> {
         let snake_case_name = self.snake_case_name()?;
@@ -246,34 +274,38 @@ impl Column {
     }
 
     /// Returns the diesel type of the column
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `Result` containing the diesel `Type` of the column if the operation
     /// was successful, or a `WebCodeGenError` if an error occurred
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while querying the database
     pub fn diesel_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
-        if self.has_custom_type() {
-            let name = PgType::from_name(self.data_type_str(conn)?, conn)?.camelcased_name();
-            let name = if self.is_nullable() {
-                format!("diesel::sql_types::Nullable<crate::Pg{name}>")
-            } else {
-                format!("crate::Pg{name}")
-            };
+        let tentative_type = postgres_type_to_diesel(self.data_type_str(conn)?, self.is_nullable());
+        match tentative_type {
+            Ok(t) => Ok(t),
+            Err(e) => {
+                if self.has_custom_type() {
+                    let name =
+                        PgType::from_name(self.data_type_str(conn)?, conn)?.camelcased_name();
+                    let name = if self.is_nullable() {
+                        format!("diesel::sql_types::Nullable<crate::Pg{name}>")
+                    } else {
+                        format!("crate::Pg{name}")
+                    };
 
-            Ok(syn::parse_str(&name).unwrap())
-        } else {
-            Ok(postgres_type_to_diesel(
-                self.data_type_str(conn)?,
-                self.is_nullable(),
-            ))
+                    Ok(syn::parse_str(&name).unwrap())
+                } else {
+                    Err(e)
+                }
+            }
         }
     }
 
@@ -285,17 +317,17 @@ impl Column {
 
     #[must_use]
     /// Returns whether the column is automatically generated
-    /// 
+    ///
     /// A column is automatically generated if:
     /// - it is marked as `ALWAYS` generated
     /// - it has a default value that starts with `nextval`
     /// - it has a default value that starts with `CURRENT_TIMESTAMP`
     /// - it is an identity column
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `bool` indicating whether the column is automatically generated
-    /// 
+    ///
     pub fn is_automatically_generated(&self) -> bool {
         self.is_generated == "ALWAYS"
             || self
@@ -344,46 +376,46 @@ impl Column {
     }
 
     /// Load all columns from the database
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `Result` containing a `Vec` of `Column` if the operation was successful,
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while querying the database
     pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::columns;
-        columns::table.load::<Column>(conn).map_err(WebCodeGenError::from)
+        columns::table
+            .load::<Column>(conn)
+            .map_err(WebCodeGenError::from)
     }
 
     /// Returns whether the column is a foreign key
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     pub fn is_foreign_key(&self, conn: &mut PgConnection) -> bool {
         use crate::schema::key_column_usage;
         use crate::schema::referential_constraints;
         key_column_usage::table
             .inner_join(
-                referential_constraints::table.on(
-                    key_column_usage::constraint_name
-                        .eq(referential_constraints::constraint_name)
-                        .and(
-                            key_column_usage::constraint_schema
-                                .eq(referential_constraints::constraint_schema),
-                        )
-                        .and(
-                            key_column_usage::constraint_catalog
-                                .eq(referential_constraints::constraint_catalog),
-                        ),
-                ),
+                referential_constraints::table.on(key_column_usage::constraint_name
+                    .eq(referential_constraints::constraint_name)
+                    .and(
+                        key_column_usage::constraint_schema
+                            .eq(referential_constraints::constraint_schema),
+                    )
+                    .and(
+                        key_column_usage::constraint_catalog
+                            .eq(referential_constraints::constraint_catalog),
+                    )),
             )
             .filter(key_column_usage::column_name.eq(&self.column_name))
             .filter(key_column_usage::table_name.eq(&self.table_name))
@@ -396,18 +428,18 @@ impl Column {
 
     /// Returns the foreign table of the column if it is a foreign key.
     /// If the column is not a foreign key, returns `None`.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `Result` containing an `Option` of a tuple containing the foreign table and
     /// the foreign column if the operation was successful, or a `DieselError` if an error occurred
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while querying the database
     pub fn foreign_table(
         &self,
@@ -431,35 +463,23 @@ impl Column {
                             .eq(key_column_usage::constraint_catalog),
                     )
                     .and(table_constraints::table_name.eq(key_column_usage::table_name))
-                    .and(
-                        table_constraints::table_schema
-                            .eq(key_column_usage::table_schema),
-                    )
-                    .and(
-                        table_constraints::table_catalog
-                            .eq(key_column_usage::table_catalog),
-                    )),
+                    .and(table_constraints::table_schema.eq(key_column_usage::table_schema))
+                    .and(table_constraints::table_catalog.eq(key_column_usage::table_catalog))),
             )
-            .inner_join(
-                constraint_column_usage::table
-                    .on(constraint_column_usage::constraint_name
-                        .eq(table_constraints::constraint_name)),
-            )
+            .inner_join(constraint_column_usage::table.on(
+                constraint_column_usage::constraint_name.eq(table_constraints::constraint_name),
+            ))
             .inner_join(
                 tables::table.on(tables::table_name
                     .eq(constraint_column_usage::table_name)
                     .and(tables::table_schema.eq(constraint_column_usage::table_schema))
-                    .and(
-                        tables::table_catalog.eq(constraint_column_usage::table_catalog),
-                    )),
+                    .and(tables::table_catalog.eq(constraint_column_usage::table_catalog))),
             )
             .inner_join(
                 columns::table.on(columns::table_name
                     .eq(constraint_column_usage::table_name)
                     .and(columns::table_schema.eq(constraint_column_usage::table_schema))
-                    .and(
-                        columns::table_catalog.eq(constraint_column_usage::table_catalog),
-                    )
+                    .and(columns::table_catalog.eq(constraint_column_usage::table_catalog))
                     .and(columns::column_name.eq(constraint_column_usage::column_name))),
             )
             .filter(table_constraints::constraint_type.eq("FOREIGN KEY"))

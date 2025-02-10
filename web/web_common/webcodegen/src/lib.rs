@@ -19,7 +19,9 @@ mod schema;
 mod sql_functions;
 mod table_metadata;
 mod codegen;
+mod postgis;
 
+pub use postgis::GeometryColumn;
 pub use table_metadata::{
     CheckConstraint, Column, ConstraintColumnUsage, ConstraintTableUsage, DomainConstraint, Index,
     KeyColumnUsage, ReferentialConstraint, SQLFunction, SQLOperator, Table,

@@ -3,7 +3,7 @@ services:
   postgres:
     container_name: ${POSTGRES_DOCKER_NAME}
     build:
-      context: ./postgres
+      context: ./core_structures
       dockerfile: Dockerfile
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
