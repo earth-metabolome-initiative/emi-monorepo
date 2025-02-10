@@ -18,7 +18,7 @@ reqwasm = "0.5.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 wasm-bindgen = "0.2.92"
-uuid = { version = "1.7", features = ["serde", "v4", "js"] }
+uuid.workspace = true
 wasm-bindgen-futures = "0.4.40"
 yew = { version = "0.21.0", features = ["csr"] }
 yew-router = "0.18.0"
