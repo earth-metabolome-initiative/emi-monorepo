@@ -141,6 +141,20 @@ impl Column {
         })
     }
 
+    /// Returns the string data type
+    fn str_data_type(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
+        Ok(if self.has_custom_type() {
+            PgType::from_name(self.data_type_str(conn)?, conn)?.camelcased_name()
+        } else {
+            rust_type_str(self.data_type_str(conn)?).to_string()
+        })
+    }
+
+    /// Returns whether the column is compatible with the provided column
+    pub fn has_compatible_data_type(&self, column: &Column, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(self.str_data_type(conn)? == column.str_data_type(conn)?)
+    }
+    
     /// Returns the rust type of the column
     /// 
     /// # Arguments
@@ -154,12 +168,8 @@ impl Column {
     /// # Errors
     /// 
     /// If an error occurs while querying the database
-    pub fn data_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
-        let rust_type = if self.has_custom_type() {
-            PgType::from_name(self.data_type_str(conn)?, conn)?.camelcased_name()
-        } else {
-            rust_type_str(self.data_type_str(conn)?).to_string()
-        };
+    pub fn rust_data_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
+        let rust_type = self.str_data_type(conn)?;
 
         let rust_type = if self.is_nullable() {
             format!("Option<{rust_type}>")
