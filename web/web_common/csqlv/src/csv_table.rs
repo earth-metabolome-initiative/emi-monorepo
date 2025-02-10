@@ -118,14 +118,14 @@ impl<'a> CSVTable<'a> {
                     ""
                 },
                 if column.is_unique() { " UNIQUE" } else { "" },
-                if column.is_nullable() {
+                if column.is_nullable() || column.is_primary_key() {
                     ""
                 } else {
                     " NOT NULL"
                 },
                 if let Some(foreign_table) = &column.foreign_table() {
                     format!(
-                        " REFERENCES {}({})",
+                        " REFERENCES {}({}) ON DELETE CASCADE",
                         foreign_table.name(),
                         foreign_table.primary_key().name()?
                     )
@@ -187,12 +187,12 @@ impl<'a> CSVTable<'a> {
 
         if self.table_metadata.gzip() {
             sql.push_str(&format!(
-                "\nCOPY {temporary_table_name} FROM PROGRAM 'gzip -dc {}' DELIMITER '{delimiter}' CSV HEADER;\n",
+                "\nCOPY {temporary_table_name} FROM PROGRAM 'gzip -dc {}' DELIMITER '{delimiter}' CSV HEADER NULL '';\n",
                 self.table_metadata.path
             ));
         } else {
             sql.push_str(&format!(
-                "\nCOPY {temporary_table_name} FROM '{}' DELIMITER '{delimiter}' CSV HEADER;\n",
+                "\nCOPY {temporary_table_name} FROM '{}' DELIMITER '{delimiter}' CSV HEADER NULL '';\n",
                 self.table_metadata.path
             ));
         }
@@ -207,6 +207,11 @@ impl<'a> CSVTable<'a> {
     /// * If the schema is in an invalid state and the foreign table does not exist.
     pub fn populate(&self) -> Result<String, CSVSchemaError> {
         let mut sql = self.temporary_table()?;
+
+        sql.push_str(&format!(
+            "\nTRUNCATE TABLE {} RESTART IDENTITY CASCADE;\n",
+            self.table_metadata.name
+        ));
         sql.push_str(&format!("\nINSERT INTO {} (\n", self.table_metadata.name));
         for column in &self.table_metadata.columns {
             if column.artificial {
