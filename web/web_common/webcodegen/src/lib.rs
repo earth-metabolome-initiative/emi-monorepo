@@ -29,6 +29,7 @@ pub use custom_schema_constraints::{
     CompulsorySiblingColumnConstraint, ConstraintError, CustomColumnConstraint,
     CustomTableConstraint, IsForeignKeyConstraint, LowercaseColumnConstraint,
     LowercaseTableConstraint, NotNullColumnConstraint, HasSpecificTypeConstraint,
+    CompatibleForeignTypeConstraint,
 };
 pub use codegen::Codegen;
 pub use meta_sql::AuthorizationFunctionBuilder;

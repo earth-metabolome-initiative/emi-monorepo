@@ -1,6 +1,8 @@
 //! Submodule defining an error enumeration for the custom constraints.
 use std::fmt::{Display, Formatter};
 
+use crate::Column;
+
 #[derive(Debug)]
 /// Error type for custom schema constraints.
 pub enum ConstraintError {
@@ -10,6 +12,13 @@ pub enum ConstraintError {
     UnexpectedUppercaseColumn(String),
     /// The table name is unexpectedly uppercase.
     UnexpectedUppercaseTable(String),
+    /// The column and foreign column types are incompatible.
+    IncompatibleForeignType {
+        /// The column
+        column: Box<Column>,
+        /// The foreign column
+        foreign_column: Box<Column>,
+    },
     /// The column is not a foreign key column.
     NotForeignKeyColumn {
         /// The name of the table
@@ -48,6 +57,19 @@ impl Display for ConstraintError {
             }
             ConstraintError::UnexpectedUppercaseTable(table_name) => {
                 write!(f, "Unexpected uppercase table: {table_name}")
+            }
+            ConstraintError::IncompatibleForeignType {
+                column,
+                foreign_column,
+            } => {
+                write!(
+                    f,
+                    "Column {column_name} is of type {column_type}, foreign column {foreign_column_name} is of type {foreign_column_type}",
+                    column_name = column.column_name,
+                    column_type = column.raw_data_type(),
+                    foreign_column_name = foreign_column.column_name,
+                    foreign_column_type = foreign_column.raw_data_type(),
+                )
             }
             ConstraintError::NotForeignKeyColumn {
                 table_name,

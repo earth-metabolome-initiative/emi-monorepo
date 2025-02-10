@@ -33,6 +33,8 @@ pub enum WebCodeGenError {
     ExcessiveNumberOfColumns(Box<Table>, usize),
     /// A table should have an update_at column.
     MissingUpdateAtColumn(Box<Table>),
+    /// A table should have an updated_by column.
+    MissingUpdatedByColumn(Box<Table>),
     /// A table has no primary key column(s).
     NoPrimaryKeyColumn(Box<Table>),
     /// The tables necessary for the roles mechanism are incomplete.
