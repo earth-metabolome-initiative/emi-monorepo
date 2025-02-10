@@ -37,6 +37,9 @@ pub trait Rank:
 				description: rank.description().to_string(),
 			})?;
         }
+
+        writer.flush()?;
+
         Ok(())
     }
 

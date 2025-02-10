@@ -12,6 +12,8 @@ pub enum TaxonomyError<TaxonId: TaxonIdentifier> {
     TaxonNotFound(TaxonId),
     /// Whether errors have occurred while reading a CSV/TSV file.
     CsvError(CsvError),
+    /// Whether an IO error has occurred.
+    IoError(IoError),
 }
 
 #[derive(Debug)]
@@ -119,6 +121,12 @@ impl<TE: TaxonEntry> From<IoError> for TaxonomyBuilderError<TE> {
 impl<TaxonId: TaxonIdentifier> From<CsvError> for TaxonomyError<TaxonId> {
     fn from(error: CsvError) -> Self {
         Self::CsvError(error)
+    }
+}
+
+impl<TaxonId: TaxonIdentifier> From<IoError> for TaxonomyError<TaxonId> {
+    fn from(error: IoError) -> Self {
+        Self::IoError(error)
     }
 }
 

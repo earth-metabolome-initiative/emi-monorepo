@@ -66,6 +66,8 @@ pub trait Taxonomy {
             writer.serialize(taxon_entry)?;
         }
 
+        writer.flush()?;
+
         Ok(())
     }
 
