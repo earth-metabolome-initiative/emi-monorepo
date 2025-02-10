@@ -524,7 +524,7 @@ impl Table {
             .into_iter()
             .map(|column| {
                 let column_attribute: Ident = column.sanitized_snake_case_ident()?;
-                let column_type = column.data_type(conn)?;
+                let column_type = column.rust_data_type(conn)?;
                 Ok(quote! {
                     pub #column_attribute: #column_type
                 })
@@ -533,7 +533,7 @@ impl Table {
 
         let mutability_impls = if self.has_session_user_generated_columns(conn)? {
             let insert_trait_impls = self.insert_trait_impls(conn)?;
-            let update_trait_impls = if self.has_primary_keys(conn)? {
+            let update_trait_impls = if self.has_updated_by_column(conn)? {
                 self.update_trait_impls(conn)?
             } else {
                 TokenStream::new()
@@ -753,6 +753,23 @@ impl Table {
             .any(|column| column.is_session_user_generated(conn)))
     }
 
+    /// Returns whether the table has an `updated_by` column.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection is invalid.
+    ///
+    pub fn has_updated_by_column(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(self
+            .columns(conn)?
+            .iter()
+            .any(|column| column.is_updated_by(conn)))
+    }
+
     /// Returns the Syn `TokenStream` for the implementation of the `InsertableVariant` trait.
     ///
     /// # Arguments
@@ -793,7 +810,7 @@ impl Table {
             .map(|column| {
                 let column_name: Ident =
                     Ident::new(&column.column_name, proc_macro2::Span::call_site());
-                let column_type = column.data_type(conn)?;
+                let column_type = column.rust_data_type(conn)?;
                 Ok(quote! {
                     pub #column_name: #column_type,
                 })
@@ -809,7 +826,7 @@ impl Table {
             .map(|column| {
                 let column_name: Ident =
                     Ident::new(&column.column_name, proc_macro2::Span::call_site());
-                let column_type = column.data_type(conn)?;
+                let column_type = column.rust_data_type(conn)?;
                 Ok(quote! {
                     pub #column_name: #column_type,
                 })
@@ -843,6 +860,14 @@ impl Table {
             }
         };
 
+        let updated_by_assignment: TokenStream = if self.has_updated_by_column(conn)? {
+            quote! {
+                updated_by: created_by
+            }
+        } else {
+            TokenStream::new()
+        };
+
         Ok(quote! {
             #new_structs_implementation
 
@@ -854,7 +879,7 @@ impl Table {
                     #session_insert_variant_name {
                         #(#into_session_insert_variant_map)*
                         created_by,
-                        updated_by: created_by
+                        #updated_by_assignment
                     }
                 }
             }
@@ -890,6 +915,10 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
+        if !self.has_updated_by_column(conn)? {
+            return Err(WebCodeGenError::MissingUpdatedByColumn(Box::new(self.clone())));
+        }
+
         let struct_name: Ident = Ident::new(&self.struct_name()?, proc_macro2::Span::call_site());
         let table_name = self.snake_case_ident()?;
         let columns = self.columns(conn)?;
@@ -925,7 +954,7 @@ impl Table {
             .map(|column| {
                 let column_name: Ident =
                     Ident::new(&column.column_name, proc_macro2::Span::call_site());
-                let column_type = column.data_type(conn)?;
+                let column_type = column.rust_data_type(conn)?;
                 Ok(
                     if column.is_updated_by(conn) || primary_key_names.contains(&column.column_name)
                     {
@@ -950,7 +979,7 @@ impl Table {
             .map(|column| {
                 let column_name: Ident =
                     Ident::new(&column.column_name, proc_macro2::Span::call_site());
-                let column_type = column.data_type(conn)?;
+                let column_type = column.rust_data_type(conn)?;
 
                 Ok(if primary_key_names.contains(&column.column_name) {
                     quote! {
