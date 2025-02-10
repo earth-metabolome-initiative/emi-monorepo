@@ -15,7 +15,7 @@ description = "Utilities for the Earth Metabolome Initiative"
 [dependencies]
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
-uuid = { version = "1.7", features = ["serde", "v4", "js"] }
+uuid.workspace = true
 validator = { version = "0.16", features = ["derive"] }
 log = "0.4"
 
