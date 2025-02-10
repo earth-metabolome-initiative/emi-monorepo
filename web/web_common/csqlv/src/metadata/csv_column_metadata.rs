@@ -33,7 +33,7 @@ impl CSVColumnMetadata {
             nullable: false,
             artificial: true,
             primary_key: true,
-            unique: true,
+            unique: false,
         })
     }
 
