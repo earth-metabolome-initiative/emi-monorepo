@@ -25,8 +25,13 @@ impl Table {
     }
 
     /// Returns whether the table is expected to have a roles table.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
     pub fn requires_roles_table(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(self.columns(conn)?.iter().any(|c| c.is_created_by(conn)))
+        Ok(self.columns(conn)?.iter().any(|c| c.is_updated_by(conn)))
     }
 
     /// Returns whether the table currently has a users_role table.
@@ -217,7 +222,10 @@ impl Table {
                 continue;
             }
             let string = table.get_roles_tables_sql(conn)?;
-            conn.batch_execute(&string)?;
+            if let Err(err) = conn.batch_execute(&string) {
+                println!("Failed to execute SQL: {}", string);
+                return Err(WebCodeGenError::DieselError(err));   
+            }
         }
         Ok(())
     }
