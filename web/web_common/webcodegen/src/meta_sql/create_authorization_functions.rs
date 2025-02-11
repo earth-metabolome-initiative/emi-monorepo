@@ -16,10 +16,12 @@
 //! Tables with multiple parent tables are at this time not supported and will raise an error.
 //!
 
+use diesel::connection::SimpleConnection;
 use diesel::PgConnection;
 
 use crate::{errors::WebCodeGenError, Column, Table};
 
+#[derive(Debug, Default, Clone)]
 /// Builder for the authorization functions.
 pub struct AuthorizationFunctionBuilder {
     childless_tables: Vec<Table>,
@@ -74,6 +76,36 @@ impl AuthorizationFunctionBuilder {
         Ok(parent_tables)
     }
 
+    /// Creates in the database for all tables the authorization functions and triggers.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The connection to the database.
+    /// * `table_catalog` - The catalog of the tables to create the functions for.
+    /// * `table_schema` - The schema of the tables to create the functions for.
+    ///
+    pub fn create_authorization_functions_and_triggers(
+        &self,
+        conn: &mut PgConnection,
+        table_catalog: &str,
+        table_schema: Option<&str>,
+    ) -> Result<(), WebCodeGenError> {
+        for table in Table::load_all_topologically(conn, table_catalog, table_schema)? {
+            if self.childless_tables.contains(&table) {
+                continue;
+            }
+            if !table.has_all_roles_mechanism_tables(conn) {
+                continue;
+            }
+            let function = self.canx_function_and_trigger(&table, conn)?;
+            if let Err(err) = conn.batch_execute(&function) {
+                println!("Failed running SQL: {}", function);
+                return Err(WebCodeGenError::DieselError(err));
+            }
+        }
+        Ok(())
+    }
+
     /// Returns the authorization function for the table.
     ///
     /// # Arguments
@@ -120,7 +152,9 @@ impl AuthorizationFunctionBuilder {
     END IF;
             "#,
             );
-            columns_to_retrieve.push(updated_by);
+            if !columns_to_retrieve.contains(&updated_by) {
+                columns_to_retrieve.push(updated_by);
+            }
             updator_check
         } else {
             "".to_owned()
@@ -135,7 +169,9 @@ impl AuthorizationFunctionBuilder {
     END IF;
             "#,
             );
-            columns_to_retrieve.push(created_by);
+            if !columns_to_retrieve.contains(&created_by) {
+                columns_to_retrieve.push(created_by);
+            }
             creator_check
         } else {
             "".to_owned()
@@ -144,7 +180,7 @@ impl AuthorizationFunctionBuilder {
         let roles_table_check = if table.requires_roles_table(conn)? {
             // We check that all of the tables necessary for the roles tables are present.
             if !table.has_all_roles_mechanism_tables(conn) {
-                return Err(WebCodeGenError::RolesMechanismIncomplete);
+                return Err(WebCodeGenError::RolesMechanismIncomplete(Box::new(table.clone())));
             }
 
             let users_where_statement = primary_keys
@@ -181,9 +217,9 @@ impl AuthorizationFunctionBuilder {
     END IF;
     IF EXISTS (
         SELECT 1 FROM {table_name}_teams_roles
-        JOIN teams_users ON teams_users.team_id = {table_name}_teams_roles.team_id
+        JOIN team_members ON team_members.team_id = {table_name}_teams_roles.team_id
         WHERE
-            teams_users.user_id = session_user_id AND
+            team_members.user_id = session_user_id AND
             {table_name}_teams_roles.role_id >= level_required AND
             {teams_where_statement}
     ) THEN
@@ -196,17 +232,20 @@ impl AuthorizationFunctionBuilder {
             "".to_owned()
         };
 
-        let parent_arguments = columns_to_retrieve
-            .iter()
-            .map(|column| {
-                format!(
-                    "this_{column_name} {data_type}",
-                    column_name = column.column_name,
-                    data_type = column.raw_data_type()
-                )
-            })
-            .collect::<Vec<String>>()
-            .join(";\n\t");
+        let parent_arguments = format!(
+            "{};",
+            columns_to_retrieve
+                .iter()
+                .map(|column| {
+                    format!(
+                        "this_{column_name} {data_type}",
+                        column_name = column.column_name,
+                        data_type = column.raw_data_type()
+                    )
+                })
+                .collect::<Vec<String>>()
+                .join(";\n")
+        );
 
         let parent_arguments_raw_names = columns_to_retrieve
             .iter()
@@ -279,7 +318,7 @@ impl AuthorizationFunctionBuilder {
 
         Ok(format!(
             r#"
-CREATE FUNCTION canx_{table_name}(
+CREATE OR REPLACE FUNCTION canx_{table_name}(
     session_user_id {session_user_id_type},
     {arguments},
     level_required SMALLINT
@@ -306,7 +345,7 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql PARALLEL SAFE;
-CREATE FUNCTION {trigger_function_name}()
+CREATE OR REPLACE FUNCTION {trigger_function_name}()
 RETURNS TRIGGER AS $$
 BEGIN
     IF TG_OP = 'UPDATE' THEN
@@ -333,14 +372,16 @@ LANGUAGE plpgsql PARALLEL SAFE;
     }
 
     fn trigger_function_name(&self, table: &Table) -> String {
-        format!("canx_{table_name}_trigger", table_name = table.table_name)
+        format!(
+            "can_insert_or_update_{table_name}_trigger",
+            table_name = table.table_name
+        )
     }
 
     /// Returns the trigger to call when the provided table receives an operation.
     fn update_trigger(&self, table: &Table) -> String {
         format!(
-            r#"
-            CREATE TRIGGER canx_{table_name}
+            r#"CREATE OR REPLACE TRIGGER can_insert_or_update_{table_name}
 BEFORE INSERT OR UPDATE ON {table_name}
 FOR EACH ROW
 EXECUTE FUNCTION {trigger_function_name}();

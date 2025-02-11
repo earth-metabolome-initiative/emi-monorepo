@@ -42,7 +42,7 @@ pub enum WebCodeGenError {
     /// A table has no primary key column(s).
     NoPrimaryKeyColumn(Box<Table>),
     /// The tables necessary for the roles mechanism are incomplete.
-    RolesMechanismIncomplete
+    RolesMechanismIncomplete(Box<Table>)
 }
 
 impl From<DieselError> for WebCodeGenError {

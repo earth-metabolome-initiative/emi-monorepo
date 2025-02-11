@@ -29,13 +29,14 @@
 //!
 
 use diesel::PgConnection;
+use diesel::connection::SimpleConnection;
 
 use crate::{errors::WebCodeGenError, Table};
 
 impl Table {
     /// Returns the SQL code to create the `updated_at_trigger` function.
-    pub fn updated_at_trigger_function() -> String {
-        format!(
+    pub fn updated_at_trigger_function() -> &'static str {
+        concat!(
             r#"CREATE OR REPLACE FUNCTION updated_at_trigger()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -132,7 +133,7 @@ $$ LANGUAGE plpgsql;"#
         }
 
         Ok(format!(
-            r#"CREATE TRIGGER {table_name}_updated_at_trigger
+            r#"CREATE OR REPLACE TRIGGER {table_name}_updated_at_trigger
 BEFORE UPDATE ON {table_name}
 FOR EACH ROW
 EXECUTE FUNCTION updated_at_trigger();"#,
@@ -157,14 +158,14 @@ EXECUTE FUNCTION updated_at_trigger();"#,
         conn: &mut PgConnection,
         table_catalog: &str,
         table_schema: Option<&str>,
-    ) -> Result<String, WebCodeGenError> {
-        let mut triggers = Self::updated_at_trigger_function();
+    ) -> Result<(), WebCodeGenError> {
+        conn.batch_execute(Self::updated_at_trigger_function())?;
         for table in Table::load_all(conn, table_catalog, table_schema)? {
             if table.has_updated_at_column(conn)? && !table.updated_at_trigger_exists(conn)? {
-                triggers.push_str(&table.updated_at_trigger(conn)?);
-                triggers.push('\n');
+                let trigger = table.updated_at_trigger(conn)?;
+                conn.batch_execute(&trigger)?;
             }
         }
-        Ok(triggers)
+        Ok(())
     }
 }

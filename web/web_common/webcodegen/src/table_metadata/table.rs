@@ -268,6 +268,10 @@ impl Table {
 
                 fn update(&self, conn: &mut C) -> impl std::future::Future<Output = Result<Self::Row, C::Error>> + Send;
             }
+
+            pub trait CanUpdate<C: Connection> {
+                fn update(&self, conn: &mut C) -> impl std::future::Future<Output = Result<bool, C::Error>> + Send;
+            }
         }
     }
 

@@ -1,4 +1,3 @@
-use diesel::connection::SimpleConnection;
 use diesel::pg::PgConnection;
 use diesel::Connection;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
@@ -103,13 +102,11 @@ async fn test_check_constraints(conn: &mut PgConnection) -> Result<(), WebCodeGe
 }
 
 async fn test_create_roles_tables(conn: &mut PgConnection) -> Result<(), WebCodeGenError> {
-    let spectra = Table::load(conn, "spectra", None, DATABASE_NAME).unwrap();
-    let spectra_roles_tables = spectra.create_roles_tables(conn)?;
-    let query_result = conn.batch_execute(&spectra_roles_tables);
+    let query_result = Table::create_roles_tables(conn, DATABASE_NAME, None);
 
     assert!(
         query_result.is_ok(),
-        "Failed to create roles tables for spectra using SQL: {spectra_roles_tables}, got error: {query_result:?}"
+        "Failed to create roles tables using SQL, got error: {query_result:?}"
     );
     Ok(())
 }
@@ -121,20 +118,19 @@ async fn test_user_table() {
     let mut conn = establish_connection_to_postgres();
     conn.run_pending_migrations(MIGRATIONS).unwrap();
 
-    test_code_generation_methods(&mut conn).await.unwrap();
     test_create_roles_tables(&mut conn).await.unwrap();
 
     // We attempt to create the update triggers for the tables
     // that have an `updated_at` column
-    let create_updated_at_triggers_sql =
-        Table::create_update_triggers(&mut conn, DATABASE_NAME, None).unwrap();
 
-    assert!(
-        !create_updated_at_triggers_sql.is_empty(),
-        "Expected non-empty query string"
-    );
+    Table::create_update_triggers(&mut conn, DATABASE_NAME, None).unwrap();
 
-    conn.batch_execute(&create_updated_at_triggers_sql).unwrap();
+    AuthorizationFunctionBuilder::default()
+        .add_childless_table(Table::load(&mut conn, "users", None, DATABASE_NAME).unwrap())
+        .create_authorization_functions_and_triggers(&mut conn, DATABASE_NAME, None)
+        .unwrap();
+
+    test_code_generation_methods(&mut conn).await.unwrap();
 
     // We try to load all elements of each type, so to ensure
     // that the structs are actually compatible with the schema

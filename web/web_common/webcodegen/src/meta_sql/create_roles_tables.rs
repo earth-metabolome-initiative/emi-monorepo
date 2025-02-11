@@ -2,10 +2,10 @@
 //!
 //! Editable tables are the ones characterized by `created_by` and `updated_by` columns.
 
-use diesel::PgConnection;
-
 use crate::errors::WebCodeGenError;
 use crate::Table;
+use diesel::connection::SimpleConnection;
+use diesel::PgConnection;
 
 impl Table {
     /// Returns whether all tables required for the roles mechanism are present.
@@ -15,7 +15,13 @@ impl Table {
             && Table::load(conn, "roles", Some(&self.table_schema), &self.table_catalog).is_ok()
             && Table::load(conn, "users", Some(&self.table_schema), &self.table_catalog).is_ok()
             && Table::load(conn, "teams", Some(&self.table_schema), &self.table_catalog).is_ok()
-            && Table::load(conn, "teams_users", Some(&self.table_schema), &self.table_catalog).is_ok()
+            && Table::load(
+                conn,
+                "team_members",
+                Some(&self.table_schema),
+                &self.table_catalog,
+            )
+            .is_ok()
     }
 
     /// Returns whether the table is expected to have a roles table.
@@ -56,7 +62,7 @@ impl Table {
         .is_ok()
     }
 
-    fn create_roles_table(
+    fn get_roles_table_sql(
         &self,
         reference_table: &Table,
         conn: &mut PgConnection,
@@ -152,7 +158,7 @@ impl Table {
     /// # Errors
     ///
     /// If an error occurs while creating the roles tables
-    pub fn create_roles_tables(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
+    pub fn get_roles_tables_sql(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
         if !self.requires_roles_table(conn)? {
             return Err(WebCodeGenError::IllegalRolesTable(format!(
                 "Table {} does not require a roles table",
@@ -181,7 +187,7 @@ impl Table {
         let mut create_tables = String::new();
         for reference_table in reference_tables {
             for role_table_type in &role_table_types {
-                create_tables.push_str(&self.create_roles_table(
+                create_tables.push_str(&self.get_roles_table_sql(
                     &reference_table,
                     conn,
                     role_table_type,
@@ -191,5 +197,28 @@ impl Table {
         }
 
         Ok(create_tables)
+    }
+
+    /// Creates all the roles tables following the topological order of the tables.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// * `table_catalog` - The catalog of the tables to create the functions for.
+    /// * `table_schema` - The schema of the tables to create the functions for.
+    ///
+    pub fn create_roles_tables(
+        conn: &mut PgConnection,
+        table_catalog: &str,
+        table_schema: Option<&str>,
+    ) -> Result<(), WebCodeGenError> {
+        for table in Table::load_all_topologically(conn, table_catalog, table_schema)? {
+            if !table.requires_roles_table(conn)? {
+                continue;
+            }
+            let string = table.get_roles_tables_sql(conn)?;
+            conn.batch_execute(&string)?;
+        }
+        Ok(())
     }
 }

@@ -14,6 +14,7 @@ quote = "1.0"
 proc-macro2 = "1.0"
 prettyplease = "0.2"
 snake-case-sanitizer = {path = "../snake-case-sanitizer"}
+sqlparser.workspace = true
 
 [dev-dependencies]
 diesel_migrations = "2.2.0"
