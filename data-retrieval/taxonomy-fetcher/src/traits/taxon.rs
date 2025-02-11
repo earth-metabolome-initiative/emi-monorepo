@@ -22,6 +22,9 @@ where
     }
 
     /// Returns the "ltree path" of the taxon.
+    /// As per https://www.postgresql.org/docs/current/ltree.html
+    /// A label is a sequence of alphanumeric characters, underscores, and hyphens. Valid alphanumeric character ranges are dependent on the database locale. For example, in C locale, the characters A-Za-z0-9_- are allowed. Labels must be no more than 1000 characters long.
+    /// TODO : We might want to add control mechanisms for these specifications here.
     fn ltree_path(&self) -> String {
         if let Some(parent) = self.parent() {
             // Here we recursively call the ltree_path function in order to return parents
