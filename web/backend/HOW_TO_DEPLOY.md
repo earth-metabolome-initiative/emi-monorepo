@@ -1,6 +1,7 @@
 # How to deploy
 
 ## Preliminary steps
+
 In order to deploy the application, you need to have the following installed on your machine:
 
 - [Docker](https://docs.docker.com/get-docker/)
@@ -8,6 +9,7 @@ In order to deploy the application, you need to have the following installed on 
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
 ### Setup for macOS
+
 If you are running on a macOS machine, after having installed [`brew`](https://brew.sh/), you can run the following commands to install the required software:
 
 ```bash
@@ -17,6 +19,7 @@ brew install git
 ```
 
 ### Setup for Ubuntu
+
 If you are running on an Ubuntu machine, you can run the following commands to install the required software:
 
 ```bash
@@ -27,6 +30,7 @@ sudo apt-get install git
 ```
 
 ## Cloning the repository
+
 Once you have installed the required software, you can clone the repository by running the following command:
 
 ```bash
@@ -34,11 +38,13 @@ git clone git@github.com:emikg/emikg.git
 ```
 
 ## Customizing the environemnt file
+
 In order to run the docker compose, you need to create a `.env` file in the root directory of the project. You can use the [`default_env`](https://github.com/emikg/emikg/blob/main/default_env) file as a template.
 
 Once you have fully customized the `.env` file, you can run the docker compose command to start the application.
 
 ### Setting up the remote backup server
+
 Within the `.env` file, you can also set up the remote backup server. In order to do so, you need to set the following variables:
 
 - `BACKUP_SERVER_USERNAME`: the username of the user on the remote server
@@ -52,6 +58,7 @@ The backup server needs to be a Linux server with `rsync` installed. The backup 
 ## Starting the docker services
 
 ### Starting the docker service on macOS
+
 If you are running on a macOS machine, you need to start the docker service by running the following command:
 
 ```bash
@@ -59,6 +66,7 @@ open --background -a Docker
 ```
 
 ### Starting the docker service on Ubuntu
+
 If you are running on an Ubuntu machine, you need to start the docker service by running the following command:
 
 ```bash
@@ -66,6 +74,7 @@ sudo systemctl start docker
 ```
 
 ## Running the docker compose
+
 To run the docker compose, you need to run the following command in the root directory of the project:
 
 ```bash
@@ -85,9 +94,11 @@ docker-compose --profile backup up -d --build -V
 ```
 
 ### Common errors encountered when running the docker compose
+
 In the following sections, we will describe some of the common errors that you might encounter when running the docker compose.
 
 #### MacOS error caused by not having started the docker desktop application
+
 If you are running on a macOS machine, you might encounter the following error:
 
 ```text
@@ -106,6 +117,7 @@ FileNotFoundError: [Errno 2] No such file or directory
 This error is caused by not having started the docker desktop application. Do start your docker desktop application and retry to run the docker compose after that.
 
 #### MacOS error caused by not having waited enough after having started the docker service
+
 If you are running on a macOS machine, you might encounter the following error:
 
 ```text
@@ -115,6 +127,7 @@ Error response from daemon: dial unix docker.raw.sock: connect: no such file or 
 This error is caused by not having started the docker desktop application. Note that it can take a minute, so even if you have just started the docker desktop application, you might still encounter this error. Do wait a minute and retry to run the docker compose after that.
 
 #### Linux error caused by not having started the docker service
+
 If you are running on an Linux machine, you might encounter the following error:
 
 ```text
@@ -128,6 +141,7 @@ sudo systemctl start docker
 ```
 
 #### Linux error caused by not being in the docker group
+
 If you are running on an Linux machine, you might encounter the following error:
 
 ```text
