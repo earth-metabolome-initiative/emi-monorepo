@@ -8,7 +8,10 @@ use std::env;
 use std::path::Path;
 use taxonomy_fetcher::impls::ncbi::{NCBIRank, NCBITaxonomy, NCBITaxonomyBuilder};
 use taxonomy_fetcher::{Rank, Taxonomy, TaxonomyBuilder};
-use webcodegen::{Codegen, CompatibleForeignTypeConstraint, CustomColumnConstraint};
+use webcodegen::{
+    AuthorizationFunctionBuilder, Codegen, CompatibleForeignTypeConstraint, CustomColumnConstraint,
+    Table,
+};
 
 const DATABASE_NAME: &str = "development.db";
 const DATABASE_PASSWORD: &str = "password";
@@ -92,6 +95,16 @@ pub async fn main() {
     for migration in migrations.ups().unwrap() {
         conn.batch_execute(&migration).unwrap();
     }
+
+    // Now that the preliminary database setup is done, we can execute the Meta-SQL
+    // which takes care of the roles tables and canx functions, which determine whether
+    // a user can insert or update entries in a given table.
+    Table::create_roles_tables(&mut conn, DATABASE_NAME, None).unwrap();
+    AuthorizationFunctionBuilder::default()
+        .add_childless_table(Table::load(&mut conn, "users", None, DATABASE_NAME).unwrap())
+        .create_authorization_functions_and_triggers(&mut conn, DATABASE_NAME, None)
+        .unwrap();
+    Table::create_update_triggers(&mut conn, DATABASE_NAME, None).unwrap();
 
     // We check that the database follows the expected constraints.
     CompatibleForeignTypeConstraint::default()
