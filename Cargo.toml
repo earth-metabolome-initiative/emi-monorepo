@@ -10,7 +10,6 @@ members = [
     "web/web_common/web_common_traits",
     "web/web_common/webcodegen",
     "web/web_common/csqlv", 
-    "web/data_migration/directus_migration",
     "web/web_common/snake-case-sanitizer", 
     "data-retrieval/taxonomy-fetcher",
     "data-retrieval/downloader", "web/core_structures", "utils/font_awesome", "utils/diesel_migrations_utils",
@@ -42,5 +41,6 @@ taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
 csqlv = { path = "web/web_common/csqlv" }
 font_awesome = {path = "utils/font_awesome"}
 testcontainers = {version="0.23.1"}
+web_common_traits = { path = "web/web_common/web_common_traits" }
 webcodegen = { path = "web/web_common/webcodegen", features = ["postgres_17"] }
 diesel_migrations_utils = { path = "utils/diesel_migrations_utils" }
