@@ -1,4 +1,3 @@
-pub mod automatic_pages;
 pub mod collect;
 pub mod home;
 pub mod login;

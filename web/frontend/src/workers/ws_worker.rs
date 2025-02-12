@@ -5,7 +5,6 @@ use crate::search_dispatch::SearchableTable;
 use futures::{SinkExt, StreamExt};
 use gloo::timers::callback::Timeout;
 use gloo_net::websocket::futures::WebSocket;
-use gluesql::prelude::*;
 use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
