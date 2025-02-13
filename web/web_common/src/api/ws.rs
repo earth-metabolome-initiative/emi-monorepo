@@ -1,4 +1,6 @@
 pub mod messages;
+pub mod operations;
+pub mod outcomes;
 use crate::combine_path;
 
 pub const ENDPOINT: &str = "/ws";

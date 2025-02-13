@@ -7,7 +7,7 @@ use serde::{de::DeserializeOwned, Serialize};
 use crate::prelude::Operation;
 
 /// Trait for operation errors.
-pub trait OperationError: Error + Serialize + DeserializeOwned {
+pub trait OperationError: Error + Serialize + DeserializeOwned + Clone {
 	/// The operation associated to this error.
     type Operation: Operation<Error = Self>;
 

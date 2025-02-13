@@ -2,9 +2,9 @@
 use std::fmt::Debug;
 
 use crate::api::ApiError;
-use crate::database::*;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
+use web_common_traits::prelude::OperationError;
+use web_common_traits::prelude::{AuthenticatedOperation, Outcome};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CloseReason {
@@ -24,21 +24,13 @@ impl CloseReason {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum FrontendMessage {
     Close(Option<CloseReason>),
-    Task(Uuid, Operation),
+    AuthenticatedOperation(Box<dyn AuthenticatedOperation>),
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum BackendMessage {
     Close(Option<CloseReason>),
-    RefreshUser(NestedUser),
-    Notification(NotificationMessage),
-    SearchTable(uuid::Uuid, Vec<u8>),
-    GetTable(uuid::Uuid, Option<String>, Vec<u8>),
-    Completed(uuid::Uuid, Option<Vec<u8>>),
-    CanView(uuid::Uuid, bool),
-    CanUpdate(uuid::Uuid, bool),
-    CanDelete(uuid::Uuid, bool),
-    Error(uuid::Uuid, ApiError),
+    Outcome(Result<Box<dyn Outcome>, Box<dyn OperationError>>),
 }
 
 #[cfg(feature = "backend")]
@@ -46,7 +38,6 @@ impl actix::Message for BackendMessage {
     type Result = ();
 }
 
-#[cfg(feature = "backend")]
 impl From<BackendMessage> for bytes::Bytes {
     fn from(msg: BackendMessage) -> Self {
         bincode::serialize(&msg).unwrap().into()

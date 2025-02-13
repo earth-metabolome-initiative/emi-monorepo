@@ -6,17 +6,18 @@ members = [
     "web/backend",
     "web/frontend",
     "web/web_common",
-    "web/web_common/web_common_derive",
     "web/web_common/web_common_traits",
     "web/web_common/webcodegen",
     "web/web_common/csqlv", 
     "web/web_common/snake-case-sanitizer", 
     "data-retrieval/taxonomy-fetcher",
-    "data-retrieval/downloader", "web/core_structures", "utils/font_awesome", "utils/diesel_migrations_utils",
+    "data-retrieval/downloader",
+    "web/core_structures",
+    "utils/font_awesome",
+    "utils/diesel_migrations_utils",
 ]
 
 [workspace.dependencies]
-rayon = "1.10.0"
 url = "2.5.4"
 indicatif = "0.17.9"
 reqwest = {version="0.12.12", features=["stream"]}
