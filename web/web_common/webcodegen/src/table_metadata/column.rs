@@ -343,36 +343,31 @@ impl Column {
 
     /// Returns whether the column contains the update user and is defined by the SESSION user
     pub fn is_updated_by(&self, conn: &mut PgConnection) -> bool {
-        self.column_name == "updated_by" && self.is_session_user_generated(conn)
+        self.column_name == "updated_by" && self.foreign_table(conn).map_or(false, |table_and_column| {
+            table_and_column.map_or(false, |(table, column)| table.table_name == "users" && column.column_name == "id")
+        })
     }
 
     /// Returns whether the column contains the creation user and is defined by the SESSION user
     pub fn is_created_by(&self, conn: &mut PgConnection) -> bool {
-        self.column_name == "created_by" && self.is_session_user_generated(conn)
+        self.column_name == "created_by" && self.foreign_table(conn).map_or(false, |table_and_column| {
+            table_and_column.map_or(false, |(table, column)| table.table_name == "users" && column.column_name == "id")
+        })
     }
 
-    /// Returns whether the a timestamp which has to be updated at each update operation
+    /// Returns whether the column is a timestamp which has to be updated at each update operation
     pub fn is_updated_at(&self) -> bool {
         self.column_name == "updated_at" && self.data_type == "timestamp without time zone"
     }
 
+    /// Returns whether the column is a timestamp which has to be set at the insert operation
+    pub fn is_created_at(&self) -> bool {
+        self.column_name == "created_at" && self.data_type == "timestamp without time zone"
+    }
+
     /// Returns whether the column is a session user generated column
     pub fn is_session_user_generated(&self, conn: &mut PgConnection) -> bool {
-        // A column is associated to the user section if:
-        // - it is a foreign key of the users table
-        // - it is named `updated_by` or `created_by`
-
-        if self.column_name != "updated_by" && self.column_name != "created_by" {
-            return false;
-        }
-
-        if let Ok(Some((table, _))) = self.foreign_table(conn) {
-            if table.table_name == "users" {
-                return true;
-            }
-        }
-
-        false
+        self.is_updated_by(conn) || self.is_created_by(conn)
     }
 
     /// Load all columns from the database

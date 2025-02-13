@@ -27,6 +27,7 @@ ipnetwork = "0.20.0"
 diesel_full_text_search = "2.2.0"
 diesel-async = {version="0.5.1", features = ["postgres", "pool"]}
 uuid.workspace = true
+web_common_traits = {workspace = true, features = ["backend"]}
 macaddr = "1.0.1"
 postgis_diesel.workspace = true
 

@@ -20,6 +20,7 @@ mod sql_functions;
 mod table_metadata;
 mod codegen;
 mod postgis;
+mod syngen;
 
 pub use postgis::{GeometryColumn, GeographyColumn};
 pub use table_metadata::{

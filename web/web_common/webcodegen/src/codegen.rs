@@ -150,8 +150,6 @@ impl<'a> Codegen<'a> {
             .map(|pg_type| pg_type.to_syn(conn))
             .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
-        let traits = Table::traits();
-
         // We define for each group of tables by column size the corresponding diesel macro
         // for allow_tables_to_appear_in_same_query, with negative flags to avoid multiple such
         // macros active at the same time.
@@ -215,8 +213,6 @@ impl<'a> Codegen<'a> {
             #above_32_columns
             #above_16_columns
             #below_16_columns
-
-            #traits
 
             #( #table_structs )*
         };
