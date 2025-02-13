@@ -6,3 +6,9 @@ edition = "2021"
 [dependencies]
 uuid.workspace = true
 serde.workspace = true
+diesel = {workspace = true, optional = true}
+diesel-async =  { workspace = true, optional = true }
+
+[features]
+frontend = []
+backend = ["dep:diesel-async", "dep:diesel"]
