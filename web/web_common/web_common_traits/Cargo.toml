@@ -8,7 +8,11 @@ uuid.workspace = true
 serde.workspace = true
 diesel = {workspace = true, optional = true}
 diesel-async =  { workspace = true, optional = true }
+common-traits.workspace = true
 
 [features]
 frontend = []
 backend = ["dep:diesel-async", "dep:diesel"]
+
+[lints]
+workspace = true

@@ -1,13 +1,11 @@
 //! Trait characterizing an error that may occur during the execution of an operation.
 
 use core::error::Error;
-
-use serde::{de::DeserializeOwned, Serialize};
-
+use common_traits::basic::Basic;
 use crate::prelude::Operation;
 
 /// Trait for operation errors.
-pub trait OperationError: Error + Serialize + DeserializeOwned + Clone {
+pub trait OperationError: Error + Basic {
 	/// The operation associated to this error.
     type Operation: Operation<Error = Self>;
 

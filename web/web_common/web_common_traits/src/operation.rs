@@ -1,11 +1,10 @@
 //! Submodule providing the Operation trait.
 
-use serde::{de::DeserializeOwned, Serialize};
-
+use common_traits::prelude::Basic;
 use crate::{operation_error::OperationError, outcome::Outcome};
 
 /// Trait for operations.
-pub trait Operation: Serialize + DeserializeOwned {
+pub trait Operation: Basic {
     /// The outcome type associated with the operation.
     type Outcome: Outcome<Operation = Self>;
     /// The error type associated with the operation.
