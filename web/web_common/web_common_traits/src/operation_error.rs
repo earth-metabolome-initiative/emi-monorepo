@@ -4,6 +4,7 @@ use core::error::Error;
 use common_traits::basic::Basic;
 use crate::prelude::Operation;
 
+#[enum_dispatch::enum_dispatch]
 /// Trait for operation errors.
 pub trait OperationError: Error + Basic {
 	/// The operation associated to this error.

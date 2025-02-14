@@ -18,6 +18,7 @@ serde_json.workspace = true
 uuid.workspace = true
 bincode.workspace = true
 bytes.workspace = true
+enum_dispatch.workspace = true
 
 validator = { version = "0.16", features = ["derive"] }
 log = "0.4"
@@ -30,7 +31,7 @@ web_common_traits.workspace = true
 # From trait for types defined in third party crates respectively in the
 # backend and frontend. The features are called `backend` and `frontend`.
 
-actix-web-actors = { version = "4.3.0", optional = true }
+actix-ws.workspace = true
 actix-web = { version = "4.0", optional = true }
 diesel = { version = "2.2.1", features = ["postgres", "r2d2", "chrono", "uuid", "extras"], optional = true }
 
@@ -87,7 +88,7 @@ features = [
 [features]
 # The `backend` feature is used to enable the implementation of the From trait
 # for types defined in third party crates in the backend.
-backend = [ "actix-web", "actix-web-actors", "actix", "diesel", "r2d2" ]
+backend = [ "actix-web", "actix", "diesel", "r2d2", "web_common_traits/backend" ]
 
 # The `frontend` feature is used to enable the implementation of the From trait
 # for types defined in third party crates in the frontend.

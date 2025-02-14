@@ -9,6 +9,7 @@ serde.workspace = true
 diesel = {workspace = true, optional = true}
 diesel-async =  { workspace = true, optional = true }
 common-traits.workspace = true
+enum_dispatch.workspace = true
 
 [features]
 frontend = []

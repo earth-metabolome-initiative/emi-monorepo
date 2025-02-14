@@ -1,36 +1,42 @@
 //! Module providing the websocket messages used in the application.
 use std::fmt::Debug;
 
-use crate::api::ApiError;
 use common_traits::prelude::*;
-use web_common_traits::prelude::OperationError;
-use web_common_traits::prelude::{AuthenticatedOperation, Outcome};
+
+use super::{operations::OperationMessage, outcomes::OutcomeMessage};
 
 #[basic]
+/// Structure representing the reason for closing a websocket connection.
 pub struct CloseReason {
-    code: u16,
-    reason: Option<String>,
+    pub code: u16,
+    pub description: Option<String>,
 }
 
-impl CloseReason {
-    pub fn new<S: ToString>(code: u16, reason: Option<S>) -> Self {
+impl From<actix_ws::CloseReason> for CloseReason {
+    fn from(reason: actix_ws::CloseReason) -> Self {
         Self {
-            code,
-            reason: reason.map(|s| s.to_string()),
+            code: reason.code.into(),
+            description: reason.description,
         }
     }
 }
 
 #[basic]
+/// Enumeration for websocket messages sent from the frontend to the backend.
 pub enum FrontendMessage {
+    /// Close the websocket connection.
     Close(Option<CloseReason>),
-    AuthenticatedOperation(String),
+    /// An operation to be executed by the backend.
+    Operation(OperationMessage),
 }
 
 #[basic]
+/// Enumeration for websocket messages sent from the backend to the frontend.
 pub enum BackendMessage {
+    /// Close the websocket connection.
     Close(Option<CloseReason>),
-    Outcome(String),
+    /// Outcome of an operation executed by the backend.
+    Outcome(OutcomeMessage),
 }
 
 #[cfg(feature = "backend")]
@@ -44,36 +50,28 @@ impl From<BackendMessage> for bytes::Bytes {
     }
 }
 
-#[cfg(feature = "backend")]
-impl From<actix_web_actors::ws::Message> for FrontendMessage {
-    fn from(actix_message: actix_web_actors::ws::Message) -> Self {
+impl From<actix_ws::Message> for FrontendMessage {
+    fn from(actix_message: actix_ws::Message) -> Self {
         match actix_message {
-            actix_web_actors::ws::Message::Text(text) => {
+            actix_ws::Message::Text(text) => {
                 log::error!("Unexpected text message from backend: {:?}", text);
                 unreachable!("Unexpected text message from backend");
             }
-            actix_web_actors::ws::Message::Binary(bin) => bincode::deserialize(&bin).unwrap(),
-            actix_web_actors::ws::Message::Ping(_) => {
+            actix_ws::Message::Binary(bin) => bincode::deserialize(&bin).unwrap(),
+            actix_ws::Message::Ping(_) => {
                 log::error!("Unexpected ping message from backend");
                 unreachable!("Unexpected ping message from backend");
             }
-            actix_web_actors::ws::Message::Pong(_) => {
+            actix_ws::Message::Pong(_) => {
                 log::error!("Unexpected pong message from backend");
                 unreachable!("Unexpected pong message from backend");
             }
-            actix_web_actors::ws::Message::Close(reason) => {
-                FrontendMessage::Close(reason.map(|r: actix_web_actors::ws::CloseReason| {
-                    CloseReason {
-                        code: r.code.into(),
-                        reason: r.description,
-                    }
-                }))
-            }
-            actix_web_actors::ws::Message::Continuation(_) => {
+            actix_ws::Message::Close(reason) => FrontendMessage::Close(reason.map(Into::into)),
+            actix_ws::Message::Continuation(_) => {
                 log::error!("Unexpected continuation message from backend");
                 unreachable!("Unexpected continuation message from backend");
             }
-            actix_web_actors::ws::Message::Nop => {
+            actix_ws::Message::Nop => {
                 log::error!("Unexpected nop message from backend");
                 unreachable!("Unexpected nop message from backend");
             }
@@ -82,17 +80,16 @@ impl From<actix_web_actors::ws::Message> for FrontendMessage {
 }
 
 #[cfg(feature = "frontend")]
-impl TryFrom<gloo_net::websocket::Message> for BackendMessage {
-    type Error = ApiError;
+impl From<gloo_net::websocket::Message> for BackendMessage {
 
-    fn try_from(value: gloo_net::websocket::Message) -> Result<Self, ApiError> {
+    fn from(value: gloo_net::websocket::Message) -> Self {
         match value {
             gloo_net::websocket::Message::Text(text) => {
                 log::error!("Unexpected text message from frontend: {:?}", text);
                 unreachable!("Unexpected text message from frontend");
             }
             gloo_net::websocket::Message::Bytes(bin) => {
-                bincode::deserialize(&bin).map_err(ApiError::from)
+                bincode::deserialize(&bin).unwrap()
             }
         }
     }

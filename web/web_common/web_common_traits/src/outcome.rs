@@ -6,6 +6,7 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use crate::prelude::Operation;
 
+#[enum_dispatch::enum_dispatch]
 /// Trait for outcomes.
 pub trait Outcome: Serialize + DeserializeOwned + Send + Sync + Debug {
     /// The operation type associated with the outcome.

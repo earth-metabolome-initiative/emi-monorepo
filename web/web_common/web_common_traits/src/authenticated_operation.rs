@@ -2,6 +2,7 @@
 
 use crate::prelude::Operation;
 
+#[enum_dispatch::enum_dispatch]
 /// Trait for authenticated operations.
 pub trait AuthenticatedOperation: Operation {
     /// The session type associated with the operation.

@@ -1,16 +1,12 @@
 //! Submodule providing the OperationMessage enum and the Operation trait.
 
+use common_traits::prelude::basic;
 
-pub trait Operation {
-	type Outcome;
+use super::NoOp;
 
-	/// Returns the identifier of the operation.
-	fn id(&self) -> uuid::Uuid;
-}
-
+#[basic]
 /// Enumeration of all possible operations.
-#[derive(Debug)]
 pub enum OperationMessage {
-	/// 
-	Insert
+    /// No-op operation.
+    NoOp(NoOp),
 }

@@ -1,17 +1,12 @@
 //! Submodule providing the OutcomeMessage enum and the Outcome trait.
 
-
-pub trait Outcome {
-	
-	type Operation;
-
-	/// Returns the identifier of the operation.
-	fn id(&self) -> uuid::Uuid;
-}
+use crate::api::ws::operations::NoOp;
+use common_traits::prelude::basic;
+use web_common_traits::prelude::Operation;
 
 /// Enumeration of all possible operations.
-#[derive(Debug)]
+#[basic]
 pub enum OutcomeMessage {
-	/// 
-	Insert
+    /// No-op operation.
+    NoOp(Result<<NoOp as Operation>::Outcome, <NoOp as Operation>::Error>),
 }
