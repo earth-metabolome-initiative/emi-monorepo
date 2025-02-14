@@ -3,7 +3,6 @@
 use super::taxonomy::NCBITaxonomy;
 use crate::traits::TaxonomyWriter;
 
-
 #[derive(Default)]
 /// Implementation of the taxonomy trait for the NCBI.
 pub struct NCBITaxonomyWriter {
@@ -11,8 +10,9 @@ pub struct NCBITaxonomyWriter {
     separator: Option<u8>,
     /// Wether the Taxonomy should be written as LTREE or not.
     ltree: bool,
+    /// Wether the output file should be compressed or not.
+    compressed: bool,
 }
-
 
 impl TaxonomyWriter for NCBITaxonomyWriter {
     type Taxonomy = NCBITaxonomy;
@@ -31,6 +31,13 @@ impl TaxonomyWriter for NCBITaxonomyWriter {
         }
     }
 
+    fn compressed(self) -> Self {
+        Self {
+            compressed: true,
+            ..self
+        }
+    }
+
     fn get_sep(&self) -> u8 {
         self.separator.unwrap_or(b'\t')
     }
@@ -39,4 +46,7 @@ impl TaxonomyWriter for NCBITaxonomyWriter {
         self.ltree
     }
 
+    fn is_compressed(&self) -> bool {
+        self.compressed
+    }
 }
