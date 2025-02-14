@@ -32,6 +32,8 @@ flate2 = "1.0.35"
 tar = "0.4.43"
 infer = "0.16.0"
 csv = "1.3.1"
+bytes = "1.10.0"
+bincode = "1.3.3"
 sqlparser = {git = "https://github.com/LucaCappelletti94/sqlparser-rs.git", branch = "gin_trgm_ops"}
 diesel = { version = "2.2.5", features = ["serde_json", "postgres", "r2d2", "chrono", "uuid", "extras"] } # uuidv07
 diesel-async = {version="0.5.1", features = ["postgres", "pool"]}

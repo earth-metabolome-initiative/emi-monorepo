@@ -9,9 +9,9 @@ itertools = "0.13.0"
 pluralizer = "0.4.0"
 regex = "1.11.1"
 serde.workspace = true
-syn = "2.0"
-quote = "1.0"
-proc-macro2 = "1.0"
+syn.workspace = true
+quote.workspace = true
+proc-macro2.workspace = true
 prettyplease = "0.2"
 snake-case-sanitizer = {path = "../snake-case-sanitizer"}
 sqlparser.workspace = true

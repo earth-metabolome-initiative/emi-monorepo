@@ -2,11 +2,11 @@
 use std::fmt::Debug;
 
 use crate::api::ApiError;
-use serde::{Deserialize, Serialize};
+use common_traits::prelude::*;
 use web_common_traits::prelude::OperationError;
 use web_common_traits::prelude::{AuthenticatedOperation, Outcome};
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[basic]
 pub struct CloseReason {
     code: u16,
     reason: Option<String>,
@@ -21,16 +21,16 @@ impl CloseReason {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[basic]
 pub enum FrontendMessage {
     Close(Option<CloseReason>),
-    AuthenticatedOperation(Box<dyn AuthenticatedOperation>),
+    AuthenticatedOperation(String),
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[basic]
 pub enum BackendMessage {
     Close(Option<CloseReason>),
-    Outcome(Result<Box<dyn Outcome>, Box<dyn OperationError>>),
+    Outcome(String),
 }
 
 #[cfg(feature = "backend")]
