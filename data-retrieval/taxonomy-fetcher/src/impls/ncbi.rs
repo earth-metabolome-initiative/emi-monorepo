@@ -6,6 +6,7 @@ pub mod taxon_entry;
 pub mod taxon_entry_builder;
 pub mod taxonomy;
 pub mod taxonomy_builder;
+pub mod taxonomy_writer;
 pub mod version;
 
 pub use taxon::NCBITaxon;
