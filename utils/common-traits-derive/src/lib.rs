@@ -9,7 +9,7 @@ use syn::{parse_macro_input, Generics, ImplGenerics, Item, TypeGenerics};
 #[proc_macro_attribute]
 /// Derive the `Basic` trait for a struct or enum.
 pub fn basic(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    let mut input = parse_macro_input!(item as Item);
+    let input = parse_macro_input!(item as Item);
 
     let (name, mut generics) = match input.clone() {
         Item::Struct(s) => (s.ident, s.generics),

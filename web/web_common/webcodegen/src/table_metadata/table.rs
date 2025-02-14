@@ -145,7 +145,7 @@ impl Table {
             .include_defaults()
             .remove_leading_underscores()
             .remove_trailing_underscores();
-        Ok(sanitizer.to_camel_case(&self.table_name)?)
+        Ok(sanitizer.to_camel_case(&self.singular_table_name())?)
     }
 
     /// Returns the sanitized snake case name of the table.
@@ -214,8 +214,17 @@ impl Table {
     #[must_use]
     /// Returns the singular name of the table.
     pub fn singular_table_name(&self) -> String {
-        // TODO: make singular
-        self.table_name.clone()
+        // We split the table name by underscores and remove the last element.
+        let mut parts = self
+            .table_name
+            .split('_')
+            .map(|part| part.to_string())
+            .collect::<Vec<String>>();
+        let last_element = parts.pop().unwrap();
+        // We convert to singular form the last element and join the parts back together.
+        let singular_last_element = pluralizer::pluralize(last_element.as_str(), 1, false);
+        parts.push(singular_last_element);
+        parts.join("_")
     }
 
     /// Returns wether a table require authorizations to be viewed
@@ -393,7 +402,7 @@ impl Table {
             .iter()
             .any(|column| column.is_created_by(conn)))
     }
-    
+
     /// Returns whether the table has an `updated_by` column.
     ///
     /// # Arguments

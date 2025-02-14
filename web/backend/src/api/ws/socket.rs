@@ -9,7 +9,7 @@ use actix::SpawnHandle;
 use actix::WrapFuture;
 use actix::{Actor, StreamHandler};
 use actix_web::web::Bytes;
-use actix_web_actors::ws;
+use actix_ws::ws;
 use sqlx::postgres::PgListener;
 use sqlx::{Pool as SQLxPool, Postgres};
 use web_common::api::oauth::jwt_cookies::AccessToken;

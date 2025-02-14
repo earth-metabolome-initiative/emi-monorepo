@@ -4,12 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-diesel.workspace = true
-diesel-async.workspace = true
+diesel = {workspace = true, optional = true}
+diesel-async = {workspace = true, optional = true}
+postgis_diesel = {workspace = true, no-default-features = true}
 uuid.workspace = true
 chrono.workspace = true
-serde.workspace = true
-postgis_diesel.workspace = true
+serde = {workspace = true, optional = true}
 
 [build-dependencies]
 taxonomy-fetcher.workspace = true
@@ -22,6 +22,8 @@ webcodegen.workspace = true
 diesel_migrations_utils.workspace = true
 
 [features]
-default = ["diesel", "serde"]
-serde = []
-diesel = []
+default = ["serde"]
+serde = ["postgis_diesel/serde", "dep:serde"]
+diesel = ["dep:diesel-async", "dep:diesel", "postgis_diesel/diesel"]
+backend = ["diesel"]
+frontend = []

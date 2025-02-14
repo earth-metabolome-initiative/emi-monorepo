@@ -1,7 +1,3 @@
-use crate::search::search_all;
-
-use super::database_type::*;
-use crate::search_dispatch::SearchableTable;
 use futures::{SinkExt, StreamExt};
 use gloo::timers::callback::Timeout;
 use gloo_net::websocket::futures::WebSocket;
@@ -15,7 +11,6 @@ use web_common::api::ws::messages::BackendMessage;
 use web_common::api::ws::messages::CloseReason;
 use web_common::api::ws::messages::FrontendMessage;
 use web_common::api::ApiError;
-use web_common::database::*;
 use yew::platform::spawn_local;
 use yew_agent::worker::HandlerId;
 use yew_agent::worker::Worker;

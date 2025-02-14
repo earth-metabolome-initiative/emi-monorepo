@@ -16,7 +16,7 @@ use webcodegen::{
 const DATABASE_NAME: &str = "development.db";
 const DATABASE_PASSWORD: &str = "password";
 const DATABASE_USER: &str = "user";
-const DATABASE_PORT: u16 = 35432;
+const DATABASE_PORT: u16 = 15032;
 
 fn establish_connection_to_postgres() -> PgConnection {
     let database_url = format!(

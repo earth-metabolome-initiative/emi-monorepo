@@ -18,7 +18,7 @@ diesel.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 uuid.workspace = true
-postgis_diesel.workspace = true
+postgis_diesel = { workspace = true, features = ["serde", "diesel"] }
 
 sqlx = { version = "0.7.3", features = ["runtime-async-std-native-tls", "postgres", "chrono", "uuid"] }
 openssl = { version = "0.10" }
@@ -32,6 +32,7 @@ actix-service = "2.0.2"
 actix-http = "3.6.0"
 actix-web-actors = "4.3.0"
 actix-files = "0.6.5"
+actix-ws.workspace = true
 log = "0.4"
 env_logger = "0.9"
 futures = "0.3.8"

@@ -4,8 +4,6 @@ mod cookies;
 mod pages;
 mod router;
 use router::AppRoute;
-mod search;
-mod search_dispatch;
 mod stores;
 pub mod traits;
 mod utils;

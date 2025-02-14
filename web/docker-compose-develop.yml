@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ${POSTGRES_DATABASE_DIRECTORY}:/var/lib/postgresql/data
+      # - ${POSTGRES_DATABASE_DIRECTORY}:/var/lib/postgresql/data
       - ./core_structures:/app
     ports:
       - "${PGPORT}:5432"
@@ -35,8 +35,8 @@ services:
 
   redis:
     image: redis:latest
-    volumes:
-      - ${REDIS_DATABASE_DIRECTORY}:/data
+    # volumes:
+    #   - ${REDIS_DATABASE_DIRECTORY}:/data
     command: --port ${REDIS_PORT}
     networks:
       - develop_backend

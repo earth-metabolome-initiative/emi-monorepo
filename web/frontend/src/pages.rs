@@ -4,7 +4,6 @@ pub mod login;
 pub mod not_found;
 pub mod observe;
 pub mod project_selection;
-pub use automatic_pages::*;
 // pub mod server_error;
 
 pub use collect::Collect;

@@ -4,7 +4,6 @@
 use crate::components::forms::automatic_forms::*;
 use crate::components::BasicList;
 use crate::pages::*;
-use web_common::database::*;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
