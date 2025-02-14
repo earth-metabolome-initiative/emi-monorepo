@@ -1,0 +1,8 @@
+[toolchain]
+channel = "stable"
+
+[profile.dev]
+rustflags = ["-Dmissing-docs", "-Dunsafe-code", "-Dunused-macro-rules", "-Dunconditional-recursion", "-Dunreachable-patterns", "-Dunused-import-braces", "-Wclippy::all", "-Wclippy::pedantic"]
+
+[profile.release]
+rustflags = ["-Dmissing-docs", "-Dunsafe-code", "-Dunused-macro-rules", "-Dunconditional-recursion", "-Dunreachable-patterns", "-Dunused-import-braces", "-Wclippy::all", "-Wclippy::pedantic"]
