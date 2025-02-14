@@ -41,3 +41,5 @@ font_awesome = {path = "utils/font_awesome"}
 testcontainers = {version="0.23.1"}
 webcodegen = { path = "web/web_common/webcodegen", features = ["postgres_17"] }
 diesel_migrations_utils = { path = "utils/diesel_migrations_utils" }
+log = "0.4"
+env_logger = "0.9"

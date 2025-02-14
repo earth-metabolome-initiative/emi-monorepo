@@ -292,12 +292,14 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
             .show_loading_bar()
             .execute()
             .await?;
-        
+
         // We read the taxonomy file.
         let mut csv_reader = ReaderBuilder::new()
             .delimiter(b'\t')
             .has_headers(true)
-            .from_reader(BufReader::new(std::fs::File::open(version.taxonomy_file())?));
+            .from_reader(BufReader::new(std::fs::File::open(
+                version.taxonomy_file(),
+            )?));
 
         // We iterate over the records.
         for record in csv_reader.deserialize() {

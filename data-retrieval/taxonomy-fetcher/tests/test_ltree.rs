@@ -6,8 +6,8 @@ use strum::IntoEnumIterator;
 use taxonomy_fetcher::impls::ncbi::NCBITaxonomyBuilder;
 use taxonomy_fetcher::impls::ncbi::NCBIVersion;
 use taxonomy_fetcher::Taxon;
-use taxonomy_fetcher::TaxonomyBuilder;
 use taxonomy_fetcher::Taxonomy;
+use taxonomy_fetcher::TaxonomyBuilder;
 
 #[tokio::test]
 async fn test_ltree_path() {
@@ -20,6 +20,4 @@ async fn test_ltree_path() {
     let taxon = taxonomy.taxon_by_id(&2).unwrap();
 
     assert_eq!("root.cellular organisms.Bacteria", taxon.ltree_path());
-
 }
-

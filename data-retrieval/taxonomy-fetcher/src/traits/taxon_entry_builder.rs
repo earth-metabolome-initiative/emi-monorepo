@@ -70,8 +70,5 @@ pub trait TaxonEntryBuilder: Sized {
         taxon_builder: &TB,
     ) -> Result<Self::TaxonEntry, crate::errors::TaxonEntryBuilderError<Self::TaxonEntry>>
     where
-        TB: super::TaxonomyBuilder<
-            TaxonEntry = Self::TaxonEntry,
-            TaxonEntryBuilder = Self
-        >;
+        TB: super::TaxonomyBuilder<TaxonEntry = Self::TaxonEntry, TaxonEntryBuilder = Self>;
 }

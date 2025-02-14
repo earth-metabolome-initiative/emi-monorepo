@@ -28,9 +28,7 @@ where
     fn ltree_path(&self) -> String {
         if let Some(parent) = self.parent() {
             // Here we recursively call the ltree_path function in order to return parents
-            format!(
-                "{}.{}", parent.ltree_path(), self.name() 
-            )
+            format!("{}.{}", parent.ltree_path(), self.name())
         } else {
             // this is the base case. We have no parents.
             self.name().to_owned()

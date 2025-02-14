@@ -228,7 +228,7 @@ impl TaxonomyBuilder for NCBITaxonomyBuilder {
         let names_reader = SeparatorFixedReader::new(names_reader, "\t", "\t|\t");
         let names_reader = SeparatorFixedReader::new(names_reader, "\n", "\t|\n");
 
-        let names_reader = SeparatorFixedReader::new(names_reader, "\'","\"");
+        let names_reader = SeparatorFixedReader::new(names_reader, "\'", "\"");
 
         // We read the taxonomy file.
         let mut names_csv_reader = ReaderBuilder::new()
@@ -250,7 +250,6 @@ impl TaxonomyBuilder for NCBITaxonomyBuilder {
             "\t|\t",
         );
         let nodes_reader = SeparatorFixedReader::new(nodes_reader, "\n", "\t|\n");
-
 
         // We read the taxonomy file.
         let mut nodes_csv_reader = ReaderBuilder::new()

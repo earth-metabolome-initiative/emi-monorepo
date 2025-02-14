@@ -38,7 +38,7 @@ enum TaxonomicalStatus {
     Accepted,
     ProvisionallyAccepted,
     AmbiguosSynonym,
-    Misapplied
+    Misapplied,
 }
 
 impl FromStr for TaxonomicalStatus {
@@ -173,7 +173,9 @@ impl TaxonomyBuilder for CatalogOfLifeTaxonomyBuilder {
             .delimiter(b'\t')
             .flexible(true)
             .has_headers(true)
-            .from_reader(BufReader::new(std::fs::File::open(version.taxonomy_file())?));
+            .from_reader(BufReader::new(std::fs::File::open(
+                version.taxonomy_file(),
+            )?));
 
         // We iterate over the records.
         for record in csv_reader.deserialize() {

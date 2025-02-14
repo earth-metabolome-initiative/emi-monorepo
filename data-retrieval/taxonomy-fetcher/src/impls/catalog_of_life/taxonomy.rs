@@ -3,8 +3,7 @@
 use crate::traits::Taxonomy;
 
 use super::{
-    taxon::CatalogOfLifeTaxon, taxon_entry::CatalogOfLifeTaxonEntry,
-    version::CatalogOfLifeVersion,
+    taxon::CatalogOfLifeTaxon, taxon_entry::CatalogOfLifeTaxonEntry, version::CatalogOfLifeVersion,
 };
 
 #[derive(Debug)]

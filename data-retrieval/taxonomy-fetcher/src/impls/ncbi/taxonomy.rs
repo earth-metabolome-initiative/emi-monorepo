@@ -2,10 +2,7 @@
 
 use crate::traits::Taxonomy;
 
-use super::{
-    taxon::NCBITaxon, taxon_entry::NCBITaxonEntry,
-    version::NCBIVersion,
-};
+use super::{taxon::NCBITaxon, taxon_entry::NCBITaxonEntry, version::NCBIVersion};
 
 /// Version of the NCBI taxonomy.
 pub struct NCBITaxonomy {
@@ -55,11 +52,9 @@ impl Taxonomy for NCBITaxonomy {
     }
 
     fn taxons(&self) -> impl Iterator<Item = Self::Taxon<'_>> + '_ {
-        self.taxon_entries
-            .iter()
-            .map(move |entry| NCBITaxon {
-                taxon_entry: entry,
-                taxonomy: self,
-            })
+        self.taxon_entries.iter().map(move |entry| NCBITaxon {
+            taxon_entry: entry,
+            taxonomy: self,
+        })
     }
 }

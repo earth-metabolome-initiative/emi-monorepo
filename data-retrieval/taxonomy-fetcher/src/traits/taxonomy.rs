@@ -6,8 +6,6 @@ use super::TaxonEntry;
 use crate::errors::TaxonomyError;
 use crate::traits::taxon::Taxon;
 
-
-
 /// Trait defining a taxonomy.
 pub trait Taxonomy {
     /// Type of the taxon entry.

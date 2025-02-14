@@ -127,40 +127,78 @@ impl Rank for CatalogOfLifeRank {
         match self {
             CatalogOfLifeRank::NoRank => "No specific taxonomic rank assigned.",
             CatalogOfLifeRank::Unranked => "An unranked position within the taxonomy.",
-            CatalogOfLifeRank::Aberration => "An unusual deviation or irregularity within a species.",
+            CatalogOfLifeRank::Aberration => {
+                "An unusual deviation or irregularity within a species."
+            }
             CatalogOfLifeRank::SectionBotany => "A grouping of plants within a genus for botany.",
-            CatalogOfLifeRank::SubSectionBotany => "A subdivision of a section in botanical classification.",
-            CatalogOfLifeRank::SectionZoology => "A grouping of animals within a genus for zoology.",
-            CatalogOfLifeRank::SubSectionZoology => "A subdivision of a section in zoological classification.",
-            CatalogOfLifeRank::Other => "A taxonomic rank not specified within standard categories.",
-            CatalogOfLifeRank::Species => "The basic unit of biological classification, representing interbreeding organisms.",
-            CatalogOfLifeRank::SubSpecies => "A taxonomic rank below species, indicating geographic or morphological variation.",
-            CatalogOfLifeRank::Variety => "A botanical rank below species, often used for cultivated plants.",
+            CatalogOfLifeRank::SubSectionBotany => {
+                "A subdivision of a section in botanical classification."
+            }
+            CatalogOfLifeRank::SectionZoology => {
+                "A grouping of animals within a genus for zoology."
+            }
+            CatalogOfLifeRank::SubSectionZoology => {
+                "A subdivision of a section in zoological classification."
+            }
+            CatalogOfLifeRank::Other => {
+                "A taxonomic rank not specified within standard categories."
+            }
+            CatalogOfLifeRank::Species => {
+                "The basic unit of biological classification, representing interbreeding organisms."
+            }
+            CatalogOfLifeRank::SubSpecies => {
+                "A taxonomic rank below species, indicating geographic or morphological variation."
+            }
+            CatalogOfLifeRank::Variety => {
+                "A botanical rank below species, often used for cultivated plants."
+            }
             CatalogOfLifeRank::SubVariety => "A finer subdivision of a variety.",
-            CatalogOfLifeRank::Genus => "A taxonomic rank grouping species with similar characteristics.",
+            CatalogOfLifeRank::Genus => {
+                "A taxonomic rank grouping species with similar characteristics."
+            }
             CatalogOfLifeRank::SubGenus => "A rank below genus, grouping closely related species.",
-            CatalogOfLifeRank::InfragenericName => "A name assigned below the genus level for further specificity.",
+            CatalogOfLifeRank::InfragenericName => {
+                "A name assigned below the genus level for further specificity."
+            }
             CatalogOfLifeRank::Kingdom => "A major rank grouping organisms into large categories.",
-            CatalogOfLifeRank::SubKingdom => "A rank below kingdom for more specific classification.",
-            CatalogOfLifeRank::Realm => "A broad taxonomic rank, often used in zoogeography or microbiology.",
+            CatalogOfLifeRank::SubKingdom => {
+                "A rank below kingdom for more specific classification."
+            }
+            CatalogOfLifeRank::Realm => {
+                "A broad taxonomic rank, often used in zoogeography or microbiology."
+            }
             CatalogOfLifeRank::Family => "A taxonomic rank grouping related genera.",
             CatalogOfLifeRank::EbiFamily => "A specific taxonomic family grouping for organisms.",
             CatalogOfLifeRank::EpiFamily => "A rank denoting families at an extended level.",
-            CatalogOfLifeRank::InfraFamily => "A rank below family, grouping closely related genera.",
+            CatalogOfLifeRank::InfraFamily => {
+                "A rank below family, grouping closely related genera."
+            }
             CatalogOfLifeRank::SuperFamily => "A rank above family, grouping related families.",
             CatalogOfLifeRank::SubFamily => "A rank below family, grouping genera within a family.",
             CatalogOfLifeRank::Form => "A minor taxonomic rank for variations within a species.",
-            CatalogOfLifeRank::SubForm => "A subdivision of form, providing additional specificity.",
-            CatalogOfLifeRank::FormaSpecialis => "A form distinguished by specialized pathogenic characteristics.",
+            CatalogOfLifeRank::SubForm => {
+                "A subdivision of form, providing additional specificity."
+            }
+            CatalogOfLifeRank::FormaSpecialis => {
+                "A form distinguished by specialized pathogenic characteristics."
+            }
             CatalogOfLifeRank::Tribe => "A rank grouping related genera within a family.",
             CatalogOfLifeRank::SuperTribe => "A rank above tribe, grouping related tribes.",
             CatalogOfLifeRank::SubTribe => "A rank below tribe for finer distinctions.",
             CatalogOfLifeRank::InfraTribe => "A rank below subtribe for even finer classification.",
-            CatalogOfLifeRank::InfraspecificName => "A name given below species for specific variations.",
-            CatalogOfLifeRank::InfrasubspecificName => "A name denoting distinctions below infraspecific level.",
-            CatalogOfLifeRank::SpeciesAggregate => "A group of closely related species treated collectively.",
+            CatalogOfLifeRank::InfraspecificName => {
+                "A name given below species for specific variations."
+            }
+            CatalogOfLifeRank::InfrasubspecificName => {
+                "A name denoting distinctions below infraspecific level."
+            }
+            CatalogOfLifeRank::SpeciesAggregate => {
+                "A group of closely related species treated collectively."
+            }
             CatalogOfLifeRank::Order => "A taxonomic rank grouping families.",
-            CatalogOfLifeRank::InfraOrder => "A rank below order, grouping closely related families.",
+            CatalogOfLifeRank::InfraOrder => {
+                "A rank below order, grouping closely related families."
+            }
             CatalogOfLifeRank::Parvorder => "A minor division within an infraorder.",
             CatalogOfLifeRank::SuperOrder => "A rank above order, grouping related orders.",
             CatalogOfLifeRank::SubOrder => "A rank below order for finer groupings.",

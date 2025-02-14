@@ -9,10 +9,10 @@ pub mod taxonomy_builder;
 pub mod taxonomy_writer;
 pub mod version;
 
+pub use rank::NCBIRank;
 pub use taxon::NCBITaxon;
 pub use taxon_entry::NCBITaxonEntry;
-pub use taxonomy::NCBITaxonomy;
-pub use version::NCBIVersion;
 pub use taxon_entry_builder::NCBITaxonEntryBuilder;
+pub use taxonomy::NCBITaxonomy;
 pub use taxonomy_builder::NCBITaxonomyBuilder;
-pub use rank::NCBIRank;
+pub use version::NCBIVersion;
