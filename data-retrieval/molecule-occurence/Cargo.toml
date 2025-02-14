@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 downloader = { path = "../downloader" }
 indicatif.workspace = true
+num_cpus = "1.16.0"
 rayon.workspace = true
 regex.workspace = true
 tokio.workspace = true
