@@ -15,9 +15,14 @@ members = [
     "web/core_structures",
     "utils/font_awesome",
     "utils/diesel_migrations_utils",
+    "utils/common-traits",
+    "utils/common-traits-derive",
 ]
 
 [workspace.dependencies]
+syn = {version="2.0", features=["full"]}
+quote = "1.0"
+proc-macro2 = "1.0"
 url = "2.5.4"
 indicatif = "0.17.9"
 reqwest = {version="0.12.12", features=["stream"]}
@@ -45,3 +50,16 @@ testcontainers = {version="0.23.1"}
 web_common_traits = { path = "web/web_common/web_common_traits" }
 webcodegen = { path = "web/web_common/webcodegen", features = ["postgres_17"] }
 diesel_migrations_utils = { path = "utils/diesel_migrations_utils" }
+common-traits-derive = { path = "utils/common-traits-derive" }
+common-traits = { path = "utils/common-traits", features = ["derive"] }
+
+[workspace.lints.rust]
+missing_docs = "forbid"
+unsafe_code = "forbid"
+unused_macro_rules = "forbid"
+unconditional_recursion = "forbid"
+unreachable_patterns = "forbid"
+unused_import_braces = "forbid"
+
+[workspace.lints.clippy]
+pedantic = "deny"

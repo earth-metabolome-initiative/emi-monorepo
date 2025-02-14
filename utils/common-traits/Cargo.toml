@@ -1,0 +1,14 @@
+[package]
+name = "common-traits"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde.workspace = true
+common-traits-derive = {workspace = true, optional = true}
+
+[features]
+derive = ["dep:common-traits-derive"]
+
+[lints]
+workspace = true
