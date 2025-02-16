@@ -18,6 +18,7 @@ csqlv.workspace = true
 tokio.workspace = true
 font_awesome.workspace = true
 diesel.workspace = true
+diesel_utils = { workspace = true, optional = true }
 testcontainers.workspace = true
 webcodegen.workspace = true
 diesel_migrations_utils.workspace = true
@@ -25,6 +26,6 @@ diesel_migrations_utils.workspace = true
 [features]
 default = ["serde"]
 serde = ["postgis_diesel/serde", "dep:serde"]
-diesel = ["dep:diesel-async", "dep:diesel", "postgis_diesel/diesel"]
+diesel = ["dep:diesel-async", "dep:diesel", "postgis_diesel/diesel", "dep:diesel_utils"]
 backend = ["diesel", "web_common_traits/backend"]
 frontend = ["web_common_traits/frontend"]

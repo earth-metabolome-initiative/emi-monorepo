@@ -61,11 +61,12 @@ impl crate::Table {
                         #(#method_arguments),*,
                         conn: &mut diesel_async::AsyncPgConnection
                     ) -> Result<Option<Self>, diesel::result::Error> {
-                        #table_name_ident::table
-                            .filter(#filter)
-                            .first::<Self>(conn)
-                            .optional()
-                            .await
+                        diesel_utils::optional(
+                            #table_name_ident::table
+                                .filter(#filter)
+                                .first::<Self>(conn)
+                                .await
+                        )
                     }
                 })
             })

@@ -17,6 +17,7 @@ members = [
     "utils/diesel_migrations_utils",
     "utils/common-traits",
     "utils/common-traits-derive",
+    "utils/diesel_utils",
 ]
 
 [workspace.dependencies]
@@ -53,6 +54,7 @@ testcontainers = {version="0.23.1"}
 web_common_traits = { path = "web/web_common/web_common_traits" }
 webcodegen = { path = "web/web_common/webcodegen", features = ["postgres_17"] }
 diesel_migrations_utils = { path = "utils/diesel_migrations_utils" }
+diesel_utils = { path = "utils/diesel_utils" }
 common-traits-derive = { path = "utils/common-traits-derive" }
 common-traits = { path = "utils/common-traits", features = ["derive"] }
 enum_dispatch = "0.3"
