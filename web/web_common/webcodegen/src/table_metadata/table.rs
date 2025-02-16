@@ -4,7 +4,7 @@ use diesel::pg::PgConnection;
 use diesel::result::Error as DieselError;
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, NullableExpressionMethods, QueryDsl,
-    Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper, TextExpressionMethods,
+    Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
 use itertools::Itertools;
 use proc_macro2::TokenStream;
@@ -15,7 +15,7 @@ use syn::{parse_str, Ident, Type};
 use crate::errors::WebCodeGenError;
 use crate::CheckConstraint;
 use crate::Column;
-use crate::Index;
+use crate::PgIndex;
 use crate::TableConstraint;
 
 use super::PgTrigger;
@@ -146,6 +146,21 @@ impl Table {
             .remove_leading_underscores()
             .remove_trailing_underscores();
         Ok(sanitizer.to_camel_case(&self.singular_table_name())?)
+    }
+
+    /// Returns the Rust Ident of the struct converted from the table name.
+    ///
+    /// # Errors
+    ///
+    /// * If the camel case name cannot be generated.
+    ///
+    pub fn struct_ident(&self) -> Result<Ident, WebCodeGenError> {
+        let struct_name = self.struct_name()?;
+        if RESERVED_RUST_WORDS.contains(&struct_name.as_str()) {
+            Ok(Ident::new_raw(&struct_name, proc_macro2::Span::call_site()))
+        } else {
+            Ok(Ident::new(&struct_name, proc_macro2::Span::call_site()))
+        }
     }
 
     /// Returns the sanitized snake case name of the table.
@@ -434,57 +449,24 @@ impl Table {
     ///
     /// * If the indices cannot be loaded from the database.
     ///
-    pub fn unique_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
-        use crate::schema::pg_indexes;
-        pg_indexes::table
-            .filter(pg_indexes::schemaname.eq(&self.table_schema))
-            .filter(pg_indexes::tablename.eq(&self.table_name))
-            .filter(pg_indexes::indexdef.like("%UNIQUE%"))
-            .load::<Index>(conn)
-    }
+    pub fn unique_indices(&self, conn: &mut PgConnection) -> Result<Vec<PgIndex>, DieselError> {
+        use crate::schema::{pg_class, pg_index};
 
-    /// Returns the GIN constraint indices for the table.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A vector of indices.
-    ///
-    /// # Errors
-    ///
-    /// * If the indices cannot be loaded from the database.
-    pub fn gin_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
-        use crate::schema::pg_indexes;
-        pg_indexes::table
-            .filter(pg_indexes::schemaname.eq(&self.table_schema))
-            .filter(pg_indexes::tablename.eq(&self.table_name))
-            .filter(pg_indexes::indexdef.like("%USING gin%"))
-            .load::<Index>(conn)
-    }
+        let (pg_class1, pg_class2) = diesel::alias!(pg_class as pg_class1, pg_class as pg_class2);
 
-    /// Returns the GIST constraint indices for the table.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A vector of indices.
-    ///
-    /// # Errors
-    ///
-    /// * If the indices cannot be loaded from the database.
-    pub fn gist_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
-        use crate::schema::pg_indexes;
-        pg_indexes::table
-            .filter(pg_indexes::schemaname.eq(&self.table_schema))
-            .filter(pg_indexes::tablename.eq(&self.table_name))
-            .filter(pg_indexes::indexdef.like("%USING gist%"))
-            .load::<Index>(conn)
+        pg_index::table
+            .inner_join(pg_class1.on(pg_class1.field(pg_class::oid).eq(pg_index::indexrelid)))
+            .inner_join(pg_class2.on(pg_class2.field(pg_class::oid).eq(pg_index::indrelid)))
+            .filter(
+                pg_class2.field(pg_class::relname).eq(&self.table_name).and(
+                    pg_class2
+                        .field(pg_class::relnamespace)
+                        .eq(pg_class1.field(pg_class::relnamespace)),
+                ),
+            )
+            .filter(pg_index::indisunique.eq(true))
+            .select(PgIndex::as_select())
+            .load::<PgIndex>(conn)
     }
 
     /// Returns all tables in the database.

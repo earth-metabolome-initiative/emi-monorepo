@@ -167,6 +167,30 @@ table! {
 }
 
 table! {
+    pg_index (indexrelid) {
+        indexrelid -> Oid,
+        indrelid -> Oid,
+        indnatts -> SmallInt,
+        indnkeyatts -> SmallInt,
+        indisunique -> Bool,
+        indnullsnotdistinct -> Bool,
+        indisprimary -> Bool,
+        indisexclusion -> Bool,
+        indimmediate -> Bool,
+        indisclustered -> Bool,
+        indisvalid -> Bool,
+        indcheckxmin -> Bool,
+        indisready -> Bool,
+        indislive -> Bool,
+        indisreplident -> Bool,
+        indkey -> Array<SmallInt>,
+        indcollation -> Array<Oid>,
+        indclass -> Array<Oid>,
+        indoption -> Array<SmallInt>,
+    }
+}
+
+table! {
     pg_catalog.pg_proc (oid, proname, pronamespace) {
         oid -> Oid,
         proname -> Text,
@@ -499,6 +523,8 @@ allow_tables_to_appear_in_same_query!(
     pg_operator,
     pg_attribute,
     pg_namespace,
+    pg_index,
+    pg_indexes,
     geometry_columns,
     geography_columns
 );

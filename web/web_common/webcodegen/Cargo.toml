@@ -35,3 +35,7 @@ default = ["diesel", "serde"]
 serde = []
 diesel = []
 postgres_17 = ["diesel"]
+
+[lints]
+workspace = true
+

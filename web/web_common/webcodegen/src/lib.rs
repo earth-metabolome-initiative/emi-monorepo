@@ -1,12 +1,4 @@
 #![doc = include_str!("../README.md")]
-#![deny(missing_docs)]
-#![deny(unsafe_code)]
-#![deny(unused_macro_rules)]
-#![deny(unconditional_recursion)]
-#![deny(unreachable_patterns)]
-#![deny(unused_import_braces)]
-#![warn(clippy::all)]
-#![warn(clippy::pedantic)]
 extern crate prettyplease;
 extern crate proc_macro2;
 extern crate quote;
@@ -24,9 +16,9 @@ mod syngen;
 
 pub use postgis::{GeometryColumn, GeographyColumn};
 pub use table_metadata::{
-    CheckConstraint, Column, ConstraintColumnUsage, ConstraintTableUsage, DomainConstraint, Index,
+    CheckConstraint, Column, ConstraintColumnUsage, ConstraintTableUsage, DomainConstraint,
     KeyColumnUsage, ReferentialConstraint, SQLFunction, SQLOperator, Table,
-    TableConstraint, PgType, PgAttribute, PGClass, PgEnum,
+    TableConstraint, PgType, PgAttribute, PGClass, PgEnum, PgIndex
 };
 pub use custom_schema_constraints::{
     CompulsorySiblingColumnConstraint, ConstraintError, CustomColumnConstraint,

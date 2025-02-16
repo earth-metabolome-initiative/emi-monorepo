@@ -1,14 +1,13 @@
 //! Primary method to convert a Table to a struct and associated impls.
 
-use diesel::PgConnection;
-use syn::Ident;
-use proc_macro2::TokenStream;
-use quote::quote;
 use crate::errors::WebCodeGenError;
 use crate::Table;
+use diesel::PgConnection;
+use proc_macro2::TokenStream;
+use quote::quote;
+use syn::Ident;
 
 impl Table {
-
     /// Returns the Syn `TokenStream` for the struct definition and associated methods.
     ///
     /// # Arguments
@@ -45,20 +44,22 @@ impl Table {
             })
             .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
-        let mutability_impls = if self.has_session_user_generated_columns(conn)? {
-            let insert_trait_impls = self.insert_trait_impls(conn)?;
-            let update_trait_impls = if self.has_updated_by_column(conn)? {
-                self.update_trait_impls(conn)?
-            } else {
-                TokenStream::new()
-            };
-            quote! {
-                #insert_trait_impls
-                #update_trait_impls
-            }
-        } else {
-            TokenStream::new()
-        };
+        // let mutability_impls = if self.has_session_user_generated_columns(conn)? {
+        //     let insert_trait_impls = self.insert_trait_impls(conn)?;
+        //     let update_trait_impls = if self.has_updated_by_column(conn)? {
+        //         self.update_trait_impls(conn)?
+        //     } else {
+        //         TokenStream::new()
+        //     };
+        //     quote! {
+        //         #insert_trait_impls
+        //         #update_trait_impls
+        //     }
+        // } else {
+        //     TokenStream::new()
+        // };
+        let mutability_impls = TokenStream::new();
+
         let foreign_key_methods = self.foreign_key_methods(conn)?;
         // We only create a delete method if the table has a created_by column, which
         // means it contains user-generated data and therefore things that can be deleted
@@ -71,6 +72,7 @@ impl Table {
         let primary_key_decorator = self.primary_key_decorator(conn)?;
         let diesel_derives_decorator = self.diesel_derives_decorator(conn)?;
         let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
+        let from_unique_indices = self.from_unique_indices(conn)?;
 
         let built_table_syn = quote! {
             #[derive(Debug)]
@@ -85,6 +87,7 @@ impl Table {
             impl #struct_name {
                 #(#foreign_key_methods)*
                 #delete_method
+                #from_unique_indices
             }
 
             #mutability_impls

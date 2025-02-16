@@ -24,7 +24,7 @@ pub use constraint_column_usage::ConstraintColumnUsage;
 pub use constraint_table_usage::ConstraintTableUsage;
 pub use domain_constraint::DomainConstraint;
 pub use key_column_usage::KeyColumnUsage;
-pub use pg_index::Index;
+pub use pg_index::PgIndex;
 pub use referential_constraint::ReferentialConstraint;
 pub use sql_function::SQLFunction;
 pub use sql_operator::SQLOperator;
