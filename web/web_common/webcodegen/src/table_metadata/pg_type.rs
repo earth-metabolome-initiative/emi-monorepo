@@ -160,13 +160,12 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> Result<&'static str, WebCod
 /// # Arguments
 ///
 /// * `postgres_type` - A string slice that holds the `PostgreSQL` type name.
-/// * `nullable` - A boolean indicating whether the type is nullable.
 ///
 /// # Returns
 ///
 /// A `Type` representing the corresponding Diesel type.
-pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Result<Type, WebCodeGenError> {
-    let rust_type_str = match postgres_type {
+pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<&str, WebCodeGenError> {
+    Ok(match postgres_type {
         // Numeric types
         "integer" | "int4" => "diesel::sql_types::Integer",
         "smallint" | "int2" => "diesel::sql_types::SmallInt",
@@ -217,7 +216,21 @@ pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Result<Ty
         _ => {
             return Err(WebCodeGenError::UnknownDieselPostgresType(postgres_type.to_owned()));
         }
-    };
+    })
+}
+
+/// Converts a `PostgreSQL` type to a `Diesel` type.
+///
+/// # Arguments
+///
+/// * `postgres_type` - A string slice that holds the `PostgreSQL` type name.
+/// * `nullable` - A boolean indicating whether the type is nullable.
+///
+/// # Returns
+///
+/// A `Type` representing the corresponding Diesel type.
+pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Result<Type, WebCodeGenError> {
+    let rust_type_str = postgres_type_to_diesel_str(postgres_type)?;
 
     let rust_type_str = if nullable {
         format!("diesel::sql_types::Nullable<{rust_type_str}>")

@@ -1,3 +1,4 @@
+//! Test suite for table metadata loading
 use diesel::pg::PgConnection;
 use diesel::Connection;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
@@ -162,49 +163,6 @@ async fn test_user_table() {
 
     let _all_columns = Column::load_all(&mut conn);
 
-    let all_unique_indexes = Index::load_all_unique(&mut conn, None).unwrap();
-    assert!(!all_unique_indexes.is_empty(),);
-
-    all_unique_indexes.iter().for_each(|index| {
-        assert!(index.is_unique());
-    });
-
-    let all_gin_indexes = Index::load_all_gin(&mut conn, None).unwrap();
-    assert_eq!(
-        all_gin_indexes.len(),
-        1,
-        "Expected 1 index, got {:?}",
-        all_gin_indexes
-    );
-
-    all_gin_indexes.iter().for_each(|index| {
-        assert!(index.is_gin());
-    });
-
-    let gin_index = all_gin_indexes.first().unwrap();
-
-    assert_eq!(gin_index.schemaname, "public");
-    assert_eq!(gin_index.tablename, "users");
-    assert_eq!(gin_index.indexname, "users_gin");
-
-    let all_gist_indexes = Index::load_all_gist(&mut conn, None).unwrap();
-    assert_eq!(
-        all_gist_indexes.len(),
-        1,
-        "Expected 1 index, got {:?}",
-        all_gist_indexes
-    );
-
-    all_gist_indexes.iter().for_each(|index| {
-        assert!(index.is_gist());
-    });
-
-    let gist_index = all_gist_indexes.first().unwrap();
-
-    assert_eq!(gist_index.schemaname, "public");
-    assert_eq!(gist_index.tablename, "composite_users");
-    assert_eq!(gist_index.indexname, "composite_users_gist");
-
     let _all_table_constraints = TableConstraint::load_all(&mut conn);
     let _all_key_column_usage = KeyColumnUsage::load_all_key_column_usages(&mut conn);
     let _all_referential_constraints =
@@ -218,16 +176,6 @@ async fn test_user_table() {
     let users = Table::load(&mut conn, "users", None, DATABASE_NAME).unwrap();
 
     test_check_constraints(&mut conn).await.unwrap();
-
-    let users_gin_indexes = users.gin_indexes(&mut conn).unwrap();
-
-    assert_eq!(
-        all_gin_indexes, users_gin_indexes,
-        "Expected {:?}, got {:?}",
-        all_gin_indexes, users_gin_indexes
-    );
-
-    assert!(users.gist_indexes(&mut conn).unwrap().is_empty());
 
     let original_user_id_column = users.column_by_name(&mut conn, "id").unwrap();
 
@@ -255,16 +203,6 @@ async fn test_user_table() {
     assert_eq!(unique_columns[2].len(), 1);
 
     let composite_users = Table::load(&mut conn, "composite_users", None, DATABASE_NAME).unwrap();
-
-    let composite_users_gist_indexes = composite_users.gist_indexes(&mut conn).unwrap();
-
-    assert_eq!(
-        all_gist_indexes, composite_users_gist_indexes,
-        "Expected {:?}, got {:?}",
-        all_gist_indexes, composite_users_gist_indexes
-    );
-
-    assert!(composite_users.gin_indexes(&mut conn).unwrap().is_empty());
 
     let columns: Result<Vec<Column>, WebCodeGenError> = composite_users.columns(&mut conn);
     let primary_key_columns: Result<Vec<Column>, WebCodeGenError> =

@@ -29,11 +29,13 @@ uuid.workspace = true
 web_common_traits = {workspace = true, features = ["backend"]}
 macaddr = "1.0.1"
 postgis_diesel.workspace = true
+diesel_utils.workspace = true
+diesel_full_text_search.workspace = true
 
 [features]
 default = ["diesel", "serde"]
 serde = []
-diesel = []
+diesel = ["postgis_diesel/diesel"]
 postgres_17 = ["diesel"]
 
 [lints]

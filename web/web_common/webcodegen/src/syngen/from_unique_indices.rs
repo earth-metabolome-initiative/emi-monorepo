@@ -37,7 +37,7 @@ impl crate::Table {
                     .iter()
                     .map(|c| {
                         let column_name = Ident::new(&c.column_name, struct_name.span());
-                        let column_type = c.rust_data_type(conn)?;
+                        let column_type = c.rust_ref_data_type(conn)?;
                         Ok(quote! { #column_name: &#column_type })
                     })
                     .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;

@@ -1,3 +1,4 @@
+//! Test the singularize function
 use pluralizer;
 use regex::Regex;
 #[test]

@@ -208,6 +208,35 @@ impl Column {
         Ok(syn::parse_str(&rust_type).unwrap())
     }
 
+    /// Returns the rust reference type of the column
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the rust `Type` of the column if the operation
+    ///
+    /// # Errors
+    ///
+    /// If an error occurs while querying the database
+    pub fn rust_ref_data_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
+        let rust_type = match self.str_rust_data_type(conn)?.as_str() {
+            "String" => "&str",
+            "Vec<u8>" => "&[u8]",
+            other => other,
+        }.to_owned();
+
+        let rust_type = if self.is_nullable() {
+            format!("Option<{rust_type}>")
+        } else {
+            rust_type.to_string()
+        };
+
+        Ok(syn::parse_str(&rust_type).unwrap())
+    }
+
     /// Returns whether the column name is a reserved diesel word.
     ///
     /// # Errors

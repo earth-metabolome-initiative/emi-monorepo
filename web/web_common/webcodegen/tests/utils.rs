@@ -1,3 +1,5 @@
+//! Utility functions for testing.
+
 use std::io::Write;
 use quote::quote;
 

@@ -1,3 +1,4 @@
+//! Test whether the generated code for a user-defined enum type is correct
 mod utils;
 
 use diesel::pg::PgConnection;
