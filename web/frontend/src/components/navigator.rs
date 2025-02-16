@@ -28,7 +28,7 @@ use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use crate::components::Badge;
 use gloo::timers::callback::Timeout;
 use gloo::utils::window;
-use web_common::database::NestedUser;
+use web_common::database::User;
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::*;
@@ -55,7 +55,7 @@ impl Navigator {
         self.app_state.sidebar_open()
     }
 
-    fn user(&self) -> Option<Rc<NestedUser>> {
+    fn user(&self) -> Option<Rc<User>> {
         self.user_state.user()
     }
 }
@@ -175,7 +175,7 @@ impl Component for Navigator {
                     <SearchBar />
                     if let Some(user) = self.user() {
                         if user.inner.has_complete_profile() {
-                            <Badge<NestedUser> size={BadgeSize::Small} badge={user.clone()}/>
+                            <Badge<User> size={BadgeSize::Small} badge={user.clone()}/>
                         } else {
                             <Link<AppRoute> classes="right_nav_button fill-profile" to={AppRoute::UsersUpdate { id: user.inner.id }}>
                                 <i class="fas fa-clipboard-check"></i>

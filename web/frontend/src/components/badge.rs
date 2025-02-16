@@ -8,50 +8,6 @@ use web_common::database::{Colorable, Describable, SimilarityScore};
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-pub mod colors;
-pub mod countries;
-pub mod derived_samples;
-pub mod document_formats;
-pub mod font_awesome_icons;
-pub mod materials;
-pub mod nameplate_categories;
-pub mod nameplates;
-pub mod observation_subjects;
-pub mod observations;
-pub mod organism_taxa;
-pub mod organisms;
-pub mod organizations;
-pub mod permanence_categories;
-pub mod project_states;
-pub mod projects;
-pub mod projects_teams_role_invitations;
-pub mod projects_teams_role_requests;
-pub mod projects_teams_roles;
-pub mod projects_users_role_invitations;
-pub mod projects_users_role_requests;
-pub mod projects_users_roles;
-pub mod ranks;
-pub mod roles;
-pub mod sample_container_categories;
-pub mod sample_containers;
-pub mod sample_states;
-pub mod sample_taxa;
-pub mod samples;
-pub mod searchable_struct;
-pub mod spectra_collections;
-pub mod taxa;
-pub mod team_states;
-pub mod teams;
-pub mod teams_teams_role_invitations;
-pub mod teams_users_role_invitations;
-pub mod teams_users_role_requests;
-pub mod teams_users_roles;
-pub mod units;
-pub mod users;
-pub mod users_users_role_invitations;
-pub mod users_users_role_requests;
-pub mod users_users_roles;
-
 /// Trait for types that can be converted to a badge.
 pub trait RowToBadge:
     Colorable + Describable + Sized + Clone + PartialEq + Debug + SimilarityScore

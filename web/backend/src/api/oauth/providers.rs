@@ -1,5 +1,4 @@
 //! This module contains the API for the OAuth2 providers.
-use crate::database::*;
 use actix_web::{get, web, HttpResponse, Responder};
 use diesel::pg::PgConnection;
 use diesel::r2d2::ConnectionManager;
@@ -7,12 +6,13 @@ use diesel::r2d2::Pool;
 use std::env;
 use web_common::api::oauth::providers::*;
 use web_common::api::ApiError;
+use core_structures::LoginProvider;
 
 #[get("/providers")]
 /// Returns a list of available OAuth2 providers.
 async fn get_providers(pool: web::Data<Pool<ConnectionManager<PgConnection>>>) -> impl Responder {
     let mut conn = pool.get().expect("couldn't get db connection from pool");
-    let providers = NestedLoginProvider::all_viewable(None, None, None, &mut conn);
+    let providers = LoginProvider::all_viewable(None, None, None, &mut conn);
 
     if providers.is_err() {
         return HttpResponse::InternalServerError().json(ApiError::internal_server_error());

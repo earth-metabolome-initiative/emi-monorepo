@@ -24,8 +24,6 @@
 //! contains the operations that should be performed as part of the transaction. If the closure returns an error, the
 //! transaction is rolled back, and the error is returned. If the closure returns Ok, the transaction is committed, and
 //! the Ok value is returned.
-use crate::database::new_variants::InsertRow;
-use crate::database::*;
 use crate::transactions::create_user::create_user;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
@@ -33,7 +31,7 @@ use diesel::sql_query;
 use diesel::sql_types::Text;
 use email_address::EmailAddress;
 use web_common::api::ApiError;
-use web_common::database::NewUserEmail;
+use core_structures::User;
 
 pub(crate) struct Emails {
     emails: Vec<String>,
@@ -62,9 +60,6 @@ fn get_unique_users_from_emails(
     emails: &[String],
     pool: &Pool<ConnectionManager<PgConnection>>,
 ) -> QueryResult<Vec<User>> {
-    use crate::database::schema::user_emails::dsl::*;
-    use crate::database::schema::users::dsl::*;
-
     let mut conn = pool.get().unwrap();
 
     user_emails
@@ -168,8 +163,6 @@ pub(crate) fn renormalize_user_emails(
     emails: Emails,
     pool: &Pool<ConnectionManager<PgConnection>>,
 ) -> Result<User, web_common::api::ApiError> {
-    use crate::database::schema::users::dsl::*;
-
     // First, we need to identify how many of the emails are already associated with users.
     // 1) If none of them are, we can create a new user account, with the provided provider ID and email address.
     // 2) If only one of the emails is already associated with a user, we insert all of the emails with the new provider

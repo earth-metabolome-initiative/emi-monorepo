@@ -12,7 +12,6 @@ use actix_web::middleware::Logger;
 use actix_web::HttpRequest;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use redis::Client;
-use sqlx::{postgres::PgPoolOptions, Pool as SQLxPool, Postgres};
 use std::path::PathBuf;
 
 /// Entrypoint to load the index.html file
@@ -71,21 +70,6 @@ async fn main() -> std::io::Result<()> {
         }
     };
 
-    let sqlx_pool: SQLxPool<Postgres> = match PgPoolOptions::new()
-        .max_connections(10)
-        .connect(&database_url)
-        .await
-    {
-        Ok(pool) => {
-            println!("✅ SQLx Connection to the database is successful!");
-            pool
-        }
-        Err(err) => {
-            println!("🔥 Failed to connect to the SQLx Database: {:?}", err);
-            std::process::exit(1);
-        }
-    };
-
     // We remove the file "backend.building" if it exists
     std::fs::remove_file("/app/backend/backend.building").unwrap_or_default();
 
@@ -127,8 +111,6 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(pool.clone()))
             // pass in the redis client to all routes
             .app_data(web::Data::new(redis_client.clone()))
-            // pass in the sqlx pool to all routes
-            .app_data(web::Data::new(sqlx_pool.clone()))
             // We register the API handlers
             .configure(backend::api::configure)
             // We serve the frontend as static files

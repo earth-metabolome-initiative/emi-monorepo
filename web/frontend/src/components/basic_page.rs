@@ -148,7 +148,7 @@ impl PageLike for NestedSampleState {
     }
 }
 
-impl PageLike for NestedUsersUsersRole {
+impl PageLike for UsersUsersRole {
     fn id(&self) -> PrimaryKey {
         (self.inner.table_id, self.inner.user_id).into()
     }
@@ -168,7 +168,7 @@ impl PageLike for NestedTeamsUsersRole {
     }
 }
 
-impl PageLike for NestedUsersUsersRoleRequest {
+impl PageLike for UsersUsersRoleRequest {
     fn id(&self) -> PrimaryKey {
         (self.inner.table_id, self.inner.user_id).into()
     }
@@ -183,7 +183,7 @@ impl PageLike for NestedUsersUsersRoleRequest {
     }
 }
 
-impl PageLike for NestedUsersUsersRoleInvitation {
+impl PageLike for UsersUsersRoleInvitation {
     fn id(&self) -> PrimaryKey {
         (self.inner.table_id, self.inner.user_id).into()
     }
@@ -429,7 +429,7 @@ impl PageLike for NestedSample {
     }
 }
 
-impl PageLike for NestedUser {
+impl PageLike for User {
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }

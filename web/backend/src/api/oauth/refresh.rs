@@ -2,13 +2,13 @@
 use crate::api::oauth::jwt_cookies::{
     eliminate_cookies, JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME,
 };
-use crate::database::*;
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
 use diesel::PgConnection;
 use web_common::api::oauth::jwt_cookies::AccessToken;
 use web_common::api::ApiError;
+use core_structures::User;
 
 #[get("/refresh")]
 /// Endpoint to refresh the access token, given a valid refresh token.
@@ -39,7 +39,7 @@ pub async fn refresh_access_token(
     req: &HttpRequest,
     pool: &web::Data<Pool<ConnectionManager<PgConnection>>>,
     redis_client: &web::Data<redis::Client>,
-) -> Result<(NestedUser, AccessToken), HttpResponse> {
+) -> Result<(User, AccessToken), HttpResponse> {
     let refresh_cookie = match req.cookie(REFRESH_COOKIE_NAME) {
         Some(cookie) => cookie,
         None => {
@@ -85,7 +85,7 @@ pub async fn refresh_access_token(
     };
 
     // If the user doesn't exist, we return an error, otherwise we return the user.
-    let user = match NestedUser::get(refresh_token.user_id(), &mut connection) {
+    let user = match User::get(refresh_token.user_id(), &mut connection) {
         Ok(user) => user,
         Err(_) => {
             return Err(

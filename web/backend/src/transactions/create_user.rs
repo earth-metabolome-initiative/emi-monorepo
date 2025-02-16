@@ -6,14 +6,13 @@
 //! - Inserting the user's email into the user_emails table
 //! - Inserting the user's primary email into the primary_user_emails table
 
-use crate::database::*;
 use crate::transactions::renormalize_user_emails::Emails;
 use diesel::connection::SimpleConnection; // Required for batch_execute
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use identicon_rs::Identicon;
 use std::io::Cursor;
-use web_common::database::{NewUser, NewUserEmail};
+use core_structures::User;
 
 /// Return a newly created user.
 ///

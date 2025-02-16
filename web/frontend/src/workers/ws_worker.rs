@@ -23,7 +23,7 @@ type DatabaseMessage = (Uuid, Option<UserId>, Operation);
 pub struct WebsocketWorker {
     subscribers: HashSet<HandlerId>,
     tasks: HashMap<Uuid, HandlerId>,
-    user: Option<Rc<NestedUser>>,
+    user: Option<Rc<User>>,
     database_sender: futures::channel::mpsc::Sender<DatabaseMessage>,
     websocket_sender: Option<futures::channel::mpsc::Sender<FrontendMessage>>,
     reconnection_attempt: u32,
@@ -33,7 +33,7 @@ pub struct WebsocketWorker {
 /// Messages from the frontend to the web-worker.
 pub enum ComponentMessage {
     Operation(Operation),
-    UserState(Option<Rc<NestedUser>>),
+    UserState(Option<Rc<User>>),
     // Connect to the provided hostname.
     Connect(String),
 }
@@ -95,14 +95,14 @@ pub enum WebsocketMessage {
     /// None in the case of a delete operation.
     Completed(Option<Vec<u8>>),
     Error(ApiError),
-    RefreshUser(Rc<NestedUser>),
+    RefreshUser(Rc<User>),
 }
 
 pub enum InternalMessage {
     Backend(BackendMessage),
     Frontend(HandlerId, ComponentMessage),
     Disconnect(Option<CloseReason>),
-    User(Option<Rc<NestedUser>>),
+    User(Option<Rc<User>>),
     Reconnect(String),
 }
 

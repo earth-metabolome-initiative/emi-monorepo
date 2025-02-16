@@ -11,7 +11,7 @@ use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use gloo::timers::callback::Timeout;
 use gloo::utils::window;
-use web_common::database::{NestedTaxon, NestedUser};
+use web_common::database::{NestedTaxon, User};
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::*;

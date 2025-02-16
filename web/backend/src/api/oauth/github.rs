@@ -7,13 +7,13 @@ use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 
 use super::jwt_cookies::build_login_response;
-use crate::database::*;
 use crate::transactions::renormalize_user_emails::{renormalize_user_emails, Emails};
 use redis::Client as RedisClient;
 use reqwest::Client;
 use serde::Deserialize;
 use std::env;
 use web_common::api::ApiError;
+use core_structures::LoginProvider;
 
 /// Struct representing the GitHub OAuth2 configuration.
 struct GitHubConfig {

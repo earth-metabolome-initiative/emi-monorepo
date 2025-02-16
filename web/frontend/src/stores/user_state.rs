@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::rc::Rc;
-use web_common::database::{NestedProject, NestedUser};
+use core_structures::{User, Project};
 use yewdux::prelude::*;
 
 use super::app_state::AppState;
@@ -9,9 +9,9 @@ use super::app_state::AppState;
 /// The following macro will make sure that the store is saved across sessions.
 #[store(storage = "session", storage_tab_sync)]
 pub struct UserState {
-    user: Option<Rc<NestedUser>>,
+    user: Option<Rc<User>>,
     // The primary project to be currently considered by the user.
-    project: Option<Rc<NestedProject>>,
+    project: Option<Rc<Project>>,
 }
 
 impl UserState {
@@ -30,7 +30,7 @@ impl UserState {
             .unwrap_or(false)
     }
 
-    pub fn user(&self) -> Option<Rc<NestedUser>> {
+    pub fn user(&self) -> Option<Rc<User>> {
         self.user.clone()
     }
 
@@ -43,7 +43,7 @@ impl UserState {
     }
 
     /// Set the user to the provided value and returns whether any changes were made.
-    pub fn set_user(&mut self, user: Rc<NestedUser>) -> bool {
+    pub fn set_user(&mut self, user: Rc<User>) -> bool {
         let maybe_user = Some(user);
         if self.user != maybe_user {
             self.user = maybe_user;

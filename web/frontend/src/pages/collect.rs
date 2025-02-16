@@ -9,7 +9,7 @@ use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use crate::components::Badge;
 use gloo::timers::callback::Timeout;
 use gloo::utils::window;
-use web_common::database::NestedUser;
+use web_common::database::User;
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::*;

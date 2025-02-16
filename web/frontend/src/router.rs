@@ -1305,7 +1305,7 @@ impl Updatable for User {
     }
 }
 
-impl Viewable for NestedUser {
+impl Viewable for User {
     fn list_route() -> AppRoute {
         AppRoute::Users {}
     }
@@ -1314,7 +1314,7 @@ impl Viewable for NestedUser {
     }
 }
 
-impl Updatable for NestedUser {
+impl Updatable for User {
     fn update_route(&self) -> AppRoute {
         AppRoute::UsersUpdate { id: self.inner.id }
     }
@@ -1346,7 +1346,7 @@ impl Insertable for UsersUsersRoleInvitation {
     }
 }
 
-impl Viewable for NestedUsersUsersRoleInvitation {
+impl Viewable for UsersUsersRoleInvitation {
     fn list_route() -> AppRoute {
         AppRoute::UsersUsersRoleInvitations {}
     }
@@ -1358,7 +1358,7 @@ impl Viewable for NestedUsersUsersRoleInvitation {
     }
 }
 
-impl Insertable for NestedUsersUsersRoleInvitation {
+impl Insertable for UsersUsersRoleInvitation {
     fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
         if let Some(filter) = filter {
             if let Some(table_id) = filter.table_id {
@@ -1384,7 +1384,7 @@ impl Viewable for UsersUsersRoleRequest {
     }
 }
 
-impl Viewable for NestedUsersUsersRoleRequest {
+impl Viewable for UsersUsersRoleRequest {
     fn list_route() -> AppRoute {
         AppRoute::UsersUsersRoleRequests {}
     }
@@ -1422,7 +1422,7 @@ impl Insertable for UsersUsersRole {
     }
 }
 
-impl Viewable for NestedUsersUsersRole {
+impl Viewable for UsersUsersRole {
     fn list_route() -> AppRoute {
         AppRoute::UsersUsersRoles {}
     }
@@ -1434,7 +1434,7 @@ impl Viewable for NestedUsersUsersRole {
     }
 }
 
-impl Insertable for NestedUsersUsersRole {
+impl Insertable for UsersUsersRole {
     fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
         if let Some(filter) = filter {
             if let Some(table_id) = filter.table_id {
@@ -2109,7 +2109,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <CreateTeamsUsersRoleForm user_id={user_id} /> }
         }
         AppRoute::Users => {
-            html! { <BasicList<NestedUser> /> }
+            html! { <BasicList<User> /> }
         }
         AppRoute::UsersView { id } => {
             html! { <UserPage id = {id} /> }
@@ -2118,7 +2118,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <UpdateUserForm id={id} /> }
         }
         AppRoute::UsersUsersRoleInvitations => {
-            html! { <BasicList<NestedUsersUsersRoleInvitation> /> }
+            html! { <BasicList<UsersUsersRoleInvitation> /> }
         }
         AppRoute::UsersUsersRoleInvitationsView { table_id, user_id } => {
             html! { <UsersUsersRoleInvitationPage table_id = {table_id} user_id = {user_id} /> }
@@ -2133,13 +2133,13 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <CreateUsersUsersRoleInvitationForm user_id={user_id} /> }
         }
         AppRoute::UsersUsersRoleRequests => {
-            html! { <BasicList<NestedUsersUsersRoleRequest> /> }
+            html! { <BasicList<UsersUsersRoleRequest> /> }
         }
         AppRoute::UsersUsersRoleRequestsView { table_id, user_id } => {
             html! { <UsersUsersRoleRequestPage table_id = {table_id} user_id = {user_id} /> }
         }
         AppRoute::UsersUsersRoles => {
-            html! { <BasicList<NestedUsersUsersRole> /> }
+            html! { <BasicList<UsersUsersRole> /> }
         }
         AppRoute::UsersUsersRolesView { table_id, user_id } => {
             html! { <UsersUsersRolePage table_id = {table_id} user_id = {user_id} /> }

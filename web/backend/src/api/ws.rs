@@ -1,11 +1,9 @@
 //! Submodule providing websocket services post-authentication.
-use crate::database::DBPool;
-use actix_web::web;
+use actix_web::{web, rt};
 use actix_web::{get, Error, HttpRequest, HttpResponse};
-use sqlx::{Pool as SQLxPool, Postgres};
-pub mod socket;
+use actix_ws::AggregatedMessage;
+use futures::StreamExt;
 use crate::api::oauth::refresh::refresh_access_token;
-use actix_web_actors::ws::WsResponseBuilder;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(start_websocket);
@@ -19,51 +17,45 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 /// * `req` - The HTTP request
 /// * `stream` - The websocket stream
 /// * `diesel_pool` - The Diesel connection pool
-/// * `sqlx_pool` - The SQLx connection pool
 async fn start_websocket(
     req: HttpRequest,
     stream: web::Payload,
     redis_client: web::Data<redis::Client>,
-    diesel_pool: web::Data<DBPool>,
-    sqlx_pool: web::Data<SQLxPool<Postgres>>,
+    diesel_pool: web::Data<diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<diesel::PgConnection>>>,
 ) -> Result<HttpResponse, Error> {
-    let mut frame_size = None;
+    let (res, mut session, stream) = actix_ws::handle(&req, stream)?;
 
-    let websocket = match refresh_access_token(&req, &diesel_pool, &redis_client).await {
-        Ok((user, access_code)) => {
-            log::info!(
-                "Starting authenticated websocket for user {}",
-                user.inner.id
-            );
-            frame_size = Some(5 * 1024 * 1024);
-            socket::WebSocket::authenticated(
-                diesel_pool.get_ref().clone(),
-                sqlx_pool.get_ref().clone(),
-                redis_client.get_ref().clone(),
-                user,
-                access_code,
-            )
+    let mut stream = stream
+        .aggregate_continuations()
+        // aggregate continuation frames up to 1MiB
+        .max_continuation_size(2_usize.pow(20));
+
+    // start task but don't wait for it
+    rt::spawn(async move {
+        // receive messages from websocket
+        while let Some(msg) = stream.next().await {
+            match msg {
+                Ok(AggregatedMessage::Text(text)) => {
+                    // echo text message
+                    session.text(text).await.unwrap();
+                }
+                Ok(AggregatedMessage::Binary(bin)) => {
+                    // echo binary message
+                    session.binary(bin).await.unwrap();
+                }
+
+                Ok(AggregatedMessage::Ping(msg)) => {
+                    // respond to PING frame with PONG frame
+                    session.pong(&msg).await.unwrap();
+                }
+
+                _ => {}
+            }
         }
-        Err(_) => {
-            log::info!("Starting unauthenticated websocket");
-            socket::WebSocket::new(
-                diesel_pool.get_ref().clone(),
-                sqlx_pool.get_ref().clone(),
-                redis_client.get_ref().clone(),
-            )
-            .map_err(|_e| {
-                log::error!("Failed to start websocket");
-                actix_web::error::ErrorInternalServerError("Failed to start websocket")
-            })?
-        }
-    };
 
-    let mut builder =
-        WsResponseBuilder::new(websocket, &req, stream).codec(actix_http::ws::Codec::new());
+        let _ = session.close(None).await;
+    });
 
-    if let Some(frame_size) = frame_size {
-        builder = builder.frame_size(frame_size);
-    }
-
-    builder.start()
+    // respond immediately with response connected to WS session
+    Ok(res)
 }
