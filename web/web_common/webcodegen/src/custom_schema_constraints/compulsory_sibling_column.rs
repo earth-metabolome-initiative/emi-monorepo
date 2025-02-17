@@ -1,8 +1,7 @@
-use crate::custom_schema_constraints::CustomTableConstraint;
-use crate::errors::WebCodeGenError;
 use diesel::pg::PgConnection;
 
 use super::ConstraintError;
+use crate::{custom_schema_constraints::CustomTableConstraint, errors::WebCodeGenError};
 
 /// Check that a column has a sibling column
 pub struct CompulsorySiblingColumnConstraint {

@@ -1,11 +1,12 @@
-//! Submodule providing methods to generate Roles tables for all editable tables.
+//! Submodule providing methods to generate Roles tables for all editable
+//! tables.
 //!
-//! Editable tables are the ones characterized by `created_by` and `updated_by` columns.
+//! Editable tables are the ones characterized by `created_by` and `updated_by`
+//! columns.
 
-use crate::errors::WebCodeGenError;
-use crate::Table;
-use diesel::connection::SimpleConnection;
-use diesel::PgConnection;
+use diesel::{connection::SimpleConnection, PgConnection};
+
+use crate::{errors::WebCodeGenError, Table};
 
 impl Table {
     /// Returns whether all tables required for the roles mechanism are present.
@@ -15,21 +16,15 @@ impl Table {
             && Table::load(conn, "roles", Some(&self.table_schema), &self.table_catalog).is_ok()
             && Table::load(conn, "users", Some(&self.table_schema), &self.table_catalog).is_ok()
             && Table::load(conn, "teams", Some(&self.table_schema), &self.table_catalog).is_ok()
-            && Table::load(
-                conn,
-                "team_members",
-                Some(&self.table_schema),
-                &self.table_catalog,
-            )
-            .is_ok()
+            && Table::load(conn, "team_members", Some(&self.table_schema), &self.table_catalog)
+                .is_ok()
     }
 
     /// Returns whether the table is expected to have a roles table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
     pub fn requires_roles_table(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(self.columns(conn)?.iter().any(|c| c.is_updated_by(conn)))
     }
@@ -55,7 +50,6 @@ impl Table {
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     pub fn has_team_roles_table(&self, conn: &mut PgConnection) -> bool {
         let expected_team_roles_table_name = format!("{}_teams_roles", self.table_name);
         Table::load(
@@ -122,7 +116,7 @@ impl Table {
             users.primary_key_columns(conn)?[0].data_type_str(conn)?
         ));
 
-        create_table.push_str("created_at TIMESTAMP NOT NULL DEFAULT NOW(),\n");
+        create_table.push_str("created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n");
 
         // We build the primary key using the primary key columns of the reference table
         create_table.push_str(&format!(
@@ -154,7 +148,8 @@ impl Table {
         Ok(create_table)
     }
 
-    /// Generates the SQL code to create the roles tables for all editable tables.
+    /// Generates the SQL code to create the roles tables for all editable
+    /// tables.
     ///
     /// # Arguments
     ///
@@ -204,14 +199,15 @@ impl Table {
         Ok(create_tables)
     }
 
-    /// Creates all the roles tables following the topological order of the tables.
+    /// Creates all the roles tables following the topological order of the
+    /// tables.
     ///
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// * `table_catalog` - The catalog of the tables to create the functions for.
+    /// * `table_catalog` - The catalog of the tables to create the functions
+    ///   for.
     /// * `table_schema` - The schema of the tables to create the functions for.
-    ///
     pub fn create_roles_tables(
         conn: &mut PgConnection,
         table_catalog: &str,
@@ -224,7 +220,7 @@ impl Table {
             let string = table.get_roles_tables_sql(conn)?;
             if let Err(err) = conn.batch_execute(&string) {
                 println!("Failed to execute SQL: {}", string);
-                return Err(WebCodeGenError::DieselError(err));   
+                return Err(WebCodeGenError::DieselError(err));
             }
         }
         Ok(())

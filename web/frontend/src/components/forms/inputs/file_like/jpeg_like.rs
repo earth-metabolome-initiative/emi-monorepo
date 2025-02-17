@@ -1,10 +1,8 @@
-use super::*;
-use base64::engine::general_purpose;
-use base64::Engine;
+use base64::{engine::general_purpose, Engine};
 use image::GenericImageView;
-use web_common::api::JPEGError;
-use web_common::traits::*;
-use web_common::types::JPEG;
+use web_common::{api::JPEGError, traits::*, types::JPEG};
+
+use super::*;
 
 impl FileLike for JPEG {
     const FORMATS: &'static [GenericFileFormat] =
@@ -77,10 +75,7 @@ impl FileLike for JPEG {
     fn preview(&self) -> Html {
         let data: &[u8] = self.as_ref();
 
-        let url = format!(
-            "data:image/jpeg;base64,{}",
-            general_purpose::STANDARD.encode(data)
-        );
+        let url = format!("data:image/jpeg;base64,{}", general_purpose::STANDARD.encode(data));
         html! {
             <img src={url} class="preview" />
         }

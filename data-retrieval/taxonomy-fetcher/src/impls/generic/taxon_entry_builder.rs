@@ -1,10 +1,11 @@
-//! Submodule implementing the TaxonEntryBuilder trait for the Open Tree of Life taxonomy.
-
-use crate::traits::{Rank, TaxonEntryBuilder, TaxonIdentifier, TaxonomyBuilder};
+//! Submodule implementing the TaxonEntryBuilder trait for the Open Tree of Life
+//! taxonomy.
 
 use super::taxon_entry::GenericTaxonEntry;
+use crate::traits::{Rank, TaxonEntryBuilder, TaxonIdentifier, TaxonomyBuilder};
 
-/// Implementation of the taxon entry builder for the Open Tree of Life taxonomy.
+/// Implementation of the taxon entry builder for the Open Tree of Life
+/// taxonomy.
 pub struct GenericTaxonEntryBuilder<Id: TaxonIdentifier, R: Rank> {
     /// Identifier of the taxon entry.
     id: Option<Id>,
@@ -19,12 +20,7 @@ pub struct GenericTaxonEntryBuilder<Id: TaxonIdentifier, R: Rank> {
 /// Implementation of the Default trait for GenericTaxonEntryBuilder
 impl<Id: TaxonIdentifier, R: Rank> Default for GenericTaxonEntryBuilder<Id, R> {
     fn default() -> Self {
-        Self {
-            id: None,
-            name: None,
-            rank: None,
-            parent_id: None,
-        }
+        Self { id: None, name: None, rank: None, parent_id: None }
     }
 }
 
@@ -43,10 +39,7 @@ impl<Id: TaxonIdentifier, R: Rank> TaxonEntryBuilder for GenericTaxonEntryBuilde
         self,
         name: S,
     ) -> Result<Self, crate::errors::TaxonEntryBuilderError<Self::TaxonEntry>> {
-        Ok(Self {
-            name: Some(name.to_string()),
-            ..self
-        })
+        Ok(Self { name: Some(name.to_string()), ..self })
     }
 
     fn set_parent_id(
@@ -72,15 +65,9 @@ impl<Id: TaxonIdentifier, R: Rank> TaxonEntryBuilder for GenericTaxonEntryBuilde
     where
         TB: TaxonomyBuilder<TaxonEntry = Self::TaxonEntry, TaxonEntryBuilder = Self>,
     {
-        let id = self
-            .id
-            .ok_or(crate::errors::TaxonEntryBuilderError::MissingId)?;
-        let name = self
-            .name
-            .ok_or(crate::errors::TaxonEntryBuilderError::MissingName)?;
-        let rank = self
-            .rank
-            .ok_or(crate::errors::TaxonEntryBuilderError::MissingRank)?;
+        let id = self.id.ok_or(crate::errors::TaxonEntryBuilderError::MissingId)?;
+        let name = self.name.ok_or(crate::errors::TaxonEntryBuilderError::MissingName)?;
+        let rank = self.rank.ok_or(crate::errors::TaxonEntryBuilderError::MissingRank)?;
 
         if taxonomy_builder.is_id_in_use(&id) {
             return Err(crate::errors::TaxonEntryBuilderError::DuplicateIdentifierError(id));
@@ -92,11 +79,6 @@ impl<Id: TaxonIdentifier, R: Rank> TaxonEntryBuilder for GenericTaxonEntryBuilde
         //     ));
         // }
 
-        Ok(GenericTaxonEntry {
-            id,
-            name,
-            rank,
-            parent_id: self.parent_id,
-        })
+        Ok(GenericTaxonEntry { id, name, rank, parent_id: self.parent_id })
     }
 }

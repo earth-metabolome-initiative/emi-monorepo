@@ -1,7 +1,6 @@
-use crate::csv_columns::CSVColumn;
-use crate::errors::CSVSchemaError;
-use crate::metadata::CSVTableMetadata;
-use crate::CSVSchema;
+use crate::{
+    csv_columns::CSVColumn, errors::CSVSchemaError, metadata::CSVTableMetadata, CSVSchema,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a CSV table.
@@ -29,10 +28,7 @@ impl<'a> CSVTable<'a> {
         self.table_metadata
             .columns
             .iter()
-            .map(|column_metadata| CSVColumn {
-                table: self,
-                column_metadata,
-            })
+            .map(|column_metadata| CSVColumn { table: self, column_metadata })
             .collect()
     }
 
@@ -49,11 +45,10 @@ impl<'a> CSVTable<'a> {
             .tables()
             .into_iter()
             .filter(|table| {
-                table.columns().iter().any(|column| {
-                    column
-                        .foreign_table()
-                        .is_some_and(|t| t.name() == self.name())
-                })
+                table
+                    .columns()
+                    .iter()
+                    .any(|column| column.foreign_table().is_some_and(|t| t.name() == self.name()))
             })
             .collect()
     }
@@ -68,10 +63,7 @@ impl<'a> CSVTable<'a> {
             .columns
             .iter()
             .find(|column| column.primary_key)
-            .map(|column_metadata| CSVColumn {
-                table: self,
-                column_metadata,
-            })
+            .map(|column_metadata| CSVColumn { table: self, column_metadata })
             .unwrap()
     }
 
@@ -86,43 +78,25 @@ impl<'a> CSVTable<'a> {
             .iter()
             .find(|column| &column.name(self.schema).unwrap() == column_name)
             .ok_or(CSVSchemaError::InvalidColumnName(column_name.to_string()))?;
-        Ok(CSVColumn {
-            table: self,
-            column_metadata,
-        })
+        Ok(CSVColumn { table: self, column_metadata })
     }
 
     #[must_use]
     /// Returns the name of the table.
     pub fn to_postgres(&self) -> Result<String, CSVSchemaError> {
-        let mut sql = format!(
-            "CREATE TABLE IF NOT EXISTS {} (\n",
-            self.table_metadata.name
-        );
+        let mut sql = format!("CREATE TABLE IF NOT EXISTS {} (\n", self.table_metadata.name);
         for column in &self.columns() {
             sql.push_str(&format!(
                 "    {} {}{}{}{}{},\n",
                 column.name()?,
                 if let Some(foreign_table) = &column.foreign_table() {
-                    foreign_table
-                        .primary_key()
-                        .data_type()
-                        .into_non_serial()
-                        .to_postgres()
+                    foreign_table.primary_key().data_type().into_non_serial().to_postgres()
                 } else {
                     column.data_type().to_postgres()
                 },
-                if column.is_primary_key() {
-                    " PRIMARY KEY"
-                } else {
-                    ""
-                },
+                if column.is_primary_key() { " PRIMARY KEY" } else { "" },
                 if column.is_unique() { " UNIQUE" } else { "" },
-                if column.is_nullable() || column.is_primary_key() {
-                    ""
-                } else {
-                    " NOT NULL"
-                },
+                if column.is_nullable() || column.is_primary_key() { "" } else { " NOT NULL" },
                 if let Some(foreign_table) = &column.foreign_table() {
                     format!(
                         " REFERENCES {}({}) ON DELETE CASCADE",
@@ -170,11 +144,7 @@ impl<'a> CSVTable<'a> {
                 column.name()?,
                 column.data_type().to_postgres(),
                 if column.is_unique() { " UNIQUE" } else { "" },
-                if column.is_nullable() {
-                    ""
-                } else {
-                    " NOT NULL"
-                },
+                if column.is_nullable() { "" } else { " NOT NULL" },
             ));
         }
 
@@ -204,7 +174,8 @@ impl<'a> CSVTable<'a> {
     /// Returns the SQL to populate the table.
     ///
     /// # Panics
-    /// * If the schema is in an invalid state and the foreign table does not exist.
+    /// * If the schema is in an invalid state and the foreign table does not
+    ///   exist.
     pub fn populate(&self) -> Result<String, CSVSchemaError> {
         let mut sql = self.temporary_table()?;
 
@@ -237,11 +208,7 @@ impl<'a> CSVTable<'a> {
                     foreign_table.primary_key().name()?
                 ));
             } else {
-                sql.push_str(&format!(
-                    "    {}.{},\n",
-                    temporary_table_name,
-                    column.name()?
-                ));
+                sql.push_str(&format!("    {}.{},\n", temporary_table_name, column.name()?));
             }
         }
         sql.pop();

@@ -5,10 +5,7 @@ edition = "2021"
 
 [dependencies]
 serde.workspace = true
-common-traits-derive = {workspace = true, optional = true}
-
-[features]
-derive = ["dep:common-traits-derive"]
+common-traits-derive.workspace = true
 
 [lints]
 workspace = true

@@ -2,13 +2,14 @@
 
 use std::str::FromStr;
 
-use crate::{errors::TaxonEntryBuilderError, traits::Rank};
-use font_awesome::Icon;
-use serde::de::Deserialize;
-use serde::ser::{Serialize, Serializer};
+use serde::{
+    de::Deserialize,
+    ser::{Serialize, Serializer},
+};
 use strum::EnumIter;
 
 use super::taxon_entry::OpenTreeOfLifeTaxonEntry;
+use crate::{errors::TaxonEntryBuilderError, traits::Rank};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 /// Enumeration of the ranks used in the Open Tree of Life taxonomy.

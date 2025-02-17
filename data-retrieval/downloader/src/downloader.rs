@@ -1,16 +1,14 @@
 //! Submodule defining a download task.
 
+use std::{fmt::Debug, fs::File, io::Write, path::Path};
+
 use futures_util::StreamExt;
 use indicatif::{MultiProgress, ProgressBar, ProgressIterator};
 use reqwest::{Client, Response};
-use std::io::Write;
-use std::path::Path;
-use std::{fmt::Debug, fs::File};
 
-use crate::reports::TaskReport;
-use crate::utils::set_bar_style;
-use crate::CompressionExtension;
-use crate::{errors::DownloaderError, Task};
+use crate::{
+    errors::DownloaderError, reports::TaskReport, utils::set_bar_style, CompressionExtension, Task,
+};
 
 /// Download task.
 #[derive(Debug, Clone, Default)]
@@ -22,7 +20,8 @@ pub struct Downloader {
     pub show_loading_bar: bool,
     /// The tasks to download.
     pub tasks: Vec<Task>,
-    /// Whether to cache the downloaded files, i.e. not download them again if they already exist.
+    /// Whether to cache the downloaded files, i.e. not download them again if
+    /// they already exist.
     pub cache: bool,
     /// Whether to automatically extract the documents
     pub extract: bool,
@@ -32,7 +31,8 @@ pub struct Downloader {
 
 impl Downloader {
     #[must_use]
-    /// Set whether to delete the partially downloaded file upon CTRL+C or failure.
+    /// Set whether to delete the partially downloaded file upon CTRL+C or
+    /// failure.
     ///
     /// # Returns
     ///
@@ -51,7 +51,6 @@ impl Downloader {
     ///
     /// assert_eq!(task.delete_on_cancel, false);
     /// ```
-    ///
     pub fn delete_on_cancel(mut self) -> Self {
         self.delete_on_cancel = true;
         self
@@ -76,7 +75,6 @@ impl Downloader {
     /// let task: Downloader = Downloader::default();
     ///
     /// assert_eq!(task.cache, false);
-    ///
     /// ```
     pub fn cache(mut self) -> Self {
         self.cache = true;
@@ -127,7 +125,6 @@ impl Downloader {
     /// let task: Downloader = Downloader::default();
     ///
     /// assert_eq!(task.delete_compressed, false);
-    ///
     /// ```
     pub fn delete_compressed(mut self) -> Self {
         self.delete_compressed = true;
@@ -154,7 +151,7 @@ impl Downloader {
     /// # Examples
     ///
     /// ```rust
-    /// use downloader::{Downloader, DownloaderError, DownloaderConfig};
+    /// use downloader::{Downloader, DownloaderConfig, DownloaderError};
     ///
     /// let mut task: Downloader = Downloader::default().task("https://example.com").unwrap();
     ///
@@ -173,7 +170,6 @@ impl Downloader {
     /// # Errors
     ///
     /// * If the URL is invalid.
-    ///
     pub fn task<T>(mut self, task: T) -> Result<Self, DownloaderError>
     where
         T: TryInto<Task>,
@@ -229,7 +225,6 @@ impl Downloader {
     /// task = task.task("https://example.com").unwrap();
     ///
     /// assert!(!task.is_empty());
-    ///
     /// ```
     pub fn is_empty(&self) -> bool {
         self.tasks.is_empty()
@@ -250,7 +245,8 @@ impl Downloader {
     /// ```rust
     /// use downloader::{Downloader, DownloaderError};
     ///
-    /// let mut task: Downloader = Downloader::default().tasks(&["https://example.com", "https://example.org"]).unwrap();
+    /// let mut task: Downloader =
+    ///     Downloader::default().tasks(&["https://example.com", "https://example.org"]).unwrap();
     ///
     /// assert_eq!(task.tasks.len(), 2);
     /// assert_eq!(task.tasks[0].url.as_str(), "https://example.com/");
@@ -260,7 +256,6 @@ impl Downloader {
     /// # Errors
     ///
     /// * If any of the URLs are invalid.
-    ///
     pub fn tasks<I, T>(mut self, tasks: I) -> Result<Self, DownloaderError>
     where
         I: IntoIterator<Item = T>,
@@ -282,17 +277,17 @@ impl Downloader {
     /// # Returns
     ///
     /// * A vector of reports for each task.
-    ///
     pub async fn execute(self) -> Result<Vec<TaskReport>, DownloaderError> {
         // We build the composite progress bar.
         let composite: MultiProgress = MultiProgress::new();
 
         // We add a progress bar for the primary task.
-        let primary: ProgressBar = set_bar_style(composite.add(if self.show_loading_bar && self.len() > 1 {
-            ProgressBar::new(self.tasks.len() as u64)
-        } else {
-            ProgressBar::hidden()
-        }));
+        let primary: ProgressBar =
+            set_bar_style(composite.add(if self.show_loading_bar && self.len() > 1 {
+                ProgressBar::new(self.tasks.len() as u64)
+            } else {
+                ProgressBar::hidden()
+            }));
 
         let mut reports = Vec::with_capacity(self.len());
         // We obtain a client.
@@ -300,12 +295,7 @@ impl Downloader {
 
         for task in self.tasks.into_iter().progress_with(primary) {
             if self.cache && Path::new(&task.target_path).exists() {
-                reports.push(TaskReport {
-                    task,
-                    time: 0.0,
-                    cached: true,
-                    extraction_report: None,
-                });
+                reports.push(TaskReport { task, time: 0.0, cached: true, extraction_report: None });
                 continue;
             }
             let task_start = std::time::Instant::now();
@@ -338,11 +328,8 @@ impl Downloader {
             let mut extraction_report = None;
 
             if self.extract {
-                extraction_report = Some(CompressionExtension::extract(
-                    path,
-                    &composite,
-                    self.show_loading_bar,
-                )?);
+                extraction_report =
+                    Some(CompressionExtension::extract(path, &composite, self.show_loading_bar)?);
                 if self.delete_compressed {
                     std::fs::remove_file(path)?;
                 }

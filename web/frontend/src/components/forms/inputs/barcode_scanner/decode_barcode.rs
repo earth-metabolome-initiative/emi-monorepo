@@ -1,5 +1,6 @@
-use super::barcode_preprocessing::preprocess_image_data;
 use std::collections::HashMap;
+
+use super::barcode_preprocessing::preprocess_image_data;
 
 #[inline]
 fn make_hints() -> rxing::DecodingHintDictionary {
@@ -10,10 +11,7 @@ fn make_hints() -> rxing::DecodingHintDictionary {
             [rxing::BarcodeFormat::QR_CODE].iter().cloned().collect(),
         ),
     );
-    hints.insert(
-        rxing::DecodeHintType::TRY_HARDER,
-        rxing::DecodeHintValue::TryHarder(true),
-    );
+    hints.insert(rxing::DecodeHintType::TRY_HARDER, rxing::DecodeHintValue::TryHarder(true));
     hints
 }
 

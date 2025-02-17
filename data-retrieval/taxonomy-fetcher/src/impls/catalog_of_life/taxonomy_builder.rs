@@ -1,18 +1,17 @@
 //! Implementation of the taxonomy builder for the Open Tree of Life taxonomy.
 
-use super::rank::CatalogOfLifeRank;
-use super::COLId;
-use super::{
-    taxon_entry::CatalogOfLifeTaxonEntry, taxon_entry_builder::CatalogOfLifeTaxonEntryBuilder,
-    taxonomy::CatalogOfLifeTaxonomy, version::CatalogOfLifeVersion,
-};
-use crate::traits::TaxonomyBuilder;
-use crate::TaxonEntryBuilder;
+use std::{io::BufReader, str::FromStr};
+
 use csv::ReaderBuilder;
 use downloader::Downloader;
 use serde::Deserialize;
-use std::io::BufReader;
-use std::str::FromStr;
+
+use super::{
+    rank::CatalogOfLifeRank, taxon_entry::CatalogOfLifeTaxonEntry,
+    taxon_entry_builder::CatalogOfLifeTaxonEntryBuilder, taxonomy::CatalogOfLifeTaxonomy,
+    version::CatalogOfLifeVersion, COLId,
+};
+use crate::{traits::TaxonomyBuilder, TaxonEntryBuilder};
 
 #[derive(Default)]
 /// Implementation of the taxonomy trait for the Open Tree of Life.
@@ -38,7 +37,7 @@ enum TaxonomicalStatus {
     Accepted,
     ProvisionallyAccepted,
     AmbiguosSynonym,
-    Misapplied
+    Misapplied,
 }
 
 impl FromStr for TaxonomicalStatus {
@@ -70,8 +69,17 @@ impl<'de> serde::Deserialize<'de> for TaxonomicalStatus {
 /// Row in the Open Tree of Life taxonomy.
 struct TaxonomyRow {
     /// Unique identifier of the taxon.
-    /// dwc:taxonID     dwc:parentNameUsageID   dwc:acceptedNameUsageID dwc:originalNameUsageID dwc:scientificNameID    dwc:datasetID   dwc:taxonomicStatus     dwc:taxonRank      dwc:scientificName      dwc:scientificNameAuthorship    col:notho       dwc:genericName dwc:infragenericEpithet dwc:specificEpithet     dwc:infraspecificEpithet   dwc:cultivarEpithet     dwc:nameAccordingTo     dwc:namePublishedIn     dwc:nomenclaturalCode   dwc:nomenclaturalStatus dwc:taxonRemarks        dcterms:references
-    // 673FW           3CP83   7YDkrov8jzu-BK-5Yf51k   ----D8DjzaNRExOS-pw7t1  2232    synonym species Anisophyllum hyssopifolium (L.) Haw.    (L.) Haw.               Anisophyllum               hyssopifolium                           Syn. Pl. Succ.: 161 (1812)      ICN
+    /// dwc:taxonID     dwc:parentNameUsageID   dwc:acceptedNameUsageID
+    /// dwc:originalNameUsageID dwc:scientificNameID    dwc:datasetID
+    /// dwc:taxonomicStatus     dwc:taxonRank      dwc:scientificName
+    /// dwc:scientificNameAuthorship    col:notho       dwc:genericName
+    /// dwc:infragenericEpithet dwc:specificEpithet     dwc:infraspecificEpithet
+    /// dwc:cultivarEpithet     dwc:nameAccordingTo     dwc:namePublishedIn
+    /// dwc:nomenclaturalCode   dwc:nomenclaturalStatus dwc:taxonRemarks
+    /// dcterms:references
+    // 673FW           3CP83   7YDkrov8jzu-BK-5Yf51k   ----D8DjzaNRExOS-pw7t1  2232    synonym
+    // species Anisophyllum hyssopifolium (L.) Haw.    (L.) Haw.               Anisophyllum
+    // hyssopifolium                           Syn. Pl. Succ.: 161 (1812)      ICN
     #[serde(rename = "dwc:taxonID")]
     uid: COLId,
     #[serde(rename = "dwc:parentNameUsageID")]
@@ -124,17 +132,11 @@ impl TaxonomyBuilder for CatalogOfLifeTaxonomyBuilder {
     type TaxonEntryBuilder = CatalogOfLifeTaxonEntryBuilder;
 
     fn version(self, version: <Self::Taxonomy as crate::traits::Taxonomy>::Version) -> Self {
-        Self {
-            version: Some(version),
-            ..self
-        }
+        Self { version: Some(version), ..self }
     }
 
     fn directory(self, directory: std::path::PathBuf) -> Self {
-        Self {
-            directory: Some(directory),
-            ..self
-        }
+        Self { directory: Some(directory), ..self }
     }
 
     fn is_id_in_use(&self, id: &<Self::TaxonEntry as crate::traits::TaxonEntry>::Id) -> bool {
@@ -149,17 +151,13 @@ impl TaxonomyBuilder for CatalogOfLifeTaxonomyBuilder {
         &self,
         id: &<Self::TaxonEntry as crate::traits::TaxonEntry>::Id,
     ) -> Option<&Self::TaxonEntry> {
-        self.id_to_position
-            .get(id)
-            .map(|&pos| &self.taxon_entries[pos as usize])
+        self.id_to_position.get(id).map(|&pos| &self.taxon_entries[pos as usize])
     }
 
     async fn build(
         mut self,
     ) -> Result<Self::Taxonomy, crate::errors::TaxonomyBuilderError<Self::TaxonEntry>> {
-        let version = self
-            .version
-            .ok_or(crate::errors::TaxonomyBuilderError::MissingVersion)?;
+        let version = self.version.ok_or(crate::errors::TaxonomyBuilderError::MissingVersion)?;
         let _reports = Downloader::default()
             .task(version.url())?
             .extract()
@@ -186,10 +184,8 @@ impl TaxonomyBuilder for CatalogOfLifeTaxonomyBuilder {
                 .set_rank(record.rank)?
                 .build(&self)?;
 
-            self.id_to_position
-                .insert(taxon_entry.id.clone(), self.taxon_entries.len() as u32);
-            self.name_to_position
-                .insert(taxon_entry.name.clone(), self.taxon_entries.len() as u32);
+            self.id_to_position.insert(taxon_entry.id.clone(), self.taxon_entries.len() as u32);
+            self.name_to_position.insert(taxon_entry.name.clone(), self.taxon_entries.len() as u32);
             if record.parent_uid.is_none() {
                 if self.root_position.is_some() {
                     return Err(crate::errors::TaxonomyBuilderError::MultipleRoots);

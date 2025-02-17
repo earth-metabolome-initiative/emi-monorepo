@@ -1,7 +1,6 @@
-use crate::errors::WebCodeGenError;
-use crate::Column;
-use crate::Table;
 use diesel::pg::PgConnection;
+
+use crate::{errors::WebCodeGenError, Column, Table};
 
 /// A trait for custom table constraints
 pub trait CustomTableConstraint {

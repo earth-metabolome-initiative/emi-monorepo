@@ -1,5 +1,5 @@
+mod create_authorization_functions;
 mod create_roles_tables;
 mod create_update_triggers;
-mod create_authorization_functions;
 
 pub use create_authorization_functions::AuthorizationFunctionBuilder;

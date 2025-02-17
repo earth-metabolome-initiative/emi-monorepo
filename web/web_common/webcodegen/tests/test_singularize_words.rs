@@ -3,18 +3,12 @@ use pluralizer;
 use regex::Regex;
 #[test]
 fn singluarize() -> () {
-    pluralizer::add_singular_rule(
-        Regex::new("(?i)(spectr|append)a$").unwrap(),
-        "$1um".to_string(),
-    );
+    pluralizer::add_singular_rule(Regex::new("(?i)(spectr|append)a$").unwrap(), "$1um".to_string());
     pluralizer::add_singular_rule(
         Regex::new("(?i)(matr|append)ices$").unwrap(),
         "$1ix".to_string(),
     );
-    pluralizer::add_singular_rule(
-        Regex::new("(?i)(tax|append)a$").unwrap(),
-        "$1on".to_string(),
-    );
+    pluralizer::add_singular_rule(Regex::new("(?i)(tax|append)a$").unwrap(), "$1on".to_string());
 
     let words = vec![
         "countries",
@@ -52,10 +46,8 @@ fn singluarize() -> () {
         "identity_increment",
     ];
 
-    let singularized = words
-        .iter()
-        .map(|word| pluralizer::pluralize(word, 1, false))
-        .collect::<Vec<String>>();
+    let singularized =
+        words.iter().map(|word| pluralizer::pluralize(word, 1, false)).collect::<Vec<String>>();
 
     assert_eq!(singularized, expected);
 }

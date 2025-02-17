@@ -2,22 +2,22 @@
 //! to determine whether a user can insert, delete, or update a row in a table.
 //!
 //! Rows in tables characterized by `created_by` and `updated_by` columns are
-//! considered editables by the user who created them and/or by the user who last
-//! updated them. Most commonly, such tables will have associated user roles tables
-//! which determine additional permissions for each user, plus analogous team roles
-//! tables which determine permissions for each team.
+//! considered editables by the user who created them and/or by the user who
+//! last updated them. Most commonly, such tables will have associated user
+//! roles tables which determine additional permissions for each user, plus
+//! analogous team roles tables which determine permissions for each team.
 //!
-//! When a table has a `parent` table (e.g., `samples` has a parent table `projects`),
-//! the permissions for the parent table are inherited by the child table. For example,
-//! if a user has `insert` permission on a project, they will also have `insert` permission
-//! on all samples associated with that project. A parent table is determined as a foreign
-//! key reference to another table.
+//! When a table has a `parent` table (e.g., `samples` has a parent table
+//! `projects`), the permissions for the parent table are inherited by the child
+//! table. For example, if a user has `insert` permission on a project, they
+//! will also have `insert` permission on all samples associated with that
+//! project. A parent table is determined as a foreign key reference to another
+//! table.
 //!
-//! Tables with multiple parent tables are at this time not supported and will raise an error.
-//!
+//! Tables with multiple parent tables are at this time not supported and will
+//! raise an error.
 
-use diesel::connection::SimpleConnection;
-use diesel::PgConnection;
+use diesel::{connection::SimpleConnection, PgConnection};
 
 use crate::{errors::WebCodeGenError, Column, Table};
 
@@ -37,7 +37,6 @@ impl AuthorizationFunctionBuilder {
     /// # Returns
     ///
     /// * `Self` - The updated builder.
-    ///
     pub fn add_childless_table(mut self, table: Table) -> Self {
         self.childless_tables.push(table);
         self
@@ -48,7 +47,6 @@ impl AuthorizationFunctionBuilder {
     /// # Arguments
     ///
     /// * `conn` - The connection to the database.
-    ///
     fn can_be_parent(&self, table: &Table) -> bool {
         self.childless_tables.contains(table)
     }
@@ -58,7 +56,6 @@ impl AuthorizationFunctionBuilder {
     /// # Arguments
     ///
     /// * `conn` - The connection to the database.
-    ///
     fn parent_tables(
         &self,
         table: &Table,
@@ -76,14 +73,15 @@ impl AuthorizationFunctionBuilder {
         Ok(parent_tables)
     }
 
-    /// Creates in the database for all tables the authorization functions and triggers.
+    /// Creates in the database for all tables the authorization functions and
+    /// triggers.
     ///
     /// # Arguments
     ///
     /// * `conn` - The connection to the database.
-    /// * `table_catalog` - The catalog of the tables to create the functions for.
+    /// * `table_catalog` - The catalog of the tables to create the functions
+    ///   for.
     /// * `table_schema` - The schema of the tables to create the functions for.
-    ///
     pub fn create_authorization_functions_and_triggers(
         &self,
         conn: &mut PgConnection,
@@ -112,19 +110,14 @@ impl AuthorizationFunctionBuilder {
     ///
     /// * `table` - The table for which to create the function.
     /// * `conn` - The connection to the database.
-    ///
     pub fn canx_function_and_trigger(
         &self,
         table: &Table,
         conn: &mut PgConnection,
     ) -> Result<String, WebCodeGenError> {
         let primary_keys = table.primary_key_columns(conn)?;
-        let user_table = Table::load(
-            conn,
-            "users",
-            Some(&table.table_schema),
-            &table.table_catalog,
-        )?;
+        let user_table =
+            Table::load(conn, "users", Some(&table.table_schema), &table.table_catalog)?;
         let user_id_column = user_table
             .primary_key_columns(conn)?
             .first()
@@ -262,10 +255,7 @@ impl AuthorizationFunctionBuilder {
         let where_statement = primary_keys
             .iter()
             .map(|column| {
-                format!(
-                    "{}.{} = this_{}",
-                    table.table_name, column.column_name, column.column_name
-                )
+                format!("{}.{} = this_{}", table.table_name, column.column_name, column.column_name)
             })
             .collect::<Vec<String>>()
             .join(" AND ");
@@ -372,13 +362,11 @@ LANGUAGE plpgsql PARALLEL SAFE;
     }
 
     fn trigger_function_name(&self, table: &Table) -> String {
-        format!(
-            "can_insert_or_update_{table_name}_trigger",
-            table_name = table.table_name
-        )
+        format!("can_insert_or_update_{table_name}_trigger", table_name = table.table_name)
     }
 
-    /// Returns the trigger to call when the provided table receives an operation.
+    /// Returns the trigger to call when the provided table receives an
+    /// operation.
     fn update_trigger(&self, table: &Table) -> String {
         format!(
             r#"CREATE OR REPLACE TRIGGER can_insert_or_update_{table_name}

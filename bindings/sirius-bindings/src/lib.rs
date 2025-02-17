@@ -14,9 +14,7 @@ mod versions;
 
 /// Prelude module
 pub mod prelude {
-    pub use crate::builder::SiriusBuilder;
-    pub use crate::parameters::*;
-    pub use crate::sirius::Sirius;
-    pub use crate::sirius_types::*;
-    pub use crate::versions::*;
+    pub use crate::{
+        builder::SiriusBuilder, parameters::*, sirius::Sirius, sirius_types::*, versions::*,
+    };
 }

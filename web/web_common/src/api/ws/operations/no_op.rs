@@ -18,7 +18,7 @@ impl Operation for NoOp {
         self.id
     }
 
-	#[cfg(feature = "backend")]
+    #[cfg(feature = "backend")]
     async fn execute(
         self,
         _connection: &mut diesel::PgConnection,

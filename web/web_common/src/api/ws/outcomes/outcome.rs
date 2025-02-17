@@ -1,8 +1,9 @@
 //! Submodule providing the OutcomeMessage enum and the Outcome trait.
 
-use crate::api::ws::operations::NoOp;
 use common_traits::prelude::basic;
 use web_common_traits::prelude::Operation;
+
+use crate::api::ws::operations::NoOp;
 
 /// Enumeration of all possible operations.
 #[basic]

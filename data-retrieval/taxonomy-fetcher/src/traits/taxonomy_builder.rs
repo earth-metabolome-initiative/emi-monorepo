@@ -27,7 +27,8 @@ pub trait TaxonomyBuilder: Sized + Default {
     /// Returns whether a provided name is already in use.
     fn is_name_in_use(&self, name: &str) -> bool;
 
-    /// Returns the [`TaxonEntry`] associated to the provided identifier, if any.
+    /// Returns the [`TaxonEntry`] associated to the provided identifier, if
+    /// any.
     fn get_taxon_entry(
         &self,
         id: &<Self::TaxonEntry as super::TaxonEntry>::Id,
@@ -36,8 +37,7 @@ pub trait TaxonomyBuilder: Sized + Default {
     /// Builds a taxonomy from the given CSV file.
     fn build(
         self,
-    ) -> impl std::future::Future<Output = Result<
-        Self::Taxonomy,
-        crate::errors::TaxonomyBuilderError<Self::TaxonEntry>,
-    >> + Send;
+    ) -> impl std::future::Future<
+        Output = Result<Self::Taxonomy, crate::errors::TaxonomyBuilderError<Self::TaxonEntry>>,
+    > + Send;
 }

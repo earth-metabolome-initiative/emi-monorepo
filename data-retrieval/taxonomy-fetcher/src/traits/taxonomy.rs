@@ -3,8 +3,7 @@
 use serde::Serialize;
 
 use super::TaxonEntry;
-use crate::errors::TaxonomyError;
-use crate::traits::taxon::Taxon;
+use crate::{errors::TaxonomyError, traits::taxon::Taxon};
 
 #[derive(Debug, Serialize)]
 struct CSVTaxonEntry<TE: TaxonEntry> {

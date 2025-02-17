@@ -1,7 +1,7 @@
 pub mod messages;
+pub mod operation_errors;
 pub mod operations;
 pub mod outcomes;
-pub mod operation_errors;
 
 use crate::combine_path;
 

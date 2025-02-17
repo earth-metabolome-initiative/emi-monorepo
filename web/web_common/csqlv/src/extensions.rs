@@ -18,9 +18,10 @@ pub const COMPRESSION_EXTENSIONS: [&str; 1] = ["gz"];
 /// supported by the CSV Schema struct. The supported extensions are defined
 /// in the `EXTENSIONS` constant, combined with the `COMPRESSION_EXTENSIONS`
 /// constant for compressed files. The function returns `true` if the path
-/// has an extension of the form `name.extension` or `name.extension.compression`
-/// where `name` is the name of the file, `extension` is the extension of the
-/// file, and `compression` is the compression extension.
+/// has an extension of the form `name.extension` or
+/// `name.extension.compression` where `name` is the name of the file,
+/// `extension` is the extension of the file, and `compression` is the
+/// compression extension.
 ///
 /// # Example
 ///
@@ -73,7 +74,6 @@ pub fn has_supported_extension(path: &Path) -> bool {
 ///
 /// assert!(!csqlv::extensions::has_compression_extension(path));
 /// ```
-///
 pub fn has_compression_extension(path: &Path) -> bool {
     if let Some(ext) = path.extension() {
         COMPRESSION_EXTENSIONS.iter().any(|compression_ext| {
@@ -133,9 +133,7 @@ pub fn delimiter_from_path(path: &Path) -> Option<char> {
 
     // We check if the extension is within the set of compressed extensions.
     // If so, we remove the compression extension and obtain the new extension.
-    let extension = if COMPRESSION_EXTENSIONS
-        .iter()
-        .any(|ext| ext.eq_ignore_ascii_case(extension))
+    let extension = if COMPRESSION_EXTENSIONS.iter().any(|ext| ext.eq_ignore_ascii_case(extension))
     {
         if let Some(stripped) = path
             .file_stem()
@@ -192,11 +190,8 @@ pub fn delimiter_from_path(path: &Path) -> Option<char> {
 /// assert_eq!(csqlv::extensions::file_name_without_extension(path), Some("data"));
 /// ```
 pub fn file_name_without_extension(path: &Path) -> Option<&str> {
-    let path: &Path = if has_compression_extension(path) {
-        Path::new(path.file_stem()?.to_str()?)
-    } else {
-        path
-    };
+    let path: &Path =
+        if has_compression_extension(path) { Path::new(path.file_stem()?.to_str()?) } else { path };
 
     if has_supported_extension(path) {
         path.file_stem()?.to_str()

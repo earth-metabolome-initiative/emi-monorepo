@@ -1,13 +1,14 @@
 //! Login page of the application.
 
-use crate::api::oauth::providers::retrieve_login_providers;
-use crate::components::login_provider::LoginProvider;
-use crate::router::AppRoute;
-use crate::stores::user_state::UserState;
 use web_common::api::oauth::providers::OAuth2LoginProvider;
 use yew::prelude::*;
 use yew_router::prelude::*;
 use yewdux::prelude::*;
+
+use crate::{
+    api::oauth::providers::retrieve_login_providers, components::login_provider::LoginProvider,
+    router::AppRoute, stores::user_state::UserState,
+};
 
 #[function_component(Login)]
 pub fn login() -> Html {

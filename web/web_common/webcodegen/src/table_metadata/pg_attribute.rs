@@ -1,14 +1,15 @@
 //! Submodule providing the struct `PgAttribute` and associated methods.
-use crate::{errors::WebCodeGenError, PgType};
 use diesel::{
-    QueryDsl, RunQueryDsl, ExpressionMethods, PgConnection, Queryable, QueryableByName, Selectable,
+    ExpressionMethods, PgConnection, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
 };
+
+use crate::{errors::WebCodeGenError, PgType};
 
 /// Represents a PostgreSQL attribute (column) in a table.
 ///
-/// This struct maps to the `pg_attribute` system catalog table in PostgreSQL, which stores
-/// metadata about table columns. Each instance of `PgAttribute` corresponds to a single column
-/// in a table.
+/// This struct maps to the `pg_attribute` system catalog table in PostgreSQL,
+/// which stores metadata about table columns. Each instance of `PgAttribute`
+/// corresponds to a single column in a table.
 ///
 /// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-attribute.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq)]
@@ -46,7 +47,8 @@ pub struct PgAttribute {
     pub atthasdef: bool,
     /// Whether the column has a missing value.
     pub atthasmissing: bool,
-    /// The identity type of the column (e.g., 'a' for always, 'd' for by default).
+    /// The identity type of the column (e.g., 'a' for always, 'd' for by
+    /// default).
     pub attidentity: String,
     /// The generation expression for the column (if any).
     pub attgenerated: String,
@@ -70,9 +72,9 @@ pub struct PgAttribute {
 
 impl PgAttribute {
     /// Returns the `PgType` associated to the `PgAttribute`.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns an error if the provided database connection fails.
     pub fn pg_type(&self, conn: &mut PgConnection) -> Result<PgType, WebCodeGenError> {
         use crate::schema::pg_type;
@@ -83,27 +85,27 @@ impl PgAttribute {
     }
 
     /// Returns whether the associated rust type supports `Copy`.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns an error if the provided database connection fails.
     pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         self.pg_type(conn)?.supports_copy(conn)
     }
 
     /// Returns whether the associated rust type supports `Hash`.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns an error if the provided database connection fails.
     pub fn supports_hash(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         self.pg_type(conn)?.supports_hash(conn)
     }
 
     /// Returns whether the associated rust type supports `Eq`.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns an error if the provided database connection fails.
     pub fn supports_eq(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         self.pg_type(conn)?.supports_eq(conn)

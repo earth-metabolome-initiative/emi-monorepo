@@ -1,6 +1,5 @@
 //! Submodule of test suite to detect circular dependencies in the CSV schema.
-use csqlv::CSVSchemaBuilder;
-use csqlv::CSVSchemaError;
+use csqlv::{CSVSchemaBuilder, CSVSchemaError};
 
 #[test]
 fn test_cycle_detection() {

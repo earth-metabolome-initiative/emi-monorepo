@@ -1,11 +1,7 @@
 //! Submodule providing the implementation of the taxonomy trait for the NCBI.
 
+use super::{taxon::NCBITaxon, taxon_entry::NCBITaxonEntry, version::NCBIVersion};
 use crate::traits::Taxonomy;
-
-use super::{
-    taxon::NCBITaxon, taxon_entry::NCBITaxonEntry,
-    version::NCBIVersion,
-};
 
 /// Version of the NCBI taxonomy.
 pub struct NCBITaxonomy {
@@ -40,26 +36,15 @@ impl Taxonomy for NCBITaxonomy {
         self.taxon_entries
             .iter()
             .find(|entry| &entry.id == id)
-            .map(|entry| NCBITaxon {
-                taxon_entry: entry,
-                taxonomy: self,
-            })
+            .map(|entry| NCBITaxon { taxon_entry: entry, taxonomy: self })
             .ok_or(crate::errors::TaxonomyError::TaxonNotFound(id.clone()))
     }
 
     fn root(&self) -> Self::Taxon<'_> {
-        NCBITaxon {
-            taxon_entry: &self.taxon_entries[self.root_position as usize],
-            taxonomy: self,
-        }
+        NCBITaxon { taxon_entry: &self.taxon_entries[self.root_position as usize], taxonomy: self }
     }
 
     fn taxons(&self) -> impl Iterator<Item = Self::Taxon<'_>> + '_ {
-        self.taxon_entries
-            .iter()
-            .map(move |entry| NCBITaxon {
-                taxon_entry: entry,
-                taxonomy: self,
-            })
+        self.taxon_entries.iter().map(move |entry| NCBITaxon { taxon_entry: entry, taxonomy: self })
     }
 }

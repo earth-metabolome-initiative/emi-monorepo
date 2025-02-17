@@ -106,22 +106,20 @@ impl<'a> TryFrom<&'a str> for MassDeviation {
 
     fn try_from(s: &'a str) -> Result<Self, Self::Error> {
         let mut split = s.split_whitespace();
-        let value = split
-            .next()
-            .ok_or_else(|| "No value provided".to_string())?;
+        let value = split.next().ok_or_else(|| "No value provided".to_string())?;
         let unit = split.next().ok_or_else(|| "No unit provided".to_string())?;
 
         match unit {
-            "ppm" => Ok(MassDeviation::Ppm(
-                value
-                    .parse()
-                    .map_err(|e| format!("Cannot parse value: {}", e))?,
-            )),
-            "Da" => Ok(MassDeviation::Da(
-                value
-                    .parse()
-                    .map_err(|e| format!("Cannot parse value: {}", e))?,
-            )),
+            "ppm" => {
+                Ok(MassDeviation::Ppm(
+                    value.parse().map_err(|e| format!("Cannot parse value: {}", e))?,
+                ))
+            }
+            "Da" => {
+                Ok(MassDeviation::Da(
+                    value.parse().map_err(|e| format!("Cannot parse value: {}", e))?,
+                ))
+            }
             _ => Err(format!("Unknown unit: {}", unit)),
         }
     }
@@ -149,16 +147,10 @@ mod tests {
     #[test]
     fn test_error_if_negative_value_with_funtion_call() {
         let error = std::panic::catch_unwind(|| MassDeviation::ppm(-10.0)).unwrap_err();
-        assert_eq!(
-            error.downcast_ref::<&str>(),
-            Some(&"ppm value can't be negative")
-        );
+        assert_eq!(error.downcast_ref::<&str>(), Some(&"ppm value can't be negative"));
 
         let error = std::panic::catch_unwind(|| MassDeviation::da(-0.1)).unwrap_err();
-        assert_eq!(
-            error.downcast_ref::<&str>(),
-            Some(&"Da value can't be negative")
-        );
+        assert_eq!(error.downcast_ref::<&str>(), Some(&"Da value can't be negative"));
     }
 
     #[test]

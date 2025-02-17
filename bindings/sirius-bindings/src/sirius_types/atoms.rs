@@ -625,10 +625,7 @@ mod tests {
                 Atoms::Ne
             ])
         );
-        assert_eq!(
-            AtomVector::try_from("N").unwrap(),
-            AtomVector::from(vec![Atoms::N])
-        );
+        assert_eq!(AtomVector::try_from("N").unwrap(), AtomVector::from(vec![Atoms::N]));
         assert_eq!(
             AtomVector::try_from("N,O").unwrap(),
             AtomVector::from(vec![Atoms::N, Atoms::O])
@@ -637,9 +634,6 @@ mod tests {
     #[test]
     fn test_display() {
         println!("{}", AtomVector::from(vec![Atoms::N]));
-        assert_eq!(
-            AtomVector::from(vec![Atoms::N, Atoms::O, Atoms::P]).to_string(),
-            "N,O,P"
-        );
+        assert_eq!(AtomVector::from(vec![Atoms::N, Atoms::O, Atoms::P]).to_string(), "N,O,P");
     }
 }

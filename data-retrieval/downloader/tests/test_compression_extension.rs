@@ -1,4 +1,5 @@
-//! Submodule to validate whether the correct compression extension is determined.
+//! Submodule to validate whether the correct compression extension is
+//! determined.
 
 use downloader::CompressionExtension;
 

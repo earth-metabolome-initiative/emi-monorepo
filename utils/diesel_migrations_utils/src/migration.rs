@@ -1,7 +1,8 @@
 //! Submodule defining the migration struct and its methods.
 
-use crate::errors::Error;
 use std::path::{Path, PathBuf};
+
+use crate::errors::Error;
 
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
 /// Struct representing a migration.
@@ -29,12 +30,10 @@ impl<'a> TryFrom<&'a Path> for Migration {
 
     fn try_from(path: &'a Path) -> Result<Self, Self::Error> {
         // We get the name of the migration.
-        let name = path
-            .file_name()
-            .ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
-        let name = name
-            .to_str()
-            .ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
+        let name =
+            path.file_name().ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
+        let name =
+            name.to_str().ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
         let mut fragmented_name = name.split('_');
         let number = fragmented_name
             .next()
@@ -78,10 +77,7 @@ impl<'a> TryFrom<&'a Path> for Migration {
             ));
         }
 
-        Ok(Migration {
-            name: name.to_string(),
-            number,
-        })
+        Ok(Migration { name: name.to_string(), number })
     }
 }
 
@@ -135,47 +131,51 @@ impl Migration {
     /// Returns the SQL content of the up migration.
     pub fn up(&self, parent: &Path) -> Result<String, Error> {
         let path = parent.join(self.directory()).join("up.sql");
-        std::fs::read_to_string(path).map_err(|error| Error::ReadingMigrationFailed (
-            self.number,
-            crate::prelude::MigrationKind::Up,
-            error.to_string(),
-        ))
+        std::fs::read_to_string(path).map_err(|error| {
+            Error::ReadingMigrationFailed(
+                self.number,
+                crate::prelude::MigrationKind::Up,
+                error.to_string(),
+            )
+        })
     }
 
     #[must_use]
     /// Returns the SQL content of the down migration.
     pub fn down(&self, parent: &Path) -> Result<String, Error> {
         let path = parent.join(self.directory()).join("down.sql");
-        std::fs::read_to_string(path).map_err(|error| Error::ReadingMigrationFailed (
-            self.number,
-            crate::prelude::MigrationKind::Down,
-            error.to_string(),
-        ))
+        std::fs::read_to_string(path).map_err(|error| {
+            Error::ReadingMigrationFailed(
+                self.number,
+                crate::prelude::MigrationKind::Down,
+                error.to_string(),
+            )
+        })
     }
 
-    /// Moves the up and down migrations to the newly provided number and returns the new migration.
+    /// Moves the up and down migrations to the newly provided number and
+    /// returns the new migration.
     ///
     /// # Implementation details
     ///
-    /// This method does not take into account whether the new number is already taken by another migration.
-    /// It is the responsibility of the caller to ensure that the new number is not already taken.
+    /// This method does not take into account whether the new number is already
+    /// taken by another migration. It is the responsibility of the caller
+    /// to ensure that the new number is not already taken.
     ///
     /// # Arguments
     ///
     /// * `number` - The new number of the migration.
     /// * `parent` - The parent path of the migration.
-    ///
     pub(crate) fn move_to(self, number: u64, parent: &Path) -> Result<Self, Error> {
         let current_migration_directory = parent.join(self.directory());
-        let updated_migration = Migration {
-            name: self.name.clone(),
-            number,
-        };
+        let updated_migration = Migration { name: self.name.clone(), number };
         let updated_migration_directory = parent.join(updated_migration.directory());
         std::fs::rename(&current_migration_directory, &updated_migration_directory).map_err(
-            |_| Error::MovingMigrationFailed {
-                source: current_migration_directory.to_string_lossy().to_string(),
-                destination: updated_migration_directory.to_string_lossy().to_string(),
+            |_| {
+                Error::MovingMigrationFailed {
+                    source: current_migration_directory.to_string_lossy().to_string(),
+                    destination: updated_migration_directory.to_string_lossy().to_string(),
+                }
             },
         )?;
         Ok(updated_migration)

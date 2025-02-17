@@ -1,10 +1,7 @@
 use csqlv::{CSVSchemaBuilder, CSVSchemaError};
-use diesel::connection::SimpleConnection;
-use diesel::pg::PgConnection;
-use diesel::Connection;
-use testcontainers::core::Mount;
+use diesel::{connection::SimpleConnection, pg::PgConnection, Connection};
 use testcontainers::{
-    core::{IntoContainerPort, WaitFor},
+    core::{IntoContainerPort, Mount, WaitFor},
     runners::AsyncRunner,
     ContainerAsync, GenericImage, ImageExt,
 };
@@ -39,19 +36,14 @@ async fn setup_postgres() -> ContainerAsync<GenericImage> {
     let local_absolute_path = local_absolute_path.to_str().unwrap();
 
     let container = GenericImage::new("postgres", "17-alpine")
-        .with_wait_for(WaitFor::message_on_stderr(
-            "database system is ready to accept connections",
-        ))
+        .with_wait_for(WaitFor::message_on_stderr("database system is ready to accept connections"))
         .with_network("bridge")
         .with_env_var("DEBUG", "1")
         .with_env_var("POSTGRES_USER", DATABASE_USER)
         .with_env_var("POSTGRES_PASSWORD", DATABASE_PASSWORD)
         .with_env_var("POSTGRES_DB", DATABASE_NAME)
         .with_mapped_port(DATABASE_PORT, 5432.tcp())
-        .with_mount(Mount::bind_mount(
-            format!("{local_absolute_path}/tests"),
-            "/app/csvs",
-        ))
+        .with_mount(Mount::bind_mount(format!("{local_absolute_path}/tests"), "/app/csvs"))
         .start()
         .await;
 

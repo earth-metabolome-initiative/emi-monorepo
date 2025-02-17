@@ -1,18 +1,19 @@
 //! Implementation of the taxonomy builder for the NCBI taxonomy.
 
+use std::{io::BufReader, str::FromStr};
+
+use csv::ReaderBuilder;
+use downloader::Downloader;
+use serde::Deserialize;
+
 use super::{
     taxon_entry::NCBITaxonEntry, taxon_entry_builder::NCBITaxonEntryBuilder,
     taxonomy::NCBITaxonomy, version::NCBIVersion,
 };
-use crate::impls::ncbi::rank::NCBIRank;
-use crate::traits::TaxonomyBuilder;
-use crate::utils::separator_fixed_reader::SeparatorFixedReader;
-use crate::TaxonEntryBuilder;
-use csv::ReaderBuilder;
-use downloader::Downloader;
-use serde::Deserialize;
-use std::io::BufReader;
-use std::str::FromStr;
+use crate::{
+    impls::ncbi::rank::NCBIRank, traits::TaxonomyBuilder,
+    utils::separator_fixed_reader::SeparatorFixedReader, TaxonEntryBuilder,
+};
 
 #[derive(Default)]
 /// Implementation of the taxonomy trait for the NCBI.
@@ -70,9 +71,11 @@ impl FromStr for TaxonomyNameClass {
             "includes" => Ok(TaxonomyNameClass::Includes),
             "common name" => Ok(TaxonomyNameClass::CommonName),
             "acronym" => Ok(TaxonomyNameClass::Acronym),
-            _ => Err(
-                crate::errors::TaxonEntryBuilderError::UnknownTaxonomicalNameClass(s.to_owned()),
-            ),
+            _ => {
+                Err(crate::errors::TaxonEntryBuilderError::UnknownTaxonomicalNameClass(
+                    s.to_owned(),
+                ))
+            }
         }
     }
 }
@@ -173,17 +176,11 @@ impl TaxonomyBuilder for NCBITaxonomyBuilder {
     type TaxonEntryBuilder = NCBITaxonEntryBuilder;
 
     fn version(self, version: <Self::Taxonomy as crate::traits::Taxonomy>::Version) -> Self {
-        Self {
-            version: Some(version),
-            ..self
-        }
+        Self { version: Some(version), ..self }
     }
 
     fn directory(self, directory: std::path::PathBuf) -> Self {
-        Self {
-            directory: Some(directory),
-            ..self
-        }
+        Self { directory: Some(directory), ..self }
     }
 
     fn is_id_in_use(&self, id: &u32) -> bool {
@@ -198,17 +195,13 @@ impl TaxonomyBuilder for NCBITaxonomyBuilder {
         &self,
         id: &<Self::TaxonEntry as crate::traits::TaxonEntry>::Id,
     ) -> Option<&Self::TaxonEntry> {
-        self.id_to_position
-            .get(id)
-            .map(|&pos| &self.taxon_entries[pos as usize])
+        self.id_to_position.get(id).map(|&pos| &self.taxon_entries[pos as usize])
     }
 
     async fn build(
         mut self,
     ) -> Result<Self::Taxonomy, crate::errors::TaxonomyBuilderError<Self::TaxonEntry>> {
-        let version = self
-            .version
-            .ok_or(crate::errors::TaxonomyBuilderError::MissingVersion)?;
+        let version = self.version.ok_or(crate::errors::TaxonomyBuilderError::MissingVersion)?;
         let _reports = Downloader::default()
             .task(version.url())?
             .extract()
@@ -220,21 +213,17 @@ impl TaxonomyBuilder for NCBITaxonomyBuilder {
         // We create a reader where we replace the odd delimiter
         // that is used in the NCBI taxonomy, i.e. '\t|\t',
         // by a comma, in stream mode.
-        let names_reader = BufReader::new(std::fs::File::open(format!(
-            "{}/names.dmp",
-            version.directory()
-        ))?);
+        let names_reader =
+            BufReader::new(std::fs::File::open(format!("{}/names.dmp", version.directory()))?);
 
         let names_reader = SeparatorFixedReader::new(names_reader, "\t", "\t|\t");
         let names_reader = SeparatorFixedReader::new(names_reader, "\n", "\t|\n");
 
-        let names_reader = SeparatorFixedReader::new(names_reader, "\'","\"");
+        let names_reader = SeparatorFixedReader::new(names_reader, "\'", "\"");
 
         // We read the taxonomy file.
-        let mut names_csv_reader = ReaderBuilder::new()
-            .delimiter(b'\t')
-            .has_headers(false)
-            .from_reader(names_reader);
+        let mut names_csv_reader =
+            ReaderBuilder::new().delimiter(b'\t').has_headers(false).from_reader(names_reader);
 
         let mut names_iter = names_csv_reader.deserialize::<NamesRow>();
 
@@ -242,21 +231,15 @@ impl TaxonomyBuilder for NCBITaxonomyBuilder {
         // that is used in the NCBI taxonomy, i.e. '\t|\t',
         // by a comma, in stream mode.
         let nodes_reader = SeparatorFixedReader::new(
-            BufReader::new(std::fs::File::open(format!(
-                "{}/nodes.dmp",
-                version.directory()
-            ))?),
+            BufReader::new(std::fs::File::open(format!("{}/nodes.dmp", version.directory()))?),
             "\t",
             "\t|\t",
         );
         let nodes_reader = SeparatorFixedReader::new(nodes_reader, "\n", "\t|\n");
 
-
         // We read the taxonomy file.
-        let mut nodes_csv_reader = ReaderBuilder::new()
-            .delimiter(b'\t')
-            .has_headers(false)
-            .from_reader(nodes_reader);
+        let mut nodes_csv_reader =
+            ReaderBuilder::new().delimiter(b'\t').has_headers(false).from_reader(nodes_reader);
 
         // We iterate over the records.
         'external: for nodes_row in nodes_csv_reader.deserialize() {
@@ -289,10 +272,8 @@ impl TaxonomyBuilder for NCBITaxonomyBuilder {
                 .set_rank(record.rank)?
                 .build(&self)?;
 
-            self.id_to_position
-                .insert(taxon_entry.id, self.taxon_entries.len() as u32);
-            self.name_to_position
-                .insert(taxon_entry.name.clone(), self.taxon_entries.len() as u32);
+            self.id_to_position.insert(taxon_entry.id, self.taxon_entries.len() as u32);
+            self.name_to_position.insert(taxon_entry.name.clone(), self.taxon_entries.len() as u32);
             if record.parent_tax_id == record.tax_id {
                 if self.root_position.is_some() {
                     return Err(crate::errors::TaxonomyBuilderError::MultipleRoots);

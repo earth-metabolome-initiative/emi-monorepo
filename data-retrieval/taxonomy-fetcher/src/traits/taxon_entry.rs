@@ -3,7 +3,7 @@
 use std::fmt::{Debug, Display};
 
 /// Trait defining a taxon entry.
-pub trait TaxonEntry: Display + Debug{
+pub trait TaxonEntry: Display + Debug {
     /// Type of the identifier for the taxon.
     type Id: super::TaxonIdentifier;
     /// Type of the rank of the taxon.

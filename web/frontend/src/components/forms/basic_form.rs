@@ -1,28 +1,30 @@
 //! Module providing a yew component that handles a basic form.
 
-use crate::components::forms::InputErrors;
-use crate::cookies::is_logged_in;
-use crate::router::{AppRoute, Viewable};
-use crate::stores::user_state::UserState;
-use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
-use crate::workers::WebsocketWorker;
+use std::{fmt::Debug, rc::Rc};
+
 use gloo::timers::callback::Timeout;
-use serde::de::DeserializeOwned;
-use serde::Serialize;
-use std::fmt::Debug;
-use std::rc::Rc;
-use web_common::api::form_traits::FormMethod;
-use web_common::api::ApiError;
-use web_common::database::*;
+use serde::{de::DeserializeOwned, Serialize};
+use web_common::api::{form_traits::FormMethod, ApiError};
 use yew::prelude::*;
-use yew_agent::prelude::WorkerBridgeHandle;
-use yew_agent::scope_ext::AgentScopeExt;
+use yew_agent::{prelude::WorkerBridgeHandle, scope_ext::AgentScopeExt};
 use yew_router::scope_ext::RouterScopeExt;
 use yewdux::prelude::*;
 
+use crate::{
+    components::forms::InputErrors,
+    cookies::is_logged_in,
+    router::AppRoute,
+    stores::user_state::UserState,
+    workers::{
+        ws_worker::{ComponentMessage, WebsocketMessage},
+        WebsocketWorker,
+    },
+};
+
 /// Trait defining something that can be built from a named get operation.
 pub(super) trait FromOperation {
-    /// Creates a new instance of the implementing type from the provided operation name and row.
+    /// Creates a new instance of the implementing type from the provided
+    /// operation name and row.
     fn from_operation<S: AsRef<str>>(operation_name: S, row: Vec<u8>) -> Self;
 }
 
@@ -44,8 +46,8 @@ pub(super) trait FormBuilder:
         self == &Self::default()
     }
 
-    /// Updates the state of the form builder with the provided data and returns the operations
-    /// necessary to complete the update.
+    /// Updates the state of the form builder with the provided data and returns
+    /// the operations necessary to complete the update.
     ///
     /// # Arguments
     /// * `richest_variant` - The data to use to update the form builder.
@@ -68,9 +70,10 @@ pub(super) trait FormBuildable:
     ///
     /// # Examples
     /// The task target is what is being inserted/deleted/updated.
-    /// If you are creating a form to insert a new Taxon, the task target is "Taxon".
-    /// If you are creating a form to update a Taxon, the task target is "Taxon".
-    /// If you are creating a form to delete a Taxon, the task target is "Taxon".
+    /// If you are creating a form to insert a new Taxon, the task target is
+    /// "Taxon". If you are creating a form to update a Taxon, the task
+    /// target is "Taxon". If you are creating a form to delete a Taxon, the
+    /// task target is "Taxon".
     fn task_target() -> &'static str;
 
     /// Returns whether this form requires authentication.
@@ -173,10 +176,7 @@ where
             FormMessage::Backend(WebsocketMessage::GetTable(operation_name, row)) => {
                 self.loading_operations -= 1;
                 if let Some(operation_name) = operation_name {
-                    log::info!(
-                        "Received a row from the backend for operation: {}",
-                        operation_name
-                    );
+                    log::info!("Received a row from the backend for operation: {}", operation_name);
                     ctx.props().builder_dispatch.apply(
                         <<Data as FormBuildable>::Builder as FormBuilder>::Actions::from_operation(
                             operation_name,
@@ -207,10 +207,7 @@ where
                     //     }
                     // }
 
-                    log::debug!(
-                        "Updating the form with the received data, {:?}",
-                        richest_variant
-                    );
+                    log::debug!("Updating the form with the received data, {:?}", richest_variant);
 
                     <<Data as FormBuildable>::Builder as FormBuilder>::update(
                         &ctx.props().builder_dispatch,
@@ -229,7 +226,8 @@ where
                 self.errors.clear();
                 // If we received a row, it means we have successfully inserted/updated the data
                 // and we can redirect to the page associated to the provided row. If we have
-                // not received a row and the current operation is NOT a delete, we have an error.
+                // not received a row and the current operation is NOT a delete, we have an
+                // error.
                 if let Some(row) = maybe_row {
                     assert!(
                         ctx.props().method.is_post() || ctx.props().method.is_update(),
@@ -330,10 +328,8 @@ where
 
         let submit_button_disabled = !ctx.props().builder.can_submit();
 
-        let classes = format!(
-            "standard-form{}",
-            if self.errors.is_empty() { " error" } else { "" }
-        );
+        let classes =
+            format!("standard-form{}", if self.errors.is_empty() { " error" } else { "" });
 
         let submit_button_classes = if submit_button_disabled {
             ""

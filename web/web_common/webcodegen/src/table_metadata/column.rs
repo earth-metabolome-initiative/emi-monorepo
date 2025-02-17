@@ -1,19 +1,18 @@
-use crate::errors::WebCodeGenError;
-use crate::table_metadata::pg_type::postgres_type_to_diesel;
-use crate::Table;
-use diesel::pg::PgConnection;
-use diesel::result::Error as DieselError;
 use diesel::{
-    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
-    RunQueryDsl, Selectable, SelectableHelper,
+    pg::PgConnection, result::Error as DieselError, BoolExpressionMethods, ExpressionMethods,
+    JoinOnDsl, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{Ident, Type};
 
-use crate::KeyColumnUsage;
-
-use super::pg_type::{rust_type_str, PgType};
-use super::table::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS};
+use super::{
+    pg_type::{rust_type_str, PgType},
+    table::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS},
+};
+use crate::{
+    errors::WebCodeGenError, table_metadata::pg_type::postgres_type_to_diesel, KeyColumnUsage,
+    Table,
+};
 
 /// Struct defining the `information_schema.columns` table.
 #[derive(Queryable, QueryableByName, Selectable, PartialEq, Eq, Debug, Clone)]
@@ -120,8 +119,12 @@ impl Column {
         self.geometry(conn).is_ok()
     }
 
-    /// Returns the associated geometry column if the column is a geometry column
-    pub fn geometry(&self, conn: &mut PgConnection) -> Result<crate::GeometryColumn, WebCodeGenError> {
+    /// Returns the associated geometry column if the column is a geometry
+    /// column
+    pub fn geometry(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<crate::GeometryColumn, WebCodeGenError> {
         use crate::schema::geometry_columns;
 
         Ok(geometry_columns::table
@@ -139,8 +142,8 @@ impl Column {
     ///
     /// # Returns
     ///
-    /// A `Result` containing the data type of the column if the operation was successful,
-    /// or a `WebCodeGenError` if an error occurred
+    /// A `Result` containing the data type of the column if the operation was
+    /// successful, or a `WebCodeGenError` if an error occurred
     ///
     /// # Errors
     ///
@@ -158,7 +161,7 @@ impl Column {
     }
 
     /// Returns the string data type
-    fn str_rust_data_type(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
+    pub fn str_rust_data_type(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
         if let Ok(geometry) = self.geometry(conn) {
             return Ok(geometry.str_rust_type().to_owned());
         }
@@ -199,13 +202,10 @@ impl Column {
     pub fn rust_data_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
         let rust_type = self.str_rust_data_type(conn)?;
 
-        let rust_type = if self.is_nullable() {
-            format!("Option<{rust_type}>")
-        } else {
-            rust_type.to_string()
-        };
+        let rust_type =
+            if self.is_nullable() { format!("Option<{rust_type}>") } else { rust_type.to_string() };
 
-        Ok(syn::parse_str(&rust_type).unwrap())
+        Ok(syn::parse_str(&rust_type)?)
     }
 
     /// Returns the rust reference type of the column
@@ -223,16 +223,13 @@ impl Column {
     /// If an error occurs while querying the database
     pub fn rust_ref_data_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
         let rust_type = match self.str_rust_data_type(conn)?.as_str() {
-            "String" => "&str",
-            "Vec<u8>" => "&[u8]",
-            other => other,
-        }.to_owned();
-
-        let rust_type = if self.is_nullable() {
-            format!("Option<{rust_type}>")
-        } else {
-            rust_type.to_string()
+            "String" => "&str".to_owned(),
+            "Vec<u8>" => "&[u8]".to_owned(),
+            other => format!("&{other}"),
         };
+
+        let rust_type =
+            if self.is_nullable() { format!("Option<{rust_type}>") } else { rust_type.to_string() };
 
         Ok(syn::parse_str(&rust_type).unwrap())
     }
@@ -261,14 +258,15 @@ impl Column {
 
     /// Returns the sanitized snake case syn Ident of the table.
     ///
-    /// If the column name is a reserved diesel word, the returned ident will be prefixed with `__`.
-    /// If the column name is a reserved rust word, the returned ident will be the raw ident.
-    /// Otherwise, the returned ident will be the sanitized snake case ident.
+    /// If the column name is a reserved diesel word, the returned ident will be
+    /// prefixed with `__`. If the column name is a reserved rust word, the
+    /// returned ident will be the raw ident. Otherwise, the returned ident
+    /// will be the sanitized snake case ident.
     ///
     /// # Returns
     ///
-    /// A `Result` containing the sanitized snake case `Ident` if the operation was successful,
-    /// or a `WebCodeGenError` if an error occurred
+    /// A `Result` containing the sanitized snake case `Ident` if the operation
+    /// was successful, or a `WebCodeGenError` if an error occurred
     ///
     /// # Errors
     ///
@@ -276,15 +274,9 @@ impl Column {
     pub fn sanitized_snake_case_ident(&self) -> Result<Ident, WebCodeGenError> {
         let snake_case_name = self.snake_case_name()?;
         if self.requires_diesel_sanitization()? {
-            Ok(Ident::new(
-                &format!("__{snake_case_name}"),
-                proc_macro2::Span::call_site(),
-            ))
+            Ok(Ident::new(&format!("__{snake_case_name}"), proc_macro2::Span::call_site()))
         } else if RESERVED_RUST_WORDS.contains(&snake_case_name.as_str()) {
-            Ok(Ident::new_raw(
-                &snake_case_name,
-                proc_macro2::Span::call_site(),
-            ))
+            Ok(Ident::new_raw(&snake_case_name, proc_macro2::Span::call_site()))
         } else {
             Ok(Ident::new(&snake_case_name, proc_macro2::Span::call_site()))
         }
@@ -356,40 +348,44 @@ impl Column {
     /// # Returns
     ///
     /// A `bool` indicating whether the column is automatically generated
-    ///
     pub fn is_automatically_generated(&self) -> bool {
         self.is_generated == "ALWAYS"
-            || self
-                .column_default
-                .as_ref()
-                .map_or(false, |d| d.starts_with("nextval"))
-            || self
-                .column_default
-                .as_ref()
-                .map_or(false, |d| d.starts_with("CURRENT_TIMESTAMP"))
+            || self.column_default.as_ref().map_or(false, |d| d.starts_with("nextval"))
+            || self.column_default.as_ref().map_or(false, |d| d.starts_with("CURRENT_TIMESTAMP"))
+            || self.column_default.as_ref().map_or(false, |d| d.starts_with("NOW()"))
             || self.is_identity.as_ref().map_or(false, |i| i == "YES")
     }
 
-    /// Returns whether the column contains the update user and is defined by the SESSION user
+    /// Returns whether the column contains the update user and is defined by
+    /// the SESSION user
     pub fn is_updated_by(&self, conn: &mut PgConnection) -> bool {
-        self.column_name == "updated_by" && self.foreign_table(conn).map_or(false, |table_and_column| {
-            table_and_column.map_or(false, |(table, column)| table.table_name == "users" && column.column_name == "id")
-        })
+        self.column_name == "updated_by"
+            && self.foreign_table(conn).map_or(false, |table_and_column| {
+                table_and_column.map_or(false, |(table, column)| {
+                    table.table_name == "users" && column.column_name == "id"
+                })
+            })
     }
 
-    /// Returns whether the column contains the creation user and is defined by the SESSION user
+    /// Returns whether the column contains the creation user and is defined by
+    /// the SESSION user
     pub fn is_created_by(&self, conn: &mut PgConnection) -> bool {
-        self.column_name == "created_by" && self.foreign_table(conn).map_or(false, |table_and_column| {
-            table_and_column.map_or(false, |(table, column)| table.table_name == "users" && column.column_name == "id")
-        })
+        self.column_name == "created_by"
+            && self.foreign_table(conn).map_or(false, |table_and_column| {
+                table_and_column.map_or(false, |(table, column)| {
+                    table.table_name == "users" && column.column_name == "id"
+                })
+            })
     }
 
-    /// Returns whether the column is a timestamp which has to be updated at each update operation
+    /// Returns whether the column is a timestamp which has to be updated at
+    /// each update operation
     pub fn is_updated_at(&self) -> bool {
         self.column_name == "updated_at" && self.data_type == "timestamp without time zone"
     }
 
-    /// Returns whether the column is a timestamp which has to be set at the insert operation
+    /// Returns whether the column is a timestamp which has to be set at the
+    /// insert operation
     pub fn is_created_at(&self) -> bool {
         self.column_name == "created_at" && self.data_type == "timestamp without time zone"
     }
@@ -407,16 +403,15 @@ impl Column {
     ///
     /// # Returns
     ///
-    /// A `Result` containing a `Vec` of `Column` if the operation was successful,
+    /// A `Result` containing a `Vec` of `Column` if the operation was
+    /// successful,
     ///
     /// # Errors
     ///
     /// If an error occurs while querying the database
     pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::columns;
-        columns::table
-            .load::<Column>(conn)
-            .map_err(WebCodeGenError::from)
+        columns::table.load::<Column>(conn).map_err(WebCodeGenError::from)
     }
 
     /// Returns whether the column is a foreign key
@@ -424,10 +419,8 @@ impl Column {
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     pub fn is_foreign_key(&self, conn: &mut PgConnection) -> bool {
-        use crate::schema::key_column_usage;
-        use crate::schema::referential_constraints;
+        use crate::schema::{key_column_usage, referential_constraints};
         key_column_usage::table
             .inner_join(
                 referential_constraints::table.on(key_column_usage::constraint_name
@@ -459,8 +452,9 @@ impl Column {
     ///
     /// # Returns
     ///
-    /// A `Result` containing an `Option` of a tuple containing the foreign table and
-    /// the foreign column if the operation was successful, or a `DieselError` if an error occurred
+    /// A `Result` containing an `Option` of a tuple containing the foreign
+    /// table and the foreign column if the operation was successful, or a
+    /// `DieselError` if an error occurred
     ///
     /// # Errors
     ///
@@ -469,11 +463,9 @@ impl Column {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Option<(Table, Column)>, DieselError> {
-        use crate::schema::columns;
-        use crate::schema::constraint_column_usage;
-        use crate::schema::key_column_usage;
-        use crate::schema::table_constraints;
-        use crate::schema::tables;
+        use crate::schema::{
+            columns, constraint_column_usage, key_column_usage, table_constraints, tables,
+        };
         table_constraints::table
             .inner_join(
                 key_column_usage::table.on(table_constraints::constraint_name
@@ -514,12 +506,20 @@ impl Column {
             .select((Table::as_select(), Column::as_select()))
             .first::<(Table, Column)>(conn)
             .map(Some)
-            .or_else(|e| {
-                if e == DieselError::NotFound {
-                    Ok(None)
-                } else {
-                    Err(e)
-                }
-            })
+            .or_else(|e| if e == DieselError::NotFound { Ok(None) } else { Err(e) })
+    }
+
+    #[must_use]
+    /// Returns the plural name of the column.
+    pub fn plural_column_name(&self) -> String {
+        // We split the column name by underscores and remove the last element.
+        let mut parts =
+            self.column_name.split('_').map(|part| part.to_string()).collect::<Vec<String>>();
+        let last_element = parts.pop().unwrap();
+        // We convert to singular form the last element and join the parts back
+        // together.
+        let singular_last_element = pluralizer::pluralize(last_element.as_str(), 10, false);
+        parts.push(singular_last_element);
+        parts.join("_")
     }
 }

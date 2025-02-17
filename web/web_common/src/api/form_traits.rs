@@ -1,12 +1,15 @@
-//! Provide traits needed for executing forms in the frontend and receiving data in the backend.
-use serde::Deserialize;
+//! Provide traits needed for executing forms in the frontend and receiving data
+//! in the backend.
 use std::fmt::Display;
+
+use serde::Deserialize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
 pub enum FormMethod {
-    GET,    // Use GET to execute a query
-    POST,   // Use POST to CREATE a new resource
-    PUT, // Use PUT instead of POST when you want to UPDATE or PATCH a resource and you have an ID
+    GET,  // Use GET to execute a query
+    POST, // Use POST to CREATE a new resource
+    PUT,  /* Use PUT instead of POST when you want to UPDATE or PATCH a resource and you have
+           * an ID */
     DELETE, // Use DELETE to remove a resource
 }
 

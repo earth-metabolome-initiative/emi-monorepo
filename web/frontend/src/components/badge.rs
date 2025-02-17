@@ -1,12 +1,13 @@
 //! Defines a badge component that can be used to display a badge.
 
-use crate::router::AppRoute;
-use crate::traits::format_match::FormatMatch;
 use core::fmt::Debug;
 use std::rc::Rc;
-use web_common::database::{Colorable, Describable, SimilarityScore};
+
+use core_structures::{Colorable, Describable, SimilarityScore};
 use yew::prelude::*;
 use yew_router::prelude::*;
+
+use crate::{router::AppRoute, traits::format_match::FormatMatch};
 
 /// Trait for types that can be converted to a badge.
 pub trait RowToBadge:

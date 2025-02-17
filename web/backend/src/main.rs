@@ -1,18 +1,15 @@
 // main.rs
 extern crate diesel;
 
-use actix_web::{get, web, App, HttpServer, Responder};
-use diesel::prelude::*;
-use diesel::r2d2::{self, ConnectionManager};
+use std::path::PathBuf;
 
 use actix_cors::Cors;
 use actix_files::NamedFile;
-use actix_web::http::header;
-use actix_web::middleware::Logger;
-use actix_web::HttpRequest;
+use actix_web::{
+    get, http::header, middleware::Logger, web, App, HttpRequest, HttpServer, Responder,
+};
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use redis::Client;
-use std::path::PathBuf;
 
 /// Entrypoint to load the index.html file
 async fn index() -> impl Responder {
@@ -39,36 +36,17 @@ async fn main() -> std::io::Result<()> {
         std::env::var("DOCKER_DATABASE_URL").expect("DOCKER_DATABASE_URL must be set");
 
     // create db connection pool
-    let manager = ConnectionManager::<PgConnection>::new(&database_url);
-    let pool: backend::database::DBPool = match r2d2::Pool::builder()
-        // We set the maximum number of connections in the pool to 10
-        .max_size(10)
-        .build(manager)
-    {
-        Ok(client) => {
-            log::info!("✅ Diesel connection to the database is successful!");
-            client
-        }
-        Err(e) => {
-            log::error!("🔥 Error connecting to the database with Diesel: {}", e);
-            std::process::exit(1);
-        }
-    };
+    let pool: web_common_traits::prelude::DBPool =
+        diesel_async::pooled_connection::bb8::Pool::builder()
+            .build(diesel_async::pooled_connection::AsyncDieselConnectionManager::<
+                diesel_async::AsyncPgConnection,
+            >::new(database_url))
+            .await
+            .expect("Error creating database pool");
 
-    let redis_client = match Client::open(
-        std::env::var("REDIS_URL")
-            .expect("REDIS_URL must be set")
-            .as_str(),
-    ) {
-        Ok(client) => {
-            log::info!("✅Connection to Redis is successful!");
-            client
-        }
-        Err(e) => {
-            log::error!("🔥 Error connecting to Redis: {}", e);
-            std::process::exit(1);
-        }
-    };
+    let redis_client =
+        Client::open(std::env::var("REDIS_URL").expect("REDIS_URL must be set").as_str())
+            .expect("Error creating redis client");
 
     // We remove the file "backend.building" if it exists
     std::fs::remove_file("/app/backend/backend.building").unwrap_or_default();
@@ -76,35 +54,25 @@ async fn main() -> std::io::Result<()> {
     // We write to a "backend.ready" file to indicate that
     // the backend has finished compiling and is now starting.
     let timestamp = chrono::Utc::now().to_rfc2822();
-    std::fs::write(
-        "/app/backend/backend.ready",
-        format!("backend is ready at {}", timestamp),
-    )
-    .unwrap();
+    std::fs::write("/app/backend/backend.ready", format!("backend is ready at {}", timestamp))
+        .unwrap();
 
     let domain = std::env::var("DOMAIN").expect("DOMAIN is not available.");
 
     // load TLS keys
     // to create a self-signed temporary cert for testing:
-    // `openssl req -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem -days 365 -subj '/CN=localhost'`
+    // `openssl req -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem
+    // -days 365 -subj '/CN=localhost'`
     let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
-    builder
-        .set_private_key_file(format!("/app/nginx/{domain}-key.pem"), SslFiletype::PEM)
-        .unwrap();
-    builder
-        .set_certificate_chain_file(format!("/app/nginx/{domain}.pem"))
-        .unwrap();
+    builder.set_private_key_file(format!("/app/nginx/{domain}-key.pem"), SslFiletype::PEM).unwrap();
+    builder.set_certificate_chain_file(format!("/app/nginx/{domain}.pem")).unwrap();
 
     // Start http server
     HttpServer::new(move || {
         let cors = Cors::default()
             .allowed_origin(&format!("https://{domain}"))
             .allowed_methods(vec!["GET", "POST", "PATCH", "DELETE"])
-            .allowed_headers(vec![
-                header::CONTENT_TYPE,
-                header::AUTHORIZATION,
-                header::ACCEPT,
-            ])
+            .allowed_headers(vec![header::CONTENT_TYPE, header::AUTHORIZATION, header::ACCEPT])
             .supports_credentials();
         App::new()
             // pass in the database pool to all routes
@@ -126,10 +94,7 @@ async fn main() -> std::io::Result<()> {
         // .app_data(web::JsonConfig::default().limit(10*1024*1024))
     })
     .bind_openssl(
-        format!(
-            "0.0.0.0:{}",
-            std::env::var("ACTIX_PORT").expect("ACTIX_PORT is not available.")
-        ),
+        format!("0.0.0.0:{}", std::env::var("ACTIX_PORT").expect("ACTIX_PORT is not available.")),
         builder,
     )?
     .workers(4)

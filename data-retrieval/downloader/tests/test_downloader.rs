@@ -22,11 +22,7 @@ async fn test_document_download() {
 async fn test_document_gzip_download() {
     let task: Downloader = Downloader::default()
         .show_loading_bar()
-        .task(
-            Task::try_from(DOCUMENT_GZIP_URL)
-                .unwrap()
-                .target_path(&"document3.txt.gz"),
-        )
+        .task(Task::try_from(DOCUMENT_GZIP_URL).unwrap().target_path(&"document3.txt.gz"))
         .unwrap();
     task.execute().await.unwrap();
 
@@ -40,11 +36,7 @@ async fn test_document_gzip_download() {
 async fn test_document_gzip_download_and_extraction() {
     let task: Downloader = Downloader::default()
         .extract()
-        .task(
-            Task::try_from(DOCUMENT_GZIP_URL)
-                .unwrap()
-                .target_path(&"document2.txt.gz"),
-        )
+        .task(Task::try_from(DOCUMENT_GZIP_URL).unwrap().target_path(&"document2.txt.gz"))
         .unwrap();
     task.execute().await.unwrap();
 
@@ -60,11 +52,7 @@ async fn test_document_tar_download() {
     let task: Downloader = Downloader::default()
         .show_loading_bar()
         .extract()
-        .task(
-            Task::try_from(DOCUMENT_TAR_URL)
-                .unwrap()
-                .target_path(&"data_tar.tar"),
-        )
+        .task(Task::try_from(DOCUMENT_TAR_URL).unwrap().target_path(&"data_tar.tar"))
         .unwrap();
     task.execute().await.unwrap();
 
@@ -83,19 +71,12 @@ async fn test_document_targz_download() {
     let task: Downloader = Downloader::default()
         .show_loading_bar()
         .extract()
-        .task(
-            Task::try_from(DOCUMENT_TARGZ_URL)
-                .unwrap()
-                .target_path(&"data_tar_gzipped.tar.gz"),
-        )
+        .task(Task::try_from(DOCUMENT_TARGZ_URL).unwrap().target_path(&"data_tar_gzipped.tar.gz"))
         .unwrap();
     let reports = task.execute().await.unwrap();
 
     let first_report = reports.first().unwrap().clone();
-    assert_eq!(
-        first_report.extraction_report.unwrap().extension,
-        CompressionExtension::TarGz
-    );
+    assert_eq!(first_report.extraction_report.unwrap().extension, CompressionExtension::TarGz);
 
     // We check that the document has been downloaded and extracted at the
     // expected location.
@@ -106,25 +87,17 @@ async fn test_document_targz_download() {
     std::fs::remove_dir_all("data_tar_gzipped").unwrap();
 }
 
-
 #[tokio::test]
 async fn test_document_zip_download() {
     let task: Downloader = Downloader::default()
         .show_loading_bar()
         .extract()
-        .task(
-            Task::try_from(DOCUMENT_ZIP_URL)
-                .unwrap()
-                .target_path(&"zipped.zip"),
-        )
+        .task(Task::try_from(DOCUMENT_ZIP_URL).unwrap().target_path(&"zipped.zip"))
         .unwrap();
     let reports = task.execute().await.unwrap();
 
     let first_report = reports.first().unwrap().clone();
-    assert_eq!(
-        first_report.extraction_report.unwrap().extension,
-        CompressionExtension::Zip
-    );
+    assert_eq!(first_report.extraction_report.unwrap().extension, CompressionExtension::Zip);
 
     // We check that the document has been downloaded and extracted at the
     // expected location.

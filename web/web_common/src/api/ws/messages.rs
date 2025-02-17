@@ -12,12 +12,10 @@ pub struct CloseReason {
     pub description: Option<String>,
 }
 
+#[cfg(feature = "backend")]
 impl From<actix_ws::CloseReason> for CloseReason {
     fn from(reason: actix_ws::CloseReason) -> Self {
-        Self {
-            code: reason.code.into(),
-            description: reason.description,
-        }
+        Self { code: reason.code.into(), description: reason.description }
     }
 }
 
@@ -50,6 +48,7 @@ impl From<BackendMessage> for bytes::Bytes {
     }
 }
 
+#[cfg(feature = "backend")]
 impl From<actix_ws::Message> for FrontendMessage {
     fn from(actix_message: actix_ws::Message) -> Self {
         match actix_message {
@@ -81,16 +80,13 @@ impl From<actix_ws::Message> for FrontendMessage {
 
 #[cfg(feature = "frontend")]
 impl From<gloo_net::websocket::Message> for BackendMessage {
-
     fn from(value: gloo_net::websocket::Message) -> Self {
         match value {
             gloo_net::websocket::Message::Text(text) => {
                 log::error!("Unexpected text message from frontend: {:?}", text);
                 unreachable!("Unexpected text message from frontend");
             }
-            gloo_net::websocket::Message::Bytes(bin) => {
-                bincode::deserialize(&bin).unwrap()
-            }
+            gloo_net::websocket::Message::Bytes(bin) => bincode::deserialize(&bin).unwrap(),
         }
     }
 }

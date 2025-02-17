@@ -20,19 +20,19 @@ impl<'a> TryFrom<&'a Path> for MigrationDirectory {
         let directory = path.to_str().unwrap().to_string();
 
         // We iterate on the subdirectories within the directory.
-        let mut migrations = path
-            .read_dir()?
-            .filter_map(|entry| {
-                entry.ok().and_then(|entry| {
-                    if entry.path().is_dir() {
-                        Some(entry.path())
-                    } else {
-                        None
-                    }
+        let mut migrations =
+            path.read_dir()?
+                .filter_map(|entry| {
+                    entry.ok().and_then(|entry| {
+                        if entry.path().is_dir() {
+                            Some(entry.path())
+                        } else {
+                            None
+                        }
+                    })
                 })
-            })
-            .map(|path| Migration::try_from(&path))
-            .collect::<Result<Vec<Migration>, Error>>()?;
+                .map(|path| Migration::try_from(&path))
+                .collect::<Result<Vec<Migration>, Error>>()?;
 
         // We check that there are no migrations with the same number.
         migrations.sort_unstable();
@@ -43,10 +43,7 @@ impl<'a> TryFrom<&'a Path> for MigrationDirectory {
             }
         }
 
-        Ok(MigrationDirectory {
-            migrations,
-            directory,
-        })
+        Ok(MigrationDirectory { migrations, directory })
     }
 }
 
@@ -67,8 +64,7 @@ impl MigrationDirectory {
     /// Iterates on the up migrations.
     pub fn ups(&self) -> Result<Vec<String>, Error> {
         let path: &Path = Path::new(&self.directory);
-        self
-            .migrations
+        self.migrations
             .iter()
             .map(|migration| migration.up(path))
             .collect::<Result<Vec<String>, Error>>()
@@ -77,8 +73,7 @@ impl MigrationDirectory {
     /// Iterates on the down migrations.
     pub fn downs(&self) -> Result<Vec<String>, Error> {
         let path: &Path = Path::new(&self.directory);
-        self
-            .migrations
+        self.migrations
             .iter()
             .map(|migration| migration.down(path))
             .collect::<Result<Vec<String>, Error>>()

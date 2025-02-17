@@ -1,5 +1,6 @@
-//! This module contains the implementation of the `Table` struct's `foreign_key_methods` method,
-//! which implements the foreign key methods for a table.
+//! This module contains the implementation of the `Table` struct's
+//! `foreign_key_methods` method, which implements the foreign key methods for a
+//! table.
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -73,7 +74,7 @@ impl Table {
 
                 Ok(quote! {
                     #[cfg(feature = #stricter_flag_name)]
-                    pub async fn #method_name(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<#return_type_ident, diesel::result::Error> {
+                    pub async fn #method_name(&self, conn: &mut web_common_traits::prelude::DBConn) -> Result<#return_type_ident, diesel::result::Error> {
                         #column_value_retrieval
                         #foreign_key_table_name::table
                             .filter(#filter_statement)

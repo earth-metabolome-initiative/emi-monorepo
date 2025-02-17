@@ -1,17 +1,15 @@
 //! Submodule providing the file input component for the frontend.
 
-use super::file_like::*;
-use super::InputErrors;
-use crate::workers::FileProcessor;
+use std::{collections::HashSet, rc::Rc};
+
 use gloo::timers::callback::Timeout;
-use std::collections::HashSet;
-use std::rc::Rc;
-use wasm_bindgen::closure::Closure;
-use wasm_bindgen::JsCast;
-use web_common::api::ApiError;
-use web_common::file_formats::GenericFileFormat;
+use wasm_bindgen::{closure::Closure, JsCast};
+use web_common::{api::ApiError, file_formats::GenericFileFormat};
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
+
+use super::{file_like::*, InputErrors};
+use crate::workers::FileProcessor;
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct MultiFileInputProp<Data>
@@ -96,8 +94,9 @@ where
     type Properties = MultiFileInputProp<Data>;
 
     fn create(ctx: &Context<Self>) -> Self {
-        // We setup an event listener for the dragstart event, which is triggered when the user starts dragging a file
-        // on the document. When this event is triggered, we send the DragStart message to the component.
+        // We setup an event listener for the dragstart event, which is triggered when
+        // the user starts dragging a file on the document. When this event is
+        // triggered, we send the DragStart message to the component.
         let document = web_sys::window().unwrap().document().unwrap();
         let link = ctx.link().clone();
         let drag_over_closure = Closure::new(move |e: DragEvent| {
@@ -161,8 +160,7 @@ where
             }
             MultiFileInputMessage::FileProcessingFailed(error) => {
                 self.number_of_files_currently_processing -= 1;
-                ctx.link()
-                    .send_message(MultiFileInputMessage::AddError(error));
+                ctx.link().send_message(MultiFileInputMessage::AddError(error));
                 false
             }
             MultiFileInputMessage::AddError(error) => self.errors.insert(error),
@@ -170,10 +168,16 @@ where
                 let link = ctx.link().clone();
                 ctx.link().run_oneshot::<FileProcessor<Data>>(
                     data,
-                    Callback::from(move |data: Result<Data, ApiError>| match data {
-                        Ok(data) => link.send_message(MultiFileInputMessage::FileProcessed(data)),
-                        Err(error) => {
-                            link.send_message(MultiFileInputMessage::FileProcessingFailed(error));
+                    Callback::from(move |data: Result<Data, ApiError>| {
+                        match data {
+                            Ok(data) => {
+                                link.send_message(MultiFileInputMessage::FileProcessed(data))
+                            }
+                            Err(error) => {
+                                link.send_message(MultiFileInputMessage::FileProcessingFailed(
+                                    error,
+                                ));
+                            }
                         }
                     }),
                 );
@@ -238,9 +242,11 @@ where
                                 let data = js_sys::Uint8Array::new(&buffer).to_vec();
                                 MultiFileInputMessage::LoadedFile(data)
                             }
-                            Err(_) => MultiFileInputMessage::AddError(ApiError::BadRequest(vec![
-                                format!("Unable to read file {}", file_name),
-                            ])),
+                            Err(_) => {
+                                MultiFileInputMessage::AddError(ApiError::BadRequest(vec![
+                                    format!("Unable to read file {}", file_name),
+                                ]))
+                            }
                         }
                     });
                 }
@@ -253,10 +259,7 @@ where
         let container_on_click = {
             let input_node = self.input_ref.clone();
             Callback::from(move |_| {
-                input_node
-                    .cast::<web_sys::HtmlInputElement>()
-                    .unwrap()
-                    .click();
+                input_node.cast::<web_sys::HtmlInputElement>().unwrap().click();
             })
         };
 
@@ -267,14 +270,16 @@ where
                 input_event.prevent_default();
                 input_event.stop_propagation();
                 match input_node.cast::<web_sys::HtmlInputElement>() {
-                    Some(input) => match input.files() {
-                        Some(files) => {
-                            link.send_message(MultiFileInputMessage::Files(files));
+                    Some(input) => {
+                        match input.files() {
+                            Some(files) => {
+                                link.send_message(MultiFileInputMessage::Files(files));
+                            }
+                            None => {
+                                link.send_message(MultiFileInputMessage::NoFiles);
+                            }
                         }
-                        None => {
-                            link.send_message(MultiFileInputMessage::NoFiles);
-                        }
-                    },
+                    }
                     None => {
                         link.send_message(MultiFileInputMessage::AddError(ApiError::BadRequest(
                             vec!["Unable to get files from input".to_string()],
@@ -294,40 +299,21 @@ where
             })
         };
 
-        let droparea_classes = format!(
-            "droparea{}",
-            if self.box_visible { " dragging" } else { "" },
-        );
+        let droparea_classes =
+            format!("droparea{}", if self.box_visible { " dragging" } else { "" },);
 
         let label_classes = format!(
             "input-label{}",
-            if ctx.props().optional {
-                ""
-            } else {
-                " input-label-mandatory"
-            }
+            if ctx.props().optional { "" } else { " input-label-mandatory" }
         );
 
-        let all_errors = ctx
-            .props()
-            .errors
-            .iter()
-            .chain(self.errors.iter())
-            .cloned()
-            .collect::<Vec<ApiError>>();
+        let all_errors =
+            ctx.props().errors.iter().chain(self.errors.iter()).cloned().collect::<Vec<ApiError>>();
 
         let classes = format!(
             "input-group file {}{}",
-            if !all_errors.is_empty() {
-                "input-group-valid"
-            } else {
-                "input-group-invalid"
-            },
-            if self.number_of_files_currently_processing > 0 {
-                " processing"
-            } else {
-                ""
-            }
+            if !all_errors.is_empty() { "input-group-valid" } else { "input-group-invalid" },
+            if self.number_of_files_currently_processing > 0 { " processing" } else { "" }
         );
 
         let object_unique_identifier = uuid::Uuid::new_v4();

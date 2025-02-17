@@ -12,6 +12,7 @@ uuid.workspace = true
 chrono.workspace = true
 web_common_traits.workspace = true
 serde = {workspace = true, optional = true}
+common-traits.workspace = true
 
 [build-dependencies]
 taxonomy-fetcher.workspace = true

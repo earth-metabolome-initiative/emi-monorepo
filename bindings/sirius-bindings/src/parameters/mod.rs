@@ -22,9 +22,10 @@ pub mod write_summaries;
 /// Get the settings for zodiac
 pub mod zodiac;
 
+pub use core::*;
+
 pub use canopus::*;
 pub use config::*;
-pub use core::*;
 pub use fingerprint::*;
 pub use formula::*;
 pub use structure::*;

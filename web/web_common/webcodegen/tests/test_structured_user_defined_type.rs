@@ -1,19 +1,18 @@
-//! Test whether the generated code for a user-defined structured type is correct
+//! Test whether the generated code for a user-defined structured type is
+//! correct
 mod utils;
 
-use diesel::pg::PgConnection;
-use diesel::Connection;
-use diesel_migrations::{
-    EmbeddedMigration, EmbeddedMigrations, EmbeddedName, MigrationHarness,
-    TomlMetadataWrapper,
-};
 use std::io::Write;
+
+use diesel::{pg::PgConnection, Connection};
+use diesel_migrations::{
+    EmbeddedMigration, EmbeddedMigrations, EmbeddedName, MigrationHarness, TomlMetadataWrapper,
+};
 use testcontainers::{
     core::{IntoContainerPort, WaitFor},
     runners::AsyncRunner,
     ContainerAsync, GenericImage, ImageExt,
 };
-
 use utils::add_main_to_file;
 use webcodegen::*;
 
@@ -50,9 +49,7 @@ fn establish_connection_to_postgres() -> PgConnection {
 
 async fn setup_postgres() -> ContainerAsync<GenericImage> {
     let container = GenericImage::new("postgres", "17-alpine")
-        .with_wait_for(WaitFor::message_on_stderr(
-            "database system is ready to accept connections",
-        ))
+        .with_wait_for(WaitFor::message_on_stderr("database system is ready to accept connections"))
         .with_network("bridge")
         .with_env_var("DEBUG", "1")
         .with_env_var("POSTGRES_USER", DATABASE_USER)
@@ -88,15 +85,11 @@ async fn test_structured_user_defined_type() {
     let path = "tests/ui/structured_user_defined_type.rs";
 
     write!(
-        std::fs::OpenOptions::new()
-            .write(true)
-            .create(true)
-            .truncate(true)
-            .open(path)
-            .unwrap(),
+        std::fs::OpenOptions::new().write(true).create(true).truncate(true).open(path).unwrap(),
         "{}",
         point2d.to_syn(&mut conn).unwrap()
-    ).unwrap();
+    )
+    .unwrap();
     add_main_to_file(path);
     builder.pass(path);
 

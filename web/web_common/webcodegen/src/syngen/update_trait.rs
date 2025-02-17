@@ -1,12 +1,12 @@
-use quote::quote;
-use crate::errors::WebCodeGenError;
-use proc_macro2::TokenStream;
 use diesel::PgConnection;
+use proc_macro2::TokenStream;
+use quote::quote;
 use syn::Ident;
-use crate::{Table, Column};
+
+use crate::{errors::WebCodeGenError, Column, Table};
 
 impl Table {
-	/// Returns the primary key columns for the table.
+    /// Returns the primary key columns for the table.
     ///
     /// # Arguments
     ///
@@ -24,9 +24,7 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
         if !self.has_updated_by_column(conn)? {
-            return Err(WebCodeGenError::MissingUpdatedByColumn(Box::new(
-                self.clone(),
-            )));
+            return Err(WebCodeGenError::MissingUpdatedByColumn(Box::new(self.clone())));
         }
 
         let struct_name: Ident = Ident::new(&self.struct_name()?, proc_macro2::Span::call_site());
@@ -67,10 +65,8 @@ impl Table {
             })
             .collect::<Vec<&&Column>>();
 
-        let session_update_variant_name = Ident::new(
-            &format!("SessionUpdate{struct_name}"),
-            proc_macro2::Span::call_site(),
-        );
+        let session_update_variant_name =
+            Ident::new(&format!("SessionUpdate{struct_name}"), proc_macro2::Span::call_site());
         let session_update_variable_attributes = session_update_columns
             .iter()
             .map(|column| {
@@ -92,10 +88,8 @@ impl Table {
             })
             .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
-        let update_variant_name = Ident::new(
-            &format!("Update{struct_name}"),
-            proc_macro2::Span::call_site(),
-        );
+        let update_variant_name =
+            Ident::new(&format!("Update{struct_name}"), proc_macro2::Span::call_site());
         let updateable_variant_attributes = update_columns
             .iter()
             .map(|column| {
@@ -123,8 +117,8 @@ impl Table {
             }
         });
 
-        // In some cases, the table will not have a primary key. In which case, we cannot specify the primary key
-        // decorator on the struct.
+        // In some cases, the table will not have a primary key. In which case, we
+        // cannot specify the primary key decorator on the struct.
         let primary_key_decorator = self.primary_key_decorator(conn)?;
         let diesel_derives_decorator = self.diesel_derives_decorator(conn)?;
         let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
@@ -166,10 +160,10 @@ impl Table {
             }
 
             #[cfg(feature = #columns_feature_flag_name)]
-            impl UpdateableVariant<diesel_async::AsyncPgConnection> for #session_update_variant_name {
+            impl UpdateableVariant<web_common_traits::prelude::DBConn> for #session_update_variant_name {
                 type Row = #struct_name;
 
-                async fn update(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<Self::Row, diesel::result::Error> {
+                async fn update(&self, conn: &mut web_common_traits::prelude::DBConn) -> Result<Self::Row, diesel::result::Error> {
                     diesel::update(#table_name::table)
                         .filter(#filter_expression)
                         .set(self)

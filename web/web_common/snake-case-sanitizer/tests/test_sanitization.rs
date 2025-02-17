@@ -19,7 +19,10 @@ const EXPECTED_CASES: [(&str, &str); 14] = [
 
 #[test]
 fn test_sanitization() {
-    let sanitizer = Sanitizer::default().include_defaults().remove_leading_underscores().remove_trailing_underscores();
+    let sanitizer = Sanitizer::default()
+        .include_defaults()
+        .remove_leading_underscores()
+        .remove_trailing_underscores();
     for (input, expected) in EXPECTED_CASES.iter() {
         println!("input: {}, expected: {}", input, expected);
         assert_eq!(sanitizer.to_snake_case(input).unwrap(), *expected);

@@ -1,6 +1,5 @@
 //! Submodule providing the `RepeatedColors` trait.
-use image::GenericImageView;
-use image::Pixel;
+use image::{GenericImageView, Pixel};
 
 pub trait RepeatedColors {
     /// Returns the rate of repeated colors in the provided image.

@@ -1,10 +1,10 @@
-//! Column constraint that checks whether the type of a column is compatible with
-//! its foreign column type, if the column is indeed a foreign key.
+//! Column constraint that checks whether the type of a column is compatible
+//! with its foreign column type, if the column is indeed a foreign key.
 
 use super::CustomColumnConstraint;
 
-/// A column constraint that checks whether the type of a column is compatible with
-/// its foreign column type, if the column is indeed a foreign key.
+/// A column constraint that checks whether the type of a column is compatible
+/// with its foreign column type, if the column is indeed a foreign key.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct CompatibleForeignTypeConstraint;
 

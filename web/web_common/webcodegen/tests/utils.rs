@@ -1,14 +1,12 @@
 //! Utility functions for testing.
 
 use std::io::Write;
+
 use quote::quote;
 
 /// Add a `fn main() {}` to the end of a file.
 pub fn add_main_to_file(file_path: &str) {
-    let mut file = std::fs::OpenOptions::new()
-        .append(true)
-        .open(file_path)
-        .unwrap();
+    let mut file = std::fs::OpenOptions::new().append(true).open(file_path).unwrap();
 
     let main = quote! {
         fn main() {}

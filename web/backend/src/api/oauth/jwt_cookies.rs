@@ -1,35 +1,24 @@
 //! Functions and APIs dealing with JWT cookies necessary for OAuth2 logins.
-use actix_web::cookie::time::Duration as ActixWebDuration;
-use actix_web::cookie::Cookie;
-use actix_web::dev::Payload;
-use actix_web::dev::ServiceRequest;
-use actix_web::error::{Error, ErrorInternalServerError, ErrorUnauthorized};
-use actix_web::http::header::LOCATION;
-use actix_web::web;
-use actix_web::FromRequest;
-use actix_web::HttpRequest;
-use actix_web::HttpResponse;
-use actix_web::HttpResponseBuilder;
+use std::{env, future::ready, num::ParseIntError, pin::Pin};
+
+use actix_web::{
+    cookie::{time::Duration as ActixWebDuration, Cookie},
+    dev::{Payload, ServiceRequest},
+    error::{Error, ErrorInternalServerError, ErrorUnauthorized},
+    http::header::LOCATION,
+    web, FromRequest, HttpRequest, HttpResponse, HttpResponseBuilder,
+};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use base64::prelude::*;
-use chrono::Duration;
-use chrono::Utc;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::Pool;
-use diesel::PgConnection;
+use chrono::{Duration, Utc};
+use core_structures::User;
 use futures::Future;
-use jsonwebtoken::Algorithm;
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use redis::AsyncCommands;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::env;
-use std::future::ready;
-use std::num::ParseIntError;
-use std::pin::Pin;
 use uuid::Uuid;
-use web_common::api::oauth::jwt_cookies::*;
-use web_common::api::ApiError;
+use web_common::api::{oauth::jwt_cookies::*, ApiError};
 
 /// Set a const with the expected cookie name.
 pub(crate) const REFRESH_COOKIE_NAME: &str = "refresh_token";
@@ -124,12 +113,7 @@ impl JsonWebToken {
         let now = Utc::now();
         let created_at = now.timestamp() as usize;
         let expires_in = (now + Duration::try_minutes(minutes).unwrap()).timestamp() as usize;
-        JsonWebToken {
-            sub: user_id,
-            token_id,
-            exp: expires_in,
-            created_at,
-        }
+        JsonWebToken { sub: user_id, token_id, exp: expires_in, created_at }
     }
 
     /// Function to insert the token into the redis database.
@@ -145,21 +129,15 @@ impl JsonWebToken {
         // We insert the token: user_id pair into the redis database,
         // with as duration the same as the duration of the token.
 
-        let mut con = redis_client
-            .get_async_connection()
-            .await
-            .map_err(|e| e.to_string())?;
+        let mut con = redis_client.get_async_connection().await.map_err(|e| e.to_string())?;
 
-        con.set_ex(
-            self.token_id.to_string(),
-            self.user_id().to_string(),
-            (minutes * 60) as u64,
-        )
-        .await
-        .map_err(|e| e.to_string())
+        con.set_ex(self.token_id.to_string(), self.user_id().to_string(), (minutes * 60) as u64)
+            .await
+            .map_err(|e| e.to_string())
     }
 
-    /// Checks whether the token is still present in the redis database and has the same user_id.
+    /// Checks whether the token is still present in the redis database and has
+    /// the same user_id.
     ///
     /// # Arguments
     /// * `redis_client` - The redis client to use for the login.
@@ -167,18 +145,14 @@ impl JsonWebToken {
         &self,
         redis_client: &redis::Client,
     ) -> Result<bool, String> {
-        let mut con = redis_client
-            .get_async_connection()
-            .await
-            .map_err(|e| e.to_string())?;
+        let mut con = redis_client.get_async_connection().await.map_err(|e| e.to_string())?;
 
-        // While extremely unlikely, it is possible that the token is still present in the
-        // redis database with a different user_id. This may happen due to a collision, or
-        // more likely, if some potentially malicious action is taking place.
-        let user_id: String = con
-            .get(self.token_id.to_string())
-            .await
-            .map_err(|e| e.to_string())?;
+        // While extremely unlikely, it is possible that the token is still present in
+        // the redis database with a different user_id. This may happen due to a
+        // collision, or more likely, if some potentially malicious action is
+        // taking place.
+        let user_id: String =
+            con.get(self.token_id.to_string()).await.map_err(|e| e.to_string())?;
 
         Ok(user_id == self.user_id().to_string())
     }
@@ -188,14 +162,9 @@ impl JsonWebToken {
     /// # Arguments
     /// * `redis_client` - The redis client to use for the login.
     async fn delete_from_redis(&self, redis_client: &redis::Client) -> Result<(), String> {
-        let mut con = redis_client
-            .get_async_connection()
-            .await
-            .map_err(|e| e.to_string())?;
+        let mut con = redis_client.get_async_connection().await.map_err(|e| e.to_string())?;
 
-        con.del(self.token_id.to_string())
-            .await
-            .map_err(|e| e.to_string())
+        con.del(self.token_id.to_string()).await.map_err(|e| e.to_string())
     }
 
     fn user_id(&self) -> i32 {
@@ -251,12 +220,11 @@ impl JsonRefreshToken {
     /// * `redis_client` - The redis client to use for the login.
     async fn insert_into_redis(&self, redis_client: &redis::Client) -> Result<(), String> {
         let config = JWTConfig::from_env()?;
-        self.web_token
-            .insert_into_redis(redis_client, config.refresh_token_minutes())
-            .await
+        self.web_token.insert_into_redis(redis_client, config.refresh_token_minutes()).await
     }
 
-    /// Checks whether the token is still present in the redis database and has the same user_id.
+    /// Checks whether the token is still present in the redis database and has
+    /// the same user_id.
     ///
     /// # Arguments
     /// * `redis_client` - The redis client to use for the login.
@@ -296,8 +264,8 @@ impl JsonRefreshToken {
     }
 }
 
-/// We do a small unit test to ensure that the encode and decode process works as expected.
-/// for the JsonRefreshToken struct.
+/// We do a small unit test to ensure that the encode and decode process works
+/// as expected. for the JsonRefreshToken struct.
 #[cfg(test)]
 mod refresh_token_tests {
     use super::*;
@@ -320,9 +288,7 @@ pub(crate) struct JsonAccessToken {
 impl JsonAccessToken {
     pub fn new(user_id: i32) -> Result<JsonAccessToken, String> {
         let config = JWTConfig::from_env()?;
-        Ok(JsonAccessToken {
-            web_token: JsonWebToken::new(user_id, config.access_token_minutes()),
-        })
+        Ok(JsonAccessToken { web_token: JsonWebToken::new(user_id, config.access_token_minutes()) })
     }
 
     /// Function to insert the token into the redis database.
@@ -331,12 +297,11 @@ impl JsonAccessToken {
     /// * `redis_client` - The redis client to use for the login.
     pub async fn insert_into_redis(&self, redis_client: &redis::Client) -> Result<(), String> {
         let config = JWTConfig::from_env()?;
-        self.web_token
-            .insert_into_redis(redis_client, config.access_token_minutes())
-            .await
+        self.web_token.insert_into_redis(redis_client, config.access_token_minutes()).await
     }
 
-    /// Checks whether the token is still present in the redis database and has the same user_id.
+    /// Checks whether the token is still present in the redis database and has
+    /// the same user_id.
     ///
     /// # Arguments
     /// * `redis_client` - The redis client to use for the login.
@@ -376,8 +341,8 @@ impl JsonAccessToken {
     }
 }
 
-/// We do a small unit test to ensure that the encode and decode process works as expected
-/// for the JsonAccessToken struct.
+/// We do a small unit test to ensure that the encode and decode process works
+/// as expected for the JsonAccessToken struct.
 #[cfg(test)]
 mod access_token_tests {
     use super::*;
@@ -498,10 +463,9 @@ pub(crate) async fn access_token_validator(
             }
             Ok(req)
         }
-        Err(_) => Err((
-            ErrorUnauthorized(json!({"status": "fail", "message": "Invalid token"})),
-            req,
-        )),
+        Err(_) => {
+            Err((ErrorUnauthorized(json!({"status": "fail", "message": "Invalid token"})), req))
+        }
     }
 }
 
@@ -527,7 +491,23 @@ pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpRespons
     builder
 }
 
-impl FromRequest for User {
+pub struct UserWrapper {
+    pub user: User,
+}
+
+impl From<User> for UserWrapper {
+    fn from(user: User) -> Self {
+        UserWrapper { user }
+    }
+}
+
+impl From<UserWrapper> for User {
+    fn from(wrapper: UserWrapper) -> Self {
+        wrapper.user
+    }
+}
+
+impl FromRequest for UserWrapper {
     type Error = Error;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
@@ -564,18 +544,17 @@ impl FromRequest for User {
         // to be authenticated and it still exists in the redis database, we still need
         // to check whether the user exists in the database, as it may have been deleted
         // in the meantime.
-        let diesel_pool =
-            match req.app_data::<web::Data<Pool<ConnectionManager<PgConnection>>>>() {
-                Some(pool) => pool.clone(),
-                None => {
-                    log::error!("Database pool not present in request");
-                    return Box::pin(ready(Err(ErrorInternalServerError(
-                        json!({"status": "fail", "message": "Internal server error"}),
-                    ))));
-                }
+        let diesel_pool = match req.app_data::<web::Data<web_common_traits::prelude::DBPool>>() {
+            Some(pool) => pool.clone(),
+            None => {
+                log::error!("Database pool not present in request");
+                return Box::pin(ready(Err(ErrorInternalServerError(
+                    json!({"status": "fail", "message": "Internal server error"}),
+                ))));
             }
-            .get_ref()
-            .clone();
+        }
+        .get_ref()
+        .clone();
 
         Box::pin(async move {
             let token = bearer.token();
@@ -588,8 +567,8 @@ impl FromRequest for User {
                     ));
                 }
             };
-    
-            let mut conn: DieselConn = match diesel_pool.get() {
+
+            let mut conn = match diesel_pool.get().await {
                 Ok(conn) => conn,
                 Err(_) => {
                     log::error!("Unable to get connection from pool.");
@@ -598,7 +577,7 @@ impl FromRequest for User {
                     ));
                 }
             };
-    
+
             // If the token is expired, we return an error.
             if access_token.is_expired() {
                 log::debug!("Token has expired");
@@ -606,26 +585,30 @@ impl FromRequest for User {
                     json!({"status": "fail", "message": "Token has expired"}),
                 ));
             }
-    
-            let is_still_present = access_token.is_still_present_in_redis(&redis_client).await;
-    
-            if is_still_present.is_err() || !is_still_present.unwrap() {
+
+            if access_token
+                .is_still_present_in_redis(&redis_client)
+                .await
+                .map_or(true, |present| !present)
+            {
                 log::error!("Token not present in redis");
                 return Err(ErrorUnauthorized(
                     json!({"status": "fail", "message": "Invalid token"}),
                 ));
             }
-    
+
             // If the user doesn't exist, we return an error, otherwise we return the user.
-            match User::get(access_token.user_id(), &mut conn) {
-                Ok(user) => Ok(user),
-                Err(_) => {
-                    log::debug!("Did not find user in database");
-                    Err(ErrorUnauthorized(
-                        json!({"status": "fail", "message": "Invalid token or user doesn't exists"}),
-                    ))
-                }
-            }
+            let Ok(user) = User::from_id(&access_token.user_id(), &mut conn).await else {
+                return Err(ErrorInternalServerError(
+                    json!({"status": "fail", "message": "Internal server error"}),
+                ));
+            };
+
+            user.map(Into::into).ok_or_else(|| {
+                ErrorUnauthorized(
+                    json!({"status": "fail", "message": "Invalid token or user doesn't exists"}),
+                )
+            })
         })
     }
 }

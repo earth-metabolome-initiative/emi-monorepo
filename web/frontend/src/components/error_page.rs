@@ -1,8 +1,9 @@
 //! Not found error page.
 
-use crate::router::AppRoute;
 use yew::prelude::*;
 use yew_router::prelude::*;
+
+use crate::router::AppRoute;
 
 #[derive(Clone, Properties, PartialEq)]
 pub struct ErrorPageProps {

@@ -4,12 +4,12 @@ use std::{collections::HashSet, path::Path};
 
 use diesel::PgConnection;
 use itertools::Itertools;
+use prettyplease::unparse;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{File, Ident};
 
 use crate::{errors::WebCodeGenError, Column, PgType, Table};
-use prettyplease::unparse;
 
 #[derive(Debug)]
 /// Error type for code generation.
@@ -43,23 +43,23 @@ impl<'a> Codegen<'a> {
     }
 
     /// Writes all the tables syn version to a file.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`.
     /// * `table_catalog` - The name of the table catalog.
     /// * `table_schema` - The name of the table schema.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * Returns an error if the output path is not provided.
     /// * Returns an error if the tables cannot be loaded.
     /// * Returns an error if the tables cannot be converted to schema.
     /// * Returns an error if the tables cannot be converted to syn.
     /// * Returns an error if the user defined types cannot be loaded.
     /// * Returns an error if the user defined types cannot be converted to syn.
-    /// * Returns an error if the generated code cannot be written to the output file.
-    /// 
+    /// * Returns an error if the generated code cannot be written to the output
+    ///   file.
     pub fn generate(
         &self,
         conn: &mut PgConnection,
@@ -93,34 +93,19 @@ impl<'a> Codegen<'a> {
 
         let table_idents_below_64_columns = tables
             .iter()
-            .filter(|table| {
-                table
-                    .columns(conn)
-                    .map(|columns| columns.len() <= 64)
-                    .unwrap_or(false)
-            })
+            .filter(|table| table.columns(conn).map(|columns| columns.len() <= 64).unwrap_or(false))
             .map(Table::snake_case_ident)
             .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
 
         let table_idents_below_32_columns = tables
             .iter()
-            .filter(|table| {
-                table
-                    .columns(conn)
-                    .map(|columns| columns.len() <= 32)
-                    .unwrap_or(false)
-            })
+            .filter(|table| table.columns(conn).map(|columns| columns.len() <= 32).unwrap_or(false))
             .map(Table::snake_case_ident)
             .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
 
         let table_idents_below_16_columns = tables
             .iter()
-            .filter(|table| {
-                table
-                    .columns(conn)
-                    .map(|columns| columns.len() <= 16)
-                    .unwrap_or(false)
-            })
+            .filter(|table| table.columns(conn).map(|columns| columns.len() <= 16).unwrap_or(false))
             .map(Table::snake_case_ident)
             .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
 
@@ -150,9 +135,9 @@ impl<'a> Codegen<'a> {
             .map(|pg_type| pg_type.to_syn(conn))
             .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
-        // We define for each group of tables by column size the corresponding diesel macro
-        // for allow_tables_to_appear_in_same_query, with negative flags to avoid multiple such
-        // macros active at the same time.
+        // We define for each group of tables by column size the corresponding diesel
+        // macro for allow_tables_to_appear_in_same_query, with negative flags
+        // to avoid multiple such macros active at the same time.
         let above_64_columns = if all_table_idents.len() == table_idents_below_64_columns.len() {
             TokenStream::new()
         } else {

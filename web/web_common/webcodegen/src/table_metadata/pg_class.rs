@@ -4,9 +4,9 @@ use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a PostgreSQL class (table, index, sequence, etc.).
 ///
-/// This struct maps to the `pg_class` system catalog table in PostgreSQL, which stores
-/// metadata about tables, indexes, sequences, and other similar objects. Each instance of `PGClass`
-/// corresponds to a single object in the database.
+/// This struct maps to the `pg_class` system catalog table in PostgreSQL, which
+/// stores metadata about tables, indexes, sequences, and other similar objects.
+/// Each instance of `PGClass` corresponds to a single object in the database.
 ///
 /// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-class.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq)]
@@ -43,7 +43,8 @@ pub struct PGClass {
     pub relhasindex: bool,
     /// Whether the object is shared across all databases.
     pub relisshared: bool,
-    /// The persistence type of the object (e.g., permanent, unlogged, or temporary).
+    /// The persistence type of the object (e.g., permanent, unlogged, or
+    /// temporary).
     pub relpersistence: String,
     /// The kind of object (e.g., table, index, sequence).
     pub relkind: String,

@@ -1,4 +1,5 @@
-//! Submodule handling the complexity of recognizing and parsing the various file formats that the application supports.
+//! Submodule handling the complexity of recognizing and parsing the various
+//! file formats that the application supports.
 
 use serde::{Deserialize, Serialize};
 

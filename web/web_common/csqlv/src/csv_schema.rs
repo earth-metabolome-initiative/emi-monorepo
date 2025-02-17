@@ -1,14 +1,17 @@
 //! Submodule providing the CSV Schema struct, which loads a CSV directory and
 //! processes it into a complete SQL database schema.
+use std::path::Path;
+
 use indicatif::ProgressIterator;
 use pluralizer::add_singular_rule;
 use regex::Regex;
-use std::path::Path;
 
-use crate::csv_table::CSVTable;
-use crate::errors::CSVSchemaError;
-use crate::extensions::{has_compression_extension, has_supported_extension};
-use crate::metadata::CSVTableMetadata;
+use crate::{
+    csv_table::CSVTable,
+    errors::CSVSchemaError,
+    extensions::{has_compression_extension, has_supported_extension},
+    metadata::CSVTableMetadata,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a CSV schema.
@@ -28,18 +31,17 @@ impl CSVSchema {
     pub fn tables(&self) -> Vec<CSVTable<'_>> {
         self.table_metadatas
             .iter()
-            .map(|table_metadata| CSVTable {
-                schema: self,
-                table_metadata,
-            })
+            .map(|table_metadata| CSVTable { schema: self, table_metadata })
             .collect()
     }
 
     #[must_use]
-    /// Returns the tables in the schema alongside their priority score, sorted by descending priority.
+    /// Returns the tables in the schema alongside their priority score, sorted
+    /// by descending priority.
     ///
     /// # Implementative details
-    /// The priority score is determined by the score of the dependant tables +1.
+    /// The priority score is determined by the score of the dependant tables
+    /// +1.
     pub fn tables_with_priority(&self) -> Vec<(CSVTable<'_>, usize)> {
         let mut table_priority: std::collections::HashMap<CSVTable<'_>, usize> =
             std::collections::HashMap::new();
@@ -88,10 +90,7 @@ impl CSVSchema {
             .iter()
             .find(|table| table.name == table_name)
             .ok_or(CSVSchemaError::InvalidTableName(table_name.to_string()))?;
-        Ok(CSVTable {
-            schema: self,
-            table_metadata,
-        })
+        Ok(CSVTable { schema: self, table_metadata })
     }
 
     #[must_use]
@@ -114,12 +113,7 @@ impl CSVSchema {
     /// The deletion happens following the reverse order of the foreign keys.
     pub fn to_postgres_delete(&self) -> String {
         let mut sql = String::new();
-        for table in self
-            .tables_with_priority()
-            .into_iter()
-            .rev()
-            .map(|(table, _)| table)
-        {
+        for table in self.tables_with_priority().into_iter().rev().map(|(table, _)| table) {
             sql.push_str(&table.to_postgres_delete());
             sql.push('\n');
         }
@@ -140,12 +134,7 @@ impl CSVSchemaBuilder {
     #[must_use]
     /// Create a new CSV schema builder.
     pub fn new() -> Self {
-        Self {
-            include_gz: false,
-            container_directory: None,
-            singularize: false,
-            verbose: false,
-        }
+        Self { include_gz: false, container_directory: None, singularize: false, verbose: false }
     }
 
     #[must_use]
@@ -195,7 +184,6 @@ impl CSVSchemaBuilder {
     ///
     /// # Panics
     /// * If the schema contains foreign keys that do not exist.
-    ///
     pub fn from_dir(self, dir: &str) -> Result<CSVSchema, CSVSchemaError> {
         // If the container directory is set, we need to prepend it to the directory.
         let container_directory = if let Some(container_directory) = self.container_directory {
@@ -250,9 +238,7 @@ impl CSVSchemaBuilder {
             .collect::<std::collections::HashSet<_>>();
 
         if unique_names.len() != table_metadatas.len() {
-            return Err(CSVSchemaError::DuplicateTable(
-                "Duplicate table name".to_string(),
-            ));
+            return Err(CSVSchemaError::DuplicateTable("Duplicate table name".to_string()));
         }
 
         // We check that there are no loops in the schema caused by foreign keys.
@@ -289,7 +275,8 @@ impl CSVSchemaBuilder {
 
         // We check that all of the foreign tables are valid and that the foreign
         // columns actually exist in the foreign tables.
-        schema.table_metadatas
+        schema
+            .table_metadatas
             .iter()
             .try_for_each(|table| table.validate_schema_compatibility(&schema))?;
 

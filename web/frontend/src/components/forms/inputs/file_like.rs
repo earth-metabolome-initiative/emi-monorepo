@@ -1,8 +1,8 @@
 use web_common::api::ApiError;
 use yew::prelude::*;
 mod jpeg_like;
-use std::fmt::Debug;
-use std::rc::Rc;
+use std::{fmt::Debug, rc::Rc};
+
 use web_common::file_formats::GenericFileFormat;
 
 /// Returns a human-readable string representing the size of a file.
@@ -98,9 +98,9 @@ pub fn file_preview<Data: FileLike>(props: &FilePreviewProp<Data>) -> Html {
 
 //     pub fn name(&self) -> Option<String> {
 //         match &self.file {
-//             FileLike::File(file) => Some(file.name().split('/').last().unwrap().to_string()),
-//             FileLike::Url(_) => None,
-//         }
+//             FileLike::File(file) =>
+// Some(file.name().split('/').last().unwrap().to_string()),
+// FileLike::Url(_) => None,         }
 //     }
 
 //     pub fn extension(&self) -> Option<String> {
@@ -139,9 +139,9 @@ pub fn file_preview<Data: FileLike>(props: &FilePreviewProp<Data>) -> Html {
 
 //     pub fn is_pdf(&self) -> bool {
 //         match &self.file {
-//             FileLike::File(file) => file.type_().starts_with("application/pdf"),
-//             FileLike::Url(url) => url.ends_with(".pdf"),
-//         }
+//             FileLike::File(file) =>
+// file.type_().starts_with("application/pdf"),             FileLike::Url(url)
+// => url.ends_with(".pdf"),         }
 //     }
 
 //     pub fn last_modified(&self) -> Option<u64> {
@@ -172,15 +172,15 @@ pub fn file_preview<Data: FileLike>(props: &FilePreviewProp<Data>) -> Html {
 
 //     pub fn last_modified_date(&self) -> Option<String> {
 //         self.last_modified().map(|last_modified| {
-//             let date = js_sys::Date::new(&JsValue::from_f64(last_modified as f64));
-//             let date = date.to_locale_string("en-US", &JsValue::undefined());
-//             date.as_string().unwrap()
+//             let date = js_sys::Date::new(&JsValue::from_f64(last_modified as
+// f64));             let date = date.to_locale_string("en-US",
+// &JsValue::undefined());             date.as_string().unwrap()
 //         })
 //     }
 
-//     /// Returns a human-readable string representing the time elapsed since the file was last modified.
-//     pub fn human_readable_modified_delta(&self) -> Option<String> {
-//         let date = self.last_modified()?;
+//     /// Returns a human-readable string representing the time elapsed since
+// the file was last modified.     pub fn human_readable_modified_delta(&self)
+// -> Option<String> {         let date = self.last_modified()?;
 //         let date = js_sys::Date::new(&JsValue::from_f64(date as f64));
 //         let now = js_sys::Date::new_0();
 //         let delta = now.get_time() - date.get_time();
@@ -229,17 +229,18 @@ pub fn file_preview<Data: FileLike>(props: &FilePreviewProp<Data>) -> Html {
 //     }
 
 //     fn view(&self, ctx: &Context<Self>) -> Html {
-//         // We add an hash obtained from the file name and the associated informations, such
-//         // as the file size and the last modified date, to the URL to make sure that the URL
-//         // changes when the file changes, so that the image is reloaded when the file changes.
+//         // We add an hash obtained from the file name and the associated
+// informations, such         // as the file size and the last modified date, to
+// the URL to make sure that the URL         // changes when the file changes,
+// so that the image is reloaded when the file changes.
 
 //         let hash = ctx.props().metadata_hash();
 
 //         match &ctx.props().file {
 //             FileLike::File(file) => {
-//                 let url = web_sys::Url::create_object_url_with_blob(&file).unwrap();
-//                 let url = format!("{}#{}", url, hash);
-//                 html! {
+//                 let url =
+// web_sys::Url::create_object_url_with_blob(&file).unwrap();
+// let url = format!("{}#{}", url, hash);                 html! {
 //                     <img src={url} class="preview" />
 //                 }
 //             }
@@ -268,17 +269,18 @@ pub fn file_preview<Data: FileLike>(props: &FilePreviewProp<Data>) -> Html {
 //     }
 
 //     fn view(&self, ctx: &Context<Self>) -> Html {
-//         // We add an hash obtained from the file name and the associated informations, such
-//         // as the file size and the last modified date, to the URL to make sure that the URL
-//         // changes when the file changes, so that the image is reloaded when the file changes.
+//         // We add an hash obtained from the file name and the associated
+// informations, such         // as the file size and the last modified date, to
+// the URL to make sure that the URL         // changes when the file changes,
+// so that the image is reloaded when the file changes.
 
 //         let hash = ctx.props().metadata_hash();
 
 //         match &ctx.props().file {
 //             FileLike::File(file) => {
-//                 let url = web_sys::Url::create_object_url_with_blob(&file).unwrap();
-//                 let url = format!("{}#{}", url, hash);
-//                 html! {
+//                 let url =
+// web_sys::Url::create_object_url_with_blob(&file).unwrap();
+// let url = format!("{}#{}", url, hash);                 html! {
 //                     <iframe src={url} class="preview"></iframe>
 //                 }
 //             }
@@ -315,19 +317,20 @@ pub fn file_preview<Data: FileLike>(props: &FilePreviewProp<Data>) -> Html {
 //         let file = match ctx.props().file_props.file.clone() {
 //             FileLike::File(file) => file,
 //             FileLike::Url(_) => {
-//                 unreachable!("TextualFilePreview should only be used with files, not URLs.")
-//             }
+//                 unreachable!("TextualFilePreview should only be used with
+// files, not URLs.")             }
 //         };
 //         let reader = web_sys::FileReader::new().unwrap();
 //         let link = ctx.link().clone();
-//         // We read the first few lines of the file to display a preview of the file.
+//         // We read the first few lines of the file to display a preview of
+// the file.
 
 //         const CHUNK_SIZE: usize = 1024; // Adjust the chunk size as needed
 
 //         let number_of_lines = ctx.props().number_of_lines;
 
-//         let on_load = Closure::wrap(Box::new(move |event: web_sys::ProgressEvent| {
-//             let mut lines_read = 0;
+//         let on_load = Closure::wrap(Box::new(move |event:
+// web_sys::ProgressEvent| {             let mut lines_read = 0;
 //             let mut text = String::new();
 //             let reader = event
 //                 .target()
@@ -418,10 +421,10 @@ pub fn file_preview<Data: FileLike>(props: &FilePreviewProp<Data>) -> Html {
 
 //     let thumbnail: Html = {
 //         if props.is_image() {
-//             html! { <ImagePreview file={props.file.clone()} large={props.large} /> }
-//         } else if props.is_pdf() {
-//             html! { <PDFPreview file={props.file.clone()} large={props.large} /> }
-//         } else {
+//             html! { <ImagePreview file={props.file.clone()}
+// large={props.large} /> }         } else if props.is_pdf() {
+//             html! { <PDFPreview file={props.file.clone()} large={props.large}
+// /> }         } else {
 //             html! { <TextualFilePreview file_props={props.clone()} /> }
 //         }
 //     };
@@ -441,9 +444,9 @@ pub fn file_preview<Data: FileLike>(props: &FilePreviewProp<Data>) -> Html {
 //             {if let Some(metadata) = props.file_metadata() {
 //                 html!{
 //                     <>
-//                     <button class="delete" onclick={on_click}><i class="fas fa-times"></i></button>
-//                     <p class="metadata">{metadata}</p>
-//                     </>
+//                     <button class="delete" onclick={on_click}><i class="fas
+// fa-times"></i></button>                     <p
+// class="metadata">{metadata}</p>                     </>
 //                 }
 //             } else {
 //                 html!{

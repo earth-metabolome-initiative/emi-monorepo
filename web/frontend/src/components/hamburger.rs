@@ -1,6 +1,7 @@
 //! File describing the hamburger menu component.
 //!
-//! On the click event, the hamburger should get the additional class "is-active" and the navigation should be shown.
+//! On the click event, the hamburger should get the additional class
+//! "is-active" and the navigation should be shown.
 
 use yew::prelude::*;
 

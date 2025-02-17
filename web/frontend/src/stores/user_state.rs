@@ -1,6 +1,7 @@
-use serde::{Deserialize, Serialize};
 use std::rc::Rc;
-use core_structures::{User, Project};
+
+use core_structures::{Project, User};
+use serde::{Deserialize, Serialize};
 use yewdux::prelude::*;
 
 use super::app_state::AppState;
@@ -24,10 +25,7 @@ impl UserState {
     }
 
     pub fn has_complete_profile(&self) -> bool {
-        self.user
-            .as_ref()
-            .map(|user| user.inner.has_complete_profile())
-            .unwrap_or(false)
+        self.user.as_ref().map(|user| user.inner.has_complete_profile()).unwrap_or(false)
     }
 
     pub fn user(&self) -> Option<Rc<User>> {
@@ -42,7 +40,8 @@ impl UserState {
         self.user.as_ref().map(|user| user.inner.id)
     }
 
-    /// Set the user to the provided value and returns whether any changes were made.
+    /// Set the user to the provided value and returns whether any changes were
+    /// made.
     pub fn set_user(&mut self, user: Rc<User>) -> bool {
         let maybe_user = Some(user);
         if self.user != maybe_user {
@@ -53,7 +52,8 @@ impl UserState {
         }
     }
 
-    /// Set the project to the provided value and returns whether any changes were made.
+    /// Set the project to the provided value and returns whether any changes
+    /// were made.
     pub fn set_project(&mut self, project: Rc<NestedProject>) -> bool {
         let maybe_project = Some(project);
         if self.project != maybe_project {

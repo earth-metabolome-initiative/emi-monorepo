@@ -1,10 +1,9 @@
-//! Submodule providing an operation trait that requires the user is authenticated.
+//! Submodule providing an operation trait that requires the user is logged in.
 
 use crate::prelude::Operation;
 
-#[enum_dispatch::enum_dispatch]
-/// Trait for authenticated operations.
-pub trait AuthenticatedOperation: Operation {
+/// Trait for an operation which requires the user to be logged in.
+pub trait SessionOperation {
     /// The session type associated with the operation.
     type User;
     /// The authenticated operation type associated with the operation.

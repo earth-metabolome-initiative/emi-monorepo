@@ -1,13 +1,15 @@
-use crate::prelude::*;
-use crate::traits::Enablable;
+use crate::{prelude::*, traits::Enablable};
 
 /// Struct providing the configuration for Sirius.
 ///
 /// # Implementative details
-/// This struct MUST be a private struct. It is only used by the [`SiriusBuilder`](crate::builder::SiriusBuilder) to
-/// build the [`Sirius`](crate::sirius::Sirius) struct, and through the builder we can evaluate all of the provided
-/// parameters. If we make this struct public, we would allow the user to create a [`Sirius`](crate::sirius::Sirius)
-/// struct with invalid parameters. DO NOT MAKE THIS STRUCT PUBLIC.
+/// This struct MUST be a private struct. It is only used by the
+/// [`SiriusBuilder`](crate::builder::SiriusBuilder) to
+/// build the [`Sirius`](crate::sirius::Sirius) struct, and through the builder
+/// we can evaluate all of the provided parameters. If we make this struct
+/// public, we would allow the user to create a
+/// [`Sirius`](crate::sirius::Sirius) struct with invalid parameters. DO NOT
+/// MAKE THIS STRUCT PUBLIC.
 pub(crate) struct SiriusConfig<V: Version> {
     core_parameters: Vec<V::Core>,
     config_parameters: Vec<V::Config>,
@@ -85,9 +87,9 @@ impl<V: Version> SiriusConfig<V> {
             ))
         } else {
             if !parameter.is_enabler() {
-                // If the current parameter is not an enabler, we make sure that the enabler variant
-                // is present in the vector by trying to insert it without checking if it is already
-                // present.
+                // If the current parameter is not an enabler, we make sure that the enabler
+                // variant is present in the vector by trying to insert it
+                // without checking if it is already present.
                 let _ = self.add_config_parameter(V::Config::enabler());
             }
             self.config_parameters.push(parameter);
@@ -118,9 +120,9 @@ impl<V: Version> SiriusConfig<V> {
             ))
         } else {
             if !parameter.is_enabler() {
-                // If the current parameter is not an enabler, we make sure that the enabler variant
-                // is present in the vector by trying to insert it without checking if it is already
-                // present.
+                // If the current parameter is not an enabler, we make sure that the enabler
+                // variant is present in the vector by trying to insert it
+                // without checking if it is already present.
                 let _ = self.add_formula_parameter(V::Formula::enabler());
             }
             self.formula_parameters.push(parameter);
@@ -151,9 +153,9 @@ impl<V: Version> SiriusConfig<V> {
             ))
         } else {
             if !parameter.is_enabler() {
-                // If the current parameter is not an enabler, we make sure that the enabler variant
-                // is present in the vector by trying to insert it without checking if it is already
-                // present.
+                // If the current parameter is not an enabler, we make sure that the enabler
+                // variant is present in the vector by trying to insert it
+                // without checking if it is already present.
                 let _ = self.add_zodiac_parameter(V::Zodiac::enabler());
             }
             self.zodiac_parameters.push(parameter);
@@ -184,9 +186,9 @@ impl<V: Version> SiriusConfig<V> {
             ))
         } else {
             if !parameter.is_enabler() {
-                // If the current parameter is not an enabler, we make sure that the enabler variant
-                // is present in the vector by trying to insert it without checking if it is already
-                // present.
+                // If the current parameter is not an enabler, we make sure that the enabler
+                // variant is present in the vector by trying to insert it
+                // without checking if it is already present.
                 let _ = self.add_fingerprint_parameter(V::Fingerprint::enabler());
             }
             self.fingerprint_parameters.push(parameter);
@@ -217,9 +219,9 @@ impl<V: Version> SiriusConfig<V> {
             ))
         } else {
             if !parameter.is_enabler() {
-                // If the current parameter is not an enabler, we make sure that the enabler variant
-                // is present in the vector by trying to insert it without checking if it is already
-                // present.
+                // If the current parameter is not an enabler, we make sure that the enabler
+                // variant is present in the vector by trying to insert it
+                // without checking if it is already present.
                 let _ = self.add_structure_parameter(V::Structure::enabler());
             }
             self.structure_parameters.push(parameter);
@@ -250,9 +252,9 @@ impl<V: Version> SiriusConfig<V> {
             ))
         } else {
             if !parameter.is_enabler() {
-                // If the current parameter is not an enabler, we make sure that the enabler variant
-                // is present in the vector by trying to insert it without checking if it is already
-                // present.
+                // If the current parameter is not an enabler, we make sure that the enabler
+                // variant is present in the vector by trying to insert it
+                // without checking if it is already present.
                 let _ = self.add_canopus_parameter(V::Canopus::enabler());
             }
             self.canopus_parameters.push(parameter);
@@ -286,9 +288,9 @@ impl<V: Version> SiriusConfig<V> {
             ))
         } else {
             if !parameter.is_enabler() {
-                // If the current parameter is not an enabler, we make sure that the enabler variant
-                // is present in the vector by trying to insert it without checking if it is already
-                // present.
+                // If the current parameter is not an enabler, we make sure that the enabler
+                // variant is present in the vector by trying to insert it
+                // without checking if it is already present.
                 let _ = self.add_write_summaries_parameter(V::WriteSummaries::enabler());
             }
             self.write_summaries_parameters.push(parameter);
@@ -306,11 +308,7 @@ impl<V: Version> SiriusConfig<V> {
             .chain(self.fingerprint_parameters.iter().map(|p| p.to_string()))
             .chain(self.structure_parameters.iter().map(|p| p.to_string()))
             .chain(self.canopus_parameters.iter().map(|p| p.to_string()))
-            .chain(
-                self.write_summaries_parameters
-                    .iter()
-                    .map(|p| p.to_string()),
-            )
+            .chain(self.write_summaries_parameters.iter().map(|p| p.to_string()))
             .collect::<Vec<String>>()
     }
 }
@@ -329,23 +327,15 @@ mod tests {
     #[test]
     fn test_sirius_config() {
         let mut config: SiriusConfig<Version5> = SiriusConfig::default();
+        config.add_config_parameter(ConfigV5::IsotopeSettingsFilter(true)).unwrap();
         config
-            .add_config_parameter(ConfigV5::IsotopeSettingsFilter(true))
-            .unwrap();
-        config
-            .add_config_parameter(ConfigV5::FormulaSearchDB(DBVector::from(vec![
-                SearchDB::Bio,
-            ])))
+            .add_config_parameter(ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::Bio])))
             .unwrap();
 
-        assert!(config
-            .add_config_parameter(ConfigV5::IsotopeSettingsFilter(true))
-            .is_err());
+        assert!(config.add_config_parameter(ConfigV5::IsotopeSettingsFilter(true)).is_err());
 
         assert!(config
-            .add_config_parameter(ConfigV5::FormulaSearchDB(DBVector::from(vec![
-                SearchDB::Bio
-            ])))
+            .add_config_parameter(ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::Bio])))
             .is_err());
     }
 }

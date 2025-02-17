@@ -1,8 +1,10 @@
-use crate::custom_schema_constraints::ConstraintError;
-use crate::custom_schema_constraints::CustomTableConstraint;
-use crate::errors::WebCodeGenError;
-use crate::Table;
 use diesel::pg::PgConnection;
+
+use crate::{
+    custom_schema_constraints::{ConstraintError, CustomTableConstraint},
+    errors::WebCodeGenError,
+    Table,
+};
 
 #[derive(Default)]
 /// Constraint to enforce that all column names are lower case.

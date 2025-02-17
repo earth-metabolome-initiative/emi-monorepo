@@ -1,12 +1,10 @@
-use crate::errors::WebCodeGenError;
-use diesel::pg::PgConnection;
-use diesel::BoolExpressionMethods;
-use diesel::SelectableHelper;
 use diesel::{
-    ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
+    pg::PgConnection, BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable,
+    QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
 
 use super::Column;
+use crate::errors::WebCodeGenError;
 
 /// Represents a row in the `pg_indexes` view
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq)]
@@ -80,7 +78,6 @@ impl PgIndex {
     /// # Errors
     ///
     /// If an error occurs while loading the columns from the database
-    ///
     pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
         use crate::schema::{columns, pg_attribute, pg_class, pg_index};
 

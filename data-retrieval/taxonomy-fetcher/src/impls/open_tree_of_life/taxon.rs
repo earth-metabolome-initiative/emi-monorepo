@@ -1,8 +1,8 @@
-//! Submodule providing the implementation of the taxon trait for the Open Tree of Life.
-
-use crate::traits::Taxon;
+//! Submodule providing the implementation of the taxon trait for the Open Tree
+//! of Life.
 
 use super::{taxon_entry::OpenTreeOfLifeTaxonEntry, taxonomy::OpenTreeOfLifeTaxonomy};
+use crate::traits::Taxon;
 
 /// Entry of a taxon in the Open Tree of Life taxonomy.
 pub struct OpenTreeOfLifeTaxon<'a> {

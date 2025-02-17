@@ -1,4 +1,5 @@
-//! Module providing a yew component that handles a basic input, which is meant to be used in combination with BasicForm.
+//! Module providing a yew component that handles a basic input, which is meant
+//! to be used in combination with BasicForm.
 
 use wasm_bindgen::JsCast;
 use web_common::api::ApiError;

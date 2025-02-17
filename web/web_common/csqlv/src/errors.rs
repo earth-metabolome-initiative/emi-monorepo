@@ -12,7 +12,7 @@ pub enum CSVSchemaError {
     /// Error indicating an invalid column name.
     InvalidColumnName(String),
     /// Error indicating a duplicate column.
-    DuplicateColumn{
+    DuplicateColumn {
         /// The column name.
         column_name: Option<String>,
         /// The table name.

@@ -1,11 +1,12 @@
-use crate::table_metadata::pg_type::postgres_type_to_diesel;
-use diesel::pg::PgConnection;
-use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, TextExpressionMethods};
+use diesel::{
+    pg::PgConnection, ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, TextExpressionMethods,
+};
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{File, Ident, Type};
-use crate::errors::WebCodeGenError;
+
+use crate::{errors::WebCodeGenError, table_metadata::pg_type::postgres_type_to_diesel};
 
 /// The list of unsupported data types
 pub const UNSUPPORTED_DATA_TYPES: &[&str] = &[
@@ -50,7 +51,6 @@ pub const UNSUPPORTED_DATA_TYPES: &[&str] = &[
     "_text",
 ];
 
-
 /// A struct representing a SQL function
 pub struct SQLFunction {
     /// The name of the function
@@ -63,22 +63,24 @@ pub struct SQLFunction {
 
 impl SQLFunction {
     /// Load all the SQL functions from the database
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A `Result` containing a `Vec` of `SQLFunction` if the operation was successful, or a `WebCodeGenError` if an error occurred
-    /// 
+    ///
+    /// A `Result` containing a `Vec` of `SQLFunction` if the operation was
+    /// successful, or a `WebCodeGenError` if an error occurred
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while loading the functions from the database
     pub fn load_all(conn: &mut PgConnection) -> Result<Vec<SQLFunction>, WebCodeGenError> {
-        use crate::schema::pg_namespace;
-        use crate::schema::pg_proc;
-        use crate::sql_functions::{pg_get_function_arguments, pg_get_function_result};
+        use crate::{
+            schema::{pg_namespace, pg_proc},
+            sql_functions::{pg_get_function_arguments, pg_get_function_result},
+        };
 
         let data: Vec<(_, _, _)> = pg_proc::table
             .inner_join(pg_namespace::table.on(pg_proc::pronamespace.eq(pg_namespace::oid)))
@@ -109,10 +111,7 @@ impl SQLFunction {
             };
             let arguments: Vec<&str> = arguments.split(", ").collect();
 
-            if overloading_functions
-                .iter()
-                .any(|f| f.name == function_name)
-            {
+            if overloading_functions.iter().any(|f| f.name == function_name) {
                 continue;
             }
 
@@ -160,10 +159,9 @@ impl SQLFunction {
                     format!("arg{i}")
                 };
 
-                sql_function.arguments.push((
-                    argument_name,
-                    postgres_type_to_diesel(argument_type, false)?,
-                ));
+                sql_function
+                    .arguments
+                    .push((argument_name, postgres_type_to_diesel(argument_type, false)?));
             }
 
             if found_unsupported_data_type || UNSUPPORTED_DATA_TYPES.contains(&return_type.as_str())
@@ -208,20 +206,22 @@ impl SQLFunction {
     }
 
     /// Write all SQL functions to a file
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
     /// * `output_path` - The path to the output file
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A `Result` containing `()` if the operation was successful, or a `WebCodeGenError` if an error occurred
-    /// 
+    ///
+    /// A `Result` containing `()` if the operation was successful, or a
+    /// `WebCodeGenError` if an error occurred
+    ///
     /// # Errors
-    /// 
-    /// An error will be returned if an error occurs while reading the functions from the database,
-    /// or while writing the generated code to the output file
+    ///
+    /// An error will be returned if an error occurs while reading the functions
+    /// from the database, or while writing the generated code to the output
+    /// file
     pub fn write_all(conn: &mut PgConnection, output_path: &str) -> Result<(), WebCodeGenError> {
         let functions = Self::load_all(conn)?;
 

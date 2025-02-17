@@ -1,14 +1,15 @@
 //! Submodule providing methods to write out the schema of a table.
 
-use crate::errors::WebCodeGenError;
-use crate::Table;
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
 
+use crate::{errors::WebCodeGenError, Table};
+
 impl Table {
-    /// Returns the Syn `TokenStream` for the diesel schema definition for the table.
+    /// Returns the Syn `TokenStream` for the diesel schema definition for the
+    /// table.
     ///
     /// # Arguments
     ///
@@ -25,7 +26,6 @@ impl Table {
     /// * If the diesel type for a column cannot be loaded.
     /// * If the primary key columns cannot be loaded from the database.
     /// * If the diesel feature flag name cannot be generated.
-    ///
     pub fn to_schema(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         let table_schema = Ident::new(&self.table_schema, proc_macro2::Span::call_site());
         let original_table_name = &self.table_name;

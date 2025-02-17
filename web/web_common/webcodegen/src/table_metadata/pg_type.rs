@@ -6,12 +6,10 @@ use diesel::{
 };
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::Ident;
-use syn::{parse_str, Type};
-
-use crate::errors::WebCodeGenError;
+use syn::{parse_str, Ident, Type};
 
 use super::{PgAttribute, PgEnum};
+use crate::errors::WebCodeGenError;
 
 /// Constant listing types supporting `Copy`.
 const COPY_TYPES: [&str; 6] = ["i32", "i16", "i64", "f32", "f64", "bool"];
@@ -96,17 +94,17 @@ pub struct PgType {
 }
 
 /// Returns the Syn rust type of the column.
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * `type_name` - The name of the type.
-/// 
+///
 /// # Returns
-/// 
+///
 /// A string slice containing the rust type.
-/// 
+///
 /// # Panics
-/// 
+///
 /// Panics if the type is not supported.
 pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> Result<&'static str, WebCodeGenError> {
     Ok(match type_name.as_ref() {
@@ -147,11 +145,8 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> Result<&'static str, WebCod
 
         // UUID type
         "uuid" => "uuid::Uuid",
-        
 
-        other =>  {
-            return Err(WebCodeGenError::UnknownPostgresRustType(other.to_owned()))
-        }
+        other => return Err(WebCodeGenError::UnknownPostgresRustType(other.to_owned())),
     })
 }
 
@@ -208,7 +203,9 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<&str, WebCodeG
         "tsquery" => "diesel_full_text_search::TsQuery",
 
         // GIS types
-        "geometry" | "geography" | "point" | "polygon" | "geometry(Point,4326)" | "line" => "postgis_diesel::sql_types::Geometry",
+        "geometry" | "geography" | "point" | "polygon" | "geometry(Point,4326)" | "line" => {
+            "postgis_diesel::sql_types::Geometry"
+        }
 
         // Other
         "uuid" => "diesel::sql_types::Uuid",
@@ -229,7 +226,10 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<&str, WebCodeG
 /// # Returns
 ///
 /// A `Type` representing the corresponding Diesel type.
-pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Result<Type, WebCodeGenError> {
+pub fn postgres_type_to_diesel(
+    postgres_type: &str,
+    nullable: bool,
+) -> Result<Type, WebCodeGenError> {
     let rust_type_str = postgres_type_to_diesel_str(postgres_type)?;
 
     let rust_type_str = if nullable {
@@ -242,28 +242,28 @@ pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Result<Ty
         .expect(format!("Failed to parse rust type: '{rust_type_str}'").as_str()))
 }
 
-
 impl PgType {
     /// Returns the Syn rust type of the `PgType`.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The Postgres connection.
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A Result containing the Syn rust type of the `PgType`, or an error if the type is not supported.
-    /// 
+    ///
+    /// A Result containing the Syn rust type of the `PgType`, or an error if
+    /// the type is not supported.
+    ///
     /// # Errors
-    /// 
+    ///
     /// * Returns an error if the provided database connection fails.
-    /// 
     pub fn rust_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
         match rust_type_str(&self.typname) {
             Ok(rust_type) => Ok(parse_str::<Type>(rust_type).unwrap()),
             Err(error) => {
                 if self.is_composite() {
-                    let struct_name = Ident::new(&self.camelcased_name(), proc_macro2::Span::call_site());
+                    let struct_name =
+                        Ident::new(&self.camelcased_name(), proc_macro2::Span::call_site());
                     Ok(parse_str::<Type>(&struct_name.to_string()).unwrap())
                 } else if self.is_user_defined(conn)? {
                     let Some(base_type) = self.base_type(conn)? else {
@@ -278,20 +278,20 @@ impl PgType {
     }
 
     /// Returns the Syn postgres type of the `PgType`.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `nullable` - A boolean indicating whether the type is nullable.
     /// * `conn` - The Postgres connection.
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A Result containing the Syn postgres type of the `PgType`, or an error if the type is not supported.
-    /// 
+    ///
+    /// A Result containing the Syn postgres type of the `PgType`, or an error
+    /// if the type is not supported.
+    ///
     /// # Errors
-    /// 
+    ///
     /// * Returns an error if the provided database connection fails.
-    /// 
     pub fn diesel_type(
         &self,
         nullable: bool,
@@ -318,19 +318,19 @@ impl PgType {
     }
 
     /// Returns the internal custom types of the `PgType`, if any.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The Postgres connection.
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A Result containing the internal custom types of the `PgType`, or an error if the type is not supported.
-    /// 
+    ///
+    /// A Result containing the internal custom types of the `PgType`, or an
+    /// error if the type is not supported.
+    ///
     /// # Errors
-    /// 
+    ///
     /// * Returns an error if the provided database connection fails.
-    /// 
     pub fn internal_custom_types(
         &self,
         conn: &mut PgConnection,
@@ -338,7 +338,7 @@ impl PgType {
         let mut internal_custom_types = Vec::new();
         for attribute in self.attributes(conn)? {
             let pg_type = attribute.pg_type(conn)?;
-            if pg_type.is_composite() || pg_type.is_enum(){
+            if pg_type.is_composite() || pg_type.is_enum() {
                 internal_custom_types.extend(pg_type.internal_custom_types(conn)?);
                 internal_custom_types.push(pg_type);
             }
@@ -348,42 +348,41 @@ impl PgType {
     }
 
     /// Returns the Type Base Type of the `PgType`.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The Postgres connection.
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A Result containing the Type Base Type of the `PgType`, or an error if the type is not supported.
-    /// 
+    ///
+    /// A Result containing the Type Base Type of the `PgType`, or an error if
+    /// the type is not supported.
+    ///
     /// # Errors
-    /// 
+    ///
     /// * Returns an error if the provided database connection fails.
     pub fn base_type(&self, conn: &mut PgConnection) -> Result<Option<PgType>, WebCodeGenError> {
         if self.typbasetype == 0 {
             Ok(None)
         } else {
             use crate::schema::pg_type;
-            Ok(pg_type::table
-                .filter(pg_type::oid.eq(self.typbasetype))
-                .first::<PgType>(conn)
-                .ok())
+            Ok(pg_type::table.filter(pg_type::oid.eq(self.typbasetype)).first::<PgType>(conn).ok())
         }
     }
 
     /// Returns whether the Postgres type is a user-defined type.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The Postgres connection.
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A Result containing a boolean indicating whether the Postgres type is a user-defined type, or an error if the type is not supported.
-    /// 
+    ///
+    /// A Result containing a boolean indicating whether the Postgres type is a
+    /// user-defined type, or an error if the type is not supported.
+    ///
     /// # Errors
-    /// 
+    ///
     /// * Returns an error if the provided database connection fails.
     pub fn is_user_defined(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(&self.typcategory == "U" && self.base_type(conn)?.is_some())
@@ -402,25 +401,24 @@ impl PgType {
     }
 
     /// Returns whether the associated rust type supports `Copy`.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The Postgres connection.
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A Result containing a boolean indicating whether the associated rust type supports `Copy`, or an error if the type is not supported.
-    /// 
+    ///
+    /// A Result containing a boolean indicating whether the associated rust
+    /// type supports `Copy`, or an error if the type is not supported.
+    ///
     /// # Errors
-    /// 
+    ///
     /// * Returns an error if the provided database connection fails.
     pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         if self.is_composite() {
             self.attributes(conn)?
                 .into_iter()
-                .try_fold(true, |acc, attribute| {
-                    attribute.supports_copy(conn).map(|b| acc && b)
-                })
+                .try_fold(true, |acc, attribute| attribute.supports_copy(conn).map(|b| acc && b))
         } else if self.is_user_defined(conn)? {
             self.base_type(conn)?
                 .ok_or(WebCodeGenError::MissingBaseType(Box::new(self.clone())))
@@ -431,50 +429,48 @@ impl PgType {
     }
 
     /// Returns whether the associated rust type supports `Hash`.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The Postgres connection.
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A Result containing a boolean indicating whether the associated rust type supports `Hash`, or an error if the type is not supported.
-    /// 
+    ///
+    /// A Result containing a boolean indicating whether the associated rust
+    /// type supports `Hash`, or an error if the type is not supported.
+    ///
     /// # Errors
-    /// 
+    ///
     /// * Returns an error if the provided database connection fails.
     pub fn supports_hash(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         if self.is_user_defined(conn)? || self.is_composite() {
             self.attributes(conn)?
                 .into_iter()
-                .try_fold(true, |acc, attribute| {
-                    attribute.supports_hash(conn).map(|b| acc && b)
-                })
+                .try_fold(true, |acc, attribute| attribute.supports_hash(conn).map(|b| acc && b))
         } else {
             Ok(HASH_TYPES.contains(&rust_type_str(&self.typname)?))
         }
     }
 
     /// Returns whether the associated rust type supports `Eq`.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The Postgres connection.
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A Result containing a boolean indicating whether the associated rust type supports `Eq`, or an error if the type is not supported.
-    /// 
+    ///
+    /// A Result containing a boolean indicating whether the associated rust
+    /// type supports `Eq`, or an error if the type is not supported.
+    ///
     /// # Errors
-    /// 
+    ///
     /// * Returns an error if the provided database connection fails.
     pub fn supports_eq(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         if self.is_user_defined(conn)? || self.is_composite() {
             self.attributes(conn)?
                 .into_iter()
-                .try_fold(true, |acc, attribute| {
-                    attribute.supports_eq(conn).map(|b| acc && b)
-                })
+                .try_fold(true, |acc, attribute| attribute.supports_eq(conn).map(|b| acc && b))
         } else {
             Ok(EQ_TYPES.contains(&rust_type_str(&self.typname)?))
         }
@@ -502,17 +498,18 @@ impl PgType {
     }
 
     /// Returns the syn of the struct or enum associated to the `PgType`.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The Postgres connection.
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A Result containing the syn of the struct or enum associated to the `PgType`, or an error if the type is not supported.
-    /// 
+    ///
+    /// A Result containing the syn of the struct or enum associated to the
+    /// `PgType`, or an error if the type is not supported.
+    ///
     /// # Errors
-    /// 
+    ///
     /// * Returns an error if the provided database connection fails.
     pub fn to_syn(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         if self.is_composite() {
@@ -652,7 +649,7 @@ impl PgType {
                     #variant => Ok(#struct_name::#variant_name),
                 });
                 out_variants.push(quote! {
-                    #struct_name::#variant_name => std::io::Write::write_all(out, #variant.as_bytes())?,         
+                    #struct_name::#variant_name => std::io::Write::write_all(out, #variant.as_bytes())?,
                 });
             }
 
@@ -697,7 +694,6 @@ impl PgType {
                     }
                 }
             })
-
         } else {
             panic!("Unsupported type: {self:?}");
         }
@@ -712,61 +708,54 @@ impl PgType {
     ///
     /// # Returns
     ///
-    /// A Result containing the `PgType` struct if the type exists, or an error if it does not.
-    /// 
-    /// # Errors
-    /// 
-    /// * Returns an error if the provided database connection fails.
+    /// A Result containing the `PgType` struct if the type exists, or an error
+    /// if it does not.
     ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
     pub fn from_name(type_name: &str, conn: &mut PgConnection) -> Result<Self, WebCodeGenError> {
         use crate::schema::pg_type;
-        Ok(pg_type::table
-            .filter(pg_type::typname.eq(type_name))
-            .first::<PgType>(conn)?)
+        Ok(pg_type::table.filter(pg_type::typname.eq(type_name)).first::<PgType>(conn)?)
     }
 
     /// Returns the attributes of the type, if it is a composite type.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The Postgres connection.
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A Result containing the attributes of the type if it is a composite type, or an error if it is not.
-    /// 
+    ///
+    /// A Result containing the attributes of the type if it is a composite
+    /// type, or an error if it is not.
+    ///
     /// # Errors
-    /// 
+    ///
     /// * Returns an error if the provided database connection fails.
     pub fn attributes(&self, conn: &mut PgConnection) -> Result<Vec<PgAttribute>, WebCodeGenError> {
-        use crate::schema::pg_attribute;
-        use crate::schema::pg_type;
+        use crate::schema::{pg_attribute, pg_type};
 
         Ok(pg_attribute::table
-            .inner_join(
-                pg_type::table.on(pg_attribute::attrelid.eq(pg_type::typrelid)),
-            )
-            .filter(
-                pg_type::typname
-                    .eq(&self.typname)
-                    .and(pg_attribute::attisdropped.eq(false)),
-            )
+            .inner_join(pg_type::table.on(pg_attribute::attrelid.eq(pg_type::typrelid)))
+            .filter(pg_type::typname.eq(&self.typname).and(pg_attribute::attisdropped.eq(false)))
             .select(PgAttribute::as_select())
             .load::<PgAttribute>(conn)?)
     }
 
     /// Returns the variants of the type, if it is an enum type.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The Postgres connection.
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A Result containing the variants of the type if it is an enum type, or an error if it is not.
-    /// 
+    ///
+    /// A Result containing the variants of the type if it is an enum type, or
+    /// an error if it is not.
+    ///
     /// # Errors
-    /// 
+    ///
     /// * Returns an error if the provided database connection fails.
     pub fn variants(&self, conn: &mut PgConnection) -> Result<Vec<PgEnum>, WebCodeGenError> {
         use crate::schema::pg_enum;

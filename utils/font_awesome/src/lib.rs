@@ -4435,10 +4435,7 @@ impl Icon {
         let mut writer = csv::Writer::from_path(path)?;
 
         for icon in Icon::iter() {
-            let row = IconRow {
-                name: icon.class(),
-                description: icon.description(),
-            };
+            let row = IconRow { name: icon.class(), description: icon.description() };
             writer.serialize(row)?;
         }
 

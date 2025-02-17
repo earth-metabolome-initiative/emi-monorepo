@@ -1,15 +1,14 @@
-//! Module providing a yew component that handles a basic input, which is meant to be used in combination with BasicForm.
+//! Module providing a yew component that handles a basic input, which is meant
+//! to be used in combination with BasicForm.
 
-use std::fmt::Display;
+use std::{fmt::Display, rc::Rc};
 
-use super::InputErrors;
-use super::Scanner;
 use chrono::NaiveDateTime;
-use std::rc::Rc;
 use wasm_bindgen::JsCast;
 use web_common::api::ApiError;
-use yew::html::IntoPropValue;
-use yew::prelude::*;
+use yew::{html::IntoPropValue, prelude::*};
+
+use super::{InputErrors, Scanner};
 #[derive(Clone, PartialEq, Default, Eq, Debug)]
 pub struct BarCode(String);
 
@@ -151,26 +150,28 @@ pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html {
 
             // We extract the current value of the input field
             let value = match Data::INPUT_TYPE {
-                InputType::Textarea => input_event
-                    .target()
-                    .unwrap()
-                    .dyn_into::<web_sys::HtmlTextAreaElement>()
-                    .unwrap()
-                    .value(),
-                _ => input_event
-                    .target()
-                    .unwrap()
-                    .dyn_into::<web_sys::HtmlInputElement>()
-                    .unwrap()
-                    .value(),
+                InputType::Textarea => {
+                    input_event
+                        .target()
+                        .unwrap()
+                        .dyn_into::<web_sys::HtmlTextAreaElement>()
+                        .unwrap()
+                        .value()
+                }
+                _ => {
+                    input_event
+                        .target()
+                        .unwrap()
+                        .dyn_into::<web_sys::HtmlInputElement>()
+                        .unwrap()
+                        .value()
+                }
             };
 
             input_errors.set(None);
 
             // We update the current value of the input field
-            props
-                .builder
-                .emit(if value.is_empty() { None } else { Some(value) });
+            props.builder.emit(if value.is_empty() { None } else { Some(value) });
         })
     };
 
@@ -180,9 +181,7 @@ pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html {
         Callback::from(move |result: rxing::RXingResult| {
             let value = result.getText().to_string();
             input_errors.set(None);
-            props
-                .builder
-                .emit(if value.is_empty() { None } else { Some(value) });
+            props.builder.emit(if value.is_empty() { None } else { Some(value) });
         })
     };
     let on_scan_error: Callback<ApiError> = {
@@ -191,18 +190,10 @@ pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html {
             input_errors.set(Some(error));
         })
     };
-    let value = props
-        .value()
-        .map_or_else(|| "".to_string(), |value| value.to_string());
+    let value = props.value().map_or_else(|| "".to_string(), |value| value.to_string());
 
-    let label_classes = format!(
-        "input-label{}",
-        if props.optional {
-            ""
-        } else {
-            " input-label-mandatory"
-        }
-    );
+    let label_classes =
+        format!("input-label{}", if props.optional { "" } else { " input-label-mandatory" });
 
     let errors = props
         .errors

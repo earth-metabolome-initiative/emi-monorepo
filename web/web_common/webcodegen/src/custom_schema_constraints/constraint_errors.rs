@@ -58,10 +58,7 @@ impl Display for ConstraintError {
             ConstraintError::UnexpectedUppercaseTable(table_name) => {
                 write!(f, "Unexpected uppercase table: {table_name}")
             }
-            ConstraintError::IncompatibleForeignType {
-                column,
-                foreign_column,
-            } => {
+            ConstraintError::IncompatibleForeignType { column, foreign_column } => {
                 write!(
                     f,
                     "Column {column_name} is of type {column_type}, foreign column {foreign_column_name} is of type {foreign_column_type}",
@@ -71,14 +68,8 @@ impl Display for ConstraintError {
                     foreign_column_type = foreign_column.raw_data_type(),
                 )
             }
-            ConstraintError::NotForeignKeyColumn {
-                table_name,
-                column_name,
-            } => {
-                write!(
-                    f,
-                    "Column {column_name} in table {table_name} is not a foreign key column",
-                )
+            ConstraintError::NotForeignKeyColumn { table_name, column_name } => {
+                write!(f, "Column {column_name} in table {table_name} is not a foreign key column",)
             }
             ConstraintError::NotOfCorrectType {
                 column_name,

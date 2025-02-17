@@ -1,10 +1,11 @@
-use diesel::pg::PgConnection;
-use diesel::{Queryable, QueryableByName, RunQueryDsl};
+use diesel::{pg::PgConnection, Queryable, QueryableByName, RunQueryDsl};
 
-/// Represents a row in the `constraint_table_usage` table in the PostgreSQL database.
-/// 
-/// The `constraint_table_usage` table contains information about table constraints
-/// defined in the database, including catalogs, schemas, and names of tables and constraints.
+/// Represents a row in the `constraint_table_usage` table in the PostgreSQL
+/// database.
+///
+/// The `constraint_table_usage` table contains information about table
+/// constraints defined in the database, including catalogs, schemas, and names
+/// of tables and constraints.
 #[derive(Queryable, QueryableByName, Debug)]
 #[diesel(table_name = crate::schema::constraint_table_usage)]
 pub struct ConstraintTableUsage {

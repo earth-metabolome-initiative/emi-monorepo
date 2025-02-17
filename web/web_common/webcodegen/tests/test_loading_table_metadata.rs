@@ -1,8 +1,8 @@
 //! Test suite for table metadata loading
-use diesel::pg::PgConnection;
-use diesel::Connection;
-use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use std::path::Path;
+
+use diesel::{pg::PgConnection, Connection};
+use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use testcontainers::{
     core::{IntoContainerPort, WaitFor},
     runners::AsyncRunner,
@@ -12,8 +12,7 @@ use testcontainers::{
 mod utils;
 
 use utils::add_main_to_file;
-use webcodegen::errors::WebCodeGenError;
-use webcodegen::*;
+use webcodegen::{errors::WebCodeGenError, *};
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./test_migrations");
 const DATABASE_NAME: &str = "test_db";
@@ -43,9 +42,7 @@ fn establish_connection_to_postgres() -> PgConnection {
 
 async fn setup_postgres() -> ContainerAsync<GenericImage> {
     let container = GenericImage::new("postgres", "17-alpine")
-        .with_wait_for(WaitFor::message_on_stderr(
-            "database system is ready to accept connections",
-        ))
+        .with_wait_for(WaitFor::message_on_stderr("database system is ready to accept connections"))
         .with_network("bridge")
         .with_env_var("DEBUG", "1")
         .with_env_var("POSTGRES_USER", DATABASE_USER)
@@ -73,9 +70,11 @@ async fn test_code_generation_methods(conn: &mut PgConnection) -> Result<(), Web
     add_main_to_file("tests/ui/sql_operators.rs");
     builder.pass("tests/ui/sql_operators.rs");
 
-    Codegen::default()
-        .set_output_path(Path::new("tests/ui/tables.rs"))
-        .generate(conn, DATABASE_NAME, None)?;
+    Codegen::default().set_output_path(Path::new("tests/ui/tables.rs")).generate(
+        conn,
+        DATABASE_NAME,
+        None,
+    )?;
 
     add_main_to_file("tests/ui/tables.rs");
     builder.pass("tests/ui/tables.rs");
@@ -216,9 +215,7 @@ async fn test_user_table() {
     let primary_key_columns = primary_key_columns.unwrap();
     assert_eq!(primary_key_columns.len(), 2);
 
-    let primary_id_column = composite_users
-        .column_by_name(&mut conn, "primary_id")
-        .unwrap();
+    let primary_id_column = composite_users.column_by_name(&mut conn, "primary_id").unwrap();
     assert_eq!(primary_id_column.column_name, "primary_id");
     assert!(primary_id_column.is_foreign_key(&mut conn));
 
@@ -227,22 +224,16 @@ async fn test_user_table() {
     assert_eq!(foreign_table, users);
     assert_eq!(user_id_column, original_user_id_column);
 
-    let secondary_id_column = composite_users
-        .column_by_name(&mut conn, "secondary_id")
-        .unwrap();
+    let secondary_id_column = composite_users.column_by_name(&mut conn, "secondary_id").unwrap();
     assert_eq!(secondary_id_column.column_name, "secondary_id");
     assert!(secondary_id_column.is_foreign_key(&mut conn));
 
-    let (foreign_table, user_id_column) = secondary_id_column
-        .foreign_table(&mut conn)
-        .unwrap()
-        .unwrap();
+    let (foreign_table, user_id_column) =
+        secondary_id_column.foreign_table(&mut conn).unwrap().unwrap();
     assert_eq!(foreign_table, users);
     assert_eq!(user_id_column, original_user_id_column);
 
-    let username_column = composite_users
-        .column_by_name(&mut conn, "username")
-        .unwrap();
+    let username_column = composite_users.column_by_name(&mut conn, "username").unwrap();
     assert_eq!(username_column.column_name, "username");
     assert!(!username_column.is_foreign_key(&mut conn));
 

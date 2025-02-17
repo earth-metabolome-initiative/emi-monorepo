@@ -1,15 +1,18 @@
-//! Module providing a yew component for a basic page with a websocket connection.
-use super::RowToBadge;
-use crate::components::forms::Datalist;
-use crate::components::PageLike;
-use crate::router::AppRoute;
-use crate::stores::user_state::UserState;
+//! Module providing a yew component for a basic page with a websocket
+//! connection.
 use std::rc::Rc;
+
 use web_common::api::form_traits::FormMethod;
-use web_common::database::*;
 use yew::prelude::*;
 use yew_router::prelude::Link;
 use yewdux::prelude::*;
+
+use super::RowToBadge;
+use crate::{
+    components::{forms::Datalist, PageLike},
+    router::AppRoute,
+    stores::user_state::UserState,
+};
 
 #[derive(Clone, Debug, PartialEq, Properties)]
 /// Properties for a BasicList component.
@@ -68,11 +71,7 @@ impl<Page: Filtrable + Searchable<false> + PageLike + RowToBadge> Component for 
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let header_type = if ctx.props().filters.is_some() {
-            "h3"
-        } else {
-            "h2"
-        };
+        let header_type = if ctx.props().filters.is_some() { "h3" } else { "h2" };
 
         html! {
             <div class="page">

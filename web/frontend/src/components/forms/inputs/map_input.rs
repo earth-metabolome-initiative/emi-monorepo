@@ -1,9 +1,6 @@
-use leaflet::{DragEndEvent, Layer};
-use leaflet::{DragEvents, LatLng, MapOptions, Marker, TileLayer};
+use leaflet::{DragEndEvent, DragEvents, LatLng, Layer, MapOptions, Marker, TileLayer};
 use wasm_bindgen::JsCast;
-use web_sys::Element;
-use web_sys::HtmlElement;
-use web_sys::Node;
+use web_sys::{Element, HtmlElement, Node};
 use yew::prelude::*;
 
 #[derive(Clone)]
@@ -51,12 +48,8 @@ impl Component for MapInput {
     type Properties = MapInputProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let container: Element = web_sys::window()
-            .unwrap()
-            .document()
-            .unwrap()
-            .create_element("div")
-            .unwrap();
+        let container: Element =
+            web_sys::window().unwrap().document().unwrap().create_element("div").unwrap();
         let container: HtmlElement = container.dyn_into().unwrap();
         container.set_class_name("map");
 
@@ -82,12 +75,7 @@ impl Component for MapInput {
             link.send_message(Msg::MarkerDrag(event.lat_lng()));
         }));
 
-        Self {
-            map,
-            container,
-            marker,
-            layer: None,
-        }
+        Self { map, container, marker, layer: None }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {

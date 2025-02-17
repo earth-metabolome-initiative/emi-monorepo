@@ -1,9 +1,10 @@
 //! Submodule defining the versions of the NCBI taxonomy.
 
-use crate::traits::TaxonVersion;
 use chrono::NaiveDateTime;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
+
+use crate::traits::TaxonVersion;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter)]
 /// Enum representing the versions of the NCBI taxonomy.
@@ -468,14 +469,7 @@ impl NCBIVersion {
     }
     /// Returns the name of the directory containing the version.
     pub fn directory(&self) -> String {
-        self.url()
-            .split('/')
-            .last()
-            .unwrap()
-            .split('.')
-            .next()
-            .unwrap()
-            .to_owned()
+        self.url().split('/').last().unwrap().split('.').next().unwrap().to_owned()
     }
 }
 

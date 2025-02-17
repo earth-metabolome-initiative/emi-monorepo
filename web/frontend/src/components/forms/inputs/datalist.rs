@@ -1,25 +1,23 @@
-//! Module providing a yew component that handles a basic input, which is meant to be used in combination with BasicForm.
+//! Module providing a yew component that handles a basic input, which is meant
+//! to be used in combination with BasicForm.
 
-use std::fmt::Debug;
+use std::{fmt::Debug, rc::Rc};
 
-use super::InputErrors;
-use crate::components::Badge;
-use crate::components::RowToBadge;
-use crate::workers::ws_worker::ComponentMessage;
-use crate::workers::ws_worker::WebsocketMessage;
-use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
 use serde::de::DeserializeOwned;
-use std::rc::Rc;
 use wasm_bindgen::JsCast;
-use web_common::database::Filtrable;
-
-use super::barcode_scanner::Scanner;
 use web_common::api::ApiError;
-use web_common::database::Searchable;
 use yew::prelude::*;
-use yew_agent::prelude::WorkerBridgeHandle;
-use yew_agent::scope_ext::AgentScopeExt;
+use yew_agent::{prelude::WorkerBridgeHandle, scope_ext::AgentScopeExt};
+
+use super::{barcode_scanner::Scanner, InputErrors};
+use crate::{
+    components::{Badge, RowToBadge},
+    workers::{
+        ws_worker::{ComponentMessage, WebsocketMessage},
+        WebsocketWorker,
+    },
+};
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct MultiDatalistProp<Data, const EDIT: bool>
@@ -103,10 +101,7 @@ impl<Data: Filtrable, const EDIT: bool> MultiDatalist<Data, EDIT> {
         self.total_number_of_search_queries == 1
             && self.number_of_search_queries == 0
             && self.candidates.is_empty()
-            && self
-                .current_value
-                .as_ref()
-                .map_or(true, |value| value.is_empty())
+            && self.current_value.as_ref().map_or(true, |value| value.is_empty())
     }
 }
 
@@ -156,30 +151,28 @@ where
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            DatalistMessage::Backend(message) => match message {
-                WebsocketMessage::SearchTable(results) => {
-                    self.number_of_search_queries -= 1;
-                    ctx.link().send_message(DatalistMessage::UpdateCandidates(
-                        bincode::deserialize::<Vec<Data>>(&results)
-                            .expect("Failed to convert row to data")
-                            .into_iter()
-                            .map(Rc::new)
-                            .collect::<Vec<Rc<Data>>>(),
-                    ));
+            DatalistMessage::Backend(message) => {
+                match message {
+                    WebsocketMessage::SearchTable(results) => {
+                        self.number_of_search_queries -= 1;
+                        ctx.link().send_message(DatalistMessage::UpdateCandidates(
+                            bincode::deserialize::<Vec<Data>>(&results)
+                                .expect("Failed to convert row to data")
+                                .into_iter()
+                                .map(Rc::new)
+                                .collect::<Vec<Rc<Data>>>(),
+                        ));
 
-                    true
+                        true
+                    }
+                    _ => false,
                 }
-                _ => false,
-            },
+            }
             DatalistMessage::UpdateCandidates(candidates) => {
                 self.candidates = candidates;
 
                 if self.candidates.is_empty() {
-                    if self
-                        .errors
-                        .iter()
-                        .all(|error| error != &ApiError::NoResults)
-                    {
+                    if self.errors.iter().all(|error| error != &ApiError::NoResults) {
                         self.errors.push(ApiError::NoResults);
                     }
                 } else {
@@ -260,8 +253,7 @@ where
             }
             DatalistMessage::UpdateCurrentValue(value) => {
                 self.current_value = Some(Rc::from(value));
-                ctx.link()
-                    .send_message(DatalistMessage::SearchCandidatesTimeout);
+                ctx.link().send_message(DatalistMessage::SearchCandidatesTimeout);
 
                 true
             }
@@ -312,9 +304,7 @@ where
             .candidates
             .iter()
             .map(|candidate| {
-                self.current_value
-                    .as_deref()
-                    .map_or(0.0, |query| candidate.similarity_score(query))
+                self.current_value.as_deref().map_or(0.0, |query| candidate.similarity_score(query))
             })
             .collect();
         let mut indices_to_sort: Vec<usize> = (0..self.candidates.len()).collect::<Vec<usize>>();
@@ -325,21 +315,14 @@ where
             .filter(|&i| {
                 // If the current candidate has already been selected,
                 // we do not want to display it.
-                !self
-                    .selections
-                    .iter()
-                    .any(|selection| selection == &self.candidates[i])
+                !self.selections.iter().any(|selection| selection == &self.candidates[i])
             })
             .take(ctx.props().number_of_candidates as usize)
             .collect::<Vec<usize>>();
 
         let classes = format!(
             "input-group datalist{}{}{}{}{}",
-            if ctx.props().show_label {
-                ""
-            } else {
-                " no-label"
-            },
+            if ctx.props().show_label { "" } else { " no-label" },
             if filtered_indices.is_empty() {
                 " no-candidates".to_string()
             } else {
@@ -352,21 +335,9 @@ where
                     }
                 )
             },
-            if self.number_of_search_queries > 0 {
-                " loading".to_string()
-            } else {
-                "".to_string()
-            },
-            if self.selections.len() > 0 {
-                " has-selections".to_string()
-            } else {
-                "".to_string()
-            },
-            if self.disable() {
-                " disabled".to_string()
-            } else {
-                "".to_string()
-            }
+            if self.number_of_search_queries > 0 { " loading".to_string() } else { "".to_string() },
+            if self.selections.len() > 0 { " has-selections".to_string() } else { "".to_string() },
+            if self.disable() { " disabled".to_string() } else { "".to_string() }
         );
 
         // We create a timeout so that when the user stops typing for at least
@@ -417,21 +388,13 @@ where
 
         let label_classes = format!(
             "input-label{}",
-            if props.optional || props.builder.is_none() {
-                ""
-            } else {
-                " input-label-mandatory"
-            }
+            if props.optional || props.builder.is_none() { "" } else { " input-label-mandatory" }
         );
 
         let all_errors: Vec<ApiError> = if self.disable() {
             Vec::new()
         } else {
-            self.errors
-                .iter()
-                .chain(ctx.props().errors.iter())
-                .cloned()
-                .collect()
+            self.errors.iter().chain(ctx.props().errors.iter()).cloned().collect()
         };
 
         html! {

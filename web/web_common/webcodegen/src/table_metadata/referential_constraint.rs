@@ -1,5 +1,6 @@
-use diesel::pg::PgConnection;
-use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl};
+use diesel::{
+    pg::PgConnection, ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl,
+};
 
 use crate::errors::WebCodeGenError;
 
@@ -29,20 +30,22 @@ pub struct ReferentialConstraint {
 
 impl ReferentialConstraint {
     /// Load all the referential constraints from the database
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A `Result` containing a `Vec` of `ReferentialConstraint` if the operation was successful, or a `WebCodeGenError` if an error occurred
-    /// 
+    ///
+    /// A `Result` containing a `Vec` of `ReferentialConstraint` if the
+    /// operation was successful, or a `WebCodeGenError` if an error occurred
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while loading the constraints from the database
-    /// 
-    pub fn load_all_referential_constraints(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
+    pub fn load_all_referential_constraints(
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::referential_constraints;
         referential_constraints::table
             .load::<ReferentialConstraint>(conn)
@@ -50,22 +53,24 @@ impl ReferentialConstraint {
     }
 
     /// Load all the referential constraints from the database
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
     /// * `constraint_name` - The name of the constraint to load
-    /// * `constraint_schema` - An optional schema name to filter the constraints by
-    /// * `constraint_catalog` - The name of the catalog to filter the constraints by
-    /// 
+    /// * `constraint_schema` - An optional schema name to filter the
+    ///   constraints by
+    /// * `constraint_catalog` - The name of the catalog to filter the
+    ///   constraints by
+    ///
     /// # Returns
-    /// 
-    /// A `Result` containing a `Vec` of `ReferentialConstraint` if the operation was successful, or a `WebCodeGenError` if an error occurred
-    /// 
+    ///
+    /// A `Result` containing a `Vec` of `ReferentialConstraint` if the
+    /// operation was successful, or a `WebCodeGenError` if an error occurred
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while loading the constraints from the database
-    /// 
     pub fn load_referential_constraints(
         conn: &mut PgConnection,
         constraint_name: &str,

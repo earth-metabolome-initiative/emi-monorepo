@@ -1,9 +1,12 @@
-use crate::components::*;
-use crate::router::{switch, AppRoute};
-use crate::workers::*;
 use yew::prelude::*;
 use yew_agent::worker::WorkerProvider;
 use yew_router::prelude::*;
+
+use crate::{
+    components::*,
+    router::{switch, AppRoute},
+    workers::*,
+};
 
 #[function_component]
 pub fn App() -> Html {

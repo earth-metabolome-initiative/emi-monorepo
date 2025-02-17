@@ -15,4 +15,3 @@ pub use taxon_entry_builder::OpenTreeOfLifeTaxonEntryBuilder;
 pub use taxonomy::OpenTreeOfLifeTaxonomy;
 pub use taxonomy_builder::OpenTreeOfLifeTaxonomyBuilder;
 pub use version::OpenTreeOfLifeVersion;
-

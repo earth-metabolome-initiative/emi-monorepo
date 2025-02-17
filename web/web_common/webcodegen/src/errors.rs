@@ -1,8 +1,10 @@
 //! Enumeration for the errors that may happen within the webcodegen crate.
-use crate::{custom_schema_constraints::ConstraintError, Column, PgType, Table};
 use diesel::result::Error as DieselError;
 use snake_case_sanitizer::SanitizationErrors;
-use crate::codegen::CodeGenerationError;
+
+use crate::{
+    codegen::CodeGenerationError, custom_schema_constraints::ConstraintError, Column, PgType, Table,
+};
 
 #[derive(Debug)]
 /// Enumeration for the errors that may happen within the webcodegen crate.
@@ -17,6 +19,8 @@ pub enum WebCodeGenError {
     IllegalRolesTable(String),
     /// A constraint is missing or invalid.
     ConstraintError(ConstraintError),
+    /// A Syn Error occurred.
+    SynError(syn::Error),
     /// A column is of an unknown type.
     UnknownColumnType(Box<Column>),
     /// Unknown PostgreSQL Diesel type.
@@ -42,7 +46,7 @@ pub enum WebCodeGenError {
     /// A table has no primary key column(s).
     NoPrimaryKeyColumn(Box<Table>),
     /// The tables necessary for the roles mechanism are incomplete.
-    RolesMechanismIncomplete(Box<Table>)
+    RolesMechanismIncomplete(Box<Table>),
 }
 
 impl From<DieselError> for WebCodeGenError {
@@ -66,5 +70,11 @@ impl From<SanitizationErrors> for WebCodeGenError {
 impl From<CodeGenerationError> for WebCodeGenError {
     fn from(value: CodeGenerationError) -> Self {
         WebCodeGenError::CodeGenerationError(value)
+    }
+}
+
+impl From<syn::Error> for WebCodeGenError {
+    fn from(value: syn::Error) -> Self {
+        WebCodeGenError::SynError(value)
     }
 }

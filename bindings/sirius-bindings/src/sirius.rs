@@ -1,11 +1,10 @@
 //! # Sirius
-use crate::sirius_config::SiriusConfig;
-use crate::versions::Version;
+use std::{env, path::Path, process::Command};
+
 use dotenvy::dotenv;
 use is_executable::IsExecutable;
-use std::env;
-use std::path::Path;
-use std::process::Command;
+
+use crate::{sirius_config::SiriusConfig, versions::Version};
 
 /// The main struct for the Sirius bindings
 pub struct Sirius<V: Version> {
@@ -21,10 +20,14 @@ impl<V: Version> From<SiriusConfig<V>> for Sirius<V> {
 impl<V: Version> Sirius<V> {
     /// Run the sirius command with the given input and output file paths.
     ///
-    /// The sirius executable is expected to be available in the environment variable SIRIUS_PATH.
-    /// The username and password for the sirius account are expected to be available in the environment variables SIRIUS_USERNAME and SIRIUS_PASSWORD.
+    /// The sirius executable is expected to be available in the environment
+    /// variable SIRIUS_PATH. The username and password for the sirius
+    /// account are expected to be available in the environment variables
+    /// SIRIUS_USERNAME and SIRIUS_PASSWORD.
     ///
-    /// This function gets the parameters that where set in the SiriusBuilder struct and runs the sirius command with the given input and output file paths.
+    /// This function gets the parameters that where set in the SiriusBuilder
+    /// struct and runs the sirius command with the given input and output file
+    /// paths.
     ///
     /// # Arguments
     /// * `input_file_path` - The path to the input file
@@ -45,7 +48,8 @@ impl<V: Version> Sirius<V> {
             .to_string()
         })?;
 
-        // We need to verify that the SIRIUS_PATH is a valid path to a file, and not a directory.
+        // We need to verify that the SIRIUS_PATH is a valid path to a file, and not a
+        // directory.
 
         let sirius_path = Path::new(&sirius_path);
 
@@ -57,14 +61,11 @@ impl<V: Version> Sirius<V> {
             return Err(format!("The sirius path {:?} is not a file", sirius_path));
         }
 
-        // We also need to check whether the file is executable, but this will be different
-        // depending on the operating system. Fortunately, the complexity of this is hidden
-        // behind the is_executable crate.
+        // We also need to check whether the file is executable, but this will be
+        // different depending on the operating system. Fortunately, the
+        // complexity of this is hidden behind the is_executable crate.
         if !sirius_path.is_executable() {
-            return Err(format!(
-                "The sirius executable at {:?} is not executable",
-                sirius_path
-            ));
+            return Err(format!("The sirius executable at {:?} is not executable", sirius_path));
         }
 
         // Fetch the SIRIUS_USERNAME and the SIRIUS_PASSWORD from environment variables
@@ -117,18 +118,10 @@ impl<V: Version> Sirius<V> {
         let mut binding = Command::new(sirius_path);
 
         // Set both SIRIUS_PASSWORD and SIRIUS_USERNAME environment variables
-        binding
-            .env("SIRIUS_USERNAME", &sirius_username)
-            .env("SIRIUS_PASSWORD", &sirius_password);
+        binding.env("SIRIUS_USERNAME", &sirius_username).env("SIRIUS_PASSWORD", &sirius_password);
 
         let login_command_status = binding
-            .args([
-                "login",
-                "--user-env",
-                "SIRIUS_USERNAME",
-                "--password-env",
-                "SIRIUS_PASSWORD",
-            ])
+            .args(["login", "--user-env", "SIRIUS_USERNAME", "--password-env", "SIRIUS_PASSWORD"])
             .status()
             .map_err(|e| format!("Failed to execute Sirius login command: {}", e))?;
 
@@ -140,20 +133,15 @@ impl<V: Version> Sirius<V> {
 
         // We now check that the input file exists and is a file and not a directory
         if !input_file_path.exists() {
-            return Err(format!(
-                "The input file {:?} does not exist",
-                input_file_path
-            ));
+            return Err(format!("The input file {:?} does not exist", input_file_path));
         }
 
         if !input_file_path.is_file() {
-            return Err(format!(
-                "The input file {:?} is not a file",
-                input_file_path
-            ));
+            return Err(format!("The input file {:?} is not a file", input_file_path));
         }
 
-        // We check that the extension of the input file is MGF, in either upper or lower case
+        // We check that the extension of the input file is MGF, in either upper or
+        // lower case
         let input_file_extension = input_file_path.extension().ok_or_else(|| {
             format!(
                 concat!(
@@ -189,10 +177,7 @@ impl<V: Version> Sirius<V> {
         // Add arguments and spawn the command
         // let mut child = command.args(&args).spawn().expect("Sirius failed to start");
         // let status = child.wait().expect("Failed to wait on child");
-        let status = command
-            .args(&args)
-            .status()
-            .expect("Sirius failed to start");
+        let status = command.args(&args).status().expect("Sirius failed to start");
 
         if !status.success() {
             return Err("Sirius failed".to_string());

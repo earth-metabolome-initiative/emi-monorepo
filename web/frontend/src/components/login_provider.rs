@@ -15,11 +15,7 @@ pub fn login_provider(props: &OAuthLoginProviderProps) -> Html {
 
     let root_url = props.provider.oauth_url.clone();
 
-    let state = web_sys::window()
-        .unwrap_throw()
-        .location()
-        .href()
-        .unwrap_throw();
+    let state = web_sys::window().unwrap_throw().location().href().unwrap_throw();
 
     // We need to construct a GET request with the following parameters:
     // - client_id: The client ID of the OAuth application.

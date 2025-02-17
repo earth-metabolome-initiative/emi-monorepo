@@ -1,11 +1,11 @@
-//! Submodule providing the implementation of the taxonomy trait for the Open Tree of Life.
-
-use crate::traits::Taxonomy;
+//! Submodule providing the implementation of the taxonomy trait for the Open
+//! Tree of Life.
 
 use super::{
     taxon::OpenTreeOfLifeTaxon, taxon_entry::OpenTreeOfLifeTaxonEntry,
     version::OpenTreeOfLifeVersion,
 };
+use crate::traits::Taxonomy;
 
 /// Version of the Open Tree of Life taxonomy.
 pub struct OpenTreeOfLifeTaxonomy {
@@ -40,10 +40,7 @@ impl Taxonomy for OpenTreeOfLifeTaxonomy {
         self.taxon_entries
             .iter()
             .find(|entry| &entry.id == id)
-            .map(|entry| OpenTreeOfLifeTaxon {
-                taxon_entry: entry,
-                taxonomy: self,
-            })
+            .map(|entry| OpenTreeOfLifeTaxon { taxon_entry: entry, taxonomy: self })
             .ok_or(crate::errors::TaxonomyError::TaxonNotFound(id.clone()))
     }
 
@@ -57,9 +54,6 @@ impl Taxonomy for OpenTreeOfLifeTaxonomy {
     fn taxons(&self) -> impl Iterator<Item = Self::Taxon<'_>> + '_ {
         self.taxon_entries
             .iter()
-            .map(move |entry| OpenTreeOfLifeTaxon {
-                taxon_entry: entry,
-                taxonomy: self,
-            })
+            .map(move |entry| OpenTreeOfLifeTaxon { taxon_entry: entry, taxonomy: self })
     }
 }

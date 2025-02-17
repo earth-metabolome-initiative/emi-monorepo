@@ -2,5 +2,5 @@
 pub mod no_op_outcome;
 pub mod outcome;
 
-pub use outcome::OutcomeMessage;
 pub use no_op_outcome::NoOpOutcome;
+pub use outcome::OutcomeMessage;

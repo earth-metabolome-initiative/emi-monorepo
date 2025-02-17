@@ -1,6 +1,7 @@
 //! Submodule providing a data type enumeration.
-use crate::errors::CSVSchemaError;
 use uuid::Uuid;
+
+use crate::errors::CSVSchemaError;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum DataType {
@@ -47,11 +48,7 @@ impl DataType {
         }
 
         if Uuid::parse_str(value).is_ok() {
-            return vec![
-                DataType::Uuid,
-                DataType::Text,
-                DataType::VarChar(value.len()),
-            ];
+            return vec![DataType::Uuid, DataType::Text, DataType::VarChar(value.len())];
         }
 
         if value.parse::<i16>().is_ok() {
@@ -74,11 +71,7 @@ impl DataType {
         }
 
         if value.parse::<i64>().is_ok() {
-            return vec![
-                DataType::BigInt,
-                DataType::Text,
-                DataType::VarChar(value.len()),
-            ];
+            return vec![DataType::BigInt, DataType::Text, DataType::VarChar(value.len())];
         }
 
         if value.parse::<f32>().is_ok() {
@@ -91,21 +84,13 @@ impl DataType {
         }
 
         if value.parse::<f64>().is_ok() {
-            return vec![
-                DataType::Double,
-                DataType::Text,
-                DataType::VarChar(value.len()),
-            ];
+            return vec![DataType::Double, DataType::Text, DataType::VarChar(value.len())];
         }
 
         if value.to_ascii_lowercase().eq_ignore_ascii_case("true")
             || value.to_ascii_lowercase().eq_ignore_ascii_case("false")
         {
-            return vec![
-                DataType::Boolean,
-                DataType::Text,
-                DataType::VarChar(value.len()),
-            ];
+            return vec![DataType::Boolean, DataType::Text, DataType::VarChar(value.len())];
         }
 
         vec![DataType::Text, DataType::VarChar(value.len())]
@@ -120,9 +105,11 @@ impl DataType {
             DataType::Serial => Ok(DataType::Serial),
             DataType::SmallSerial => Ok(DataType::SmallSerial),
             DataType::BigSerial => Ok(DataType::BigSerial),
-            error => Err(CSVSchemaError::UnknownDataType(format!(
-                "Unknown Serial variant for {error:?}",
-            ))),
+            error => {
+                Err(CSVSchemaError::UnknownDataType(format!(
+                    "Unknown Serial variant for {error:?}",
+                )))
+            }
         }
     }
 
@@ -157,9 +144,6 @@ impl DataType {
 
     /// Returns whether the data type may be used as a primary key.
     pub fn is_key_like(&self) -> bool {
-        matches!(
-            self,
-            DataType::SmallInt | DataType::Integer | DataType::BigInt | DataType::Uuid
-        )
+        matches!(self, DataType::SmallInt | DataType::Integer | DataType::BigInt | DataType::Uuid)
     }
 }

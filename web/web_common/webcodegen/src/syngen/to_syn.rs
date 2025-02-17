@@ -1,14 +1,15 @@
 //! Primary method to convert a Table to a struct and associated impls.
 
-use crate::errors::WebCodeGenError;
-use crate::Table;
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
 
+use crate::{errors::WebCodeGenError, Table};
+
 impl Table {
-    /// Returns the Syn `TokenStream` for the struct definition and associated methods.
+    /// Returns the Syn `TokenStream` for the struct definition and associated
+    /// methods.
     ///
     /// # Arguments
     ///
@@ -16,12 +17,12 @@ impl Table {
     ///
     /// # Returns
     ///
-    /// A `TokenStream` representing the struct definition and associated methods.
+    /// A `TokenStream` representing the struct definition and associated
+    /// methods.
     ///
     /// # Errors
     ///
     /// * If the number of columns exceeds 128.
-    ///
     pub fn to_syn(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         if self.columns(conn)?.len() > 128 {
             return Err(WebCodeGenError::ExcessiveNumberOfColumns(
@@ -58,13 +59,18 @@ impl Table {
         // } else {
         //     TokenStream::new()
         // };
-        let mutability_impls = TokenStream::new();
+        let insert_trait_impls =
+            if self.has_session_user_generated_columns(conn)? || self.is_users_table() {
+                self.insert_trait_impls(conn)?
+            } else {
+                TokenStream::new()
+            };
 
         let foreign_key_methods = self.foreign_key_methods(conn)?;
         // We only create a delete method if the table has a created_by column, which
-        // means it contains user-generated data and therefore things that can be deleted
-        // by some user.
-        let delete_method = if self.has_created_by_column(conn)? {
+        // means it contains user-generated data and therefore things that can be
+        // deleted by some user.
+        let delete_method = if self.has_primary_keys(conn)? {
             self.delete_method(conn)?
         } else {
             TokenStream::new()
@@ -73,10 +79,10 @@ impl Table {
         let diesel_derives_decorator = self.diesel_derives_decorator(conn)?;
         let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
         let from_unique_indices = self.from_unique_indices(conn)?;
+        let load_all = self.load_all_method()?;
 
         let built_table_syn = quote! {
-            #[derive(Debug)]
-            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+            #[common_traits::prelude::basic]
             #diesel_derives_decorator
             #primary_key_decorator
             #[cfg_attr(feature = #columns_feature_flag_name, diesel(table_name = #sanitized_table_name))]
@@ -88,9 +94,10 @@ impl Table {
                 #(#foreign_key_methods)*
                 #delete_method
                 #from_unique_indices
+                #load_all
             }
 
-            #mutability_impls
+            #insert_trait_impls
         };
 
         // Convert the generated TokenStream to a string

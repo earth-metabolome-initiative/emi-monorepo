@@ -1,31 +1,29 @@
 //! Yew component handling GPS input. If possible, it tries to use the browser's
 //! geolocation API to get the user's current position. If that fails, it falls
-//! back to a set of simple input fields and asks the user to enter the coordinates.
+//! back to a set of simple input fields and asks the user to enter the
+//! coordinates.
 //!
 //! These input fields also include the accuracy of the measurement.
 //!
 //! TODO: also handle the registration device!
-use crate::components::forms::InputErrors;
-use std::collections::HashSet;
-use std::rc::Rc;
-use wasm_bindgen::closure::Closure;
-use wasm_bindgen::JsCast;
-use web_common::api::ApiError;
-use web_common::api::GeolocationError;
+use std::{collections::HashSet, rc::Rc};
+
+use wasm_bindgen::{closure::Closure, JsCast};
+use web_common::api::{ApiError, GeolocationError};
 use web_sys::{PositionError, PositionOptions};
 use yew::prelude::*;
 
-use super::BasicInput;
-use super::MapInput;
+use super::{BasicInput, MapInput};
+use crate::components::forms::InputErrors;
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct GPSInputProps {
     pub label: String,
-    pub builder: Callback<Option<web_common::types::Point>>,
+    pub builder: Callback<Option<postgis_diesel::types::Point>>,
     #[prop_or_default]
     pub errors: Vec<ApiError>,
     #[prop_or_default]
-    pub coordinates: Option<web_common::types::Point>,
+    pub coordinates: Option<postgis_diesel::types::Point>,
     #[prop_or(false)]
     pub optional: bool,
 }
@@ -101,13 +99,10 @@ impl Component for GPSInput {
                         match geolocation.watch_position_with_error_callback_and_options(
                             success_callback.as_ref().unchecked_ref(),
                             Some(error_callback.as_ref().unchecked_ref()),
-                            PositionOptions::new()
-                                .enable_high_accuracy(true)
-                                .maximum_age(10_000),
+                            PositionOptions::new().enable_high_accuracy(true).maximum_age(10_000),
                         ) {
                             Ok(watch_id) => {
-                                ctx.link()
-                                    .send_message(GPSInputMessage::Authorized(watch_id));
+                                ctx.link().send_message(GPSInputMessage::Authorized(watch_id));
                             }
                             Err(_) => {
                                 ctx.link().send_message(GPSInputMessage::Error(
@@ -137,12 +132,10 @@ impl Component for GPSInput {
                 self.latitude = latitude;
                 self.longitude = longitude;
 
-                let latitude = self
-                    .latitude
-                    .or_else(|| ctx.props().coordinates.map(|point| point.x));
-                let longitude = self
-                    .longitude
-                    .or_else(|| ctx.props().coordinates.map(|point| point.y));
+                let latitude =
+                    self.latitude.or_else(|| ctx.props().coordinates.map(|point| point.x));
+                let longitude =
+                    self.longitude.or_else(|| ctx.props().coordinates.map(|point| point.y));
 
                 if let (Some(latitude), Some(longitude)) = (latitude, longitude) {
                     ctx.props().builder.emit(Some((latitude, longitude).into()));
@@ -153,14 +146,12 @@ impl Component for GPSInput {
                 false
             }
             GPSInputMessage::Latitude(latitude) => {
-                ctx.link()
-                    .send_message(GPSInputMessage::Coordinates(latitude, self.longitude));
+                ctx.link().send_message(GPSInputMessage::Coordinates(latitude, self.longitude));
 
                 false
             }
             GPSInputMessage::Longitude(longitude) => {
-                ctx.link()
-                    .send_message(GPSInputMessage::Coordinates(self.latitude, longitude));
+                ctx.link().send_message(GPSInputMessage::Coordinates(self.latitude, longitude));
 
                 false
             }
@@ -169,19 +160,13 @@ impl Component for GPSInput {
 
     fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
         if first_render {
-            ctx.link()
-                .send_message(GPSInputMessage::RequireAuthorization);
+            ctx.link().send_message(GPSInputMessage::RequireAuthorization);
         }
     }
 
     fn destroy(&mut self, _ctx: &Context<Self>) {
         if let Some(watch_id) = self.watch_id.take() {
-            web_sys::window()
-                .unwrap()
-                .navigator()
-                .geolocation()
-                .unwrap()
-                .clear_watch(watch_id);
+            web_sys::window().unwrap().navigator().geolocation().unwrap().clear_watch(watch_id);
         }
     }
 
@@ -239,13 +224,8 @@ impl Component for GPSInput {
             (self.latitude.unwrap_or(0.0), self.longitude.unwrap_or(0.0))
         };
 
-        let all_errors = ctx
-            .props()
-            .errors
-            .iter()
-            .chain(self.errors.iter())
-            .cloned()
-            .collect::<Vec<ApiError>>();
+        let all_errors =
+            ctx.props().errors.iter().chain(self.errors.iter()).cloned().collect::<Vec<ApiError>>();
 
         html! {
             <div class="gps-input">

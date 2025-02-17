@@ -1,59 +1,48 @@
 //! Login API for GitHub OAuth
-use crate::api::oauth::*;
+use std::env;
 
 use actix_web::{get, HttpResponse, Responder};
-
-use diesel::prelude::*;
-use diesel::r2d2::{ConnectionManager, Pool};
-
-use super::jwt_cookies::build_login_response;
-use crate::transactions::renormalize_user_emails::{renormalize_user_emails, Emails};
+use core_structures::LoginProvider;
 use redis::Client as RedisClient;
 use reqwest::Client;
 use serde::Deserialize;
-use std::env;
 use web_common::api::ApiError;
-use core_structures::LoginProvider;
+
+use super::jwt_cookies::build_login_response;
+use crate::api::oauth::*;
 
 /// Struct representing the GitHub OAuth2 configuration.
 struct GitHubConfig {
     client_id: String,
     client_secret: String,
-    provider_id: i32,
+    provider_id: i16,
 }
 
 impl GitHubConfig {
-    /// Function to retrieve the GitHub OAuth2 configuration from the environment.
+    /// Function to retrieve the GitHub OAuth2 configuration from the
+    /// environment.
     ///
     /// # Returns
     ///
-    /// A `Result` containing the `GitHubConfig` if the environment variables are set, or an error
-    /// message if they are not.
-    pub fn from_env(
-        pool: &Pool<ConnectionManager<PgConnection>>,
+    /// A `Result` containing the `GitHubConfig` if the environment variables
+    /// are set, or an error message if they are not.
+    pub async fn from_env(
+        connection: &mut web_common_traits::prelude::DBConn,
     ) -> Result<GitHubConfig, ApiError> {
-        let client_secret = env::var("GITHUB_CLIENT_SECRET");
-
-        if client_secret.is_err() {
+        let Ok(client_secret) = env::var("GITHUB_CLIENT_SECRET") else {
             panic!("GITHUB_CLIENT_SECRET not set");
-        }
+        };
 
-        let mut connection = pool.get()?;
+        let Ok(client_id) = env::var("GITHUB_CLIENT_ID") else {
+            panic!("GITHUB_CLIENT_ID not set");
+        };
 
         // We retrieve the ID for the 'GitHub' provider from the database.
-        let provider = LoginProvider::from_name("GitHub", &mut connection)?;
+        let Some(provider) = LoginProvider::from_name("GitHub", connection).await? else {
+            panic!("GitHub provider not found in the database");
+        };
 
-        let client_id = env::var("GITHUB_CLIENT_ID");
-
-        if client_id.is_err() {
-            panic!("GITHUB_CLIENT_ID not set");
-        }
-
-        Ok(GitHubConfig {
-            client_id: client_id.unwrap(),
-            client_secret: client_secret.unwrap(),
-            provider_id: provider.id,
-        })
+        Ok(GitHubConfig { client_id, client_secret, provider_id: provider.id })
     }
 }
 
@@ -74,7 +63,7 @@ struct GithubEmailMetadata {
 #[get("/github")]
 async fn github_oauth_handler(
     query: web::Query<QueryCode>,
-    pool: web::Data<Pool<ConnectionManager<PgConnection>>>,
+    pool: web::Data<web_common_traits::prelude::DBPool>,
     redis_client: web::Data<RedisClient>,
 ) -> impl Responder {
     let code = &query.code;
@@ -84,40 +73,33 @@ async fn github_oauth_handler(
         return HttpResponse::Unauthorized().json(ApiError::unauthorized());
     }
 
-    let token_response = get_github_oauth_token(code.as_str(), &pool).await;
-    if let Err(e) = token_response {
-        return HttpResponse::BadGateway().json(e);
-    }
-
-    let token_response = token_response.unwrap();
+    let Ok(token_response) = get_github_oauth_token(code.as_str(), &pool).await else {
+        return HttpResponse::BadRequest().json(ApiError::internal_server_error());
+    };
 
     // We retrieve the GitHub user emails
-    let emails_response = get_github_user_emails(token_response.access_token.as_str()).await;
+    let Ok(emails) = get_github_user_emails(token_response.access_token.as_str()).await else {
+        return HttpResponse::BadRequest().json(ApiError::internal_server_error());
+    };
 
-    if let Err(e) = emails_response {
-        return HttpResponse::BadGateway().json(e);
-    }
+    let Ok(mut connection) = pool.get().await else {
+        return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
+    };
+    let Ok(github_config) = GitHubConfig::from_env(&mut connection).await else {
+        return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
+    };
 
-    let github_config = GitHubConfig::from_env(&pool).unwrap();
+    todo!("Build the user from the emails and the GitHubConfig");
 
-    let user_query =
-        renormalize_user_emails(github_config.provider_id, emails_response.unwrap(), &pool)
-            .map_err(ApiError::from);
-
-    if let Err(e) = user_query {
-        return HttpResponse::InternalServerError().json(e);
-    }
-
-    let user_id = user_query.unwrap().id;
-
-    build_login_response(user_id, state, &redis_client).await
+    // build_login_response(user.id, state, &redis_client).await
 }
 
 pub async fn get_github_oauth_token(
     authorization_code: &str,
-    pool: &web::Data<Pool<ConnectionManager<PgConnection>>>,
+    pool: &web::Data<web_common_traits::prelude::DBPool>,
 ) -> Result<GitHubOauthToken, ApiError> {
-    let github_config = GitHubConfig::from_env(pool)?;
+    let mut connection = pool.get().await?;
+    let github_config = GitHubConfig::from_env(&mut connection).await?;
 
     let root_url = "https://github.com/login/oauth/access_token";
 
@@ -129,35 +111,16 @@ pub async fn get_github_oauth_token(
         ("client_secret", github_config.client_secret.as_str()),
     ];
 
-    let response = client
-        .post(root_url)
-        .header("Accept", "application/json")
-        .form(&params)
-        .send()
-        .await?;
+    let response =
+        client.post(root_url).header("Accept", "application/json").form(&params).send().await?;
 
-    if response.status().is_success() {
-        let oauth_response = response.json::<GitHubOauthToken>().await?;
-        Ok(oauth_response)
-    } else {
-        let message = format!(
-            "An error occurred while trying to retrieve the access token: {}, text: {}",
-            response.status(),
-            response.text().await?
-        );
-        Err(ApiError::BadRequest(vec![message]))
-    }
+    Ok(response.json::<GitHubOauthToken>().await?)
 }
 
-/// Function to retrieve the emails associated with a GitHub user.
-///
-/// # Implementative details
-/// This function uses the GitHub API to retrieve the emails associated with a user.
-/// While there is an email field in the set of informations returned as the user logs in,
-/// these emails are optional and the user on GitHub may choose to not display them (in fact
-/// this is the default setting). This function retrieves the emails from the GitHub API
-/// from the endpoint `/user/emails` and returns them as a `Vec<String>`.
-pub async fn get_github_user_emails(authorization_code: &str) -> Result<Emails, ApiError> {
+/// Returns the emails associated with the GitHub user.
+pub async fn get_github_user_emails(
+    authorization_code: &str,
+) -> Result<Vec<GithubEmailMetadata>, ApiError> {
     let root_url = "https://api.github.com/user/emails";
 
     let client = Client::new();
@@ -170,33 +133,5 @@ pub async fn get_github_user_emails(authorization_code: &str) -> Result<Emails, 
         .send()
         .await?;
 
-    if response.status().is_success() {
-        let emails = response.json::<Vec<GithubEmailMetadata>>().await?;
-        let mut primary = String::new();
-        let mut email_list = Vec::new();
-
-        for email in emails {
-            if !email.verified {
-                continue;
-            }
-            if email.primary {
-                primary.clone_from(&email.email);
-            }
-            email_list.push(email.email);
-        }
-
-        // If not primary mail was set, then this was a bad request.
-        if primary.is_empty() {
-            Err("No primary email was found in the list of emails from GitHub")?;
-        }
-
-        // If no email was found, then this was a bad request.
-        if email_list.is_empty() {
-            Err("No email was found in the list of emails from GitHub")?;
-        }
-
-        Ok(Emails::new(email_list, primary)?)
-    } else {
-        Err("An error occurred while trying to retrieve the user emails")?
-    }
+    Ok(response.json::<Vec<GithubEmailMetadata>>().await?)
 }

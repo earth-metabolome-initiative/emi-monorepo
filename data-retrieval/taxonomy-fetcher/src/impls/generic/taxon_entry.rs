@@ -17,13 +17,7 @@ pub struct GenericTaxonEntry<Id: TaxonIdentifier, R: Rank> {
 
 impl<Id: TaxonIdentifier, R: Rank> std::fmt::Display for GenericTaxonEntry<Id, R> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{} ({}): {}",
-            self.name,
-            self.rank,
-            self.id
-        )
+        write!(f, "{} ({}): {}", self.name, self.rank, self.id)
     }
 }
 

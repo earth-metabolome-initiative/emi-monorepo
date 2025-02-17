@@ -1,5 +1,7 @@
-use crate::prelude::*;
-use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
+use crate::{
+    prelude::*,
+    traits::{Enablable, IntoDefault, NamedParametersSet},
+};
 
 /// The possible config settings
 #[derive(Debug, Clone, PartialEq)]
@@ -8,14 +10,17 @@ pub enum ConfigV5 {
     Enabled,
 
     /// This configurations define how to deal with isotope patterns in MS1.
-    /// When filtering is enabled, molecular formulas are excluded if their theoretical isotope
-    /// pattern does not match the theoretical one, even if their MS/MS pattern has high score.
+    /// When filtering is enabled, molecular formulas are excluded if their
+    /// theoretical isotope pattern does not match the theoretical one, even
+    /// if their MS/MS pattern has high score.
     IsotopeSettingsFilter(bool),
 
-    /// The database from which to search formulas. This can consist of one or more search databases.
+    /// The database from which to search formulas. This can consist of one or
+    /// more search databases.
     FormulaSearchDB(DBVector),
 
-    /// The database from which to search structures. This can consist of one or more search databases.
+    /// The database from which to search structures. This can consist of one or
+    /// more search databases.
     StructureSearchDB(DBVector),
 
     /// The timeout seconds per tree
@@ -39,15 +44,18 @@ pub enum ConfigV5 {
     /// The timeout seconds per instance
     TimeoutSecondsPerInstance(u32),
 
-    /// Specifies if the list of Molecular Formula Identifications is filtered by
-    /// a soft threshold (calculateThreshold) before CSI:FingerID predictions are calculated.
+    /// Specifies if the list of Molecular Formula Identifications is filtered
+    /// by a soft threshold (calculateThreshold) before CSI:FingerID
+    /// predictions are calculated.
     FormulaResultThreshold(bool),
 
-    /// Candidates matching the lipid class estimated by El Gordo will be tagged.
-    /// The lipid class will only be available if El Gordo predicts that the MS/MS is a lipid spectrum.
+    /// Candidates matching the lipid class estimated by El Gordo will be
+    /// tagged. The lipid class will only be available if El Gordo predicts
+    /// that the MS/MS is a lipid spectrum.
     ///
-    /// If this parameter is set to 'false' El Gordo will still be executed and e.g. improve the fragmentation
-    /// tree, but the matching candidates will not be tagged as lipid class.
+    /// If this parameter is set to 'false' El Gordo will still be executed and
+    /// e.g. improve the fragmentation tree, but the matching candidates
+    /// will not be tagged as lipid class.
     ///
     /// Default: `true`
     InjectElGordoCompounds(bool),
@@ -104,8 +112,8 @@ pub enum ConfigV5 {
     ZodiacNumberOfConsideredCandidatesAt800Mz(i32),
 
     /// The zodiac ratio of considered candidates per ionization
-    ZodiacRatioOfConsideredCandidatesPerIonization(f32), //can't be negative, higher than 1 or NaN
-
+    ZodiacRatioOfConsideredCandidatesPerIonization(f32), // can't be negative, higher than 1 or
+    // NaN
     /// Whether to run zodiac in two steps
     ZodiacRunInTwoSteps(bool),
 
@@ -124,21 +132,24 @@ pub enum ConfigV5 {
     /// The MS2 mass deviation standard mass deviation
     MS2MassDeviationStandardMassDeviation(MassDeviation),
 
-    /// Detectable elements are added to the chemical alphabet, if there are indications for them (e.g. in isotope pattern)
+    /// Detectable elements are added to the chemical alphabet, if there are
+    /// indications for them (e.g. in isotope pattern)
     ///
     /// Default: `S,Br,Cl,B,Se`
     FormulaSettingsDetectable(AtomVector),
 
-    ///These configurations hold the information how to autodetect elements based on the given
-    /// formula constraints.
-    /// Note: If the compound is already assigned to a specific molecular formula, this annotation is ignored.
+    /// These configurations hold the information how to autodetect elements
+    /// based on the given formula constraints.
+    /// Note: If the compound is already assigned to a specific molecular
+    /// formula, this annotation is ignored.
     ///
     /// Enforced elements are always considered.
     ///
     /// Default: `C,H,N,O,P`
     FormulaSettingsEnforced(AtomVector),
 
-    /// Fallback elements are used, if the auto-detection fails (e.g. no isotope pattern available)
+    /// Fallback elements are used, if the auto-detection fails (e.g. no isotope
+    /// pattern available)
     ///
     /// Default: `S`
     FormulaSettingsFallback(AtomVector),
@@ -155,15 +166,18 @@ pub enum ConfigV5 {
     /// The use heuristic mz to use heuristic only
     UseHeuristicMZToUseHeuristicOnly(u32),
 
-    ///  Detectable ion modes which are only considered if there is an indication in the MS1 scan (e.g. correct mass delta).
+    ///  Detectable ion modes which are only considered if there is an
+    /// indication in the MS1 scan (e.g. correct mass delta).
     ///
-    /// The default is `[M+H]+,[M+K]+,[M+Na]+,[M+H-H2O]+,[M+H-H4O2]+,[M+NH4]+,[M-H]-,[M+Cl]-,[M-H2O-H]-,[M+Br]-`.
+    /// The default is
+    /// `[M+H]+,[M+K]+,[M+Na]+,[M+H-H2O]+,[M+H-H4O2]+,[M+NH4]+,[M-H]-,[M+Cl]-,
+    /// [M-H2O-H]-,[M+Br]-`.
     AdductSettingsDetectable(AdductsVector),
 
     /// Fallback ion modes which are considered if the auto
     /// detection did not find any indication for an ion mode.
-    /// ATTENTION: Expanding adducts from ionizations (e.g. `[M+H]+` to `[M+H-H2O]+``)
-    /// does not respect databases that were selected in the
+    /// ATTENTION: Expanding adducts from ionizations (e.g. `[M+H]+` to
+    /// `[M+H-H2O]+``) does not respect databases that were selected in the
     /// formulas annotation step.
     AdductSettingsFallback(AdductsVector),
 
@@ -172,8 +186,9 @@ pub enum ConfigV5 {
     /// Default: `default`
     AlgorithmProfile(Instruments),
 
-    /// Keywords that can be assigned to a input spectrum to judge its quality. Available keywords
-    /// are: Good, LowIntensity, NoMS1Peak, FewPeaks, Chimeric, NotMonoisotopicPeak, PoorlyExplained
+    /// Keywords that can be assigned to a input spectrum to judge its quality.
+    /// Available keywords are: Good, LowIntensity, NoMS1Peak, FewPeaks,
+    /// Chimeric, NotMonoisotopicPeak, PoorlyExplained
     ///
     /// Default: `UNKNOWN`
     CompoundQuality(CompoundQuality),
@@ -181,27 +196,33 @@ pub enum ConfigV5 {
     /// Describes how to deal with Adducts:
     ///
     /// Pos Examples:
-    /// `[M+H]+,[M]+,[M+K]+,[M+Na]+,[M+H-H2O]+,[M+Na2-H]+,[M+2K-H]+,[M+NH4]+,[M+H3O]+,[M+MeOH+H]+,[M+ACN+H]+,[M+2ACN+H]+,[M+IPA+H]+,[M+ACN+Na]+,[M+DMSO+H]+`
+    /// `[M+H]+,[M]+,[M+K]+,[M+Na]+,[M+H-H2O]+,[M+Na2-H]+,[M+2K-H]+,[M+NH4]+,
+    /// [M+H3O]+,[M+MeOH+H]+,[M+ACN+H]+,[M+2ACN+H]+,[M+IPA+H]+,[M+ACN+Na]+,
+    /// [M+DMSO+H]+`
     ///
     /// Neg Examples:
-    /// `[M-H]-,[M]-,[M+K-2H]-,[M+Cl]-,[M-H2O-H]-,[M+Na-2H]-,[M+FA-H]-,[M+Br]-,[M+HAc-H]-,[M+TFA-H]-,[M+ACN-H]-`
+    /// `[M-H]-,[M]-,[M+K-2H]-,[M+Cl]-,[M-H2O-H]-,[M+Na-2H]-,[M+FA-H]-,[M+Br]-,
+    /// [M+HAc-H]-,[M+TFA-H]-,[M+ACN-H]-`
     ///
     /// Default: `,`
     ///
     /// Enforced ion modes that are always considered.
     AdductSettingsEnforced(AdductSettingsEnforced),
 
-    ///  This configuration holds a set of user given formulas to be used as candidates for SIRIUS.
-    /// Note: This set might be merged with other sources like formulas from databases
-    /// Set of Molecular Formulas to be used as candidates for molecular formula estimation with SIRIUS
+    ///  This configuration holds a set of user given formulas to be used as
+    /// candidates for SIRIUS. Note: This set might be merged with other
+    /// sources like formulas from databases Set of Molecular Formulas to be
+    /// used as candidates for molecular formula estimation with SIRIUS
     ///
     /// Currently only the default value is supported.
     ///
     /// Default: `,`
     CandidateFormulas(CandidateFormulas),
 
-    /// Allows the USER to Specify the ScoreType that is used to rank the list of Molecular Formula Identifications
-    /// before CSI:FingerID predictions are calculated. Auto means that this ScoreType is automatically set depending on the executed workflow.
+    /// Allows the USER to Specify the ScoreType that is used to rank the list
+    /// of Molecular Formula Identifications before CSI:FingerID predictions
+    /// are calculated. Auto means that this ScoreType is automatically set
+    /// depending on the executed workflow.
     ///
     /// Currently only the default value is supported.
     ///
@@ -211,9 +232,11 @@ pub enum ConfigV5 {
     /// The isotope ms2 settings
     IsotopeMS2Settings(IsotopeMS2Settings),
 
-    ///   multiplier for the isotope score. Set to 0 to disable isotope scoring. Otherwise, the score from isotope
-    /// pattern analysis is multiplied with this coefficient. Set to a value larger than one if
-    ///  your isotope pattern data is of much better quality than your MS/MS data.
+    ///   multiplier for the isotope score. Set to 0 to disable isotope scoring.
+    /// Otherwise, the score from isotope pattern analysis is multiplied
+    /// with this coefficient. Set to a value larger than one if
+    ///  your isotope pattern data is of much better quality than your MS/MS
+    /// data.
     ///
     /// Default: `1`
     IsotopeSettingsMultiplier(u32),
@@ -248,16 +271,10 @@ impl ToString for ConfigV5 {
                 format!("--Timeout.secondsPerTree={}", timeout_seconds_per_tree)
             }
             ConfigV5::NumberOfCandidatesPerIon(number_of_candidates_per_ion) => {
-                format!(
-                    "--NumberOfCandidatesPerIon={}",
-                    number_of_candidates_per_ion
-                )
+                format!("--NumberOfCandidatesPerIon={}", number_of_candidates_per_ion)
             }
             ConfigV5::NumberOfStructureCandidates(number_of_structure_candidates) => {
-                format!(
-                    "--NumberOfStructureCandidates={}",
-                    number_of_structure_candidates
-                )
+                format!("--NumberOfStructureCandidates={}", number_of_structure_candidates)
             }
             ConfigV5::RecomputeResults(recompute_results) => {
                 format!("--RecomputeResults={}", recompute_results)
@@ -266,10 +283,7 @@ impl ToString for ConfigV5 {
                 format!("--PrintCitations={}", print_citations)
             }
             ConfigV5::TimeoutSecondsPerInstance(timeout_seconds_per_instance) => {
-                format!(
-                    "--Timeout.secondsPerInstance={}",
-                    timeout_seconds_per_instance
-                )
+                format!("--Timeout.secondsPerInstance={}", timeout_seconds_per_instance)
             }
             ConfigV5::FormulaResultThreshold(formula_result_threshold) => {
                 format!("--FormulaResultThreshold={}", formula_result_threshold)
@@ -281,35 +295,30 @@ impl ToString for ConfigV5 {
                 format!("--MedianNoiseIntensity={}", median_noise_intensity)
             }
             ConfigV5::MS1AbsoluteIntensityError(ms1_absolute_intensity_error) => {
-                format!(
-                    "--ms1.absoluteIntensityError={}",
-                    ms1_absolute_intensity_error
-                )
+                format!("--ms1.absoluteIntensityError={}", ms1_absolute_intensity_error)
             }
             ConfigV5::MS1MinimalIntensityToConsider(ms1_minimal_intensity_to_consider) => {
-                format!(
-                    "--ms1.minimalIntensityToConsider={}",
-                    ms1_minimal_intensity_to_consider
-                )
+                format!("--ms1.minimalIntensityToConsider={}", ms1_minimal_intensity_to_consider)
             }
             ConfigV5::MS1RelativeIntensityError(ms1_relative_intensity_error) => {
-                format!(
-                    "--ms1.relativeIntensityError={}",
-                    ms1_relative_intensity_error
-                )
+                format!("--ms1.relativeIntensityError={}", ms1_relative_intensity_error)
             }
             ConfigV5::NoiseThresholdSettingsIntensityThreshold(
                 noise_threshold_settings_intensity_threshold,
-            ) => format!(
-                "--NoiseThresholdSettings.intensityThreshold={}",
-                noise_threshold_settings_intensity_threshold
-            ),
+            ) => {
+                format!(
+                    "--NoiseThresholdSettings.intensityThreshold={}",
+                    noise_threshold_settings_intensity_threshold
+                )
+            }
             ConfigV5::NoiseThresholdSettingsMaximalNumberOfPeaks(
                 noise_threshold_settings_maximal_number_of_peaks,
-            ) => format!(
-                "--NoiseThresholdSettings.maximalNumberOfPeaks={}",
-                noise_threshold_settings_maximal_number_of_peaks
-            ),
+            ) => {
+                format!(
+                    "--NoiseThresholdSettings.maximalNumberOfPeaks={}",
+                    noise_threshold_settings_maximal_number_of_peaks
+                )
+            }
             ConfigV5::NumberOfCandidates(number_of_candidates) => {
                 format!("--NumberOfCandidates={}", number_of_candidates)
             }
@@ -318,26 +327,31 @@ impl ToString for ConfigV5 {
             }
             ConfigV5::ZodiacEdgeFilterThresholdsMinLocalCandidates(
                 zodiac_edge_filter_thresholds_min_local_candidates,
-            ) => format!(
-                "--ZodiacEdgeFilterThresholds.minLocalCandidates={}",
-                zodiac_edge_filter_thresholds_min_local_candidates
-            ),
+            ) => {
+                format!(
+                    "--ZodiacEdgeFilterThresholds.minLocalCandidates={}",
+                    zodiac_edge_filter_thresholds_min_local_candidates
+                )
+            }
             ConfigV5::ZodiacEdgeFilterThresholdsMinLocalConnections(
                 zodiac_edge_filter_thresholds_min_local_connections,
-            ) => format!(
-                "--ZodiacEdgeFilterThresholds.minLocalConnections={}",
-                zodiac_edge_filter_thresholds_min_local_connections
-            ),
+            ) => {
+                format!(
+                    "--ZodiacEdgeFilterThresholds.minLocalConnections={}",
+                    zodiac_edge_filter_thresholds_min_local_connections
+                )
+            }
             ConfigV5::ZodiacEdgeFilterThresholdsThresholdFilter(
                 zodiac_edge_filter_thresholds_threshold_filter,
-            ) => format!(
-                "--ZodiacEdgeFilterThresholds.thresholdFilter={}",
-                zodiac_edge_filter_thresholds_threshold_filter
-            ),
-            ConfigV5::ZodiacEpochsBurnInPeriod(zodiac_epochs_burn_in_period) => format!(
-                "--ZodiacEpochs.burnInPeriod={}",
-                zodiac_epochs_burn_in_period
-            ),
+            ) => {
+                format!(
+                    "--ZodiacEdgeFilterThresholds.thresholdFilter={}",
+                    zodiac_edge_filter_thresholds_threshold_filter
+                )
+            }
+            ConfigV5::ZodiacEpochsBurnInPeriod(zodiac_epochs_burn_in_period) => {
+                format!("--ZodiacEpochs.burnInPeriod={}", zodiac_epochs_burn_in_period)
+            }
             ConfigV5::ZodiacEpochsIterations(zodiac_epochs_iterations) => {
                 format!("--ZodiacEpochs.iterations={}", zodiac_epochs_iterations)
             }
@@ -347,69 +361,82 @@ impl ToString for ConfigV5 {
                     zodiac_epochs_number_of_markov_chains
                 )
             }
-            ConfigV5::ZodiacLibraryScoringLambda(zodiac_library_scoring_lambda) => format!(
-                "--ZodiacLibraryScoring.lambda={}",
-                zodiac_library_scoring_lambda
-            ),
-            ConfigV5::ZodiacLibraryScoringMinCosine(zodiac_library_scoring_min_cosine) => format!(
-                "--ZodiacLibraryScoring.minCosine={}",
-                zodiac_library_scoring_min_cosine
-            ),
+            ConfigV5::ZodiacLibraryScoringLambda(zodiac_library_scoring_lambda) => {
+                format!("--ZodiacLibraryScoring.lambda={}", zodiac_library_scoring_lambda)
+            }
+            ConfigV5::ZodiacLibraryScoringMinCosine(zodiac_library_scoring_min_cosine) => {
+                format!("--ZodiacLibraryScoring.minCosine={}", zodiac_library_scoring_min_cosine)
+            }
             ConfigV5::ZodiacNumberOfConsideredCandidatesAt300Mz(
                 zodiac_number_of_considered_candidates_at_300_mz,
-            ) => format!(
-                "--ZodiacNumberOfConsideredCandidatesAt300Mz={}",
-                zodiac_number_of_considered_candidates_at_300_mz
-            ),
+            ) => {
+                format!(
+                    "--ZodiacNumberOfConsideredCandidatesAt300Mz={}",
+                    zodiac_number_of_considered_candidates_at_300_mz
+                )
+            }
             ConfigV5::ZodiacNumberOfConsideredCandidatesAt800Mz(
                 zodiac_number_of_considered_candidates_at_800_mz,
-            ) => format!(
-                "--ZodiacNumberOfConsideredCandidatesAt800Mz={}",
-                zodiac_number_of_considered_candidates_at_800_mz
-            ),
+            ) => {
+                format!(
+                    "--ZodiacNumberOfConsideredCandidatesAt800Mz={}",
+                    zodiac_number_of_considered_candidates_at_800_mz
+                )
+            }
             ConfigV5::ZodiacRatioOfConsideredCandidatesPerIonization(
                 zodiac_ratio_of_considered_candidates_per_ionization,
-            ) => format!(
-                "--ZodiacRatioOfConsideredCandidatesPerIonization={}",
-                zodiac_ratio_of_considered_candidates_per_ionization
-            ),
+            ) => {
+                format!(
+                    "--ZodiacRatioOfConsideredCandidatesPerIonization={}",
+                    zodiac_ratio_of_considered_candidates_per_ionization
+                )
+            }
             ConfigV5::ZodiacRunInTwoSteps(zodiac_run_in_two_steps) => {
                 format!("--ZodiacRunInTwoSteps={}", zodiac_run_in_two_steps)
             }
             ConfigV5::MS1MassDeviationAllowedMassDeviation(
                 ms1_mass_deviation_allowed_mass_deviation,
-            ) => format!(
-                "--MS1MassDeviation.allowedMassDeviation={}",
-                ms1_mass_deviation_allowed_mass_deviation
-            ),
+            ) => {
+                format!(
+                    "--MS1MassDeviation.allowedMassDeviation={}",
+                    ms1_mass_deviation_allowed_mass_deviation
+                )
+            }
             ConfigV5::MS1MassDeviationMassDifferenceDeviation(
                 ms1_mass_deviation_mass_difference_deviation,
-            ) => format!(
-                "--MS1MassDeviation.massDifferenceDeviation={}",
-                ms1_mass_deviation_mass_difference_deviation
-            ),
+            ) => {
+                format!(
+                    "--MS1MassDeviation.massDifferenceDeviation={}",
+                    ms1_mass_deviation_mass_difference_deviation
+                )
+            }
             ConfigV5::MS1MassDeviationStandardMassDeviation(
                 ms1_mass_deviation_standard_mass_deviation,
-            ) => format!(
-                "--MS1MassDeviation.standardMassDeviation={}",
-                ms1_mass_deviation_standard_mass_deviation
-            ),
+            ) => {
+                format!(
+                    "--MS1MassDeviation.standardMassDeviation={}",
+                    ms1_mass_deviation_standard_mass_deviation
+                )
+            }
             ConfigV5::MS2MassDeviationAllowedMassDeviation(
                 ms2_mass_deviation_allowed_mass_deviation,
-            ) => format!(
-                "--MS2MassDeviation.allowedMassDeviation={}",
-                ms2_mass_deviation_allowed_mass_deviation
-            ),
+            ) => {
+                format!(
+                    "--MS2MassDeviation.allowedMassDeviation={}",
+                    ms2_mass_deviation_allowed_mass_deviation
+                )
+            }
             ConfigV5::MS2MassDeviationStandardMassDeviation(
                 ms2_mass_deviation_standard_mass_deviation,
-            ) => format!(
-                "--MS2MassDeviation.standardMassDeviation={}",
-                ms2_mass_deviation_standard_mass_deviation
-            ),
-            ConfigV5::FormulaSettingsDetectable(formula_settings_detectable) => format!(
-                "--FormulaSettings.detectable={}",
-                formula_settings_detectable
-            ),
+            ) => {
+                format!(
+                    "--MS2MassDeviation.standardMassDeviation={}",
+                    ms2_mass_deviation_standard_mass_deviation
+                )
+            }
+            ConfigV5::FormulaSettingsDetectable(formula_settings_detectable) => {
+                format!("--FormulaSettings.detectable={}", formula_settings_detectable)
+            }
             ConfigV5::FormulaSettingsEnforced(formula_settings_enforced) => {
                 format!("--FormulaSettings.enforced={}", formula_settings_enforced)
             }
@@ -420,10 +447,7 @@ impl ToString for ConfigV5 {
                 format!("--ForbidRecalibration={}", forbid_recalibration)
             }
             ConfigV5::UseHeuristicMZToUseHeuristic(use_heuristic_mz_to_use_heuristic) => {
-                format!(
-                    "--UseHeuristic.mzToUseHeuristic={}",
-                    use_heuristic_mz_to_use_heuristic
-                )
+                format!("--UseHeuristic.mzToUseHeuristic={}", use_heuristic_mz_to_use_heuristic)
             }
             ConfigV5::UseHeuristicMZToUseHeuristicOnly(use_heuristic_mz_to_use_heuristic_only) => {
                 format!(
@@ -450,31 +474,24 @@ impl ToString for ConfigV5 {
                 format!("--CandidateFormulas={}", candidate_formulas)
             }
             ConfigV5::FormulaResultRankingScore(formula_result_ranking_score) => {
-                format!(
-                    "--FormulaResultRankingScore={}",
-                    formula_result_ranking_score
-                )
+                format!("--FormulaResultRankingScore={}", formula_result_ranking_score)
             }
             ConfigV5::IsotopeMS2Settings(isotope_ms2_settings) => {
                 format!("--IsotopeMs2Settings={}", isotope_ms2_settings)
             }
             ConfigV5::IsotopeSettingsMultiplier(isotope_settings_multiplier) => {
-                format!(
-                    "--IsotopeSettings.multiplier={}",
-                    isotope_settings_multiplier
-                )
+                format!("--IsotopeSettings.multiplier={}", isotope_settings_multiplier)
             }
             ConfigV5::NoiseThresholdSettingsAbsoluteThreshold(
                 noise_threshold_settings_absolute_threshold,
-            ) => format!(
-                "--NoiseThresholdSettings.absoluteThreshold={}",
-                noise_threshold_settings_absolute_threshold
-            ),
-            ConfigV5::NoiseThresholdSettingsBasePeak(noise_threshold_settings_base_peak) => {
+            ) => {
                 format!(
-                    "--NoiseThresholdSettings.basePeak={}",
-                    noise_threshold_settings_base_peak
+                    "--NoiseThresholdSettings.absoluteThreshold={}",
+                    noise_threshold_settings_absolute_threshold
                 )
+            }
+            ConfigV5::NoiseThresholdSettingsBasePeak(noise_threshold_settings_base_peak) => {
+                format!("--NoiseThresholdSettings.basePeak={}", noise_threshold_settings_base_peak)
             }
             ConfigV5::StructurePredictors(structure_predictors) => {
                 format!("--StructurePredictors={}", structure_predictors)

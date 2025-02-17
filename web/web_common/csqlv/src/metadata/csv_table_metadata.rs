@@ -1,14 +1,16 @@
 //! Submodule providing the CSV Table struct and associated functions.
-use super::csv_column_metadata::{CSVColumnMetadata, CSVColumnMetadataBuilder};
-use crate::data_types::DataType;
-use crate::errors::CSVSchemaError;
-use crate::extensions::{
-    delimiter_from_path, file_name_without_extension, has_compression_extension,
-};
-use crate::CSVSchema;
+use std::path::Path;
+
 use csv::Reader;
 use pluralizer::pluralize;
-use std::path::Path;
+
+use super::csv_column_metadata::{CSVColumnMetadata, CSVColumnMetadataBuilder};
+use crate::{
+    data_types::DataType,
+    errors::CSVSchemaError,
+    extensions::{delimiter_from_path, file_name_without_extension, has_compression_extension},
+    CSVSchema,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a CSV table.
@@ -81,10 +83,7 @@ impl CSVTableMetadata {
 
         // If there is no column identified as the primary key, we add a new
         // column with the name "id".
-        if !columns
-            .iter()
-            .any(|col: &CSVColumnMetadata| col.primary_key)
-        {
+        if !columns.iter().any(|col: &CSVColumnMetadata| col.primary_key) {
             columns.push(CSVColumnMetadata::new_primary_key(
                 if number_of_rows < i16::MAX as u64 {
                     DataType::SmallSerial
@@ -96,13 +95,7 @@ impl CSVTableMetadata {
             )?);
         }
 
-        Ok(Self {
-            name: name.to_string(),
-            path,
-            number_of_rows,
-            singularize,
-            columns,
-        })
+        Ok(Self { name: name.to_string(), path, number_of_rows, singularize, columns })
     }
 
     /// Create a new `CSVTableMetadata` from a CSV file.
@@ -118,9 +111,7 @@ impl CSVTableMetadata {
         {
             (table_name, delimiter)
         } else {
-            return Err(CSVSchemaError::InvalidPath(
-                path.to_string_lossy().to_string(),
-            ));
+            return Err(CSVSchemaError::InvalidPath(path.to_string_lossy().to_string()));
         };
 
         // We check that there is no invalid character in the table name
@@ -130,10 +121,7 @@ impl CSVTableMetadata {
 
         // We determine the internal path of the file, by replacing the root
         // portion of the path with the docker root
-        let docker_path = path
-            .to_string_lossy()
-            .to_string()
-            .replace(root, docker_root);
+        let docker_path = path.to_string_lossy().to_string().replace(root, docker_root);
 
         let mut reader_builder = csv::ReaderBuilder::new();
         reader_builder.has_headers(true);
@@ -165,14 +153,13 @@ impl CSVTableMetadata {
         &self,
         schema: &CSVSchema,
     ) -> Result<(), CSVSchemaError> {
-        self.columns
-            .iter()
-            .filter(|column| column.foreign_table_name.is_some())
-            .try_for_each(|column| {
+        self.columns.iter().filter(|column| column.foreign_table_name.is_some()).try_for_each(
+            |column| {
                 if let (Some(foreign_table_name), Some(foreign_column_name)) =
                     (&column.foreign_table_name, &column.foreign_column_name)
                 {
-                    let foreign_table = schema.tables()
+                    let foreign_table = schema
+                        .tables()
                         .into_iter()
                         .find(|table| table.name() == *foreign_table_name)
                         .ok_or(CSVSchemaError::UnknownForeignKey {
@@ -192,6 +179,7 @@ impl CSVTableMetadata {
                     }
                 }
                 Ok(())
-            })
+            },
+        )
     }
 }

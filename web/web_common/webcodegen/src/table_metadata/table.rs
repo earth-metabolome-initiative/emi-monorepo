@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 
-use diesel::pg::PgConnection;
-use diesel::result::Error as DieselError;
 use diesel::{
-    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, NullableExpressionMethods, QueryDsl,
-    Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
+    pg::PgConnection, result::Error as DieselError, BoolExpressionMethods, ExpressionMethods,
+    JoinOnDsl, NullableExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl,
+    Selectable, SelectableHelper,
 };
 use itertools::Itertools;
 use proc_macro2::TokenStream;
@@ -12,13 +11,8 @@ use quote::quote;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{parse_str, Ident, Type};
 
-use crate::errors::WebCodeGenError;
-use crate::CheckConstraint;
-use crate::Column;
-use crate::PgIndex;
-use crate::TableConstraint;
-
 use super::PgTrigger;
+use crate::{errors::WebCodeGenError, CheckConstraint, Column, PgIndex, TableConstraint};
 
 /// Reserved Rust words that cannot be used as identifiers.
 pub const RESERVED_RUST_WORDS: [&str; 49] = [
@@ -55,7 +49,8 @@ pub struct Table {
     pub user_defined_type_schema: Option<String>,
     /// The user-defined type name.
     pub user_defined_type_name: Option<String>,
-    /// The user-defined type name that the current table is a temporary table for.
+    /// The user-defined type name that the current table is a temporary table
+    /// for.
     pub is_insertable_into: String,
     /// Whether the table is typed.
     pub is_typed: String,
@@ -64,7 +59,8 @@ pub struct Table {
 }
 
 impl Table {
-    /// Returns the correct diesel feature flag for the number of columns in the table.
+    /// Returns the correct diesel feature flag for the number of columns in the
+    /// table.
     ///
     /// # Arguments
     ///
@@ -72,7 +68,8 @@ impl Table {
     ///
     /// # Returns
     ///
-    /// A string representing the diesel feature flag for the number of columns in the table.
+    /// A string representing the diesel feature flag for the number of columns
+    /// in the table.
     ///
     /// # Errors
     ///
@@ -98,7 +95,8 @@ impl Table {
         }
     }
 
-    /// Returns the correct diesel feature flag for the number of columns in the table.
+    /// Returns the correct diesel feature flag for the number of columns in the
+    /// table.
     ///
     /// # Arguments
     ///
@@ -106,7 +104,8 @@ impl Table {
     ///
     /// # Returns
     ///
-    /// A `TokenStream` representing the diesel feature flag for the number of columns in the table.
+    /// A `TokenStream` representing the diesel feature flag for the number of
+    /// columns in the table.
     ///
     /// # Errors
     ///
@@ -139,7 +138,8 @@ impl Table {
     ///
     /// # Returns
     ///
-    /// A string representing the name of the struct converted from the table name.
+    /// A string representing the name of the struct converted from the table
+    /// name.
     pub fn struct_name(&self) -> Result<String, WebCodeGenError> {
         let sanitizer = SnakeCaseSanizer::default()
             .include_defaults()
@@ -153,7 +153,6 @@ impl Table {
     /// # Errors
     ///
     /// * If the camel case name cannot be generated.
-    ///
     pub fn struct_ident(&self) -> Result<Ident, WebCodeGenError> {
         let struct_name = self.struct_name()?;
         if RESERVED_RUST_WORDS.contains(&struct_name.as_str()) {
@@ -172,7 +171,6 @@ impl Table {
     /// # Returns
     ///
     /// A string representing the sanitized snake case name of the table.
-    ///
     pub fn snake_case_name(&self) -> Result<String, WebCodeGenError> {
         let sanitizer = SnakeCaseSanizer::default()
             .include_defaults()
@@ -194,7 +192,6 @@ impl Table {
     /// # Errors
     ///
     /// * If the snake case name cannot be generated.
-    ///
     pub fn has_snake_case_name(&self) -> Result<bool, WebCodeGenError> {
         let snake_case_name = self.snake_case_name()?;
         Ok(snake_case_name != self.table_name)
@@ -213,14 +210,10 @@ impl Table {
     /// # Errors
     ///
     /// * If the snake case name cannot be generated.
-    ///
     pub fn snake_case_ident(&self) -> Result<Ident, WebCodeGenError> {
         let snake_case_name = self.snake_case_name()?;
         if RESERVED_RUST_WORDS.contains(&snake_case_name.as_str()) {
-            Ok(Ident::new_raw(
-                &snake_case_name,
-                proc_macro2::Span::call_site(),
-            ))
+            Ok(Ident::new_raw(&snake_case_name, proc_macro2::Span::call_site()))
         } else {
             Ok(Ident::new(&snake_case_name, proc_macro2::Span::call_site()))
         }
@@ -230,13 +223,11 @@ impl Table {
     /// Returns the singular name of the table.
     pub fn singular_table_name(&self) -> String {
         // We split the table name by underscores and remove the last element.
-        let mut parts = self
-            .table_name
-            .split('_')
-            .map(|part| part.to_string())
-            .collect::<Vec<String>>();
+        let mut parts =
+            self.table_name.split('_').map(|part| part.to_string()).collect::<Vec<String>>();
         let last_element = parts.pop().unwrap();
-        // We convert to singular form the last element and join the parts back together.
+        // We convert to singular form the last element and join the parts back
+        // together.
         let singular_last_element = pluralizer::pluralize(last_element.as_str(), 1, false);
         parts.push(singular_last_element);
         parts.join("_")
@@ -265,7 +256,6 @@ impl Table {
     /// # Errors
     ///
     /// * If the primary key columns cannot be loaded from the database.
-    ///
     pub fn primary_key_identifiers(
         &self,
         conn: &mut PgConnection,
@@ -289,13 +279,12 @@ impl Table {
     /// # Errors
     ///
     /// * If the primary key columns cannot be loaded from the database.
-    ///
     pub fn primary_key_decorator(
         &self,
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
-        // In some cases, the table will not have a primary key. In which case, we cannot specify the primary key
-        // decorator on the struct.
+        // In some cases, the table will not have a primary key. In which case, we
+        // cannot specify the primary key decorator on the struct.
         let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
         Ok(if self.has_primary_keys(conn)? {
             let primary_key_identifiers = self.primary_key_identifiers(conn)?;
@@ -395,10 +384,12 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<bool, WebCodeGenError> {
-        Ok(self
-            .columns(conn)?
-            .iter()
-            .any(|column| column.is_session_user_generated(conn)))
+        Ok(self.columns(conn)?.iter().any(|column| column.is_session_user_generated(conn)))
+    }
+
+    /// Returns whether the table IS the `users` table.
+    pub fn is_users_table(&self) -> bool {
+        self.table_name == "users"
     }
 
     /// Returns whether the table has an `created_by` column.
@@ -410,12 +401,8 @@ impl Table {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection is invalid.
-    ///
     pub fn has_created_by_column(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(self
-            .columns(conn)?
-            .iter()
-            .any(|column| column.is_created_by(conn)))
+        Ok(self.columns(conn)?.iter().any(|column| column.is_created_by(conn)))
     }
 
     /// Returns whether the table has an `updated_by` column.
@@ -427,12 +414,8 @@ impl Table {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection is invalid.
-    ///
     pub fn has_updated_by_column(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(self
-            .columns(conn)?
-            .iter()
-            .any(|column| column.is_updated_by(conn)))
+        Ok(self.columns(conn)?.iter().any(|column| column.is_updated_by(conn)))
     }
 
     /// Returns the UNIQUE constraint indices for the table.
@@ -448,7 +431,6 @@ impl Table {
     /// # Errors
     ///
     /// * If the indices cannot be loaded from the database.
-    ///
     pub fn unique_indices(&self, conn: &mut PgConnection) -> Result<Vec<PgIndex>, DieselError> {
         use crate::schema::{pg_class, pg_index};
 
@@ -457,13 +439,9 @@ impl Table {
         pg_index::table
             .inner_join(pg_class1.on(pg_class1.field(pg_class::oid).eq(pg_index::indexrelid)))
             .inner_join(pg_class2.on(pg_class2.field(pg_class::oid).eq(pg_index::indrelid)))
-            .filter(
-                pg_class2.field(pg_class::relname).eq(&self.table_name).and(
-                    pg_class2
-                        .field(pg_class::relnamespace)
-                        .eq(pg_class1.field(pg_class::relnamespace)),
-                ),
-            )
+            .filter(pg_class2.field(pg_class::relname).eq(&self.table_name).and(
+                pg_class2.field(pg_class::relnamespace).eq(pg_class1.field(pg_class::relnamespace)),
+            ))
             .filter(pg_index::indisunique.eq(true))
             .select(PgIndex::as_select())
             .load::<PgIndex>(conn)
@@ -546,12 +524,7 @@ impl Table {
         }
 
         // We sort the tables by their priority.
-        tables.sort_by(|a, b| {
-            table_priority
-                .get(a)
-                .unwrap()
-                .cmp(table_priority.get(b).unwrap())
-        });
+        tables.sort_by(|a, b| table_priority.get(a).unwrap().cmp(table_priority.get(b).unwrap()));
 
         Ok(tables)
     }
@@ -564,7 +537,6 @@ impl Table {
     /// * `table_name` - The name of the table.
     /// * `table_schema` - The schema of the table.
     /// * `table_catalog` - The catalog of the table.
-    ///
     pub fn load(
         conn: &mut PgConnection,
         table_name: &str,
@@ -647,9 +619,7 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<Vec<Column>>, WebCodeGenError> {
-        use crate::schema::columns;
-        use crate::schema::key_column_usage;
-        use crate::schema::table_constraints;
+        use crate::schema::{columns, key_column_usage, table_constraints};
         Ok(key_column_usage::table
             .inner_join(
                 columns::table.on(key_column_usage::table_name
@@ -713,10 +683,7 @@ impl Table {
                     .chunk_by(|(constraint, _)| constraint.constraint_name.clone())
                     .into_iter()
                     .map(|(_, group)| {
-                        group
-                            .into_iter()
-                            .map(|(_, column)| column)
-                            .collect::<Vec<Column>>()
+                        group.into_iter().map(|(_, column)| column).collect::<Vec<Column>>()
                     })
                     .collect()
             })?)
@@ -735,10 +702,8 @@ impl Table {
     /// # Errors
     ///
     /// * If the primary key columns cannot be loaded from the database.
-    ///
     pub fn has_primary_keys(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        self.primary_key_columns(conn)
-            .map(|columns| !columns.is_empty())
+        self.primary_key_columns(conn).map(|columns| !columns.is_empty())
     }
 
     /// Returns the columns composing the primary keys.
@@ -754,14 +719,11 @@ impl Table {
     /// # Errors
     ///
     /// * If the primary key columns cannot be loaded from the database.
-    ///
     pub fn primary_key_columns(
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<Column>, WebCodeGenError> {
-        use crate::schema::columns;
-        use crate::schema::key_column_usage;
-        use crate::schema::table_constraints;
+        use crate::schema::{columns, key_column_usage, table_constraints};
         Ok(key_column_usage::table
             .inner_join(
                 columns::table.on(key_column_usage::table_name
@@ -838,8 +800,7 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<CheckConstraint>, DieselError> {
-        use crate::schema::check_constraints;
-        use crate::schema::table_constraints;
+        use crate::schema::{check_constraints, table_constraints};
 
         check_constraints::table
             .inner_join(
@@ -874,7 +835,6 @@ impl Table {
     /// # Errors
     ///
     /// * If the triggers cannot be loaded from the database.
-    ///
     pub fn triggers(&self, conn: &mut PgConnection) -> Result<Vec<PgTrigger>, DieselError> {
         use crate::schema::{pg_class, pg_namespace, pg_trigger};
         pg_trigger::table

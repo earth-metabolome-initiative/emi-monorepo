@@ -1,5 +1,7 @@
-use diesel::pg::PgConnection;
-use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable};
+use diesel::{
+    pg::PgConnection, ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl,
+    Selectable,
+};
 
 use crate::errors::WebCodeGenError;
 
@@ -19,37 +21,39 @@ pub struct CheckConstraint {
 
 impl CheckConstraint {
     /// Load all the check constraints from the database
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A `Result` containing a `Vec` of `CheckConstraint` if the operation was successful, or a `WebCodeGenError` if an error occurred
-    /// 
+    ///
+    /// A `Result` containing a `Vec` of `CheckConstraint` if the operation was
+    /// successful, or a `WebCodeGenError` if an error occurred
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while loading the constraints from the database
-    pub fn load_all_check_constraints(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
+    pub fn load_all_check_constraints(
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::check_constraints;
-        check_constraints::table
-            .load::<CheckConstraint>(conn)
-            .map_err(WebCodeGenError::from)
+        check_constraints::table.load::<CheckConstraint>(conn).map_err(WebCodeGenError::from)
     }
 
     /// Load all the check constraints from the database
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A `Result` containing a `Vec` of `CheckConstraint` if the operation was successful, or a `WebCodeGenError` if an error occurred
-    /// 
+    ///
+    /// A `Result` containing a `Vec` of `CheckConstraint` if the operation was
+    /// successful, or a `WebCodeGenError` if an error occurred
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while loading the constraints from the database
     pub fn load_check_constraints(
         conn: &mut PgConnection,

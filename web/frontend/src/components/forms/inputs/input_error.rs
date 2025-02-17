@@ -1,4 +1,5 @@
-//! Submodule defining the `InputError` component, which is used to define the error message for an input or form.
+//! Submodule defining the `InputError` component, which is used to define the
+//! error message for an input or form.
 
 use web_common::api::ApiError;
 use yew::prelude::*;

@@ -13,10 +13,10 @@ mod csv_schema;
 mod csv_table;
 mod data_types;
 mod errors;
-mod metadata;
 pub mod extensions;
+mod metadata;
 
+pub use csv_columns::CSVColumn;
 pub use csv_schema::{CSVSchema, CSVSchemaBuilder};
 pub use csv_table::CSVTable;
-pub use csv_columns::CSVColumn;
 pub use errors::CSVSchemaError;

@@ -1,15 +1,13 @@
 //! This file is auto-generated. Do not edit it manually.
 //!
 //! This file contains the sidebar for the frontend.
-use super::logout::Logout;
-use crate::components::basic_page::PageLike;
-use crate::router::AppRoute;
-use crate::stores::user_state::UserState;
-use web_common::database::*;
 use yew::prelude::*;
 use yew_hooks::use_click_away;
 use yew_router::prelude::*;
 use yewdux::use_store;
+
+use super::logout::Logout;
+use crate::{components::basic_page::PageLike, router::AppRoute, stores::user_state::UserState};
 
 #[derive(Properties, Clone, PartialEq, Debug)]
 pub struct SidebarProps {
@@ -30,11 +28,7 @@ pub fn sidebar(props: &SidebarProps) -> Html {
         }
     });
 
-    let sidebar_class = if props.visible {
-        "sidebar"
-    } else {
-        "sidebar hidden"
-    };
+    let sidebar_class = if props.visible { "sidebar" } else { "sidebar hidden" };
     let on_click_close = {
         let onclose = props.onclose.clone();
         Callback::from(move |_| {

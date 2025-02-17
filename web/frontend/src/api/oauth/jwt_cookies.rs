@@ -1,14 +1,13 @@
 //! Submodule for APIs involving JWT cookies.
-use crate::api::FrontendApiError;
 use reqwasm::http::Request;
 use web_common::api::{oauth::jwt_cookies::*, ApiError};
 
+use crate::api::FrontendApiError;
+
 /// Refresh the JWT cookie.
 pub async fn refresh_jwt_cookie() -> Result<AccessToken, FrontendApiError> {
-    let response = Request::get(FULL_REFRESH_ENDPOINT)
-        .send()
-        .await
-        .map_err(FrontendApiError::from)?;
+    let response =
+        Request::get(FULL_REFRESH_ENDPOINT).send().await.map_err(FrontendApiError::from)?;
 
     match response.status() {
         200 => {

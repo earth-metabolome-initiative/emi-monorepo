@@ -1,5 +1,6 @@
-use crate::combine_path;
 use serde::{Deserialize, Serialize};
+
+use crate::combine_path;
 
 pub const REFRESH_ENDPOINT: &str = "/refresh";
 pub const FULL_REFRESH_ENDPOINT: &str = combine_path!(super::FULL_ENDPOINT, REFRESH_ENDPOINT);

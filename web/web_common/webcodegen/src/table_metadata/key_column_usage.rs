@@ -1,10 +1,12 @@
-use diesel::pg::PgConnection;
-use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable};
+use diesel::{
+    pg::PgConnection, ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl,
+    Selectable,
+};
 
 use crate::errors::WebCodeGenError;
 
-/// Represents a row in the `key_column_usage` table, which contains information about 
-/// columns that are constrained by a unique or primary key constraint.
+/// Represents a row in the `key_column_usage` table, which contains information
+/// about columns that are constrained by a unique or primary key constraint.
 ///
 /// For more details, see the PostgreSQL documentation:
 /// https://www.postgresql.org/docs/current/infoschema-key-column-usage.html
@@ -33,39 +35,43 @@ pub struct KeyColumnUsage {
 
 impl KeyColumnUsage {
     /// Load all the key column usages from the database
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A `Result` containing a `Vec` of `KeyColumnUsage` if the operation was successful, or a `WebCodeGenError` if an error occurred
-    /// 
+    ///
+    /// A `Result` containing a `Vec` of `KeyColumnUsage` if the operation was
+    /// successful, or a `WebCodeGenError` if an error occurred
+    ///
     /// # Errors
     /// If an error occurs while loading the key column usages from the database
-    pub fn load_all_key_column_usages(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
+    pub fn load_all_key_column_usages(
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::key_column_usage;
-        key_column_usage::table
-            .load::<KeyColumnUsage>(conn)
-            .map_err(WebCodeGenError::from)
+        key_column_usage::table.load::<KeyColumnUsage>(conn).map_err(WebCodeGenError::from)
     }
 
     /// Load all the key column usages from the database
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
     /// * `table_name` - The name of the table to load the key column usages for
-    /// * `table_schema` - An optional schema name to filter the key column usages by
-    /// * `table_catalog` - The name of the catalog to filter the key column usages by
-    /// 
+    /// * `table_schema` - An optional schema name to filter the key column
+    ///   usages by
+    /// * `table_catalog` - The name of the catalog to filter the key column
+    ///   usages by
+    ///
     /// # Returns
-    /// 
-    /// A `Result` containing a `Vec` of `KeyColumnUsage` if the operation was successful, or a `WebCodeGenError` if an error occurred
-    /// 
+    ///
+    /// A `Result` containing a `Vec` of `KeyColumnUsage` if the operation was
+    /// successful, or a `WebCodeGenError` if an error occurred
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while loading the key column usages from the database
     pub fn load_key_column_usages(
         conn: &mut PgConnection,

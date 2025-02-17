@@ -30,14 +30,14 @@ impl Task {
     /// ```rust
     /// use downloader::Task;
     ///
-    /// let task: Task = Task::try_from("https://example.com/file.zip").unwrap().target_path(&"file.zip");
+    /// let task: Task =
+    ///     Task::try_from("https://example.com/file.zip").unwrap().target_path(&"file.zip");
     ///
     /// assert_eq!(task.target_path, "file.zip");
     ///
     /// let task: Task = Task::try_from("https://example.com/file.zip").unwrap();
     ///
     /// assert_eq!(task.target_path, "file.zip");
-    ///
     /// ```
     pub fn target_path<S: ToString>(mut self, target_path: &S) -> Self {
         self.target_path = target_path.to_string();
@@ -49,18 +49,12 @@ impl TryFrom<Url> for Task {
     type Error = DownloaderError;
 
     fn try_from(value: Url) -> Result<Self, Self::Error> {
-        let Some(target_path) = value
-            .path_segments()
-            .and_then(Iterator::last)
-            .map(String::from)
+        let Some(target_path) = value.path_segments().and_then(Iterator::last).map(String::from)
         else {
             return Err(DownloaderConfig::NoInferrablePath(value).into());
         };
 
-        Ok(Self {
-            url: value,
-            target_path,
-        })
+        Ok(Self { url: value, target_path })
     }
 }
 

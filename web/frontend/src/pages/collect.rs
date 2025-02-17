@@ -1,23 +1,23 @@
 //! Page for the collection of a sample.
 
-use crate::components::badge::BadgeSize;
-use crate::router::AppRoute;
-use crate::stores::app_state::AppState;
-use crate::stores::user_state::UserState;
-use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
+use std::rc::Rc;
 
-use crate::components::Badge;
-use gloo::timers::callback::Timeout;
-use gloo::utils::window;
-use web_common::database::User;
+use core_structures::User;
+use gloo::{timers::callback::Timeout, utils::window};
 use yew::prelude::*;
-use yew_agent::scope_ext::AgentScopeExt;
+use yew_agent::{prelude::WorkerBridgeHandle, scope_ext::AgentScopeExt};
 use yew_router::prelude::*;
 use yewdux::prelude::*;
 
-use crate::workers::WebsocketWorker;
-use std::rc::Rc;
-use yew_agent::prelude::WorkerBridgeHandle;
+use crate::{
+    components::{badge::BadgeSize, Badge},
+    router::AppRoute,
+    stores::{app_state::AppState, user_state::UserState},
+    workers::{
+        ws_worker::{ComponentMessage, WebsocketMessage},
+        WebsocketWorker,
+    },
+};
 
 pub struct Collect {
     user_state: Rc<UserState>,
@@ -50,15 +50,9 @@ impl Component for Collect {
         }));
 
         websocket.send(ComponentMessage::UserState(user_state.user()));
-        websocket.send(ComponentMessage::Connect(
-            window().location().hostname().unwrap(),
-        ));
+        websocket.send(ComponentMessage::Connect(window().location().hostname().unwrap()));
 
-        Self {
-            websocket,
-            user_state,
-            user_dispatch,
-        }
+        Self { websocket, user_state, user_dispatch }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -84,17 +78,17 @@ impl Component for Collect {
             ctx.link().navigator().unwrap().push(&AppRoute::Login);
         }
 
-        // If the user is logged in, but has not yet completed their profile, redirect to the profile page.
+        // If the user is logged in, but has not yet completed their profile, redirect
+        // to the profile page.
         if self.user_state.has_user() && !self.user_state.has_complete_profile() {
             ctx.link()
                 .navigator()
                 .unwrap()
-                .push(&AppRoute::UsersUpdate {
-                    id: self.user_state.id().unwrap(),
-                });
+                .push(&AppRoute::UsersUpdate { id: self.user_state.id().unwrap() });
         }
 
-        // If the user is logged in, but has not yet selected which project to work on, redirect to the project selection page.
+        // If the user is logged in, but has not yet selected which project to work on,
+        // redirect to the project selection page.
         if self.user_state.has_user()
             && self.user_state.has_complete_profile()
             && !self.user_state.has_project()
@@ -102,12 +96,11 @@ impl Component for Collect {
             ctx.link()
                 .navigator()
                 .unwrap()
-                .push(&AppRoute::ProjectSelection {
-                    source_page: AppRoute::Collect.to_path(),
-                });
+                .push(&AppRoute::ProjectSelection { source_page: AppRoute::Collect.to_path() });
         }
 
-        // If all of the above conditions are met, we display and start the QR code scanner.
+        // If all of the above conditions are met, we display and start the QR code
+        // scanner.
 
         Html::default()
     }

@@ -10,7 +10,8 @@ pub trait FormatMatch {
     /// * `query` - The query to match against.
     fn format_match<S: AsRef<str>>(&self, query: S) -> yew::Html;
 
-    /// Format the string for a given query using sublime_fuzzy if the query is present.
+    /// Format the string for a given query using sublime_fuzzy if the query is
+    /// present.
     ///
     /// # Arguments
     /// * `query` - The optional query to match against.

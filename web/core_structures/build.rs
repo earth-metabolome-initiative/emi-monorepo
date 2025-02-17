@@ -1,16 +1,16 @@
 //! Build the core structures.
+use std::{env, path::Path};
+
 use csqlv::{CSVSchema, CSVSchemaBuilder};
-use diesel::connection::SimpleConnection;
-use diesel::pg::PgConnection;
-use diesel::Connection;
+use diesel::{connection::SimpleConnection, pg::PgConnection, Connection};
 use diesel_migrations_utils::prelude::*;
-use std::env;
-use std::path::Path;
-use taxonomy_fetcher::impls::ncbi::{NCBIRank, NCBITaxonomy, NCBITaxonomyBuilder};
-use taxonomy_fetcher::{Rank, Taxonomy, TaxonomyBuilder};
+use taxonomy_fetcher::{
+    impls::ncbi::{NCBIRank, NCBITaxonomy, NCBITaxonomyBuilder},
+    Rank, Taxonomy, TaxonomyBuilder,
+};
 use webcodegen::{
     AuthorizationFunctionBuilder, Codegen, CompatibleForeignTypeConstraint, CustomColumnConstraint,
-    Table,
+    CustomTableConstraint, LowercaseColumnConstraint, LowercaseTableConstraint, Table,
 };
 
 const DATABASE_NAME: &str = "development.db";
@@ -60,7 +60,8 @@ pub async fn main() {
     let taxonomy: NCBITaxonomy = NCBITaxonomyBuilder::latest().build().await.unwrap();
     taxonomy.to_csv("csvs/taxa.csv").unwrap();
 
-    // Next, we build the SQL associated with the CSVs present in the 'csvs' directory
+    // Next, we build the SQL associated with the CSVs present in the 'csvs'
+    // directory
     let schema: CSVSchema = CSVSchemaBuilder::default()
         // To show a loading bar while processing the CSVs
         .verbose()
@@ -97,8 +98,8 @@ pub async fn main() {
     }
 
     // Now that the preliminary database setup is done, we can execute the Meta-SQL
-    // which takes care of the roles tables and canx functions, which determine whether
-    // a user can insert or update entries in a given table.
+    // which takes care of the roles tables and canx functions, which determine
+    // whether a user can insert or update entries in a given table.
     Table::create_roles_tables(&mut conn, DATABASE_NAME, None).unwrap();
     AuthorizationFunctionBuilder::default()
         .add_childless_table(Table::load(&mut conn, "users", None, DATABASE_NAME).unwrap())
@@ -107,9 +108,9 @@ pub async fn main() {
     Table::create_update_triggers(&mut conn, DATABASE_NAME, None).unwrap();
 
     // We check that the database follows the expected constraints.
-    CompatibleForeignTypeConstraint::default()
-        .check_all(DATABASE_NAME, None, &mut conn)
-        .unwrap();
+    CompatibleForeignTypeConstraint::default().check_all(DATABASE_NAME, None, &mut conn).unwrap();
+    LowercaseColumnConstraint::default().check_all(DATABASE_NAME, None, &mut conn).unwrap();
+    LowercaseTableConstraint::default().check_all(DATABASE_NAME, None, &mut conn).unwrap();
 
     // We write to the target directory the generated structs
 

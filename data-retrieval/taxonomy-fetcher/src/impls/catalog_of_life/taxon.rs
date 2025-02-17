@@ -1,8 +1,8 @@
-//! Submodule providing the implementation of the taxon trait for the Catalog of Life.
-
-use crate::traits::Taxon;
+//! Submodule providing the implementation of the taxon trait for the Catalog of
+//! Life.
 
 use super::{taxon_entry::CatalogOfLifeTaxonEntry, taxonomy::CatalogOfLifeTaxonomy};
+use crate::traits::Taxon;
 
 /// Entry of a taxon in the Catalog of Life taxonomy.
 pub struct CatalogOfLifeTaxon<'a> {

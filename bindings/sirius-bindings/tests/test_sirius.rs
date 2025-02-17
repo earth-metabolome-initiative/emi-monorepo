@@ -1,6 +1,7 @@
 //! # Test for the Sirius bindings
-use sirius_bindings::prelude::*;
 use std::path::Path;
+
+use sirius_bindings::prelude::*;
 
 #[test]
 #[should_panic]

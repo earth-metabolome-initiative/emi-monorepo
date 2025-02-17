@@ -1,6 +1,8 @@
 //! Submodule providing the CSV Column struct.
 
-use crate::{csv_table::CSVTable, data_types::DataType, metadata::CSVColumnMetadata, CSVSchemaError};
+use crate::{
+    csv_table::CSVTable, data_types::DataType, metadata::CSVColumnMetadata, CSVSchemaError,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a CSV column.
@@ -10,13 +12,12 @@ pub struct CSVColumn<'a> {
 }
 
 impl<'a> CSVColumn<'a> {
-    
     #[must_use]
     /// Returns the name of the column.
     pub fn name(&self) -> Result<String, CSVSchemaError> {
         self.column_metadata.name(self.table.schema)
     }
-    
+
     #[must_use]
     /// Returns the data type of the column.
     pub fn data_type(&self) -> &DataType {
@@ -49,19 +50,14 @@ impl<'a> CSVColumn<'a> {
 
     #[must_use]
     /// Returns the foreign key table, if any.
-    /// 
+    ///
     /// # Panics
-    /// * If the schema is in an invalid state and the foreign table does not exist.
+    /// * If the schema is in an invalid state and the foreign table does not
+    ///   exist.
     pub fn foreign_table(&self) -> Option<CSVTable<'_>> {
-        self.column_metadata
-            .foreign_table_name
-            .as_ref()
-            .map(|foreign_table_name| {
-                self.table
-                    .schema
-                    .table_from_name(foreign_table_name)
-                    .unwrap()
-            })
+        self.column_metadata.foreign_table_name.as_ref().map(|foreign_table_name| {
+            self.table.schema.table_from_name(foreign_table_name).unwrap()
+        })
     }
 
     #[must_use]

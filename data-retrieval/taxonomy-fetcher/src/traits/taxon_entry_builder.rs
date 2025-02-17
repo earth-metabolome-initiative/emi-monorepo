@@ -14,7 +14,6 @@ pub trait TaxonEntryBuilder: Sized {
     /// # Errors
     ///
     /// * [`TaxonEntryBuilderError`] when the identifier is not unique.
-    ///
     fn set_id(
         self,
         id: <Self::TaxonEntry as super::TaxonEntry>::Id,
@@ -39,7 +38,6 @@ pub trait TaxonEntryBuilder: Sized {
     /// # Arguments
     ///
     /// * `rank` - Rank of the taxon.
-    ///
     fn set_rank(
         self,
         rank: <Self::TaxonEntry as super::TaxonEntry>::Rank,
@@ -54,7 +52,6 @@ pub trait TaxonEntryBuilder: Sized {
     /// # Errors
     ///
     /// * [`TaxonEntryBuilderError`] when the parent identifier is not unique.
-    ///
     fn set_parent_id(
         self,
         parent_id: Option<<Self::TaxonEntry as super::TaxonEntry>::Id>,
@@ -70,8 +67,5 @@ pub trait TaxonEntryBuilder: Sized {
         taxon_builder: &TB,
     ) -> Result<Self::TaxonEntry, crate::errors::TaxonEntryBuilderError<Self::TaxonEntry>>
     where
-        TB: super::TaxonomyBuilder<
-            TaxonEntry = Self::TaxonEntry,
-            TaxonEntryBuilder = Self
-        >;
+        TB: super::TaxonomyBuilder<TaxonEntry = Self::TaxonEntry, TaxonEntryBuilder = Self>;
 }

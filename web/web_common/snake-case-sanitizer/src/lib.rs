@@ -1,6 +1,5 @@
 //! Crate to sanitize strings and convert them to snake_case.
 
-
 #[derive(Debug, PartialEq, Clone)]
 /// Errors that can occur during the sanitization process.
 pub enum SanitizationErrors {
@@ -28,13 +27,8 @@ pub struct Sanitizer<'a> {
 }
 
 /// Default replacements.
-pub const DEFAULT_REPLACEMENTS: [(&str, &str); 5] = [
-    ("°C", "celsius"),
-    ("°F", "fahrenheit"),
-    ("°", "degrees"),
-    ("%", "percent"),
-    ("$", "dollar")
-];
+pub const DEFAULT_REPLACEMENTS: [(&str, &str); 5] =
+    [("°C", "celsius"), ("°F", "fahrenheit"), ("°", "degrees"), ("%", "percent"), ("$", "dollar")];
 
 impl<'a> Sanitizer<'a> {
     /// Set whether to remove leading underscores.
@@ -58,7 +52,11 @@ impl<'a> Sanitizer<'a> {
     }
 
     /// Add a replacement to the Sanitizer.
-    pub fn add_replacement(mut self, needle: &'a str, replacement: &'a str) -> Result<Self, SanitizationErrors> {
+    pub fn add_replacement(
+        mut self,
+        needle: &'a str,
+        replacement: &'a str,
+    ) -> Result<Self, SanitizationErrors> {
         if needle.is_empty() {
             return Err(SanitizationErrors::EmptyNeedle);
         }
@@ -96,20 +94,20 @@ impl<'a> Sanitizer<'a> {
     }
 
     /// Sanitize the provided string.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `input` - The string to sanitize.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// The sanitized string.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * `SanitizationErrors::EmptyTerm` - The term was empty.
-    /// * `SanitizationErrors::OnlyUnderscores` - The term contained only underscores.
-    /// 
+    /// * `SanitizationErrors::OnlyUnderscores` - The term contained only
+    ///   underscores.
     pub fn to_snake_case<S: ToString>(&self, input: S) -> Result<String, SanitizationErrors> {
         let mut with_replacements = self.apply_replacement(input);
 
@@ -132,7 +130,7 @@ impl<'a> Sanitizer<'a> {
         let mut last_was_underscore = false;
         let mut last_was_uppercase = false;
 
-      for mut character in with_replacements.chars() {
+        for mut character in with_replacements.chars() {
             if !character.is_ascii_alphanumeric() {
                 character = '_';
             }
@@ -172,12 +170,16 @@ impl<'a> Sanitizer<'a> {
 
     /// Returns the string sanitized to CamelCase.
     pub fn to_camel_case<S: ToString>(&self, input: S) -> Result<String, SanitizationErrors> {
-        Ok(self.to_snake_case(input)?.split('_').map(|part| {
-            let mut chars = part.chars();
-            match chars.next() {
-                None => String::new(),
-                Some(first) => first.to_ascii_uppercase().to_string() + chars.as_str(),
-            }
-        }).collect())
+        Ok(self
+            .to_snake_case(input)?
+            .split('_')
+            .map(|part| {
+                let mut chars = part.chars();
+                match chars.next() {
+                    None => String::new(),
+                    Some(first) => first.to_ascii_uppercase().to_string() + chars.as_str(),
+                }
+            })
+            .collect())
     }
 }

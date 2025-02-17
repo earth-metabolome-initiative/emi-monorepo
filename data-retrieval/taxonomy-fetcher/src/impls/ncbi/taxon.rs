@@ -1,8 +1,7 @@
 //! Submodule providing the implementation of the taxon trait for NCBI.
 
-use crate::traits::Taxon;
-
 use super::{taxon_entry::NCBITaxonEntry, taxonomy::NCBITaxonomy};
+use crate::traits::Taxon;
 
 /// Entry of a taxon in the Open Tree of Life taxonomy.
 pub struct NCBITaxon<'a> {

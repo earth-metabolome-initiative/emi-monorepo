@@ -1,10 +1,11 @@
 //! Utilities regarding cookies that can be used in the frontend.
 //!
 //! # Implementative details
-//! There exist a type of cookie called `HttpOnly` cookies, which are not accessible from JavaScript.
-//! This is a security feature, and is used for cookies that are not meant to be accessed from JavaScript.
-//! As such, we will not be able to access the `HttpOnly` cookies from Yew, and these utilities solely
-//! exist to access cookies that are not `HttpOnly`.
+//! There exist a type of cookie called `HttpOnly` cookies, which are not
+//! accessible from JavaScript. This is a security feature, and is used for
+//! cookies that are not meant to be accessed from JavaScript. As such, we will
+//! not be able to access the `HttpOnly` cookies from Yew, and these utilities
+//! solely exist to access cookies that are not `HttpOnly`.
 use wasm_bindgen::JsCast;
 use web_common::api::oauth::jwt_cookies::USER_ONLINE_COOKIE_NAME;
 use web_sys::window;

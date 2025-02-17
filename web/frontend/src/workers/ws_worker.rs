@@ -1,19 +1,19 @@
+use std::{
+    collections::{HashMap, HashSet},
+    rc::Rc,
+};
+
 use futures::{SinkExt, StreamExt};
 use gloo::timers::callback::Timeout;
 use gloo_net::websocket::futures::WebSocket;
-use serde::Deserialize;
-use serde::Serialize;
-use std::collections::HashMap;
-use std::collections::HashSet;
-use std::rc::Rc;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use web_common::api::ws::messages::BackendMessage;
-use web_common::api::ws::messages::CloseReason;
-use web_common::api::ws::messages::FrontendMessage;
-use web_common::api::ApiError;
+use web_common::api::{
+    ws::messages::{BackendMessage, CloseReason, FrontendMessage},
+    ApiError,
+};
 use yew::platform::spawn_local;
-use yew_agent::worker::HandlerId;
-use yew_agent::worker::Worker;
+use yew_agent::worker::{HandlerId, Worker};
 
 const NOMINAL_CLOSURE_CODE: u16 = 1000;
 
@@ -36,49 +36,6 @@ pub enum ComponentMessage {
     UserState(Option<Rc<User>>),
     // Connect to the provided hostname.
     Connect(String),
-}
-
-impl ComponentMessage {
-    pub(crate) fn insert<R: Serialize + Tabular>(row: &R) -> Self {
-        Self::Operation(Operation::Insert(
-            R::TABLE.to_string(),
-            bincode::serialize(row).unwrap(),
-        ))
-    }
-
-    pub(crate) fn update<R: Serialize + Tabular>(row: &R) -> Self {
-        Self::Operation(Operation::Update(
-            R::TABLE.to_string(),
-            bincode::serialize(row).unwrap(),
-        ))
-    }
-
-    pub(crate) fn get<R: Tabular>(primary_key: PrimaryKey) -> Self {
-        Self::Operation(Operation::Select(Select::id(R::TABLE, primary_key)))
-    }
-
-    pub(crate) fn get_named<S: ToString, R: Tabular>(
-        operation_name: S,
-        primary_key: PrimaryKey,
-    ) -> Self {
-        Self::Operation(Operation::Select(Select::id_with_operation_name(
-            R::TABLE,
-            operation_name.to_string(),
-            primary_key,
-        )))
-    }
-
-    pub(crate) fn can_view<R: Tabular>(primary_key: PrimaryKey) -> Self {
-        Self::Operation(Operation::Select(Select::can_view(R::TABLE, primary_key)))
-    }
-
-    pub(crate) fn can_update<R: Tabular>(primary_key: PrimaryKey) -> Self {
-        Self::Operation(Operation::Select(Select::can_update(R::TABLE, primary_key)))
-    }
-
-    pub(crate) fn can_admin<R: Tabular>(primary_key: PrimaryKey) -> Self {
-        Self::Operation(Operation::Select(Select::can_admin(R::TABLE, primary_key)))
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -107,123 +64,6 @@ pub enum InternalMessage {
 }
 
 impl WebsocketWorker {
-    fn connect_to_database(
-        scope: yew_agent::prelude::WorkerScope<Self>,
-    ) -> futures::channel::mpsc::Sender<DatabaseMessage> {
-        let (sender, mut receiver) = futures::channel::mpsc::channel::<DatabaseMessage>(1000);
-
-        spawn_local(async move {
-            let mut database = create_database().await;
-
-            while let Some((task_id, user_id, operation)) = receiver.next().await {
-                // TODO!
-                // HANDLE THAT THE USER IS AUTHORIZED TO DO THE OPERATION!
-                // DO NOT ALLOW OFFLINE USERS TO DO ILLEGAL OPERATIONS!
-
-                scope.send_message(InternalMessage::Backend(match operation {
-                    Operation::Delete(table_name, primary_key) => {
-                        let table: Table = table_name.try_into().unwrap();
-                        match table.delete_from_id(primary_key, &mut database).await {
-                            Ok(_number_of_affected_rows) => {
-                                BackendMessage::Completed(task_id, None)
-                            }
-                            Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
-                        }
-                    }
-                    Operation::Insert(table_name, serialized_row) => {
-                        let table: Table = table_name.try_into().unwrap();
-                        match table
-                            .insert(serialized_row, user_id.unwrap(), &mut database)
-                            .await
-                        {
-                            Ok(row) => BackendMessage::Completed(task_id, Some(row)),
-                            Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
-                        }
-                    }
-                    Operation::Select(select) => match select {
-                        Select::Id {
-                            table_name,
-                            operation_name,
-                            primary_key,
-                        } => {
-                            let table: Table = table_name.try_into().unwrap();
-
-                            match table.get(primary_key, &mut database).await {
-                                Ok(Some(row)) => {
-                                    BackendMessage::GetTable(task_id, operation_name, row)
-                                }
-                                Ok(None) => BackendMessage::Error(
-                                    task_id,
-                                    ApiError::BadRequest(vec![
-                                        "No row found with the given primary key".to_string(),
-                                    ]),
-                                ),
-                                Err(err) => BackendMessage::Error(task_id, err),
-                            }
-                        }
-                        Select::SearchTable {
-                            table_name,
-                            query,
-                            limit,
-                            offset,
-                            filter,
-                        } => {
-                            let table: Table = table_name.try_into().unwrap();
-                            let lowercase_query = query.to_lowercase();
-                            match table
-                                .search(
-                                    &lowercase_query,
-                                    filter,
-                                    Some(limit),
-                                    Some(offset),
-                                    &mut database,
-                                )
-                                .await
-                            {
-                                Ok(rows) => BackendMessage::SearchTable(task_id, rows),
-                                Err(err) => BackendMessage::Error(task_id, err),
-                            }
-                        }
-                        Select::SearchEditableTable { .. } => {
-                            todo!()
-                        }
-                        Select::SearchAll { query, limit } => {
-                            match search_all(&query, Some(limit), None, &mut database).await {
-                                Ok(rows) => BackendMessage::SearchTable(
-                                    task_id,
-                                    bincode::serialize(&rows).unwrap(),
-                                ),
-                                Err(err) => BackendMessage::Error(task_id, err),
-                            }
-                        }
-                        Select::CanView { .. } => {
-                            todo!()
-                        }
-                        Select::CanUpdate { .. } => {
-                            todo!()
-                        }
-                        Select::CanDelete { .. } => {
-                            todo!()
-                        }
-                    },
-                    Operation::Update(table_name, serialized_row) => {
-                        let table: Table = table_name.try_into().unwrap();
-                        match table
-                            .update(serialized_row, user_id.unwrap(), &mut database)
-                            .await
-                        {
-                            Ok(row) => BackendMessage::Completed(task_id, Some(row)),
-                            Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
-                        }
-                    }
-                }));
-            }
-            log::debug!("Database sender closed");
-        });
-
-        sender
-    }
-
     fn connect_to_websocket(
         hostname: &str,
         scope: &yew_agent::prelude::WorkerScope<Self>,
@@ -262,14 +102,16 @@ impl WebsocketWorker {
             spawn_local(async move {
                 while let Some(backend_message) = read.next().await {
                     match backend_message {
-                        Ok(message) => match message.try_into() {
-                            Ok(message) => {
-                                scope.send_message(InternalMessage::Backend(message));
+                        Ok(message) => {
+                            match message.try_into() {
+                                Ok(message) => {
+                                    scope.send_message(InternalMessage::Backend(message));
+                                }
+                                Err(err) => {
+                                    log::error!("Error deserializing message: {:?}", err);
+                                }
                             }
-                            Err(err) => {
-                                log::error!("Error deserializing message: {:?}", err);
-                            }
-                        },
+                        }
                         Err(err) => {
                             log::error!("Error reading from websocket: {:?}", err);
                             break;
@@ -386,8 +228,8 @@ impl Worker for WebsocketWorker {
                     }
                     ComponentMessage::Operation(operation) => {
                         if operation.requires_authentication() && self.user.is_none() {
-                            // When the user is offline, but some operation requires authentication, we need to
-                            // return an error.
+                            // When the user is offline, but some operation requires authentication,
+                            // we need to return an error.
                             log::error!("Unauthorized operation: {:?}", operation);
                             scope.respond(
                                 subscriber_id,

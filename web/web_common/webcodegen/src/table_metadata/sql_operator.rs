@@ -1,14 +1,16 @@
-use crate::errors::WebCodeGenError;
-use crate::table_metadata::pg_type::postgres_type_to_diesel;
-use crate::table_metadata::pg_type::postgres_type_to_diesel_str;
 use diesel::PgConnection;
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
-
 use quote::quote;
 use syn::{File, Ident, Type};
 
-use crate::table_metadata::sql_function::UNSUPPORTED_DATA_TYPES;
+use crate::{
+    errors::WebCodeGenError,
+    table_metadata::{
+        pg_type::{postgres_type_to_diesel, postgres_type_to_diesel_str},
+        sql_function::UNSUPPORTED_DATA_TYPES,
+    },
+};
 
 /// A struct representing a SQL operator
 pub struct SQLOperator {
@@ -24,12 +26,8 @@ pub struct SQLOperator {
     pub name: String,
 }
 
-const DEPRECATED_OPERATORS: &[(&str, &str)] = &[
-    ("point_above", ">^"),
-    ("point_below", "<^"),
-    ("ts_match_vq", "@@@"),
-    ("ts_match_qv", "@@@"),
-];
+const DEPRECATED_OPERATORS: &[(&str, &str)] =
+    &[("point_above", ">^"), ("point_below", "<^"), ("ts_match_vq", "@@@"), ("ts_match_qv", "@@@")];
 
 impl SQLOperator {
     /// Load all the SQL operators from the database
@@ -40,16 +38,16 @@ impl SQLOperator {
     ///
     /// # Returns
     ///
-    /// A `Result` containing a `Vec` of `SQLOperator` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// A `Result` containing a `Vec` of `SQLOperator` if the operation was
+    /// successful, or a `WebCodeGenError` if an error occurred
     ///
     /// # Errors
     ///
     /// If an error occurs while loading the operators from the database
     pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
-        use crate::schema::pg_operator;
-        use crate::schema::pg_proc;
-        use crate::schema::pg_type;
         use diesel::prelude::*;
+
+        use crate::schema::{pg_operator, pg_proc, pg_type};
 
         let (left_pg_type, right_pg_type, return_pg_type) = diesel::alias!(
             pg_type as left_pg_type_alias,
@@ -86,32 +84,28 @@ impl SQLOperator {
             .map_err(WebCodeGenError::from)
             .and_then(|rows| {
                 rows.into_iter()
-                    .filter(
-                        |(symbol, left_operand_type, right_operand_type, result_type, name)| {
-                            if UNSUPPORTED_DATA_TYPES.contains(&left_operand_type.as_str())
-                                || UNSUPPORTED_DATA_TYPES.contains(&right_operand_type.as_str())
-                                || UNSUPPORTED_DATA_TYPES.contains(&result_type.as_str())
-                            {
-                                return false;
-                            }
-                            if DEPRECATED_OPERATORS.contains(&(name.as_str(), symbol.as_str())) {
-                                return false;
-                            }
+                    .filter(|(symbol, left_operand_type, right_operand_type, result_type, name)| {
+                        if UNSUPPORTED_DATA_TYPES.contains(&left_operand_type.as_str())
+                            || UNSUPPORTED_DATA_TYPES.contains(&right_operand_type.as_str())
+                            || UNSUPPORTED_DATA_TYPES.contains(&result_type.as_str())
+                        {
+                            return false;
+                        }
+                        if DEPRECATED_OPERATORS.contains(&(name.as_str(), symbol.as_str())) {
+                            return false;
+                        }
 
-                            true
-                        },
-                    )
-                    .map(
-                        |(symbol, left_operand_type, right_operand_type, result_type, name)| {
-                            Ok(Self {
-                                symbol,
-                                left_operand_type,
-                                right_operand_type,
-                                result_type,
-                                name,
-                            })
-                        },
-                    )
+                        true
+                    })
+                    .map(|(symbol, left_operand_type, right_operand_type, result_type, name)| {
+                        Ok(Self {
+                            symbol,
+                            left_operand_type,
+                            right_operand_type,
+                            result_type,
+                            name,
+                        })
+                    })
                     .collect()
             })
     }
@@ -169,10 +163,8 @@ impl SQLOperator {
         let left_type = self.left_operand_type()?;
         let right_type = self.right_operand_type()?;
 
-        let sanitized_name = Ident::new(
-            self.name.replace('.', "_").as_str(),
-            proc_macro2::Span::call_site(),
-        );
+        let sanitized_name =
+            Ident::new(self.name.replace('.', "_").as_str(), proc_macro2::Span::call_site());
         let trait_name = Ident::new(
             format!("Has{}", self.struct_name()).as_str(),
             proc_macro2::Span::call_site(),
@@ -207,16 +199,18 @@ impl SQLOperator {
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// * `output_path` - The path to the file where the generated code will be written
+    /// * `output_path` - The path to the file where the generated code will be
+    ///   written
     ///
     /// # Returns
     ///
-    /// A `Result` containing `()` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// A `Result` containing `()` if the operation was successful, or a
+    /// `WebCodeGenError` if an error occurred
     ///
     /// # Errors
     ///
-    /// If an error occurs while loading the operators from the database, or while writing the generated code to the output file
-    ///
+    /// If an error occurs while loading the operators from the database, or
+    /// while writing the generated code to the output file
     pub fn write_all(conn: &mut PgConnection, output_path: &str) -> Result<(), WebCodeGenError> {
         let operators = Self::load_all(conn)?;
 
@@ -227,10 +221,7 @@ impl SQLOperator {
             .collect::<Vec<_>>();
 
         // We convert the types to TokenStream
-        let operators = operators
-            .iter()
-            .map(SQLOperator::to_syn)
-            .collect::<Result<Vec<_>, _>>()?;
+        let operators = operators.iter().map(SQLOperator::to_syn).collect::<Result<Vec<_>, _>>()?;
 
         // Create a new TokenStream
         let output = quote! {

@@ -7,8 +7,7 @@ pub mod form_traits;
 pub mod oauth;
 pub mod ws;
 
-use validator::ValidationError;
-use validator::ValidationErrors;
+use validator::{ValidationError, ValidationErrors};
 
 use crate::custom_validators::validation_errors::ValidationErrorToString;
 
@@ -50,11 +49,13 @@ impl ToString for JPEGError {
             JPEGError::ImageTooDark => "The provided image is too dark.".to_string(),
             JPEGError::ImageTooLight => "The provided image is too light.".to_string(),
             JPEGError::ImageIsBlurry => "The provided image is blurry.".to_string(),
-            JPEGError::ImageHasFewColors => concat!(
-                "The image contains a very limited number of colors. ",
-                "Therefore, it is unlikely to be a photograph."
-            )
-            .to_string(),
+            JPEGError::ImageHasFewColors => {
+                concat!(
+                    "The image contains a very limited number of colors. ",
+                    "Therefore, it is unlikely to be a photograph."
+                )
+                .to_string()
+            }
             JPEGError::UnableToEncode => "Unable to encode image.".to_string(),
         }
     }
@@ -106,27 +107,33 @@ impl ApiError {
             Self::NoResults => "search",
             Self::InvalidFileFormat(_) => "file-circle-exclamation",
             Self::Empty(_) => "puzzle-piece",
-            Self::JPEGError(e) => match e {
-                JPEGError::InvalidImage => "file-image",
-                JPEGError::ImageTooSmall => "expand-arrows-alt",
-                JPEGError::ImageHasTransparency => "file-image",
-                JPEGError::ImageTooDark => "moon",
-                JPEGError::ImageTooLight => "sun",
-                JPEGError::ImageIsBlurry => "eye-slash",
-                JPEGError::ImageHasFewColors => "palette",
-                JPEGError::UnableToEncode => "file-image",
-            },
-            Self::DeviceError(e) => match e {
-                DeviceError::NoCameras => "camera",
-                DeviceError::DeviceStoppedResponding => "heart-crack",
-            },
-            Self::Geolocation(e) => match e {
-                GeolocationError::NotSupported => "person-circle-question",
-                GeolocationError::PermissionDenied => "lock",
-                GeolocationError::PositionUnavailable => "person-circle-question",
-                GeolocationError::Timeout => "stopwatch",
-                GeolocationError::Unknown(_) => "map-location-dot",
-            },
+            Self::JPEGError(e) => {
+                match e {
+                    JPEGError::InvalidImage => "file-image",
+                    JPEGError::ImageTooSmall => "expand-arrows-alt",
+                    JPEGError::ImageHasTransparency => "file-image",
+                    JPEGError::ImageTooDark => "moon",
+                    JPEGError::ImageTooLight => "sun",
+                    JPEGError::ImageIsBlurry => "eye-slash",
+                    JPEGError::ImageHasFewColors => "palette",
+                    JPEGError::UnableToEncode => "file-image",
+                }
+            }
+            Self::DeviceError(e) => {
+                match e {
+                    DeviceError::NoCameras => "camera",
+                    DeviceError::DeviceStoppedResponding => "heart-crack",
+                }
+            }
+            Self::Geolocation(e) => {
+                match e {
+                    GeolocationError::NotSupported => "person-circle-question",
+                    GeolocationError::PermissionDenied => "lock",
+                    GeolocationError::PositionUnavailable => "person-circle-question",
+                    GeolocationError::Timeout => "stopwatch",
+                    GeolocationError::Unknown(_) => "map-location-dot",
+                }
+            }
         }
     }
 
@@ -258,19 +265,23 @@ impl From<diesel::result::Error> for ApiError {
                 log::error!("Database error {:?}: message: {:?}, details: {:?}, hint: {:?}, table_name: {:?}, column_name: {:?}, constraint_name: {:?}, statement_position: {:?}", kind, information.message(), information.details(), information.hint(), information.table_name(), information.column_name(), information.constraint_name(), information.statement_position());
 
                 match kind {
-                    diesel::result::DatabaseErrorKind::UniqueViolation => Self::BadRequest(vec![
-                        "You are attempting to create a duplicate entry".to_string(),
-                    ]),
+                    diesel::result::DatabaseErrorKind::UniqueViolation => {
+                        Self::BadRequest(vec![
+                            "You are attempting to create a duplicate entry".to_string()
+                        ])
+                    }
                     diesel::result::DatabaseErrorKind::ForeignKeyViolation => {
                         Self::BadRequest(vec![
                             "You are attempting to create a reference to a non-existent entry"
                                 .to_string(),
                         ])
                     }
-                    _ => match information.message() {
-                        "unauthorized_update" => Self::Unauthorized,
-                        _ => Self::InternalServerError,
-                    },
+                    _ => {
+                        match information.message() {
+                            "unauthorized_update" => Self::Unauthorized,
+                            _ => Self::InternalServerError,
+                        }
+                    }
                 }
             }
             diesel::result::Error::NotFound => {
@@ -284,25 +295,17 @@ impl From<diesel::result::Error> for ApiError {
     }
 }
 
-#[cfg(feature = "backend")]
-impl From<diesel::r2d2::Error> for ApiError {
-    fn from(e: diesel::r2d2::Error) -> Self {
-        log::error!("Database connection error: {:?}", e);
-        Self::InternalServerError
-    }
-}
-
-#[cfg(feature = "backend")]
-impl From<r2d2::Error> for ApiError {
-    fn from(e: r2d2::Error) -> Self {
-        log::error!("Database connection error: {:?}", e);
-        Self::InternalServerError
-    }
-}
-
 impl From<image::ImageError> for ApiError {
     fn from(e: image::ImageError) -> Self {
         log::error!("Image error: {:?}", e);
+        Self::InternalServerError
+    }
+}
+
+#[cfg(feature = "backend")]
+impl From<diesel_async::pooled_connection::bb8::RunError> for ApiError {
+    fn from(e: diesel_async::pooled_connection::bb8::RunError) -> Self {
+        log::error!("Database pool error: {:?}", e);
         Self::InternalServerError
     }
 }
@@ -341,8 +344,10 @@ impl From<ApiError> for actix_web::HttpResponse {
             ApiError::InternalServerError => {
                 actix_web::HttpResponse::InternalServerError().finish()
             }
-            ApiError::InvalidFileFormat(format) => actix_web::HttpResponse::BadRequest()
-                .json(format!("Invalid file format: {}", format)),
+            ApiError::InvalidFileFormat(format) => {
+                actix_web::HttpResponse::BadRequest()
+                    .json(format!("Invalid file format: {}", format))
+            }
             ApiError::JPEGError(e) => actix_web::HttpResponse::BadRequest().json(e.to_string()),
             ApiError::DeviceError(e) => actix_web::HttpResponse::BadRequest().json(e.to_string()),
             ApiError::Geolocation(e) => actix_web::HttpResponse::BadRequest().json(e.to_string()),

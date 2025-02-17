@@ -1,8 +1,10 @@
-use crate::custom_schema_constraints::ConstraintError;
-use crate::custom_schema_constraints::CustomColumnConstraint;
-use crate::errors::WebCodeGenError;
-use crate::Column;
 use diesel::pg::PgConnection;
+
+use crate::{
+    custom_schema_constraints::{ConstraintError, CustomColumnConstraint},
+    errors::WebCodeGenError,
+    Column,
+};
 
 #[derive(Default)]
 /// Constraint to enforce that all column names are lower case.
@@ -16,7 +18,7 @@ impl CustomColumnConstraint for LowercaseColumnConstraint {
     ) -> Result<(), WebCodeGenError> {
         if column.column_name.chars().any(char::is_uppercase) {
             return Err(
-                ConstraintError::UnexpectedUppercaseColumn(column.column_name.clone()).into(),
+                ConstraintError::UnexpectedUppercaseColumn(column.column_name.clone()).into()
             );
         }
         Ok(())

@@ -1,13 +1,12 @@
-use crate::utils::is_mobile_device;
-use gloo::timers::callback::Interval;
-use gloo::timers::callback::Timeout;
+use gloo::timers::callback::{Interval, Timeout};
 use wasm_bindgen::JsCast;
-use web_common::api::ApiError;
-use web_common::api::DeviceError;
+use web_common::api::{ApiError, DeviceError};
 use web_sys::{
     CanvasRenderingContext2d, HtmlCanvasElement, HtmlVideoElement, MediaStream, MediaStreamTrack,
 };
 use yew::prelude::*;
+
+use crate::utils::is_mobile_device;
 mod barcode_preprocessing;
 mod decode_barcode;
 use decode_barcode::decode_barcode;
@@ -199,8 +198,7 @@ impl Component for Scanner {
                     ) {
                     Ok(promise) => promise,
                     Err(error) => {
-                        ctx.link()
-                            .send_message(ScannerMessage::Error(ApiError::from(error)));
+                        ctx.link().send_message(ScannerMessage::Error(ApiError::from(error)));
                         return false;
                     }
                 };
@@ -216,8 +214,7 @@ impl Component for Scanner {
             }
             ScannerMessage::Authorized(stream) => {
                 self.authorized = true;
-                ctx.link()
-                    .send_message(ScannerMessage::ReceivedStream(stream));
+                ctx.link().send_message(ScannerMessage::ReceivedStream(stream));
                 false
             }
             ScannerMessage::VideoTimeUpdate => {
@@ -265,7 +262,8 @@ impl Component for Scanner {
                     .cast::<HtmlCanvasElement>()
                     .expect("canvas should be an HtmlCanvasElement");
 
-                // We prepare context options with desynchronized flag to avoid blocking the main thread.
+                // We prepare context options with desynchronized flag to avoid blocking the
+                // main thread.
 
                 let context_options = js_sys::Object::new();
                 js_sys::Reflect::set(
@@ -313,8 +311,7 @@ impl Component for Scanner {
                     .unwrap();
 
                 if let Err(error) = context.draw_image_with_html_video_element(&video, 0.0, 0.0) {
-                    ctx.link()
-                        .send_message(ScannerMessage::Error(ApiError::from(error)));
+                    ctx.link().send_message(ScannerMessage::Error(ApiError::from(error)));
                     return false;
                 }
 
@@ -366,10 +363,9 @@ impl Component for Scanner {
                                 self.number_of_scan_attempts += 1;
                             }
                             error => {
-                                ctx.link()
-                                    .send_message(ScannerMessage::Error(ApiError::from(vec![
-                                        error.to_string(),
-                                    ])));
+                                ctx.link().send_message(ScannerMessage::Error(ApiError::from(
+                                    vec![error.to_string()],
+                                )));
                             }
                         }
                     }
@@ -391,8 +387,7 @@ impl Component for Scanner {
 
                 if !self.authorized {
                     self.status = ScannerStatus::RetrievingAuthorization;
-                    ctx.link()
-                        .send_message(ScannerMessage::RequireAuthorization);
+                    ctx.link().send_message(ScannerMessage::RequireAuthorization);
                     return true;
                 }
 
@@ -528,24 +523,13 @@ impl Component for Scanner {
 
         let classes = format!(
             "active-scanner-ui{}{}{}",
-            if self.video_ready && self.stream_ready {
-                ""
-            } else {
-                " loading"
-            },
-            if self.closing.is_some() {
-                " closing"
-            } else {
-                " opening"
-            },
+            if self.video_ready && self.stream_ready { "" } else { " loading" },
+            if self.closing.is_some() { " closing" } else { " opening" },
             if self.mirrored { " mirrored" } else { "" }
         );
 
-        let flash_light_message = if self.is_flashlight_on {
-            "Turn off flashlight"
-        } else {
-            "Turn on flashlight"
-        };
+        let flash_light_message =
+            if self.is_flashlight_on { "Turn off flashlight" } else { "Turn on flashlight" };
 
         html! {
             <>

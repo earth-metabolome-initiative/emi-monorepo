@@ -1,8 +1,8 @@
 //! Submodule defining the possible errors encountered during a download task.
+use std::{convert::Infallible, fmt::Debug, io::Error as IoError};
+
 use reqwest::Error as ReqwestError;
-use std::{convert::Infallible, fmt::Debug};
 use url::{ParseError, Url};
-use std::io::Error as IoError;
 use zip::result::ZipError;
 
 #[derive(Debug)]

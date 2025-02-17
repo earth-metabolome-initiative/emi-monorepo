@@ -1,9 +1,10 @@
 //! Test whether the OTOL taxonomy fetcher works as expected.
 
 use strum::IntoEnumIterator;
-use taxonomy_fetcher::impls::open_tree_of_life::OpenTreeOfLifeTaxonomyBuilder;
-use taxonomy_fetcher::impls::open_tree_of_life::OpenTreeOfLifeVersion;
-use taxonomy_fetcher::TaxonomyBuilder;
+use taxonomy_fetcher::{
+    impls::open_tree_of_life::{OpenTreeOfLifeTaxonomyBuilder, OpenTreeOfLifeVersion},
+    TaxonomyBuilder,
+};
 
 #[tokio::test]
 async fn test_all_otol() {

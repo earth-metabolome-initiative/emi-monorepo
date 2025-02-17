@@ -1,6 +1,8 @@
-//! Submodule implementing the TaxonEntryBuilder trait for the Open Tree of Life taxonomy.
+//! Submodule implementing the TaxonEntryBuilder trait for the Open Tree of Life
+//! taxonomy.
 
-/// Implementation of the taxon entry builder for the Open Tree of Life taxonomy.
+/// Implementation of the taxon entry builder for the Open Tree of Life
+/// taxonomy.
 pub type OpenTreeOfLifeTaxonEntryBuilder =
     crate::impls::generic::taxon_entry_builder::GenericTaxonEntryBuilder<
         u32,

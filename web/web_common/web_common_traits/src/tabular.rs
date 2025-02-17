@@ -3,7 +3,8 @@
 
 use crate::prelude::Connection;
 
-/// Trait representing metadata associated to structs that are stored in a tabular format.
+/// Trait representing metadata associated to structs that are stored in a
+/// tabular format.
 pub trait Tabular {
     /// Type of the connection associated to the struct.
     type Connection: Connection;

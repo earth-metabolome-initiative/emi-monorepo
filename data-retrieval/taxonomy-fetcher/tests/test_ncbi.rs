@@ -1,11 +1,11 @@
 //! Test whether the NCBI taxonomy fetcher works as expected.
 
-use indicatif::ProgressBar;
-use indicatif::ProgressIterator;
+use indicatif::{ProgressBar, ProgressIterator};
 use strum::IntoEnumIterator;
-use taxonomy_fetcher::impls::ncbi::NCBITaxonomyBuilder;
-use taxonomy_fetcher::impls::ncbi::NCBIVersion;
-use taxonomy_fetcher::TaxonomyBuilder;
+use taxonomy_fetcher::{
+    impls::ncbi::{NCBITaxonomyBuilder, NCBIVersion},
+    TaxonomyBuilder,
+};
 
 #[tokio::test]
 async fn test_all_ncbi() {

@@ -1,483 +1,23 @@
-//! Module providing a yew component for a basic page with a websocket connection.
+//! Module providing a yew component for a basic page with a websocket
+//! connection.
 use std::rc::Rc;
 
-use crate::router::*;
-use crate::stores::user_state::UserState;
-use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
-use crate::workers::WebsocketWorker;
 use serde::de::DeserializeOwned;
 use web_common::api::form_traits::FormMethod;
-use web_common::database::PrimaryKey;
-use web_common::database::*;
 use yew::prelude::*;
-use yew_agent::prelude::WorkerBridgeHandle;
-use yew_agent::scope_ext::AgentScopeExt;
-use yew_router::prelude::Link;
-use yew_router::scope_ext::RouterScopeExt;
+use yew_agent::{prelude::WorkerBridgeHandle, scope_ext::AgentScopeExt};
+use yew_router::{prelude::Link, scope_ext::RouterScopeExt};
 use yewdux::Dispatch;
 
 use super::RowToBadge;
-
-pub(crate) trait PageLike:
-    RowToBadge + DeserializeOwned + Filtrable + Viewable + PartialEq + Clone + Tabular + 'static
-{
-    fn section() -> String {
-        let mut section = Self::TABLE.to_string().replace("_", " ");
-        if let Some(r) = section.get_mut(0..1) {
-            r.make_ascii_uppercase();
-        }
-        section
-    }
-
-    fn id(&self) -> PrimaryKey;
-
-    fn update_path(&self) -> Option<AppRoute> {
-        None
-    }
-
-    /// Create a path to create a new item.
-    ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the path.
-    fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        None
-    }
-
-    /// Returns font-awesome icon associated with the page type.
-    fn icon() -> &'static str;
-}
-
-impl PageLike for NestedRank {
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-
-    fn icon() -> &'static str {
-        "dna"
-    }
-}
-
-impl PageLike for NestedDerivedSample {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.parent_sample_id, self.inner.child_sample_id).into()
-    }
-
-    fn icon() -> &'static str {
-        "vial"
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        Some(self.update_route())
-    }
-}
-
-impl PageLike for NestedTaxon {
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-
-    fn icon() -> &'static str {
-        "dna"
-    }
-}
-
-impl PageLike for NestedOrganismTaxon {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.organism_id, self.inner.taxon_id).into()
-    }
-
-    fn icon() -> &'static str {
-        "dna"
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-}
-
-impl PageLike for NestedSampleTaxon {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.sample_id, self.inner.taxon_id).into()
-    }
-
-    fn icon() -> &'static str {
-        "dna"
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-}
-
-impl PageLike for NestedTeamsUsersRoleRequest {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.table_id, self.inner.user_id).into()
-    }
-
-    fn icon() -> &'static str {
-        NestedTeam::icon()
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        // Some(Self::new_route(filter))
-        None
-    }
-}
-
-impl PageLike for Country {
-    fn id(&self) -> PrimaryKey {
-        self.id.into()
-    }
-
-    fn icon() -> &'static str {
-        "globe"
-    }
-}
-
-impl PageLike for NestedSampleState {
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-
-    fn icon() -> &'static str {
-        "vial"
-    }
-}
-
-impl PageLike for UsersUsersRole {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.table_id, self.inner.user_id).into()
-    }
-
-    fn icon() -> &'static str {
-        "users"
-    }
-}
-
-impl PageLike for NestedTeamsUsersRole {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.table_id, self.inner.user_id).into()
-    }
-
-    fn icon() -> &'static str {
-        NestedTeam::icon()
-    }
-}
-
-impl PageLike for UsersUsersRoleRequest {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.table_id, self.inner.user_id).into()
-    }
-
-    fn icon() -> &'static str {
-        "users"
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        // Some(Self::new_route(filter))
-        None
-    }
-}
-
-impl PageLike for UsersUsersRoleInvitation {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.table_id, self.inner.user_id).into()
-    }
-
-    fn icon() -> &'static str {
-        "users"
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-}
-
-impl PageLike for NestedTeamsUsersRoleInvitation {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.table_id, self.inner.user_id).into()
-    }
-
-    fn icon() -> &'static str {
-        NestedTeam::icon()
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-}
-
-impl PageLike for NestedTeamsTeamsRoleInvitation {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.table_id, self.inner.team_id).into()
-    }
-
-    fn icon() -> &'static str {
-        NestedTeam::icon()
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-}
-
-impl PageLike for NestedProjectsUsersRoleRequest {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.table_id, self.inner.user_id).into()
-    }
-
-    fn icon() -> &'static str {
-        NestedProject::icon()
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        // Some(Self::new_route(filter))
-        None
-    }
-}
-
-impl PageLike for NestedProjectsUsersRoleInvitation {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.table_id, self.inner.user_id).into()
-    }
-
-    fn icon() -> &'static str {
-        NestedProject::icon()
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-}
-
-impl PageLike for NestedProjectsUsersRole {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.table_id, self.inner.user_id).into()
-    }
-
-    fn icon() -> &'static str {
-        NestedProject::icon()
-    }
-}
-
-impl PageLike for NestedProjectsTeamsRoleRequest {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.table_id, self.inner.team_id).into()
-    }
-
-    fn icon() -> &'static str {
-        NestedProject::icon()
-    }
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        // Some(Self::new_route(filter))
-        None
-    }
-}
-
-impl PageLike for NestedProjectsTeamsRole {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.table_id, self.inner.team_id).into()
-    }
-
-    fn icon() -> &'static str {
-        NestedProject::icon()
-    }
-}
-
-impl PageLike for NestedProjectsTeamsRoleInvitation {
-    fn id(&self) -> PrimaryKey {
-        (self.inner.table_id, self.inner.team_id).into()
-    }
-
-    fn icon() -> &'static str {
-        NestedProject::icon()
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-}
-
-impl PageLike for NestedProject {
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        Some(self.update_route())
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-
-    fn icon() -> &'static str {
-        "diagram-project"
-    }
-}
-
-impl PageLike for NestedOrganization {
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-
-    fn icon() -> &'static str {
-        "sitemap"
-    }
-}
-
-impl PageLike for NestedObservationSubject {
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-
-    fn icon() -> &'static str {
-        "dna"
-    }
-}
-
-impl PageLike for NestedObservation {
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        Some(self.update_route())
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-
-    fn icon() -> &'static str {
-        "tower-observation"
-    }
-}
-
-impl PageLike for NestedSpectraCollection {
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        Some(self.update_route())
-    }
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-
-    fn icon() -> &'static str {
-        "flask-vial"
-    }
-}
-
-impl PageLike for NestedNameplate {
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        Some(self.update_route())
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-
-    fn icon() -> &'static str {
-        "tag"
-    }
-}
-
-impl PageLike for NestedOrganism {
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        Some(self.update_route())
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-
-    fn icon() -> &'static str {
-        "dna"
-    }
-}
-
-impl PageLike for NestedSample {
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        Some(self.update_route())
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-
-    fn icon() -> &'static str {
-        "vial"
-    }
-}
-
-impl PageLike for User {
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        Some(self.update_route())
-    }
-
-    fn icon() -> &'static str {
-        "users"
-    }
-}
-
-impl PageLike for NestedTeam {
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        Some(self.update_route())
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-
-    fn icon() -> &'static str {
-        "people-group"
-    }
-}
-
-impl PageLike for NestedSampleContainer {
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        Some(self.update_route())
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
-    }
-
-    fn icon() -> &'static str {
-        "box"
-    }
-}
+use crate::{
+    router::*,
+    stores::user_state::UserState,
+    workers::{
+        ws_worker::{ComponentMessage, WebsocketMessage},
+        WebsocketWorker,
+    },
+};
 
 #[derive(Properties, Clone, PartialEq)]
 pub(crate) struct PageProps<Page>
@@ -544,20 +84,13 @@ impl<Page: PageLike> Component for BasicPage<Page> {
     }
 
     fn rendered(&mut self, ctx: &Context<Self>, _first_render: bool) {
-        if self
-            .page
-            .as_ref()
-            .map_or(true, |p| p.id() != ctx.props().id)
-        {
-            self.websocket
-                .send(ComponentMessage::can_view::<Page>(ctx.props().id));
+        if self.page.as_ref().map_or(true, |p| p.id() != ctx.props().id) {
+            self.websocket.send(ComponentMessage::can_view::<Page>(ctx.props().id));
             if self.user_state.has_user() {
                 if Page::create_path(None).is_some() {
-                    self.websocket
-                        .send(ComponentMessage::can_admin::<Page>(ctx.props().id));
+                    self.websocket.send(ComponentMessage::can_admin::<Page>(ctx.props().id));
                 }
-                self.websocket
-                    .send(ComponentMessage::can_update::<Page>(ctx.props().id));
+                self.websocket.send(ComponentMessage::can_update::<Page>(ctx.props().id));
             }
         }
     }
@@ -566,46 +99,44 @@ impl<Page: PageLike> Component for BasicPage<Page> {
         match msg {
             PageMessage::UserState(user_state) => {
                 if user_state.has_user() {
-                    self.websocket
-                        .send(ComponentMessage::can_admin::<Page>(ctx.props().id));
-                    self.websocket
-                        .send(ComponentMessage::can_update::<Page>(ctx.props().id));
+                    self.websocket.send(ComponentMessage::can_admin::<Page>(ctx.props().id));
+                    self.websocket.send(ComponentMessage::can_update::<Page>(ctx.props().id));
                 }
-                self.websocket
-                    .send(ComponentMessage::can_view::<Page>(ctx.props().id));
+                self.websocket.send(ComponentMessage::can_view::<Page>(ctx.props().id));
 
                 self.user_state = user_state;
                 true
             }
-            PageMessage::Backend(message) => match message {
-                WebsocketMessage::GetTable(_, row) => {
-                    self.page = Some(bincode::deserialize(&row).unwrap());
-                    true
-                }
-                WebsocketMessage::CanView(can_view) => {
-                    if can_view {
-                        self.websocket
-                            .send(ComponentMessage::get::<Page>(ctx.props().id));
-                    } else {
-                        ctx.link().navigator().unwrap().push(&AppRoute::Home);
+            PageMessage::Backend(message) => {
+                match message {
+                    WebsocketMessage::GetTable(_, row) => {
+                        self.page = Some(bincode::deserialize(&row).unwrap());
+                        true
                     }
-                    true
+                    WebsocketMessage::CanView(can_view) => {
+                        if can_view {
+                            self.websocket.send(ComponentMessage::get::<Page>(ctx.props().id));
+                        } else {
+                            ctx.link().navigator().unwrap().push(&AppRoute::Home);
+                        }
+                        true
+                    }
+                    WebsocketMessage::CanDelete(can_admin) => {
+                        self.can_admin = can_admin;
+                        ctx.props().can_admin.emit(can_admin);
+                        true
+                    }
+                    WebsocketMessage::CanUpdate(can_update) => {
+                        self.can_update = can_update;
+                        ctx.props().can_update.emit(can_update);
+                        true
+                    }
+                    _ => {
+                        log::info!("Received message: {:?}", message);
+                        false
+                    }
                 }
-                WebsocketMessage::CanDelete(can_admin) => {
-                    self.can_admin = can_admin;
-                    ctx.props().can_admin.emit(can_admin);
-                    true
-                }
-                WebsocketMessage::CanUpdate(can_update) => {
-                    self.can_update = can_update;
-                    ctx.props().can_update.emit(can_update);
-                    true
-                }
-                _ => {
-                    log::info!("Received message: {:?}", message);
-                    false
-                }
-            },
+            }
         }
     }
 

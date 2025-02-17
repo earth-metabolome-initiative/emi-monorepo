@@ -41,12 +41,7 @@ fn crop_square_from_center(
         data.chunks_exact(width as usize)
             .skip(y as usize)
             .take(square_side as usize)
-            .map(|row| {
-                row.iter()
-                    .skip(x as usize)
-                    .take(square_side as usize)
-                    .cloned()
-            })
+            .map(|row| row.iter().skip(x as usize).take(square_side as usize).cloned())
             .flatten()
             .collect(),
         square_side as usize,
@@ -73,12 +68,8 @@ pub(super) fn preprocess_image_data(
     crop_dimension: u32,
 ) -> (Vec<u8>, usize) {
     let data = convert_js_image_to_luma(&image_data.data());
-    let (cropped_data, square_side) = crop_square_from_center(
-        &data,
-        crop_percentage,
-        image_data.width(),
-        image_data.height(),
-    );
+    let (cropped_data, square_side) =
+        crop_square_from_center(&data, crop_percentage, image_data.width(), image_data.height());
     if square_side > crop_dimension as usize {
         let downsampled_data = downscale_image(&cropped_data, square_side as u32, crop_dimension);
         (downsampled_data.into_raw(), crop_dimension as usize)

@@ -1,8 +1,8 @@
 //! Submodule providing websocket services post-authentication.
-use actix_web::{web, rt};
-use actix_web::{get, Error, HttpRequest, HttpResponse};
+use actix_web::{get, rt, web, Error, HttpRequest, HttpResponse};
 use actix_ws::AggregatedMessage;
 use futures::StreamExt;
+
 use crate::api::oauth::refresh::refresh_access_token;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
@@ -13,7 +13,8 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 /// Entrypoint to start the websocket
 ///
 /// # Arguments
-/// * `user` - The logged in user that is starting the websocket, as derived from the JWT token middleware
+/// * `user` - The logged in user that is starting the websocket, as derived
+///   from the JWT token middleware
 /// * `req` - The HTTP request
 /// * `stream` - The websocket stream
 /// * `diesel_pool` - The Diesel connection pool
@@ -21,7 +22,7 @@ async fn start_websocket(
     req: HttpRequest,
     stream: web::Payload,
     redis_client: web::Data<redis::Client>,
-    diesel_pool: web::Data<diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<diesel::PgConnection>>>,
+    diesel_pool: web::Data<web_common_traits::prelude::DBPool>,
 ) -> Result<HttpResponse, Error> {
     let (res, mut session, stream) = actix_ws::handle(&req, stream)?;
 

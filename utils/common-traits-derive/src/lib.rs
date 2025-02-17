@@ -30,7 +30,9 @@ pub fn basic(_attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 /// Add necessary trait constraints to generic parameters.
-fn add_trait_constraints<'a>(generics: &'a mut Generics) -> (ImplGenerics<'a>, TypeGenerics<'a>, Option<&'a syn::WhereClause>) {
+fn add_trait_constraints<'a>(
+    generics: &'a mut Generics,
+) -> (ImplGenerics<'a>, TypeGenerics<'a>, Option<&'a syn::WhereClause>) {
     for param in &mut generics.params {
         if let syn::GenericParam::Type(ty) = param {
             ty.bounds.push(syn::parse_quote!(common_traits::basic::Basic));

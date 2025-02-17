@@ -1,7 +1,6 @@
 //! Submodule proving a trait defining a taxon entry.
 
-use crate::traits::taxonomy::Taxonomy;
-use crate::traits::TaxonEntry;
+use crate::traits::{taxonomy::Taxonomy, TaxonEntry};
 
 /// Trait defining a taxon entry.
 pub trait Taxon<'a>: Sized
@@ -44,14 +43,11 @@ where
 
     /// Returns the identifier of the parent taxon.
     fn parent(&self) -> Option<Self> {
-        self.parent_id()
-            .and_then(|id| self.taxonomy().taxon_by_id(id).ok())
+        self.parent_id().and_then(|id| self.taxonomy().taxon_by_id(id).ok())
     }
 
     /// Returns an iterator over the children of the taxon.
     fn children(&self) -> impl Iterator<Item = Self> {
-        self.taxonomy()
-            .taxons()
-            .filter(move |taxon| taxon.parent_id() == Some(self.id()))
+        self.taxonomy().taxons().filter(move |taxon| taxon.parent_id() == Some(self.id()))
     }
 }

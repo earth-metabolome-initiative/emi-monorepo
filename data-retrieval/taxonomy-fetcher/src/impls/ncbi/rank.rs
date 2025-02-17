@@ -2,13 +2,11 @@
 
 use std::{fmt::Display, str::FromStr};
 
-use font_awesome::Icon;
 use serde::{de::Deserialize, Serialize};
 use strum::EnumIter;
 
-use crate::{errors::TaxonEntryBuilderError, traits::Rank};
-
 use super::taxon_entry::NCBITaxonEntry;
+use crate::{errors::TaxonEntryBuilderError, traits::Rank};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 /// Enumeration of the ranks used in the NCBI taxonomy.
@@ -108,13 +106,19 @@ pub enum NCBIRank {
 impl Rank for NCBIRank {
     fn description(&self) -> &'static str {
         match self {
-            NCBIRank::BioType => "A biological type, often representing a specific characteristic or group.",
+            NCBIRank::BioType => {
+                "A biological type, often representing a specific characteristic or group."
+            }
             NCBIRank::Class => "A taxonomic rank grouping orders of organisms.",
-            NCBIRank::Clade => "A group of organisms believed to have evolved from a common ancestor.",
+            NCBIRank::Clade => {
+                "A group of organisms believed to have evolved from a common ancestor."
+            }
             NCBIRank::Cohort => "A taxonomic rank grouping related orders or families.",
             NCBIRank::Family => "A taxonomic rank grouping genera.",
             NCBIRank::Forma => "A minor taxonomic rank for variations within a species.",
-            NCBIRank::FormaSpecialis => "A forma distinguished by specific pathogenic characteristics.",
+            NCBIRank::FormaSpecialis => {
+                "A forma distinguished by specific pathogenic characteristics."
+            }
             NCBIRank::Genotype => "A group of organisms with the same genetic makeup.",
             NCBIRank::Genus => "A taxonomic rank grouping species with shared traits.",
             NCBIRank::InfraClass => "A rank below subclass for finer classifications.",
@@ -131,7 +135,9 @@ impl Rank for NCBIRank {
             NCBIRank::SeroGroup => "A group based on shared serological properties.",
             NCBIRank::Serotype => "A classification based on antigenic properties.",
             NCBIRank::Series => "A taxonomic rank grouping related species or varieties.",
-            NCBIRank::Species => "The basic rank, representing individual organisms capable of interbreeding.",
+            NCBIRank::Species => {
+                "The basic rank, representing individual organisms capable of interbreeding."
+            }
             NCBIRank::SpeciesGroup => "A grouping of related species.",
             NCBIRank::SpeciesSubgroup => "A subdivision within a species group.",
             NCBIRank::Strain => "A genetic variant or subtype within a species.",
@@ -143,7 +149,9 @@ impl Rank for NCBIRank {
             NCBIRank::SubOrder => "A rank below order, dividing orders into smaller groups.",
             NCBIRank::SubPhylum => "A rank below phylum, dividing it further.",
             NCBIRank::SubSection => "A rank below section for finer groupings.",
-            NCBIRank::Subspecies => "A rank below species, denoting geographic or morphological variation.",
+            NCBIRank::Subspecies => {
+                "A rank below species, denoting geographic or morphological variation."
+            }
             NCBIRank::SubTribe => "A rank below tribe for finer distinctions.",
             NCBIRank::SubVariety => "A rank below variety for additional specificity.",
             NCBIRank::SuperClass => "A rank above class, for larger groupings.",
@@ -163,50 +171,50 @@ impl FromStr for NCBIRank {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "no rank" => Ok(NCBIRank::NoRank),
-			"superkingdom" => Ok(NCBIRank::SuperKingdom),
-			"kingdom" => Ok(NCBIRank::Kingdom),
-			"subkingdom" => Ok(NCBIRank::SubKingdom),
-			"genus" => Ok(NCBIRank::Genus),
-			"subgenus" => Ok(NCBIRank::SubGenus),
-			"species group" => Ok(NCBIRank::SpeciesGroup),
-			"species subgroup" => Ok(NCBIRank::SpeciesSubgroup),
-			"species" => Ok(NCBIRank::Species),
-			"subspecies" => Ok(NCBIRank::Subspecies),
-			"order" => Ok(NCBIRank::Order),
-			"parvorder" => Ok(NCBIRank::ParvOrder),
-			"superorder" => Ok(NCBIRank::SuperOrder),
-			"infraorder" => Ok(NCBIRank::InfraOrder),
-			"suborder" => Ok(NCBIRank::SubOrder),
-			"family" => Ok(NCBIRank::Family),
-			"superfamily" => Ok(NCBIRank::SuperFamily),
-			"subfamily" => Ok(NCBIRank::SubFamily),
-			"tribe" => Ok(NCBIRank::Tribe),
-			"subtribe" => Ok(NCBIRank::SubTribe),
-			"phylum" => Ok(NCBIRank::Phylum),
-			"superphylum" => Ok(NCBIRank::SuperPhylum),
-			"subphylum" => Ok(NCBIRank::SubPhylum),
-			"class" => Ok(NCBIRank::Class),
-			"superclass" => Ok(NCBIRank::SuperClass),
-			"infraclass" => Ok(NCBIRank::InfraClass),
-			"subclass" => Ok(NCBIRank::SubClass),
-			"forma" => Ok(NCBIRank::Forma),
-			"forma specialis" => Ok(NCBIRank::FormaSpecialis),
-			"varietas" => Ok(NCBIRank::Varietas),
-			"subvariety" => Ok(NCBIRank::SubVariety),
-			"cohort" => Ok(NCBIRank::Cohort),
-			"subcohort" => Ok(NCBIRank::SubCohort),
-			"section" => Ok(NCBIRank::Section),
-			"subsection" => Ok(NCBIRank::SubSection),
-			"series" => Ok(NCBIRank::Series),
-			"strain" => Ok(NCBIRank::Strain),
-			"serogroup" => Ok(NCBIRank::SeroGroup),
-			"pathogroup" => Ok(NCBIRank::PathoGroup),
-			"biotype" => Ok(NCBIRank::BioType),
-			"clade" => Ok(NCBIRank::Clade),
-			"isolate" => Ok(NCBIRank::Isolate),
-			"serotype" => Ok(NCBIRank::Serotype),
-			"genotype" => Ok(NCBIRank::Genotype),
-			"morph" => Ok(NCBIRank::Morph),
+            "superkingdom" => Ok(NCBIRank::SuperKingdom),
+            "kingdom" => Ok(NCBIRank::Kingdom),
+            "subkingdom" => Ok(NCBIRank::SubKingdom),
+            "genus" => Ok(NCBIRank::Genus),
+            "subgenus" => Ok(NCBIRank::SubGenus),
+            "species group" => Ok(NCBIRank::SpeciesGroup),
+            "species subgroup" => Ok(NCBIRank::SpeciesSubgroup),
+            "species" => Ok(NCBIRank::Species),
+            "subspecies" => Ok(NCBIRank::Subspecies),
+            "order" => Ok(NCBIRank::Order),
+            "parvorder" => Ok(NCBIRank::ParvOrder),
+            "superorder" => Ok(NCBIRank::SuperOrder),
+            "infraorder" => Ok(NCBIRank::InfraOrder),
+            "suborder" => Ok(NCBIRank::SubOrder),
+            "family" => Ok(NCBIRank::Family),
+            "superfamily" => Ok(NCBIRank::SuperFamily),
+            "subfamily" => Ok(NCBIRank::SubFamily),
+            "tribe" => Ok(NCBIRank::Tribe),
+            "subtribe" => Ok(NCBIRank::SubTribe),
+            "phylum" => Ok(NCBIRank::Phylum),
+            "superphylum" => Ok(NCBIRank::SuperPhylum),
+            "subphylum" => Ok(NCBIRank::SubPhylum),
+            "class" => Ok(NCBIRank::Class),
+            "superclass" => Ok(NCBIRank::SuperClass),
+            "infraclass" => Ok(NCBIRank::InfraClass),
+            "subclass" => Ok(NCBIRank::SubClass),
+            "forma" => Ok(NCBIRank::Forma),
+            "forma specialis" => Ok(NCBIRank::FormaSpecialis),
+            "varietas" => Ok(NCBIRank::Varietas),
+            "subvariety" => Ok(NCBIRank::SubVariety),
+            "cohort" => Ok(NCBIRank::Cohort),
+            "subcohort" => Ok(NCBIRank::SubCohort),
+            "section" => Ok(NCBIRank::Section),
+            "subsection" => Ok(NCBIRank::SubSection),
+            "series" => Ok(NCBIRank::Series),
+            "strain" => Ok(NCBIRank::Strain),
+            "serogroup" => Ok(NCBIRank::SeroGroup),
+            "pathogroup" => Ok(NCBIRank::PathoGroup),
+            "biotype" => Ok(NCBIRank::BioType),
+            "clade" => Ok(NCBIRank::Clade),
+            "isolate" => Ok(NCBIRank::Isolate),
+            "serotype" => Ok(NCBIRank::Serotype),
+            "genotype" => Ok(NCBIRank::Genotype),
+            "morph" => Ok(NCBIRank::Morph),
             _ => Err(TaxonEntryBuilderError::UnknownRank(s.to_string())),
         }
     }

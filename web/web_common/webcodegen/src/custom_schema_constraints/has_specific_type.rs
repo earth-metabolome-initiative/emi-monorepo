@@ -1,9 +1,7 @@
-use crate::custom_schema_constraints::CustomColumnConstraint;
-use crate::errors::WebCodeGenError;
-use crate::Column;
 use diesel::pg::PgConnection;
 
 use super::ConstraintError;
+use crate::{custom_schema_constraints::CustomColumnConstraint, errors::WebCodeGenError, Column};
 
 /// Check that a column has a specific type
 pub struct HasSpecificTypeConstraint {
@@ -19,7 +17,9 @@ impl CustomColumnConstraint for HasSpecificTypeConstraint {
         conn: &mut PgConnection,
         column: &Column,
     ) -> Result<(), WebCodeGenError> {
-        if self.column_name == column.column_name && self.column_type != column.data_type_str(conn)? {
+        if self.column_name == column.column_name
+            && self.column_type != column.data_type_str(conn)?
+        {
             return Err(ConstraintError::NotOfCorrectType {
                 column_name: self.column_name.clone(),
                 column_type: column.data_type_str(conn)?.to_owned(),

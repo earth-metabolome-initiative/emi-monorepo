@@ -12,9 +12,9 @@ pub struct NoOpOutcome {
 }
 
 impl From<NoOp> for NoOpOutcome {
-	fn from(operation: NoOp) -> Self {
-		Self { operation }
-	}
+    fn from(operation: NoOp) -> Self {
+        Self { operation }
+    }
 }
 
 impl Outcome for NoOpOutcome {

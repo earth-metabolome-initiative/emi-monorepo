@@ -35,27 +35,28 @@ fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> std::io::Result
 #[test]
 /// Test that the densification procedure works as expected.
 pub fn test_densification() {
-	// First, we duplicate the directory `standard_migrations` as
-	// `standard_migrations_to_be_densified`, which we will densify.
-	let source = Path::new("standard_migrations");
-	let destination = Path::new("standard_migrations_to_be_densified");
-	copy_dir_all(source, destination).unwrap();
+    // First, we duplicate the directory `standard_migrations` as
+    // `standard_migrations_to_be_densified`, which we will densify.
+    let source = Path::new("standard_migrations");
+    let destination = Path::new("standard_migrations_to_be_densified");
+    copy_dir_all(source, destination).unwrap();
 
-	// We create the migration directory.
-	let mut migrations = MigrationDirectory::try_from("standard_migrations_to_be_densified").unwrap();
-	assert_eq!(migrations.len(), 2);
-	assert!(!migrations.is_dense());
+    // We create the migration directory.
+    let mut migrations =
+        MigrationDirectory::try_from("standard_migrations_to_be_densified").unwrap();
+    assert_eq!(migrations.len(), 2);
+    assert!(!migrations.is_dense());
 
-	// We densify the migrations.
-	migrations = migrations.redensify().unwrap();
-	assert_eq!(migrations.len(), 2);
-	assert!(migrations.is_dense());
+    // We densify the migrations.
+    migrations = migrations.redensify().unwrap();
+    assert_eq!(migrations.len(), 2);
+    assert!(migrations.is_dense());
 
-	// We reload the migrations from the directory.
-	let migrations = MigrationDirectory::try_from("standard_migrations_to_be_densified").unwrap();
-	assert_eq!(migrations.len(), 2);
-	assert!(migrations.is_dense());
+    // We reload the migrations from the directory.
+    let migrations = MigrationDirectory::try_from("standard_migrations_to_be_densified").unwrap();
+    assert_eq!(migrations.len(), 2);
+    assert!(migrations.is_dense());
 
-	// We remove the directory `standard_migrations_to_be_densified`.
-	std::fs::remove_dir_all(destination).unwrap();
+    // We remove the directory `standard_migrations_to_be_densified`.
+    std::fs::remove_dir_all(destination).unwrap();
 }

@@ -1,14 +1,17 @@
-//! Submodule defining the set of extensions for the extraction of compressed files.
+//! Submodule defining the set of extensions for the extraction of compressed
+//! files.
 
-use crate::{reports::ExtractionReport, DownloaderError};
-use flate2::bufread::GzDecoder;
-use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use std::{
     fs::File,
     io::{BufReader, BufWriter, Read, Write},
     path::Path,
 };
+
+use flate2::bufread::GzDecoder;
+use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use tar::Archive;
+
+use crate::{reports::ExtractionReport, DownloaderError};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 /// Enum defining the set of extensions for the extraction of compressed files.
@@ -73,10 +76,7 @@ impl CompressionExtension {
                     source.with_extension("").to_string_lossy().to_string()
                 } else {
                     // We add the '.extracted' extension to the file.
-                    source
-                        .with_extension("extracted")
-                        .to_string_lossy()
-                        .to_string()
+                    source.with_extension("extracted").to_string_lossy().to_string()
                 }
             }
             CompressionExtension::TarGz => {
@@ -92,10 +92,7 @@ impl CompressionExtension {
                     path.with_extension("").to_string_lossy().to_string()
                 } else {
                     // We add the '.extracted' extension to the file.
-                    source
-                        .with_extension("extracted")
-                        .to_string_lossy()
-                        .to_string()
+                    source.with_extension("extracted").to_string_lossy().to_string()
                 }
             }
             CompressionExtension::Zip => {
@@ -103,24 +100,15 @@ impl CompressionExtension {
                     source.with_extension("").to_string_lossy().to_string()
                 } else {
                     // We add the '.extracted' extension to the file.
-                    source
-                        .with_extension("extracted")
-                        .to_string_lossy()
-                        .to_string()
+                    source.with_extension("extracted").to_string_lossy().to_string()
                 }
             }
             CompressionExtension::Gzip => {
-                if source
-                    .extension()
-                    .map_or(false, |ext| ext == "gz" || ext == "gzip")
-                {
+                if source.extension().map_or(false, |ext| ext == "gz" || ext == "gzip") {
                     source.with_extension("").to_string_lossy().to_string()
                 } else {
                     // We add the '.extracted' extension to the file.
-                    source
-                        .with_extension("extracted")
-                        .to_string_lossy()
-                        .to_string()
+                    source.with_extension("extracted").to_string_lossy().to_string()
                 }
             }
             CompressionExtension::Xz => {
@@ -128,10 +116,7 @@ impl CompressionExtension {
                     source.with_extension("").to_string_lossy().to_string()
                 } else {
                     // We add the '.extracted' extension to the file.
-                    source
-                        .with_extension("extracted")
-                        .to_string_lossy()
-                        .to_string()
+                    source.with_extension("extracted").to_string_lossy().to_string()
                 }
             }
             CompressionExtension::Unknown => source.to_string_lossy().to_string(),

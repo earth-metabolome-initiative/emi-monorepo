@@ -1,9 +1,10 @@
-//! Submodule providing the LinkButton yew component, which is a button that navigates to a new page when clicked.
+//! Submodule providing the LinkButton yew component, which is a button that
+//! navigates to a new page when clicked.
 
 use yew::prelude::*;
+use yew_router::prelude::*;
 
 use crate::router::AppRoute;
-use yew_router::prelude::*;
 
 pub struct LinkButton {}
 

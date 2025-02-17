@@ -1,15 +1,14 @@
 //! Logout button for the sidebar.
 //!
 //! The logout button is a simple button that sends a request to the backend to
-//! remove the user's session by using the logout method from the APIs. Furthermore,
-//! upon success, proceeds to delete the user session and redirect the user to the
-//! login page.
+//! remove the user's session by using the logout method from the APIs.
+//! Furthermore, upon success, proceeds to delete the user session and redirect
+//! the user to the login page.
 
 use yew::prelude::*;
 use yewdux::prelude::*;
 
-use crate::stores::app_state;
-use crate::stores::user_state;
+use crate::stores::{app_state, user_state};
 
 #[function_component(Logout)]
 /// Logout button for the sidebar.

@@ -8,8 +8,8 @@
 ///
 /// # Errors
 ///
-/// If the `QueryResult` is an error other than `NotFound`, the error is returned.
-///
+/// If the `QueryResult` is an error other than `NotFound`, the error is
+/// returned.
 pub fn optional<T>(
     query_result: diesel::QueryResult<T>,
 ) -> Result<Option<T>, diesel::result::Error> {

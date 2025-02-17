@@ -1,17 +1,17 @@
 //! Implementation of the taxonomy builder for the Open Tree of Life taxonomy.
 
-use super::OpenTreeOfLifeRank;
-use super::{
-    taxon_entry::OpenTreeOfLifeTaxonEntry, taxon_entry_builder::OpenTreeOfLifeTaxonEntryBuilder,
-    taxonomy::OpenTreeOfLifeTaxonomy, version::OpenTreeOfLifeVersion,
-};
-use crate::traits::TaxonomyBuilder;
-use crate::TaxonEntryBuilder;
+use std::io::BufReader;
+
 use csv::ReaderBuilder;
 use downloader::Downloader;
 use reqwest::Url;
 use serde::Deserialize;
-use std::io::BufReader;
+
+use super::{
+    taxon_entry::OpenTreeOfLifeTaxonEntry, taxon_entry_builder::OpenTreeOfLifeTaxonEntryBuilder,
+    taxonomy::OpenTreeOfLifeTaxonomy, version::OpenTreeOfLifeVersion, OpenTreeOfLifeRank,
+};
+use crate::{traits::TaxonomyBuilder, TaxonEntryBuilder};
 
 #[derive(Default)]
 /// Implementation of the taxonomy trait for the Open Tree of Life.
@@ -58,10 +58,7 @@ impl<'de> Deserialize<'de> for SourceInfo {
         }
 
         if !s.contains(':') {
-            return Err(serde::de::Error::custom(format!(
-                "Invalid source information: '{}'",
-                s
-            )));
+            return Err(serde::de::Error::custom(format!("Invalid source information: '{}'", s)));
         }
 
         let mut parts = s.split(':');
@@ -95,10 +92,7 @@ impl<'de> Deserialize<'de> for SourceInfo {
                     _ => unreachable!(),
                 }
             }
-            unknown => Err(serde::de::Error::custom(format!(
-                "Unknown source: '{}'",
-                unknown
-            ))),
+            unknown => Err(serde::de::Error::custom(format!("Unknown source: '{}'", unknown))),
         }
     }
 }
@@ -249,17 +243,11 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
     type TaxonEntryBuilder = OpenTreeOfLifeTaxonEntryBuilder;
 
     fn version(self, version: <Self::Taxonomy as crate::traits::Taxonomy>::Version) -> Self {
-        Self {
-            version: Some(version),
-            ..self
-        }
+        Self { version: Some(version), ..self }
     }
 
     fn directory(self, directory: std::path::PathBuf) -> Self {
-        Self {
-            directory: Some(directory),
-            ..self
-        }
+        Self { directory: Some(directory), ..self }
     }
 
     fn is_id_in_use(&self, id: &u32) -> bool {
@@ -274,17 +262,13 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
         &self,
         id: &<Self::TaxonEntry as crate::traits::TaxonEntry>::Id,
     ) -> Option<&Self::TaxonEntry> {
-        self.id_to_position
-            .get(id)
-            .map(|&pos| &self.taxon_entries[pos as usize])
+        self.id_to_position.get(id).map(|&pos| &self.taxon_entries[pos as usize])
     }
 
     async fn build(
         mut self,
     ) -> Result<Self::Taxonomy, crate::errors::TaxonomyBuilderError<Self::TaxonEntry>> {
-        let version = self
-            .version
-            .ok_or(crate::errors::TaxonomyBuilderError::MissingVersion)?;
+        let version = self.version.ok_or(crate::errors::TaxonomyBuilderError::MissingVersion)?;
         let _reports = Downloader::default()
             .task(version.url())?
             .extract()
@@ -292,7 +276,7 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
             .show_loading_bar()
             .execute()
             .await?;
-        
+
         // We read the taxonomy file.
         let mut csv_reader = ReaderBuilder::new()
             .delimiter(b'\t')
@@ -314,10 +298,8 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
                 .set_rank(record.rank)?
                 .build(&self)?;
 
-            self.id_to_position
-                .insert(taxon_entry.id, self.taxon_entries.len() as u32);
-            self.name_to_position
-                .insert(taxon_entry.name.clone(), self.taxon_entries.len() as u32);
+            self.id_to_position.insert(taxon_entry.id, self.taxon_entries.len() as u32);
+            self.name_to_position.insert(taxon_entry.name.clone(), self.taxon_entries.len() as u32);
             if record.parent_uid.is_none() {
                 if self.root_position.is_some() {
                     return Err(crate::errors::TaxonomyBuilderError::MultipleRoots);

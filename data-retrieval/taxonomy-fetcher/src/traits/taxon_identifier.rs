@@ -1,7 +1,9 @@
 //! Submodule defining a trait for an identifier of a taxon.
-use std::fmt::{Debug, Display};
-use std::hash::Hash;
-use std::str::FromStr;
+use std::{
+    fmt::{Debug, Display},
+    hash::Hash,
+    str::FromStr,
+};
 
 use serde::Serialize;
 

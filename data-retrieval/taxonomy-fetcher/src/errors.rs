@@ -1,9 +1,11 @@
 //! Submodule defining the errors used across the taxonomy-fetcher crate.
 
-use crate::traits::{TaxonEntry, TaxonIdentifier};
+use std::io::Error as IoError;
+
 use csv::Error as CsvError;
 use downloader::DownloaderError;
-use std::io::Error as IoError;
+
+use crate::traits::{TaxonEntry, TaxonIdentifier};
 
 #[derive(Debug)]
 /// Enum defining the errors that can occur when fetching a taxonomy.

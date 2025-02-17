@@ -1,25 +1,27 @@
 //! Page for the observation action sequence.
 
-use crate::components::badge::BadgeSize;
-use crate::components::forms::Datalist;
-use crate::components::forms::GPSInput;
-use crate::components::forms::MultiFileInput;
-use crate::components::Badge;
-use crate::router::AppRoute;
-use crate::stores::app_state::AppState;
-use crate::stores::user_state::UserState;
-use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
-use gloo::timers::callback::Timeout;
-use gloo::utils::window;
-use web_common::database::{NestedTaxon, User};
+use std::rc::Rc;
+
+use core_structures::{Taxa, User};
+use gloo::{timers::callback::Timeout, utils::window};
 use yew::prelude::*;
-use yew_agent::scope_ext::AgentScopeExt;
+use yew_agent::{prelude::WorkerBridgeHandle, scope_ext::AgentScopeExt};
 use yew_router::prelude::*;
 use yewdux::prelude::*;
 
-use crate::workers::WebsocketWorker;
-use std::rc::Rc;
-use yew_agent::prelude::WorkerBridgeHandle;
+use crate::{
+    components::{
+        badge::BadgeSize,
+        forms::{Datalist, GPSInput, MultiFileInput},
+        Badge,
+    },
+    router::AppRoute,
+    stores::{app_state::AppState, user_state::UserState},
+    workers::{
+        ws_worker::{ComponentMessage, WebsocketMessage},
+        WebsocketWorker,
+    },
+};
 
 #[derive(Debug, Copy, Eq, PartialEq, Clone)]
 enum PageSection {
@@ -73,9 +75,7 @@ impl Component for Observe {
         }));
 
         websocket.send(ComponentMessage::UserState(user_state.user()));
-        websocket.send(ComponentMessage::Connect(
-            window().location().hostname().unwrap(),
-        ));
+        websocket.send(ComponentMessage::Connect(window().location().hostname().unwrap()));
 
         Self {
             websocket,
@@ -141,17 +141,17 @@ impl Component for Observe {
             ctx.link().navigator().unwrap().push(&AppRoute::Login);
         }
 
-        // If the user is logged in, but has not yet completed their profile, redirect to the profile page.
+        // If the user is logged in, but has not yet completed their profile, redirect
+        // to the profile page.
         if self.user_state.has_user() && !self.user_state.has_complete_profile() {
             ctx.link()
                 .navigator()
                 .unwrap()
-                .push(&AppRoute::UsersUpdate {
-                    id: self.user_state.id().unwrap(),
-                });
+                .push(&AppRoute::UsersUpdate { id: self.user_state.id().unwrap() });
         }
 
-        // If the user is logged in, but has not yet selected which project to work on, redirect to the project selection page.
+        // If the user is logged in, but has not yet selected which project to work on,
+        // redirect to the project selection page.
         if self.user_state.has_user()
             && self.user_state.has_complete_profile()
             && !self.user_state.has_project()
@@ -159,12 +159,11 @@ impl Component for Observe {
             ctx.link()
                 .navigator()
                 .unwrap()
-                .push(&AppRoute::ProjectSelection {
-                    source_page: AppRoute::Observe.to_path(),
-                });
+                .push(&AppRoute::ProjectSelection { source_page: AppRoute::Observe.to_path() });
         }
 
-        // If all of the above conditions are met, we display the input field for multiple environment_pictures.
+        // If all of the above conditions are met, we display the input field for
+        // multiple environment_pictures.
 
         let section = match self.section {
             PageSection::Environment => {
@@ -172,23 +171,17 @@ impl Component for Observe {
                 let add_picture = ctx.link().callback(ObserveMessage::AddEnvironmentPicture);
 
                 // We create a callback for when a picture is removed.
-                let remove_picture = ctx
-                    .link()
-                    .callback(ObserveMessage::RemoveEnvironmentPicture);
+                let remove_picture = ctx.link().callback(ObserveMessage::RemoveEnvironmentPicture);
 
-                // We prepare the classes for the next button, which brings the user to the next step.
+                // We prepare the classes for the next button, which brings the user to the next
+                // step.
                 let next_button_classes = format!(
                     "next-button{}",
-                    if !self.environment_pictures.is_empty() {
-                        " enabled"
-                    } else {
-                        ""
-                    }
+                    if !self.environment_pictures.is_empty() { " enabled" } else { "" }
                 );
 
-                let on_click_next = ctx
-                    .link()
-                    .callback(|_| ObserveMessage::SetSection(PageSection::Details));
+                let on_click_next =
+                    ctx.link().callback(|_| ObserveMessage::SetSection(PageSection::Details));
 
                 html! {
                     <>
@@ -211,23 +204,18 @@ impl Component for Observe {
                 // We create a callback for when a picture is removed.
                 let remove_picture = ctx.link().callback(ObserveMessage::RemoveDetailsPicture);
 
-                // We prepare the classes for the next button, which brings the user to the next step.
+                // We prepare the classes for the next button, which brings the user to the next
+                // step.
                 let next_button_classes = format!(
                     "next-button{}",
-                    if !self.details_pictures.is_empty() {
-                        " enabled"
-                    } else {
-                        ""
-                    }
+                    if !self.details_pictures.is_empty() { " enabled" } else { "" }
                 );
 
-                let on_click_back = ctx
-                    .link()
-                    .callback(|_| ObserveMessage::SetSection(PageSection::Environment));
+                let on_click_back =
+                    ctx.link().callback(|_| ObserveMessage::SetSection(PageSection::Environment));
 
-                let on_click_next = ctx
-                    .link()
-                    .callback(|_| ObserveMessage::SetSection(PageSection::Location));
+                let on_click_next =
+                    ctx.link().callback(|_| ObserveMessage::SetSection(PageSection::Location));
 
                 html! {
                     <>
@@ -251,22 +239,14 @@ impl Component for Observe {
             PageSection::Location => {
                 let set_geolocation = ctx.link().callback(ObserveMessage::GeoLocation);
 
-                let next_button_classes = format!(
-                    "next-button{}",
-                    if self.location.is_some() {
-                        " enabled"
-                    } else {
-                        ""
-                    }
-                );
+                let next_button_classes =
+                    format!("next-button{}", if self.location.is_some() { " enabled" } else { "" });
 
-                let on_click_back = ctx
-                    .link()
-                    .callback(|_| ObserveMessage::SetSection(PageSection::Details));
+                let on_click_back =
+                    ctx.link().callback(|_| ObserveMessage::SetSection(PageSection::Details));
 
-                let on_click_next = ctx
-                    .link()
-                    .callback(|_| ObserveMessage::SetSection(PageSection::Taxa));
+                let on_click_next =
+                    ctx.link().callback(|_| ObserveMessage::SetSection(PageSection::Taxa));
 
                 html! {
                     <>
@@ -287,18 +267,15 @@ impl Component for Observe {
             }
             PageSection::Taxa => {
                 let selected_taxon =
-                    ctx.link()
-                        .callback(move |project: Option<Rc<NestedTaxon>>| {
-                            ObserveMessage::SelectedTaxon(project)
-                        });
+                    ctx.link().callback(move |project: Option<Rc<NestedTaxon>>| {
+                        ObserveMessage::SelectedTaxon(project)
+                    });
 
-                let on_click_back = ctx
-                    .link()
-                    .callback(|_| ObserveMessage::SetSection(PageSection::Location));
+                let on_click_back =
+                    ctx.link().callback(|_| ObserveMessage::SetSection(PageSection::Location));
 
-                let on_click_next = ctx
-                    .link()
-                    .callback(|_| ObserveMessage::SetSection(PageSection::Summary));
+                let on_click_next =
+                    ctx.link().callback(|_| ObserveMessage::SetSection(PageSection::Summary));
 
                 html! {
                     <>
@@ -318,9 +295,8 @@ impl Component for Observe {
                 }
             }
             PageSection::Summary => {
-                let on_click_back = ctx
-                    .link()
-                    .callback(|_| ObserveMessage::SetSection(PageSection::Taxa));
+                let on_click_back =
+                    ctx.link().callback(|_| ObserveMessage::SetSection(PageSection::Taxa));
 
                 html! {
                     <>

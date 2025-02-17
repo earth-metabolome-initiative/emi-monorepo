@@ -1,9 +1,10 @@
 //! Submodule providing the CSV Columns struct and associated functions.
-use crate::data_types::DataType;
-use crate::errors::CSVSchemaError;
-use crate::CSVSchema;
-use std::cmp::Reverse;
-use std::collections::{HashMap, HashSet};
+use std::{
+    cmp::Reverse,
+    collections::{HashMap, HashSet},
+};
+
+use crate::{data_types::DataType, errors::CSVSchemaError, CSVSchema};
 
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -21,7 +22,7 @@ pub struct CSVColumnMetadata {
 
 impl CSVColumnMetadata {
     /// Create a new primary key column.
-    /// 
+    ///
     /// # Errors
     /// * If the data type cannot be converted to a serial data type.
     pub(crate) fn new_primary_key(data_type: DataType) -> Result<Self, CSVSchemaError> {
@@ -61,9 +62,10 @@ impl TryFrom<CSVColumnMetadataBuilder> for CSVColumnMetadata {
             .into_iter()
             .filter(|(data_type, _)| !data_type.is_null())
             .max_by_key(|(data_type, count)| (*count, Reverse(data_type.min_dimension())))
-            .map(|(data_type, _)| data_type) else {
-                return Err(CSVSchemaError::EmptyColumn);
-            };
+            .map(|(data_type, _)| data_type)
+        else {
+            return Err(CSVSchemaError::EmptyColumn);
+        };
 
         if builder.sequential {
             data_type = data_type.into_serial()?;
@@ -115,8 +117,9 @@ impl CSVColumnMetadataBuilder {
             )));
         }
 
-        // The expected original name syntax is "column_name:foreign_table_name.foreign_column_name"
-        // or "column_name" if there is no foreign key, or "foreign_table_name.foreign_column_name"
+        // The expected original name syntax is
+        // "column_name:foreign_table_name.foreign_column_name" or "column_name"
+        // if there is no foreign key, or "foreign_table_name.foreign_column_name"
         // if the expected column name is '{foreign_table_name}_id'.
 
         let mut column_name = Some(original_name.to_owned());
@@ -174,11 +177,7 @@ impl CSVColumnMetadataBuilder {
             *self.data_type_counts.entry(data_type).or_insert(0) += 1;
         }
         if self.unique_values.is_some()
-            && !self
-                .unique_values
-                .as_mut()
-                .unwrap()
-                .insert(value.to_string())
+            && !self.unique_values.as_mut().unwrap().insert(value.to_string())
         {
             // If we find a duplicate value, we disable the unique constraint and
             // free the memory used to store the unique values.

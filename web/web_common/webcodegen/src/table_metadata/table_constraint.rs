@@ -1,14 +1,15 @@
-use diesel::pg::PgConnection;
-use diesel::serialize::IsNull;
-use diesel::serialize::{Output, ToSql};
+use std::io::Write;
+
 use diesel::{
     backend::Backend,
     deserialize::{FromSql, FromSqlRow},
     expression::AsExpression,
+    pg::PgConnection,
+    serialize::{IsNull, Output, ToSql},
+    ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
 };
-use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable};
 use serde::{Deserialize, Serialize};
-use std::io::Write;
+
 use crate::errors::WebCodeGenError;
 
 #[derive(Queryable, QueryableByName, Selectable, PartialEq, Debug)]
@@ -132,40 +133,40 @@ impl FromSql<diesel::sql_types::Text, diesel::pg::Pg> for ConstraintType {
 
 impl TableConstraint {
     /// Load all the constraints from the database
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A `Result` containing a `Vec` of `TableConstraint` if the operation was successful, or a `WebCodeGenError` if an error occurred
-    /// 
+    ///
+    /// A `Result` containing a `Vec` of `TableConstraint` if the operation was
+    /// successful, or a `WebCodeGenError` if an error occurred
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while loading the constraints from the database
     pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::table_constraints;
-        table_constraints::table
-            .load::<TableConstraint>(conn)
-            .map_err(WebCodeGenError::from)
+        table_constraints::table.load::<TableConstraint>(conn).map_err(WebCodeGenError::from)
     }
 
     /// Load all the constraints for a given table
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
     /// * `table_name` - The name of the table to load the constraints for
     /// * `table_schema` - An optional schema name to filter the constraints by
     /// * `table_catalog` - The name of the catalog to filter the constraints by
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A `Result` containing a `Vec` of `TableConstraint` if the operation was successful, or a `WebCodeGenError` if an error occurred
-    /// 
+    ///
+    /// A `Result` containing a `Vec` of `TableConstraint` if the operation was
+    /// successful, or a `WebCodeGenError` if an error occurred
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while loading the constraints from the database
     pub fn load_table_constraints(
         conn: &mut PgConnection,

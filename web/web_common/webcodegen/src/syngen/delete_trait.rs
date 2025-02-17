@@ -1,12 +1,12 @@
-use quote::quote;
-use crate::errors::WebCodeGenError;
-use proc_macro2::TokenStream;
 use diesel::PgConnection;
+use proc_macro2::TokenStream;
+use quote::quote;
 use syn::Ident;
-use crate::Table;
+
+use crate::{errors::WebCodeGenError, Table};
 
 impl Table {
-	/// Returns the Syn `TokenStream` for the delete method of the table.
+    /// Returns the Syn `TokenStream` for the delete method of the table.
     ///
     /// # Arguments
     ///
@@ -21,7 +21,6 @@ impl Table {
     /// * If the snake case name cannot be generated.
     /// * If the primary key columns cannot be loaded from the database.
     /// * If the diesel feature flag name cannot be generated.
-    ///
     pub fn delete_method(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         let sanitized_table_name =
             Ident::new(&self.snake_case_name()?, proc_macro2::Span::call_site());
@@ -48,10 +47,9 @@ impl Table {
 
         Ok(quote! {
             #[cfg(feature = #columns_feature_flag_name)]
-            pub async fn delete(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<usize, diesel::result::Error> {
+            pub async fn delete(&self, conn: &mut web_common_traits::prelude::DBConn) -> Result<usize, diesel::result::Error> {
                 diesel::delete(#sanitized_table_name::table.filter(#where_clause)).execute(conn).await
             }
         })
     }
-
 }

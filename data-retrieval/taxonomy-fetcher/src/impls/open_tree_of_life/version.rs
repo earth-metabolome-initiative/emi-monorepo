@@ -1,8 +1,9 @@
 //! Submodule defining the versions of the Open Tree of Life taxonomy.
 
 use chrono::NaiveDateTime;
-use strum_macros::EnumIter;
 use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
+
 use crate::traits::TaxonVersion;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter)]

@@ -1,9 +1,11 @@
-//! Submodule to create triggers to automatically update the `updated_at` column of a table.
+//! Submodule to create triggers to automatically update the `updated_at` column
+//! of a table.
 //!
-//! The core functionality is provided by the creation of the `updated_at_trigger` function,
-//! which sets the `updated_at` column to the current timestamp. The metaprogramming here
-//! solely checks that the table being parsed indeed has a column named `updated_at`, and that
-//! it is of type `timestamp`.
+//! The core functionality is provided by the creation of the
+//! `updated_at_trigger` function, which sets the `updated_at` column to the
+//! current timestamp. The metaprogramming here solely checks that the table
+//! being parsed indeed has a column named `updated_at`, and that it is of type
+//! `timestamp`.
 //!
 //! ```sql
 //! CREATE OR REPLACE FUNCTION updated_at_trigger()
@@ -15,10 +17,10 @@
 //! $$ LANGUAGE plpgsql;
 //! ```
 //!
-//! Secondarily, for each table that has an `updated_at` column, a trigger is created that
-//! calls the `updated_at_trigger` function before an `UPDATE` operation is performed.
-//! In the following example, the `users` table has an `updated_at` column, and a trigger
-//! is created for it.
+//! Secondarily, for each table that has an `updated_at` column, a trigger is
+//! created that calls the `updated_at_trigger` function before an `UPDATE`
+//! operation is performed. In the following example, the `users` table has an
+//! `updated_at` column, and a trigger is created for it.
 //!
 //! ```sql
 //! CREATE TRIGGER users_updated_at_trigger
@@ -26,10 +28,8 @@
 //! FOR EACH ROW
 //! EXECUTE FUNCTION updated_at_trigger();
 //! ```
-//!
 
-use diesel::PgConnection;
-use diesel::connection::SimpleConnection;
+use diesel::{connection::SimpleConnection, PgConnection};
 
 use crate::{errors::WebCodeGenError, Table};
 
@@ -56,12 +56,8 @@ $$ LANGUAGE plpgsql;"#
     /// # Errors
     ///
     /// * Returns an error if the provided database connection is invalid.
-    ///
     pub fn has_updated_at_column(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(self
-            .columns(conn)?
-            .iter()
-            .any(|column| column.is_updated_at()))
+        Ok(self.columns(conn)?.iter().any(|column| column.is_updated_at()))
     }
 
     /// Returns the expected name of the current table trigger.
@@ -74,21 +70,15 @@ $$ LANGUAGE plpgsql;"#
     ///
     /// * Returns an error if the table does not have an `updated_at` column.
     /// * Returns an error if the provided database connection is invalid.
-    ///
     pub fn updated_at_trigger_name(
         &self,
         conn: &mut PgConnection,
     ) -> Result<String, WebCodeGenError> {
         if !self.has_updated_at_column(conn)? {
-            return Err(WebCodeGenError::MissingUpdateAtColumn(Box::new(
-                self.clone(),
-            )));
+            return Err(WebCodeGenError::MissingUpdateAtColumn(Box::new(self.clone())));
         }
 
-        Ok(format!(
-            "{table_name}_updated_at_trigger",
-            table_name = self.table_name
-        ))
+        Ok(format!("{table_name}_updated_at_trigger", table_name = self.table_name))
     }
 
     /// Returns whether the current updated_at trigger exists.
@@ -101,17 +91,13 @@ $$ LANGUAGE plpgsql;"#
     ///
     /// * Returns an error if the table does not have an `updated_at` column.
     /// * Returns an error if the provided database connection is invalid.
-    ///
     pub fn updated_at_trigger_exists(
         &self,
         conn: &mut PgConnection,
     ) -> Result<bool, WebCodeGenError> {
         let trigger_name = self.updated_at_trigger_name(conn)?;
 
-        Ok(self
-            .triggers(conn)?
-            .iter()
-            .any(|trigger| trigger.tgname == trigger_name))
+        Ok(self.triggers(conn)?.iter().any(|trigger| trigger.tgname == trigger_name))
     }
 
     /// Returns the SQL code to create the trigger for the `updated_at` column.
@@ -124,12 +110,9 @@ $$ LANGUAGE plpgsql;"#
     ///
     /// * Returns an error if the table does not have an `updated_at` column.
     /// * Returns an error if the provided database connection is invalid.
-    ///
     pub fn updated_at_trigger(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
         if !self.has_updated_at_column(conn)? {
-            return Err(WebCodeGenError::MissingUpdateAtColumn(Box::new(
-                self.clone(),
-            )));
+            return Err(WebCodeGenError::MissingUpdateAtColumn(Box::new(self.clone())));
         }
 
         Ok(format!(
@@ -141,8 +124,9 @@ EXECUTE FUNCTION updated_at_trigger();"#,
         ))
     }
 
-    /// Returns the SQL code to create the trigger for the `updated_at` column for all tables with an `updated_at` column
-    /// that do not already have the trigger.
+    /// Returns the SQL code to create the trigger for the `updated_at` column
+    /// for all tables with an `updated_at` column that do not already have
+    /// the trigger.
     ///
     /// # Arguments
     ///
@@ -153,7 +137,6 @@ EXECUTE FUNCTION updated_at_trigger();"#,
     /// # Errors
     ///
     /// * Returns an error if the provided database connection is invalid.
-    ///
     pub fn create_update_triggers(
         conn: &mut PgConnection,
         table_catalog: &str,

@@ -1,7 +1,6 @@
 //! Utiliti traits for formatting and matching strings.
 
-use base64::engine::general_purpose;
-use base64::Engine;
+use base64::{engine::general_purpose, Engine};
 use image::ImageFormat;
 mod is_blurry;
 pub use is_blurry::IsBlurry;
