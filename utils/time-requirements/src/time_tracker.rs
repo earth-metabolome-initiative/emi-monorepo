@@ -24,7 +24,7 @@ impl TimeTracker {
     }
 
     /// Adds a task to the tracker.
-    pub fn add_task(&mut self, task: Task) {
+    pub fn add_completed_task(&mut self, task: Task) {
         self.tasks.push(task.complete());
     }
 

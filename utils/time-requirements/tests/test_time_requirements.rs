@@ -8,13 +8,13 @@ pub fn time_tracker() -> TimeTracker {
     let task1 = Task::new("Test Task 1");
     // We sleep for 1 second to simulate the task taking time.
     std::thread::sleep(std::time::Duration::from_secs(1));
-    tracker.add_task(task1);
+    tracker.add_completed_task(task1);
 
     // We add a second task
     let task2 = Task::new("Test Task 2");
     // We sleep for 2 seconds to simulate the task taking time.
     std::thread::sleep(std::time::Duration::from_secs(2));
-    tracker.add_task(task2);
+    tracker.add_completed_task(task2);
 
     tracker
 }

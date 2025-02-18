@@ -10,6 +10,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{parse_str, Ident, Type};
+use inflector::Inflector;
 
 use super::PgTrigger;
 use crate::{errors::WebCodeGenError, CheckConstraint, Column, PgIndex, TableConstraint};
@@ -228,8 +229,7 @@ impl Table {
         let last_element = parts.pop().unwrap();
         // We convert to singular form the last element and join the parts back
         // together.
-        let singular_last_element = pluralizer::pluralize(last_element.as_str(), 1, false);
-        parts.push(singular_last_element);
+        parts.push(Inflector::default().singularize(&last_element));
         parts.join("_")
     }
 

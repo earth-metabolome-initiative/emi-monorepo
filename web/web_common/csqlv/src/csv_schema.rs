@@ -3,8 +3,6 @@
 use std::path::Path;
 
 use indicatif::ProgressIterator;
-use pluralizer::add_singular_rule;
-use regex::Regex;
 
 use crate::{
     csv_table::CSVTable,
@@ -162,13 +160,6 @@ impl CSVSchemaBuilder {
     /// Singularize the table names.
     pub fn singularize(mut self) -> Self {
         self.singularize = true;
-        self
-    }
-
-    #[must_use]
-    /// Add a singular rule to the pluralizer.
-    pub fn add_singular_rule<S: ToString>(self, singular: Regex, plural: S) -> Self {
-        add_singular_rule(singular, plural.to_string());
         self
     }
 

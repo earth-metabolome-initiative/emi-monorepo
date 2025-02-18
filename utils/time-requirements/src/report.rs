@@ -66,7 +66,7 @@ impl Report {
         self.time_tracker.slowest_task().map(|task| {
             let total_time = self.time_tracker.total_time();
             format!(
-                "The slowest task was {} which took {} ({:.2}% of all time).",
+                "The slowest task was `{}` which took {} ({:.2}% of all time).",
                 task.name(),
                 HumanTime::from(task.time()).to_text_en(Accuracy::Rough, Tense::Present),
                 task.time().num_seconds() as f64 / total_time.num_seconds() as f64 * 100.0,
@@ -109,6 +109,9 @@ impl Report {
             let difference = current_time - previous_time;
             let percentage =
                 difference.num_seconds() as f64 / previous_time.num_seconds() as f64 * 100.0;
+            if percentage.is_nan() || percentage.abs() < 1.0 {
+                return "Unchanged.".to_string();
+            }
             format!(
                 "{:.2}% {}",
                 percentage.abs(),
@@ -131,6 +134,11 @@ impl Report {
             .slowest_task()
     }
 
+    /// Returns the total number of reports
+    pub fn total_reports(&self) -> usize {
+        self.previous_reports.len() + 1
+    }
+
     /// Writes out a plot of the trends for all tasks in the report and saves it to the given file.
     pub fn plot(&self, path: &Path) -> std::io::Result<()> {
         let root = BitMapBackend::new(path, (800, 600)).into_drawing_area();
@@ -140,8 +148,7 @@ impl Report {
             .x_label_area_size(40)
             .y_label_area_size(40)
             .build_cartesian_2d(
-                self.oldest_report().start().and_utc().timestamp() as f64
-                    ..self.time_tracker.start().and_utc().timestamp() as f64,
+                0.0..self.total_reports() as f64,
                 0.0..self
                     .slowest_task()
                     .map(|task| task.time().num_seconds() as f64)
@@ -162,10 +169,9 @@ impl Report {
             let series = self.task_series(task);
             chart
                 .draw_series(LineSeries::new(
-                    series.iter().map(|(x, y)| {
-                        let x = x.and_utc().timestamp() as f64;
+                    series.iter().enumerate().map(|(x, (_, y))| {
                         let y = y.num_seconds() as f64;
-                        (x, y)
+                        (x as f64, y)
                     }),
                     styles.get(task).unwrap().clone(),
                 ))

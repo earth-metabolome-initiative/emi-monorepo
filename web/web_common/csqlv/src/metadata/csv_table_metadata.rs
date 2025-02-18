@@ -2,7 +2,8 @@
 use std::path::Path;
 
 use csv::Reader;
-use pluralizer::pluralize;
+
+use inflector::Inflector;
 
 use super::csv_column_metadata::{CSVColumnMetadata, CSVColumnMetadataBuilder};
 use crate::{
@@ -34,7 +35,7 @@ impl CSVTableMetadata {
     /// Returns the name of the table to use as foreign key.
     pub fn foreign_table_name(&self) -> String {
         if self.singularize {
-            pluralize(&self.name, 1, false)
+            Inflector::default().singularize(&self.name)
         } else {
             self.name.clone()
         }

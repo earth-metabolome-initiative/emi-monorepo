@@ -32,7 +32,7 @@ impl UserState {
         self.user.clone()
     }
 
-    pub fn project(&self) -> Option<Rc<NestedProject>> {
+    pub fn project(&self) -> Option<Rc<Project>> {
         self.project.clone()
     }
 
@@ -54,7 +54,7 @@ impl UserState {
 
     /// Set the project to the provided value and returns whether any changes
     /// were made.
-    pub fn set_project(&mut self, project: Rc<NestedProject>) -> bool {
+    pub fn set_project(&mut self, project: Rc<Project>) -> bool {
         let maybe_project = Some(project);
         if self.project != maybe_project {
             self.project = maybe_project;

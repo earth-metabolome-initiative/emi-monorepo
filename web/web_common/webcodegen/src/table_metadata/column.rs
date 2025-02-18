@@ -4,6 +4,7 @@ use diesel::{
 };
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{Ident, Type};
+use inflector::Inflector;
 
 use super::{
     pg_type::{rust_type_str, PgType},
@@ -518,8 +519,7 @@ impl Column {
         let last_element = parts.pop().unwrap();
         // We convert to singular form the last element and join the parts back
         // together.
-        let singular_last_element = pluralizer::pluralize(last_element.as_str(), 10, false);
-        parts.push(singular_last_element);
+        parts.push(Inflector::default().pluralize(&last_element));
         parts.join("_")
     }
 }

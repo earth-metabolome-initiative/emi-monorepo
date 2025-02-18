@@ -50,7 +50,7 @@ postcard = "1.0.8"
 serde-wasm-bindgen = "0.6.5"
 yew-agent = "0.3.0"
 rustfft = "6.2.0"
-regex = "1.10.5"
+regex.workspace = true
 strsim = "0.11.1"
 core_structures = { workspace = true, features = ["frontend"]}
 

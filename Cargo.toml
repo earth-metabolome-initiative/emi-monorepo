@@ -18,6 +18,7 @@ members = [
     "utils/common-traits",
     "utils/common-traits-derive",
     "utils/diesel_utils",
+    "utils/inflector", "utils/time-requirements",
 ]
 
 [workspace.dependencies]
@@ -59,7 +60,11 @@ diesel_migrations_utils = { path = "utils/diesel_migrations_utils" }
 diesel_utils = { path = "utils/diesel_utils" }
 common-traits-derive = { path = "utils/common-traits-derive" }
 common-traits = { path = "utils/common-traits" }
+inflector = { path = "utils/inflector" }
 core_structures = { path = "web/core_structures" }
+regex = "1.11"
+plotters = "0.3.7"
+time-requirements = { path = "utils/time-requirements" }
 
 [workspace.lints.rust]
 missing_docs = "forbid"

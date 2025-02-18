@@ -2,7 +2,7 @@
 
 use std::rc::Rc;
 
-use core_structures::{Taxa, User};
+use core_structures::{Taxon, User};
 use gloo::{timers::callback::Timeout, utils::window};
 use yew::prelude::*;
 use yew_agent::{prelude::WorkerBridgeHandle, scope_ext::AgentScopeExt};
@@ -40,7 +40,7 @@ pub struct Observe {
     environment_pictures: Vec<Rc<web_common::types::JPEG>>,
     details_pictures: Vec<Rc<web_common::types::JPEG>>,
     location: Option<web_common::types::Point>,
-    taxon: Option<Rc<NestedTaxon>>,
+    taxon: Option<Rc<Taxon>>,
 }
 
 pub enum ObserveMessage {
@@ -51,7 +51,7 @@ pub enum ObserveMessage {
     RemoveEnvironmentPicture(usize),
     RemoveDetailsPicture(usize),
     GeoLocation(Option<web_common::types::Point>),
-    SelectedTaxon(Option<Rc<NestedTaxon>>),
+    SelectedTaxon(Option<Rc<Taxon>>),
     SetSection(PageSection),
 }
 
@@ -267,7 +267,7 @@ impl Component for Observe {
             }
             PageSection::Taxa => {
                 let selected_taxon =
-                    ctx.link().callback(move |project: Option<Rc<NestedTaxon>>| {
+                    ctx.link().callback(move |project: Option<Rc<Taxon>>| {
                         ObserveMessage::SelectedTaxon(project)
                     });
 
@@ -280,7 +280,7 @@ impl Component for Observe {
                 html! {
                     <>
                         <p>{"Select the primary taxon associated with this observation."}</p>
-                        <Datalist<web_common::database::nested_variants::NestedTaxon, false> builder={selected_taxon} optional={false} value={self.taxon.clone()} label="Select taxon" scanner={false} />
+                        <Datalist<Taxon, false> builder={selected_taxon} optional={false} value={self.taxon.clone()} label="Select taxon" scanner={false} />
                         <button title={"Next step"} onclick={on_click_next} class={"next-button enabled"}>
                             <i class="fas fa-arrow-right"></i>
                             {'\u{00a0}'}
