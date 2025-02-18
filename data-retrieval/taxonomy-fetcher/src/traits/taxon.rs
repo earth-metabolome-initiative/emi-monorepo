@@ -36,26 +36,25 @@ where
     //     }
     // }
 
-
     fn ltree_path(
-        &self, 
+        &self,
         cache: &mut HashMap<
-            <<Self::Taxonomy as super::Taxonomy>::TaxonEntry as super::TaxonEntry>::Id, 
-            String
-        >
+            <<Self::Taxonomy as super::Taxonomy>::TaxonEntry as super::TaxonEntry>::Id,
+            String,
+        >,
     ) -> String {
         if let Some(cached_path) = cache.get(self.id()) {
             return cached_path.clone();
         }
-    
+
         let sanitized_name = Self::sanitize_ltree_label(self.name()); // Sanitize the taxon name
-    
+
         let path = if let Some(parent) = self.parent() {
             format!("{}.{}", parent.ltree_path(cache), sanitized_name)
         } else {
             sanitized_name
         };
-    
+
         cache.insert(self.id().clone(), path.clone());
         path
     }
@@ -63,14 +62,13 @@ where
     /// Sanitize the taxon names for LTREE compliance
     fn sanitize_ltree_label(label: &str) -> String {
         label
-            .replace(".", "_")  // Replace dots with underscores
-            .replace("/", "_")  // Replace slashes with underscores
-            .replace(" ", "_")  // Replace spaces with underscores
+            .replace(".", "_") // Replace dots with underscores
+            .replace("/", "_") // Replace slashes with underscores
+            .replace(" ", "_") // Replace spaces with underscores
             .chars()
-            .filter(|c| c.is_alphanumeric() || *c == '_')  // Keep only valid characters
+            .filter(|c| c.is_alphanumeric() || *c == '_') // Keep only valid characters
             .collect()
     }
-    
 
     /// Returns the rank of the taxon.
     fn rank(

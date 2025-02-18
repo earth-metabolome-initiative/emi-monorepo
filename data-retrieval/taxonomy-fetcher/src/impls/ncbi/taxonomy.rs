@@ -34,14 +34,19 @@ impl Taxonomy for NCBITaxonomy {
         Self::Taxon<'_>,
         crate::errors::TaxonomyError<<Self::TaxonEntry as crate::traits::TaxonEntry>::Id>,
     > {
-        self.taxon_entries
-            .iter()
-            .find(|entry| &entry.id == id)
-            .map(|entry| NCBITaxon {
-                taxon_entry: entry,
-                taxonomy: self,
-            })
-            .ok_or(crate::errors::TaxonomyError::TaxonNotFound(id.clone()))
+        match self
+            .taxon_entries
+            .binary_search_by_key(id, |taxon_entry| taxon_entry.id)
+        {
+            Ok(index) => {
+                let taxon_entry = &self.taxon_entries[index];
+                Ok(NCBITaxon {
+                    taxon_entry,
+                    taxonomy: self,
+                })
+            }
+            Err(_) => Err(crate::errors::TaxonomyError::TaxonNotFound(id.clone())),
+        }
     }
 
     fn root(&self) -> Self::Taxon<'_> {

@@ -11,6 +11,7 @@ use taxonomy_fetcher::Taxon;
 use taxonomy_fetcher::Taxonomy;
 use taxonomy_fetcher::TaxonomyBuilder;
 use taxonomy_fetcher::TaxonomyWriter;
+use std::path::Path;
 
 #[tokio::test]
 async fn test_writer() {
@@ -27,39 +28,39 @@ async fn test_writer() {
     let duration = start.elapsed();
     log::info!("Taxonomy fetching took: {:?}", duration);
 
-    // log::info!("Outputting the standard compressed taxonomy.");
-    // let start = Instant::now();
-    // NCBITaxonomyWriter::default()
-    //     .compressed()
-    //     .write(&taxonomy, "./NCBItaxonomy.tsv.gz")
-    //     .unwrap();
-    // let duration = start.elapsed();
-    // log::info!("Standard compressed taxonomy writing took: {:?}", duration);
+    log::info!("Outputting the standard compressed taxonomy.");
+    let start = Instant::now();
+    NCBITaxonomyWriter::default()
+        .compressed()
+        .write(&taxonomy, Path::new("./NCBItaxonomy.tsv.gz"))
+        .unwrap();
+    let duration = start.elapsed();
+    log::info!("Standard compressed taxonomy writing took: {:?}", duration);
 
-    // log::info!("Outputting the standard taxonomy.");
-    // let start = Instant::now();
-    // NCBITaxonomyWriter::default()
-    //     .compressed()
-    //     .write(&taxonomy, "./NCBItaxonomy.tsv")
-    //     .unwrap();
-    // let duration = start.elapsed();
-    // log::info!("Standard taxonomy writing took: {:?}", duration);
+    log::info!("Outputting the standard taxonomy.");
+    let start = Instant::now();
+    NCBITaxonomyWriter::default()
+        .compressed()
+        .write(&taxonomy, Path::new("./NCBItaxonomy.tsv"))
+        .unwrap();
+    let duration = start.elapsed();
+    log::info!("Standard taxonomy writing took: {:?}", duration);
 
-    // log::info!("Outputting the ltree compressed taxonomy.");
-    // let start = Instant::now();
-    // NCBITaxonomyWriter::default()
-    //     .ltree()
-    //     .compressed()
-    //     .write(&taxonomy, "./NCBItaxonomy_ltree.tsv.gz")
-    //     .unwrap();
-    // let duration = start.elapsed();
-    // log::info!("Ltree compressed taxonomy writing took: {:?}", duration);
+    log::info!("Outputting the ltree compressed taxonomy.");
+    let start = Instant::now();
+    NCBITaxonomyWriter::default()
+        .ltree()
+        .compressed()
+        .write(&taxonomy, Path::new("./NCBItaxonomy_ltree.tsv.gz"))
+        .unwrap();
+    let duration = start.elapsed();
+    log::info!("Ltree compressed taxonomy writing took: {:?}", duration);
 
     log::info!("Outputting the ltree taxonomy.");
     let start = Instant::now();
     NCBITaxonomyWriter::default()
         .ltree()
-        .write(&taxonomy, "./NCBItaxonomy_ltree.tsv")
+        .write(&taxonomy, Path::new("./NCBItaxonomy_ltree.tsv"))
         .unwrap();
     let duration = start.elapsed();
     log::info!("Ltree taxonomy writing took: {:?}", duration);

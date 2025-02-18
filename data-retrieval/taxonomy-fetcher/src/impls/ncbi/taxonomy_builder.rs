@@ -1,5 +1,6 @@
 //! Implementation of the taxonomy builder for the NCBI taxonomy.
 
+use super::taxon_entry;
 use super::{
     taxon_entry::NCBITaxonEntry, taxon_entry_builder::NCBITaxonEntryBuilder,
     taxonomy::NCBITaxonomy, version::NCBIVersion,
@@ -319,6 +320,11 @@ impl TaxonomyBuilder for NCBITaxonomyBuilder {
 
             // TODO! Check that parent has a compatible rank!
         }
+
+        // For the binary search requirement we need to make sure that the entries are sorted.
+
+        self.taxon_entries
+            .sort_unstable_by_key(|taxon_entry| taxon_entry.id);
 
         Ok(NCBITaxonomy {
             version,

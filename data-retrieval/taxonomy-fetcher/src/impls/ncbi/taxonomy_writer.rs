@@ -12,6 +12,8 @@ pub struct NCBITaxonomyWriter {
     ltree: bool,
     /// Wether the output file should be compressed or not.
     compressed: bool,
+    /// Wether to skip the file or not when it is already here.
+    skip_if_output_present: bool,
 }
 
 impl TaxonomyWriter for NCBITaxonomyWriter {
@@ -38,6 +40,13 @@ impl TaxonomyWriter for NCBITaxonomyWriter {
         }
     }
 
+    fn skip_if_output_present(self) -> Self {
+        Self {
+            skip_if_output_present: true,
+            ..self
+        }
+    }
+
     fn get_sep(&self) -> u8 {
         self.separator.unwrap_or(b'\t')
     }
@@ -48,5 +57,9 @@ impl TaxonomyWriter for NCBITaxonomyWriter {
 
     fn is_compressed(&self) -> bool {
         self.compressed
+    }
+
+    fn should_skip_if_output_present(&self) -> bool {
+        self.skip_if_output_present
     }
 }

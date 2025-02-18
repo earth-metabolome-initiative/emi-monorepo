@@ -7,11 +7,11 @@ use crate::traits::taxon::Taxon;
 use flate2::write::GzEncoder;
 use flate2::Compression;
 use serde::Serialize;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufWriter, Write};
+use std::path::Path;
 use std::sync::{Arc, Mutex};
-use std::collections::HashMap;
-
 
 #[derive(Debug, Serialize)]
 struct CSVTaxonEntry<TE: TaxonEntry> {
@@ -37,6 +37,9 @@ pub trait TaxonomyWriter: Default {
     /// Wether the file should be compressed or not.
     fn compressed(self) -> Self;
 
+    /// Skips the writing step if the output file already exists.
+    fn skip_if_output_present(self) -> Self;
+
     /// Gets the defined separator.
     fn get_sep(&self) -> u8;
 
@@ -46,15 +49,21 @@ pub trait TaxonomyWriter: Default {
     /// Returns wether the compressing option was used or not.
     fn is_compressed(&self) -> bool;
 
+    /// Returns wether the writer should skip or not.
+    fn should_skip_if_output_present(&self) -> bool;
+
     /// Writes the Taxonomy out.
     fn write(
         &self,
         taxonomy: &Self::Taxonomy,
-        path: &str,
+        path: &Path,
     ) -> Result<
         (),
         TaxonomyError<<<Self::Taxonomy as super::Taxonomy>::TaxonEntry as super::TaxonEntry>::Id>,
     > {
+        if path.exists() && self.should_skip_if_output_present() {
+            return Ok(());
+        }
         // Create a boxed writer that abstracts over the underlying writer type
         let writer: Box<dyn Write> = if self.is_compressed() {
             let file = File::create(path)?;
