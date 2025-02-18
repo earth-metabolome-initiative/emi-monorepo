@@ -41,6 +41,17 @@ fn establish_connection_to_postgres() -> PgConnection {
 
 #[tokio::main]
 pub async fn main() {
+    // Get the output directory
+    let out_dir = env::var("OUT_DIR").unwrap();
+
+    // Path to the file to create
+    let path = Path::new(&out_dir).join("core_structs.rs");
+
+    // If the file already exists, we skip the build
+    if path.exists() {
+        return;
+    }
+
     // We ensure that the migrations directory has all expected properties.
     let mut time_tracker = TimeTracker::new("Building Core Structures");
     let task = Task::new("Checking Migrations Directory");
@@ -137,12 +148,6 @@ pub async fn main() {
     time_tracker.add_completed_task(task);
 
     // We write to the target directory the generated structs
-
-    // Get the output directory
-    let out_dir = env::var("OUT_DIR").unwrap();
-
-    // Path to the file to create
-    let path = Path::new(&out_dir).join("core_structs.rs");
 
     // Generate the code associated with the database
     let task = Task::new("Generating Code");

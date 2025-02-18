@@ -14,6 +14,7 @@ use web_common::api::{
 };
 use yew::platform::spawn_local;
 use yew_agent::worker::{HandlerId, Worker};
+use core_structures::User;
 
 const NOMINAL_CLOSURE_CODE: u16 = 1000;
 

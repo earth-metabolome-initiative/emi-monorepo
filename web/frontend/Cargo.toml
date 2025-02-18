@@ -13,13 +13,19 @@ description = "Frontend for the Earth Metabolome Initiative"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-gloo = "0.11.0"
+serde.workspace = true
+regex.workspace = true
+chrono.workspace = true
+serde_json.workspace = true
+bincode.workspace = true
+core_structures = { workspace = true, features = ["frontend"]}
+postgis_diesel = { workspace = true, default-features = false }
+
 reqwasm = "0.5.0"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-wasm-bindgen = "0.2.92"
+gloo = "0.11.0"
+wasm-bindgen = "0.2.100"
 uuid.workspace = true
-wasm-bindgen-futures = "0.4.40"
+wasm-bindgen-futures.workspace = true
 yew = { version = "0.21.0", features = ["csr"] }
 yew-router = "0.18.0"
 # The doc-tests feature is required to avoid errors from the Rust Analyzer,
@@ -29,33 +35,28 @@ web_common = { path = "../web_common", features = ["frontend"] }
 gloo-net = "0.5.0"
 gloo-console = "0.3.0"
 wasm-logger = "0.2.0"
-log = "0.4.20"
+log = "0.4.25"
 validator = { version = "0.16", features = ["derive"] }
-futures = "0.3.30"
-bincode = "1.3.3"
-rustrict = "0.7.24"
-js-sys = "0.3.69"
-leaflet = "0.4.0"
-chrono.workspace = true
+futures.workspace = true
+rustrict = "0.7.33"
+js-sys = "0.3.77"
+leaflet = "0.4.1"
 sublime_fuzzy = "0.7.0"
 implicit-clone = "0.4.9"
-v = "0.1.0"
-image = "0.24.0"
+image = "0.24.9"
 base64 = "0.22.1"
-rxing = { version = "0.5.9", features = [
+rxing = { version = "0.5.20", features = [
   "wasm_support",
 ], default-features = false }
-yew-hooks = "0.3.2"
-postcard = "1.0.8"
+yew-hooks = "0.3.3"
+postcard = "1.1.1"
 serde-wasm-bindgen = "0.6.5"
 yew-agent = "0.3.0"
 rustfft = "6.2.0"
-regex.workspace = true
 strsim = "0.11.1"
-core_structures = { workspace = true, features = ["frontend"]}
 
 [dependencies.web-sys]
-version = "0.3.69"
+version = "0.3.77"
 features = [
   'Headers',
   'Request',

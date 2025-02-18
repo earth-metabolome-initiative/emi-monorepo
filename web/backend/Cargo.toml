@@ -19,6 +19,8 @@ diesel-async.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 uuid.workspace = true
+bincode.workspace = true
+futures.workspace = true
 postgis_diesel = { workspace = true, features = ["serde", "diesel"] }
 core_structures = {workspace = true, features = ["backend"]}
 web_common_traits = {workspace = true, features = ["backend"]}
@@ -28,25 +30,23 @@ openssl = { version = "0.10" }
 
 actix = "0.13"
 actix-cors = "0.7.0"
-actix-rt = "2.9.0"
-actix-web = {version="4.5", features=["cookies", "openssl"]}
-actix-web-httpauth = "0.8.1"
+actix-rt = "2.10.0"
+actix-web = {version="4.9", features=["cookies", "openssl"]}
+actix-web-httpauth = "0.8.2"
 actix-service = "2.0.2"
-actix-http = "3.6.0"
-actix-files = "0.6.5"
+actix-http = "3.9.0"
+actix-files = "0.6.6"
 actix-ws.workspace = true
 log = "0.4"
 env_logger = "0.9"
-futures = "0.3.8"
 rust-argon2 = "1.0"
 time = "0.3"
-jsonwebtoken = "9.2.0"
-reqwest = {version="0.12.4", features = ["blocking", "json"] }
-email_address = "0.2.4"
+jsonwebtoken = "9.3.1"
+reqwest.workspace = true
+email_address = "0.2.9"
 redis = { version = "0.24.0", features = ["tokio-comp"] }
 base64 = "0.21.7"
 validator = "0.16"
-bincode = "1.3.3"
-image = "0.25.0"
+image = "0.25.5"
 identicon-rs = "5.0.1"
 strsim = "0.11.1"
