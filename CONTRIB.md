@@ -27,6 +27,14 @@ crate_name.workspace = true
 another_crate { workspace = true, optional = true }
 ```
 
+### Performance analysis
+
+One of the best tools available for a rough primary performance analysis is the `perf` tool. You can install it by running:
+
+```bash
+sudo perf top
+```
+
 ## Contributing to the backend
 
 The main backend code is found in [`web/backend`](web/backend). You will find therein another [`CONTRIB.md`](web/backend/CONTRIB.md) file with instructions on how to contribute to the backend.

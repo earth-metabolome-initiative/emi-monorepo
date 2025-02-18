@@ -3,7 +3,8 @@
 use core::fmt::Debug;
 use std::rc::Rc;
 
-use core_structures::{Colorable, Describable, SimilarityScore};
+use core_structures::Color;
+use web_common_traits::prelude::*;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -11,7 +12,7 @@ use crate::{router::AppRoute, traits::format_match::FormatMatch};
 
 /// Trait for types that can be converted to a badge.
 pub trait RowToBadge:
-    Colorable + Describable + Sized + Clone + PartialEq + Debug + SimilarityScore
+    Foreign<Color> + Describable + Sized + Clone + PartialEq + Debug + SimilarityScore
 {
     /// Returns the title for the badge.
     fn badge_title(&self) -> String;

@@ -7,8 +7,8 @@ pub mod operation_error;
 pub mod outcome;
 pub mod session;
 pub mod session_operation;
-pub mod tabular;
 pub mod types;
+pub mod foreign_key_traits;
 
 /// Main prelude for the library.
 pub mod prelude {
@@ -23,7 +23,7 @@ pub mod prelude {
         operation_error::OperationError,
         outcome::Outcome,
         session::Session,
+        foreign_key_traits::Foreign,
         session_operation::SessionOperation,
-        tabular::Tabular,
     };
 }

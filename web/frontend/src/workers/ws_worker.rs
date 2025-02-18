@@ -19,13 +19,11 @@ use core_structures::User;
 const NOMINAL_CLOSURE_CODE: u16 = 1000;
 
 type UserId = i32;
-type DatabaseMessage = (Uuid, Option<UserId>, Operation);
 
 pub struct WebsocketWorker {
     subscribers: HashSet<HandlerId>,
     tasks: HashMap<Uuid, HandlerId>,
     user: Option<Rc<User>>,
-    database_sender: futures::channel::mpsc::Sender<DatabaseMessage>,
     websocket_sender: Option<futures::channel::mpsc::Sender<FrontendMessage>>,
     reconnection_attempt: u32,
 }
@@ -138,7 +136,6 @@ impl Worker for WebsocketWorker {
             tasks: HashMap::new(),
             user: None,
             websocket_sender: None,
-            database_sender: Self::connect_to_database(scope.clone()),
             reconnection_attempt: 0,
         }
     }
