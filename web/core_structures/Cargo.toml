@@ -23,6 +23,7 @@ diesel.workspace = true
 testcontainers.workspace = true
 webcodegen.workspace = true
 diesel_migrations_utils.workspace = true
+time-requirements.workspace = true
 
 [features]
 default = ["serde"]
