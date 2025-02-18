@@ -9,6 +9,10 @@ use flate2::Compression;
 use serde::Serialize;
 use std::fs::File;
 use std::io::{self, BufWriter, Write};
+use std::sync::{Arc, Mutex};
+use std::collections::HashMap;
+
+
 
 #[derive(Debug, Serialize)]
 struct CSVTaxonEntry<TE: TaxonEntry> {
@@ -68,12 +72,16 @@ pub trait TaxonomyWriter: Default {
             .delimiter(self.get_sep())
             .from_writer(writer);
 
+        // Initialize the cache for memoization of ltree paths
+        let cache = Arc::new(Mutex::new(HashMap::new()));
+
         for taxon in taxonomy.taxons() {
             let taxon_entry: CSVTaxonEntry<<Self::Taxonomy as super::Taxonomy>::TaxonEntry> =
                 CSVTaxonEntry {
                     id: *taxon.id(),
                     name: if self.is_ltree() {
-                        taxon.ltree_path()
+                        let mut cache_lock = cache.lock().unwrap();
+                        taxon.ltree_path(&mut cache_lock)
                     } else {
                         taxon.name().to_string()
                     },

@@ -2,6 +2,7 @@
 
 use crate::traits::taxonomy::Taxonomy;
 use crate::traits::TaxonEntry;
+use std::collections::HashMap;
 
 /// Trait defining a taxon entry.
 pub trait Taxon<'a>: Sized
@@ -25,15 +26,37 @@ where
     /// As per https://www.postgresql.org/docs/current/ltree.html
     /// A label is a sequence of alphanumeric characters, underscores, and hyphens. Valid alphanumeric character ranges are dependent on the database locale. For example, in C locale, the characters A-Za-z0-9_- are allowed. Labels must be no more than 1000 characters long.
     /// TODO : We might want to add control mechanisms for these specifications here.
-    fn ltree_path(&self) -> String {
-        if let Some(parent) = self.parent() {
-            // Here we recursively call the ltree_path function in order to return parents
-            format!("{}.{}", parent.ltree_path(), self.name())
-        } else {
-            // this is the base case. We have no parents.
-            self.name().to_owned()
+    // fn ltree_path(&self) -> String {
+    //     if let Some(parent) = self.parent() {
+    //         // Here we recursively call the ltree_path function in order to return parents
+    //         format!("{}.{}", parent.ltree_path(), self.name())
+    //     } else {
+    //         // this is the base case. We have no parents.
+    //         self.name().to_owned()
+    //     }
+    // }
+
+    fn ltree_path(
+        &self, 
+        cache: &mut HashMap<
+            <<Self::Taxonomy as super::Taxonomy>::TaxonEntry as super::TaxonEntry>::Id, 
+            String
+        >
+    ) -> String {
+        if let Some(cached_path) = cache.get(self.id()) {
+            return cached_path.clone();
         }
+    
+        let path = if let Some(parent) = self.parent() {
+            format!("{}.{}", parent.ltree_path(cache), self.name())
+        } else {
+            self.name().to_owned()
+        };
+    
+        cache.insert(self.id().clone(), path.clone());
+        path
     }
+    
 
     /// Returns the rank of the taxon.
     fn rank(
