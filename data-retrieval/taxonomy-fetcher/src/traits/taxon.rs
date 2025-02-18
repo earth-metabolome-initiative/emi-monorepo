@@ -36,6 +36,7 @@ where
     //     }
     // }
 
+
     fn ltree_path(
         &self, 
         cache: &mut HashMap<
@@ -47,14 +48,27 @@ where
             return cached_path.clone();
         }
     
+        let sanitized_name = Self::sanitize_ltree_label(self.name()); // Sanitize the taxon name
+    
         let path = if let Some(parent) = self.parent() {
-            format!("{}.{}", parent.ltree_path(cache), self.name())
+            format!("{}.{}", parent.ltree_path(cache), sanitized_name)
         } else {
-            self.name().to_owned()
+            sanitized_name
         };
     
         cache.insert(self.id().clone(), path.clone());
         path
+    }
+
+    /// Sanitize the taxon names for LTREE compliance
+    fn sanitize_ltree_label(label: &str) -> String {
+        label
+            .replace(".", "_")  // Replace dots with underscores
+            .replace("/", "_")  // Replace slashes with underscores
+            .replace(" ", "_")  // Replace spaces with underscores
+            .chars()
+            .filter(|c| c.is_alphanumeric() || *c == '_')  // Keep only valid characters
+            .collect()
     }
     
 
