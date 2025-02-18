@@ -12,10 +12,10 @@ CREATE TABLE IF NOT EXISTS teams (
     -- The user who created the team
     created_by INTEGER NOT NULL,
     -- The date the team was created
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by INTEGER NOT NULL,
     -- The date the team was last updated
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (icon_id) REFERENCES icons(id),
     FOREIGN KEY (color_id) REFERENCES colors(id),
     FOREIGN KEY (state_id) REFERENCES team_states(id),

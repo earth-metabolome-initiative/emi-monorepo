@@ -9,6 +9,7 @@ pub mod session;
 pub mod session_operation;
 pub mod types;
 pub mod foreign_key_traits;
+pub mod attributes;
 
 /// Main prelude for the library.
 pub mod prelude {
@@ -24,6 +25,7 @@ pub mod prelude {
         outcome::Outcome,
         session::Session,
         foreign_key_traits::Foreign,
+        attributes::*,
         session_operation::SessionOperation,
     };
 }

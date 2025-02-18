@@ -5,7 +5,7 @@
 --
 CREATE TABLE IF NOT EXISTS organism_taxa (
   created_by INTEGER NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   organism_id UUID NOT NULL,
   taxon_id INTEGER NOT NULL,
   PRIMARY KEY (organism_id, taxon_id),

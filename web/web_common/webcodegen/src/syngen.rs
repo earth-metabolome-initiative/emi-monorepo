@@ -8,3 +8,4 @@ mod load_all;
 mod schema;
 mod to_syn;
 mod update_trait;
+mod attribute_traits;

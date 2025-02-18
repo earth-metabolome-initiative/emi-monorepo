@@ -2,7 +2,6 @@
 //! connection.
 use std::rc::Rc;
 
-use serde::de::DeserializeOwned;
 use web_common::api::form_traits::FormMethod;
 use yew::prelude::*;
 use yew_agent::{prelude::WorkerBridgeHandle, scope_ext::AgentScopeExt};

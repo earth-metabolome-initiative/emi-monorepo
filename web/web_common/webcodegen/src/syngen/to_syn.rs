@@ -67,6 +67,7 @@ impl Table {
             };
 
         let foreign_key_methods = self.foreign_key_methods(conn)?;
+        let foreign_key_traits_impls = self.foreign_key_traits(conn)?;
         // We only create a delete method if the table has a created_by column, which
         // means it contains user-generated data and therefore things that can be
         // deleted by some user.
@@ -79,6 +80,7 @@ impl Table {
         let diesel_derives_decorator = self.diesel_derives_decorator(conn)?;
         let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
         let from_unique_indices = self.from_unique_indices(conn)?;
+        let attribute_traits_impls = self.attribute_traits_impl(conn)?;
         let load_all = self.load_all_method()?;
 
         let built_table_syn = quote! {
@@ -97,6 +99,8 @@ impl Table {
                 #load_all
             }
 
+            #( #foreign_key_traits_impls )*
+            #attribute_traits_impls
             #insert_trait_impls
         };
 

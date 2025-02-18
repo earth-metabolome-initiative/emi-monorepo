@@ -5,7 +5,7 @@
 --
 CREATE TABLE IF NOT EXISTS sample_taxa (
     created_by INTEGER NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     sample_id UUID NOT NULL,
     taxon_id INTEGER NOT NULL,
     PRIMARY KEY (sample_id, taxon_id),

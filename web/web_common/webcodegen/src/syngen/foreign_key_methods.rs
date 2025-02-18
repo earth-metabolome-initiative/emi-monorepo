@@ -42,12 +42,6 @@ impl Table {
                     quote! { #foreign_key_struct_name }
                 };
 
-                let stricter_flag_name = if self.columns(conn)?.len() > foreign_key_table.columns(conn)?.len() {
-                    self.diesel_feature_flag_name(conn)?
-                } else {
-                    foreign_key_table.diesel_feature_flag_name(conn)?
-                };
-
                 let method_name: Ident = if column.column_name.ends_with("_id") {
                     Ident::new(&column.column_name[..column.column_name.len() - 3], proc_macro2::Span::call_site())
                 } else {
@@ -55,7 +49,6 @@ impl Table {
                 };
 
                 Ok(quote! {
-                    #[cfg(feature = #stricter_flag_name)]
                     impl web_common_traits::prelude::Foreign<#foreign_key_struct_name> for #struct_name {
                         #[cfg(feature = "backend")]
                         async fn foreign(&self, conn: &mut web_common_traits::prelude::DBConn) -> Result<#return_type_ident, diesel::result::Error> {

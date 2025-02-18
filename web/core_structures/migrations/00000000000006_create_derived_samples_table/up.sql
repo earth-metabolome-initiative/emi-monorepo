@@ -3,9 +3,9 @@
 
 CREATE TABLE IF NOT EXISTS derived_samples (
     created_by INTEGER NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by INTEGER NOT NULL,
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     parent_sample_id UUID NOT NULL,
     child_sample_id UUID NOT NULL,
     quantity FLOAT NOT NULL,

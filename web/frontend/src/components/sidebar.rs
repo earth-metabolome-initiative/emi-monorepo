@@ -7,7 +7,7 @@ use yew_router::prelude::*;
 use yewdux::use_store;
 
 use super::logout::Logout;
-use crate::{components::basic_page::PageLike, router::AppRoute, stores::user_state::UserState};
+use crate::{router::AppRoute, stores::user_state::UserState};
 
 #[derive(Properties, Clone, PartialEq, Debug)]
 pub struct SidebarProps {

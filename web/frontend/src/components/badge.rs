@@ -12,7 +12,7 @@ use crate::{router::AppRoute, traits::format_match::FormatMatch};
 
 /// Trait for types that can be converted to a badge.
 pub trait RowToBadge:
-    Foreign<Color> + Describable + Sized + Clone + PartialEq + Debug + SimilarityScore
+    Foreign<Color> + Described + Sized + Clone + PartialEq + Debug + SimilarityScore
 {
     /// Returns the title for the badge.
     fn badge_title(&self) -> String;

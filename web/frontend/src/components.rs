@@ -15,7 +15,6 @@ pub mod basic_list;
 pub use app::App;
 pub use badge::{Badge, RowToBadge};
 pub use basic_list::BasicList;
-pub(crate) use basic_page::{BasicPage, PageLike};
 pub use error_page::ErrorPage;
 pub use footer::Footer;
 pub use navigator::*;
