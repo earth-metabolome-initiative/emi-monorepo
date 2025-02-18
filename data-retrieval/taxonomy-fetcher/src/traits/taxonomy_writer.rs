@@ -8,10 +8,9 @@ use flate2::write::GzEncoder;
 use flate2::Compression;
 use serde::Serialize;
 use std::fs::File;
-use std::io::{self, BufWriter, Write};
+use std::io::{BufWriter, Write};
 use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
-
 
 
 #[derive(Debug, Serialize)]

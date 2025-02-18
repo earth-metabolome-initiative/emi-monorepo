@@ -21,3 +21,5 @@ csv.workspace = true
 flate2.workspace = true
 log.workspace = true
 env_logger.workspace = true
+rayon.workspace = true
+crossbeam-channel.workspace = true
