@@ -18,7 +18,10 @@ members = [
     "utils/common-traits",
     "utils/common-traits-derive",
     "utils/diesel_utils",
-    "utils/inflector", "utils/time-requirements",
+    "utils/inflector",
+    "utils/time-requirements",
+    "data-structures/graph",
+    "data-structures/algebra"
 ]
 
 [workspace.dependencies]
