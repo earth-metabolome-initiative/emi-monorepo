@@ -22,7 +22,7 @@ members = [
     "utils/time-requirements",
     "data-structures/graph",
     "data-structures/algebra"
-]
+, "data-structures/sorted-vec"]
 
 [workspace.dependencies]
 actix-ws = "0.3.0"
@@ -70,10 +70,12 @@ plotters = "0.3.7"
 futures = "0.3.31"
 wasm-bindgen-futures = "0.4.50"
 time-requirements = { path = "utils/time-requirements" }
+algebra = { path = "data-structures/algebra" }
+graph = { path = "data-structures/graph" }
+sorted-vec = { path = "data-structures/sorted-vec" }
 
 [workspace.lints.rust]
 missing_docs = "forbid"
-unsafe_code = "forbid"
 unused_macro_rules = "forbid"
 unconditional_recursion = "forbid"
 unreachable_patterns = "forbid"

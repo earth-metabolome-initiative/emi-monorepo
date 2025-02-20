@@ -12,6 +12,11 @@ pub trait Builder: Default + crate::basic::Basic {
     type Attribute: Basic;
 
     /// Builds the object.
+    /// 
+    /// # Errors
+    /// 
+    /// * If an attribute was not set.
+    /// * If the object could not be built.
     fn build(self) -> Result<Self::Object, Self::Error>;
 }
 
@@ -29,7 +34,7 @@ impl<A: std::fmt::Display> std::fmt::Display for BuilderError<A> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::IncompleteBuild { missing_attribute } => {
-                write!(f, "Incomplete build: missing attribute: {}", missing_attribute)
+                write!(f, "Incomplete build: missing attribute: {missing_attribute}")
             }
         }
     }

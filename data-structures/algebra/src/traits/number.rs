@@ -1,5 +1,7 @@
 //! Trait defining a number.
 
+use super::{One, Zero, Bounded};
+
 /// Trait defining a number.
 pub trait Number:
     Copy
@@ -8,6 +10,9 @@ pub trait Number:
     + core::fmt::Debug
     + PartialEq
     + PartialOrd
+    + One
+    + Zero
+    + Bounded
     + core::ops::Add<Output = Self>
     + core::ops::Sub<Output = Self>
     + core::ops::Mul<Output = Self>

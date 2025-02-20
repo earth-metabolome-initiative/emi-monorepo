@@ -1,13 +1,13 @@
 //! Submodule defining the graph-related traits.
 
+pub mod vocabulary;
 pub mod graph;
-pub mod graph_ref;
-pub mod node_ref;
-pub mod edge_ref;
-pub mod numeric_identifier;
+pub mod directed_graph;
+pub mod undirected_graph;
+pub mod algorithms;
 
+pub use vocabulary::*;
 pub use graph::*;
-pub use graph_ref::*;
-pub use node_ref::*;
-pub use edge_ref::*;
-pub use numeric_identifier::*;
+pub use directed_graph::*;
+pub use undirected_graph::*;
+pub use algorithms::*;

@@ -8,6 +8,10 @@ use syn::{parse_macro_input, Generics, ImplGenerics, Item, TypeGenerics};
 
 #[proc_macro_attribute]
 /// Derive the `Basic` trait for a struct or enum.
+/// 
+/// # Panics
+/// 
+/// Panics if the input is not a struct or an enum.
 pub fn basic(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as Item);
 
@@ -30,9 +34,9 @@ pub fn basic(_attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 /// Add necessary trait constraints to generic parameters.
-fn add_trait_constraints<'a>(
-    generics: &'a mut Generics,
-) -> (ImplGenerics<'a>, TypeGenerics<'a>, Option<&'a syn::WhereClause>) {
+fn add_trait_constraints(
+    generics: &mut Generics,
+) -> (ImplGenerics, TypeGenerics, Option<&syn::WhereClause>) {
     for param in &mut generics.params {
         if let syn::GenericParam::Type(ty) = param {
             ty.bounds.push(syn::parse_quote!(common_traits::basic::Basic));

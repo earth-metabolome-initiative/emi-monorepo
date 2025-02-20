@@ -1,0 +1,4 @@
+//! Trait defining an unique symbolic identifier.
+
+/// Trait defining an unique symbolic identifier.
+pub trait Symbol: PartialEq + Eq + Clone + core::hash::Hash + core::fmt::Debug{}

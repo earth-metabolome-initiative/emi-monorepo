@@ -4,6 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+algebra.workspace = true
+sorted-vec.workspace = true
 
 [lints]
 workspace = true
+
+[features]
+default = ["std"]
+std = ["alloc", "sorted-vec/std"]
+alloc = ["sorted-vec/alloc"]
