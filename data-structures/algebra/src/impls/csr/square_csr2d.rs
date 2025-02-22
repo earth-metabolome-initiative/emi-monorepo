@@ -76,8 +76,8 @@ where
     Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
     CSR2D<Offset, Idx, Idx>: SparseMatrix2D<RowIndex = Idx, ColumnIndex = Idx>,
 {
-    type SparseRowColumns<'a>
-        = <CSR2D<Offset, Idx, Idx> as SparseMatrix2D>::SparseRowColumns<'a>
+    type SparseRow<'a>
+        = <CSR2D<Offset, Idx, Idx> as SparseMatrix2D>::SparseRow<'a>
     where
         Self: 'a;
     type SparseColumns<'a>
@@ -89,8 +89,8 @@ where
     where
         Self: 'a;
 
-    fn row_sparse_columns(&self, row: Self::RowIndex) -> Self::SparseRowColumns<'_> {
-        self.csr.row_sparse_columns(row)
+    fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
+        self.csr.sparse_row(row)
     }
 
     fn sparse_columns(&self) -> Self::SparseColumns<'_> {

@@ -106,7 +106,7 @@ impl<
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
-    type SparseRowColumns<'a>
+    type SparseRow<'a>
         = core::iter::Copied<core::slice::Iter<'a, Self::ColumnIndex>>
     where
         Self: 'a;
@@ -119,7 +119,7 @@ where
     where
         Self: 'a;
 
-    fn row_sparse_columns(&self, row: Self::RowIndex) -> Self::SparseRowColumns<'_> {
+    fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         let start = self.offsets[row.into_usize()].into_usize();
         let end = self.offsets[row.into_usize() + 1].into_usize();
         self.column_indices[start..end].iter().copied()
@@ -159,11 +159,11 @@ where
     fn add(&mut self, (row, column): Self::Entry) -> Result<(), Self::Error> {
         if !self.is_empty() && row == self.number_of_rows() - <Self as Matrix2D>::RowIndex::ONE {
             // We check that the provided column is not repeated.
-            if self.row_sparse_columns(row).last().is_some_and(|last| last == column) {
+            if self.sparse_row(row).last().is_some_and(|last| last == column) {
                 return Err(MutabilityError::DuplicatedEntry((row, column)));
             }
             // We check that the provided column is provided in sorted order.
-            if self.row_sparse_columns(row).last().is_some_and(|last| last > column) {
+            if self.sparse_row(row).last().is_some_and(|last| last > column) {
                 return Err(MutabilityError::UnorderedColumnIndex(column));
             }
             // If the row is the last row, we can add the entry at the end of the column indices.

@@ -11,9 +11,9 @@ pub struct CSR2DView<'a, CSR: SparseMatrix2D> {
     /// The end row index.
     back_row: CSR::RowIndex,
     /// The row associated with the index at the beginning of the iteration.
-    next: CSR::SparseRowColumns<'a>,
+    next: CSR::SparseRow<'a>,
     /// The row associated with the index at the end of the iteration.
-    back: CSR::SparseRowColumns<'a>,
+    back: CSR::SparseRow<'a>,
 }
 
 impl<CSR: SparseMatrix2D> Iterator for CSR2DView<'_, CSR> {
@@ -23,7 +23,7 @@ impl<CSR: SparseMatrix2D> Iterator for CSR2DView<'_, CSR> {
         self.next.next().map(|column_index| (self.next_row, column_index)).or_else(|| {
             self.next_row += CSR::RowIndex::ONE;
             if self.next_row < self.back_row {
-                self.next = self.csr2d.row_sparse_columns(self.next_row);
+                self.next = self.csr2d.sparse_row(self.next_row);
                 self.next()
             } else {
                 self.back.next().map(|column_index| (self.back_row, column_index))
@@ -57,7 +57,7 @@ impl<CSR: SparseMatrix2D> DoubleEndedIterator for CSR2DView<'_, CSR> {
         self.back.next().map(|column_index| (self.back_row, column_index)).or_else(|| {
             self.back_row -= CSR::RowIndex::ONE;
             if self.back_row > self.next_row {
-                self.back = self.csr2d.row_sparse_columns(self.back_row);
+                self.back = self.csr2d.sparse_row(self.back_row);
                 self.next_back()
             } else {
                 self.next.next().map(|column_index| (self.next_row, column_index))
@@ -70,8 +70,8 @@ impl<'a, CSR: SparseMatrix2D> From<&'a CSR> for CSR2DView<'a, CSR> {
     fn from(csr2d: &'a CSR) -> Self {
         let next_row = CSR::RowIndex::ZERO;
         let back_row = csr2d.number_of_rows() - CSR::RowIndex::ONE;
-        let next = csr2d.row_sparse_columns(next_row);
-        let back = csr2d.row_sparse_columns(back_row);
+        let next = csr2d.sparse_row(next_row);
+        let back = csr2d.sparse_row(back_row);
         Self {
             csr2d,
             next_row,

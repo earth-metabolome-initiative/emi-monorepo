@@ -79,8 +79,8 @@ where
     Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
     CSR2D<Offset, Idx, Idx>: SparseMatrix2D<RowIndex = Idx, ColumnIndex = Idx>,
 {
-    type SparseRowColumns<'a>
-        = <CSR2D<Offset, Idx, Idx> as SparseMatrix2D>::SparseRowColumns<'a>
+    type SparseRow<'a>
+        = <CSR2D<Offset, Idx, Idx> as SparseMatrix2D>::SparseRow<'a>
     where
         Self: 'a;
     type SparseColumns<'a>
@@ -92,8 +92,8 @@ where
     where
         Self: 'a;
 
-    fn row_sparse_columns(&self, row: Self::RowIndex) -> Self::SparseRowColumns<'_> {
-        self.csr.row_sparse_columns(row)
+    fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
+        self.csr.sparse_row(row)
     }
 
     fn sparse_columns(&self) -> Self::SparseColumns<'_> {
@@ -157,7 +157,7 @@ where
             offsets: vec![Offset::ZERO; self.order().into_usize() + 1],
             number_of_columns: self.order(),
             column_indices: vec![Idx::ZERO; self.number_of_defined_values() * 2],
-            _row_indices: PhantomData::default(),
+            _row_indices: PhantomData,
         };
 
         // First, we proceed to compute the number of elements in each column.
