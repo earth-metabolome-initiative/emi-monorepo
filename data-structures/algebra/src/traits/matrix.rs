@@ -1,0 +1,54 @@
+//! Trait defining a matrix.
+
+mod matrix2d;
+mod square_matrix;
+mod triangular_matrix;
+mod matrix_mut;
+
+pub use matrix2d::*;
+pub use square_matrix::*;
+pub use triangular_matrix::*;
+pub use matrix_mut::*;
+
+use super::Coordinates;
+
+/// Trait defining a matrix.
+pub trait Matrix {
+    /// Type of the coordinate for this matrix.
+    type Coordinates: Coordinates;
+
+    #[must_use]
+    /// Returns the number of dimensions of this matrix.
+    fn dimensions() -> usize {
+        Self::Coordinates::dimensions()
+    }
+
+    /// Returns the number of elements in the matrix.
+    fn number_of_elements(&self) -> usize;
+
+    /// Returns whether the matrix is empty.
+    fn is_empty(&self) -> bool {
+        self.number_of_elements() == 0
+    }
+}
+
+/// Trait defining a matrix with values.
+pub trait ValuedMatrix: Matrix {
+    /// Type of the values of the matrix.
+    type Value;
+}
+
+/// Trait defining a sparse matrix.
+pub trait SparseMatrix: Matrix {
+    /// Iterator of the sparse coordinates of the matrix.
+    type SparseCoordinates<'a>: ExactSizeIterator<Item = Self::Coordinates>
+        + DoubleEndedIterator<Item = Self::Coordinates>
+    where
+        Self: 'a;
+
+    /// Returns the number of defined elements in the matrix.
+    fn number_of_defined_values(&self) -> usize;
+
+    /// Returns an iterator of the sparse coordinates of the matrix.
+    fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_>;
+}
