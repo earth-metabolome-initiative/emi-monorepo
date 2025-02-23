@@ -4,4 +4,6 @@
 
 /// Trait providing several basic traits for a struct such as `Debug`, `Clone`,
 /// `Serialize`, and `Deserialize`.
-pub trait Basic: std::fmt::Debug + Clone + serde::Serialize + serde::de::DeserializeOwned {}
+pub trait Basic: core::fmt::Debug + Clone + crate::serde_trait::Serde {}
+
+impl<T> Basic for Vec<T> where T: Basic {}
