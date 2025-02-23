@@ -1,16 +1,19 @@
 //! Enumeration of errors that may occour when handling sorted vectors.
 
+use core::fmt::Debug;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// Enumeration of errors that may occour when handling sorted vectors.
-pub enum Error {
-	/// Error indicating that the vector is not sorted.
-	NotSorted,
+pub enum Error<V> {
+	/// Error indicating that the vector is not sorted, providing
+	/// proof of the offending entry.
+	UnsortedEntry(V),
 }
 
-impl core::fmt::Display for Error {
+impl<V: Debug> core::fmt::Display for Error<V> {
 	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
 		match self {
-			Error::NotSorted => write!(f, "The vector is not sorted"),
+			Error::UnsortedEntry(v) => write!(f, "Found unsorted entru: {v:?}"),
 		}
 	}
 }
