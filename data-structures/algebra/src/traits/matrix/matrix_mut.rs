@@ -1,6 +1,6 @@
 //! Submodule defining the `MatrixMut` trait.
 
-use super::Matrix;
+use super::{Matrix, SparseMatrix};
 
 /// Trait defining a mutable matrix.
 pub trait MatrixMut: Matrix + Default {
@@ -26,4 +26,13 @@ pub trait MatrixMut: Matrix + Default {
     /// - The entry is already defined.
     ///
     fn add(&mut self, entry: Self::Entry) -> Result<(), Self::Error>;
+}
+
+/// Trait defining a bidimensional mutable matrix.
+pub trait SparseMatrixMut: MatrixMut + SparseMatrix {
+    /// Type describing the shape of the matrix.
+    type MinimalShape;
+
+    /// Creates a new matrix with the given capacity.
+    fn with_sparse_capacity(shape: Self::MinimalShape, number_of_values: Self::SparseIndex) -> Self;
 }

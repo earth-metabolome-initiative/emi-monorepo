@@ -5,9 +5,9 @@ use crate::prelude::*;
 
 #[derive(Clone)]
 /// A compressed sparse row matrix.
-pub struct CSR2D<Offset, RowIndex, ColumnIndex> {
+pub struct CSR2D<SparseIndex, RowIndex, ColumnIndex> {
     /// The row pointers.
-    pub(super) offsets: Vec<Offset>,
+    pub(super) offsets: Vec<SparseIndex>,
     /// The number of columns.
     pub(super) number_of_columns: ColumnIndex,
     /// The column indices.
@@ -16,10 +16,12 @@ pub struct CSR2D<Offset, RowIndex, ColumnIndex> {
     pub(super) _row_indices: PhantomData<RowIndex>,
 }
 
-impl<Offset: Zero, RowIndex, ColumnIndex: Zero> Default for CSR2D<Offset, RowIndex, ColumnIndex> {
+impl<SparseIndex: Zero, RowIndex, ColumnIndex: Zero> Default
+    for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+{
     fn default() -> Self {
         Self {
-            offsets: vec![Offset::ZERO],
+            offsets: vec![SparseIndex::ZERO],
             number_of_columns: ColumnIndex::ZERO,
             column_indices: Vec::new(),
             _row_indices: PhantomData,
@@ -27,9 +29,16 @@ impl<Offset: Zero, RowIndex, ColumnIndex: Zero> Default for CSR2D<Offset, RowInd
     }
 }
 
-impl<Offset: IntoUsize, RowIndex: PositiveInteger + IntoUsize, ColumnIndex: Zero>
-    CSR2D<Offset, RowIndex, ColumnIndex>
+impl<
+        SparseIndex: PositiveInteger + IntoUsize,
+        RowIndex: PositiveInteger + IntoUsize,
+        ColumnIndex: PositiveInteger + IntoUsize + From<SparseIndex>,
+    > SparseMatrixMut for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+where
+    Self: SparseMatrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex, SparseIndex = SparseIndex>,
 {
+    type MinimalShape = Self::Coordinates;
+
     /// Creates a new CSR matrix with the provided number of rows and columns.
     ///
     /// # Arguments
@@ -41,10 +50,9 @@ impl<Offset: IntoUsize, RowIndex: PositiveInteger + IntoUsize, ColumnIndex: Zero
     /// # Returns
     ///
     /// A new CSR matrix with the provided number of rows and columns.
-    pub fn with_capacity(
-        number_of_rows: RowIndex,
-        number_of_columns: ColumnIndex,
-        number_of_values: Offset,
+    fn with_sparse_capacity(
+        (number_of_rows, number_of_columns): Self::Coordinates,
+        number_of_values: Self::SparseIndex,
     ) -> Self {
         Self {
             offsets: Vec::with_capacity((number_of_rows + RowIndex::ONE).into_usize()),
@@ -56,10 +64,10 @@ impl<Offset: IntoUsize, RowIndex: PositiveInteger + IntoUsize, ColumnIndex: Zero
 }
 
 impl<
-        Offset,
+        SparseIndex,
         RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
         ColumnIndex: PositiveInteger + IntoUsize,
-    > Matrix2D for CSR2D<Offset, RowIndex, ColumnIndex>
+    > Matrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     type RowIndex = RowIndex;
     type ColumnIndex = ColumnIndex;
@@ -78,20 +86,21 @@ impl<
 }
 
 impl<
-        Offset: IntoUsize,
+        SparseIndex: PositiveInteger + IntoUsize,
         RowIndex: PositiveInteger + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize,
-    > SparseMatrix for CSR2D<Offset, RowIndex, ColumnIndex>
+        ColumnIndex: PositiveInteger + IntoUsize + From<SparseIndex>,
+    > SparseMatrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
+    type SparseIndex = SparseIndex;
     type SparseCoordinates<'a>
         = super::CSR2DView<'a, Self>
     where
         Self: 'a;
 
-    fn number_of_defined_values(&self) -> usize {
-        self.column_indices.len()
+    fn number_of_defined_values(&self) -> Self::SparseIndex {
+        self.offsets.last().copied().unwrap_or(SparseIndex::ZERO)
     }
 
     fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_> {
@@ -100,10 +109,10 @@ where
 }
 
 impl<
-        Offset: IntoUsize,
+        SparseIndex: PositiveInteger + IntoUsize,
         RowIndex: PositiveInteger + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize,
-    > SparseMatrix2D for CSR2D<Offset, RowIndex, ColumnIndex>
+        ColumnIndex: PositiveInteger + IntoUsize + From<SparseIndex>,
+    > SparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
@@ -134,10 +143,8 @@ where
         self.into()
     }
 
-    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> usize {
-        let start = self.offsets[row.into_usize()].into_usize();
-        let end = self.offsets[row.into_usize() + 1].into_usize();
-        end - start
+    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
+        (self.offsets[row.into_usize() + 1] - self.offsets[row.into_usize()]).into()
     }
 
     /// Returns the rank for the provided row.
@@ -147,10 +154,10 @@ where
 }
 
 impl<
-        Offset: PositiveInteger + IntoUsize,
+        SparseIndex: PositiveInteger + IntoUsize,
         RowIndex: PositiveInteger + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize,
-    > MatrixMut for CSR2D<Offset, RowIndex, ColumnIndex>
+        ColumnIndex: PositiveInteger + IntoUsize + From<SparseIndex>,
+    > MatrixMut for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
@@ -171,7 +178,7 @@ where
             self.column_indices.push(column);
             self.number_of_columns = self.number_of_columns.max(column + ColumnIndex::ONE);
             if let Some(offset) = self.offsets.last_mut() {
-                *offset += Offset::ONE;
+                *offset += SparseIndex::ONE;
             } else {
                 unreachable!()
             }
@@ -179,11 +186,12 @@ where
         } else if row >= self.number_of_rows() {
             // If the row is the next row, we can add the entry at the end of the column indices.
             while self.number_of_rows() < row {
-                self.offsets.push(self.offsets.last().copied().unwrap_or(Offset::ZERO));
+                self.offsets.push(self.offsets.last().copied().unwrap_or(SparseIndex::ZERO));
             }
             self.column_indices.push(column);
             self.number_of_columns = self.number_of_columns.max(column + ColumnIndex::ONE);
-            self.offsets.push(self.offsets.last().copied().unwrap_or(Offset::ZERO) + Offset::ONE);
+            self.offsets
+                .push(self.offsets.last().copied().unwrap_or(SparseIndex::ZERO) + SparseIndex::ONE);
             Ok(())
         } else {
             Err(MutabilityError::UnorderedRowIndex(row))
@@ -192,32 +200,33 @@ where
 }
 
 impl<
-        Offset: PositiveInteger + IntoUsize,
+        SparseIndex: PositiveInteger + IntoUsize,
         RowIndex: PositiveInteger + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize,
-    > TransposableMatrix2D for CSR2D<Offset, RowIndex, ColumnIndex>
+        ColumnIndex: PositiveInteger + IntoUsize + From<SparseIndex>,
+    > TransposableMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
-    CSR2D<Offset, ColumnIndex, RowIndex>: Matrix2D<RowIndex = ColumnIndex, ColumnIndex = RowIndex>,
+    CSR2D<SparseIndex, ColumnIndex, RowIndex>:
+        Matrix2D<RowIndex = ColumnIndex, ColumnIndex = RowIndex>,
 {
-    type Transposed = CSR2D<Offset, ColumnIndex, RowIndex>;
+    type Transposed = CSR2D<SparseIndex, ColumnIndex, RowIndex>;
 
     fn transpose(&self) -> Self::Transposed {
         // We initialize the transposed matrix.
         let mut transposed: Self::Transposed = Self::Transposed {
-            offsets: vec![Offset::ZERO; self.number_of_columns.into_usize() + 1],
+            offsets: vec![SparseIndex::ZERO; self.number_of_columns.into_usize() + 1],
             number_of_columns: self.number_of_rows(),
-            column_indices: vec![RowIndex::ZERO; self.number_of_defined_values()],
+            column_indices: vec![RowIndex::ZERO; self.number_of_defined_values().into_usize()],
             _row_indices: PhantomData,
         };
 
         // First, we proceed to compute the number of elements in each column.
         for column in self.column_indices.iter().copied() {
-            transposed.offsets[column.into_usize() + 1] += Offset::ONE;
+            transposed.offsets[column.into_usize() + 1] += SparseIndex::ONE;
         }
 
         // Then, we compute the prefix sum of the degrees to get the offsets.
-        let mut prefix_sum = Offset::ZERO;
+        let mut prefix_sum = SparseIndex::ZERO;
         for offset in &mut transposed.offsets {
             let current = *offset;
             *offset = prefix_sum;
@@ -225,12 +234,12 @@ where
         }
 
         // Finally, we fill the column indices.
-        let mut degree = vec![Offset::ZERO; self.number_of_columns.into_usize()];
+        let mut degree = vec![SparseIndex::ZERO; self.number_of_columns.into_usize()];
         for (row, column) in self.sparse_coordinates() {
-            let current_degree: &mut Offset = &mut degree[column.into_usize()];
+            let current_degree: &mut SparseIndex = &mut degree[column.into_usize()];
             let index = *current_degree + transposed.offsets[column.into_usize()];
             transposed.column_indices[index.into_usize()] = row;
-            *current_degree += Offset::ONE;
+            *current_degree += SparseIndex::ONE;
         }
 
         transposed

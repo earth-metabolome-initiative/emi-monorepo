@@ -45,12 +45,13 @@ where
     M: TransposableMatrix2D,
     M: SparseMatrix,
 {
+    type SparseIndex = M::SparseIndex;
     type SparseCoordinates<'a>
         = M::SparseCoordinates<'a>
     where
         Self: 'a;
 
-    fn number_of_defined_values(&self) -> usize {
+    fn number_of_defined_values(&self) -> Self::SparseIndex {
         self.matrix.number_of_defined_values()
     }
 
@@ -89,7 +90,7 @@ where
         self.matrix.sparse_rows()
     }
 
-    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> usize {
+    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
         self.matrix.number_of_defined_values_in_row(row)
     }
 

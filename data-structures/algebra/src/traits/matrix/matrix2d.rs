@@ -61,7 +61,7 @@ pub trait SparseMatrix2D: Matrix2D + SparseMatrix {
     fn sparse_rows(&self) -> Self::SparseRows<'_>;
 
     /// Returns the number of defined values in a row.
-    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> usize;
+    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex;
 
     /// Returns the rank of a row.
     fn rank(&self, row: Self::RowIndex) -> usize;
@@ -112,6 +112,16 @@ pub trait SparseBiMatrix2D: BiMatrix2D<
     ) -> <Self::SparseTransposedMatrix as SparseMatrix2D>::SparseRow<'_>
     {
         self.transposed().sparse_row(column)
+    }
+
+    /// Returns the number of defined values in a column.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `column` - The column index.
+    /// 
+    fn number_of_defined_values_in_column(&self, column: Self::ColumnIndex) -> Self::RowIndex {
+        self.transposed().number_of_defined_values_in_row(column)
     }
 }
 
