@@ -6,6 +6,8 @@ use crate::prelude::*;
 pub struct SquareCSR2D<SparseIndex, Idx> {
     /// The underlying CSR matrix.
     pub(super) csr: CSR2D<SparseIndex, Idx, Idx>,
+    /// The number of values in the diagonal.
+    pub(super) number_of_diagonal_values: Idx,
 }
 
 impl<SparseIndex, Idx: IntoUsize + PositiveInteger> SquareMatrix for SquareCSR2D<SparseIndex, Idx>
@@ -19,6 +21,18 @@ where
     }
 }
 
+impl<SparseIndex: PositiveInteger + IntoUsize, Idx: IntoUsize + PositiveInteger> SparseSquareMatrix
+    for SquareCSR2D<SparseIndex, Idx>
+where
+    Self: SquareMatrix<Index = Idx>,
+    CSR2D<SparseIndex, Idx, Idx>:
+        SparseMatrix2D<RowIndex = Idx, ColumnIndex = Idx, SparseIndex = SparseIndex>,
+{
+    fn number_of_defined_diagonal_values(&self) -> Self::Index {
+        self.number_of_diagonal_values
+    }
+}
+
 impl<SparseIndex, Idx> AsRef<CSR2D<SparseIndex, Idx, Idx>> for SquareCSR2D<SparseIndex, Idx> {
     fn as_ref(&self) -> &CSR2D<SparseIndex, Idx, Idx> {
         &self.csr
@@ -27,7 +41,7 @@ impl<SparseIndex, Idx> AsRef<CSR2D<SparseIndex, Idx, Idx>> for SquareCSR2D<Spars
 
 impl<SparseIndex: Zero, Idx: Zero> Default for SquareCSR2D<SparseIndex, Idx> {
     fn default() -> Self {
-        Self { csr: CSR2D::default() }
+        Self { csr: CSR2D::default(), number_of_diagonal_values: Idx::ZERO }
     }
 }
 
@@ -41,18 +55,21 @@ where
 {
     type MinimalShape = Idx;
 
-    /// Creates a new CSR matrix with the provided number of rows and columns.
-    ///
-    /// # Arguments
-    ///
-    /// * `order`: The number of rows and columns.
-    /// * `number_of_values`: The number of values.
-    ///
-    /// # Returns
-    ///
-    /// A new CSR matrix with the provided number of rows and columns.
-    fn with_sparse_capacity(order: Idx, number_of_values: SparseIndex) -> Self {
-        Self { csr: CSR2D::with_sparse_capacity((order, order), number_of_values) }
+    fn with_sparse_capacity(number_of_values: Self::SparseIndex) -> Self {
+        Self {
+            csr: CSR2D::with_sparse_capacity(number_of_values),
+            number_of_diagonal_values: Idx::ZERO,
+        }
+    }
+
+    fn with_sparse_shaped_capacity(
+        order: Self::MinimalShape,
+        number_of_values: Self::SparseIndex,
+    ) -> Self {
+        Self {
+            csr: CSR2D::with_sparse_shaped_capacity((order, order), number_of_values),
+            number_of_diagonal_values: Idx::ZERO,
+        }
     }
 }
 
@@ -131,7 +148,9 @@ where
     type Error = super::MutabilityError<Self>;
 
     fn add(&mut self, (row, column): Self::Entry) -> Result<(), Self::Error> {
-        Ok(self.csr.add((row, column))?)
+        self.csr.add((row, column))?;
+        self.number_of_diagonal_values += Idx::ONE;
+        Ok(())
     }
 }
 
@@ -143,9 +162,12 @@ where
     Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
     CSR2D<SparseIndex, Idx, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
 {
-    type Transposed = CSR2D<SparseIndex, Idx, Idx>;
+    type Transposed = Self;
 
     fn transpose(&self) -> Self::Transposed {
-        self.csr.transpose()
+        Self {
+            csr: self.csr.transpose(),
+            number_of_diagonal_values: self.number_of_diagonal_values,
+        }
     }
 }

@@ -1,6 +1,7 @@
 //! Trait defining a number.
 
-use super::{One, Zero, Bounded};
+use common_traits::prelude::Serde;
+use super::{Bounded, One, Zero};
 
 /// Trait defining a number.
 pub trait Number:
@@ -13,6 +14,7 @@ pub trait Number:
     + One
     + Zero
     + Bounded
+    + Serde
     + core::ops::Add<Output = Self>
     + core::ops::Sub<Output = Self>
     + core::ops::Mul<Output = Self>

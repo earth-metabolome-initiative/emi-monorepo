@@ -3,4 +3,4 @@
 use crate::prelude::*;
 
 /// Trait defining a lower triangular matrix.
-pub trait LowerTriangularMatrix: SquareMatrix {}
+pub trait UpperTriangularMatrix: SquareMatrix {}

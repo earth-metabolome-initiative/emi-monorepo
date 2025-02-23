@@ -1,9 +1,9 @@
 //! Enumeration for the errors associated with the CSR data structure.
 
-use crate::traits::Matrix2D;
+use crate::traits::{IntoUsize, Matrix2D, PositiveInteger};
 use core::fmt::Debug;
 
-use super::{UpperTriangularCSR2D, SquareCSR2D, CSR2D};
+use super::{SquareCSR2D, UpperTriangularCSR2D, CSR2D};
 
 /// Enumeration for the errors associated with the CSR data structure.
 pub enum Error<M: Matrix2D> {
@@ -82,7 +82,9 @@ where
             MutabilityError::UnorderedColumnIndex(index) => {
                 MutabilityError::UnorderedColumnIndex(index)
             }
-            MutabilityError::DuplicatedEntry(coordinates) => MutabilityError::DuplicatedEntry(coordinates),
+            MutabilityError::DuplicatedEntry(coordinates) => {
+                MutabilityError::DuplicatedEntry(coordinates)
+            }
             MutabilityError::OutOfBounds(coordinates) => MutabilityError::OutOfBounds(coordinates),
         }
     }
@@ -100,7 +102,29 @@ where
             MutabilityError::UnorderedColumnIndex(index) => {
                 MutabilityError::UnorderedColumnIndex(index)
             }
-            MutabilityError::DuplicatedEntry(coordinates) => MutabilityError::DuplicatedEntry(coordinates),
+            MutabilityError::DuplicatedEntry(coordinates) => {
+                MutabilityError::DuplicatedEntry(coordinates)
+            }
+            MutabilityError::OutOfBounds(coordinates) => MutabilityError::OutOfBounds(coordinates),
+        }
+    }
+}
+
+impl<Offset, Idx: PositiveInteger + IntoUsize> From<MutabilityError<SquareCSR2D<Offset, Idx>>>
+    for MutabilityError<UpperTriangularCSR2D<Offset, Idx>>
+where
+    SquareCSR2D<Offset, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    UpperTriangularCSR2D<Offset, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+{
+    fn from(error: MutabilityError<SquareCSR2D<Offset, Idx>>) -> Self {
+        match error {
+            MutabilityError::UnorderedRowIndex(index) => MutabilityError::UnorderedRowIndex(index),
+            MutabilityError::UnorderedColumnIndex(index) => {
+                MutabilityError::UnorderedColumnIndex(index)
+            }
+            MutabilityError::DuplicatedEntry(coordinates) => {
+                MutabilityError::DuplicatedEntry(coordinates)
+            }
             MutabilityError::OutOfBounds(coordinates) => MutabilityError::OutOfBounds(coordinates),
         }
     }

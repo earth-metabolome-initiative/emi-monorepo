@@ -39,18 +39,16 @@ where
 {
     type MinimalShape = Self::Coordinates;
 
-    /// Creates a new CSR matrix with the provided number of rows and columns.
-    ///
-    /// # Arguments
-    ///
-    /// * `number_of_rows`: The number of rows.
-    /// * `number_of_columns`: The number of columns.
-    /// * `number_of_values`: The number of values.
-    ///
-    /// # Returns
-    ///
-    /// A new CSR matrix with the provided number of rows and columns.
-    fn with_sparse_capacity(
+    fn with_sparse_capacity(number_of_values: Self::SparseIndex) -> Self {
+        Self {
+            offsets: vec![SparseIndex::ZERO],
+            number_of_columns: ColumnIndex::ZERO,
+            column_indices: Vec::with_capacity(number_of_values.into_usize()),
+            _row_indices: PhantomData,
+        }
+    }
+
+    fn with_sparse_shaped_capacity(
         (number_of_rows, number_of_columns): Self::Coordinates,
         number_of_values: Self::SparseIndex,
     ) -> Self {

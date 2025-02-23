@@ -4,6 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+common-traits.workspace = true
+serde = {workspace = true, optional = true}
 
 [lints]
 workspace = true
+
+[features]
+serde = ["dep:serde", "common-traits/serde"]

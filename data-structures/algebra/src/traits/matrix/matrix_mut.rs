@@ -31,8 +31,22 @@ pub trait MatrixMut: Matrix + Default {
 /// Trait defining a bidimensional mutable matrix.
 pub trait SparseMatrixMut: MatrixMut + SparseMatrix {
     /// Type describing the shape of the matrix.
-    type MinimalShape;
+    type MinimalShape: core::fmt::Debug + Copy;
 
-    /// Creates a new matrix with the given capacity.
-    fn with_sparse_capacity(shape: Self::MinimalShape, number_of_values: Self::SparseIndex) -> Self;
+    /// Creates a new matrix with the given capacity, using the given shape.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `shape` - The shape of the matrix.
+    /// * `number_of_values` - The number of values.
+    /// 
+    fn with_sparse_shaped_capacity(shape: Self::MinimalShape, number_of_values: Self::SparseIndex) -> Self;
+
+    /// Creates a new matrix with the given capacity and unknown shape.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `number_of_values` - The number of values.
+    /// 
+    fn with_sparse_capacity(number_of_values: Self::SparseIndex) -> Self;
 }

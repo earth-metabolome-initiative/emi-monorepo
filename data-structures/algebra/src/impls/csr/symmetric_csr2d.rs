@@ -20,6 +20,18 @@ where
     }
 }
 
+impl<SparseIndex: PositiveInteger + IntoUsize, Idx: IntoUsize + PositiveInteger> SparseSquareMatrix
+    for SymmetricCSR2D<SparseIndex, Idx>
+where
+    Self: SquareMatrix<Index = Idx>,
+    CSR2D<SparseIndex, Idx, Idx>:
+        SparseMatrix2D<RowIndex = Idx, ColumnIndex = Idx, SparseIndex = SparseIndex>,
+{
+    fn number_of_defined_diagonal_values(&self) -> Self::Index {
+        self.csr.number_of_defined_diagonal_values()
+    }
+}
+
 impl<SparseIndex, Idx> AsRef<SquareCSR2D<SparseIndex, Idx>> for SymmetricCSR2D<SparseIndex, Idx> {
     fn as_ref(&self) -> &SquareCSR2D<SparseIndex, Idx> {
         &self.csr
@@ -41,19 +53,12 @@ where
 {
     type MinimalShape = Idx;
 
-    /// Creates a new CSR matrix with the provided number of rows and columns.
-    ///
-    /// # Arguments
-    ///
-    /// * `number_of_rows`: The number of rows.
-    /// * `number_of_columns`: The number of columns.
-    /// * `number_of_values`: The number of values.
-    ///
-    /// # Returns
-    ///
-    /// A new CSR matrix with the provided number of rows and columns.
-    fn with_sparse_capacity(order: Idx, number_of_values: SparseIndex) -> Self {
-        Self { csr: SquareCSR2D::with_sparse_capacity(order, number_of_values) }
+    fn with_sparse_capacity(number_of_values: Self::SparseIndex) -> Self {
+        Self { csr: SquareCSR2D::with_sparse_capacity(number_of_values) }
+    }
+
+    fn with_sparse_shaped_capacity(order: Self::MinimalShape, number_of_values: Self::SparseIndex) -> Self {
+        Self { csr: SquareCSR2D::with_sparse_shaped_capacity(order, number_of_values) }
     }
 }
 

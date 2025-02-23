@@ -7,15 +7,13 @@ use crate::prelude::*;
 /// A compressed sparse row matrix.
 pub struct UpperTriangularCSR2D<SparseIndex, Idx> {
     /// The underlying CSR matrix.
-    csr: CSR2D<SparseIndex, Idx, Idx>,
-    /// The number of values in the diagonal.
-    number_of_diagonal_values: Idx,
+    csr: SquareCSR2D<SparseIndex, Idx>,
 }
 
 impl<SparseIndex, Idx: IntoUsize + PositiveInteger> SquareMatrix
     for UpperTriangularCSR2D<SparseIndex, Idx>
 where
-    CSR2D<SparseIndex, Idx, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    SquareCSR2D<SparseIndex, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
 {
     type Index = Idx;
 
@@ -28,11 +26,10 @@ impl<SparseIndex: PositiveInteger + IntoUsize, Idx: IntoUsize + PositiveInteger>
     for UpperTriangularCSR2D<SparseIndex, Idx>
 where
     Self: SquareMatrix<Index = Idx>,
-    CSR2D<SparseIndex, Idx, Idx>:
-        SparseMatrix2D<RowIndex = Idx, ColumnIndex = Idx, SparseIndex = SparseIndex>,
+    SquareCSR2D<SparseIndex, Idx>: SparseSquareMatrix<Index = Idx, SparseIndex = SparseIndex>,
 {
     fn number_of_defined_diagonal_values(&self) -> Self::Index {
-        self.number_of_diagonal_values
+        self.csr.number_of_defined_diagonal_values()
     }
 }
 
@@ -40,41 +37,34 @@ impl<SparseIndex, Idx> AsRef<CSR2D<SparseIndex, Idx, Idx>>
     for UpperTriangularCSR2D<SparseIndex, Idx>
 {
     fn as_ref(&self) -> &CSR2D<SparseIndex, Idx, Idx> {
-        &self.csr
+        self.csr.as_ref()
     }
 }
 
 impl<SparseIndex: Zero, Idx: Zero> Default for UpperTriangularCSR2D<SparseIndex, Idx> {
     fn default() -> Self {
-        Self { csr: CSR2D::default(), number_of_diagonal_values: Idx::ZERO }
+        Self { csr: SquareCSR2D::default() }
     }
 }
 
 impl<SparseIndex: IntoUsize, Idx: PositiveInteger + IntoUsize + Zero> SparseMatrixMut
     for UpperTriangularCSR2D<SparseIndex, Idx>
-where 
+where
     Self: SparseMatrix<SparseIndex = SparseIndex, Coordinates = (Idx, Idx)>
         + MatrixMut<Entry = Self::Coordinates>,
-    CSR2D<SparseIndex, Idx, Idx>:
-        SparseMatrixMut<SparseIndex = SparseIndex, MinimalShape = Self::Coordinates>,
+    SquareCSR2D<SparseIndex, Idx>: SparseMatrixMut<SparseIndex = SparseIndex, MinimalShape = Idx>,
 {
     type MinimalShape = Idx;
 
-    /// Creates a new CSR matrix with the provided number of rows and columns.
-    ///
-    /// # Arguments
-    ///
-    /// * `order`: The number of rows and columns.
-    /// * `number_of_values`: The number of values.
-    ///
-    /// # Returns
-    ///
-    /// A new CSR matrix with the provided number of rows and columns.
-    fn with_sparse_capacity(order: Idx, number_of_values: SparseIndex) -> Self {
-        Self {
-            csr: CSR2D::with_sparse_capacity((order, order), number_of_values),
-            number_of_diagonal_values: Idx::ZERO,
-        }
+    fn with_sparse_capacity(number_of_values: Self::SparseIndex) -> Self {
+        Self { csr: SquareCSR2D::with_sparse_capacity(number_of_values) }
+    }
+
+    fn with_sparse_shaped_capacity(
+        shape: Self::MinimalShape,
+        number_of_values: Self::SparseIndex,
+    ) -> Self {
+        Self { csr: SquareCSR2D::with_sparse_shaped_capacity(shape, number_of_values) }
     }
 }
 
@@ -82,12 +72,12 @@ impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize>
     for UpperTriangularCSR2D<SparseIndex, Idx>
 where
     Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-    CSR2D<SparseIndex, Idx, Idx>:
+    SquareCSR2D<SparseIndex, Idx>:
         SparseMatrix<Coordinates = Self::Coordinates, SparseIndex = SparseIndex>,
 {
-    type SparseIndex = <CSR2D<SparseIndex, Idx, Idx> as SparseMatrix>::SparseIndex;
+    type SparseIndex = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix>::SparseIndex;
     type SparseCoordinates<'a>
-        = <CSR2D<SparseIndex, Idx, Idx> as SparseMatrix>::SparseCoordinates<'a>
+        = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix>::SparseCoordinates<'a>
     where
         Self: 'a;
 
@@ -96,7 +86,7 @@ where
     }
 
     fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_> {
-        self.as_ref().sparse_coordinates()
+        self.csr.sparse_coordinates()
     }
 }
 
@@ -104,19 +94,19 @@ impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize>
     for UpperTriangularCSR2D<SparseIndex, Idx>
 where
     Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-    CSR2D<SparseIndex, Idx, Idx>:
+    SquareCSR2D<SparseIndex, Idx>:
         SparseMatrix2D<RowIndex = Idx, ColumnIndex = Idx, SparseIndex = SparseIndex>,
 {
     type SparseRow<'a>
-        = <CSR2D<SparseIndex, Idx, Idx> as SparseMatrix2D>::SparseRow<'a>
+        = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::SparseRow<'a>
     where
         Self: 'a;
     type SparseColumns<'a>
-        = <CSR2D<SparseIndex, Idx, Idx> as SparseMatrix2D>::SparseColumns<'a>
+        = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::SparseColumns<'a>
     where
         Self: 'a;
     type SparseRows<'a>
-        = <CSR2D<SparseIndex, Idx, Idx> as SparseMatrix2D>::SparseRows<'a>
+        = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::SparseRows<'a>
     where
         Self: 'a;
 
@@ -146,7 +136,7 @@ impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize>
     for UpperTriangularCSR2D<SparseIndex, Idx>
 where
     Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-    CSR2D<SparseIndex, Idx, Idx>: MatrixMut<Entry = Self::Coordinates, Error = MutabilityError<CSR2D<SparseIndex, Idx, Idx>>>
+    SquareCSR2D<SparseIndex, Idx>: MatrixMut<Entry = Self::Coordinates, Error = MutabilityError<SquareCSR2D<SparseIndex, Idx>>>
         + Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
 {
     type Entry = Self::Coordinates;
@@ -157,7 +147,6 @@ where
             return Err(MutabilityError::OutOfBounds((row, column)));
         }
         self.csr.add((row, column))?;
-        self.number_of_diagonal_values += Idx::ONE;
 
         Ok(())
     }
@@ -169,9 +158,13 @@ impl<
     > TransposableMatrix2D for UpperTriangularCSR2D<SparseIndex, Idx>
 where
     Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-    CSR2D<SparseIndex, Idx, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    SquareCSR2D<SparseIndex, Idx>: TransposableMatrix2D<
+        RowIndex = Idx,
+        ColumnIndex = Idx,
+        Transposed = SquareCSR2D<SparseIndex, Idx>,
+    >,
 {
-    type Transposed = CSR2D<SparseIndex, Idx, Idx>;
+    type Transposed = SquareCSR2D<SparseIndex, Idx>;
 
     fn transpose(&self) -> Self::Transposed {
         self.csr.transpose()
@@ -182,7 +175,7 @@ impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize>
     Symmetrize<SymmetricCSR2D<SparseIndex, Idx>> for UpperTriangularCSR2D<SparseIndex, Idx>
 where
     Self: SparseSquareMatrix<Index = Idx, SparseIndex = SparseIndex>,
-    CSR2D<SparseIndex, Idx, Idx>:
+    SquareCSR2D<SparseIndex, Idx>:
         SparseMatrix2D<RowIndex = Idx, ColumnIndex = Idx, SparseIndex = SparseIndex>,
 {
     fn symmetrize(&self) -> SymmetricCSR2D<SparseIndex, Idx> {
@@ -217,7 +210,9 @@ where
         // Finally, we fill the column indices.
         let mut degree = vec![SparseIndex::ZERO; self.order().into_usize()];
         for (row, column) in self.sparse_coordinates() {
-            for (i, j) in [(row, column), (column, row)] {
+            let edges: Vec<(Idx, Idx)> =
+                if row == column { vec![(row, column)] } else { vec![(row, column), (column, row)] };
+            for (i, j) in edges {
                 let current_degree: &mut SparseIndex = &mut degree[i.into_usize()];
                 let index = *current_degree + symmetric.offsets[i.into_usize()];
                 symmetric.column_indices[index.into_usize()] = j;
@@ -225,6 +220,11 @@ where
             }
         }
 
-        SymmetricCSR2D { csr: SquareCSR2D { csr: symmetric } }
+        SymmetricCSR2D {
+            csr: SquareCSR2D {
+                csr: symmetric,
+                number_of_diagonal_values: self.number_of_defined_diagonal_values(),
+            },
+        }
     }
 }
