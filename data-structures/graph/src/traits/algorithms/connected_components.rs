@@ -5,7 +5,7 @@ use algebra::prelude::*;
 use crate::traits::{Graph, UndirectedGraph};
 
 /// Connected components object.
-pub struct ConnectedComponentsResult<'a, G: Graph + ?Sized, Marker = usize> {
+pub struct ConnectedComponentsResult<'a, G: UndirectedGraph + ?Sized, Marker = usize> {
     /// Identifiers of the connected components.
     component_identifiers: Vec<Marker>,
     /// Underlying graph.
@@ -18,7 +18,7 @@ pub struct ConnectedComponentsResult<'a, G: Graph + ?Sized, Marker = usize> {
     smallest_component_size: G::NodeId,
 }
 
-impl<G: Graph + ?Sized, Marker: PositiveInteger> ConnectedComponentsResult<'_, G, Marker>
+impl<G: UndirectedGraph + ?Sized, Marker: PositiveInteger> ConnectedComponentsResult<'_, G, Marker>
 where
     G::NodeId: IntoUsize,
 {
@@ -113,8 +113,6 @@ impl<G: Graph + ?Sized> From<ConnectedComponentsError> for crate::errors::Error<
 ///    save a significant amount of memory.
 pub trait ConnectedComponents<Marker: IntoUsize + PositiveInteger = usize>:
     UndirectedGraph
-where
-    Self::NodeId: IntoUsize + FromUsize,
 {
     /// Returns the number of connected components in the graph.
     ///
@@ -125,18 +123,11 @@ where
     fn connected_components(
         &self,
     ) -> Result<ConnectedComponentsResult<'_, Self, Marker>, crate::errors::Error<Self>> {
-        let mut component_identifiers: Vec<Marker> = vec![Marker::MAX; self.number_of_nodes()];
+        let mut component_identifiers: Vec<Marker> =
+            vec![Marker::MAX; self.number_of_nodes().into_usize()];
         let mut number_of_components: Marker = Marker::ZERO;
         let mut largest_component_size: Self::NodeId = Self::NodeId::ZERO;
-        let Ok(mut smallest_component_size) = Self::NodeId::from_usize(self.number_of_nodes())
-        else {
-            return Err(
-                crate::errors::graph::illegal_graph_states::IllegalGraphState::TooManyNodes {
-                    number_of_nodes: self.number_of_nodes(),
-                }
-                .into(),
-            );
-        };
+        let mut smallest_component_size: Self::NodeId = self.number_of_nodes();
 
         let mut frontier = Vec::new();
         let mut temporary_frontier = Vec::new();
@@ -198,4 +189,11 @@ where
             smallest_component_size,
         })
     }
+}
+
+impl<G: UndirectedGraph + ?Sized, Marker: IntoUsize + PositiveInteger> ConnectedComponents<Marker>
+    for G
+where
+    Self: UndirectedGraph,
+{
 }

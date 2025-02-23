@@ -1,14 +1,13 @@
 //! Module implementing traits for the Vec type.
 
-use algebra::prelude::Symbol;
+use algebra::prelude::{PositiveInteger, Symbol};
 #[cfg(all(not(feature = "std"), feature = "alloc"))]
 use alloc::vec::Vec;
 
-use crate::prelude::*;
 use core::iter::Cloned;
 use core::ops::Range;
 
-impl<V: Symbol> Vocabulary for Vec<V> {
+impl<V: Symbol, const N: usize> crate::traits::Vocabulary for [V; N] {
     type SourceSymbol = usize;
     type DestinationSymbol = V;
     type Sources<'a>
@@ -25,7 +24,7 @@ impl<V: Symbol> Vocabulary for Vec<V> {
     }
 
     fn len(&self) -> usize {
-        self.len()
+        N
     }
 
     fn sources(&self) -> Self::Sources<'_> {
@@ -37,7 +36,7 @@ impl<V: Symbol> Vocabulary for Vec<V> {
     }
 }
 
-impl<V: Symbol> VocabularyRef for Vec<V> {
+impl<V: Symbol, const N: usize> crate::traits::VocabularyRef for [V; N] {
     type DestinationRefs<'a>
         = core::slice::Iter<'a, Self::DestinationSymbol>
     where
@@ -52,40 +51,22 @@ impl<V: Symbol> VocabularyRef for Vec<V> {
     }
 }
 
-impl<V: Symbol> BidirectionalVocabulary for Vec<V> {
+impl<V: Symbol, const N: usize> crate::traits::BidirectionalVocabulary for [V; N] {
     fn invert(&self, destination: &Self::DestinationSymbol) -> Option<Self::SourceSymbol> {
         self.iter().position(|v| v == destination)
     }
 }
 
-impl<V: Symbol + Ord> GrowableVocabulary for Vec<V> {
-    fn new() -> Self {
-        Vec::new()
+
+impl<NodeId: PositiveInteger> crate::traits::Edge for [NodeId; 2] {
+    type SourceNodeId = NodeId;
+    type DestinationNodeId = NodeId;
+
+    fn source(&self) -> Self::SourceNodeId {
+        self[0]
     }
 
-    fn with_capacity(capacity: usize) -> Self {
-        Vec::with_capacity(capacity)
-    }
-
-    fn add(
-        &mut self,
-        source: Self::SourceSymbol,
-        destination: Self::DestinationSymbol,
-    ) -> Result<(), crate::errors::builder::vocabulary::VocabularyBuilderError<Self>> {
-        if source != self.len() {
-            return Err(
-                crate::errors::builder::vocabulary::VocabularyBuilderError::SparseSourceNode(
-                    source,
-                ),
-            );
-        }
-
-        if self.invert(&destination).is_some() {
-            return Err(crate::errors::builder::vocabulary::VocabularyBuilderError::RepeatedDestinationSymbol(destination));
-        }
-
-        self.push(destination);
-
-        Ok(())
+    fn destination(&self) -> Self::DestinationNodeId {
+        self[1]
     }
 }

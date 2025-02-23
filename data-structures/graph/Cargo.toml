@@ -6,6 +6,8 @@ edition = "2021"
 [dependencies]
 algebra.workspace = true
 sorted-vec.workspace = true
+common-traits.workspace = true
+serde = { workspace = true, optional = true }
 
 [lints]
 workspace = true
@@ -14,3 +16,4 @@ workspace = true
 default = ["std"]
 std = ["alloc", "sorted-vec/std"]
 alloc = ["sorted-vec/alloc"]
+serde = ["algebra/serde", "dep:serde"]

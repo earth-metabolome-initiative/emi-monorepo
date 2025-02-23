@@ -1,48 +1,131 @@
-//! Module defining a graph.
+//! Module defining a bipartite graph.
 
 use crate::prelude::*;
-use algebra::prelude::{PositiveInteger, Symbol};
+use algebra::prelude::{PositiveInteger, SparseMatrix2D, Symbol};
 
-/// Trait for a graph.
-pub trait Graph: core::fmt::Debug {
-    /// The dense identifiers of the nodes in the graph.
-    type NodeId: PositiveInteger;
-    /// The symbol of the node.
-    type NodeSymbol: Symbol;
-    /// The vocabulary holding the symbols of the nodes.
-    type NodeVocabulary: VocabularyRef<SourceSymbol = Self::NodeId, DestinationSymbol = Self::NodeSymbol>
-        + BidirectionalVocabulary<SourceSymbol = Self::NodeId, DestinationSymbol = Self::NodeSymbol>;
+/// Trait for a bipartite graph.
+pub trait Graph {
+    /// The dense identifiers of the source nodes in the graph.
+    type SourceNodeId: PositiveInteger;
+    /// The dense identifiers of the destination nodes in the graph.
+    type DestinationNodeId: PositiveInteger;
+    /// The dense identifiers of the edges in the graph.
+    type EdgeId: PositiveInteger;
+    /// The representation of an edge in the graph.
+    type Edge: Edge<SourceNodeId = Self::SourceNodeId, DestinationNodeId = Self::DestinationNodeId>;
+    /// The symbol of the source node.
+    type SourceNodeSymbol: Symbol;
+    /// The symbol of the destination node.
+    type DestinationNodeSymbol: Symbol;
+    /// The vocabulary holding the symbols of the source nodes.
+    type Sources: VocabularyRef<SourceSymbol = Self::SourceNodeId, DestinationSymbol = Self::SourceNodeSymbol>
+        + BidirectionalVocabulary<
+            SourceSymbol = Self::SourceNodeId,
+            DestinationSymbol = Self::SourceNodeSymbol,
+        >;
+    /// The vocabulary holding the symbols of the destination nodes.
+    type Destinations: VocabularyRef<SourceSymbol = Self::DestinationNodeId, DestinationSymbol = Self::DestinationNodeSymbol>
+        + BidirectionalVocabulary<
+            SourceSymbol = Self::DestinationNodeId,
+            DestinationSymbol = Self::DestinationNodeSymbol,
+        >;
+    /// The edges data structure.
+    type Edges: Edges<
+        Edge = Self::Edge,
+        SourceNodeId = Self::SourceNodeId,
+        DestinationNodeId = Self::DestinationNodeId,
+        EdgeId = Self::EdgeId,
+    >;
 
-    /// Returns  a reference to the vocabulary of the nodes.
-    fn node_vocabulary(&self) -> &Self::NodeVocabulary;
+    /// Returns a reference to the vocabulary of the source nodes.
+    fn source_vocabulary(&self) -> &Self::Sources;
 
-    /// Returns an iterator over the node identifiers in the graph.
-    fn node_ids(&self) -> <Self::NodeVocabulary as Vocabulary>::Sources<'_> {
-        self.node_vocabulary().sources()
+    /// Returns a reference to the edges of the graph.
+    fn edges(&self) -> &Self::Edges;
+
+    /// Returns an iterator over the source node IDs in the graph.
+    fn source_ids(&self) -> <Self::Sources as Vocabulary>::Sources<'_> {
+        self.source_vocabulary().sources()
     }
 
     /// Returns an iterator over the node symbols in the graph.
-    fn nodes(&self) -> <Self::NodeVocabulary as VocabularyRef>::DestinationRefs<'_> {
-        self.node_vocabulary().destination_refs()
+    fn sources(&self) -> <Self::Sources as VocabularyRef>::DestinationRefs<'_> {
+        self.source_vocabulary().destination_refs()
     }
 
     /// Returns the Symbol of the node with the given ID.
-    fn node(&self, id: &Self::NodeId) -> Option<&Self::NodeSymbol> {
-        self.node_vocabulary().convert_ref(id)
+    fn source(&self, source_id: &Self::SourceNodeId) -> Option<&Self::SourceNodeSymbol> {
+        self.source_vocabulary().convert_ref(source_id)
     }
 
     /// Returns the ID of the node with the given symbol.
-    fn node_id(&self, symbol: &Self::NodeSymbol) -> Option<Self::NodeId> {
-        self.node_vocabulary().invert(symbol)
+    fn source_id(&self, symbol: &Self::SourceNodeSymbol) -> Option<Self::SourceNodeId> {
+        self.source_vocabulary().invert(symbol)
     }
 
-    /// Returns the number of nodes in the graph.
-    fn number_of_nodes(&self) -> usize {
-        self.node_vocabulary().len()
+    /// Returns the number of source nodes in the graph.
+    fn number_of_source_nodes(&self) -> usize {
+        self.source_vocabulary().len()
+    }
+
+    /// Returns a reference to the vocabulary of the destination nodes.
+    fn destination_vocabulary(&self) -> &Self::Destinations;
+
+    /// Returns an iterator over the destination node IDs in the graph.
+    fn destination_ids(&self) -> <Self::Destinations as Vocabulary>::Sources<'_> {
+        self.destination_vocabulary().sources()
+    }
+
+    /// Returns an iterator over the node symbols in the graph.
+    fn destinations(&self) -> <Self::Destinations as VocabularyRef>::DestinationRefs<'_> {
+        self.destination_vocabulary().destination_refs()
+    }
+
+    /// Returns the Symbol of the node with the given ID.
+    fn destination(&self, destination_id: &Self::DestinationNodeId) -> Option<&Self::DestinationNodeSymbol> {
+        self.destination_vocabulary().convert_ref(destination_id)
+    }
+
+    /// Returns the ID of the node with the given symbol.
+    fn destination_id(&self, symbol: &Self::DestinationNodeSymbol) -> Option<Self::DestinationNodeId> {
+        self.destination_vocabulary().invert(symbol)
+    }
+
+    /// Returns the number of destination nodes in the graph.
+    fn number_of_destination_nodes(&self) -> usize {
+        self.destination_vocabulary().len()
+    }
+
+    /// Returns the number of edges in the graph.
+    fn number_of_edges(&self) -> Self::EdgeId {
+        self.edges().number_of_edges()
     }
 
     /// Returns whether the graph is empty.
     fn is_empty(&self) -> bool {
-        self.number_of_nodes() == 0
+        self.source_vocabulary().is_empty() && self.destination_vocabulary().is_empty()
+    }
+
+    /// Returns the successors of the node with the given identifier.
+    ///
+    /// # Arguments
+    ///
+    /// * `source` - The identifier of the source node.
+    ///
+    fn successors(
+        &self,
+        source: Self::SourceNodeId,
+    ) -> <<Self::Edges as Edges>::Matrix as SparseMatrix2D>::SparseRow<'_>{
+        self.edges().successors(source)
+    }
+
+    /// Returns the outbound degree of the node with the given identifier.
+    ///
+    /// # Arguments
+    ///
+    /// * `source` - The identifier of the source node.
+    ///
+    fn out_degree(&self, source: Self::SourceNodeId) -> Self::DestinationNodeId {
+        self.edges().out_degree(source)
     }
 }

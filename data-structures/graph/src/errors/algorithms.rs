@@ -16,3 +16,11 @@ impl<G: Graph> From<AlgorithmError> for crate::errors::Error<G> {
 		crate::errors::Error::AlgorithmError(error)
 	}
 }
+
+impl core::fmt::Display for AlgorithmError {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        match self {
+            AlgorithmError::ConnectedComponentsError(e) => write!(f, "{e}"),
+        }
+    }
+}

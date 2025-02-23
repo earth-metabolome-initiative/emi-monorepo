@@ -3,21 +3,25 @@
 use crate::traits::Graph;
 
 /// Error enumeration relative to nodes.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub enum NodeError<G: Graph + ?Sized> {
     /// The node does not exist.
-    UnknownNodeId(G::NodeId),
+    UnknownSourceNodeId(G::SourceNodeId),
     /// The node symbol does not exist.
-    UnknownNodeSymbol(G::NodeSymbol),
+    UnknownNodeSymbol(G::SourceNodeSymbol),
 }
 
-impl<G: Graph> core::fmt::Display for NodeError<G> {
+impl<G: Graph + ?Sized> core::fmt::Debug for NodeError<G> {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        <Self as core::fmt::Display>::fmt(self, f)
+    }
+}
+
+impl<G: Graph+ ?Sized> core::fmt::Display for NodeError<G> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            NodeError::UnknownNodeId(node_id) => write!(f, "Unknown node ID: {node_id}"),
-            NodeError::UnknownNodeSymbol(node_symbol) => {
-                write!(f, "Unknown node symbol: {node_symbol:?}")
-            }
+            NodeError::UnknownSourceNodeId(id) => write!(f, "The node with id {id:?} does not exist."),
+            NodeError::UnknownNodeSymbol(symbol) => write!(f, "The node with symbol {symbol:?} does not exist."),
         }
     }
 }

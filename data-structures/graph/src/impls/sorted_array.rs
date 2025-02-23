@@ -1,12 +1,11 @@
 //! Module implementing traits for the Vec type.
 
-use crate::prelude::*;
 use algebra::prelude::Symbol;
 use core::iter::Cloned;
 use core::ops::Range;
-use sorted_vec::prelude::SortedVec;
+use sorted_vec::prelude::SortedArray;
 
-impl<V: Symbol> Vocabulary for SortedVec<V> {
+impl<V: Symbol, const N: usize> crate::traits::Vocabulary for SortedArray<V, N> {
     type SourceSymbol = usize;
     type DestinationSymbol = V;
     type Sources<'a>
@@ -35,7 +34,7 @@ impl<V: Symbol> Vocabulary for SortedVec<V> {
     }
 }
 
-impl<V: Symbol> VocabularyRef for SortedVec<V> {
+impl<V: Symbol, const N: usize> crate::traits::VocabularyRef for SortedArray<V, N> {
     type DestinationRefs<'a>
         = core::slice::Iter<'a, Self::DestinationSymbol>
     where
@@ -50,42 +49,8 @@ impl<V: Symbol> VocabularyRef for SortedVec<V> {
     }
 }
 
-impl<V: Symbol + Ord> BidirectionalVocabulary for SortedVec<V> {
+impl<V: Symbol + Ord, const N: usize> crate::traits::BidirectionalVocabulary for SortedArray<V, N> {
     fn invert(&self, destination: &Self::DestinationSymbol) -> Option<Self::SourceSymbol> {
         self.as_ref().binary_search(destination).ok()
-    }
-}
-
-impl<V: Symbol + Ord> GrowableVocabulary for SortedVec<V> {
-    fn new() -> Self {
-        SortedVec::new()
-    }
-
-    fn with_capacity(capacity: usize) -> Self {
-        SortedVec::with_capacity(capacity)
-    }
-
-    fn add(
-        &mut self,
-        source: Self::SourceSymbol,
-        destination: Self::DestinationSymbol,
-    ) -> Result<(), crate::errors::builder::vocabulary::VocabularyBuilderError<Self>> {
-        if source != self.len() {
-            return Err(
-                crate::errors::builder::vocabulary::VocabularyBuilderError::SparseSourceNode(
-                    source,
-                ),
-            );
-        }
-
-        self.push(destination).map_err(|err| {
-            match err {
-                sorted_vec::error::Error::UnsortedEntry(destination) => {
-                    crate::errors::builder::vocabulary::VocabularyBuilderError::UnorderedDestinationNode(destination)
-                }
-            }
-        })?;
-
-        Ok(())
     }
 }

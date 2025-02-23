@@ -1,9 +1,13 @@
 //! A trait defining a conversion between a source symbol and a destination symbol.
 
+use core::fmt::Debug;
+
 use algebra::prelude::Symbol;
 
+use crate::errors::builder::vocabulary::VocabularyBuilderError;
+
 /// Trait defining a conversion between a source symbol and a destination symbol.
-pub trait Vocabulary {
+pub trait Vocabulary: Debug + Clone {
     /// The source symbol.
     type SourceSymbol: Symbol;
     /// The destination symbol.
@@ -67,4 +71,31 @@ pub trait BidirectionalVocabularyRef: BidirectionalVocabulary + VocabularyRef {
 
     /// Returns an iterator over the references of the source symbols.
     fn source_refs(&self) -> Self::SourceRefs<'_>;
+}
+
+/// Trait defining a growable vocabulary.
+pub trait GrowableVocabulary: Vocabulary + Default {
+    /// Creates a new growable vocabulary.
+    fn new() -> Self;
+
+    /// Creates a new growable vocabulary with the specified capacity.
+    fn with_capacity(capacity: usize) -> Self;
+
+    /// Adds a new entry to the vocabulary.
+    ///
+    /// # Arguments
+    ///
+    /// * `source` - The source symbol.
+    /// * `destination` - The destination symbol.
+    ///
+    /// # Errors
+    ///
+    /// * If the source symbol is already in the vocabulary.
+    /// * If the destination symbol is already in the vocabulary.
+    ///
+    fn add(
+        &mut self,
+        source: Self::SourceSymbol,
+        destination: Self::DestinationSymbol,
+    ) -> Result<(), VocabularyBuilderError<Self>>;
 }
