@@ -3,7 +3,7 @@
 use crate::traits::{IntoUsize, Matrix2D, PositiveInteger};
 use core::fmt::Debug;
 
-use super::{SquareCSR2D, UpperTriangularCSR2D, CSR2D};
+use super::{SquareCSR2D, SymmetricCSR2D, UpperTriangularCSR2D, CSR2D};
 
 /// Enumeration for the errors associated with the CSR data structure.
 pub enum Error<M: Matrix2D> {
@@ -70,13 +70,13 @@ impl<M: Matrix2D> core::fmt::Display for MutabilityError<M> {
     }
 }
 
-impl<Offset, Idx> From<MutabilityError<CSR2D<Offset, Idx, Idx>>>
-    for MutabilityError<UpperTriangularCSR2D<Offset, Idx>>
+impl<SparseIndex, Idx> From<MutabilityError<CSR2D<SparseIndex, Idx, Idx>>>
+    for MutabilityError<UpperTriangularCSR2D<SparseIndex, Idx>>
 where
-    CSR2D<Offset, Idx, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-    UpperTriangularCSR2D<Offset, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    CSR2D<SparseIndex, Idx, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    UpperTriangularCSR2D<SparseIndex, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
 {
-    fn from(error: MutabilityError<CSR2D<Offset, Idx, Idx>>) -> Self {
+    fn from(error: MutabilityError<CSR2D<SparseIndex, Idx, Idx>>) -> Self {
         match error {
             MutabilityError::UnorderedRowIndex(index) => MutabilityError::UnorderedRowIndex(index),
             MutabilityError::UnorderedColumnIndex(index) => {
@@ -90,13 +90,13 @@ where
     }
 }
 
-impl<Offset, Idx> From<MutabilityError<CSR2D<Offset, Idx, Idx>>>
-    for MutabilityError<SquareCSR2D<Offset, Idx>>
+impl<SparseIndex, Idx> From<MutabilityError<CSR2D<SparseIndex, Idx, Idx>>>
+    for MutabilityError<SquareCSR2D<SparseIndex, Idx>>
 where
-    CSR2D<Offset, Idx, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-    SquareCSR2D<Offset, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    CSR2D<SparseIndex, Idx, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    SquareCSR2D<SparseIndex, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
 {
-    fn from(error: MutabilityError<CSR2D<Offset, Idx, Idx>>) -> Self {
+    fn from(error: MutabilityError<CSR2D<SparseIndex, Idx, Idx>>) -> Self {
         match error {
             MutabilityError::UnorderedRowIndex(index) => MutabilityError::UnorderedRowIndex(index),
             MutabilityError::UnorderedColumnIndex(index) => {
@@ -110,13 +110,33 @@ where
     }
 }
 
-impl<Offset, Idx: PositiveInteger + IntoUsize> From<MutabilityError<SquareCSR2D<Offset, Idx>>>
-    for MutabilityError<UpperTriangularCSR2D<Offset, Idx>>
+impl<SparseIndex, Idx: PositiveInteger + IntoUsize> From<MutabilityError<SquareCSR2D<SparseIndex, Idx>>>
+    for MutabilityError<UpperTriangularCSR2D<SparseIndex, Idx>>
 where
-    SquareCSR2D<Offset, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-    UpperTriangularCSR2D<Offset, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    SquareCSR2D<SparseIndex, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    UpperTriangularCSR2D<SparseIndex, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
 {
-    fn from(error: MutabilityError<SquareCSR2D<Offset, Idx>>) -> Self {
+    fn from(error: MutabilityError<SquareCSR2D<SparseIndex, Idx>>) -> Self {
+        match error {
+            MutabilityError::UnorderedRowIndex(index) => MutabilityError::UnorderedRowIndex(index),
+            MutabilityError::UnorderedColumnIndex(index) => {
+                MutabilityError::UnorderedColumnIndex(index)
+            }
+            MutabilityError::DuplicatedEntry(coordinates) => {
+                MutabilityError::DuplicatedEntry(coordinates)
+            }
+            MutabilityError::OutOfBounds(coordinates) => MutabilityError::OutOfBounds(coordinates),
+        }
+    }
+}
+
+impl<SparseIndex, Idx: PositiveInteger + IntoUsize> From<MutabilityError<UpperTriangularCSR2D<SparseIndex, Idx>>>
+    for MutabilityError<SymmetricCSR2D<SparseIndex, Idx>>
+where
+    UpperTriangularCSR2D<SparseIndex, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    SymmetricCSR2D<SparseIndex, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+{
+    fn from(error: MutabilityError<UpperTriangularCSR2D<SparseIndex, Idx>>) -> Self {
         match error {
             MutabilityError::UnorderedRowIndex(index) => MutabilityError::UnorderedRowIndex(index),
             MutabilityError::UnorderedColumnIndex(index) => {
