@@ -29,6 +29,14 @@ pub trait UndirectedEdges:
     }
 }
 
+impl<E> UndirectedEdges for E
+where
+    E: TransposedDirectedEdges,
+    E::BiMatrix: SparseSymmetricMatrix2D<Index = E::NodeId>,
+{
+    type SymmetricMatrix = E::BiMatrix;
+}
+
 /// Trait defining the coversion of directed edges to undirected edges.
 pub trait FromDirectedEdges<DE: DirectedEdges>: UndirectedEdges
 where
@@ -64,4 +72,12 @@ pub trait UndirectedGraph:
     fn degree(&self, id: Self::NodeId) -> Self::NodeId {
         self.edges().degree(id)
     }
+}
+
+impl<G> UndirectedGraph for G
+where
+    G: TransposedDirectedGraph,
+    G::TransposedDirectedEdges: UndirectedEdges<NodeId = G::NodeId, Edge = G::Edge>,
+{
+    type UndirectedEdges = G::TransposedDirectedEdges;
 }

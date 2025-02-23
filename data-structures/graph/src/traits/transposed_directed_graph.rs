@@ -2,6 +2,8 @@
 
 use algebra::prelude::*;
 
+use super::DirectedEdges;
+
 /// Trait defining the properties of a transposed directed graph.
 pub trait TransposedDirectedEdges:
     super::DirectedEdges<DirectedMatrix = <Self as TransposedDirectedEdges>::BiMatrix>
@@ -37,6 +39,16 @@ pub trait TransposedDirectedEdges:
     }
 }
 
+impl<E: DirectedEdges> TransposedDirectedEdges for E
+where
+    E::DirectedMatrix: SparseBiMatrix2D<
+        RowIndex = E::SourceNodeId,
+        ColumnIndex = E::DestinationNodeId,
+    >,
+{
+    type BiMatrix = E::DirectedMatrix;
+}
+
 /// Trait defining the properties of a directed graph.
 pub trait TransposedDirectedGraph:
     super::DirectedGraph<DirectedEdges = <Self as TransposedDirectedGraph>::TransposedDirectedEdges>
@@ -70,4 +82,16 @@ pub trait TransposedDirectedGraph:
     fn in_degree(&self, destination: Self::DestinationNodeId) -> Self::SourceNodeId {
         self.edges().in_degree(destination)
     }
+}
+
+impl<G> TransposedDirectedGraph for G
+where
+    G: super::DirectedGraph,
+    G::DirectedEdges: TransposedDirectedEdges<
+        SourceNodeId = G::SourceNodeId,
+        DestinationNodeId = G::DestinationNodeId,
+        Edge = G::Edge,
+    >,
+{
+    type TransposedDirectedEdges = G::DirectedEdges;
 }

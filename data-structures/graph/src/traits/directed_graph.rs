@@ -16,7 +16,7 @@ pub trait DirectedEdges:
     type DirectedMatrix: SquareMatrix<Index = Self::NodeId>;
 
     /// The identifier of the node.
-    type NodeId: PositiveInteger;
+    type NodeId: PositiveInteger + IntoUsize + TryFromUsize;
 
     /// Returns whether the graph has self-loops.
     fn has_self_loops(&self) -> bool {

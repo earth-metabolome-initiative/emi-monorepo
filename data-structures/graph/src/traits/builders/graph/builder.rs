@@ -2,11 +2,11 @@
 
 use core::fmt::Display;
 
-use common_traits::prelude::Builder;
+use common_traits::prelude::{basic, Builder};
 
-use crate::traits::Graph;
+use crate::traits::{DirectedGraph, Graph, UndirectedGraph};
 
-#[derive(Debug, Clone)]
+#[basic]
 /// Options for building a graph.
 pub enum GraphBuilderOptions {
     /// The edges-list describing the edges in the graph.
@@ -15,6 +15,8 @@ pub enum GraphBuilderOptions {
     Sources,
     /// The vocabulary describing the destinations in the graph.
     Destinations,
+    /// The vocabulary describing the nodes in the graph.
+    Nodes,
 }
 
 impl Display for GraphBuilderOptions {
@@ -23,15 +25,16 @@ impl Display for GraphBuilderOptions {
             GraphBuilderOptions::Edges => write!(f, "edges"),
             GraphBuilderOptions::Sources => write!(f, "sources"),
             GraphBuilderOptions::Destinations => write!(f, "destinations"),
+            GraphBuilderOptions::Nodes => write!(f, "nodes"),
         }
     }
 }
 
 /// Trait for Options for building a graph.
-pub trait DirectedGraphBuilder:
+pub trait GraphBuilder:
     Builder<
-    Object = <Self as DirectedGraphBuilder>::Graph,
-    Error = crate::errors::builder::graph::GraphBuilderError<<Self as DirectedGraphBuilder>::Graph>,
+    Object = <Self as GraphBuilder>::Graph,
+    Error = crate::errors::builder::graph::GraphBuilderError<<Self as GraphBuilder>::Graph>,
     Attribute = GraphBuilderOptions,
 >
 {
@@ -49,9 +52,9 @@ pub trait DirectedGraphBuilder:
     /// Sets the destinations of the graph.
     ///
     /// # Arguments
-    /// 
+    ///
     /// * `destinations` - The destinations of the graph.
-    /// 
+    ///
     fn destinations(&mut self, destinations: <Self::Graph as Graph>::Destinations) -> &mut Self;
 
     /// Sets the edges of the graph.
@@ -61,4 +64,40 @@ pub trait DirectedGraphBuilder:
     /// * `edges` - The edges of the graph.
     ///
     fn edges(&mut self, edges: <Self::Graph as Graph>::Edges) -> &mut Self;
+}
+
+/// Trait for creating a directed graph.
+pub trait DirectedGraphBuilder:
+    Builder<
+    Object = <Self as DirectedGraphBuilder>::Graph,
+    Error = crate::errors::builder::graph::GraphBuilderError<<Self as DirectedGraphBuilder>::Graph>,
+    Attribute = GraphBuilderOptions,
+>
+{
+    /// The type of the graph to build.
+    type Graph: DirectedGraph;
+
+    /// Sets the nodes of the graph.
+    ///
+    /// # Arguments
+    ///
+    /// * `nodes` - The nodes of the graph.
+    ///
+    fn nodes(&mut self, nodes: <Self::Graph as DirectedGraph>::Nodes) -> &mut Self;
+
+    /// Sets the edges of the graph.
+    ///
+    /// # Arguments
+    ///
+    /// * `edges` - The edges of the graph.
+    ///
+    fn edges(&mut self, edges: <Self::Graph as DirectedGraph>::DirectedEdges) -> &mut Self;
+}
+
+/// Trait for creating an undirected graph.
+pub trait UndirectedGraphBuilder:
+    DirectedGraphBuilder<Graph = <Self as UndirectedGraphBuilder>::UndirectedGraph>
+{
+    /// The type of the graph to build.
+    type UndirectedGraph: UndirectedGraph;
 }

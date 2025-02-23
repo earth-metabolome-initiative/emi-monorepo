@@ -35,22 +35,6 @@ impl<
 impl<
         SparseIndex: PositiveInteger + IntoUsize,
         Idx: PositiveInteger + TryFromUsize + IntoUsize + From<SparseIndex>,
-    > TransposedDirectedEdges for SymmetricCSR2D<SparseIndex, Idx>
-{
-    type BiMatrix = Self;
-}
-
-impl<
-        SparseIndex: PositiveInteger + IntoUsize,
-        Idx: PositiveInteger + TryFromUsize + IntoUsize + From<SparseIndex>,
-    > UndirectedEdges for SymmetricCSR2D<SparseIndex, Idx>
-{
-    type SymmetricMatrix = Self;
-}
-
-impl<
-        SparseIndex: PositiveInteger + IntoUsize,
-        Idx: PositiveInteger + TryFromUsize + IntoUsize + From<SparseIndex>,
         DE: DirectedEdges<NodeId = Idx>,
     > FromDirectedEdges<DE> for SymmetricCSR2D<SparseIndex, Idx>
 where

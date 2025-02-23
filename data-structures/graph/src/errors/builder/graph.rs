@@ -19,6 +19,14 @@ impl<G: crate::traits::Graph + ?Sized> Debug for GraphBuilderError<G> {
     }
 }
 
+impl<G: crate::traits::Graph + ?Sized> From<common_traits::builder::BuilderError<GraphBuilderOptions>>
+    for GraphBuilderError<G>
+{
+    fn from(e: common_traits::builder::BuilderError<GraphBuilderOptions>) -> Self {
+        GraphBuilderError::BuilderError(e)
+    }
+}
+
 impl<G: crate::traits::Graph + ?Sized> core::error::Error for GraphBuilderError<G> {}
 
 impl<G: crate::traits::Graph + ?Sized> core::fmt::Display for GraphBuilderError<G> {
