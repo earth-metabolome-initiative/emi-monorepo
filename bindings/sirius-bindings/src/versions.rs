@@ -1,5 +1,5 @@
 //! Trait and structs to define the different versions of Sirius
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 

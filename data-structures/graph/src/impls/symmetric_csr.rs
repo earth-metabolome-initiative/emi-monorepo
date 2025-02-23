@@ -47,3 +47,16 @@ impl<
 {
     type SymmetricMatrix = Self;
 }
+
+impl<
+        SparseIndex: PositiveInteger + IntoUsize,
+        Idx: PositiveInteger + TryFromUsize + IntoUsize + From<SparseIndex>,
+        DE: DirectedEdges<NodeId = Idx>,
+    > FromDirectedEdges<DE> for SymmetricCSR2D<SparseIndex, Idx>
+where
+    DE::Matrix: Symmetrize<Self>,
+{
+    fn from_directed_edges(edges: DE) -> Self {
+        edges.matrix().symmetrize()
+    }
+}
