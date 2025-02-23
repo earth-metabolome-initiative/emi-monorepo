@@ -32,12 +32,12 @@ where
 {
     type Graph = G;
 
-    fn nodes(&mut self, nodes: <Self::Graph as DirectedGraph>::Nodes) -> &mut Self {
+    fn nodes(mut self, nodes: <Self::Graph as DirectedGraph>::Nodes) -> Self {
         self.nodes = Some(nodes);
         self
     }
 
-    fn edges(&mut self, edges: <Self::Graph as DirectedGraph>::DirectedEdges) -> &mut Self {
+    fn edges(mut self, edges: <Self::Graph as DirectedGraph>::DirectedEdges) -> Self {
         self.edges = Some(edges);
         self
     }

@@ -31,20 +31,20 @@ where
 {
     type Graph = G;
 
-    fn sources(&mut self, sources: <Self::Graph as crate::prelude::Graph>::Sources) -> &mut Self {
+    fn sources(mut self, sources: <Self::Graph as crate::prelude::Graph>::Sources) -> Self {
         self.sources = Some(sources);
         self
     }
 
     fn destinations(
-        &mut self,
+        mut self,
         destinations: <Self::Graph as crate::prelude::Graph>::Destinations,
-    ) -> &mut Self {
+    ) -> Self {
         self.destinations = Some(destinations);
         self
     }
 
-    fn edges(&mut self, edges: <Self::Graph as Graph>::Edges) -> &mut Self {
+    fn edges(mut self, edges: <Self::Graph as Graph>::Edges) -> Self {
         self.edges = Some(edges);
         self
     }

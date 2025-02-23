@@ -1,6 +1,6 @@
 //! Submodule implementing Edges for CSR2D.
 
-use crate::prelude::*;
+use crate::{errors::builder::edges::EdgesBuilderError, prelude::*};
 use algebra::prelude::*;
 
 impl<
@@ -27,7 +27,7 @@ impl<
     > GrowableEdges for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     type GrowableMatrix = Self;
-    type Error = algebra::error::MutabilityError<Self>;
+    type Error = EdgesBuilderError<Self>;
 
     fn matrix_mut(&mut self) -> &mut Self::GrowableMatrix {
         self

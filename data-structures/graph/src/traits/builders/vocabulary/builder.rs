@@ -39,28 +39,31 @@ pub trait VocabularyBuilder:
         ),
     >;
 
+    #[must_use]
     /// Set whether to ignore duplicated symbols.
-    fn ignore_duplicates(&mut self) -> &mut Self;
+    fn ignore_duplicates(self) -> Self;
 
     /// Returns whether to ignore duplicated symbols.
     fn should_ignore_duplicates(&self) -> bool;
 
+    #[must_use]
     /// Set the expected number of symbols.
     ///
     /// # Arguments
     ///
     /// * `number_of_symbols` - The expected number of symbols.
     ///
-    fn expected_number_of_symbols(&mut self, number_of_symbols: usize) -> &mut Self;
+    fn expected_number_of_symbols(self, number_of_symbols: usize) -> Self;
 
     /// Returns the expected number of symbols.
     fn get_expected_number_of_symbols(&self) -> Option<usize>;
 
+    #[must_use]
     /// Set the iterator of symbols.
     ///
     /// # Arguments
     ///
     /// * `symbols` - The iterator of symbols.
     ///
-    fn symbols(&mut self, symbols: Self::Symbols) -> &mut Self;
+    fn symbols(self, symbols: Self::Symbols) -> Self;
 }

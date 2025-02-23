@@ -33,8 +33,8 @@ where
     type IntermediateEdges = GE;
     type Edges = GE;
 
-    fn expected_number_of_edges(&mut self, number_of_edges: GE::EdgeId) -> &mut Self {
-        self.builder.expected_number_of_edges(number_of_edges);
+    fn expected_number_of_edges(mut self, number_of_edges: GE::EdgeId) -> Self {
+        self.builder = self.builder.expected_number_of_edges(number_of_edges);
         self
     }
 
@@ -42,8 +42,8 @@ where
         self.builder.get_expected_number_of_edges()
     }
 
-    fn ignore_duplicates(&mut self) -> &mut Self {
-        self.builder.ignore_duplicates();
+    fn ignore_duplicates(mut self) -> Self {
+        self.builder = self.builder.ignore_duplicates();
         self
     }
 
@@ -52,10 +52,10 @@ where
     }
 
     fn expected_shape(
-        &mut self,
+        mut self,
         shape: <<Self::IntermediateEdges as GrowableEdges>::GrowableMatrix as SparseMatrixMut>::MinimalShape,
-    ) -> &mut Self {
-        self.builder.expected_shape(shape);
+    ) -> Self {
+        self.builder = self.builder.expected_shape(shape);
         self
     }
 
@@ -63,15 +63,16 @@ where
         self.builder.get_expected_shape()
     }
 
-    fn edges(&mut self, edges: Self::EdgeIterator) -> &mut Self {
-        self.builder.edges(edges);
+    fn edges(mut self, edges: Self::EdgeIterator) -> Self {
+        self.builder = self.builder.edges(edges);
         self
     }
 }
 
 impl<EdgeIterator, GE: GrowableEdges> GenericDirectedEdgesBuilder<EdgeIterator, GE> {
+    #[must_use]
     /// Set whether to ignore self-loops.
-    pub fn ignore_self_loops(&mut self) -> &mut Self {
+    pub fn ignore_self_loops(mut self) -> Self {
         self.ignore_self_loops = true;
         self
     }

@@ -40,7 +40,7 @@ where
     type IntermediateEdges = GE;
     type Edges = GE;
 
-    fn expected_number_of_edges(&mut self, number_of_edges: GE::EdgeId) -> &mut Self {
+    fn expected_number_of_edges(mut self, number_of_edges: GE::EdgeId) -> Self {
         self.expected_number_of_edges = Some(number_of_edges);
         self
     }
@@ -49,7 +49,7 @@ where
         self.expected_number_of_edges
     }
 
-    fn ignore_duplicates(&mut self) -> &mut Self {
+    fn ignore_duplicates(mut self) -> Self {
         self.ignore_duplicates = true;
         self
     }
@@ -59,18 +59,20 @@ where
     }
 
     fn expected_shape(
-        &mut self,
+        mut self,
         shape: <GE::GrowableMatrix as SparseMatrixMut>::MinimalShape,
-    ) -> &mut Self {
+    ) -> Self {
         self.expected_shape = Some(shape);
         self
     }
 
-    fn get_expected_shape(&self) -> Option<<<GE as GrowableEdges>::GrowableMatrix as SparseMatrixMut>::MinimalShape>{
+    fn get_expected_shape(
+        &self,
+    ) -> Option<<<GE as GrowableEdges>::GrowableMatrix as SparseMatrixMut>::MinimalShape> {
         self.expected_shape
     }
 
-    fn edges(&mut self, edges: Self::EdgeIterator) -> &mut Self {
+    fn edges(mut self, edges: Self::EdgeIterator) -> Self {
         self.edges = Some(edges);
         self
     }

@@ -6,7 +6,7 @@ use crate::traits::{GrowableVocabulary, Vocabulary, VocabularyBuilder, Vocabular
 
 #[basic]
 /// A generic vocabulary builder that can be used to build a vocabulary for any type of graph.
-pub struct GenericVocabularyBuilder<Symbols, V> {
+pub struct GenericVocabularyBuilder<Symbols, Vocabulary> {
     /// The symbols to build the vocabulary from.
     symbols: Option<Symbols>,
     /// The expected number of symbols.
@@ -14,7 +14,7 @@ pub struct GenericVocabularyBuilder<Symbols, V> {
     /// Whether to ignore duplicated symbols.
     ignore_duplicates: bool,
     /// The vocabulary type.
-    _vocabulary: core::marker::PhantomData<V>,
+    _vocabulary: core::marker::PhantomData<Vocabulary>,
 }
 
 impl<Symbols, V> Default for GenericVocabularyBuilder<Symbols, V> {
@@ -37,7 +37,7 @@ where
     type Symbols = Symbols;
     type Vocabulary = V;
 
-    fn expected_number_of_symbols(&mut self, number_of_symbols: usize) -> &mut Self {
+    fn expected_number_of_symbols(mut self, number_of_symbols: usize) -> Self {
         self.expected_number_of_symbols = Some(number_of_symbols);
         self
     }
@@ -46,7 +46,7 @@ where
         self.expected_number_of_symbols
     }
 
-    fn ignore_duplicates(&mut self) -> &mut Self {
+    fn ignore_duplicates(mut self) -> Self {
         self.ignore_duplicates = true;
         self
     }
@@ -55,7 +55,7 @@ where
         self.ignore_duplicates
     }
 
-    fn symbols(&mut self, symbols: Self::Symbols) -> &mut Self {
+    fn symbols(mut self, symbols: Self::Symbols) -> Self {
         self.symbols = Some(symbols);
         self
     }

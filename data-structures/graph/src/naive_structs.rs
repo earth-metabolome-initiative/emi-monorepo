@@ -11,6 +11,7 @@ pub mod generic_graph_builder;
 pub mod generic_graph;
 pub mod generic_directional_graph_builder;
 pub mod generic_directional_graph;
+pub mod named_types;
 
 pub use generic_vocabulary_builder::GenericVocabularyBuilder;
 pub use generic_edges_builder::GenericEdgesBuilder;
@@ -20,3 +21,4 @@ pub use generic_graph_builder::GenericGraphBuilder;
 pub use generic_graph::GenericGraph;
 pub use generic_directional_graph_builder::GenericDirectionalGraphBuilder;
 pub use generic_directional_graph::GenericDirectionalGraph;
+pub use named_types::*;

@@ -41,29 +41,32 @@ pub trait GraphBuilder:
     /// The type of the graph to build.
     type Graph: Graph;
 
+    #[must_use]
     /// Sets the sources of the graph.
     ///
     /// # Arguments
     ///
     /// * `sources` - The sources of the graph.
     ///
-    fn sources(&mut self, sources: <Self::Graph as Graph>::Sources) -> &mut Self;
+    fn sources(self, sources: <Self::Graph as Graph>::Sources) -> Self;
 
+    #[must_use]
     /// Sets the destinations of the graph.
     ///
     /// # Arguments
     ///
     /// * `destinations` - The destinations of the graph.
     ///
-    fn destinations(&mut self, destinations: <Self::Graph as Graph>::Destinations) -> &mut Self;
+    fn destinations(self, destinations: <Self::Graph as Graph>::Destinations) -> Self;
 
+    #[must_use]
     /// Sets the edges of the graph.
     ///
     /// # Arguments
     ///
     /// * `edges` - The edges of the graph.
     ///
-    fn edges(&mut self, edges: <Self::Graph as Graph>::Edges) -> &mut Self;
+    fn edges(self, edges: <Self::Graph as Graph>::Edges) -> Self;
 }
 
 /// Trait for creating a directed graph.
@@ -77,21 +80,23 @@ pub trait DirectedGraphBuilder:
     /// The type of the graph to build.
     type Graph: DirectedGraph;
 
+    #[must_use]
     /// Sets the nodes of the graph.
     ///
     /// # Arguments
     ///
     /// * `nodes` - The nodes of the graph.
     ///
-    fn nodes(&mut self, nodes: <Self::Graph as DirectedGraph>::Nodes) -> &mut Self;
+    fn nodes(self, nodes: <Self::Graph as DirectedGraph>::Nodes) -> Self;
 
+    #[must_use]
     /// Sets the edges of the graph.
     ///
     /// # Arguments
     ///
     /// * `edges` - The edges of the graph.
     ///
-    fn edges(&mut self, edges: <Self::Graph as DirectedGraph>::DirectedEdges) -> &mut Self;
+    fn edges(self, edges: <Self::Graph as DirectedGraph>::DirectedEdges) -> Self;
 }
 
 /// Trait for creating an undirected graph.

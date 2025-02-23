@@ -2,7 +2,10 @@
 
 use core::fmt::Debug;
 
-use algebra::impls::MutabilityError;
+use algebra::{
+    impls::{MutabilityError, SymmetricCSR2D, UpperTriangularCSR2D},
+    prelude::{IntoUsize, PositiveInteger, TryFromUsize},
+};
 
 use crate::traits::{Edges, EdgesBuilderOptions};
 
@@ -45,6 +48,29 @@ impl<V: Edges> core::fmt::Display for EdgesBuilderError<V> {
                 write!(f, "Expected number of edges: {expected}, actual number of edges: {actual}")
             }
             EdgesBuilderError::MatrixError(e) => write!(f, "{e}"),
+        }
+    }
+}
+
+impl<V: Edges> From<MutabilityError<V::Matrix>> for EdgesBuilderError<V> {
+    fn from(e: MutabilityError<V::Matrix>) -> Self {
+        EdgesBuilderError::MatrixError(e)
+    }
+}
+
+impl<
+        SparseIndex: PositiveInteger + IntoUsize,
+        Idx: PositiveInteger + IntoUsize + TryFromUsize + From<SparseIndex>,
+    > From<EdgesBuilderError<UpperTriangularCSR2D<SparseIndex, Idx>>>
+    for EdgesBuilderError<SymmetricCSR2D<SparseIndex, Idx>>
+{
+    fn from(e: EdgesBuilderError<UpperTriangularCSR2D<SparseIndex, Idx>>) -> Self {
+        match e {
+            EdgesBuilderError::BuilderError(e) => EdgesBuilderError::BuilderError(e),
+            EdgesBuilderError::NumberOfEdges { expected, actual } => {
+                EdgesBuilderError::NumberOfEdges { expected, actual }
+            }
+            EdgesBuilderError::MatrixError(e) => EdgesBuilderError::MatrixError(e.into()),
         }
     }
 }
