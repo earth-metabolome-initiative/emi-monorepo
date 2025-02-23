@@ -24,7 +24,8 @@ pub fn basic(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let (impl_generics, ty_generics, where_clause) = add_trait_constraints(&mut generics);
 
     let expanded = quote! {
-        #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+        #[derive(Debug, Clone)]
+        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         #input
 
         impl #impl_generics common_traits::basic::Basic for #name #ty_generics #where_clause {}
