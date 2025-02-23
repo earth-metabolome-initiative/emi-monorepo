@@ -2,7 +2,7 @@
 
 pub mod csr;
 pub mod vec;
-pub mod bimatrix2d;
+pub mod generic_bimatrix2d;
 pub use csr::*;
 pub use vec::VecMatrix2D;
-pub use bimatrix2d::BiMatrix2D;
+pub use generic_bimatrix2d::GenericBiMatrix2D;

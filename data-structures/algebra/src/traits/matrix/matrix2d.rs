@@ -2,6 +2,8 @@
 
 use crate::traits::{IntoUsize, Matrix, PositiveInteger, SparseMatrix};
 
+use super::SquareMatrix;
+
 /// Trait defining a bidimensional matrix.
 pub trait Matrix2D:
     Matrix<Coordinates = (<Self as Matrix2D>::RowIndex, <Self as Matrix2D>::ColumnIndex)>
@@ -75,20 +77,28 @@ pub trait TransposableMatrix2D: Matrix2D {
 }
 
 /// Trait defining a matrix which supports efficient operations on columns.
-pub trait SparseBiMatrix2D: SparseMatrix2D {
+pub trait BiMatrix2D: Matrix2D {
     /// The type of the underlying matrix.
-    type Matrix: SparseMatrix2D<RowIndex = Self::RowIndex, ColumnIndex = Self::ColumnIndex>;
+    type Matrix: Matrix2D<RowIndex = Self::RowIndex, ColumnIndex = Self::ColumnIndex>;
     /// The type of the underlying transposed matrix.
-    type TransposedMatrix: SparseMatrix2D<
-        RowIndex = Self::ColumnIndex,
-        ColumnIndex = Self::RowIndex,
-    >;
+    type TransposedMatrix: Matrix2D<RowIndex = Self::ColumnIndex, ColumnIndex = Self::RowIndex>;
 
     /// Returns a reference to the underlying matrix.
     fn matrix(&self) -> &Self::Matrix;
 
     /// Returns a reference to the underlying transposed matrix.
     fn transposed(&self) -> &Self::TransposedMatrix;
+}
+
+/// Trait defining a sparse matrix which supports efficient operations on columns.
+pub trait SparseBiMatrix2D: BiMatrix2D<
+    Matrix = <Self as SparseBiMatrix2D>::SparseMatrix,
+    TransposedMatrix = <Self as SparseBiMatrix2D>::SparseTransposedMatrix,
+> + SparseMatrix2D {
+    /// The type of the underlying sparse matrix.
+    type SparseMatrix: SparseMatrix2D<RowIndex = Self::RowIndex, ColumnIndex = Self::ColumnIndex>;
+    /// The type of the underlying transposed sparse matrix.
+    type SparseTransposedMatrix: SparseMatrix2D<RowIndex = Self::ColumnIndex, ColumnIndex = Self::RowIndex>;
 
     /// Returns an iterator over the sparse rows of a column.
     ///
@@ -99,7 +109,33 @@ pub trait SparseBiMatrix2D: SparseMatrix2D {
     fn sparse_column(
         &self,
         column: Self::ColumnIndex,
-    ) -> <Self::TransposedMatrix as SparseMatrix2D>::SparseRow<'_> {
+    ) -> <Self::SparseTransposedMatrix as SparseMatrix2D>::SparseRow<'_>
+    {
         self.transposed().sparse_row(column)
     }
+}
+
+/// Trait defining a symmetric matrix.
+pub trait SymmetricMatrix2D:
+    SquareMatrix
+    + BiMatrix2D<
+        Matrix = <Self as SymmetricMatrix2D>::SymmetricMatrix,
+        TransposedMatrix = <Self as SymmetricMatrix2D>::SymmetricMatrix,
+    >
+{
+    /// The underlying symmetric matrix type.
+    type SymmetricMatrix: Matrix2D<RowIndex = Self::RowIndex, ColumnIndex = Self::ColumnIndex>;
+}
+
+/// Trait defining a sparse symmetric matrix.
+pub trait SparseSymmetricMatrix2D:
+SymmetricMatrix2D<SymmetricMatrix = <Self as SparseSymmetricMatrix2D>::SymmetricSparseMatrix>
++ SparseMatrix2D 
++ SparseBiMatrix2D<
+    SparseMatrix = <Self as SparseSymmetricMatrix2D>::SymmetricSparseMatrix,
+    SparseTransposedMatrix = <Self as SparseSymmetricMatrix2D>::SymmetricSparseMatrix,
+>
+{
+    /// The underlying symmetric sparse matrix type.
+    type SymmetricSparseMatrix: SparseMatrix2D<RowIndex = Self::RowIndex, ColumnIndex = Self::ColumnIndex>;
 }

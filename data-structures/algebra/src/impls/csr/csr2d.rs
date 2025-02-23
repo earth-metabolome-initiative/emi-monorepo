@@ -3,6 +3,7 @@ use core::marker::PhantomData;
 
 use crate::prelude::*;
 
+#[derive(Clone)]
 /// A compressed sparse row matrix.
 pub struct CSR2D<Offset, RowIndex, ColumnIndex> {
     /// The row pointers.

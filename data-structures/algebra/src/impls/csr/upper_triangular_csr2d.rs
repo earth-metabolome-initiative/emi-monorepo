@@ -3,6 +3,7 @@ use core::marker::PhantomData;
 
 use crate::prelude::*;
 
+#[derive(Clone)]
 /// A compressed sparse row matrix.
 pub struct UpperTriangularCSR2D<Offset, Idx> {
     /// The underlying CSR matrix.
@@ -37,19 +38,14 @@ impl<Offset: IntoUsize, Idx: PositiveInteger + IntoUsize + Zero> UpperTriangular
     ///
     /// # Arguments
     ///
-    /// * `number_of_rows`: The number of rows.
-    /// * `number_of_columns`: The number of columns.
+    /// * `order`: The number of rows and columns.
     /// * `number_of_values`: The number of values.
     ///
     /// # Returns
     ///
     /// A new CSR matrix with the provided number of rows and columns.
-    pub fn with_capacity(
-        number_of_rows: Idx,
-        number_of_columns: Idx,
-        number_of_values: Offset,
-    ) -> Self {
-        Self { csr: CSR2D::with_capacity(number_of_rows, number_of_columns, number_of_values) }
+    pub fn with_capacity(order: Idx, number_of_values: Offset) -> Self {
+        Self { csr: CSR2D::with_capacity(order, order, number_of_values) }
     }
 }
 
@@ -146,12 +142,12 @@ where
 }
 
 impl<Offset: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize>
-    Symmetrize<SquareCSR2D<Offset, Idx>> for UpperTriangularCSR2D<Offset, Idx>
+    Symmetrize<SymmetricCSR2D<Offset, Idx>> for UpperTriangularCSR2D<Offset, Idx>
 where
     Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
     CSR2D<Offset, Idx, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
 {
-    fn symmetrize(&self) -> SquareCSR2D<Offset, Idx> {
+    fn symmetrize(&self) -> SymmetricCSR2D<Offset, Idx> {
         // We initialize the transposed matrix.
         let mut symmetric: CSR2D<Offset, Idx, Idx> = CSR2D {
             offsets: vec![Offset::ZERO; self.order().into_usize() + 1],
@@ -185,6 +181,6 @@ where
             }
         }
 
-        SquareCSR2D { csr: symmetric }
+        SymmetricCSR2D { csr: SquareCSR2D { csr: symmetric } }
     }
 }

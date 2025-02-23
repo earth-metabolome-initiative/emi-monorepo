@@ -2,7 +2,7 @@
 
 use crate::traits::{IntoUsize, PositiveInteger};
 
-use super::Matrix2D;
+use super::{Matrix2D, SymmetricMatrix2D};
 
 /// Trait defining a square matrix.
 pub trait SquareMatrix: Matrix2D<RowIndex = Self::Index, ColumnIndex = Self::Index> {
@@ -14,7 +14,7 @@ pub trait SquareMatrix: Matrix2D<RowIndex = Self::Index, ColumnIndex = Self::Ind
 }
 
 /// Trait defining a matrix that can be symmetrized.
-pub trait Symmetrize<M: SquareMatrix>: SquareMatrix {
+pub trait Symmetrize<M: SymmetricMatrix2D>: SquareMatrix {
     /// Returns the symmetrized version of the matrix.
     fn symmetrize(&self) -> M;
 }

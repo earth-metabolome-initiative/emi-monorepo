@@ -1,6 +1,7 @@
 //! Submodule providing a definition of a CSR matrix.
 use crate::prelude::*;
 
+#[derive(Clone)]
 /// A compressed sparse row matrix.
 pub struct SquareCSR2D<Offset, Idx> {
     /// The underlying CSR matrix.
@@ -35,19 +36,17 @@ impl<Offset: IntoUsize, Idx: PositiveInteger + IntoUsize + Zero> SquareCSR2D<Off
     ///
     /// # Arguments
     ///
-    /// * `number_of_rows`: The number of rows.
-    /// * `number_of_columns`: The number of columns.
+    /// * `order`: The number of rows and columns.
     /// * `number_of_values`: The number of values.
     ///
     /// # Returns
     ///
     /// A new CSR matrix with the provided number of rows and columns.
     pub fn with_capacity(
-        number_of_rows: Idx,
-        number_of_columns: Idx,
+        order: Idx,
         number_of_values: Offset,
     ) -> Self {
-        Self { csr: CSR2D::with_capacity(number_of_rows, number_of_columns, number_of_values) }
+        Self { csr: CSR2D::with_capacity(order, order, number_of_values) }
     }
 }
 
