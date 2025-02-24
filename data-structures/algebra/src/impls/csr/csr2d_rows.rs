@@ -35,11 +35,11 @@ impl<CSR: SparseMatrix2D> Iterator for CSR2DRows<'_, CSR> {
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let next_row_rank = self.csr2d.rank(self.next_row);
+        let next_row_rank = self.csr2d.rank(self.next_row).into_usize();
         let already_observed_in_next_row =
             self.csr2d.number_of_defined_values_in_row(self.next_row).into_usize()
                 - self.next.len();
-        let back_row_rank = self.csr2d.rank(self.back_row);
+        let back_row_rank = self.csr2d.rank(self.back_row).into_usize();
         let already_observed_in_back_row =
             self.csr2d.number_of_defined_values_in_row(self.back_row).into_usize()
                 - self.back.len();

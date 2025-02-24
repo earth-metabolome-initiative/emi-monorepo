@@ -1,4 +1,5 @@
 //! Submodule providing a definition of a CSR matrix.
+use core::fmt::Debug;
 use crate::prelude::*;
 
 #[derive(Clone)]
@@ -10,6 +11,15 @@ pub struct SquareCSR2D<SparseIndex, Idx> {
     pub(super) number_of_diagonal_values: Idx,
 }
 
+impl<SparseIndex: Debug, Idx: Debug> Debug for SquareCSR2D<SparseIndex, Idx> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("SquareCSR2D")
+            .field("csr", &self.csr)
+            .field("number_of_diagonal_values", &self.number_of_diagonal_values)
+            .finish()
+    }
+}
+
 impl<SparseIndex, Idx: IntoUsize + PositiveInteger> SquareMatrix for SquareCSR2D<SparseIndex, Idx>
 where
     CSR2D<SparseIndex, Idx, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
@@ -17,10 +27,8 @@ where
     type Index = Idx;
 
     fn order(&self) -> Self::Index {
-        // Since we cannot necessarily guarantee that the underlying CSR matrix is a square,
-        // as it might require to extend the number of outbound indices, we can simply report
-        // the order as the largest of the two dimensions.
-        self.csr.number_of_rows().max(self.csr.number_of_columns())
+        debug_assert_eq!(self.csr.number_of_columns(), self.csr.number_of_rows(), "The matrix is not square.");
+        self.csr.number_of_rows()
     }
 }
 
@@ -142,7 +150,7 @@ where
     }
 
     /// Returns the rank for the provided row.
-    fn rank(&self, row: Idx) -> usize {
+    fn rank(&self, row: Idx) -> Self::SparseIndex {
         self.csr.rank(row)
     }
 }
@@ -163,17 +171,16 @@ where
         // and if the user happens to provide a row that is greater than the number of columns,
         // we need to update the number of columns so as to keep the matrix square.
         self.csr.number_of_columns = self.csr.number_of_columns.max(row + Idx::ONE);
+        self.csr.number_of_rows = self.csr.number_of_rows.max(column + Idx::ONE);
+        self.number_of_diagonal_values += Idx::from(row == column);
 
-        if row == column {
-            self.number_of_diagonal_values += Idx::ONE;
-        }
         Ok(())
     }
 }
 
 impl<
         SparseIndex: PositiveInteger + IntoUsize,
-        Idx: PositiveInteger + IntoUsize + From<SparseIndex>,
+        Idx: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
     > TransposableMatrix2D for SquareCSR2D<SparseIndex, Idx>
 where
     Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,

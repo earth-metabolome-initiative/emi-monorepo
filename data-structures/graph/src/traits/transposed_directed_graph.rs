@@ -37,14 +37,17 @@ pub trait TransposedDirectedEdges:
     fn in_degree(&self, destination: Self::DestinationNodeId) -> Self::SourceNodeId {
         self.matrix().number_of_defined_values_in_column(destination)
     }
+
+    /// Returns an iterator over the in-boynd degrees of the nodes.
+    fn in_degrees(&self) -> <<Self::BiMatrix as SparseBiMatrix2D>::SparseTransposedMatrix as SparseMatrix2D>::SparseRowSizes<'_>{
+        self.matrix().sparse_column_sizes()
+    }
 }
 
 impl<E: DirectedEdges> TransposedDirectedEdges for E
 where
-    E::DirectedMatrix: SparseBiMatrix2D<
-        RowIndex = E::SourceNodeId,
-        ColumnIndex = E::DestinationNodeId,
-    >,
+    E::DirectedMatrix:
+        SparseBiMatrix2D<RowIndex = E::SourceNodeId, ColumnIndex = E::DestinationNodeId>,
 {
     type BiMatrix = E::DirectedMatrix;
 }
@@ -81,6 +84,11 @@ pub trait TransposedDirectedGraph:
     ///
     fn in_degree(&self, destination: Self::DestinationNodeId) -> Self::SourceNodeId {
         self.edges().in_degree(destination)
+    }
+
+    /// Returns an iterator over the in-boynd degrees of the nodes.
+    fn in_degrees(&self) -> <<<Self::TransposedDirectedEdges as TransposedDirectedEdges>::BiMatrix as SparseBiMatrix2D>::SparseTransposedMatrix as SparseMatrix2D>::SparseRowSizes<'_>{
+        self.edges().in_degrees()
     }
 }
 

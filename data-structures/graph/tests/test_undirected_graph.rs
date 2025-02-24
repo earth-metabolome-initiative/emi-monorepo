@@ -8,7 +8,7 @@ use sorted_vec::prelude::SortedVec;
 #[test]
 /// First simple test for undirected graph.
 pub fn test_undirected_graph() {
-    let nodes: Vec<usize> = vec![1, 2, 3, 4, 5];
+    let nodes: Vec<usize> = vec![0, 1, 2, 3, 4, 5];
     let edges: Vec<(usize, usize)> = vec![(1, 2), (1, 3), (2, 3), (3, 4), (4, 5)];
     let nodes: SortedVec<usize> = GenericVocabularyBuilder::default()
         .expected_number_of_symbols(nodes.len())
@@ -24,6 +24,6 @@ pub fn test_undirected_graph() {
     let graph: UndiGraph<usize> =
         GenericDirectionalGraphBuilder::default().nodes(nodes).edges(edges).build().unwrap();
 
-    assert_eq!(graph.number_of_nodes(), 5);
+    assert_eq!(graph.number_of_nodes(), 6);
     assert_eq!(graph.number_of_edges(), 10);
 }

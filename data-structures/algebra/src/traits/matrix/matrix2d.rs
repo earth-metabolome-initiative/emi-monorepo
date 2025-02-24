@@ -22,10 +22,6 @@ pub trait Matrix2D:
 
 impl<M: Matrix2D> Matrix for M {
     type Coordinates = (<Self as Matrix2D>::RowIndex, <Self as Matrix2D>::ColumnIndex);
-
-    fn number_of_elements(&self) -> usize {
-        self.number_of_rows().into_usize() * self.number_of_columns().into_usize()
-    }
 }
 
 /// Trait defining a sparse bidimensional matrix.
@@ -72,7 +68,7 @@ pub trait SparseMatrix2D: Matrix2D + SparseMatrix {
     fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex;
 
     /// Returns the rank of a row.
-    fn rank(&self, row: Self::RowIndex) -> usize;
+    fn rank(&self, row: Self::RowIndex) -> Self::SparseIndex;
 }
 
 /// Trait defining a transposable bidimensional matrix.
@@ -187,7 +183,6 @@ pub trait SparseSymmetricMatrix2D:
         ColumnIndex = Self::ColumnIndex,
     >;
 }
-
 
 impl<M> SparseSymmetricMatrix2D for M
 where

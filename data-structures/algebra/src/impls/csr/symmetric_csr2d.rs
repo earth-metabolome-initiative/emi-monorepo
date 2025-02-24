@@ -1,4 +1,6 @@
 //! Submodule providing a definition of a CSR matrix.
+use core::fmt::Debug;
+
 use crate::prelude::*;
 
 #[derive(Clone)]
@@ -6,6 +8,14 @@ use crate::prelude::*;
 pub struct SymmetricCSR2D<SparseIndex, Idx> {
     /// The underlying CSR matrix.
     pub(super) csr: SquareCSR2D<SparseIndex, Idx>,
+}
+
+impl<SparseIndex: Debug, Idx: Debug> Debug for SymmetricCSR2D<SparseIndex, Idx> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("SymmetricCSR2D")
+            .field("csr", &self.csr)
+            .finish()
+    }
 }
 
 impl<SparseIndex, Idx: IntoUsize + PositiveInteger> SquareMatrix
@@ -128,7 +138,7 @@ where
     }
 
     /// Returns the rank for the provided row.
-    fn rank(&self, row: Idx) -> usize {
+    fn rank(&self, row: Idx) -> Self::SparseIndex {
         self.csr.rank(row)
     }
 }

@@ -10,7 +10,7 @@ pub use square_matrix::*;
 pub use triangular_matrix::*;
 pub use matrix_mut::*;
 
-use super::{Coordinates, PositiveInteger};
+use super::{Coordinates, IntoUsize, PositiveInteger, Zero};
 
 /// Trait defining a matrix.
 pub trait Matrix {
@@ -21,14 +21,6 @@ pub trait Matrix {
     /// Returns the number of dimensions of this matrix.
     fn dimensions() -> usize {
         Self::Coordinates::dimensions()
-    }
-
-    /// Returns the number of elements in the matrix.
-    fn number_of_elements(&self) -> usize;
-
-    /// Returns whether the matrix is empty.
-    fn is_empty(&self) -> bool {
-        self.number_of_elements() == 0
     }
 }
 
@@ -41,7 +33,7 @@ pub trait ValuedMatrix: Matrix {
 /// Trait defining a sparse matrix.
 pub trait SparseMatrix: Matrix {
     /// Type defining the numeric index for the sparse values in the matrix.
-    type SparseIndex: PositiveInteger;
+    type SparseIndex: PositiveInteger + IntoUsize;
 
     /// Iterator of the sparse coordinates of the matrix.
     type SparseCoordinates<'a>: ExactSizeIterator<Item = Self::Coordinates>
@@ -54,4 +46,9 @@ pub trait SparseMatrix: Matrix {
 
     /// Returns an iterator of the sparse coordinates of the matrix.
     fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_>;
+
+    /// Returns whether the matrix is empty.
+    fn is_empty(&self) -> bool {
+        self.number_of_defined_values() == Self::SparseIndex::ZERO
+    }
 }

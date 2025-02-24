@@ -27,6 +27,11 @@ pub trait UndirectedEdges:
         );
         self.matrix().number_of_defined_values_in_row(node)
     }
+
+    /// Returns the iterator over the degrees of the nodes in the graph.
+    fn degrees(&self) -> <Self::SymmetricMatrix as SparseMatrix2D>::SparseRowSizes<'_> {
+        self.matrix().sparse_row_sizes()
+    }
 }
 
 impl<E> UndirectedEdges for E
@@ -71,6 +76,11 @@ pub trait UndirectedGraph:
     ///
     fn degree(&self, id: Self::NodeId) -> Self::NodeId {
         self.edges().degree(id)
+    }
+
+    /// Returns the iterator over the degrees of the nodes in the graph.
+    fn degrees(&self) -> <<Self::UndirectedEdges as UndirectedEdges>::SymmetricMatrix as SparseMatrix2D>::SparseRowSizes<'_>{
+        self.edges().degrees()
     }
 }
 

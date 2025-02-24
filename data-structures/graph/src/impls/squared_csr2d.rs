@@ -4,8 +4,8 @@ use crate::{errors::builder::edges::EdgesBuilderError, prelude::*};
 use algebra::prelude::*;
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize,
-        Idx: PositiveInteger + TryFromUsize + IntoUsize + From<SparseIndex>,
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
     > Edges for SquareCSR2D<SparseIndex, Idx>
 {
     type Edge = <Self as Matrix>::Coordinates;
@@ -20,8 +20,8 @@ impl<
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize,
-        Idx: PositiveInteger + TryFromUsize + IntoUsize + From<SparseIndex>,
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
     > GrowableEdges for SquareCSR2D<SparseIndex, Idx>
 {
     type GrowableMatrix = Self;
@@ -43,15 +43,3 @@ impl<
     }
 }
 
-impl<
-        SparseIndex: PositiveInteger + IntoUsize,
-        Idx: PositiveInteger + TryFromUsize + IntoUsize + From<SparseIndex>,
-    > DirectedEdges for SquareCSR2D<SparseIndex, Idx>
-{
-    type DirectedMatrix = Self;
-    type NodeId = Idx;
-
-    fn number_of_self_loops(&self) -> Idx {
-        self.number_of_defined_diagonal_values()
-    }
-}

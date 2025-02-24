@@ -4,9 +4,9 @@ use crate::{errors::builder::edges::EdgesBuilderError, prelude::*};
 use algebra::prelude::*;
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize,
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
         RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + From<SparseIndex>,
+        ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
     > Edges for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     type Edge = <Self as Matrix>::Coordinates;
@@ -21,9 +21,9 @@ impl<
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize,
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
         RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + From<SparseIndex>,
+        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex> + TryFromUsize,
     > GrowableEdges for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     type GrowableMatrix = Self;

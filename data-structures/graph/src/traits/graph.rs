@@ -1,16 +1,16 @@
 //! Module defining a bipartite graph.
 
 use crate::prelude::*;
-use algebra::prelude::{PositiveInteger, SparseMatrix2D, Symbol};
+use algebra::prelude::{IntoUsize, PositiveInteger, SparseMatrix2D, Symbol, TryFromUsize};
 
 /// Trait for a bipartite graph.
 pub trait Graph {
     /// The dense identifiers of the source nodes in the graph.
-    type SourceNodeId: PositiveInteger;
+    type SourceNodeId: PositiveInteger + IntoUsize + TryFromUsize;
     /// The dense identifiers of the destination nodes in the graph.
-    type DestinationNodeId: PositiveInteger;
+    type DestinationNodeId: PositiveInteger + IntoUsize + TryFromUsize;
     /// The dense identifiers of the edges in the graph.
-    type EdgeId: PositiveInteger;
+    type EdgeId: PositiveInteger + IntoUsize;
     /// The representation of an edge in the graph.
     type Edge: Edge<SourceNodeId = Self::SourceNodeId, DestinationNodeId = Self::DestinationNodeId>;
     /// The symbol of the source node.
@@ -127,5 +127,10 @@ pub trait Graph {
     ///
     fn out_degree(&self, source: Self::SourceNodeId) -> Self::DestinationNodeId {
         self.edges().out_degree(source)
+    }
+
+    /// Iterates across all out degrees of the graph.
+    fn out_degrees(&self) -> <<Self::Edges as Edges>::Matrix as SparseMatrix2D>::SparseRowSizes<'_> {
+        self.edges().out_degrees()
     }
 }

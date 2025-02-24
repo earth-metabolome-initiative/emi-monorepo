@@ -1,6 +1,4 @@
 //! Submodule providing a definition of a CSR matrix.
-use core::marker::PhantomData;
-
 use crate::prelude::*;
 
 #[derive(Clone)]
@@ -109,7 +107,8 @@ where
         = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::SparseRows<'a>
     where
         Self: 'a;
-    type SparseRowSizes<'a> = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::SparseRowSizes<'a>
+    type SparseRowSizes<'a>
+        = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::SparseRowSizes<'a>
     where
         Self: 'a;
 
@@ -134,7 +133,7 @@ where
     }
 
     /// Returns the rank for the provided row.
-    fn rank(&self, row: Idx) -> usize {
+    fn rank(&self, row: Idx) -> Self::SparseIndex {
         self.csr.rank(row)
     }
 }
@@ -161,7 +160,7 @@ where
 
 impl<
         SparseIndex: PositiveInteger + IntoUsize,
-        Idx: PositiveInteger + IntoUsize + From<SparseIndex>,
+        Idx: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
     > TransposableMatrix2D for UpperTriangularCSR2D<SparseIndex, Idx>
 where
     Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
@@ -178,8 +177,10 @@ where
     }
 }
 
-impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize + TryFromUsize>
-    Symmetrize<SymmetricCSR2D<SparseIndex, Idx>> for UpperTriangularCSR2D<SparseIndex, Idx>
+impl<
+        SparseIndex: PositiveInteger + IntoUsize,
+        Idx: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
+    > Symmetrize<SymmetricCSR2D<SparseIndex, Idx>> for UpperTriangularCSR2D<SparseIndex, Idx>
 where
     Self: SparseSquareMatrix<Index = Idx, SparseIndex = SparseIndex>,
     SquareCSR2D<SparseIndex, Idx>:
@@ -187,38 +188,39 @@ where
 {
     fn symmetrize(&self) -> SymmetricCSR2D<SparseIndex, Idx> {
         // We initialize the transposed matrix.
+        let number_of_expected_column_indices = (self.number_of_defined_values().into_usize()
+            - self.number_of_defined_diagonal_values().into_usize())
+            * 2
+            + self.number_of_defined_diagonal_values().into_usize();
         let mut symmetric: CSR2D<SparseIndex, Idx, Idx> = CSR2D {
             offsets: vec![SparseIndex::ZERO; self.order().into_usize() + 1],
             number_of_columns: self.order(),
-            column_indices: vec![
-                Idx::ZERO;
-                (self.number_of_defined_values().into_usize()
-                    - self.number_of_defined_diagonal_values().into_usize())
-                    * 2
-                    + self.number_of_defined_diagonal_values().into_usize()
-            ],
-            _row_indices: PhantomData,
+            number_of_rows: self.order(),
+            column_indices: vec![Idx::ZERO; number_of_expected_column_indices],
         };
 
         // First, we proceed to compute the number of elements in each column.
         for (row, column) in self.sparse_coordinates() {
+            // TODO! IF YOU INITIALIZE OFFSETS WITH THE OUT BOUND DEGREES, THERE IS NO NEED FOR ALL OF THE SPARSE ROW ACCESSES!
             symmetric.offsets[row.into_usize() + 1] += SparseIndex::ONE;
-            symmetric.offsets[column.into_usize() + 1] += SparseIndex::ONE;
+            symmetric.offsets[column.into_usize() + 1] += SparseIndex::from(row != column);
         }
 
         // Then, we compute the prefix sum of the degrees to get the offsets.
         let mut prefix_sum = SparseIndex::ZERO;
         for offset in &mut symmetric.offsets {
-            let current = *offset;
+            prefix_sum += *offset;
             *offset = prefix_sum;
-            prefix_sum += current;
         }
 
         // Finally, we fill the column indices.
         let mut degree = vec![SparseIndex::ZERO; self.order().into_usize()];
         for (row, column) in self.sparse_coordinates() {
-            let edges: Vec<(Idx, Idx)> =
-                if row == column { vec![(row, column)] } else { vec![(row, column), (column, row)] };
+            let edges: Vec<(Idx, Idx)> = if row == column {
+                vec![(row, column)]
+            } else {
+                vec![(row, column), (column, row)]
+            };
             for (i, j) in edges {
                 let current_degree: &mut SparseIndex = &mut degree[i.into_usize()];
                 let index = *current_degree + symmetric.offsets[i.into_usize()];
@@ -226,6 +228,14 @@ where
                 *current_degree += SparseIndex::ONE;
             }
         }
+
+        debug_assert_eq!(
+            symmetric.number_of_defined_values().into_usize(),
+            number_of_expected_column_indices,
+            "The number of inserted values is not the expected one. Original number of values: {}. Diagonals: {}",
+            self.number_of_defined_values(),
+            self.number_of_defined_diagonal_values()
+        );
 
         SymmetricCSR2D {
             csr: SquareCSR2D {

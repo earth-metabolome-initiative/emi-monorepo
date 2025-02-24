@@ -2,7 +2,7 @@
 
 use algebra::prelude::*;
 
-use super::{BidirectionalVocabulary, Edges, Vocabulary, VocabularyRef};
+use super::{BidirectionalVocabulary, Edges, Graph, Vocabulary, VocabularyRef};
 
 /// Trait defining the properties of the directed edges of a graph.
 pub trait DirectedEdges:
@@ -13,7 +13,7 @@ pub trait DirectedEdges:
 >
 {
     /// The directed matrix of the graph.
-    type DirectedMatrix: SquareMatrix<Index = Self::NodeId>;
+    type DirectedMatrix: SparseSquareMatrix<Index = Self::NodeId>;
 
     /// The identifier of the node.
     type NodeId: PositiveInteger + IntoUsize + TryFromUsize;
@@ -25,6 +25,19 @@ pub trait DirectedEdges:
 
     /// Returns the number of self-loops in the graph.
     fn number_of_self_loops(&self) -> Self::NodeId;
+}
+
+impl<E> DirectedEdges for E
+where
+    E: Edges<DestinationNodeId = <E as Edges>::SourceNodeId>,
+    E::Matrix: SparseSquareMatrix<Index = E::SourceNodeId>,
+{
+    type DirectedMatrix = E::Matrix;
+    type NodeId = E::SourceNodeId;
+
+    fn number_of_self_loops(&self) -> Self::NodeId {
+        self.matrix().number_of_defined_diagonal_values()
+    }
 }
 
 /// Trait defining the properties of a directed graph.
@@ -82,4 +95,19 @@ pub trait DirectedGraph:
     fn number_of_self_loops(&self) -> Self::NodeId {
         self.edges().number_of_self_loops()
     }
+}
+
+impl<G> DirectedGraph for G
+where
+    G: Graph<
+        SourceNodeId = <G as Graph>::DestinationNodeId,
+        SourceNodeSymbol = <G as Graph>::DestinationNodeSymbol,
+        Sources = <G as Graph>::Destinations,
+    >,
+    G::Edges: DirectedEdges<NodeId = G::SourceNodeId>,
+{
+    type NodeId = G::SourceNodeId;
+    type NodeSymbol = G::SourceNodeSymbol;
+    type Nodes = G::Sources;
+    type DirectedEdges = G::Edges;
 }

@@ -1,7 +1,7 @@
 //! Submodule defining the Integer number trait.
 
 /// Trait defining an integer number.
-pub trait Integer: super::Number + Ord + Eq + core::hash::Hash {}
+pub trait Integer: super::Number + Ord + Eq + core::hash::Hash + From<bool> {}
 
 impl Integer for i8 {}
 impl Integer for i16 {}

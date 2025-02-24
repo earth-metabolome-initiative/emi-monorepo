@@ -3,7 +3,7 @@
 use crate::{
     errors::builder::graph::GraphBuilderError,
     traits::{
-        BidirectionalVocabulary, DirectedEdges, DirectedGraph, Graph, Vocabulary, VocabularyRef,
+        BidirectionalVocabulary, DirectedEdges, Graph, Vocabulary, VocabularyRef,
     },
 };
 
@@ -53,15 +53,4 @@ where
     fn edges(&self) -> &Self::Edges {
         &self.edges
     }
-}
-
-impl<S, E> DirectedGraph for GenericDirectionalGraph<S, E>
-where
-    S: BidirectionalVocabulary + VocabularyRef + Vocabulary<SourceSymbol = E::NodeId>,
-    E: DirectedEdges,
-{
-    type DirectedEdges = E;
-    type NodeId = E::NodeId;
-    type NodeSymbol = S::DestinationSymbol;
-    type Nodes = S;
 }

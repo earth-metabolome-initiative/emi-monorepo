@@ -4,8 +4,8 @@ use crate::prelude::*;
 use algebra::prelude::*;
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize,
-        Idx: PositiveInteger + TryFromUsize + IntoUsize + From<SparseIndex>,
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
     > Edges for SymmetricCSR2D<SparseIndex, Idx>
 {
     type Edge = <Self as Matrix>::Coordinates;
@@ -20,21 +20,8 @@ impl<
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize,
-        Idx: PositiveInteger + TryFromUsize + IntoUsize + From<SparseIndex>,
-    > DirectedEdges for SymmetricCSR2D<SparseIndex, Idx>
-{
-    type DirectedMatrix = Self;
-    type NodeId = Idx;
-
-    fn number_of_self_loops(&self) -> Idx {
-        self.number_of_defined_diagonal_values()
-    }
-}
-
-impl<
-        SparseIndex: PositiveInteger + IntoUsize,
-        Idx: PositiveInteger + TryFromUsize + IntoUsize + From<SparseIndex>,
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
         DE: DirectedEdges<NodeId = Idx>,
     > FromDirectedEdges<DE> for SymmetricCSR2D<SparseIndex, Idx>
 where

@@ -1,7 +1,7 @@
 //! Trait defining a data structure to handle Edges, such as a simple edge list,
 //! or a ragged list or a compressed sparse row matrix.
 
-use algebra::prelude::{MatrixMut, PositiveInteger, SparseMatrix, SparseMatrix2D, SparseMatrixMut};
+use algebra::prelude::{IntoUsize, MatrixMut, PositiveInteger, SparseMatrix, SparseMatrix2D, SparseMatrixMut, TryFromUsize};
 
 use super::Edge;
 
@@ -11,11 +11,11 @@ pub trait Edges {
     /// The type of the edge.
     type Edge: Edge<SourceNodeId = Self::SourceNodeId, DestinationNodeId = Self::DestinationNodeId>;
     /// The type of the source node ID.
-    type SourceNodeId: PositiveInteger;
+    type SourceNodeId: PositiveInteger + IntoUsize + TryFromUsize;
     /// The type of the destination node ID.
-    type DestinationNodeId: PositiveInteger;
+    type DestinationNodeId: PositiveInteger + IntoUsize + TryFromUsize;
     /// The type of the edge identifier.
-    type EdgeId: PositiveInteger;
+    type EdgeId: PositiveInteger + IntoUsize + TryFromUsize;
     /// The underlying matrix type.
     type Matrix: SparseMatrix2D<
         RowIndex = Self::SourceNodeId,
@@ -53,6 +53,17 @@ pub trait Edges {
     fn out_degree(&self, source: Self::SourceNodeId) -> Self::DestinationNodeId {
         self.matrix().number_of_defined_values_in_row(source)
     }
+
+    /// Returns an iterator over the out degrees of the nodes.
+    fn out_degrees(&self) -> <Self::Matrix as SparseMatrix2D>::SparseRowSizes<'_> {
+        self.matrix().sparse_row_sizes()
+    }
+
+    /// Returns the iterator of the edges.
+    fn edges(&self) -> <Self::Matrix as SparseMatrix>::SparseCoordinates<'_> {
+        self.matrix().sparse_coordinates()
+    }
+
 }
 
 /// Trait defining a data structure to handle edges that can grow dynamically.

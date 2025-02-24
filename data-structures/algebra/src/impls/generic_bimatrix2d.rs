@@ -101,7 +101,7 @@ where
         self.matrix.sparse_row_sizes()
     }
 
-    fn rank(&self, row: Self::RowIndex) -> usize {
+    fn rank(&self, row: Self::RowIndex) -> Self::SparseIndex {
         self.matrix.rank(row)
     }
 }
