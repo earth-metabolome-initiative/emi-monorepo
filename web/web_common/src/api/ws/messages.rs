@@ -1,5 +1,5 @@
 //! Module providing the websocket messages used in the application.
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 use common_traits::prelude::*;
 

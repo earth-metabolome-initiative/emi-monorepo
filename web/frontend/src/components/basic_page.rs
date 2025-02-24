@@ -26,7 +26,7 @@ where
     pub id: PrimaryKey,
     pub children: Html,
     #[prop_or_default]
-    _phantom: std::marker::PhantomData<Page>,
+    _phantom: core::marker::PhantomData<Page>,
 }
 
 #[derive(Properties, Clone, PartialEq)]
@@ -41,7 +41,7 @@ where
     #[prop_or_default]
     pub can_admin: Callback<bool>,
     #[prop_or_default]
-    _phantom: std::marker::PhantomData<Page>,
+    _phantom: core::marker::PhantomData<Page>,
 }
 
 pub(crate) struct BasicPage<Page> {

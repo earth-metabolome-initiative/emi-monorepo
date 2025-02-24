@@ -39,7 +39,7 @@ pub struct Observe {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
     environment_pictures: Vec<Rc<web_common::types::JPEG>>,
     details_pictures: Vec<Rc<web_common::types::JPEG>>,
-    location: Option<web_common::types::Point>,
+    location: Option<postgis_diesel::types::Point>,
     taxon: Option<Rc<Taxon>>,
 }
 
@@ -50,7 +50,7 @@ pub enum ObserveMessage {
     AddDetailsPicture(Rc<web_common::types::JPEG>),
     RemoveEnvironmentPicture(usize),
     RemoveDetailsPicture(usize),
-    GeoLocation(Option<web_common::types::Point>),
+    GeoLocation(Option<postgis_diesel::types::Point>),
     SelectedTaxon(Option<Rc<Taxon>>),
     SetSection(PageSection),
 }

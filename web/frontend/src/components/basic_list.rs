@@ -32,7 +32,7 @@ pub struct BasicList<Page> {
     // websocket: WorkerBridgeHandle<WebsocketWorker>,
     user_state: Rc<UserState>,
     _dispatcher: Dispatch<UserState>,
-    _phantom: std::marker::PhantomData<Page>,
+    _phantom: core::marker::PhantomData<Page>,
 }
 
 pub enum PagesMessage {
@@ -57,7 +57,7 @@ impl<Page: Filtrable + Searchable<false> + PageLike + RowToBadge> Component for 
             // })),
             user_state,
             _dispatcher: user_dispatch,
-            _phantom: std::marker::PhantomData,
+            _phantom: core::marker::PhantomData,
         }
     }
 

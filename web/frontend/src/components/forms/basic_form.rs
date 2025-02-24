@@ -21,45 +21,9 @@ use crate::{
     },
 };
 
-/// Trait defining something that can be built from a named get operation.
-pub(super) trait FromOperation {
-    /// Creates a new instance of the implementing type from the provided
-    /// operation name and row.
-    fn from_operation<S: AsRef<str>>(operation_name: S, row: Vec<u8>) -> Self;
-}
-
-/// Trait defining something that can be used to build something else by a form.
-pub(super) trait FormBuilder:
-    Clone + Store + PartialEq + Serialize + Debug + Default
-{
-    type Actions: Reducer<Self> + FromOperation;
-    type RichVariant: DeserializeOwned + Debug + Viewable;
-
-    /// Returns whether the form contains errors.
-    fn has_errors(&self) -> bool;
-
-    /// Returns whether the can currently be submitted.
-    fn can_submit(&self) -> bool;
-
-    /// Returns whether the form is currently equal to the default state.
-    fn is_default(&self) -> bool {
-        self == &Self::default()
-    }
-
-    /// Updates the state of the form builder with the provided data and returns
-    /// the operations necessary to complete the update.
-    ///
-    /// # Arguments
-    /// * `richest_variant` - The data to use to update the form builder.
-    fn update(
-        dispatcher: &Dispatch<Self>,
-        richest_variant: Self::RichVariant,
-    ) -> Vec<ComponentMessage>;
-}
-
 /// Trait defining something that can be built by a form.
 pub(super) trait FormBuildable:
-    Clone + PartialEq + Serialize + 'static + From<<Self as FormBuildable>::Builder> + Tabular + Debug
+    Clone + PartialEq + Serialize + 'static + From<<Self as FormBuildable>::Builder> + Debug
 {
     type Builder: FormBuilder;
 
@@ -103,7 +67,7 @@ pub(super) struct BasicForm<Data> {
     user_state: Rc<UserState>,
     _dispatcher: Dispatch<UserState>,
     loading_operations: usize,
-    _phantom: std::marker::PhantomData<Data>,
+    _phantom: core::marker::PhantomData<Data>,
 }
 
 pub(super) enum FormMessage {
@@ -144,7 +108,7 @@ where
             user_state,
             loading_operations: 0,
             _dispatcher: user_dispatch,
-            _phantom: std::marker::PhantomData,
+            _phantom: core::marker::PhantomData,
         }
     }
 

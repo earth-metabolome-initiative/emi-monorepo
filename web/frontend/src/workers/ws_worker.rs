@@ -43,9 +43,6 @@ pub enum WebsocketMessage {
     Notification(NotificationMessage),
     SearchTable(Vec<u8>),
     GetTable(Option<String>, Vec<u8>),
-    CanView(bool),
-    CanUpdate(bool),
-    CanDelete(bool),
     /// Contains the serialized object in the cases
     /// where the operation was an update of get, and
     /// None in the case of a delete operation.
@@ -151,24 +148,6 @@ impl Worker for WebsocketWorker {
             }
             InternalMessage::Backend(backend_message) => {
                 match backend_message {
-                    BackendMessage::CanView(task_id, can_view) => {
-                        // We can remove this task from the queue.
-                        if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, WebsocketMessage::CanView(can_view));
-                        }
-                    }
-                    BackendMessage::CanUpdate(task_id, can_update) => {
-                        // We can remove this task from the queue.
-                        if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, WebsocketMessage::CanUpdate(can_update));
-                        }
-                    }
-                    BackendMessage::CanDelete(task_id, can_admin) => {
-                        // We can remove this task from the queue.
-                        if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, WebsocketMessage::CanDelete(can_admin));
-                        }
-                    }
                     BackendMessage::Notification(notification) => {
                         // TODO! HANDLE UPDATE OF THE DATABASE!
                         log::debug!("Notification received: {:?}", notification);

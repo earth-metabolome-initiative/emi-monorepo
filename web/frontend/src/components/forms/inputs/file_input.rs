@@ -72,7 +72,7 @@ pub struct MultiFileInput<Data> {
     number_of_files_currently_processing: usize,
     drag_over_closure: Closure<dyn FnMut(DragEvent)>,
     drop_closure: Closure<dyn FnMut(DragEvent)>,
-    _phantom: std::marker::PhantomData<Data>,
+    _phantom: core::marker::PhantomData<Data>,
 }
 
 pub enum MultiFileInputMessage<Data> {
@@ -129,7 +129,7 @@ where
             number_of_files_currently_processing: 0,
             drag_over_closure,
             drop_closure,
-            _phantom: std::marker::PhantomData,
+            _phantom: core::marker::PhantomData,
         }
     }
 
