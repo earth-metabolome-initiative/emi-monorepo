@@ -17,7 +17,10 @@ where
     type Index = Idx;
 
     fn order(&self) -> Self::Index {
-        self.csr.number_of_rows()
+        // Since we cannot necessarily guarantee that the underlying CSR matrix is a square,
+        // as it might require to extend the number of outbound indices, we can simply report
+        // the order as the largest of the two dimensions.
+        self.csr.number_of_rows().max(self.csr.number_of_columns())
     }
 }
 
@@ -114,6 +117,9 @@ where
         = <CSR2D<SparseIndex, Idx, Idx> as SparseMatrix2D>::SparseRows<'a>
     where
         Self: 'a;
+    type SparseRowSizes<'a> = <CSR2D<SparseIndex, Idx, Idx> as SparseMatrix2D>::SparseRowSizes<'a>
+    where
+        Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.csr.sparse_row(row)
@@ -129,6 +135,10 @@ where
 
     fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
         self.csr.number_of_defined_values_in_row(row)
+    }
+
+    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
+        self.csr.sparse_row_sizes()
     }
 
     /// Returns the rank for the provided row.
@@ -149,7 +159,14 @@ where
 
     fn add(&mut self, (row, column): Self::Entry) -> Result<(), Self::Error> {
         self.csr.add((row, column))?;
-        self.number_of_diagonal_values += Idx::ONE;
+        // Since the matrix is square, the number of columns is equal to the number of row,
+        // and if the user happens to provide a row that is greater than the number of columns,
+        // we need to update the number of columns so as to keep the matrix square.
+        self.csr.number_of_columns = self.csr.number_of_columns.max(row + Idx::ONE);
+
+        if row == column {
+            self.number_of_diagonal_values += Idx::ONE;
+        }
         Ok(())
     }
 }

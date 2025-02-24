@@ -77,6 +77,9 @@ where
         = M::SparseRows<'a>
     where
         Self: 'a;
+    type SparseRowSizes<'a> = M::SparseRowSizes<'a>
+    where
+        Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.matrix.sparse_row(row)
@@ -92,6 +95,10 @@ where
 
     fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
         self.matrix.number_of_defined_values_in_row(row)
+    }
+
+    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
+        self.matrix.sparse_row_sizes()
     }
 
     fn rank(&self, row: Self::RowIndex) -> usize {

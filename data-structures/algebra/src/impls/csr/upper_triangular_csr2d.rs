@@ -13,12 +13,12 @@ pub struct UpperTriangularCSR2D<SparseIndex, Idx> {
 impl<SparseIndex, Idx: IntoUsize + PositiveInteger> SquareMatrix
     for UpperTriangularCSR2D<SparseIndex, Idx>
 where
-    SquareCSR2D<SparseIndex, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    SquareCSR2D<SparseIndex, Idx>: SquareMatrix<Index = Idx>,
 {
     type Index = Idx;
 
     fn order(&self) -> Self::Index {
-        self.csr.number_of_rows()
+        self.csr.order()
     }
 }
 
@@ -109,6 +109,9 @@ where
         = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::SparseRows<'a>
     where
         Self: 'a;
+    type SparseRowSizes<'a> = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::SparseRowSizes<'a>
+    where
+        Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.csr.sparse_row(row)
@@ -124,6 +127,10 @@ where
 
     fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
         self.csr.number_of_defined_values_in_row(row)
+    }
+
+    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
+        self.csr.sparse_row_sizes()
     }
 
     /// Returns the rank for the provided row.
@@ -171,7 +178,7 @@ where
     }
 }
 
-impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize>
+impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize + TryFromUsize>
     Symmetrize<SymmetricCSR2D<SparseIndex, Idx>> for UpperTriangularCSR2D<SparseIndex, Idx>
 where
     Self: SparseSquareMatrix<Index = Idx, SparseIndex = SparseIndex>,

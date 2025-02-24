@@ -14,3 +14,5 @@ pub mod error;
 pub use error::*;
 pub mod symmetric_csr2d;
 pub use symmetric_csr2d::SymmetricCSR2D;
+pub mod csr2d_row_sizes;
+pub use csr2d_row_sizes::CSR2DRowSizes;

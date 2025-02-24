@@ -34,14 +34,13 @@ impl<CSR: SparseMatrix2D> Iterator for CSR2DView<'_, CSR> {
     fn size_hint(&self) -> (usize, Option<usize>) {
         let next_row_rank = self.csr2d.rank(self.next_row);
         let already_observed_in_next_row =
-            self.csr2d.number_of_defined_values_in_row(self.next_row).into_usize() - self.next.len();
+            self.csr2d.number_of_defined_values_in_row(self.next_row).into_usize()
+                - self.next.len();
         let back_row_rank = self.csr2d.rank(self.back_row);
-        let already_observed_in_back_row =
-            self.csr2d.number_of_defined_values_in_row(self.back_row).into_usize() - self.back.len();
-        let remaining = back_row_rank
+        let still_to_be_observed_in_back_row = self.back.len();
+        let remaining = back_row_rank + still_to_be_observed_in_back_row
             - next_row_rank
-            - already_observed_in_next_row
-            - already_observed_in_back_row;
+            - already_observed_in_next_row;
         (remaining, Some(remaining))
     }
 }
@@ -72,12 +71,6 @@ impl<'a, CSR: SparseMatrix2D> From<&'a CSR> for CSR2DView<'a, CSR> {
         let back_row = csr2d.number_of_rows() - CSR::RowIndex::ONE;
         let next = csr2d.sparse_row(next_row);
         let back = csr2d.sparse_row(back_row);
-        Self {
-            csr2d,
-            next_row,
-            back_row,
-            next,
-            back,
-        }
+        Self { csr2d, next_row, back_row, next, back }
     }
 }

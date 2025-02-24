@@ -11,12 +11,12 @@ pub struct SymmetricCSR2D<SparseIndex, Idx> {
 impl<SparseIndex, Idx: IntoUsize + PositiveInteger> SquareMatrix
     for SymmetricCSR2D<SparseIndex, Idx>
 where
-    SquareCSR2D<SparseIndex, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    SquareCSR2D<SparseIndex, Idx>: SquareMatrix<Index = Idx>,
 {
     type Index = Idx;
 
     fn order(&self) -> Self::Index {
-        self.csr.number_of_rows()
+        self.csr.order()
     }
 }
 
@@ -103,6 +103,9 @@ where
         = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::SparseRows<'a>
     where
         Self: 'a;
+    type SparseRowSizes<'a> = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::SparseRowSizes<'a>
+    where
+        Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.csr.sparse_row(row)
@@ -118,6 +121,10 @@ where
 
     fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
         self.csr.number_of_defined_values_in_row(row)
+    }
+
+    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
+        self.csr.sparse_row_sizes()
     }
 
     /// Returns the rank for the provided row.
@@ -143,7 +150,7 @@ impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize>
     for SymmetricCSR2D<SparseIndex, Idx>
 where
     Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-    SquareCSR2D<SparseIndex, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    SquareCSR2D<SparseIndex, Idx>: SquareMatrix<Index = Idx>,
 {
     fn symmetrize(&self) -> Self {
         self.clone()
@@ -166,32 +173,4 @@ where
     fn transposed(&self) -> &Self::TransposedMatrix {
         &self.csr
     }
-}
-
-impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize> SparseBiMatrix2D
-    for SymmetricCSR2D<SparseIndex, Idx>
-where
-    Self: SparseMatrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-    SquareCSR2D<SparseIndex, Idx>: SparseMatrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-{
-    type SparseMatrix = SquareCSR2D<SparseIndex, Idx>;
-    type SparseTransposedMatrix = SquareCSR2D<SparseIndex, Idx>;
-}
-
-impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize> SymmetricMatrix2D
-    for SymmetricCSR2D<SparseIndex, Idx>
-where
-    Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-    SquareCSR2D<SparseIndex, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-{
-    type SymmetricMatrix = SquareCSR2D<SparseIndex, Idx>;
-}
-
-impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize>
-    SparseSymmetricMatrix2D for SymmetricCSR2D<SparseIndex, Idx>
-where
-    Self: SparseMatrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-    SquareCSR2D<SparseIndex, Idx>: SparseMatrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-{
-    type SymmetricSparseMatrix = SquareCSR2D<SparseIndex, Idx>;
 }

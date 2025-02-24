@@ -49,7 +49,7 @@ where
     }
 
     fn with_sparse_shaped_capacity(
-        (number_of_rows, number_of_columns): Self::Coordinates,
+        (number_of_rows, number_of_columns): Self::MinimalShape,
         number_of_values: Self::SparseIndex,
     ) -> Self {
         Self {
@@ -126,6 +126,10 @@ where
         = CSR2DRows<'a, Self>
     where
         Self: 'a;
+    type SparseRowSizes<'a>
+        = CSR2DRowSizes<'a, Self>
+    where
+        Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         let start = self.offsets[row.into_usize()].into_usize();
@@ -138,6 +142,10 @@ where
     }
 
     fn sparse_rows(&self) -> Self::SparseRows<'_> {
+        self.into()
+    }
+
+    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
         self.into()
     }
 
