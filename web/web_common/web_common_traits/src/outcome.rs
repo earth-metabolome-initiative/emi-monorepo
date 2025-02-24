@@ -1,13 +1,11 @@
 //! Submodule providing the Outcome trait.
 
-use core::fmt::Debug;
-
-use serde::{de::DeserializeOwned, Serialize};
+use common_traits::basic::Basic;
 
 use crate::prelude::Operation;
 
 /// Trait for outcomes.
-pub trait Outcome: Serialize + DeserializeOwned + Send + Sync + Debug {
+pub trait Outcome: Basic {
     /// The operation type associated with the outcome.
     type Operation: Operation<Outcome = Self>;
 
