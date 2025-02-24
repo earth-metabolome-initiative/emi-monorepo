@@ -22,6 +22,13 @@ impl Table {
         let mut foreign_keys_and_tables = Vec::new();
         for foreign_key in foreign_keys {
             let (foreign_key_table, _) = foreign_key.foreign_table(conn).unwrap().unwrap();
+            if &foreign_key_table == self {
+                continue;
+            }
+            if foreign_key.is_nullable() {
+                // If the foreign key is nullable, we don't want to write the trait for it.
+                continue;
+            }
             if foreign_keys_and_tables.iter().any(|(table, _)| table == &foreign_key_table) {
                 // If we have already written the trait for this table, we remove the other occurrences.
                 foreign_keys_and_tables.retain(|(table, _)| table != &foreign_key_table);

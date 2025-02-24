@@ -1,64 +1,11 @@
 //! Test suite for table metadata loading
-use std::path::Path;
-
-use diesel::{pg::PgConnection, Connection};
-use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-use testcontainers::{
-    core::{IntoContainerPort, WaitFor},
-    runners::AsyncRunner,
-    ContainerAsync, GenericImage, ImageExt,
-};
+use diesel::pg::PgConnection;
 
 mod utils;
 
-use utils::add_main_to_file;
+use utils::*;
+
 use webcodegen::{errors::WebCodeGenError, *};
-
-const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./test_migrations");
-const DATABASE_NAME: &str = "test_db";
-const DATABASE_PASSWORD: &str = "password";
-const DATABASE_USER: &str = "user";
-const DATABASE_PORT: u16 = 33676;
-
-fn establish_connection_to_postgres() -> PgConnection {
-    let database_url = format!(
-        "postgres://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:{DATABASE_PORT}/{DATABASE_NAME}",
-    );
-
-    let mut number_of_attempts = 0;
-
-    while let Err(e) = PgConnection::establish(&database_url) {
-        eprintln!("Failed to establish connection: {:?}", e);
-        std::thread::sleep(std::time::Duration::from_secs(1));
-        if number_of_attempts > 10 {
-            eprintln!("Failed to establish connection after 10 attempts");
-            std::process::exit(1);
-        }
-        number_of_attempts += 1;
-    }
-
-    PgConnection::establish(&database_url).unwrap()
-}
-
-async fn setup_postgres() -> ContainerAsync<GenericImage> {
-    let container = GenericImage::new("postgres", "17-alpine")
-        .with_wait_for(WaitFor::message_on_stderr("database system is ready to accept connections"))
-        .with_network("bridge")
-        .with_env_var("DEBUG", "1")
-        .with_env_var("POSTGRES_USER", DATABASE_USER)
-        .with_env_var("POSTGRES_PASSWORD", DATABASE_PASSWORD)
-        .with_env_var("POSTGRES_DB", DATABASE_NAME)
-        .with_mapped_port(DATABASE_PORT, 5432.tcp())
-        .start()
-        .await;
-
-    if let Err(e) = container {
-        eprintln!("Failed to start container: {:?}", e);
-        std::process::exit(1);
-    }
-
-    container.unwrap()
-}
 
 async fn test_code_generation_methods(conn: &mut PgConnection) -> Result<(), WebCodeGenError> {
     let builder = trybuild::TestCases::new();
@@ -70,20 +17,17 @@ async fn test_code_generation_methods(conn: &mut PgConnection) -> Result<(), Web
     add_main_to_file("tests/ui/sql_operators.rs");
     builder.pass("tests/ui/sql_operators.rs");
 
-    Codegen::default().set_output_path(Path::new("tests/ui/tables.rs")).generate(
-        conn,
-        DATABASE_NAME,
-        None,
-    )?;
-
     add_main_to_file("tests/ui/tables.rs");
     builder.pass("tests/ui/tables.rs");
 
     Ok(())
 }
 
-async fn test_check_constraints(conn: &mut PgConnection) -> Result<(), WebCodeGenError> {
-    let users = Table::load(conn, "users", None, DATABASE_NAME).unwrap();
+async fn test_check_constraints(
+    database_name: &str,
+    conn: &mut PgConnection,
+) -> Result<(), WebCodeGenError> {
+    let users = Table::load(conn, "users", None, &database_name).unwrap();
 
     let table_check_constraint = users.check_constraints(conn)?;
 
@@ -101,8 +45,11 @@ async fn test_check_constraints(conn: &mut PgConnection) -> Result<(), WebCodeGe
     Ok(())
 }
 
-async fn test_create_roles_tables(conn: &mut PgConnection) -> Result<(), WebCodeGenError> {
-    let query_result = Table::create_roles_tables(conn, DATABASE_NAME, None);
+async fn test_create_roles_tables(
+    database_name: &str,
+    conn: &mut PgConnection,
+) -> Result<(), WebCodeGenError> {
+    let query_result = Table::create_roles_tables(conn, &database_name, None);
 
     assert!(
         query_result.is_ok(),
@@ -113,21 +60,19 @@ async fn test_create_roles_tables(conn: &mut PgConnection) -> Result<(), WebCode
 
 #[tokio::test]
 async fn test_user_table() {
-    let container = setup_postgres().await;
+    let (docker, mut conn, database_name) =
+        setup_database_with_default_migrations("test_table_properties").await.unwrap();
 
-    let mut conn = establish_connection_to_postgres();
-    conn.run_pending_migrations(MIGRATIONS).unwrap();
-
-    test_create_roles_tables(&mut conn).await.unwrap();
+    test_create_roles_tables(&database_name, &mut conn).await.unwrap();
 
     // We attempt to create the update triggers for the tables
     // that have an `updated_at` column
 
-    Table::create_update_triggers(&mut conn, DATABASE_NAME, None).unwrap();
+    Table::create_update_triggers(&mut conn, &database_name, None).unwrap();
 
     AuthorizationFunctionBuilder::default()
-        .add_childless_table(Table::load(&mut conn, "users", None, DATABASE_NAME).unwrap())
-        .create_authorization_functions_and_triggers(&mut conn, DATABASE_NAME, None)
+        .add_childless_table(Table::load(&mut conn, "users", None, &database_name).unwrap())
+        .create_authorization_functions_and_triggers(&mut conn, &database_name, None)
         .unwrap();
 
     test_code_generation_methods(&mut conn).await.unwrap();
@@ -135,7 +80,7 @@ async fn test_user_table() {
     // We try to load all elements of each type, so to ensure
     // that the structs are actually compatible with the schema
     // of PostgreSQL
-    let all_tables = Table::load_all(&mut conn, DATABASE_NAME, None).unwrap();
+    let all_tables = Table::load_all(&mut conn, &database_name, None).unwrap();
     assert!(!all_tables.is_empty());
 
     // We check that all tables that have the `updated_at` column also have the
@@ -152,7 +97,7 @@ async fn test_user_table() {
 
     // We check specifically that the `teams` table has the `updated_at` column
     // and the trigger to update it
-    let teams = Table::load(&mut conn, "teams", None, DATABASE_NAME).unwrap();
+    let teams = Table::load(&mut conn, "teams", None, &database_name).unwrap();
     assert!(
         teams.has_updated_at_column(&mut conn).unwrap(),
         "Table teams does not have the updated_at column, but has columns: {:?}",
@@ -172,9 +117,9 @@ async fn test_user_table() {
     let _all_constraint_table_usage = ConstraintTableUsage::load_all(&mut conn);
     let _all_domain_constraint = DomainConstraint::load_all_domain_constraints(&mut conn);
 
-    let users = Table::load(&mut conn, "users", None, DATABASE_NAME).unwrap();
+    let users = Table::load(&mut conn, "users", None, &database_name).unwrap();
 
-    test_check_constraints(&mut conn).await.unwrap();
+    test_check_constraints(&database_name, &mut conn).await.unwrap();
 
     let original_user_id_column = users.column_by_name(&mut conn, "id").unwrap();
 
@@ -201,7 +146,7 @@ async fn test_user_table() {
     assert_eq!(unique_columns[1].len(), 2);
     assert_eq!(unique_columns[2].len(), 1);
 
-    let composite_users = Table::load(&mut conn, "composite_users", None, DATABASE_NAME).unwrap();
+    let composite_users = Table::load(&mut conn, "composite_users", None, &database_name).unwrap();
 
     let columns: Result<Vec<Column>, WebCodeGenError> = composite_users.columns(&mut conn);
     let primary_key_columns: Result<Vec<Column>, WebCodeGenError> =
@@ -239,5 +184,5 @@ async fn test_user_table() {
 
     assert!(username_column.foreign_table(&mut conn).unwrap().is_none());
 
-    container.stop().await.unwrap();
+    docker.stop().await.unwrap();
 }

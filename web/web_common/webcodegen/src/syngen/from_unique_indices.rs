@@ -121,11 +121,6 @@ impl crate::Table {
             })
             .collect::<Result<TokenStream, WebCodeGenError>>()?;
 
-        let multiple_entry_methods = self.from_single_column_unique_indices(conn)?;
-
-        Ok(quote! {
-            #single_entry_methods
-            #multiple_entry_methods
-        })
+        Ok(single_entry_methods)
     }
 }

@@ -28,7 +28,7 @@ pub const RESERVED_RUST_WORDS: [&str; 49] = [
 /// Diesel collisions that need to be handled.
 pub const RESERVED_DIESEL_WORDS: [&str; 1] = ["columns"];
 
-#[derive(Queryable, QueryableByName, PartialEq, Eq, Selectable, Debug, Clone, Hash)]
+#[derive(Queryable, QueryableByName, PartialEq, Eq, PartialOrd, Ord, Selectable, Debug, Clone, Hash)]
 #[diesel(table_name = crate::schema::tables)]
 /// Struct defining the `information_schema.tables` table.
 pub struct Table {
@@ -365,6 +365,28 @@ impl Table {
             .into_iter()
             .filter(|column| column.is_foreign_key(conn))
             .collect::<Vec<Column>>())
+    }
+
+    /// Returns the set of foreign tables of the table.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - The database connection.
+    /// 
+    /// # Returns
+    /// 
+    /// A set of tables that are foreign to the current table.
+    /// 
+    pub fn foreign_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
+        let mut tables = Vec::new();
+        for column in self.foreign_keys(conn)? {
+            if let Some((foreign_table, _)) = column.foreign_table(conn)? {
+                if !tables.contains(&foreign_table) {
+                    tables.push(foreign_table);
+                }
+            }
+        }
+        Ok(tables)
     }
 
     /// Returns whether the table has user-associated columns.

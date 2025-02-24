@@ -2,9 +2,7 @@
 use diesel::result::Error as DieselError;
 use snake_case_sanitizer::SanitizationErrors;
 
-use crate::{
-    codegen::CodeGenerationError, custom_schema_constraints::ConstraintError, Column, PgType, Table,
-};
+use crate::{custom_schema_constraints::ConstraintError, Column, PgType, Table};
 
 #[derive(Debug)]
 /// Enumeration for the errors that may happen within the webcodegen crate.
@@ -47,6 +45,15 @@ pub enum WebCodeGenError {
     NoPrimaryKeyColumn(Box<Table>),
     /// The tables necessary for the roles mechanism are incomplete.
     RolesMechanismIncomplete(Box<Table>),
+    /// When an io error occurs.
+    IoError(std::io::Error),
+}
+
+#[derive(Debug)]
+/// Error type for code generation.
+pub enum CodeGenerationError {
+    /// When the generation directory was not provided.
+    GenerationDirectoryNotProvided,
 }
 
 impl From<DieselError> for WebCodeGenError {
@@ -76,5 +83,11 @@ impl From<CodeGenerationError> for WebCodeGenError {
 impl From<syn::Error> for WebCodeGenError {
     fn from(value: syn::Error) -> Self {
         WebCodeGenError::SynError(value)
+    }
+}
+
+impl From<std::io::Error> for WebCodeGenError {
+    fn from(value: std::io::Error) -> Self {
+        WebCodeGenError::IoError(value)
     }
 }

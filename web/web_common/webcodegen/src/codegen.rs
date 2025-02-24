@@ -1,30 +1,31 @@
 //! Submodule providing the 'Codegen' struct for code generation.
 
-use std::{collections::HashSet, path::Path};
+use std::path::Path;
 
 use diesel::PgConnection;
-use itertools::Itertools;
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
-use quote::quote;
-use syn::{File, Ident};
+use syn::File;
+mod diesel_codegen;
 
-use crate::{errors::WebCodeGenError, Column, PgType, Table};
-
-#[derive(Debug)]
-/// Error type for code generation.
-pub enum CodeGenerationError {
-    /// The output path was not provided.
-    PathNotProvided,
-}
+use crate::{
+    errors::{CodeGenerationError, WebCodeGenError},
+    Table,
+};
 
 #[derive(Debug, Default)]
 /// Struct for code generation.
 pub struct Codegen<'a> {
     /// List of tables to ignore when generating code.
     tables_deny_list: Vec<&'a Table>,
-    /// The output path for the generated code.
-    output_path: Option<&'a Path>,
+    /// The output directory for the generated code.
+    output_directory: Option<&'a Path>,
+    /// Whether to make the code readable.
+    beautify: bool,
+    /// Whether to generate the diesel joinables.
+    pub(super) enable_joinables: bool,
+    /// Whether to generate the diesel allow_tables_to_appear_in_same_query.
+    pub(super) enable_allow_tables_to_appear_in_same_query: bool,
 }
 
 impl<'a> Codegen<'a> {
@@ -36,10 +37,58 @@ impl<'a> Codegen<'a> {
     }
 
     #[must_use]
-    /// Sets the output path for the generated code.
-    pub fn set_output_path(mut self, output_path: &'a Path) -> Self {
-        self.output_path = Some(output_path);
+    /// Sets the output directory for the generated code.
+    pub fn set_output_directory(mut self, output_directory: &'a Path) -> Self {
+        self.output_directory = Some(output_directory);
         self
+    }
+
+    #[must_use]
+    /// Whether to generate the diesel joinables.
+    pub fn enable_joinables(mut self) -> Self {
+        self.enable_joinables = true;
+        self
+    }
+
+    #[must_use]
+    /// Whether to generate the diesel allow_tables_to_appear_in_same_query.
+    pub fn enable_allow_tables_to_appear_in_same_query(mut self) -> Self {
+        self.enable_allow_tables_to_appear_in_same_query = true;
+        self
+    }
+
+    #[must_use]
+    /// Whether to make the code beautified after generation.
+    pub fn beautify(mut self) -> Self {
+        self.beautify = true;
+        self
+    }
+
+    /// Dispatches beautification for the provided TokenStream, if requested.
+    pub(crate) fn beautify_code(&self, code: TokenStream) -> Result<String, WebCodeGenError> {
+        if !self.beautify {
+            return Ok(code.to_string());
+        }
+
+        let code_string = code.to_string();
+
+        // Parse the generated code string into a syn::Item
+        let syntax_tree: File = syn::parse_str(&code_string)?;
+
+        // Use prettyplease to format the syntax tree
+        let formatted_code = unparse(&syntax_tree);
+
+        Ok(formatted_code)
+    }
+
+    /// Returns the output directory.
+    ///
+    /// # Errors
+    ///
+    /// * Raises a `GenerationDirectoryNotProvided` when the output directory is not provided.
+    ///
+    pub fn get_output_directory(&self) -> Result<&Path, CodeGenerationError> {
+        self.output_directory.ok_or(CodeGenerationError::GenerationDirectoryNotProvided)
     }
 
     /// Writes all the tables syn version to a file.
@@ -66,153 +115,29 @@ impl<'a> Codegen<'a> {
         table_catalog: &str,
         table_schema: Option<&str>,
     ) -> Result<(), WebCodeGenError> {
-        if self.output_path.is_none() {
-            return Err(CodeGenerationError::PathNotProvided.into());
-        }
-
-        let tables = Table::load_all(conn, table_catalog, table_schema)?
+        let mut tables = Table::load_all(conn, table_catalog, table_schema)?
             .into_iter()
             .filter(|table| !(table.is_temporary() || table.is_view()))
             .filter(|table| !self.tables_deny_list.contains(&table))
             .collect::<Vec<Table>>();
 
-        let schema = tables
-            .iter()
-            .map(|table| table.to_schema(conn))
-            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+        tables.sort_unstable();
 
-        let table_structs = tables
-            .iter()
-            .map(|table| table.to_syn(conn))
-            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+        let codegen_directory = self.get_output_directory()?.join("codegen");
+        std::fs::create_dir_all(&codegen_directory)?;
+        let codegen_module = codegen_directory.with_extension("rs");
 
-        let all_table_idents = tables
-            .iter()
-            .map(Table::snake_case_ident)
-            .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
+        self.generate_diesel_code(
+            codegen_directory.as_path().join("diesel_codegen").as_path(),
+            &tables,
+            conn,
+        )?;
 
-        let table_idents_below_64_columns = tables
-            .iter()
-            .filter(|table| table.columns(conn).map(|columns| columns.len() <= 64).unwrap_or(false))
-            .map(Table::snake_case_ident)
-            .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
+        let codegen_module_impl = self.beautify_code(quote::quote! {
+            pub mod diesel_codegen;
+        })?;
 
-        let table_idents_below_32_columns = tables
-            .iter()
-            .filter(|table| table.columns(conn).map(|columns| columns.len() <= 32).unwrap_or(false))
-            .map(Table::snake_case_ident)
-            .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
-
-        let table_idents_below_16_columns = tables
-            .iter()
-            .filter(|table| table.columns(conn).map(|columns| columns.len() <= 16).unwrap_or(false))
-            .map(Table::snake_case_ident)
-            .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
-
-        let user_defined_types = tables
-            .iter()
-            .map(|table| {
-                let custom_types = table
-                    .columns(conn)?
-                    .into_iter()
-                    .filter(Column::has_custom_type)
-                    .map(|column| PgType::from_name(column.data_type_str(conn)?, conn))
-                    .filter_ok(|pg_type| pg_type.is_enum() || pg_type.is_composite())
-                    .collect::<Result<HashSet<PgType>, WebCodeGenError>>()?;
-                let mut additional_custom_types = custom_types.clone();
-                for custom_type in custom_types {
-                    additional_custom_types.extend(custom_type.internal_custom_types(conn)?);
-                }
-                Ok(additional_custom_types)
-            })
-            .collect::<Result<Vec<HashSet<PgType>>, WebCodeGenError>>()?
-            .into_iter()
-            .flatten()
-            .collect::<HashSet<PgType>>();
-
-        let user_defined_types_syn = user_defined_types
-            .into_iter()
-            .map(|pg_type| pg_type.to_syn(conn))
-            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
-
-        // We define for each group of tables by column size the corresponding diesel
-        // macro for allow_tables_to_appear_in_same_query, with negative flags
-        // to avoid multiple such macros active at the same time.
-        let above_64_columns = if all_table_idents.len() == table_idents_below_64_columns.len() {
-            TokenStream::new()
-        } else {
-            quote! {
-                #[cfg(feature = "128-column-tables")]
-                diesel::allow_tables_to_appear_in_same_query!( #( #all_table_idents ),* );
-            }
-        };
-
-        let above_32_columns = if table_idents_below_64_columns.len()
-            == table_idents_below_32_columns.len()
-        {
-            TokenStream::new()
-        } else {
-            quote! {
-                #[cfg(all(feature = "64-column-tables", not(feature = "128-column-tables")))]
-                diesel::allow_tables_to_appear_in_same_query!( #( #table_idents_below_64_columns ),* );
-            }
-        };
-
-        let above_16_columns = if table_idents_below_32_columns.len()
-            == table_idents_below_16_columns.len()
-        {
-            TokenStream::new()
-        } else {
-            quote! {
-                #[cfg(all(feature = "32-column-tables", not(feature = "64-column-tables")))]
-                diesel::allow_tables_to_appear_in_same_query!( #( #table_idents_below_32_columns ),* );
-            }
-        };
-
-        let below_16_columns = if table_idents_below_16_columns.is_empty() {
-            TokenStream::new()
-        } else if table_idents_below_16_columns.len() == table_idents_below_32_columns.len() {
-            quote! {
-                #[cfg(feature = "diesel")]
-                diesel::allow_tables_to_appear_in_same_query!( #( #table_idents_below_16_columns ),* );
-            }
-        } else {
-            quote! {
-                #[cfg(all(feature = "diesel", not(feature = "32-column-tables")))]
-                diesel::allow_tables_to_appear_in_same_query!( #( #table_idents_below_16_columns ),* );
-            }
-        };
-
-        // Create a new TokenStream
-        let output = quote! {
-            #[cfg(feature = "diesel")]
-            use diesel::{ExpressionMethods, QueryDsl};
-            #[cfg(feature = "diesel")]
-            use diesel_async::RunQueryDsl;
-
-            #(#user_defined_types_syn)*
-
-            #( #schema )*
-
-            #above_64_columns
-            #above_32_columns
-            #above_16_columns
-            #below_16_columns
-
-            #( #table_structs )*
-        };
-
-        // Convert the generated TokenStream to a string
-        let code_string = output.to_string();
-
-        // Parse the generated code string into a syn::Item
-        let syntax_tree: File = syn::parse_str(&code_string).unwrap();
-
-        // Use prettyplease to format the syntax tree
-        let formatted_code = unparse(&syntax_tree);
-
-        // Write the formatted code to the output file
-        std::fs::write(self.output_path.unwrap(), formatted_code).unwrap();
+        std::fs::write(&codegen_module, codegen_module_impl)?;
 
         Ok(())
     }

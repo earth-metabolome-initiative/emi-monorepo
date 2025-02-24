@@ -15,6 +15,9 @@ snake-case-sanitizer = {path = "../snake-case-sanitizer"}
 sqlparser.workspace = true
 common-traits.workspace = true
 inflector.workspace = true
+graph.workspace = true
+algebra.workspace = true
+sorted-vec.workspace = true
 
 [dev-dependencies]
 diesel_migrations = "2.2.0"
@@ -40,4 +43,3 @@ postgres_17 = ["diesel"]
 
 [lints]
 workspace = true
-

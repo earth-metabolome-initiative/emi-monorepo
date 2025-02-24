@@ -66,23 +66,18 @@ impl Table {
 
         let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
 
-        Ok(if self.has_snake_case_name()? {
-            quote! {
-                #[cfg(feature = #columns_feature_flag_name)]
-                diesel::table! {
-                    #[sql_name = #original_table_name]
-                    #table_schema.#sanitized_table_name_ident #primary_key_names {
-                        #(#columns),*
-                    }
-                }
-            }
+        let sql_name = if self.has_snake_case_name()? {
+            TokenStream::new()
         } else {
-            quote! {
-                #[cfg(feature = #columns_feature_flag_name)]
-                diesel::table! {
-                    #table_schema.#sanitized_table_name_ident #primary_key_names {
-                        #(#columns),*
-                    }
+            quote! {#[sql_name = #original_table_name]}
+        };
+
+        Ok(quote! {
+            #[cfg(feature = #columns_feature_flag_name)]
+            diesel::table! {
+                #sql_name
+                #table_schema.#sanitized_table_name_ident #primary_key_names {
+                    #(#columns),*
                 }
             }
         })

@@ -16,7 +16,7 @@ impl Table {
     ///
     /// * `conn` - The database connection.
     ///
-    /// # Raises
+    /// # Errors
     ///
     /// * If the columns of the table cannot be retrieved.
     pub fn attribute_traits_impl(
