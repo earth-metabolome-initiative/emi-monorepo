@@ -13,15 +13,16 @@ async fn test_codegen_allow_join() {
         setup_database_with_default_migrations("test_codegen_allow_join").await.unwrap();
 
     Codegen::default()
-        .set_output_directory("tests/test_codegen_allow_join".as_ref())
+        .set_output_directory("tests/codegen_allow_join".as_ref())
 		.enable_allow_tables_to_appear_in_same_query()
+        .enable_tables()
+        .beautify()
         .generate(&mut conn, &database_name, None)
         .unwrap();
 
     docker.stop().await.unwrap();
 
-    // TODO! ACTUALLY TEST!
-    // let builder: trybuild::TestCases = trybuild::TestCases::new();
-    // add_main_to_file("tests/test_codegen_allow_join/codegen.rs");
-    // builder.pass("tests/test_codegen_allow_join/codegen.rs");
+    codegen_test("codegen_allow_join");
+
+    std::fs::remove_dir_all("tests/codegen_allow_join").unwrap();
 }

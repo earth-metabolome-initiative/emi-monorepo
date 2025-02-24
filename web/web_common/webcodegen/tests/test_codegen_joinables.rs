@@ -13,15 +13,16 @@ async fn test_codegen_joinables() {
         setup_database_with_default_migrations("test_codegen_joinables").await.unwrap();
 
     Codegen::default()
-        .set_output_directory("tests/test_codegen_joinables".as_ref())
+        .set_output_directory("tests/codegen_joinables".as_ref())
 		.enable_joinables()
+        .enable_tables()
+        .beautify()
         .generate(&mut conn, &database_name, None)
         .unwrap();
 
     docker.stop().await.unwrap();
 
-    // TODO! ACTUALLY TEST!
-    // let builder = trybuild::TestCases::new();
-    // add_main_to_file("tests/test_codegen_joinables/codegen.rs");
-    // builder.pass("tests/test_codegen_joinables/codegen.rs");
+    codegen_test("codegen_joinables");
+
+    std::fs::remove_dir_all("tests/codegen_joinables").unwrap();
 }

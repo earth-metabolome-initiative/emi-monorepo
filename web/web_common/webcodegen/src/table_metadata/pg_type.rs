@@ -6,9 +6,10 @@ use diesel::{
 };
 use proc_macro2::TokenStream;
 use quote::quote;
+use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{parse_str, Ident, Type};
 
-use super::{PgAttribute, PgEnum};
+use super::{table::RESERVED_RUST_WORDS, PgAttribute, PgEnum};
 use crate::errors::WebCodeGenError;
 
 /// Constant listing types supporting `Copy`.
@@ -24,7 +25,9 @@ const HASH_TYPES: [&str; 4] = ["i32", "i16", "i64", "bool"];
 ///
 /// This struct contains metadata about a PostgreSQL type, including its name,
 /// OID (Object Identifier), namespace, and other properties.
-#[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(
+    Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone,
+)]
 #[diesel(table_name = crate::schema::pg_type)]
 #[allow(clippy::struct_excessive_bools)]
 pub struct PgType {
@@ -301,8 +304,16 @@ impl PgType {
         match diesel_type {
             Ok(diesel_type) => Ok(diesel_type),
             Err(error) => {
-                if self.is_composite() {
-                    Ok(parse_str::<Type>(&format!("crate::Pg{}", &self.camelcased_name())).unwrap())
+                if self.is_composite() || self.is_enum() {
+                    let snake_case_name = self.snake_case_name()?;
+                    let mut full_name = format!(
+                        "crate::codegen::diesel_codegen::types::{snake_case_name}::Pg{}",
+                        &self.camelcased_name()
+                    );
+                    if nullable {
+                        full_name = format!("diesel::sql_types::Nullable<{}>", full_name);
+                    }
+                    Ok(parse_str::<Type>(&full_name)?)
                 } else if self.is_user_defined(conn)? {
                     let base_type = self.base_type(conn)?;
                     if let Some(base_type) = base_type {
@@ -367,6 +378,38 @@ impl PgType {
         } else {
             use crate::schema::pg_type;
             Ok(pg_type::table.filter(pg_type::oid.eq(self.typbasetype)).first::<PgType>(conn).ok())
+        }
+    }
+
+    /// Returns the sanitized snake case name of the table.
+    ///
+    /// # Errors
+    ///
+    /// * If the snake case name cannot be generated.
+    ///
+    /// # Returns
+    ///
+    /// A string representing the sanitized snake case name of the table.
+    pub fn snake_case_name(&self) -> Result<String, WebCodeGenError> {
+        let sanitizer = SnakeCaseSanizer::default()
+            .include_defaults()
+            .remove_leading_underscores()
+            .remove_trailing_underscores();
+        Ok(sanitizer.to_snake_case(&self.typname)?)
+    }
+
+    /// Returns the sanitized snake case identifier of the table.
+    ///
+    /// # Errors
+    ///
+    /// * If the snake case identifier cannot be generated.
+    ///
+    pub fn snake_case_identifier(&self) -> Result<Ident, WebCodeGenError> {
+        let snake_case_name = self.snake_case_name()?;
+        if RESERVED_RUST_WORDS.contains(&snake_case_name.as_str()) {
+            Ok(Ident::new_raw(&snake_case_name, proc_macro2::Span::call_site()))
+        } else {
+            Ok(Ident::new(&snake_case_name, proc_macro2::Span::call_site()))
         }
     }
 

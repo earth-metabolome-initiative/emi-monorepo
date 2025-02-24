@@ -2,9 +2,9 @@ use diesel::{
     pg::PgConnection, result::Error as DieselError, BoolExpressionMethods, ExpressionMethods,
     JoinOnDsl, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
+use inflector::Inflector;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{Ident, Type};
-use inflector::Inflector;
 
 use super::{
     pg_type::{rust_type_str, PgType},
@@ -315,15 +315,8 @@ impl Column {
             Ok(t) => Ok(t),
             Err(e) => {
                 if self.has_custom_type() {
-                    let name =
-                        PgType::from_name(self.data_type_str(conn)?, conn)?.camelcased_name();
-                    let name = if self.is_nullable() {
-                        format!("diesel::sql_types::Nullable<crate::Pg{name}>")
-                    } else {
-                        format!("crate::Pg{name}")
-                    };
-
-                    Ok(syn::parse_str(&name).unwrap())
+                    PgType::from_name(self.data_type_str(conn)?, conn)?
+                        .diesel_type(self.is_nullable(), conn)
                 } else {
                     Err(e)
                 }

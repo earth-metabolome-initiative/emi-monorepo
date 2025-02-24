@@ -75,16 +75,6 @@ pub async fn setup_docker(database_port: u16, database_name: &str) -> ContainerA
     container.unwrap()
 }
 
-pub async fn setup_database(
-    test_name: &str,
-) -> Result<(ContainerAsync<GenericImage>, PgConnection, String), diesel::ConnectionError> {
-    let port = random_port(test_name);
-    let database_name = format!("{}_db", test_name);
-    let docker = setup_docker(port, &database_name).await;
-    let conn = establish_connection_to_postgres(port, &database_name)?;
-    Ok((docker, conn, database_name))
-}
-
 pub async fn setup_database_with_default_migrations(
     test_name: &str,
 ) -> Result<(ContainerAsync<GenericImage>, PgConnection, String), diesel::ConnectionError> {
@@ -102,4 +92,18 @@ pub fn random_port(test_name: &str) -> u16 {
     let test_name_hash: u64 = hasher.finish();
     let port = (test_name_hash % 30000) as u16 + 10000;
     port
+}
+
+pub fn codegen_test(directory_name: &str) {
+    let builder = trybuild::TestCases::new();
+
+    // We create a main document to test the generated code.
+    let file_content = quote::quote! {
+        pub mod codegen;
+    }
+    .to_string();
+
+    std::fs::write(&format!("tests/{directory_name}/main.rs"), file_content).unwrap();
+    add_main_to_file(&format!("tests/{directory_name}/main.rs"));
+    builder.pass(&format!("tests/{directory_name}/main.rs"));
 }

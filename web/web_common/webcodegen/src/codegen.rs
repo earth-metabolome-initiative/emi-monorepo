@@ -26,6 +26,10 @@ pub struct Codegen<'a> {
     pub(super) enable_joinables: bool,
     /// Whether to generate the diesel allow_tables_to_appear_in_same_query.
     pub(super) enable_allow_tables_to_appear_in_same_query: bool,
+    /// Whether to generate the SQL types.
+    pub(super) enable_sql_types: bool,
+    /// Whether to generate the tables schema.
+    pub(super) enable_tables: bool,
 }
 
 impl<'a> Codegen<'a> {
@@ -54,6 +58,26 @@ impl<'a> Codegen<'a> {
     /// Whether to generate the diesel allow_tables_to_appear_in_same_query.
     pub fn enable_allow_tables_to_appear_in_same_query(mut self) -> Self {
         self.enable_allow_tables_to_appear_in_same_query = true;
+        self
+    }
+
+    #[must_use]
+    /// Whether to generate the SQL types.
+    pub fn enable_sql_types(mut self) -> Self {
+        self.enable_sql_types = true;
+        self
+    }
+
+    #[must_use]
+    /// Whether to generate the tables schema.
+    /// 
+    /// # Note
+    /// 
+    /// Since the tables may require some custom types, enabling the
+    /// generation of tables automatically enables the generation of SQL types.
+    pub fn enable_tables(mut self) -> Self {
+        self = self.enable_sql_types();
+        self.enable_tables = true;
         self
     }
 

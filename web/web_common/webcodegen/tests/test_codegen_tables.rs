@@ -10,17 +10,18 @@ use webcodegen::*;
 /// Test generation of diesel schema for tables.
 async fn test_codegen_tables() {
     let (docker, mut conn, database_name) =
-        setup_database_with_default_migrations("test_table_codegen").await.unwrap();
+        setup_database_with_default_migrations("test_codegen_tables").await.unwrap();
 
     Codegen::default()
-        .set_output_directory("tests/test_table_codegen".as_ref())
+        .set_output_directory("tests/codegen_tables".as_ref())
+        .enable_tables()
+        .beautify()
         .generate(&mut conn, &database_name, None)
         .unwrap();
 
     docker.stop().await.unwrap();
 
-    // TODO! ACTUALLY TEST!
-    // let builder = trybuild::TestCases::new();
-    // add_main_to_file("tests/test_table_codegen/codegen.rs");
-    // builder.pass("tests/test_table_codegen/codegen.rs");
+    codegen_test("codegen_tables");
+
+    std::fs::remove_dir_all("tests/codegen_tables").unwrap();
 }
