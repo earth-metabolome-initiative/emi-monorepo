@@ -15,5 +15,3 @@ impl Integer for u32 {}
 impl Integer for u64 {}
 impl Integer for u128 {}
 impl Integer for usize {}
-
-impl<T> super::Symbol for T where T: Integer {}
