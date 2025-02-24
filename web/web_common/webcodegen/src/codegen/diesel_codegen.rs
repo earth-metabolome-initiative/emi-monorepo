@@ -35,7 +35,7 @@ impl<'a> Codegen<'a> {
 
         let mut submodule_file_content = TokenStream::new();
 
-        if self.enable_tables {
+        if self.enable_tables_schema {
             self.generate_table_macro(root.join("table").as_path(), tables, conn)?;
             submodule_file_content.extend(quote::quote! {
                 pub mod table;

@@ -14,7 +14,7 @@ async fn test_codegen_tables() {
 
     Codegen::default()
         .set_output_directory("tests/codegen_tables".as_ref())
-        .enable_tables()
+        .enable_tables_schema()
         .beautify()
         .generate(&mut conn, &database_name, None)
         .unwrap();

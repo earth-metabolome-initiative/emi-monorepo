@@ -45,7 +45,7 @@ pub async fn main() {
     let out_dir = env::var("OUT_DIR").unwrap();
 
     // Path to the file to create
-    let path = Path::new(&out_dir).join("core_structs.rs");
+    let path = Path::new(&out_dir).join("codegen.rs");
 
     // If the file already exists, we skip the build
     if path.exists() {
@@ -152,7 +152,8 @@ pub async fn main() {
     // Generate the code associated with the database
     let task = Task::new("Generating Code");
     Codegen::default()
-        .set_output_path(path.as_ref())
+        .set_output_directory(out_dir.as_ref())
+        .enable_tables_schema()
         .generate(&mut conn, DATABASE_NAME, None)
         .unwrap();
     time_tracker.add_completed_task(task);

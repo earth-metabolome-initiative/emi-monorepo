@@ -29,7 +29,7 @@ pub struct Codegen<'a> {
     /// Whether to generate the SQL types.
     pub(super) enable_sql_types: bool,
     /// Whether to generate the tables schema.
-    pub(super) enable_tables: bool,
+    pub(super) enable_tables_schema: bool,
 }
 
 impl<'a> Codegen<'a> {
@@ -75,9 +75,9 @@ impl<'a> Codegen<'a> {
     /// 
     /// Since the tables may require some custom types, enabling the
     /// generation of tables automatically enables the generation of SQL types.
-    pub fn enable_tables(mut self) -> Self {
+    pub fn enable_tables_schema(mut self) -> Self {
         self = self.enable_sql_types();
-        self.enable_tables = true;
+        self.enable_tables_schema = true;
         self
     }
 
