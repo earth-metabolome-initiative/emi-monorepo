@@ -1,6 +1,6 @@
 //! Submodule implementing code relative to diesel's [`joinable`](https://docs.rs/diesel/latest/diesel/macro.joinable.html) macro.
 
-use std::path::Path;
+use std::{collections::HashMap, path::Path};
 
 use diesel::PgConnection;
 use syn::Ident;
@@ -39,9 +39,9 @@ impl<'a> Codegen<'a> {
                 Ident::new(&table.snake_case_name()?, proc_macro2::Span::call_site());
             // We create a file for each table
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
-            // We generate the content of the file
-            let mut table_content = TokenStream::new();
-        
+
+            let mut table_hashmap: HashMap<&Table, Option<TokenStream>> = HashMap::new();
+
             for foreign_key in table.foreign_keys(conn)? {
                 // For each table we retrieve the foreign key(s).
                 // First we fetch the foreign table (and its primary key)
@@ -49,21 +49,53 @@ impl<'a> Codegen<'a> {
                 else {
                     continue;
                 };
+
+                // We check wether for the current table we havce already created a given token stream.
+                if let Some(maybe_token_stream) = table_hashmap.get_mut(&foreign_table) {
+                    // Since there is already a foreign_table present in our HashMap we set the TakenStrem to None
+                    *maybe_token_stream = None;
+                    continue;
+                }
+
+                // Since we want to access to the Table that `foreign_table` outside of the current for loop (foreign_table dying here),
+                // we iterate over tge tables array defined out there (tables: &[Table],) and find an entry matching &foreign_table.
+                let Some(foreign_table_ref) = tables.iter().find(|t| t == &&foreign_table) else {
+                    continue;
+                };
+
                 // We retrieve the foreign_table identifier
                 let foreign_table_identifier =
                     Ident::new(&foreign_table.snake_case_name()?, proc_macro2::Span::call_site());
-                // We retrieve the foreign_table_pk identifer
-                let foreign_table_pk_identifier = Ident::new(
-                    &foreign_table_pk.snake_case_name()?,
-                    proc_macro2::Span::call_site(),
-                );
+                // We retrieve the foreign_key identifer
+                let foreign_key_identifier = foreign_key.sanitized_snake_case_ident()?;
                 // Using TokeStream we write the  joinable!(table -> foreign_table (foreign_key));
-                table_content.extend(quote::quote! {
-                    joinable!(#table_identifier -> #foreign_table_identifier (#foreign_table_pk_identifier));
-                });
 
-                std::fs::write(&table_file, self.beautify_code(table_content)?)?;
+                table_hashmap.insert(foreign_table_ref, Some(quote::quote! {
+                    use crate::codegen::diesel_codegen::table::#foreign_table_identifier::#foreign_table_identifier;
+
+                    diesel::joinable!(#table_identifier -> #foreign_table_identifier (#foreign_key_identifier));
+                }
+            )
+        );
             }
+
+            // We make sure that there is at least Some TokenStream for the table.
+            // We create a TokenStream that is a Composite of all TS in the HashMap
+
+            let overall_token_stream: TokenStream = table_hashmap
+                .into_values()
+                .filter_map(|maybe_token_stream| maybe_token_stream)
+                .collect();
+
+            if overall_token_stream.is_empty() {
+                continue;
+            }
+
+            std::fs::write(&table_file, self.beautify_code(quote::quote! {
+                use crate::codegen::diesel_codegen::table::#table_identifier::#table_identifier;
+                #overall_token_stream}
+            )?)?;
+
             joinable_main_module.extend(quote::quote! {
                 pub mod #table_identifier;
             });
