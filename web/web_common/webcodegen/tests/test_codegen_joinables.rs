@@ -24,5 +24,5 @@ async fn test_codegen_joinables() {
 
     codegen_test("codegen_joinables");
 
-    std::fs::remove_dir_all("tests/codegen_joinables").unwrap();
+    // std::fs::remove_dir_all("tests/codegen_joinables").unwrap();
 }
