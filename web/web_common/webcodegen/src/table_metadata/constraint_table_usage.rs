@@ -1,6 +1,6 @@
 use diesel::{pg::PgConnection, Queryable, QueryableByName, RunQueryDsl};
 
-/// Represents a row in the `constraint_table_usage` table in the PostgreSQL
+/// Represents a row in the `constraint_table_usage` table in the `PostgreSQL`
 /// database.
 ///
 /// The `constraint_table_usage` table contains information about table
@@ -28,12 +28,17 @@ impl ConstraintTableUsage {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A connection to the PostgreSQL database.
+    /// * `conn` - A connection to the `PostgreSQL` database.
     ///
     /// # Returns
     ///
     /// A `Result` containing a vector of `ConstraintTableUsage` on success,
     /// or a `diesel::result::Error` on failure.
+    /// 
+    /// # Errors
+    /// 
+    /// * If an error occurs while loading the rows from the database.
+    /// 
     pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::constraint_table_usage;
         constraint_table_usage::table.load::<ConstraintTableUsage>(conn)

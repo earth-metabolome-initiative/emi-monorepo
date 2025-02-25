@@ -5,7 +5,7 @@ use diesel::{
 
 use crate::{errors::WebCodeGenError, PgType};
 
-/// Represents a PostgreSQL attribute (column) in a table.
+/// Represents a `PostgreSQL` attribute (column) in a table.
 ///
 /// This struct maps to the `pg_attribute` system catalog table in `PostgreSQL`,
 /// which stores metadata about table columns. Each instance of `PgAttribute`

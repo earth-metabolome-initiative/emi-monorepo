@@ -4,7 +4,7 @@ use diesel::{
 
 use crate::errors::WebCodeGenError;
 
-/// Represents a row in the `constraint_column_usage` table in PostgreSQL
+/// Represents a row in the `constraint_column_usage` table in `PostgreSQL`
 ///
 /// The `constraint_column_usage` table contains information about columns that
 /// are used in constraints.

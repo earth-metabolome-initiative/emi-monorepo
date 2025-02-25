@@ -222,7 +222,6 @@ impl Table {
         }
     }
 
-    #[must_use]
     /// Returns the singular name of the table.
     ///
     /// # Errors

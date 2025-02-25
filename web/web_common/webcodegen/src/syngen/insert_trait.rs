@@ -47,7 +47,7 @@ impl Table {
         })
     }
 
-    /// Returns vector of the columns that compose the SessionInsertVariant.
+    /// Returns vector of the columns that compose the `SessionInsertVariant`.
     pub fn session_insert_columns(
         &self,
         conn: &mut PgConnection,

@@ -24,7 +24,7 @@ impl Table {
     pub fn delete_method(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         let sanitized_table_name =
             Ident::new(&self.snake_case_name()?, proc_macro2::Span::call_site());
-        let primary_key_columns = self.primary_key_columns(conn).unwrap();
+        let primary_key_columns = self.primary_key_columns(conn)?;
 
         let where_clause = primary_key_columns
             .iter()

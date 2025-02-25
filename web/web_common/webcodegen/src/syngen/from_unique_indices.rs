@@ -15,7 +15,7 @@ impl crate::Table {
     /// # Arguments
     ///
     /// * `conn` - The Diesel connection to the database.
-    fn from_single_column_unique_indices(
+    fn generate_from_single_column_unique_indices(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
@@ -32,7 +32,7 @@ impl crate::Table {
                 };
 
                 let plural_column_name = first_column.plural_column_name();
-                let method_name = format!("from_{}", plural_column_name);
+                let method_name = format!("from_{plural_column_name}");
                 let method_ident = syn::Ident::new(&method_name, struct_name.span());
 
                 let plural_column_ident = Ident::new(&plural_column_name, struct_name.span());

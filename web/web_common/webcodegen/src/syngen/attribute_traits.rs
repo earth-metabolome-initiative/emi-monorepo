@@ -26,7 +26,7 @@ impl Table {
     ) -> Result<TokenStream, WebCodeGenError> {
         let columns = self.columns(conn)?;
         let struct_ident = self.struct_ident()?;
-        Ok(ATTRIBUTE_TRAITS
+        ATTRIBUTE_TRAITS
             .iter()
             .map(|(trait_name, attribute_name)| {
                 let Some(column) = columns
@@ -46,6 +46,6 @@ impl Table {
                     }
                 })
             })
-            .collect::<Result<TokenStream, WebCodeGenError>>()?)
+            .collect::<Result<TokenStream, WebCodeGenError>>()
     }
 }

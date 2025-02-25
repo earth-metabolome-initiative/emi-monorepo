@@ -31,7 +31,7 @@
 
 use diesel::{connection::SimpleConnection, PgConnection};
 
-use crate::{errors::WebCodeGenError, Table};
+use crate::{errors::WebCodeGenError, Column, Table};
 
 impl Table {
     #[must_use]
@@ -58,7 +58,7 @@ $$ LANGUAGE plpgsql;"#
     ///
     /// * Returns an error if the provided database connection is invalid.
     pub fn has_updated_at_column(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(self.columns(conn)?.iter().any(|column| column.is_updated_at()))
+        Ok(self.columns(conn)?.iter().any(Column::is_updated_at))
     }
 
     /// Returns the expected name of the current table trigger.
@@ -82,7 +82,7 @@ $$ LANGUAGE plpgsql;"#
         Ok(format!("{table_name}_updated_at_trigger", table_name = self.table_name))
     }
 
-    /// Returns whether the current updated_at trigger exists.
+    /// Returns whether the current `updated_at` trigger exists.
     ///
     /// # Arguments
     ///
@@ -117,10 +117,10 @@ $$ LANGUAGE plpgsql;"#
         }
 
         Ok(format!(
-            r#"CREATE OR REPLACE TRIGGER {table_name}_updated_at_trigger
+            "CREATE OR REPLACE TRIGGER {table_name}_updated_at_trigger
 BEFORE UPDATE ON {table_name}
 FOR EACH ROW
-EXECUTE FUNCTION updated_at_trigger();"#,
+EXECUTE FUNCTION updated_at_trigger();",
             table_name = self.table_name
         ))
     }

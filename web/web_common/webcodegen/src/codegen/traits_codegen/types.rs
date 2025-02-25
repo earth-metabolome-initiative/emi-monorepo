@@ -1,4 +1,4 @@
-//! Submodule implementing code relative to the Rust counterpart of PostgresPG
+//! Submodule implementing code relative to the Rust counterpart of `PostgresPG`
 //! types.
 
 use std::path::Path;
@@ -9,8 +9,8 @@ use proc_macro2::TokenStream;
 use super::Codegen;
 use crate::Table;
 
-impl<'a> Codegen<'a> {
-    /// Generate implementations the Rust counterpart of PostgresPG types.
+impl Codegen<'_> {
+    /// Generate implementations the Rust counterpart of `PostgresPG` types.
     ///
     /// # Arguments
     ///
@@ -23,7 +23,7 @@ impl<'a> Codegen<'a> {
         tables: &[Table],
         conn: &mut PgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
-        std::fs::create_dir_all(&root)?;
+        std::fs::create_dir_all(root)?;
 
         let types = self.required_types(tables, conn)?;
 
@@ -34,8 +34,8 @@ impl<'a> Codegen<'a> {
         for r#type in types {
             let type_name = r#type.snake_case_name()?;
             let type_ident = r#type.snake_case_identifier()?;
-            let type_file = root.join(format!("{}.rs", type_name));
-            std::fs::write(&type_file, self.beautify_code(r#type.to_diesel_impls(conn)?)?)?;
+            let type_file = root.join(format!("{type_name}.rs"));
+            std::fs::write(&type_file, self.beautify_code(&r#type.to_diesel_impls(conn)?)?)?;
 
             types_main_module.extend(quote::quote! {
                 mod #type_ident;
@@ -43,7 +43,7 @@ impl<'a> Codegen<'a> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(types_main_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&types_main_module)?)?;
 
         Ok(())
     }

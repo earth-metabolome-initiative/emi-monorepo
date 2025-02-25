@@ -123,6 +123,15 @@ impl Column {
 
     /// Returns the associated geometry column if the column is a geometry
     /// column
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Errors
+    /// 
+    /// * If an error occurs while querying the database
+    /// 
     pub fn geometry(
         &self,
         conn: &mut PgConnection,
@@ -189,6 +198,17 @@ impl Column {
     }
 
     /// Returns whether the column is compatible with the provided column
+    /// 
+    /// # Arguments
+    /// 
+    /// * `column` - A reference to a `Column`
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Errors
+    /// 
+    /// * If an error occurs while querying the database
+    /// * If the underlying data type of the column is not compatible
+    /// 
     pub fn has_compatible_data_type(
         &self,
         column: &Column,
@@ -212,7 +232,7 @@ impl Column {
     /// If an error occurs while querying the database
     pub fn rust_data_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
         if let Ok(geometry) = self.geometry(conn) {
-            return Ok(geometry.rust_type(self.is_nullable())?);
+            return geometry.rust_type(self.is_nullable());
         }
         match rust_type_str(self.data_type_str(conn)?) {
             Ok(s) => Ok(syn::parse_str(s)?),
@@ -362,18 +382,18 @@ impl Column {
     /// A `bool` indicating whether the column is automatically generated
     pub fn is_automatically_generated(&self) -> bool {
         self.is_generated == "ALWAYS"
-            || self.column_default.as_ref().map_or(false, |d| d.starts_with("nextval"))
-            || self.column_default.as_ref().map_or(false, |d| d.starts_with("CURRENT_TIMESTAMP"))
-            || self.column_default.as_ref().map_or(false, |d| d.starts_with("NOW()"))
-            || self.is_identity.as_ref().map_or(false, |i| i == "YES")
+            || self.column_default.as_ref().is_some_and(|d| d.starts_with("nextval"))
+            || self.column_default.as_ref().is_some_and(|d| d.starts_with("CURRENT_TIMESTAMP"))
+            || self.column_default.as_ref().is_some_and(|d| d.starts_with("NOW()"))
+            || self.is_identity.as_ref().is_some_and(|i| i == "YES")
     }
 
     /// Returns whether the column contains the update user and is defined by
     /// the SESSION user
     pub fn is_updated_by(&self, conn: &mut PgConnection) -> bool {
         self.column_name == "updated_by"
-            && self.foreign_table(conn).map_or(false, |table_and_column| {
-                table_and_column.map_or(false, |(table, column)| {
+            && self.foreign_table(conn).is_ok_and(|table_and_column| {
+                table_and_column.is_some_and(|(table, column)| {
                     table.table_name == "users" && column.column_name == "id"
                 })
             })
@@ -383,8 +403,8 @@ impl Column {
     /// the SESSION user
     pub fn is_created_by(&self, conn: &mut PgConnection) -> bool {
         self.column_name == "created_by"
-            && self.foreign_table(conn).map_or(false, |table_and_column| {
-                table_and_column.map_or(false, |(table, column)| {
+            && self.foreign_table(conn).is_ok_and(|table_and_column| {
+                table_and_column.is_some_and(|(table, column)| {
                     table.table_name == "users" && column.column_name == "id"
                 })
             })
@@ -528,11 +548,11 @@ impl Column {
     pub fn plural_column_name(&self) -> String {
         // We split the column name by underscores and remove the last element.
         let mut parts =
-            self.column_name.split('_').map(|part| part.to_string()).collect::<Vec<String>>();
+            self.column_name.split('_').map(ToString::to_string).collect::<Vec<String>>();
         let last_element = parts.pop().unwrap();
         // We convert to singular form the last element and join the parts back
         // together.
-        parts.push(Inflector::default().pluralize(&last_element));
+        parts.push(Inflector.pluralize(&last_element));
         parts.join("_")
     }
 }

@@ -13,7 +13,7 @@ mod joinable;
 mod table;
 mod types;
 
-impl<'a> Codegen<'a> {
+impl Codegen<'_> {
     /// Code relative to generating all of the diesel code.
     ///
     /// # Arguments
@@ -29,7 +29,7 @@ impl<'a> Codegen<'a> {
     ) -> Result<(), crate::errors::WebCodeGenError> {
         let submodule_file = root.with_extension("rs");
 
-        std::fs::create_dir_all(&root)?;
+        std::fs::create_dir_all(root)?;
 
         let mut submodule_file_content = TokenStream::new();
 

@@ -2,7 +2,7 @@
 //! `geography_columns` table.
 use diesel::{Queryable, QueryableByName, Selectable};
 
-/// Represents an entry in the PostGIS `geography_columns` system table.
+/// Represents an entry in the `PostGIS` `geography_columns` system table.
 ///
 /// The `geography_columns` table provides metadata about all geography columns
 /// stored in the database, including their spatial reference system (SRID)

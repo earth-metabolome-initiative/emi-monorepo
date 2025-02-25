@@ -28,6 +28,7 @@ pub struct AuthorizationFunctionBuilder {
 }
 
 impl AuthorizationFunctionBuilder {
+    #[must_use]
     /// Adds a new table to the list of childless tables.
     ///
     /// # Arguments
@@ -82,6 +83,17 @@ impl AuthorizationFunctionBuilder {
     /// * `table_catalog` - The catalog of the tables to create the functions
     ///   for.
     /// * `table_schema` - The schema of the tables to create the functions for.
+    /// 
+    /// # Errors
+    /// 
+    /// * If an error occurs while creating the functions and triggers
+    /// * If the roles mechanism is incomplete
+    /// * If the roles mechanism is not complete
+    /// * If the table does not have all the roles mechanism tables
+    /// * If the table does not have a primary key column
+    /// * If the table does not have a column named `updated_by`
+    /// * If the table does not have a column named `created_by`
+    /// 
     pub fn create_authorization_functions_and_triggers(
         &self,
         conn: &mut PgConnection,
@@ -97,7 +109,7 @@ impl AuthorizationFunctionBuilder {
             }
             let function = self.canx_function_and_trigger(&table, conn)?;
             if let Err(err) = conn.batch_execute(&function) {
-                println!("Failed running SQL: {}", function);
+                println!("Failed running SQL: {function}");
                 return Err(WebCodeGenError::DieselError(err));
             }
         }
@@ -136,38 +148,28 @@ impl AuthorizationFunctionBuilder {
             .collect::<Vec<Column>>();
 
         let updator_check = if let Ok(updated_by) = table.column_by_name(conn, "updated_by") {
-            let updator_check = format!(
-                // If the table has an `updated_by` column, we check whether the user
-                // which is currently executing this request is authorized by being
-                // the last updator of the row.
-                r#"IF session_user_id = this_updated_by THEN
+            let updator_check = "IF session_user_id = this_updated_by THEN
         RETURN TRUE;
     END IF;
-            "#,
-            );
+            ".to_owned();
             if !columns_to_retrieve.contains(&updated_by) {
                 columns_to_retrieve.push(updated_by);
             }
             updator_check
         } else {
-            "".to_owned()
+            String::new()
         };
         let creator_check = if let Ok(created_by) = table.column_by_name(conn, "created_by") {
-            let creator_check = format!(
-                // If the table has a `created_by` column, we check whether the user
-                // which is currently executing this request is authorized by being
-                // the author or the row.
-                r#"IF session_user_id = this_created_by THEN
+            let creator_check = "IF session_user_id = this_created_by THEN
         RETURN TRUE;
     END IF;
-            "#,
-            );
+            ".to_owned();
             if !columns_to_retrieve.contains(&created_by) {
                 columns_to_retrieve.push(created_by);
             }
             creator_check
         } else {
-            "".to_owned()
+            String::new()
         };
 
         let roles_table_check = if table.requires_roles_table(conn)? {
@@ -199,7 +201,7 @@ impl AuthorizationFunctionBuilder {
                 .join(" AND ");
 
             format!(
-                r#"IF EXISTS (
+                "IF EXISTS (
         SELECT 1 FROM {table_name}_users_roles
         WHERE
             {table_name}_users_roles.user_id = session_user_id AND
@@ -218,11 +220,11 @@ impl AuthorizationFunctionBuilder {
     ) THEN
         RETURN TRUE;
     END IF;
-            "#,
+            ",
                 table_name = table.table_name
             )
         } else {
-            "".to_owned()
+            String::new()
         };
 
         let parent_arguments = format!(
@@ -265,10 +267,10 @@ impl AuthorizationFunctionBuilder {
             .map(|(foreign_key, parent_table, _parent_column)| {
                 // If the user has the required level on the parent table, we return TRUE.
                 format!(
-                    r#"IF canx_{parent_table_name}(session_user_id, this_{parent_column_name}, level_required) THEN
+                    "IF canx_{parent_table_name}(session_user_id, this_{parent_column_name}, level_required) THEN
         RETURN TRUE;
     END IF;
-                "#,
+                ",
                     parent_table_name = parent_table.table_name,
                     parent_column_name = foreign_key.column_name
                 )
@@ -283,14 +285,14 @@ impl AuthorizationFunctionBuilder {
             .join(", ");
 
         let insert_check = if parent_tables.is_empty() {
-            "".to_owned()
+            String::new()
         } else {
             let parent_check = parent_tables.iter().map(|(foreign_key, parent_table, _parent_column)| {
             format!(
-                r#"IF NOT canx_{parent_table_name}(NEW.created_by, NEW.{parent_column_name}, 2) THEN
+                "IF NOT canx_{parent_table_name}(NEW.created_by, NEW.{parent_column_name}, 2) THEN
         RAISE EXCEPTION 'unauthorized_update' USING DETAIL = 'Unauthorized to insert this row of the `{table_name}` table.';
     END IF;
-                "#,
+                ",
                 table_name = table.table_name,
                 parent_table_name = parent_table.table_name,
                 parent_column_name = foreign_key.column_name
@@ -298,16 +300,16 @@ impl AuthorizationFunctionBuilder {
         }).collect::<Vec<String>>().join("\n");
 
             format!(
-                r#"
+                "
             IF TG_OP = 'INSERT' THEN
         {parent_check}
     END IF;
-            "#
+            "
             )
         };
 
         Ok(format!(
-            r#"
+            "
 CREATE OR REPLACE FUNCTION canx_{table_name}(
     session_user_id {session_user_id_type},
     {arguments},
@@ -353,7 +355,7 @@ END;
 $$
 LANGUAGE plpgsql PARALLEL SAFE;
 {update_trigger}
-"#,
+",
             session_user_id_type = user_id_column.raw_data_type(),
             table_name = table.table_name,
             update_trigger = self.update_trigger(table),
@@ -369,11 +371,11 @@ LANGUAGE plpgsql PARALLEL SAFE;
     /// operation.
     fn update_trigger(&self, table: &Table) -> String {
         format!(
-            r#"CREATE OR REPLACE TRIGGER can_insert_or_update_{table_name}
+            "CREATE OR REPLACE TRIGGER can_insert_or_update_{table_name}
 BEFORE INSERT OR UPDATE ON {table_name}
 FOR EACH ROW
 EXECUTE FUNCTION {trigger_function_name}();
-"#,
+",
             table_name = table.table_name,
             trigger_function_name = self.trigger_function_name(table)
         )

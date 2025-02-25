@@ -1,4 +1,4 @@
-//! Submodule providing PostGIS support for the webcodegen crate.
+//! Submodule providing `PostGIS` support for the webcodegen crate.
 
 pub mod geography_columns;
 pub mod geometry_columns;

@@ -4,7 +4,7 @@ use diesel::{Queryable, QueryableByName, Selectable};
 
 use crate::errors::WebCodeGenError;
 
-/// Represents an entry in the PostGIS `geometry_columns` system table.
+/// Represents an entry in the `PostGIS` `geometry_columns` system table.
 ///
 /// The `geometry_columns` table provides metadata about all geometry columns
 /// stored in the database, including their spatial reference system (SRID)
@@ -33,7 +33,13 @@ pub struct GeometryColumn {
 }
 
 impl GeometryColumn {
+    #[must_use]
     /// Returns the rust type of the geometry column.
+    /// 
+    /// # Panics
+    /// 
+    /// * If the geometry type is unknown.
+    /// 
     pub fn str_rust_type(&self) -> &'static str {
         match self.r#type.as_str() {
             "POINT" => "postgis_diesel::types::Point",
@@ -43,7 +49,7 @@ impl GeometryColumn {
             "MULTILINESTRING" => "postgis_diesel::types::MultiLineString",
             "MULTIPOLYGON" => "postgis_diesel::types::MultiPolygon",
             "GEOMETRYCOLLECTION" => "postgis_diesel::types::GeometryCollection",
-            unknown => panic!("Unknown geometry type: {}", unknown),
+            unknown => panic!("Unknown geometry type: {unknown}"),
         }
     }
 
@@ -61,7 +67,7 @@ impl GeometryColumn {
         let mut rust_type_str = self.str_rust_type().to_owned();
 
         if optional {
-            rust_type_str = format!("Option<{}>", rust_type_str);
+            rust_type_str = format!("Option<{rust_type_str}>");
         }
 
         Ok(syn::parse_str(&rust_type_str)?)

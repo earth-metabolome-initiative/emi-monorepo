@@ -9,7 +9,7 @@ use syn::Ident;
 use super::Codegen;
 use crate::Table;
 
-impl<'a> Codegen<'a> {
+impl Codegen<'_> {
     /// Generate implementations of the `joinable` diesel macro.
     ///
     /// # Arguments
@@ -24,7 +24,7 @@ impl<'a> Codegen<'a> {
         conn: &mut PgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         // As a first step, we create a directory for the generated code.
-        std::fs::create_dir_all(&root)?;
+        std::fs::create_dir_all(root)?;
         // Then we create a Token stream for the main module that will expose the
         // individual tables.
         let mut joinable_main_module = TokenStream::new();
@@ -87,7 +87,7 @@ impl<'a> Codegen<'a> {
 
             let overall_token_stream: TokenStream = table_hashmap
                 .into_values()
-                .filter_map(|maybe_token_stream| maybe_token_stream)
+                .flatten()
                 .collect();
 
             if overall_token_stream.is_empty() {
@@ -98,7 +98,7 @@ impl<'a> Codegen<'a> {
 
             std::fs::write(
                 &table_file,
-                self.beautify_code(quote::quote! {
+                self.beautify_code(&quote::quote! {
                 use #table_path;
                 #overall_token_stream})?,
             )?;
@@ -109,7 +109,7 @@ impl<'a> Codegen<'a> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(joinable_main_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&joinable_main_module)?)?;
 
         Ok(())
     }

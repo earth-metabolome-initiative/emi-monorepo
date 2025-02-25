@@ -8,7 +8,7 @@ use proc_macro2::TokenStream;
 use super::Codegen;
 use crate::Table;
 
-impl<'a> Codegen<'a> {
+impl Codegen<'_> {
     /// Generate implementations of the `allow_tables_to_appear_in_same_query`
     /// diesel macro.
     ///
@@ -27,7 +27,7 @@ impl<'a> Codegen<'a> {
 
         // We create the path where we are going to output the modules
         // with all its submodules.
-        std::fs::create_dir_all(&root)?;
+        std::fs::create_dir_all(root)?;
 
         // create token stream for importing the
         // diffent submodules
@@ -81,10 +81,10 @@ impl<'a> Codegen<'a> {
             }
             let table_path = table.import_path()?;
             let table_name = table.snake_case_ident()?;
-            let table_file = root.join(format!("{}.rs", table_name.to_string()));
+            let table_file = root.join(format!("{table_name}.rs"));
             std::fs::write(
                 &table_file,
-                self.beautify_code(quote::quote! {
+                self.beautify_code(&quote::quote! {
                     use #table_path;
                     #submodule_token_stream
                 })?,
@@ -97,7 +97,7 @@ impl<'a> Codegen<'a> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(allow_table_query_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&allow_table_query_module)?)?;
         Ok(())
     }
 }

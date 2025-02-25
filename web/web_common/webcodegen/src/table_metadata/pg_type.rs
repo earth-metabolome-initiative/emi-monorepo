@@ -162,6 +162,11 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> Result<&'static str, WebCod
 /// # Returns
 ///
 /// A `Type` representing the corresponding Diesel type.
+/// 
+/// # Errors
+/// 
+/// * Returns an error if the type is not supported.
+/// 
 pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<&str, WebCodeGenError> {
     Ok(match postgres_type {
         // Numeric types
@@ -229,6 +234,11 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<&str, WebCodeG
 /// # Returns
 ///
 /// A `Type` representing the corresponding Diesel type.
+/// 
+/// # Errors
+/// 
+/// * Returns an error if the type is not supported.
+/// 
 pub fn postgres_type_to_diesel(
     postgres_type: &str,
     nullable: bool,
@@ -241,8 +251,7 @@ pub fn postgres_type_to_diesel(
         rust_type_str.to_string()
     };
 
-    Ok(parse_str::<Type>(&rust_type_str)
-        .expect(format!("Failed to parse rust type: '{rust_type_str}'").as_str()))
+    Ok(parse_str::<Type>(&rust_type_str)?)
 }
 
 impl PgType {
@@ -279,7 +288,7 @@ impl PgType {
                         self.camelcased_name()
                     );
                     if optional {
-                        struct_name = format!("Option<{}>", struct_name);
+                        struct_name = format!("Option<{struct_name}>");
                     }
 
                     Ok(parse_str::<Type>(&struct_name)?)
@@ -329,7 +338,7 @@ impl PgType {
                         &self.pg_binding_name()
                     );
                     if nullable {
-                        full_name = format!("diesel::sql_types::Nullable<{}>", full_name);
+                        full_name = format!("diesel::sql_types::Nullable<{full_name}>");
                     }
                     Ok(parse_str::<Type>(&full_name)?)
                 } else if self.is_user_defined(conn)? {
@@ -577,6 +586,11 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
+    /// 
+    /// # Panics
+    /// 
+    /// * If it is unknown how to implement the associated struct or enum.
+    /// 
     pub fn to_struct_or_enum(
         &self,
         conn: &mut PgConnection,
@@ -658,6 +672,11 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
+    /// 
+    /// # Panics
+    /// 
+    /// * If it is unknown what type macros are needed.
+    /// 
     pub fn to_diesel_macro(&self) -> TokenStream {
         let postgres_struct_name = self.pg_binding_ident();
         let this_typname: &str = &self.typname;
@@ -688,6 +707,11 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
+    /// 
+    /// # Panics
+    /// 
+    /// * If it is unknown what type implementations are needed.
+    /// 
     pub fn to_diesel_impls(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         let diesel_struct_path = self.diesel_type(false, conn)?;
         let rust_struct_path = self.rust_type(false, conn)?;

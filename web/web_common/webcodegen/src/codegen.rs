@@ -16,15 +16,16 @@ use crate::{
     Column, PgType, Table,
 };
 
-pub const CODEGEN_DIRECTORY: &'static str = "codegen";
-pub const CODEGEN_DIESEL_MODULE: &'static str = "diesel_codegen";
-pub const CODEGEN_STRUCTS_MODULE: &'static str = "structs_codegen";
-pub const CODEGEN_TRAITS_MODULE: &'static str = "traits_codegen";
-pub const CODEGEN_TABLE_PATH: &'static str = "tables";
-pub const CODEGEN_TYPES_PATH: &'static str = "types";
-pub const CODEGEN_JOINABLE_PATH: &'static str = "joinable";
+pub const CODEGEN_DIRECTORY: &str = "codegen";
+pub const CODEGEN_DIESEL_MODULE: &str = "diesel_codegen";
+pub const CODEGEN_STRUCTS_MODULE: &str = "structs_codegen";
+pub const CODEGEN_TRAITS_MODULE: &str = "traits_codegen";
+pub const CODEGEN_TABLE_PATH: &str = "tables";
+pub const CODEGEN_TYPES_PATH: &str = "types";
+pub const CODEGEN_JOINABLE_PATH: &str = "joinable";
 
 #[derive(Debug, Default)]
+#[allow(clippy::struct_excessive_bools)]
 /// Struct for code generation.
 pub struct Codegen<'a> {
     /// List of tables to ignore when generating code.
@@ -33,9 +34,9 @@ pub struct Codegen<'a> {
     output_directory: Option<&'a Path>,
     /// Whether to make the code readable.
     beautify: bool,
-    /// Whether to generate the diesel joinables.
+    /// Whether to generate the diesel `joinables`.
     pub(super) enable_joinables: bool,
-    /// Whether to generate the diesel allow_tables_to_appear_in_same_query.
+    /// Whether to generate the diesel `allow_tables_to_appear_in_same_query`.
     pub(super) enable_allow_tables_to_appear_in_same_query: bool,
     /// Whether to generate the SQL types.
     pub(super) enable_sql_types: bool,
@@ -72,11 +73,11 @@ impl<'a> Codegen<'a> {
     }
 
     #[must_use]
-    /// Whether to generate the diesel allow_tables_to_appear_in_same_query.
+    /// Whether to generate the diesel `allow_tables_to_appear_in_same_query`.
     ///
     /// # Note
     /// Since to we need the tables before generating the
-    /// allow_tables_to_appear_in_same_query we enable the generation of the
+    /// `allow_tables_to_appear_in_same_query` we enable the generation of the
     /// tables schema.
     pub fn enable_allow_tables_to_appear_in_same_query(mut self) -> Self {
         self = self.enable_tables_schema();
@@ -161,8 +162,8 @@ impl<'a> Codegen<'a> {
         self
     }
 
-    /// Dispatches beautification for the provided TokenStream, if requested.
-    pub(crate) fn beautify_code(&self, code: TokenStream) -> Result<String, WebCodeGenError> {
+    /// Dispatches beautification for the provided `TokenStream`, if requested.
+    pub(crate) fn beautify_code(&self, code: &TokenStream) -> Result<String, WebCodeGenError> {
         if !self.beautify {
             return Ok(code.to_string());
         }
@@ -282,7 +283,7 @@ impl<'a> Codegen<'a> {
         let traits_codegen_ident =
             syn::Ident::new(CODEGEN_TRAITS_MODULE, proc_macro2::Span::call_site());
 
-        let codegen_module_impl = self.beautify_code(quote::quote! {
+        let codegen_module_impl = self.beautify_code(&quote::quote! {
             #[cfg(feature = "diesel")]
             pub mod #diesel_codegen_ident;
 

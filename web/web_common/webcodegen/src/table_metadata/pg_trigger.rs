@@ -34,7 +34,7 @@ pub struct PgTrigger {
     /// for disabled, etc.).
     pub tgenabled: String,
     /// A boolean indicating whether the trigger is internally created by
-    /// PostgreSQL (`true`) or user-defined (`false`).
+    /// `PostgreSQL` (`true`) or user-defined (`false`).
     pub tgisinternal: bool,
     /// The OID of the related table for a constraint trigger, or zero if not
     /// applicable.

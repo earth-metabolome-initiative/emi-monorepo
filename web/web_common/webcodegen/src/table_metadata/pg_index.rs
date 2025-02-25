@@ -9,7 +9,7 @@ use crate::errors::WebCodeGenError;
 /// Represents a row in the `pg_indexes` view
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq)]
 #[diesel(table_name = crate::schema::pg_indexes)]
-/// Represents a PostgreSQL index in the database.
+/// Represents a `PostgreSQL` index in the database.
 pub struct Indices {
     /// The name of the schema containing the index.
     pub schemaname: String,
@@ -23,10 +23,11 @@ pub struct Indices {
     pub indexdef: String,
 }
 
-/// Represents the `pg_index` system catalog table in PostgreSQL.
+/// Represents the `pg_index` system catalog table in `PostgreSQL`.
 /// This table stores information about indexes on tables.
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq)]
 #[diesel(table_name = crate::schema::pg_index)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct PgIndex {
     /// The OID of the index.
     pub indexrelid: u32,

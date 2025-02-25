@@ -21,9 +21,9 @@ pub enum WebCodeGenError {
     SynError(syn::Error),
     /// A column is of an unknown type.
     UnknownColumnType(Box<Column>),
-    /// Unknown PostgreSQL Diesel type.
+    /// Unknown `PostgreSQL` Diesel type.
     UnknownDieselPostgresType(String),
-    /// Unknown PostgreSQL Rust type.
+    /// Unknown `PostgreSQL` Rust type.
     UnknownPostgresRustType(String),
     /// A type is not user-defined.
     NotUserDefinedType(String),
@@ -37,9 +37,9 @@ pub enum WebCodeGenError {
     IllegalTableCodegen(String, String, Box<Table>),
     /// A table has an excessive number of columns (> 64)
     ExcessiveNumberOfColumns(Box<Table>, usize),
-    /// A table should have an update_at column.
+    /// A table should have an `update_at` column.
     MissingUpdateAtColumn(Box<Table>),
-    /// A table should have an updated_by column.
+    /// A table should have an `updated_by` column.
     MissingUpdatedByColumn(Box<Table>),
     /// A table has no primary key column(s).
     NoPrimaryKeyColumn(Box<Table>),
