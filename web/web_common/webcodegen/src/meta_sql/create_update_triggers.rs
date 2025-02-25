@@ -34,6 +34,7 @@ use diesel::{connection::SimpleConnection, PgConnection};
 use crate::{errors::WebCodeGenError, Table};
 
 impl Table {
+    #[must_use]
     /// Returns the SQL code to create the `updated_at_trigger` function.
     pub fn updated_at_trigger_function() -> &'static str {
         concat!(

@@ -3,11 +3,11 @@
 
 use diesel::{Queryable, QueryableByName, Selectable};
 
-/// Represents a PostgreSQL trigger, as defined in the `pg_trigger` system
+/// Represents a `PostgreSQL` trigger, as defined in the `pg_trigger` system
 /// catalog table. This struct corresponds to the internal representation of
-/// triggers within PostgreSQL.
+/// triggers within `PostgreSQL`.
 ///
-/// Triggers in PostgreSQL are special procedures that are automatically
+/// Triggers in `PostgreSQL` are special procedures that are automatically
 /// executed in response to certain events on a particular table or view.
 ///
 /// This struct provides metadata about triggers, including their function,

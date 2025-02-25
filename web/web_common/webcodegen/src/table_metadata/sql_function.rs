@@ -237,13 +237,13 @@ impl SQLFunction {
         let code_string = output.to_string();
 
         // Parse the generated code string into a syn::Item
-        let syntax_tree: File = syn::parse_str(&code_string).unwrap();
+        let syntax_tree: File = syn::parse_str(&code_string)?;
 
         // Use prettyplease to format the syntax tree
         let formatted_code = unparse(&syntax_tree);
 
         // Write the formatted code to the output file
-        std::fs::write(output_path, formatted_code).unwrap();
+        std::fs::write(output_path, formatted_code)?;
 
         Ok(())
     }

@@ -36,19 +36,31 @@ impl<'a> Codegen<'a> {
         let mut submodule_file_content = TokenStream::new();
 
         if self.enable_tables_schema {
-            self.generate_table_macro(root.join("table").as_path(), tables, conn)?;
+            self.generate_table_macro(
+                root.join(crate::codegen::CODEGEN_TABLE_PATH).as_path(),
+                tables,
+                conn,
+            )?;
             submodule_file_content.extend(quote::quote! {
                 pub mod table;
             });
         }
         if self.enable_sql_types {
-            self.generate_types_macro(root.join("types").as_path(), tables, conn)?;
+            self.generate_types_macro(
+                root.join(crate::codegen::CODEGEN_TYPES_PATH).as_path(),
+                tables,
+                conn,
+            )?;
             submodule_file_content.extend(quote::quote! {
                 pub mod types;
             });
         }
         if self.enable_joinables {
-            self.generate_joinable_macro(root.join("joinable").as_path(), tables, conn)?;
+            self.generate_joinable_macro(
+                root.join(crate::codegen::CODEGEN_JOINABLE_PATH).as_path(),
+                tables,
+                conn,
+            )?;
             submodule_file_content.extend(quote::quote! {
                 mod joinable;
             });

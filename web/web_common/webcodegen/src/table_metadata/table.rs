@@ -5,12 +5,12 @@ use diesel::{
     JoinOnDsl, NullableExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl,
     Selectable, SelectableHelper,
 };
+use inflector::Inflector;
 use itertools::Itertools;
 use proc_macro2::TokenStream;
 use quote::quote;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{parse_str, Ident, Type};
-use inflector::Inflector;
 
 use super::PgTrigger;
 use crate::{errors::WebCodeGenError, CheckConstraint, Column, PgIndex, TableConstraint};
@@ -28,7 +28,9 @@ pub const RESERVED_RUST_WORDS: [&str; 49] = [
 /// Diesel collisions that need to be handled.
 pub const RESERVED_DIESEL_WORDS: [&str; 1] = ["columns"];
 
-#[derive(Queryable, QueryableByName, PartialEq, Eq, PartialOrd, Ord, Selectable, Debug, Clone, Hash)]
+#[derive(
+    Queryable, QueryableByName, PartialEq, Eq, PartialOrd, Ord, Selectable, Debug, Clone, Hash,
+)]
 #[diesel(table_name = crate::schema::tables)]
 /// Struct defining the `information_schema.tables` table.
 pub struct Table {
@@ -146,7 +148,7 @@ impl Table {
             .include_defaults()
             .remove_leading_underscores()
             .remove_trailing_underscores();
-        Ok(sanitizer.to_camel_case(&self.singular_table_name())?)
+        Ok(sanitizer.to_camel_case(self.singular_table_name()?)?)
     }
 
     /// Returns the Rust Ident of the struct converted from the table name.
@@ -222,15 +224,22 @@ impl Table {
 
     #[must_use]
     /// Returns the singular name of the table.
-    pub fn singular_table_name(&self) -> String {
+    ///
+    /// # Errors
+    /// * If the table name is empty.
+    pub fn singular_table_name(&self) -> Result<String, WebCodeGenError> {
         // We split the table name by underscores and remove the last element.
-        let mut parts =
-            self.table_name.split('_').map(|part| part.to_string()).collect::<Vec<String>>();
-        let last_element = parts.pop().unwrap();
+        let mut parts = self
+            .table_name
+            .split('_')
+            .map(std::string::ToString::to_string)
+            .collect::<Vec<String>>();
+        let last_element =
+            parts.pop().ok_or(WebCodeGenError::EmptyTableName(Box::new(self.clone())))?;
         // We convert to singular form the last element and join the parts back
         // together.
-        parts.push(Inflector::default().singularize(&last_element));
-        parts.join("_")
+        parts.push(Inflector.singularize(&last_element));
+        Ok(parts.join("_"))
     }
 
     /// Returns wether a table require authorizations to be viewed
@@ -312,11 +321,11 @@ impl Table {
     pub fn diesel_derives(&self, conn: &mut PgConnection) -> Result<Vec<Type>, WebCodeGenError> {
         let mut derives = Vec::new();
 
-        derives.push(parse_str("diesel::Selectable").unwrap());
+        derives.push(parse_str("diesel::Selectable")?);
 
         if self.has_primary_keys(conn)? {
-            derives.push(parse_str("diesel::Queryable").unwrap());
-            derives.push(parse_str("diesel::Identifiable").unwrap());
+            derives.push(parse_str("diesel::Queryable")?);
+            derives.push(parse_str("diesel::Identifiable")?);
         }
 
         Ok(derives)
@@ -359,6 +368,10 @@ impl Table {
     /// # Returns
     ///
     /// A vector of columns representing the foreign keys of the table.
+    ///
+    /// # Errors
+    ///
+    /// * If the foreign keys cannot be loaded from the database.
     pub fn foreign_keys(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
         Ok(self
             .columns(conn)?
@@ -368,15 +381,19 @@ impl Table {
     }
 
     /// Returns the set of foreign tables of the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A set of tables that are foreign to the current table.
-    /// 
+    ///
+    ///
+    /// # Errors
+    ///
+    /// * If the foreign tables cannot be loaded from the database.
     pub fn foreign_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
         let mut tables = Vec::new();
         for column in self.foreign_keys(conn)? {
@@ -409,6 +426,7 @@ impl Table {
         Ok(self.columns(conn)?.iter().any(|column| column.is_session_user_generated(conn)))
     }
 
+    #[must_use]
     /// Returns whether the table IS the `users` table.
     pub fn is_users_table(&self) -> bool {
         self.table_name == "users"
@@ -510,6 +528,10 @@ impl Table {
     /// A vector of all tables in the database sorted topologically, i.e.
     /// such that tables that depend on other tables are listed after the
     /// tables they depend on.
+    ///
+    /// # Errors
+    ///
+    /// * If the tables cannot be loaded from the database.
     pub fn load_all_topologically(
         conn: &mut PgConnection,
         table_catalog: &str,
@@ -517,20 +539,20 @@ impl Table {
     ) -> Result<Vec<Self>, WebCodeGenError> {
         let mut tables = Self::load_all(conn, table_catalog, table_schema)?;
 
-        let mut table_priority: HashMap<Table, usize> =
-            tables.iter().cloned().map(|table| (table, 0)).collect();
+        let mut table_priority: HashMap<Table, usize> = HashMap::new();
 
         // We determine the priority of each table by setting the priority of a table
         // to the maximum priority of the tables it depends on plus one.
         loop {
             let mut changed = false;
-            for table in tables.iter() {
+            for table in &tables {
                 for column in table.columns(conn)? {
                     if let Some((foreign_table, _)) = column.foreign_table(conn)? {
                         if foreign_table == *table {
                             continue;
                         }
-                        let priority = table_priority.get(&foreign_table).unwrap() + 1;
+                        let priority =
+                            table_priority.get(&foreign_table).copied().unwrap_or_default() + 1;
                         table_priority.entry(table.clone()).and_modify(|e| {
                             if *e < priority {
                                 *e = priority;
@@ -546,7 +568,13 @@ impl Table {
         }
 
         // We sort the tables by their priority.
-        tables.sort_by(|a, b| table_priority.get(a).unwrap().cmp(table_priority.get(b).unwrap()));
+        tables.sort_by(|a, b| {
+            table_priority
+                .get(a)
+                .copied()
+                .unwrap_or_default()
+                .cmp(&table_priority.get(b).copied().unwrap_or_default())
+        });
 
         Ok(tables)
     }
@@ -559,6 +587,14 @@ impl Table {
     /// * `table_name` - The name of the table.
     /// * `table_schema` - The schema of the table.
     /// * `table_catalog` - The catalog of the table.
+    ///
+    /// # Returns
+    ///
+    /// The table.
+    ///
+    /// # Errors
+    ///
+    /// * If the table cannot be loaded from the database.
     pub fn load(
         conn: &mut PgConnection,
         table_name: &str,
@@ -866,5 +902,26 @@ impl Table {
             .filter(pg_namespace::nspname.eq(&self.table_schema))
             .select(PgTrigger::as_select())
             .load::<PgTrigger>(conn)
+    }
+
+    /// Returns a the path to the diesel table module.
+    ///
+    /// # Returns
+    ///
+    /// A `syn::Type` representing the path to the diesel table module.
+    ///
+    /// # Errors
+    ///
+    /// * If the snake case name cannot be generated.
+    pub fn import_path(&self) -> Result<syn::Type, WebCodeGenError> {
+        let table_name = self.snake_case_name()?;
+        Ok(syn::parse_str::<Type>(&format!(
+            "crate::{}::{}::{}::{}::{}",
+            crate::codegen::CODEGEN_DIRECTORY,
+            crate::codegen::CODEGEN_MODULE,
+            crate::codegen::CODEGEN_TABLE_PATH,
+            table_name,
+            table_name
+        ))?)
     }
 }

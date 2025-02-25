@@ -36,11 +36,13 @@ impl Default for Inflector {
 }
 
 impl Inflector {
+    #[must_use]
     /// Returns the plural form of a word.
     pub fn pluralize(&self, word: &str) -> String {
         pluralizer::pluralize(word, 5, false)
     }
 
+    #[must_use]
     /// Returns the singular form of a word.
     pub fn singularize(&self, word: &str) -> String {
         pluralizer::pluralize(word, 1, false)
