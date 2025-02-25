@@ -83,7 +83,7 @@ impl<
 
     fn number_of_rows(&self) -> Self::RowIndex {
         debug_assert!(
-            self.offsets.len() >= 1,
+            !self.offsets.is_empty(),
             "The offsets should always have at least one element."
         );
         debug_assert!(
