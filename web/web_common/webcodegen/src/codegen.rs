@@ -13,6 +13,12 @@ use crate::{
     Table,
 };
 
+pub const CODEGEN_DIRECTORY: &'static str = "codegen";
+pub const CODEGEN_MODULE: &'static str = "diesel_codegen";
+pub const CODEGEN_TABLE_PATH: &'static str = "table";
+pub const CODEGEN_TYPES_PATH: &'static str = "types";
+pub const CODEGEN_JOINABLE_PATH: &'static str = "joinable";
+
 #[derive(Debug, Default)]
 /// Struct for code generation.
 pub struct Codegen<'a> {
@@ -56,7 +62,12 @@ impl<'a> Codegen<'a> {
 
     #[must_use]
     /// Whether to generate the diesel allow_tables_to_appear_in_same_query.
+    ///
+    /// # Note
+    /// Since to we need the tables before generating the allow_tables_to_appear_in_same_query
+    /// we enable the generation of the tables schema.
     pub fn enable_allow_tables_to_appear_in_same_query(mut self) -> Self {
+        self = self.enable_tables_schema();
         self.enable_allow_tables_to_appear_in_same_query = true;
         self
     }
@@ -70,9 +81,9 @@ impl<'a> Codegen<'a> {
 
     #[must_use]
     /// Whether to generate the tables schema.
-    /// 
+    ///
     /// # Note
-    /// 
+    ///
     /// Since the tables may require some custom types, enabling the
     /// generation of tables automatically enables the generation of SQL types.
     pub fn enable_tables_schema(mut self) -> Self {
@@ -147,12 +158,12 @@ impl<'a> Codegen<'a> {
 
         tables.sort_unstable();
 
-        let codegen_directory = self.get_output_directory()?.join("codegen");
+        let codegen_directory = self.get_output_directory()?.join(CODEGEN_DIRECTORY);
         std::fs::create_dir_all(&codegen_directory)?;
         let codegen_module = codegen_directory.with_extension("rs");
 
         self.generate_diesel_code(
-            codegen_directory.as_path().join("diesel_codegen").as_path(),
+            codegen_directory.as_path().join(CODEGEN_MODULE).as_path(),
             &tables,
             conn,
         )?;

@@ -47,6 +47,8 @@ pub enum WebCodeGenError {
     RolesMechanismIncomplete(Box<Table>),
     /// When an io error occurs.
     IoError(std::io::Error),
+    /// Empty table name.
+    EmptyTableName(Box<Table>),
 }
 
 #[derive(Debug)]

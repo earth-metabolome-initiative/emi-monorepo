@@ -2,9 +2,9 @@
 //! enum type.
 use diesel::{Queryable, QueryableByName, Selectable};
 
-/// Represents a PostgreSQL enum type.
+/// Represents a `PostgreSQL` enum type.
 ///
-/// This struct maps to the `pg_enum` system catalog table in PostgreSQL, which
+/// This struct maps to the `pg_enum` system catalog table in `PostgreSQL`, which
 /// stores metadata about enum types. Each instance of `PgEnum` corresponds to a
 /// single enum value in the database.
 ///

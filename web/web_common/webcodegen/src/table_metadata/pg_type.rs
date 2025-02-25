@@ -21,9 +21,9 @@ const EQ_TYPES: [&str; 4] = ["i32", "i16", "i64", "bool"];
 /// Constant listing types supporting `Hash`.
 const HASH_TYPES: [&str; 4] = ["i32", "i16", "i64", "bool"];
 
-/// Represents a PostgreSQL type.
+/// Represents a `PostgreSQL` type.
 ///
-/// This struct contains metadata about a PostgreSQL type, including its name,
+/// This struct contains metadata about a `PostgreSQL` type, including its name,
 /// OID (Object Identifier), namespace, and other properties.
 #[derive(
     Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone,
@@ -262,12 +262,12 @@ impl PgType {
     /// * Returns an error if the provided database connection fails.
     pub fn rust_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
         match rust_type_str(&self.typname) {
-            Ok(rust_type) => Ok(parse_str::<Type>(rust_type).unwrap()),
+            Ok(rust_type) => Ok(parse_str::<Type>(rust_type)?),
             Err(error) => {
                 if self.is_composite() {
                     let struct_name =
                         Ident::new(&self.camelcased_name(), proc_macro2::Span::call_site());
-                    Ok(parse_str::<Type>(&struct_name.to_string()).unwrap())
+                    Ok(parse_str::<Type>(&struct_name.to_string())?)
                 } else if self.is_user_defined(conn)? {
                     let Some(base_type) = self.base_type(conn)? else {
                         return Err(WebCodeGenError::MissingBaseType(Box::new(self.clone())));

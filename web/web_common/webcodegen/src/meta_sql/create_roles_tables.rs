@@ -102,7 +102,7 @@ impl Table {
 
         create_table.push_str(&format!(
             "{}_id {} NOT NULL,\n",
-            reference_table.singular_table_name(),
+            reference_table.singular_table_name()?,
             reference_table.primary_key_columns(conn)?[0].data_type_str(conn)?
         ));
 
@@ -122,7 +122,7 @@ impl Table {
         create_table.push_str(&format!(
             "PRIMARY KEY ({}, {}_id),\n",
             primary_key_names.join(", "),
-            reference_table.singular_table_name(),
+            reference_table.singular_table_name()?,
         ));
 
         create_table.push_str(&format!(
@@ -134,7 +134,7 @@ impl Table {
 
         create_table.push_str(&format!(
             "FOREIGN KEY ({}_id) REFERENCES {}({}) ON DELETE CASCADE,\n",
-            reference_table.singular_table_name(),
+            reference_table.singular_table_name()?,
             reference_table.table_name,
             reference_table.primary_key_columns(conn)?[0].column_name
         ));
@@ -219,7 +219,7 @@ impl Table {
             }
             let string = table.get_roles_tables_sql(conn)?;
             if let Err(err) = conn.batch_execute(&string) {
-                println!("Failed to execute SQL: {}", string);
+                println!("Failed to execute SQL: {string}");
                 return Err(WebCodeGenError::DieselError(err));
             }
         }

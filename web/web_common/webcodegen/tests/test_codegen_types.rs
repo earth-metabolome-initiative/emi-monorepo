@@ -14,8 +14,8 @@ async fn test_codegen_types() {
 
     Codegen::default()
         .set_output_directory("tests/codegen_types".as_ref())
-		.enable_sql_types()
-		.beautify()
+        .enable_sql_types()
+        .beautify()
         .generate(&mut conn, &database_name, None)
         .unwrap();
 
@@ -23,5 +23,5 @@ async fn test_codegen_types() {
 
     codegen_test("codegen_types");
 
-    std::fs::remove_dir_all("tests/codegen_types").unwrap();
+    // std::fs::remove_dir_all("tests/codegen_types").unwrap();
 }
