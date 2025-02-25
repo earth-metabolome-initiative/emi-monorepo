@@ -70,8 +70,10 @@ impl<'a> Codegen<'a> {
                 let foreign_key_identifier = foreign_key.sanitized_snake_case_ident()?;
                 // Using TokeStream we write the  joinable!(table -> foreign_table (foreign_key));
 
+                let foreign_table_path = foreign_table_ref.import_path()?;
+
                 table_hashmap.insert(foreign_table_ref, Some(quote::quote! {
-                    use crate::codegen::diesel_codegen::table::#foreign_table_identifier::#foreign_table_identifier;
+                    use #foreign_table_path;
 
                     diesel::joinable!(#table_identifier -> #foreign_table_identifier (#foreign_key_identifier));
                 }
@@ -90,9 +92,11 @@ impl<'a> Codegen<'a> {
             if overall_token_stream.is_empty() {
                 continue;
             }
+            
+            let table_path = table.import_path()?;
 
             std::fs::write(&table_file, self.beautify_code(quote::quote! {
-                use crate::codegen::diesel_codegen::table::#table_identifier::#table_identifier;
+                use #table_path;
                 #overall_token_stream}
             )?)?;
 
