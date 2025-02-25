@@ -3,7 +3,6 @@
 mod utils;
 
 use utils::*;
-
 use webcodegen::*;
 
 #[tokio::test]
@@ -14,7 +13,7 @@ async fn test_codegen_joinables() {
 
     Codegen::default()
         .set_output_directory("tests/codegen_joinables".as_ref())
-		.enable_joinables()
+        .enable_joinables()
         .enable_tables_schema()
         .beautify()
         .generate(&mut conn, &database_name, None)

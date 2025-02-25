@@ -10,7 +10,8 @@ use crate::{errors::WebCodeGenError, Table};
 const ATTRIBUTE_TRAITS: &[(&str, &str)] = &[("Described", "description")];
 
 impl Table {
-    /// Returns the Syn `TokenStream` for the implementation of the `Described` trait.
+    /// Returns the Syn `TokenStream` for the implementation of the `Described`
+    /// trait.
     ///
     /// # Arguments
     ///

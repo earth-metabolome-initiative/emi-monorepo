@@ -4,7 +4,6 @@ use diesel::pg::PgConnection;
 mod utils;
 
 use utils::*;
-
 use webcodegen::{errors::WebCodeGenError, *};
 
 async fn test_code_generation_methods(conn: &mut PgConnection) -> Result<(), WebCodeGenError> {

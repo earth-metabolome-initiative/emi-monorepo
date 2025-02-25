@@ -163,6 +163,15 @@ impl Column {
     }
 
     /// Returns the string data type
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    ///
     pub fn str_rust_data_type(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
         if let Ok(geometry) = self.geometry(conn) {
             return Ok(geometry.str_rust_type().to_owned());
@@ -202,12 +211,20 @@ impl Column {
     ///
     /// If an error occurs while querying the database
     pub fn rust_data_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
-        let rust_type = self.str_rust_data_type(conn)?;
-
-        let rust_type =
-            if self.is_nullable() { format!("Option<{rust_type}>") } else { rust_type.to_string() };
-
-        Ok(syn::parse_str(&rust_type)?)
+        if let Ok(geometry) = self.geometry(conn) {
+            return Ok(geometry.rust_type(self.is_nullable())?);
+        }
+        match rust_type_str(self.data_type_str(conn)?) {
+            Ok(s) => Ok(syn::parse_str(s)?),
+            Err(error) => {
+                if self.has_custom_type() {
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?
+                        .rust_type(self.is_nullable(), conn)?)
+                } else {
+                    Err(error)
+                }
+            }
+        }
     }
 
     /// Returns the rust reference type of the column

@@ -4,9 +4,10 @@ use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a `PostgreSQL` class (table, index, sequence, etc.).
 ///
-/// This struct maps to the `pg_class` system catalog table in `PostgreSQL`, which
-/// stores metadata about tables, indexes, sequences, and other similar objects.
-/// Each instance of `PGClass` corresponds to a single object in the database.
+/// This struct maps to the `pg_class` system catalog table in `PostgreSQL`,
+/// which stores metadata about tables, indexes, sequences, and other similar
+/// objects. Each instance of `PGClass` corresponds to a single object in the
+/// database.
 ///
 /// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-class.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq)]

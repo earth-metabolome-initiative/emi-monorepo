@@ -3,13 +3,11 @@
 use std::{collections::HashMap, path::Path};
 
 use diesel::PgConnection;
+use proc_macro2::TokenStream;
 use syn::Ident;
 
-use proc_macro2::TokenStream;
-
-use crate::Table;
-
 use super::Codegen;
+use crate::Table;
 
 impl<'a> Codegen<'a> {
     /// Generate implementations of the `joinable` diesel macro.
@@ -19,18 +17,16 @@ impl<'a> Codegen<'a> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    ///
     pub(crate) fn generate_joinable_macro(
         &self,
         root: &Path,
         tables: &[Table],
         conn: &mut PgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
-        // https://github.com/earth-metabolome-initiative/emi-monorepo/issues/36
-        // todo!("See issue #36")
         // As a first step, we create a directory for the generated code.
         std::fs::create_dir_all(&root)?;
-        // Then we create a Token stream for the main module that will expose the individual tables.
+        // Then we create a Token stream for the main module that will expose the
+        // individual tables.
         let mut joinable_main_module = TokenStream::new();
         // We will now iterate on the various tables
         for table in tables {
@@ -45,20 +41,24 @@ impl<'a> Codegen<'a> {
             for foreign_key in table.foreign_keys(conn)? {
                 // For each table we retrieve the foreign key(s).
                 // First we fetch the foreign table (and its primary key)
-                let Some((foreign_table, foreign_table_pk)) = foreign_key.foreign_table(conn)?
+                let Some((foreign_table, _foreign_table_pk)) = foreign_key.foreign_table(conn)?
                 else {
                     continue;
                 };
 
-                // We check wether for the current table we havce already created a given token stream.
+                // We check wether for the current table we havce already created a given token
+                // stream.
                 if let Some(maybe_token_stream) = table_hashmap.get_mut(&foreign_table) {
-                    // Since there is already a foreign_table present in our HashMap we set the TakenStrem to None
+                    // Since there is already a foreign_table present in our HashMap we set the
+                    // TakenStrem to None
                     *maybe_token_stream = None;
                     continue;
                 }
 
-                // Since we want to access to the Table that `foreign_table` outside of the current for loop (foreign_table dying here),
-                // we iterate over tge tables array defined out there (tables: &[Table],) and find an entry matching &foreign_table.
+                // Since we want to access to the Table that `foreign_table` outside of the
+                // current for loop (foreign_table dying here), we iterate over
+                // tge tables array defined out there (tables: &[Table],) and find an entry
+                // matching &foreign_table.
                 let Some(foreign_table_ref) = tables.iter().find(|t| t == &&foreign_table) else {
                     continue;
                 };
@@ -68,7 +68,8 @@ impl<'a> Codegen<'a> {
                     Ident::new(&foreign_table.snake_case_name()?, proc_macro2::Span::call_site());
                 // We retrieve the foreign_key identifer
                 let foreign_key_identifier = foreign_key.sanitized_snake_case_ident()?;
-                // Using TokeStream we write the  joinable!(table -> foreign_table (foreign_key));
+                // Using TokeStream we write the  joinable!(table -> foreign_table
+                // (foreign_key));
 
                 let foreign_table_path = foreign_table_ref.import_path()?;
 
@@ -92,13 +93,15 @@ impl<'a> Codegen<'a> {
             if overall_token_stream.is_empty() {
                 continue;
             }
-            
+
             let table_path = table.import_path()?;
 
-            std::fs::write(&table_file, self.beautify_code(quote::quote! {
+            std::fs::write(
+                &table_file,
+                self.beautify_code(quote::quote! {
                 use #table_path;
-                #overall_token_stream}
-            )?)?;
+                #overall_token_stream})?,
+            )?;
 
             joinable_main_module.extend(quote::quote! {
                 pub mod #table_identifier;

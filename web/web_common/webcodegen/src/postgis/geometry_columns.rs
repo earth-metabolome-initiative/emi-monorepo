@@ -2,6 +2,8 @@
 //! `geometry_columns` table.
 use diesel::{Queryable, QueryableByName, Selectable};
 
+use crate::errors::WebCodeGenError;
+
 /// Represents an entry in the PostGIS `geometry_columns` system table.
 ///
 /// The `geometry_columns` table provides metadata about all geometry columns
@@ -43,5 +45,25 @@ impl GeometryColumn {
             "GEOMETRYCOLLECTION" => "postgis_diesel::types::GeometryCollection",
             unknown => panic!("Unknown geometry type: {}", unknown),
         }
+    }
+
+    /// Returns the rust type of the geometry column.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `optional` - If `true`, the type will be wrapped in an `Option`.
+    /// 
+    /// # Errors
+    /// 
+    /// * If the rust type cannot be parsed.
+    /// 
+    pub fn rust_type(&self, optional: bool) -> Result<syn::Type, WebCodeGenError> {
+        let mut rust_type_str = self.str_rust_type().to_owned();
+
+        if optional {
+            rust_type_str = format!("Option<{}>", rust_type_str);
+        }
+
+        Ok(syn::parse_str(&rust_type_str)?)
     }
 }

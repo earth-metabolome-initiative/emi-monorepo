@@ -1,4 +1,4 @@
-//! Submodule implementing code relative to diesel's [`table`](https://docs.rs/diesel/latest/diesel/macro.table.html) macro.
+//! Code generating the table structs.
 
 use std::path::Path;
 
@@ -9,14 +9,15 @@ use super::Codegen;
 use crate::Table;
 
 impl<'a> Codegen<'a> {
-    /// Generate implementations of the `table` diesel macro.
+    /// Generate implementations of the structs representing rows of the tables
+    /// in the database.
     ///
     /// # Arguments
     ///
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(crate) fn generate_table_macro(
+    pub(crate) fn generate_table_structs(
         &self,
         root: &Path,
         tables: &[Table],
@@ -30,7 +31,7 @@ impl<'a> Codegen<'a> {
             let table_identifier =
                 Ident::new(&table.snake_case_name()?, proc_macro2::Span::call_site());
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
-            let table_content = table.to_schema(conn)?;
+            let table_content = table.to_syn(conn)?;
             std::fs::write(&table_file, self.beautify_code(table_content)?)?;
 
             table_main_module.extend(quote::quote! {

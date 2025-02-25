@@ -30,7 +30,8 @@ impl Table {
                 continue;
             }
             if foreign_keys_and_tables.iter().any(|(table, _)| table == &foreign_key_table) {
-                // If we have already written the trait for this table, we remove the other occurrences.
+                // If we have already written the trait for this table, we remove the other
+                // occurrences.
                 foreign_keys_and_tables.retain(|(table, _)| table != &foreign_key_table);
                 continue;
             }

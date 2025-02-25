@@ -8,20 +8,15 @@ use syn::Ident;
 use crate::{errors::WebCodeGenError, Table};
 
 impl Table {
-    /// Returns the Syn `TokenStream` for the struct definition and associated
-    /// methods.
+    /// Returns the Syn `TokenStream` for the struct definition.
     ///
     /// # Arguments
     ///
     /// * `conn` - The database connection.
     ///
-    /// # Returns
-    ///
-    /// A `TokenStream` representing the struct definition and associated
-    /// methods.
-    ///
     /// # Errors
     ///
+    /// * If the provided connection is not valid.
     /// * If the number of columns exceeds 128.
     pub fn to_syn(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         if self.columns(conn)?.len() > 128 {
@@ -31,8 +26,9 @@ impl Table {
             ));
         }
 
-        let sanitized_table_name = self.snake_case_ident()?;
-        let struct_name: Ident = Ident::new(&self.struct_name()?, proc_macro2::Span::call_site());
+        let table_path = self.import_path()?;
+        let struct_name: Ident = self.struct_ident()?;
+
         let attributes = self
             .columns(conn)?
             .into_iter()
@@ -45,77 +41,18 @@ impl Table {
             })
             .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
-        // let mutability_impls = if self.has_session_user_generated_columns(conn)? {
-        //     let insert_trait_impls = self.insert_trait_impls(conn)?;
-        //     let update_trait_impls = if self.has_updated_by_column(conn)? {
-        //         self.update_trait_impls(conn)?
-        //     } else {
-        //         TokenStream::new()
-        //     };
-        //     quote! {
-        //         #insert_trait_impls
-        //         #update_trait_impls
-        //     }
-        // } else {
-        //     TokenStream::new()
-        // };
-        let insert_trait_impls =
-            if self.has_session_user_generated_columns(conn)? || self.is_users_table() {
-                self.insert_trait_impls(conn)?
-            } else {
-                TokenStream::new()
-            };
-
-        let foreign_key_methods = self.foreign_key_methods(conn)?;
-        let foreign_key_traits_impls = self.foreign_key_traits(conn)?;
-        // We only create a delete method if the table has a created_by column, which
-        // means it contains user-generated data and therefore things that can be
-        // deleted by some user.
-        let delete_method = if self.has_primary_keys(conn)? {
-            self.delete_method(conn)?
-        } else {
-            TokenStream::new()
-        };
-        let primary_key_decorator = self.primary_key_decorator(conn)?;
         let diesel_derives_decorator = self.diesel_derives_decorator(conn)?;
+        let primary_key_decorator = self.primary_key_decorator(conn)?;
         let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
-        let from_unique_indices = self.from_unique_indices(conn)?;
-        let attribute_traits_impls = self.attribute_traits_impl(conn)?;
-        let load_all = self.load_all_method()?;
 
-        let built_table_syn = quote! {
+        Ok(quote! {
             #[common_traits::prelude::basic]
             #diesel_derives_decorator
             #primary_key_decorator
-            #[cfg_attr(feature = #columns_feature_flag_name, diesel(table_name = #sanitized_table_name))]
+            #[cfg_attr(feature = #columns_feature_flag_name, diesel(table_name = #table_path))]
             pub struct #struct_name {
                 #(#attributes),*
             }
-
-            impl #struct_name {
-                #(#foreign_key_methods)*
-                #delete_method
-                #from_unique_indices
-                #load_all
-            }
-
-            #( #foreign_key_traits_impls )*
-            #attribute_traits_impls
-            #insert_trait_impls
-        };
-
-        // Convert the generated TokenStream to a string
-        let code_string = built_table_syn.to_string();
-
-        // Parse the generated code string into a syn::Item
-        if let Err(error) = syn::parse_str::<syn::File>(&code_string) {
-            return Err(WebCodeGenError::IllegalTableCodegen(
-                format!("Error building table struct: {error}"),
-                code_string,
-                Box::new(self.clone()),
-            ));
-        }
-
-        Ok(built_table_syn)
+        })
     }
 }

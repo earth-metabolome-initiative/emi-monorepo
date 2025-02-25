@@ -4,9 +4,9 @@ use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents a `PostgreSQL` enum type.
 ///
-/// This struct maps to the `pg_enum` system catalog table in `PostgreSQL`, which
-/// stores metadata about enum types. Each instance of `PgEnum` corresponds to a
-/// single enum value in the database.
+/// This struct maps to the `pg_enum` system catalog table in `PostgreSQL`,
+/// which stores metadata about enum types. Each instance of `PgEnum`
+/// corresponds to a single enum value in the database.
 ///
 /// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/catalog-pg-enum.html).
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Clone)]

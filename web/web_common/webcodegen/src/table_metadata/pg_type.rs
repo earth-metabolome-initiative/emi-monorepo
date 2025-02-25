@@ -250,6 +250,7 @@ impl PgType {
     ///
     /// # Arguments
     ///
+    /// * `optional` - A boolean indicating whether the type is optional.
     /// * `conn` - The Postgres connection.
     ///
     /// # Returns
@@ -260,19 +261,33 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub fn rust_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
+    pub fn rust_type(
+        &self,
+        optional: bool,
+        conn: &mut PgConnection,
+    ) -> Result<Type, WebCodeGenError> {
         match rust_type_str(&self.typname) {
             Ok(rust_type) => Ok(parse_str::<Type>(rust_type)?),
             Err(error) => {
-                if self.is_composite() {
-                    let struct_name =
-                        Ident::new(&self.camelcased_name(), proc_macro2::Span::call_site());
-                    Ok(parse_str::<Type>(&struct_name.to_string())?)
+                if self.is_composite() || self.is_enum() {
+                    let mut struct_name = format!(
+                        "crate::{}::{}::{}::{}::{}",
+                        crate::codegen::CODEGEN_DIRECTORY,
+                        crate::codegen::CODEGEN_STRUCTS_MODULE,
+                        crate::codegen::CODEGEN_TYPES_PATH,
+                        self.snake_case_name()?,
+                        self.camelcased_name()
+                    );
+                    if optional {
+                        struct_name = format!("Option<{}>", struct_name);
+                    }
+
+                    Ok(parse_str::<Type>(&struct_name)?)
                 } else if self.is_user_defined(conn)? {
                     let Some(base_type) = self.base_type(conn)? else {
                         return Err(WebCodeGenError::MissingBaseType(Box::new(self.clone())));
                     };
-                    base_type.rust_type(conn)
+                    base_type.rust_type(optional, conn)
                 } else {
                     Err(error)
                 }
@@ -307,8 +322,11 @@ impl PgType {
                 if self.is_composite() || self.is_enum() {
                     let snake_case_name = self.snake_case_name()?;
                     let mut full_name = format!(
-                        "crate::codegen::diesel_codegen::types::{snake_case_name}::Pg{}",
-                        &self.camelcased_name()
+                        "crate::{}::{}::{}::{snake_case_name}::{}",
+                        crate::codegen::CODEGEN_DIRECTORY,
+                        crate::codegen::CODEGEN_DIESEL_MODULE,
+                        crate::codegen::CODEGEN_TYPES_PATH,
+                        &self.pg_binding_name()
                     );
                     if nullable {
                         full_name = format!("diesel::sql_types::Nullable<{}>", full_name);
@@ -403,7 +421,6 @@ impl PgType {
     /// # Errors
     ///
     /// * If the snake case identifier cannot be generated.
-    ///
     pub fn snake_case_identifier(&self) -> Result<Ident, WebCodeGenError> {
         let snake_case_name = self.snake_case_name()?;
         if RESERVED_RUST_WORDS.contains(&snake_case_name.as_str()) {
@@ -540,7 +557,13 @@ impl PgType {
         format!("Pg{}", self.camelcased_name())
     }
 
-    /// Returns the syn of the struct or enum associated to the `PgType`.
+    #[must_use]
+    /// Returns the `CamelCased` Ident of the `PgType` for the Diesel binding.
+    pub fn pg_binding_ident(&self) -> Ident {
+        Ident::new(&self.pg_binding_name(), proc_macro2::Span::call_site())
+    }
+
+    /// Returns the syn-based struct or enum associated to the `PgType`.
     ///
     /// # Arguments
     ///
@@ -554,47 +577,24 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub fn to_syn(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
+    pub fn to_struct_or_enum(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<TokenStream, WebCodeGenError> {
+        let struct_name = Ident::new(&self.camelcased_name(), proc_macro2::Span::call_site());
+        let postgres_struct_name = self.diesel_type(false, conn)?;
         if self.is_composite() {
-            let struct_name = Ident::new(&self.camelcased_name(), proc_macro2::Span::call_site());
             let mut fields = Vec::new();
-            let mut diesel_types = Vec::new();
-            let mut rust_types = Vec::new();
-            let mut struct_attributes = Vec::new();
-            let mut field_names = Vec::new();
             let attributes = self.attributes(conn)?;
             for attribute in &attributes {
                 let field_name = Ident::new(&attribute.attname, proc_macro2::Span::call_site());
                 let field_pg_type = attribute.pg_type(conn)?;
-                let field_type = field_pg_type.rust_type(conn)?;
-                field_names.push(quote! {
-                    #field_name
-                });
-                rust_types.push(quote! {
-                    #field_type
-                });
-                let diesel_type = field_pg_type.diesel_type(attribute.attnotnull, conn)?;
-                if field_pg_type.supports_copy(conn)? || attributes.len() == 1 {
-                    struct_attributes.push(quote! {
-                        self.#field_name
-                    });
-                } else {
-                    struct_attributes.push(quote! {
-                        self.#field_name.clone()
-                    });
-                }
-
+                let field_type = field_pg_type.rust_type(false, conn)?;
+                
                 fields.push(quote! {
                     pub #field_name: #field_type
                 });
-                diesel_types.push(quote! {
-                    #diesel_type
-                });
             }
-
-            let this_typname: &str = &self.typname;
-            let postgres_struct_name =
-                Ident::new(&self.pg_binding_name(), proc_macro2::Span::call_site());
 
             let mut derives = vec![
                 Ident::new("Debug", proc_macro2::Span::call_site()),
@@ -612,6 +612,115 @@ impl PgType {
 
             if self.supports_copy(conn)? {
                 derives.push(Ident::new("Copy", proc_macro2::Span::call_site()));
+            }
+
+            Ok(quote! {
+                #[derive(#(#derives),*)]
+                #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+                #[cfg_attr(feature = "diesel", derive(diesel::deserialize::FromSqlRow, diesel::expression::AsExpression))]
+                #[cfg_attr(feature = "diesel", diesel(sql_type = #postgres_struct_name))]
+                pub struct #struct_name {
+                    #(#fields),*
+                }
+            })
+        } else if self.is_enum() {
+            let variants = self.variants(conn)?;
+            let mut variant_names = Vec::new();
+            for variant in &variants {
+                let variant_name = Ident::new(&variant.enumlabel, proc_macro2::Span::call_site());
+                variant_names.push(quote! {
+                    #variant_name
+                });
+            }
+
+            Ok(quote! {
+                #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+                #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+                #[cfg_attr(feature = "diesel", derive(diesel::deserialize::FromSqlRow, diesel::expression::AsExpression))]
+                #[cfg_attr(feature = "diesel", diesel(sql_type = #postgres_struct_name))]
+                pub enum #struct_name {
+                    #(#variant_names),*
+                }
+            })
+        } else {
+            panic!("Unsupported type: {self:?}");
+        }
+    }
+
+    #[must_use]
+    /// Returns the syn of the struct or enum associated to the `PgType`.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing the syn of the struct or enum associated to the
+    /// `PgType`, or an error if the type is not supported.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
+    pub fn to_diesel_macro(&self) -> TokenStream {
+        let postgres_struct_name = self.pg_binding_ident();
+        let this_typname: &str = &self.typname;
+        if self.is_composite() || self.is_enum() {
+            quote! {
+                #[cfg(feature = "diesel")]
+                #[derive(diesel::query_builder::QueryId, diesel::sql_types::SqlType)]
+                #[diesel(postgres_type(name = #this_typname))]
+                pub struct #postgres_struct_name;
+            }
+        } else {
+            panic!("Unsupported type: {self:?}");
+        }
+    }
+
+    /// Returns the syn of the traits necessary for diesel to support the
+    /// conversion between the Postgres type and the Rust type.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing the syn of the struct or enum associated to the
+    /// `PgType`, or an error if the type is not supported.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
+    pub fn to_diesel_impls(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
+        let diesel_struct_path = self.diesel_type(false, conn)?;
+        let rust_struct_path = self.rust_type(false, conn)?;
+        if self.is_composite() {
+            let mut diesel_types = Vec::new();
+            let mut rust_types = Vec::new();
+            let mut struct_attributes = Vec::new();
+            let mut field_names = Vec::new();
+            let attributes = self.attributes(conn)?;
+            for attribute in &attributes {
+                let field_name = Ident::new(&attribute.attname, proc_macro2::Span::call_site());
+                let field_pg_type = attribute.pg_type(conn)?;
+                let field_type = field_pg_type.rust_type(false, conn)?;
+                field_names.push(quote! {
+                    #field_name
+                });
+                rust_types.push(quote! {
+                    #field_type
+                });
+                let diesel_type = field_pg_type.diesel_type(attribute.attnotnull, conn)?;
+                if field_pg_type.supports_copy(conn)? || attributes.len() == 1 {
+                    struct_attributes.push(quote! {
+                        self.#field_name
+                    });
+                } else {
+                    struct_attributes.push(quote! {
+                        self.#field_name.clone()
+                    });
+                }
+
+                diesel_types.push(quote! {
+                    #diesel_type
+                });
             }
 
             let to_sql_operation = if diesel_types.len() > 1 {
@@ -648,27 +757,14 @@ impl PgType {
 
             Ok(quote! {
                 #[cfg(feature = "diesel")]
-                #[derive(diesel::query_builder::QueryId, diesel::sql_types::SqlType)]
-                #[diesel(postgres_type(name = #this_typname))]
-                pub struct #postgres_struct_name;
-
-                #[derive(#(#derives),*)]
-                #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-                #[cfg_attr(feature = "diesel", derive(diesel::deserialize::FromSqlRow, diesel::expression::AsExpression))]
-                #[cfg_attr(feature = "diesel", diesel(sql_type = #postgres_struct_name))]
-                pub struct #struct_name {
-                    #(#fields),*
-                }
-
-                #[cfg(feature = "diesel")]
-                impl diesel::serialize::ToSql<#postgres_struct_name, diesel::pg::Pg> for #struct_name {
+                impl diesel::serialize::ToSql<#diesel_struct_path, diesel::pg::Pg> for #rust_struct_path {
                     fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, diesel::pg::Pg>) -> diesel::serialize::Result {
                         #to_sql_operation
                     }
                 }
 
                 #[cfg(feature = "diesel")]
-                impl diesel::deserialize::FromSql<#postgres_struct_name, diesel::pg::Pg> for #struct_name {
+                impl diesel::deserialize::FromSql<#diesel_struct_path, diesel::pg::Pg> for #rust_struct_path {
                     fn from_sql(
                         bytes: <diesel::pg::Pg as diesel::backend::Backend>::RawValue<'_>,
                     ) -> diesel::deserialize::Result<Self> {
@@ -677,45 +773,23 @@ impl PgType {
                 }
             })
         } else if self.is_enum() {
-            let struct_name = Ident::new(&self.camelcased_name(), proc_macro2::Span::call_site());
             let variants = self.variants(conn)?;
-            let mut variant_names = Vec::new();
             let mut in_variants = Vec::new();
             let mut out_variants = Vec::new();
             for variant in &variants {
                 let variant_name = Ident::new(&variant.enumlabel, proc_macro2::Span::call_site());
-                variant_names.push(quote! {
-                    #variant_name
-                });
                 let variant = variant.enumlabel.clone();
                 in_variants.push(quote! {
-                    #variant => Ok(#struct_name::#variant_name),
+                    #variant => Ok(Self::#variant_name),
                 });
                 out_variants.push(quote! {
-                    #struct_name::#variant_name => std::io::Write::write_all(out, #variant.as_bytes())?,
+                    Self::#variant_name => std::io::Write::write_all(out, #variant.as_bytes())?,
                 });
             }
 
-            let this_typname: &str = &self.typname;
-            let postgres_enum_name =
-                Ident::new(&self.pg_binding_name(), proc_macro2::Span::call_site());
-
             Ok(quote! {
                 #[cfg(feature = "diesel")]
-                #[derive(diesel::query_builder::QueryId, diesel::sql_types::SqlType)]
-                #[diesel(postgres_type(name = #this_typname))]
-                pub struct #postgres_enum_name;
-
-                #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-                #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-                #[cfg_attr(feature = "diesel", derive(diesel::deserialize::FromSqlRow, diesel::expression::AsExpression))]
-                #[cfg_attr(feature = "diesel", diesel(sql_type = #postgres_enum_name))]
-                pub enum #struct_name {
-                    #(#variant_names),*
-                }
-
-                #[cfg(feature = "diesel")]
-                impl diesel::serialize::ToSql<#postgres_enum_name, diesel::pg::Pg> for #struct_name {
+                impl diesel::serialize::ToSql<#diesel_struct_path, diesel::pg::Pg> for #rust_struct_path {
                     fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, diesel::pg::Pg>) -> diesel::serialize::Result {
                         match *self {
                             #(#out_variants)*
@@ -725,7 +799,7 @@ impl PgType {
                 }
 
                 #[cfg(feature = "diesel")]
-                impl diesel::deserialize::FromSql<#postgres_enum_name, diesel::pg::Pg> for #struct_name {
+                impl diesel::deserialize::FromSql<#diesel_struct_path, diesel::pg::Pg> for #rust_struct_path {
                     fn from_sql(
                         bytes: <diesel::pg::Pg as diesel::backend::Backend>::RawValue<'_>,
                     ) -> diesel::deserialize::Result<Self> {

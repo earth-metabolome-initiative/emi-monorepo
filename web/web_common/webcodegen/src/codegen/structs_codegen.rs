@@ -8,8 +8,6 @@ use proc_macro2::TokenStream;
 use super::Codegen;
 use crate::Table;
 
-mod allow_tables_to_appear_in_same_query;
-mod joinable;
 mod table;
 mod types;
 
@@ -21,7 +19,7 @@ impl<'a> Codegen<'a> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(crate) fn generate_diesel_code(
+    pub(crate) fn generate_structs_code(
         &self,
         root: &Path,
         tables: &[Table],
@@ -33,18 +31,8 @@ impl<'a> Codegen<'a> {
 
         let mut submodule_file_content = TokenStream::new();
 
-        if self.enable_tables_schema {
-            self.generate_table_macro(
-                root.join(crate::codegen::CODEGEN_TABLE_PATH).as_path(),
-                tables,
-                conn,
-            )?;
-            submodule_file_content.extend(quote::quote! {
-                pub mod table;
-            });
-        }
-        if self.enable_sql_types {
-            self.generate_types_macro(
+        if self.enable_type_structs {
+            self.generate_types_structs(
                 root.join(crate::codegen::CODEGEN_TYPES_PATH).as_path(),
                 tables,
                 conn,
@@ -53,24 +41,15 @@ impl<'a> Codegen<'a> {
                 pub mod types;
             });
         }
-        if self.enable_joinables {
-            self.generate_joinable_macro(
-                root.join(crate::codegen::CODEGEN_JOINABLE_PATH).as_path(),
+
+        if self.enable_table_structs {
+            self.generate_table_structs(
+                root.join(crate::codegen::CODEGEN_TABLE_PATH).as_path(),
                 tables,
                 conn,
             )?;
             submodule_file_content.extend(quote::quote! {
-                mod joinable;
-            });
-        }
-        if self.enable_allow_tables_to_appear_in_same_query {
-            self.generate_allow_tables_to_appear_in_same_query(
-                root.join("allow_tables_to_appear_in_same_query").as_path(),
-                tables,
-                conn,
-            )?;
-            submodule_file_content.extend(quote::quote! {
-                mod allow_tables_to_appear_in_same_query;
+                pub mod table;
             });
         }
 

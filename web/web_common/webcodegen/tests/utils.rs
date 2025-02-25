@@ -1,18 +1,17 @@
 //! Utility functions for testing.
 
-use std::hash::{DefaultHasher, Hasher};
-use std::io::Write;
+use std::{
+    hash::{DefaultHasher, Hash, Hasher},
+    io::Write,
+};
 
 use diesel::{Connection, PgConnection};
-use diesel_migrations::MigrationHarness;
-use diesel_migrations::{embed_migrations, EmbeddedMigrations};
+use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use quote::quote;
-use std::hash::Hash;
-use testcontainers::runners::AsyncRunner;
-use testcontainers::ImageExt;
 use testcontainers::{
     core::{IntoContainerPort, WaitFor},
-    ContainerAsync, GenericImage,
+    runners::AsyncRunner,
+    ContainerAsync, GenericImage, ImageExt,
 };
 
 const DEFAULT_MIGRATIONS: EmbeddedMigrations = embed_migrations!("./test_migrations");

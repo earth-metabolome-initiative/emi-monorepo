@@ -1,4 +1,5 @@
-//! Submodule implementing code relative to diesel's [`table`](https://docs.rs/diesel/latest/diesel/macro.table.html) macro.
+//! Submodule implementing code relative to the Rust counterpart of PostgresPG
+//! types.
 
 use std::path::Path;
 
@@ -9,14 +10,14 @@ use super::Codegen;
 use crate::Table;
 
 impl<'a> Codegen<'a> {
-    /// Generate implementations of the `table` diesel macro.
+    /// Generate implementations the Rust counterpart of PostgresPG types.
     ///
     /// # Arguments
     ///
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(crate) fn generate_types_macro(
+    pub(crate) fn generate_types_traits(
         &self,
         root: &Path,
         tables: &[Table],
@@ -34,10 +35,10 @@ impl<'a> Codegen<'a> {
             let type_name = r#type.snake_case_name()?;
             let type_ident = r#type.snake_case_identifier()?;
             let type_file = root.join(format!("{}.rs", type_name));
-            std::fs::write(&type_file, self.beautify_code(r#type.to_diesel_macro())?)?;
+            std::fs::write(&type_file, self.beautify_code(r#type.to_diesel_impls(conn)?)?)?;
 
             types_main_module.extend(quote::quote! {
-                pub mod #type_ident;
+                mod #type_ident;
             });
         }
 

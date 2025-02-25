@@ -918,7 +918,7 @@ impl Table {
         Ok(syn::parse_str::<Type>(&format!(
             "crate::{}::{}::{}::{}::{}",
             crate::codegen::CODEGEN_DIRECTORY,
-            crate::codegen::CODEGEN_MODULE,
+            crate::codegen::CODEGEN_DIESEL_MODULE,
             crate::codegen::CODEGEN_TABLE_PATH,
             table_name,
             table_name

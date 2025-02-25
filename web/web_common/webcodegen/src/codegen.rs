@@ -3,19 +3,24 @@
 use std::path::Path;
 
 use diesel::PgConnection;
+use itertools::Itertools;
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
 use syn::File;
 mod diesel_codegen;
+mod structs_codegen;
+mod traits_codegen;
 
 use crate::{
     errors::{CodeGenerationError, WebCodeGenError},
-    Table,
+    Column, PgType, Table,
 };
 
 pub const CODEGEN_DIRECTORY: &'static str = "codegen";
-pub const CODEGEN_MODULE: &'static str = "diesel_codegen";
-pub const CODEGEN_TABLE_PATH: &'static str = "table";
+pub const CODEGEN_DIESEL_MODULE: &'static str = "diesel_codegen";
+pub const CODEGEN_STRUCTS_MODULE: &'static str = "structs_codegen";
+pub const CODEGEN_TRAITS_MODULE: &'static str = "traits_codegen";
+pub const CODEGEN_TABLE_PATH: &'static str = "tables";
 pub const CODEGEN_TYPES_PATH: &'static str = "types";
 pub const CODEGEN_JOINABLE_PATH: &'static str = "joinable";
 
@@ -36,6 +41,12 @@ pub struct Codegen<'a> {
     pub(super) enable_sql_types: bool,
     /// Whether to generate the tables schema.
     pub(super) enable_tables_schema: bool,
+    /// Whether to enable the generation of the table structs.
+    pub(super) enable_table_structs: bool,
+    /// Whether to enable the generation of the type structs.
+    pub(super) enable_type_structs: bool,
+    /// Whether to enable the generation of the type traits implementations.
+    pub(super) enable_type_impls: bool,
 }
 
 impl<'a> Codegen<'a> {
@@ -64,8 +75,9 @@ impl<'a> Codegen<'a> {
     /// Whether to generate the diesel allow_tables_to_appear_in_same_query.
     ///
     /// # Note
-    /// Since to we need the tables before generating the allow_tables_to_appear_in_same_query
-    /// we enable the generation of the tables schema.
+    /// Since to we need the tables before generating the
+    /// allow_tables_to_appear_in_same_query we enable the generation of the
+    /// tables schema.
     pub fn enable_allow_tables_to_appear_in_same_query(mut self) -> Self {
         self = self.enable_tables_schema();
         self.enable_allow_tables_to_appear_in_same_query = true;
@@ -76,6 +88,35 @@ impl<'a> Codegen<'a> {
     /// Whether to generate the SQL types.
     pub fn enable_sql_types(mut self) -> Self {
         self.enable_sql_types = true;
+        self
+    }
+
+    #[must_use]
+    /// Whether to generate the type structs.
+    ///
+    /// # Note
+    ///
+    /// Since the type structs require the SQL types, enabling the
+    /// generation of the type structs automatically enables the generation
+    /// of the SQL types.
+    pub fn enable_type_structs(mut self) -> Self {
+        self = self.enable_sql_types();
+        self.enable_type_structs = true;
+        self
+    }
+
+    #[must_use]
+    /// Whether to generate the type traits implementations.
+    ///
+    /// # Note
+    ///
+    /// Since the type impls are defined on both SQL types and type structs,
+    /// enabling the generation of the type impls automatically enables the
+    /// generation of the SQL types and the type structs.
+    pub fn enable_type_impls(mut self) -> Self {
+        self = self.enable_sql_types();
+        self = self.enable_type_structs();
+        self.enable_type_impls = true;
         self
     }
 
@@ -93,7 +134,28 @@ impl<'a> Codegen<'a> {
     }
 
     #[must_use]
+    /// Whether to enable the generation of the table structs.
+    ///
+    /// # Note
+    ///
+    /// Since the tables structs require the tables schema, enabling the
+    /// generation of the table structs automatically enables the generation
+    /// of the tables schema.
+    pub fn enable_table_structs(mut self) -> Self {
+        self = self.enable_tables_schema();
+        self = self.enable_type_impls();
+        self.enable_table_structs = true;
+        self
+    }
+
+    #[must_use]
     /// Whether to make the code beautified after generation.
+    ///
+    /// # Note
+    ///
+    /// This should generally NOT be enabled for production code,
+    /// as we do not care about the formatting of the generated code.
+    /// It is primarily used for debugging purposes.
     pub fn beautify(mut self) -> Self {
         self.beautify = true;
         self
@@ -120,10 +182,43 @@ impl<'a> Codegen<'a> {
     ///
     /// # Errors
     ///
-    /// * Raises a `GenerationDirectoryNotProvided` when the output directory is not provided.
-    ///
+    /// * Raises a `GenerationDirectoryNotProvided` when the output directory is
+    ///   not provided.
     pub fn get_output_directory(&self) -> Result<&Path, CodeGenerationError> {
         self.output_directory.ok_or(CodeGenerationError::GenerationDirectoryNotProvided)
+    }
+
+    /// Returns the list of required types.
+    pub(super) fn required_types(
+        &self,
+        tables: &[Table],
+        conn: &mut PgConnection,
+    ) -> Result<Vec<PgType>, WebCodeGenError> {
+        let mut types = tables
+            .iter()
+            .map(|table| {
+                let custom_types = table
+                    .columns(conn)?
+                    .into_iter()
+                    .filter(Column::has_custom_type)
+                    .map(|column| PgType::from_name(column.data_type_str(conn)?, conn))
+                    .filter_ok(|pg_type| pg_type.is_enum() || pg_type.is_composite())
+                    .collect::<Result<Vec<PgType>, WebCodeGenError>>()?;
+                let mut additional_custom_types = custom_types.clone();
+                for custom_type in custom_types {
+                    additional_custom_types.extend(custom_type.internal_custom_types(conn)?);
+                }
+                Ok(additional_custom_types)
+            })
+            .collect::<Result<Vec<Vec<PgType>>, WebCodeGenError>>()?
+            .into_iter()
+            .flatten()
+            .collect::<Vec<PgType>>();
+
+        types.sort_unstable();
+        types.dedup();
+
+        Ok(types)
     }
 
     /// Writes all the tables syn version to a file.
@@ -163,13 +258,37 @@ impl<'a> Codegen<'a> {
         let codegen_module = codegen_directory.with_extension("rs");
 
         self.generate_diesel_code(
-            codegen_directory.as_path().join(CODEGEN_MODULE).as_path(),
+            codegen_directory.as_path().join(CODEGEN_DIESEL_MODULE).as_path(),
             &tables,
             conn,
         )?;
 
+        self.generate_structs_code(
+            codegen_directory.as_path().join(CODEGEN_STRUCTS_MODULE).as_path(),
+            &tables,
+            conn,
+        )?;
+
+        self.generate_web_common_traits_implementations(
+            codegen_directory.as_path().join(CODEGEN_TRAITS_MODULE).as_path(),
+            &tables,
+            conn,
+        )?;
+
+        let diesel_codegen_ident =
+            syn::Ident::new(CODEGEN_DIESEL_MODULE, proc_macro2::Span::call_site());
+        let structs_codegen_ident =
+            syn::Ident::new(CODEGEN_STRUCTS_MODULE, proc_macro2::Span::call_site());
+        let traits_codegen_ident =
+            syn::Ident::new(CODEGEN_TRAITS_MODULE, proc_macro2::Span::call_site());
+
         let codegen_module_impl = self.beautify_code(quote::quote! {
-            pub mod diesel_codegen;
+            #[cfg(feature = "diesel")]
+            pub mod #diesel_codegen_ident;
+
+            pub mod #structs_codegen_ident;
+
+            mod #traits_codegen_ident;
         })?;
 
         std::fs::write(&codegen_module, codegen_module_impl)?;

@@ -1,23 +1,22 @@
 //! Submodule implementing code relative to diesel's [`allow_tables_to_appear_in_same_query`](https://docs.rs/diesel/latest/diesel/macro.allow_tables_to_appear_in_same_query.html) macro.
 
-use core::todo;
 use std::{collections::HashSet, path::Path};
 
-use crate::Table;
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 
 use super::Codegen;
+use crate::Table;
 
 impl<'a> Codegen<'a> {
-    /// Generate implementations of the `allow_tables_to_appear_in_same_query` diesel macro.
+    /// Generate implementations of the `allow_tables_to_appear_in_same_query`
+    /// diesel macro.
     ///
     /// # Arguments
     ///
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    ///
     pub(crate) fn generate_allow_tables_to_appear_in_same_query(
         &self,
         root: &Path,
@@ -41,11 +40,9 @@ impl<'a> Codegen<'a> {
         // allow_tables_to_appear_in_same_query!() macro with the correct tables
         let mut allow_table_query_module = TokenStream::new();
 
-        // TODO: create hashset for the table tuples
         let mut table_hashset: HashSet<(&Table, &Table)> = HashSet::new();
 
         for table in tables {
-            // TODO: create token stream for sub module
             let mut submodule_token_stream = TokenStream::new();
             for foreign_table in table.foreign_tables(conn)? {
                 // if the foreign table is the same as table we continue
@@ -53,7 +50,6 @@ impl<'a> Codegen<'a> {
                     continue;
                 }
 
-                // TODO: check if the table is already in the hashset,
                 // even if the tuple direction is reversed.
                 if table_hashset.contains(&(table, &foreign_table))
                     || table_hashset.contains(&(&foreign_table, table))
@@ -61,13 +57,11 @@ impl<'a> Codegen<'a> {
                     continue;
                 }
 
-                // TODO: add the table, foreign table tuple to the hashset
                 let Some(foreign_table_ref) = tables.iter().find(|&t| *t == foreign_table) else {
                     continue;
                 };
                 table_hashset.insert((table, foreign_table_ref));
 
-                // TODO: Add to the inner token stream the allow_tables_to_appear_in_same_query!() macro
                 // with the correct tables
                 let table_name = table.snake_case_ident()?;
                 let foreign_table_name = foreign_table.snake_case_ident()?;
@@ -81,7 +75,6 @@ impl<'a> Codegen<'a> {
                 });
             }
 
-            // TODO: if we have created any submodule, we write
             // it out to the expected file.
             if submodule_token_stream.is_empty() {
                 continue;
@@ -97,14 +90,12 @@ impl<'a> Codegen<'a> {
                 })?,
             )?;
 
-            // TODO: if we have created any submodule, we add it to the
             // main token stream
             allow_table_query_module.extend(quote::quote! {
                 mod #table_name;
             });
         }
 
-        // TODO: write the main token stream to the main file
         let table_module = root.with_extension("rs");
         std::fs::write(&table_module, self.beautify_code(allow_table_query_module)?)?;
         Ok(())
