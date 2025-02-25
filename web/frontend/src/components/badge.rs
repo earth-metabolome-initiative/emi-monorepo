@@ -125,7 +125,7 @@ pub fn badge<B: RowToBadge>(props: &BadgeProps<B>) -> Html {
         },
         match props.badge.color() {
             Some(color) => format!(" {}", color),
-            None => "".to_owned(),
+            None => String::new(),
         },
         match props.closable {
             true => " closable",
@@ -145,7 +145,7 @@ pub fn badge<B: RowToBadge>(props: &BadgeProps<B>) -> Html {
                     <>
                         <i class={format!("fas fa-{}{}", icon, match props.badge.color() {
                             Some(color) => format!(" {}", color),
-                            None => "".to_owned(),
+                            None => String::new(),
                         })}></i>
                         {'\u{00A0}'}
                     </>
