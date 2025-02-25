@@ -140,7 +140,7 @@ impl SQLOperator {
             .collect()
     }
 
-    /// Returns whether the operator includes postgil_diesel types
+    /// Returns whether the operator includes `postgil_diesel` types
     pub fn includes_postgres_diesel_types(&self) -> Result<bool, WebCodeGenError> {
         Ok(postgres_type_to_diesel_str(&self.left_operand_type)?
             == "postgis_diesel::sql_types::Geometry"
@@ -156,6 +156,10 @@ impl SQLOperator {
     /// # Returns
     ///
     /// A `TokenStream` representing the SQL operator
+    ///
+    /// # Errors
+    ///
+    /// If the return, the left or the right operand types returned an error
     pub fn to_syn(&self) -> Result<TokenStream, WebCodeGenError> {
         let name = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
         let symbol = self.symbol.clone();
@@ -232,13 +236,13 @@ impl SQLOperator {
         let code_string = output.to_string();
 
         // Parse the generated code string into a syn::Item
-        let syntax_tree: File = syn::parse_str(&code_string).unwrap();
+        let syntax_tree: File = syn::parse_str(&code_string)?;
 
         // Use prettyplease to format the syntax tree
         let formatted_code = unparse(&syntax_tree);
 
         // Write the formatted code to the output file
-        std::fs::write(output_path, formatted_code).unwrap();
+        std::fs::write(output_path, formatted_code)?;
 
         Ok(())
     }

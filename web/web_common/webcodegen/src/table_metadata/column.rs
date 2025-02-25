@@ -110,12 +110,13 @@ pub struct Column {
 }
 
 impl Column {
+    #[must_use]
     /// Returns the raw data type of the column
     pub fn raw_data_type(&self) -> &str {
         &self.data_type
     }
 
-    /// Returns whether the column contains PostGIS geometry data
+    /// Returns whether the column contains `PostGIS` geometry data
     pub fn is_geometry(&self, conn: &mut PgConnection) -> bool {
         self.geometry(conn).is_ok()
     }
@@ -232,7 +233,7 @@ impl Column {
         let rust_type =
             if self.is_nullable() { format!("Option<{rust_type}>") } else { rust_type.to_string() };
 
-        Ok(syn::parse_str(&rust_type).unwrap())
+        Ok(syn::parse_str(&rust_type)?)
     }
 
     /// Returns whether the column name is a reserved diesel word.
@@ -372,12 +373,14 @@ impl Column {
             })
     }
 
+    #[must_use]
     /// Returns whether the column is a timestamp which has to be updated at
     /// each update operation
     pub fn is_updated_at(&self) -> bool {
         self.column_name == "updated_at" && self.data_type == "timestamp without time zone"
     }
 
+    #[must_use]
     /// Returns whether the column is a timestamp which has to be set at the
     /// insert operation
     pub fn is_created_at(&self) -> bool {
