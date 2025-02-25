@@ -12,7 +12,6 @@ quote.workspace = true
 proc-macro2.workspace = true
 prettyplease = "0.2"
 snake-case-sanitizer = {path = "../snake-case-sanitizer"}
-sqlparser.workspace = true
 common-traits.workspace = true
 inflector.workspace = true
 
