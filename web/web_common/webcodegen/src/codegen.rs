@@ -50,14 +50,15 @@ pub struct Codegen<'a> {
     pub(super) enable_type_impls: bool,
     /// Wether to enable the deletable traits implementations.
     pub(super) enable_deletable_trait: bool,
-
+    /// Wether to enable the attribute traits implementations.
+    pub(super) enable_attribute_trait: bool,
 }
 
 impl<'a> Codegen<'a> {
     #[must_use]
     /// Check wether traits should be generated for tables.
     pub fn should_generate_table_traits(&self) -> bool {
-        self.enable_deletable_trait
+        self.enable_deletable_trait || self.enable_attribute_trait
     }
 
     #[must_use]
@@ -172,6 +173,19 @@ impl<'a> Codegen<'a> {
         self
     }
 
+    #[must_use]
+    /// Whether to enable the generation of the Attribute traits.
+    ///
+    /// # Note
+    ///
+    /// Since the Attribute traits require the tables structs, enabling the
+    /// generation of the Attribute traits automatically enables the generation
+    /// of the tables structs.
+    pub fn enable_attribute_trait(mut self) -> Self {
+        self = self.enable_table_structs();
+        self.enable_attribute_trait = true;
+        self
+    }
 
     #[must_use]
     /// Whether to make the code beautified after generation.

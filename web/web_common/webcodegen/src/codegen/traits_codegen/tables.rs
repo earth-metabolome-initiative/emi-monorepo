@@ -1,6 +1,7 @@
 //! Webcommon traits generation
 use std::path::Path;
 mod deletable;
+mod attribute_traits;
 
 use diesel::PgConnection;
 
@@ -42,6 +43,21 @@ impl Codegen<'_> {
 
             submodule_file_content.extend(quote::quote! {
                 pub mod #deletable_module_ident;
+            });
+        }
+
+        if self.enable_attribute_trait {
+            self.generate_attribute_impls(
+                root.join("attributes").as_path(),
+                tables,
+                conn,
+            )?;
+
+            let attribute_module_ident =
+                Ident::new("attributes", proc_macro2::Span::call_site());
+
+            submodule_file_content.extend(quote::quote! {
+                pub mod #attribute_module_ident;
             });
         }
 

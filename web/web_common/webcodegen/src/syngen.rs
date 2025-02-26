@@ -1,6 +1,5 @@
 //! Submodule providing syn-generated code.
 
-mod attribute_traits;
 mod foreign_key_methods;
 mod from_unique_indices;
 mod insert_trait;
