@@ -48,9 +48,18 @@ pub struct Codegen<'a> {
     pub(super) enable_type_structs: bool,
     /// Whether to enable the generation of the type traits implementations.
     pub(super) enable_type_impls: bool,
+    /// Wether to enable the deletable traits implementations.
+    pub(super) enable_deletable_trait: bool,
+
 }
 
 impl<'a> Codegen<'a> {
+    #[must_use]
+    /// Check wether traits should be generated for tables.
+    pub fn should_generate_table_traits(&self) -> bool {
+        self.enable_deletable_trait
+    }
+
     #[must_use]
     /// Adds a new table to the deny list.
     pub fn add_table_to_deny_list(mut self, table: &'a Table) -> Self {
@@ -148,6 +157,21 @@ impl<'a> Codegen<'a> {
         self.enable_table_structs = true;
         self
     }
+
+    #[must_use]
+    /// Whether to enable the generation of the Deletable traits.
+    ///
+    /// # Note
+    ///
+    /// Since the Deletable traits require the tables structs, enabling the
+    /// generation of the Deletable traits automatically enables the generation
+    /// of the tables structs.
+    pub fn enable_deletable_trait(mut self) -> Self {
+        self = self.enable_table_structs();
+        self.enable_deletable_trait = true;
+        self
+    }
+
 
     #[must_use]
     /// Whether to make the code beautified after generation.

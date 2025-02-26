@@ -11,6 +11,7 @@ pub mod types;
 pub mod foreign_key_traits;
 pub mod attributes;
 pub mod filtrable;
+pub mod database;
 
 /// Main prelude for the library.
 pub mod prelude {
@@ -29,5 +30,6 @@ pub mod prelude {
         attributes::*,
         filtrable::*,
         session_operation::SessionOperation,
+        database::Deletable
     };
 }
