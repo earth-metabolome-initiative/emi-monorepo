@@ -41,7 +41,7 @@ impl Codegen<'_> {
             )?;
 
             let types_ident =
-                Ident::new_raw(crate::codegen::CODEGEN_TYPES_PATH, proc_macro2::Span::call_site());
+                Ident::new(crate::codegen::CODEGEN_TYPES_PATH, proc_macro2::Span::call_site());
 
             submodule_file_content.extend(quote::quote! {
                 pub mod #types_ident;
@@ -56,7 +56,7 @@ impl Codegen<'_> {
             )?;
 
             let tables_ident =
-                Ident::new_raw(crate::codegen::CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());
+                Ident::new(crate::codegen::CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());
 
             submodule_file_content.extend(quote::quote! {
                 pub mod #tables_ident;
