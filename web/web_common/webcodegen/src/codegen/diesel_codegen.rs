@@ -7,6 +7,7 @@ use proc_macro2::TokenStream;
 
 use super::Codegen;
 use crate::Table;
+use syn::Ident;
 
 mod allow_tables_to_appear_in_same_query;
 mod joinable;
@@ -35,12 +36,16 @@ impl Codegen<'_> {
 
         if self.enable_tables_schema {
             self.generate_table_macro(
-                root.join(crate::codegen::CODEGEN_TABLE_PATH).as_path(),
+                root.join(crate::codegen::CODEGEN_TABLES_PATH).as_path(),
                 tables,
                 conn,
             )?;
+
+            let tables_ident =
+                Ident::new_raw(crate::codegen::CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());
+
             submodule_file_content.extend(quote::quote! {
-                pub mod table;
+                pub mod #tables_ident;
             });
         }
         if self.enable_sql_types {
@@ -49,8 +54,12 @@ impl Codegen<'_> {
                 tables,
                 conn,
             )?;
+
+            let types_ident =
+                Ident::new_raw(crate::codegen::CODEGEN_TYPES_PATH, proc_macro2::Span::call_site());
+
             submodule_file_content.extend(quote::quote! {
-                pub mod types;
+                pub mod #types_ident;
             });
         }
         if self.enable_joinables {
@@ -59,8 +68,14 @@ impl Codegen<'_> {
                 tables,
                 conn,
             )?;
+
+            let joinable_ident = Ident::new_raw(
+                crate::codegen::CODEGEN_JOINABLE_PATH,
+                proc_macro2::Span::call_site(),
+            );
+
             submodule_file_content.extend(quote::quote! {
-                mod joinable;
+                mod #joinable_ident;
             });
         }
         if self.enable_allow_tables_to_appear_in_same_query {
@@ -69,6 +84,7 @@ impl Codegen<'_> {
                 tables,
                 conn,
             )?;
+
             submodule_file_content.extend(quote::quote! {
                 mod allow_tables_to_appear_in_same_query;
             });

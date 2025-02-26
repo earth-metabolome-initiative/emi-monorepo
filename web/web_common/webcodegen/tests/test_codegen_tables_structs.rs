@@ -21,5 +21,5 @@ async fn test_codegen_tables_structs() {
 
     codegen_test("codegen_tables_structs");
 
-    std::fs::remove_dir_all("tests/codegen_tables_structs").unwrap();
+    // std::fs::remove_dir_all("tests/codegen_tables_structs").unwrap();
 }

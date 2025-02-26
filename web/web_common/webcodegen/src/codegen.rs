@@ -20,7 +20,7 @@ pub const CODEGEN_DIRECTORY: &str = "codegen";
 pub const CODEGEN_DIESEL_MODULE: &str = "diesel_codegen";
 pub const CODEGEN_STRUCTS_MODULE: &str = "structs_codegen";
 pub const CODEGEN_TRAITS_MODULE: &str = "traits_codegen";
-pub const CODEGEN_TABLE_PATH: &str = "tables";
+pub const CODEGEN_TABLES_PATH: &str = "tables";
 pub const CODEGEN_TYPES_PATH: &str = "types";
 pub const CODEGEN_JOINABLE_PATH: &str = "joinable";
 

@@ -7,6 +7,8 @@ use proc_macro2::TokenStream;
 
 use super::Codegen;
 use crate::Table;
+use syn::Ident;
+
 
 mod table;
 mod types;
@@ -37,19 +39,27 @@ impl Codegen<'_> {
                 tables,
                 conn,
             )?;
+
+            let types_ident =
+                Ident::new_raw(crate::codegen::CODEGEN_TYPES_PATH, proc_macro2::Span::call_site());
+
             submodule_file_content.extend(quote::quote! {
-                pub mod types;
+                pub mod #types_ident;
             });
         }
 
         if self.enable_table_structs {
             self.generate_table_structs(
-                root.join(crate::codegen::CODEGEN_TABLE_PATH).as_path(),
+                root.join(crate::codegen::CODEGEN_TABLES_PATH).as_path(),
                 tables,
                 conn,
             )?;
+
+            let tables_ident =
+                Ident::new_raw(crate::codegen::CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());
+
             submodule_file_content.extend(quote::quote! {
-                pub mod table;
+                pub mod #tables_ident;
             });
         }
 

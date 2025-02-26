@@ -918,7 +918,7 @@ impl Table {
             "crate::{}::{}::{}::{}::{}",
             crate::codegen::CODEGEN_DIRECTORY,
             crate::codegen::CODEGEN_DIESEL_MODULE,
-            crate::codegen::CODEGEN_TABLE_PATH,
+            crate::codegen::CODEGEN_TABLES_PATH,
             table_name,
             table_name
         ))?)
