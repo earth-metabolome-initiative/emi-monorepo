@@ -32,12 +32,22 @@ impl crate::Table {
         conn: &mut diesel::PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
         let struct_name = self.struct_ident()?;
-        let table_name_ident = self.snake_case_ident()?;
+        let table_name_ident = self.import_diesel_path()?;
+        let primary_keys = self.primary_key_columns(conn)?;
 
         self.unique_indices(conn)?
             .into_iter()
             .map(|index| {
                 let columns = index.columns(conn)?;
+
+                if columns.iter().all(|c| c.is_foreign_key(conn)) {
+                    return Ok(quote! {});
+                }
+
+                if columns.iter().all(|c| primary_keys.contains(c)) {
+                    return Ok(quote! {});
+                }
+
                 let method_name = format!(
                     "from_{}",
                     columns
@@ -59,7 +69,7 @@ impl crate::Table {
                     .iter()
                     .map(|c| {
                         let column_name = Ident::new(&c.column_name, struct_name.span());
-                        quote! { #table_name_ident::#column_name.eq(#column_name) }
+                        quote! { diesel::ExpressionMethods::eq(#table_name_ident::#column_name, #column_name) }
                     })
                     .fold(quote! {}, |acc, filter| {
                         if acc.is_empty() {
@@ -75,6 +85,8 @@ impl crate::Table {
                         #(#method_arguments),*,
                         conn: &mut web_common_traits::prelude::DBConn
                     ) -> Result<Option<Self>, diesel::result::Error> {
+                        use diesel_async::RunQueryDsl;
+                        use diesel::{QueryDsl, OptionalExtension};
                         #table_name_ident::table
                             .filter(#filter)
                             .first::<Self>(conn)

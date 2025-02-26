@@ -38,11 +38,13 @@ impl Codegen<'_> {
             } else {
                 TokenStream::new()
             };
+            let from_unique_indices = table.from_unique_indices(conn)?;
 
             std::fs::write(&table_file, self.beautify_code(&quote::quote!{
                 #table_content
                 impl #table_struct {
                     #foreign_key_methods
+                    #from_unique_indices
                 }
             })?)?;
 
