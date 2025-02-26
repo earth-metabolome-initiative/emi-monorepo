@@ -912,7 +912,7 @@ impl Table {
     /// # Errors
     ///
     /// * If the snake case name cannot be generated.
-    pub fn import_path(&self) -> Result<syn::Type, WebCodeGenError> {
+    pub fn import_diesel_path(&self) -> Result<syn::Type, WebCodeGenError> {
         let table_name = self.snake_case_name()?;
         Ok(syn::parse_str::<Type>(&format!(
             "crate::{}::{}::{}::{}::{}",
@@ -921,6 +921,27 @@ impl Table {
             crate::codegen::CODEGEN_TABLES_PATH,
             table_name,
             table_name
+        ))?)
+    }
+
+    /// Returns a the path to the table struct.
+    ///
+    /// # Returns
+    ///
+    /// A `syn::Type` representing the path to the table struct.
+    ///
+    /// # Errors
+    ///
+    /// * If the snake case name cannot be generated.
+    pub fn import_struct_path(&self) -> Result<syn::Type, WebCodeGenError> {
+        let table_name = self.snake_case_name()?;
+        Ok(syn::parse_str::<Type>(&format!(
+            "crate::{}::{}::{}::{}::{}",
+            crate::codegen::CODEGEN_DIRECTORY,
+            crate::codegen::CODEGEN_STRUCTS_MODULE,
+            crate::codegen::CODEGEN_TABLES_PATH,
+            table_name,
+            self.struct_name()?
         ))?)
     }
 }

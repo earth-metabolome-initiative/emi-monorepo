@@ -14,6 +14,7 @@ prettyplease = "0.2"
 snake-case-sanitizer = {path = "../snake-case-sanitizer"}
 common-traits.workspace = true
 inflector.workspace = true
+futures.workspace = true
 
 [dev-dependencies]
 diesel_migrations = "2.2.0"

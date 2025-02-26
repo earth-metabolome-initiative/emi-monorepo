@@ -13,8 +13,8 @@ pub trait Deletable {
     ///
     /// * Returns an error if the row cannot be deleted.
     ///
-    fn delete(
-        &self,
-        conn: &mut crate::prelude::DBConn,
-    ) -> impl std::future::Future<Output = Result<usize, diesel::result::Error>> + '_;
+    fn delete<'a>(
+        &'a self,
+        conn: &'a mut crate::prelude::DBConn,
+    ) -> impl std::future::Future<Output = Result<usize, diesel::result::Error>> + 'a;
 }

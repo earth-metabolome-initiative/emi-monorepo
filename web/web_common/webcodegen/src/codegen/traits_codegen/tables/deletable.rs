@@ -38,8 +38,9 @@ impl Codegen<'_> {
             }
 
             let primary_key_columns = table.primary_key_columns(conn)?;
-            let sanitized_table_ident = table.snake_case_ident()?;
-            let table_struct = table.import_path()?;
+            let table_struct = table.import_struct_path()?;
+            let table_diesel = table.import_diesel_path()?;
+            let snake_case_ident = table.snake_case_ident()?;
             // We create a file for each table
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
 
@@ -48,7 +49,7 @@ impl Codegen<'_> {
                 .map(|column| {
                     let column_name: Ident = column.sanitized_snake_case_ident()?;
                     Ok(quote! {
-                        #sanitized_table_ident::#column_name.eq(&self.#column_name)
+                        diesel::ExpressionMethods::eq(#table_diesel::#column_name, &self.#column_name)
                     })
                 })
                 .collect::<Result<Vec<_>, WebCodeGenError>>()?;
@@ -59,22 +60,20 @@ impl Codegen<'_> {
                 .reduce(|a, b| quote! { diesel::BoolExpressionMethods::and(#a, #b) })
                 .unwrap_or_default();
     
-            let columns_feature_flag_name = table.diesel_feature_flag_name(conn)?;
-
-            let deletable_impl = quote! {
-                #[cfg(feature = #columns_feature_flag_name)]
+            // impl Deletable for struct_ident
+            std::fs::write(&table_file, self.beautify_code(&quote! {
                 impl web_common_traits::prelude::Deletable for #table_struct{
-                    async fn delete(&self, conn: &mut web_common_traits::prelude::DBConn) -> Result<usize, diesel::result::Error> {
-                        diesel::delete(#sanitized_table_ident::table.filter(#where_clause)).execute(conn).await
+                    #[cfg(feature = "diesel")]
+                    async fn delete<'a>(&'a self, conn: &'a mut web_common_traits::prelude::DBConn) -> Result<usize, diesel::result::Error> {
+                        use diesel_async::RunQueryDsl;
+                        use diesel::QueryDsl;
+                        diesel::delete(#table_diesel::table.filter(#where_clause)).execute(conn).await
                     }
                 }
-            };
-
-            // impl Deletable for struct_ident
-            std::fs::write(&table_file, self.beautify_code(&deletable_impl)?)?;
+            })?)?;
 
             table_deletable_main_module.extend(quote::quote! {
-                mod #sanitized_table_ident;
+                mod #snake_case_ident;
             });
         }
 

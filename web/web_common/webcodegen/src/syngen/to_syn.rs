@@ -26,7 +26,7 @@ impl Table {
             ));
         }
 
-        let table_path = self.import_path()?;
+        let table_path = self.import_diesel_path()?;
         let struct_name: Ident = self.struct_ident()?;
 
         let attributes = self

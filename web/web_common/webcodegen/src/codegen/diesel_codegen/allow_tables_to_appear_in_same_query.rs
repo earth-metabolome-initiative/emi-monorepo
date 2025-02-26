@@ -65,7 +65,7 @@ impl Codegen<'_> {
                 // with the correct tables
                 let table_name = table.snake_case_ident()?;
                 let foreign_table_name = foreign_table.snake_case_ident()?;
-                let foreign_table_path = foreign_table.import_path()?;
+                let foreign_table_path = foreign_table.import_diesel_path()?;
                 submodule_token_stream.extend(quote::quote! {
                     use #foreign_table_path;
                     diesel::allow_tables_to_appear_in_same_query!(
@@ -79,7 +79,7 @@ impl Codegen<'_> {
             if submodule_token_stream.is_empty() {
                 continue;
             }
-            let table_path = table.import_path()?;
+            let table_path = table.import_diesel_path()?;
             let table_name = table.snake_case_ident()?;
             let table_file = root.join(format!("{table_name}.rs"));
             std::fs::write(

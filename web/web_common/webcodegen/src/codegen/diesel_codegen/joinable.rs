@@ -71,7 +71,7 @@ impl Codegen<'_> {
                 // Using TokeStream we write the  joinable!(table -> foreign_table
                 // (foreign_key));
 
-                let foreign_table_path = foreign_table_ref.import_path()?;
+                let foreign_table_path = foreign_table_ref.import_diesel_path()?;
 
                 table_hashmap.insert(foreign_table_ref, Some(quote::quote! {
                     use #foreign_table_path;
@@ -94,7 +94,7 @@ impl Codegen<'_> {
                 continue;
             }
 
-            let table_path = table.import_path()?;
+            let table_path = table.import_diesel_path()?;
 
             std::fs::write(
                 &table_file,
