@@ -19,6 +19,11 @@ const DATABASE_PASSWORD: &str = "password";
 const DATABASE_USER: &str = "user";
 
 /// Add a `fn main() {}` to the end of a file.
+/// 
+/// # Arguments
+/// 
+/// * `file_path` - The path to the file.
+/// 
 pub fn add_main_to_file(file_path: &str) {
     let mut file = std::fs::OpenOptions::new().append(true).open(file_path).unwrap();
 
@@ -31,6 +36,17 @@ pub fn add_main_to_file(file_path: &str) {
     file.sync_all().unwrap();
 }
 
+/// Establish a connection to a postgres database.
+/// 
+/// # Arguments
+/// 
+/// * `database_port` - The port of the database.
+/// * `database_name` - The name of the database.
+/// 
+/// # Errors
+/// 
+/// * If the connection cannot be established.
+/// 
 pub fn establish_connection_to_postgres(
     database_port: u16,
     database_name: &str,
@@ -54,6 +70,17 @@ pub fn establish_connection_to_postgres(
     PgConnection::establish(&database_url)
 }
 
+/// Setup a docker container with a postgres database.
+/// 
+/// # Arguments
+/// 
+/// * `database_port` - The port of the database.
+/// * `database_name` - The name of the database.
+/// 
+/// # Panics
+/// 
+/// * If the container cannot be started.
+/// 
 pub async fn setup_docker(database_port: u16, database_name: &str) -> ContainerAsync<GenericImage> {
     let container = GenericImage::new("postgres", "17-alpine")
         .with_wait_for(WaitFor::message_on_stderr("database system is ready to accept connections"))
@@ -74,6 +101,20 @@ pub async fn setup_docker(database_port: u16, database_name: &str) -> ContainerA
     container.unwrap()
 }
 
+/// Setup a database with the default migrations.
+/// 
+/// # Arguments
+/// 
+/// * `test_name` - The name of the test.
+/// 
+/// # Errors
+/// 
+/// * If the connection cannot be established.
+/// 
+/// # Panics
+/// 
+/// * If the container cannot be started.
+/// 
 pub async fn setup_database_with_default_migrations(
     test_name: &str,
 ) -> Result<(ContainerAsync<GenericImage>, PgConnection, String), diesel::ConnectionError> {
@@ -85,6 +126,12 @@ pub async fn setup_database_with_default_migrations(
     Ok((docker, conn, database_name))
 }
 
+/// Generate a random port based on the test name.
+/// 
+/// # Arguments
+/// 
+/// * `test_name` - The name of the test.
+/// 
 pub fn random_port(test_name: &str) -> u16 {
     let mut hasher = DefaultHasher::default();
     test_name.hash(&mut hasher);
@@ -93,6 +140,16 @@ pub fn random_port(test_name: &str) -> u16 {
     port
 }
 
+/// Generate the code for a test and run it.
+/// 
+/// # Arguments
+/// 
+/// * `directory_name` - The name of the directory.
+/// 
+/// # Panics
+/// 
+/// * If writing to the file fails.
+/// 
 pub fn codegen_test(directory_name: &str) {
     let builder = trybuild::TestCases::new();
 

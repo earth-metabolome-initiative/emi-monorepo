@@ -22,5 +22,5 @@ async fn test_codegen_types() {
 
     codegen_test("codegen_types");
 
-    // std::fs::remove_dir_all("tests/codegen_types").unwrap();
+    std::fs::remove_dir_all("tests/codegen_types").unwrap();
 }

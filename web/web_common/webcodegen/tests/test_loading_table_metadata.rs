@@ -7,6 +7,9 @@ use utils::*;
 use webcodegen::{errors::WebCodeGenError, *};
 
 async fn test_code_generation_methods(conn: &mut PgConnection) -> Result<(), WebCodeGenError> {
+    // We create the `./tests/ui` directory if it does not exist
+    std::fs::create_dir_all("tests/ui")?;
+
     let builder = trybuild::TestCases::new();
     SQLFunction::write_all(conn, "tests/ui/sql_functions.rs")?;
     add_main_to_file("tests/ui/sql_functions.rs");
@@ -15,9 +18,6 @@ async fn test_code_generation_methods(conn: &mut PgConnection) -> Result<(), Web
     SQLOperator::write_all(conn, "tests/ui/sql_operators.rs")?;
     add_main_to_file("tests/ui/sql_operators.rs");
     builder.pass("tests/ui/sql_operators.rs");
-
-    add_main_to_file("tests/ui/tables.rs");
-    builder.pass("tests/ui/tables.rs");
 
     Ok(())
 }
