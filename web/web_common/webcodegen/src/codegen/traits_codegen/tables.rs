@@ -1,6 +1,7 @@
 //! Webcommon traits generation
 use std::path::Path;
 mod deletable;
+mod foreign;
 mod attribute_traits;
 
 use diesel::PgConnection;
@@ -58,6 +59,21 @@ impl Codegen<'_> {
 
             submodule_file_content.extend(quote::quote! {
                 pub mod #attribute_module_ident;
+            });
+        }
+
+        if self.enable_foreign_trait {
+            self.generate_foreign_impls(
+                root.join("foreign").as_path(),
+                tables,
+                conn,
+            )?;
+
+            let foreign_module_ident =
+                Ident::new("foreign", proc_macro2::Span::call_site());
+
+            submodule_file_content.extend(quote::quote! {
+                pub mod #foreign_module_ident;
             });
         }
 

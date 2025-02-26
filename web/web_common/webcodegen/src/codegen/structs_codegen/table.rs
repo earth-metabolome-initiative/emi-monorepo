@@ -31,8 +31,16 @@ impl Codegen<'_> {
             let table_identifier =
                 Ident::new(&table.snake_case_name()?, proc_macro2::Span::call_site());
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
+            let table_struct = table.struct_ident()?;
             let table_content = table.to_syn(conn)?;
-            std::fs::write(&table_file, self.beautify_code(&table_content)?)?;
+            let foreign_key_methods = table.foreign_key_methods(conn)?;
+
+            std::fs::write(&table_file, self.beautify_code(&quote::quote!{
+                #table_content
+                impl #table_struct {
+                    #foreign_key_methods
+                }
+            })?)?;
 
             table_main_module.extend(quote::quote! {
                 pub mod #table_identifier;

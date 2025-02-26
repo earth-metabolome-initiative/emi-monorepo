@@ -235,7 +235,11 @@ impl Column {
             return geometry.rust_type(self.is_nullable());
         }
         match rust_type_str(self.data_type_str(conn)?) {
-            Ok(s) => Ok(syn::parse_str(s)?),
+            Ok(s) => if self.is_nullable() {
+                Ok(syn::parse_str(&format!("Option<{}>", s))?)
+            } else {
+                Ok(syn::parse_str(s)?)
+            },
             Err(error) => {
                 if self.has_custom_type() {
                     Ok(PgType::from_name(self.data_type_str(conn)?, conn)?
