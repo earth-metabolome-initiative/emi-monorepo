@@ -6,6 +6,7 @@ use std::path::Path;
 use diesel::PgConnection;
 use crate::Codegen;
 use crate::Table;
+use proc_macro2::TokenStream;
 
 impl Codegen<'_> {
     /// Generates the Foreign traits implementation for the tables
@@ -24,7 +25,7 @@ impl Codegen<'_> {
         std::fs::create_dir_all(root)?;
         // We generate each table in a separate document under the provided root, and we
         // collect all of the imported modules in a public one.
-        let mut table_foreign_main_module = quote::quote! {};
+        let mut table_foreign_main_module = TokenStream::new();
         for table in tables {
             // We create a file for each table
 			let foreign_trait_impls = table.foreign_key_traits(conn)?;

@@ -29,7 +29,7 @@ impl Codegen<'_> {
         std::fs::create_dir_all(root)?;
         // We generate each table in a separate document under the provided root, and we
         // collect all of the imported modules in a public one.
-        let mut table_deletable_main_module = quote::quote! {};
+        let mut table_deletable_main_module = TokenStream::new();
         for table in tables {
             let columns = table.columns(conn)?;
             let struct_ident = table.import_struct_path()?;

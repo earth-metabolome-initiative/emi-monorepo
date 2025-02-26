@@ -17,7 +17,6 @@ members = [
     "utils/diesel_migrations_utils",
     "utils/common-traits",
     "utils/common-traits-derive",
-    "utils/diesel_utils",
     "utils/inflector",
     "utils/time-requirements",
     "data-structures/graph",
@@ -60,7 +59,6 @@ web_common = { path = "web/web_common" }
 web_common_traits = { path = "web/web_common/web_common_traits" }
 webcodegen = { path = "web/web_common/webcodegen", features = ["postgres_17"] }
 diesel_migrations_utils = { path = "utils/diesel_migrations_utils" }
-diesel_utils = { path = "utils/diesel_utils" }
 common-traits-derive = { path = "utils/common-traits-derive" }
 common-traits = { path = "utils/common-traits" }
 inflector = { path = "utils/inflector" }

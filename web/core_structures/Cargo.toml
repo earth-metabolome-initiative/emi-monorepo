@@ -6,7 +6,6 @@ edition = "2021"
 [dependencies]
 diesel = {workspace = true, optional = true}
 diesel-async = {workspace = true, optional = true}
-diesel_utils = { workspace = true, optional = true }
 postgis_diesel.workspace = true
 uuid.workspace = true
 chrono.workspace = true
@@ -28,6 +27,6 @@ time-requirements.workspace = true
 [features]
 default = ["serde"]
 serde = ["postgis_diesel/serde", "dep:serde"]
-diesel = ["dep:diesel-async", "dep:diesel", "postgis_diesel/diesel", "dep:diesel_utils"]
+diesel = ["dep:diesel-async", "dep:diesel", "postgis_diesel/diesel"]
 backend = ["diesel", "web_common_traits/backend"]
 frontend = ["web_common_traits/frontend"]

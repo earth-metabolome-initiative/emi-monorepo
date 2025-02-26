@@ -30,6 +30,6 @@ pub mod prelude {
         attributes::*,
         filtrable::*,
         session_operation::SessionOperation,
-        database::Deletable
+        database::{Deletable, Loadable},
     };
 }

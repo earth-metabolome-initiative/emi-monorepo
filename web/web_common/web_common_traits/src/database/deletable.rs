@@ -1,4 +1,4 @@
-//! A trait defining a deletable table entry.
+//! A trait defining a Deletable table entry.
 
 /// The Deletable trait
 pub trait Deletable {

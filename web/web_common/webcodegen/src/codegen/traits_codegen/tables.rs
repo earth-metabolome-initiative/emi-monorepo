@@ -3,6 +3,7 @@ use std::path::Path;
 mod deletable;
 mod foreign;
 mod attribute_traits;
+mod loadable;
 
 use diesel::PgConnection;
 
@@ -43,7 +44,22 @@ impl Codegen<'_> {
                 Ident::new("deletable", proc_macro2::Span::call_site());
 
             submodule_file_content.extend(quote::quote! {
-                pub mod #deletable_module_ident;
+                mod #deletable_module_ident;
+            });
+        }
+
+        if self.enable_loadable_trait {
+            self.generate_loadable_impls(
+                root.join("loadable").as_path(),
+                tables,
+                conn,
+            )?;
+
+            let loadable_module_ident =
+                Ident::new("loadable", proc_macro2::Span::call_site());
+
+            submodule_file_content.extend(quote::quote! {
+                mod #loadable_module_ident;
             });
         }
 
@@ -58,7 +74,7 @@ impl Codegen<'_> {
                 Ident::new("attributes", proc_macro2::Span::call_site());
 
             submodule_file_content.extend(quote::quote! {
-                pub mod #attribute_module_ident;
+                mod #attribute_module_ident;
             });
         }
 
@@ -73,7 +89,7 @@ impl Codegen<'_> {
                 Ident::new("foreign", proc_macro2::Span::call_site());
 
             submodule_file_content.extend(quote::quote! {
-                pub mod #foreign_module_ident;
+                mod #foreign_module_ident;
             });
         }
 

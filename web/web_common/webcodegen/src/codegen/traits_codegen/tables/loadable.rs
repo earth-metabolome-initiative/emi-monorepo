@@ -1,4 +1,4 @@
-//! Submodule providing the code to generate the implementation of the [`Deletable`] traits for all requiring tables.
+//! Submodule providing the code to generate the implementation of the `Loadable`` traits for all requiring tables.
 
 
 use std::path::Path;
@@ -14,14 +14,15 @@ use crate::Codegen;
 use crate::Table;
 
 impl Codegen<'_> {
-    /// Generates the [`Deletable`] traits implementation for the tables
+    /// Generates the `Loadable`` traits implementation for the tables
     ///
     /// # Arguments
     ///
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(super) fn generate_deletable_impls(
+	/// 
+    pub(super) fn generate_loadable_impls(
         &self,
         root: &Path,
         tables: &[Table],
@@ -39,6 +40,9 @@ impl Codegen<'_> {
             }
 
             let primary_key_columns = table.primary_key_columns(conn)?;
+			let primary_key_type = table.primary_key_type(conn)?;
+			let primary_key_attributes = table.primary_key_attributes(conn)?;
+
             let table_struct = table.import_struct_path()?;
             let table_diesel = table.import_diesel_path()?;
             let snake_case_ident = table.snake_case_ident()?;
@@ -50,7 +54,7 @@ impl Codegen<'_> {
                 .map(|column| {
                     let column_name: Ident = column.sanitized_snake_case_ident()?;
                     Ok(quote! {
-                        diesel::ExpressionMethods::eq(#table_diesel::#column_name, &self.#column_name)
+                        diesel::ExpressionMethods::eq(#table_diesel::#column_name, #column_name)
                     })
                 })
                 .collect::<Result<Vec<_>, WebCodeGenError>>()?;
@@ -61,14 +65,24 @@ impl Codegen<'_> {
                 .reduce(|a, b| quote! { diesel::BoolExpressionMethods::and(#a, #b) })
                 .unwrap_or_default();
     
-            // impl Deletable for struct_ident
+            // impl `Loadable`` for struct_ident
             std::fs::write(&table_file, self.beautify_code(&quote! {
-                impl web_common_traits::prelude::Deletable for #table_struct{
+                impl web_common_traits::prelude::Loadable for #table_struct{
+					type PrimaryKey = #primary_key_type;
+
                     #[cfg(feature = "diesel")]
-                    async fn delete<'a>(&'a self, conn: &'a mut web_common_traits::prelude::DBConn) -> Result<usize, diesel::result::Error> {
+                    async fn load(
+						#primary_key_attributes: &Self::PrimaryKey,
+						conn: &mut web_common_traits::prelude::DBConn
+					) -> Result<Option<Self>, diesel::result::Error> {
                         use diesel_async::RunQueryDsl;
-                        use diesel::QueryDsl;
-                        diesel::delete(#table_diesel::table.filter(#where_clause)).execute(conn).await
+                        use diesel::{QueryDsl, OptionalExtension};
+                        #table_diesel::table
+                            .filter(#where_clause)
+                            .select(<#table_struct as diesel::SelectableHelper<diesel::pg::Pg>>::as_select())
+                            .first::<#table_struct>(conn)
+                            .await
+							.optional()
                     }
                 }
             })?)?;

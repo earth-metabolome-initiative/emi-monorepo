@@ -54,13 +54,18 @@ pub struct Codegen<'a> {
     pub(super) enable_attribute_trait: bool,
     /// Whether to enable the [`Foreign`] traits implementations.
     pub(super) enable_foreign_trait: bool,
+    /// Whether to enable the [`Loadable`] traits implementations.
+    pub(super) enable_loadable_trait: bool,
 }
 
 impl<'a> Codegen<'a> {
     #[must_use]
     /// Check wether traits should be generated for tables.
     pub fn should_generate_table_traits(&self) -> bool {
-        self.enable_deletable_trait || self.enable_attribute_trait
+        self.enable_deletable_trait
+            || self.enable_attribute_trait
+            || self.enable_foreign_trait
+            || self.enable_loadable_trait
     }
 
     #[must_use]
@@ -162,12 +167,12 @@ impl<'a> Codegen<'a> {
     }
 
     #[must_use]
-    /// Whether to enable the generation of the Deletable traits.
+    /// Whether to enable the generation of the [`Deletable`] traits.
     ///
     /// # Note
     ///
-    /// Since the Deletable traits require the tables structs, enabling the
-    /// generation of the Deletable traits automatically enables the generation
+    /// Since the [`Deletable`] traits require the tables structs, enabling the
+    /// generation of the [`Deletable`] traits automatically enables the generation
     /// of the tables structs.
     pub fn enable_deletable_trait(mut self) -> Self {
         self = self.enable_table_structs();
@@ -183,7 +188,7 @@ impl<'a> Codegen<'a> {
     /// Since the Attribute traits require the tables structs, enabling the
     /// generation of the Attribute traits automatically enables the generation
     /// of the tables structs.
-    /// 
+    ///
     pub fn enable_attribute_trait(mut self) -> Self {
         self = self.enable_table_structs();
         self.enable_attribute_trait = true;
@@ -191,17 +196,32 @@ impl<'a> Codegen<'a> {
     }
 
     #[must_use]
-    /// Whether to enable the generation of the Foreign traits.
+    /// Whether to enable the generation of the [`Foreign`] traits.
     ///
     /// # Note
+    ///
+    /// Since the [`Foreign`] traits require the tables structs, enabling the
+    /// generation of the [`Foreign`] traits automatically enables the generation
+    /// of the tables structs.
+    ///
+    pub fn enable_foreign_trait(mut self) -> Self {
+        self = self.enable_loadable_trait();
+        self.enable_foreign_trait = true;
+        self
+    }
+
+    #[must_use]
+    /// Whether to enable the generation of the [`Loadable`] traits.
     /// 
-    /// Since the Foreign traits require the tables structs, enabling the
-    /// generation of the Foreign traits automatically enables the generation
+    /// # Note
+    /// 
+    /// Since the [`Loadable`] traits require the tables structs, enabling the
+    /// generation of the [`Loadable`] traits automatically enables the generation
     /// of the tables structs.
     /// 
-    pub fn enable_foreign_trait(mut self) -> Self {
+    pub fn enable_loadable_trait(mut self) -> Self {
         self = self.enable_table_structs();
-        self.enable_foreign_trait = true;
+        self.enable_loadable_trait = true;
         self
     }
 

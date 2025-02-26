@@ -4,9 +4,9 @@
 pub trait Foreign<T> {
 	#[cfg(feature = "backend")]
 	/// Returns the foreign key.
-	fn foreign(&self, conn: &mut crate::types::DBConn) -> impl std::future::Future<Output = Result<T, diesel::result::Error>>;
+	fn foreign(&self, conn: &mut crate::types::DBConn) -> impl std::future::Future<Output = Result<Option<T>, diesel::result::Error>>;
 
 	#[cfg(not(feature = "backend"))]
 	/// Returns the foreign key.
-	fn foreign(&self) -> impl std::future::Future<Output = Result<T, std::convert::Infallible>>;
+	fn foreign(&self) -> impl std::future::Future<Output = Result<Option<T>, std::convert::Infallible>>;
 }

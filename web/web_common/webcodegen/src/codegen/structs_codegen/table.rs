@@ -4,7 +4,7 @@ use std::path::Path;
 
 use diesel::PgConnection;
 use syn::Ident;
-
+use proc_macro2::TokenStream;
 use super::Codegen;
 use crate::Table;
 
@@ -26,14 +26,18 @@ impl Codegen<'_> {
         std::fs::create_dir_all(root)?;
         // We generate each table in a separate document under the provided root, and we
         // collect all of the imported modules in a public one.
-        let mut table_main_module = quote::quote! {};
+        let mut table_main_module = TokenStream::new();
         for table in tables {
             let table_identifier =
                 Ident::new(&table.snake_case_name()?, proc_macro2::Span::call_site());
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let table_struct = table.struct_ident()?;
             let table_content = table.to_syn(conn)?;
-            let foreign_key_methods = table.foreign_key_methods(conn)?;
+            let foreign_key_methods = if self.enable_foreign_trait{
+                table.foreign_key_methods(conn)?
+            } else {
+                TokenStream::new()
+            };
 
             std::fs::write(&table_file, self.beautify_code(&quote::quote!{
                 #table_content

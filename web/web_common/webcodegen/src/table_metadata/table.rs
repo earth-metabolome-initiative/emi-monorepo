@@ -763,6 +763,77 @@ impl Table {
         self.primary_key_columns(conn).map(|columns| !columns.is_empty())
     }
 
+    /// Returns the primary key type for the table.
+    ///
+    /// # Arguments
+    /// 
+    /// * `conn` - The database connection.
+    /// 
+    /// # Returns
+    /// 
+    /// The syn data type representing the primary key type.
+    /// 
+    /// # Errors
+    /// 
+    /// * If the table does not have primary keys.
+    /// * If the primary key columns cannot be loaded from the database.
+    /// 
+    pub fn primary_key_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
+        if !self.has_primary_keys(conn)? {
+            return Err(WebCodeGenError::NoPrimaryKeyColumn(Box::new(self.clone())));
+        }
+
+        let primary_key_columns = self.primary_key_columns(conn)?;
+
+        // We construct the rust type or tuple of rust types that represent the primary key.
+        Ok(if primary_key_columns.len() == 1 {
+            // If the primary key is a single column, we can just use the type of that column.
+            primary_key_columns[0].rust_data_type(conn)?
+        } else {
+            // If the primary key is a composite key, we need to construct a tuple of the types.
+            let primary_key_types = primary_key_columns.iter().map(|column| {
+                column.rust_data_type(conn)
+            }).collect::<Result<Vec<Type>, WebCodeGenError>>()?;
+            syn::parse_quote! { (#(#primary_key_types),*) }
+        })
+    }
+
+    /// Returns the primary key attribute(s) for the table.
+    ///
+    /// # Arguments
+    /// 
+    /// * `conn` - The database connection.
+    /// 
+    /// # Returns
+    /// 
+    /// The syn TokenStream representing the primary key attribute(s).
+    /// 
+    /// # Errors
+    /// 
+    /// * If the table does not have primary keys.
+    /// * If the primary key columns cannot be loaded from the database.
+    /// 
+    pub fn primary_key_attributes(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
+        if !self.has_primary_keys(conn)? {
+            return Err(WebCodeGenError::NoPrimaryKeyColumn(Box::new(self.clone())));
+        }
+
+        let primary_key_columns = self.primary_key_columns(conn)?;
+
+        // We construct the rust type or tuple of rust types that represent the primary key.
+        Ok(if primary_key_columns.len() == 1 {
+            // If the primary key is a single column, we can just use the type of that column.
+            let primary_key = primary_key_columns[0].sanitized_snake_case_ident()?;
+            quote! { #primary_key }
+        } else {
+            // If the primary key is a composite key, we need to construct a tuple of the types.
+            let primary_key_types = primary_key_columns.iter().map(|column| {
+                column.sanitized_snake_case_ident()
+            }).collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
+            quote! { (#(#primary_key_types),*) }
+        })
+    }
+
     /// Returns the columns composing the primary keys.
     ///
     /// # Arguments
