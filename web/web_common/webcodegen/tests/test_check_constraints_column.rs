@@ -19,8 +19,8 @@ async fn test_check_constraints_column() {
     .await
     .unwrap();
 
-    for (column_name, expected_number_of_check_constraints) in
-        [("fortune", 1), ("id", 0), ("email", 0), ("age", 2), ("created_at", 0)]
+    for (column_name, expected_number_of_check_constraints, expected_number_of_functions) in
+        [("fortune", 1, 0), ("id", 0, 0), ("email", 0, 0), ("age", 2, 2), ("created_at", 0, 0)]
     {
         let column =
             Column::load(column_name, "constrained_users", "public", &database_name, &mut conn)
@@ -38,6 +38,21 @@ async fn test_check_constraints_column() {
             expected_number_of_check_constraints,
             "Column `{column_name}` has an unexpected number of check constraints"
         );
+
+        for check_constraint in column_check_constraints {
+            let functions = check_constraint
+                .functions(&mut conn)
+                .expect(&format!(
+                    "Failed to query functions for check constraint `{check_constraint_name}`",
+                    check_constraint_name = check_constraint.constraint_name
+                ));
+            assert_eq!(
+                functions.len(),
+                expected_number_of_functions,
+                "Check constraint `{check_constraint_name}` has an unexpected number of functions",
+                check_constraint_name = check_constraint.constraint_name
+            );
+        }
     }
 
     docker.stop().await.unwrap();

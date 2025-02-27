@@ -212,14 +212,15 @@ table! {
         pronargdefaults -> SmallInt,
         prorettype -> Oid,
         proargtypes -> Array<Oid>,
-        proallargtypes -> Array<Oid>,
+        proallargtypes -> Nullable<Array<Oid>>,
         proargmodes -> Nullable<Array<Char>>,
         proargnames -> Nullable<Array<Text>>,
         proargdefaults -> Nullable<Array<Text>>,
+        protrftypes -> Nullable<Array<Oid>>,
         prosrc -> Text,
-        probin -> Bytea,
+        probin -> Nullable<Bytea>,
         prosqlbody -> Nullable<Text>,
-        proconfig -> Array<Text>,
+        proconfig -> Nullable<Array<Text>>,
     }
 }
 
@@ -369,13 +370,13 @@ table! {
         conislocal -> Bool,
         coninhcount -> SmallInt,
         connoinherit -> Bool,
-        conkey -> Array<SmallInt>,
-        confkey -> Array<SmallInt>,
-        conpfeqop -> Array<Oid>,
-        conppeqop -> Array<Oid>,
-        conffeqop -> Array<Oid>,
-        confdelsetcols -> Array<SmallInt>,
-        conexclop -> Array<Oid>,
+        conkey -> Nullable<Array<SmallInt>>,
+        confkey -> Nullable<Array<SmallInt>>,
+        conpfeqop -> Nullable<Array<Oid>>,
+        conppeqop -> Nullable<Array<Oid>>,
+        conffeqop -> Nullable<Array<Oid>>,
+        confdelsetcols -> Nullable<Array<SmallInt>>,
+        conexclop -> Nullable<Array<Oid>>,
     }
 }
 

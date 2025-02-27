@@ -50,19 +50,19 @@ pub struct PgConstraint {
     /// This constraint is defined locally for the relation. It is a non-inheritable constraint.
     pub connoinherit: bool,
     /// If a table constraint (including foreign keys, but not constraint triggers), list of the constrained columns
-    pub conkey: Vec<i16>,
+    pub conkey: Option<Vec<i16>>,
     /// If a foreign key, list of the referenced columns
-    pub confkey: Vec<i16>,
+    pub confkey: Option<Vec<i16>>,
     /// If a foreign key, list of the equality operators for PK = FK comparisons
-    pub conpfeqop: Vec<u32>,
+    pub conpfeqop: Option<Vec<u32>>,
     /// If a foreign key, list of the equality operators for PK = PK comparisons
-    pub conppeqop: Vec<u32>,
+    pub conppeqop: Option<Vec<u32>>,
     /// If a foreign key, list of the equality operators for FK = FK comparisons
-    pub conffeqop: Vec<u32>,
+    pub conffeqop: Option<Vec<u32>>,
     /// If a foreign key with a SET NULL or SET DEFAULT delete action, the columns that will be updated. If null, all of the referencing columns will be updated.
-    pub confdelsetcols: Vec<i16>,
+    pub confdelsetcols: Option<Vec<i16>>,
     /// If an exclusion constraint, list of the per-column exclusion operators
-    pub conexclop: Vec<u32>,
+    pub conexclop: Option<Vec<u32>>,
 }
 
 impl PgConstraint {

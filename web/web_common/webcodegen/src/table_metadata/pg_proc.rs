@@ -55,7 +55,7 @@ pub struct PgProc {
     /// An array of OIDs of the argument types.
     pub proargtypes: Vec<u32>,
     /// An array of OIDs of all argument types, including OUT parameters.
-    pub proallargtypes: Vec<u32>,
+    pub proallargtypes: Option<Vec<u32>>,
     /// An array of modes of the arguments ('i' for IN, 'o' for OUT, etc.).
     pub proargmodes: Option<Vec<String>>,
     /// An array of names of the arguments.
@@ -65,11 +65,11 @@ pub struct PgProc {
     /// The source code of the function.
     pub prosrc: String,
     /// The binary representation of the function.
-    pub probin: Vec<u8>,
+    pub probin: Option<Vec<u8>>,
     /// The SQL body of the function, if any.
     pub prosqlbody: Option<String>,
     /// The configuration settings for the function.
-    pub proconfig: Vec<String>,
+    pub proconfig: Option<Vec<String>>,
 }
 
 impl PgProc {
