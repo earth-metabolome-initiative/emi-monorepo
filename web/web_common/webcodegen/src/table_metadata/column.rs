@@ -3,6 +3,7 @@ use diesel::{
     JoinOnDsl, OptionalExtension, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
     SelectableHelper,
 };
+
 use inflector::Inflector;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{Ident, Type};
@@ -13,8 +14,8 @@ use super::{
     table::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS},
 };
 use crate::{
-    errors::WebCodeGenError, table_metadata::pg_type::postgres_type_to_diesel, KeyColumnUsage,
-    Table,
+    errors::WebCodeGenError,
+    table_metadata::pg_type::postgres_type_to_diesel, KeyColumnUsage, Table,
 };
 
 /// Struct defining the `information_schema.columns` table.
