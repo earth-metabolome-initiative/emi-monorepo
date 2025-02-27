@@ -63,21 +63,28 @@ impl Codegen<'_> {
             // impl `Loadable`` for struct_ident
             std::fs::write(&table_file, self.beautify_code(&quote! {
                 impl web_common_traits::prelude::Loadable for #table_struct{
-					type PrimaryKey = #primary_key_type;
+                    type PrimaryKey = #primary_key_type;
 
                     #[cfg(feature = "diesel")]
                     async fn load(
-						#primary_key_attributes: &Self::PrimaryKey,
-						conn: &mut web_common_traits::prelude::DBConn
-					) -> Result<Option<Self>, diesel::result::Error> {
+                        #primary_key_attributes: &Self::PrimaryKey,
+                        conn: &mut web_common_traits::prelude::DBConn
+                    ) -> Result<Option<Self>, diesel::result::Error> {
                         use diesel_async::RunQueryDsl;
                         use diesel::{QueryDsl, OptionalExtension};
                         #table_diesel::table
                             .filter(#where_clause)
-                            .select(<#table_struct as diesel::SelectableHelper<diesel::pg::Pg>>::as_select())
-                            .first::<#table_struct>(conn)
+                            .select(<Self as diesel::SelectableHelper<diesel::pg::Pg>>::as_select())
+                            .first::<Self>(conn)
                             .await
-							.optional()
+                            .optional()
+                    }
+
+                    async fn load_all(conn: &mut web_common_traits::prelude::DBConn
+                    ) -> Result<Vec<Self>, diesel::result::Error> {
+                        use diesel_async::RunQueryDsl;
+                        #table_diesel::table.load::<Self>(conn)
+                        .await
                     }
                 }
             })?)?;
