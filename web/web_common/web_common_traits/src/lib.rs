@@ -8,7 +8,6 @@ pub mod outcome;
 pub mod session;
 pub mod session_operation;
 pub mod types;
-pub mod foreign_key_traits;
 pub mod attributes;
 pub mod filtrable;
 pub mod database;
@@ -26,7 +25,6 @@ pub mod prelude {
         operation_error::OperationError,
         outcome::Outcome,
         session::Session,
-        foreign_key_traits::Foreign,
         attributes::*,
         filtrable::*,
         session_operation::SessionOperation,
