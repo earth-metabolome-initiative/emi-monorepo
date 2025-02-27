@@ -98,7 +98,6 @@ pub async fn setup_docker(database_port: u16, database_name: &str) -> ContainerA
     container.unwrap()
 }
 
-
 /// Setup a database with the default migrations.
 ///
 /// # Arguments
@@ -138,7 +137,7 @@ pub async fn setup_database_with_default_migrations(
 /// * If the container cannot be started.
 pub async fn setup_database_with_migrations(
     test_name: &str,
-    migration: EmbeddedMigrations
+    migration: EmbeddedMigrations,
 ) -> Result<(ContainerAsync<GenericImage>, PgConnection, String), diesel::ConnectionError> {
     let port = random_port(test_name);
     let database_name = format!("{}_db", test_name);

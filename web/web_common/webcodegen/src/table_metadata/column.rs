@@ -1,9 +1,8 @@
 use diesel::{
     pg::PgConnection, result::Error as DieselError, BoolExpressionMethods, ExpressionMethods,
-    JoinOnDsl, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
+    JoinOnDsl, OptionalExtension, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
+    SelectableHelper,
 };
-
-use diesel::OptionalExtension;
 use inflector::Inflector;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{Ident, Type};
@@ -124,11 +123,7 @@ impl Column {
         self.geometry(conn).is_ok()
     }
 
-    /// Returns all the check constraint associated to stzrictly and ONLY the current column.
-    ///
-    /// # Implementative Details
-    ///
-    /// Indeed there can be Check constraints that imply more than one column.
+    /// Returns all the check constraint associated to the current column.
     ///
     /// # Arguments
     ///
@@ -136,24 +131,18 @@ impl Column {
     ///
     /// # Errors
     ///
-    /// * If their is an error while querying the `CheckConstraint`.
+    /// * If their is an error while querying the [`CheckConstraint`].
     ///
     /// # Returns
     ///
-    /// * A `Vec` of all the `CheckConstraint`
+    /// * A `Vec` of all the [`CheckConstraint`]
+    ///
     pub fn check_constraints(
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<CheckConstraint>, WebCodeGenError> {
-        use diesel::debug_query;
-        // use crate::schema::columns;
-        // columns::table.load::<CheckConstraint>(conn).map_err(WebCodeGenError::from)
-        // TODO write a query using Diesel.
-        // we need for sure the Check
-        // We first need to import the required table froms the schema.rs representation
         use crate::schema::{check_constraints, constraint_column_usage};
-
-        let query_check_constraint = check_constraints::table
+        Ok(check_constraints::table
             .inner_join(
                 constraint_column_usage::table.on(constraint_column_usage::constraint_name
                     .eq(check_constraints::constraint_name)
@@ -175,13 +164,31 @@ impl Column {
                     ),
                 ),
             )
-            .select(CheckConstraint::as_select());
+            .select(CheckConstraint::as_select())
+            .load(conn)?)
+    }
 
-        let debug_query = debug_query::<diesel::pg::Pg, _>(&query_check_constraint).to_string();
-
-        println!("{}", debug_query);
-
-        Ok(query_check_constraint.load(conn)?)
+    /// Returns all single column check constraints associated to the current column.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If their is an error while querying the database.
+    ///
+    pub fn single_column_check_constraints(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<CheckConstraint>, WebCodeGenError> {
+        let mut single_column_check_constraints = vec![];
+        for check_constraint in self.check_constraints(conn)? {
+            if check_constraint.is_single_column_constraint(conn)? {
+                single_column_check_constraints.push(check_constraint);
+            }
+        }
+        Ok(single_column_check_constraints)
     }
 
     /// Returns the associated geometry column if the column is a geometry
@@ -518,6 +525,10 @@ impl Column {
     ///
     /// # Arguments
     ///
+    /// * `column_name` - The name of the column
+    /// * `table_name` - The name of the table
+    /// * `table_schema` - The schema of the table
+    /// * `table_catalog` - The catalog of the table
     /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Returns
@@ -532,14 +543,20 @@ impl Column {
         column_name: &str,
         table_name: &str,
         table_schema: &str,
+        table_catalog: &str,
         conn: &mut PgConnection,
     ) -> Result<Option<Self>, WebCodeGenError> {
         use crate::schema::columns;
 
         Ok(columns::table
-            .filter(columns::column_name.eq(column_name).and(
-                columns::table_name.eq(table_name).and(columns::table_schema.eq(table_schema)),
-            ))
+            .filter(
+                columns::column_name.eq(column_name).and(
+                    columns::table_name
+                        .eq(table_name)
+                        .and(columns::table_schema.eq(table_schema))
+                        .and(columns::table_catalog.eq(table_catalog)),
+                ),
+            )
             .first(conn)
             .optional()?)
     }
