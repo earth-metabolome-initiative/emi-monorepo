@@ -9,5 +9,6 @@ CREATE TABLE constrained_users (
     UNIQUE (username),
     UNIQUE (email),
     UNIQUE (username, email),
-    CHECK (username <> email)
+    CHECK (username <> email),
+    CHECK (age < 50)
 );
