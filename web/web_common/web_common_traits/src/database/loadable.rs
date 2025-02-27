@@ -16,7 +16,6 @@ pub trait Loadable: Sized {
     /// # Errors
     ///
     /// * Returns an error if loading the row fails.
-    ///
     fn load(
         primary_key: &Self::PrimaryKey,
         conn: &mut crate::prelude::DBConn,

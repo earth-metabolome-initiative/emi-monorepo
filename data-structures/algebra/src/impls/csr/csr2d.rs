@@ -1,6 +1,5 @@
 //! Submodule providing a definition of a CSR matrix.
-use core::fmt::Debug;
-use core::iter::repeat;
+use core::{fmt::Debug, iter::repeat};
 
 use crate::prelude::*;
 
@@ -205,7 +204,8 @@ where
             if self.sparse_row(row).last().is_some_and(|last| last > column) {
                 return Err(MutabilityError::UnorderedColumnIndex(column));
             }
-            // If the row is the last row, we can add the entry at the end of the column indices.
+            // If the row is the last row, we can add the entry at the end of the column
+            // indices.
             self.column_indices.push(column);
             self.number_of_columns = self.number_of_columns.max(column + ColumnIndex::ONE);
             if let Some(offset) = self.offsets.last_mut() {
@@ -215,7 +215,8 @@ where
             }
             Ok(())
         } else if row.into_usize() >= self.offsets.len() - 1 {
-            // If the row is the next row, we can add the entry at the end of the column indices.
+            // If the row is the next row, we can add the entry at the end of the column
+            // indices.
             self.offsets.extend(
                 repeat(self.number_of_defined_values())
                     .take((row.into_usize() + 1) - self.offsets.len()),

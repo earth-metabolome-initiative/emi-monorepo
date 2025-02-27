@@ -1,8 +1,7 @@
 //! Submodule defining the trait for a undirected edges builder.
 
-use crate::traits::UndirectedEdges;
-
 use super::DirectedEdgesBuilder;
+use crate::traits::UndirectedEdges;
 
 /// Trait for Options for building edges.
 pub trait UndirectedEdgesBuilder:

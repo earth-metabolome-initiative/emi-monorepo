@@ -4,10 +4,10 @@ use std::path::Path;
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
+use syn::Ident;
 
 use super::Codegen;
 use crate::Table;
-use syn::Ident;
 
 mod allow_tables_to_appear_in_same_query;
 mod joinable;
@@ -69,10 +69,8 @@ impl Codegen<'_> {
                 conn,
             )?;
 
-            let joinable_ident = Ident::new(
-                crate::codegen::CODEGEN_JOINABLE_PATH,
-                proc_macro2::Span::call_site(),
-            );
+            let joinable_ident =
+                Ident::new(crate::codegen::CODEGEN_JOINABLE_PATH, proc_macro2::Span::call_site());
 
             submodule_file_content.extend(quote::quote! {
                 mod #joinable_ident;

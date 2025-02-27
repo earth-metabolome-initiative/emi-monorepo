@@ -1,9 +1,9 @@
 //! Submodule defining builder traits for graph structures and related types.
 
-mod vocabulary;
-mod graph;
 mod edges;
+mod graph;
+mod vocabulary;
 
-pub use vocabulary::*;
-pub use graph::*;
 pub use edges::*;
+pub use graph::*;
+pub use vocabulary::*;

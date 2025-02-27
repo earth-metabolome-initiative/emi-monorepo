@@ -35,11 +35,10 @@ pub struct GeometryColumn {
 impl GeometryColumn {
     #[must_use]
     /// Returns the rust type of the geometry column.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// * If the geometry type is unknown.
-    /// 
     pub fn str_rust_type(&self) -> &'static str {
         match self.r#type.as_str() {
             "POINT" => "postgis_diesel::types::Point",
@@ -54,15 +53,14 @@ impl GeometryColumn {
     }
 
     /// Returns the rust type of the geometry column.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `optional` - If `true`, the type will be wrapped in an `Option`.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the rust type cannot be parsed.
-    /// 
     pub fn rust_type(&self, optional: bool) -> Result<syn::Type, WebCodeGenError> {
         let mut rust_type_str = self.str_rust_type().to_owned();
 

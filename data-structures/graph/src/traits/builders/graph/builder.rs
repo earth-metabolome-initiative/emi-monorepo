@@ -47,7 +47,6 @@ pub trait GraphBuilder:
     /// # Arguments
     ///
     /// * `sources` - The sources of the graph.
-    ///
     fn sources(self, sources: <Self::Graph as Graph>::Sources) -> Self;
 
     #[must_use]
@@ -56,7 +55,6 @@ pub trait GraphBuilder:
     /// # Arguments
     ///
     /// * `destinations` - The destinations of the graph.
-    ///
     fn destinations(self, destinations: <Self::Graph as Graph>::Destinations) -> Self;
 
     #[must_use]
@@ -65,7 +63,6 @@ pub trait GraphBuilder:
     /// # Arguments
     ///
     /// * `edges` - The edges of the graph.
-    ///
     fn edges(self, edges: <Self::Graph as Graph>::Edges) -> Self;
 }
 
@@ -86,7 +83,6 @@ pub trait DirectedGraphBuilder:
     /// # Arguments
     ///
     /// * `nodes` - The nodes of the graph.
-    ///
     fn nodes(self, nodes: <Self::Graph as DirectedGraph>::Nodes) -> Self;
 
     #[must_use]
@@ -95,7 +91,6 @@ pub trait DirectedGraphBuilder:
     /// # Arguments
     ///
     /// * `edges` - The edges of the graph.
-    ///
     fn edges(self, edges: <Self::Graph as DirectedGraph>::DirectedEdges) -> Self;
 }
 

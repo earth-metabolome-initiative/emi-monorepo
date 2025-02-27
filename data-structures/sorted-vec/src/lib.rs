@@ -8,6 +8,5 @@ pub mod sorted_vec;
 
 /// Prelude module for the sorted-vec crate.
 pub mod prelude {
-    pub use crate::sorted_vec::*;
-    pub use crate::sorted_array::*;
+    pub use crate::{sorted_array::*, sorted_vec::*};
 }

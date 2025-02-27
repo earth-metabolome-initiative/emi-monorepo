@@ -1,5 +1,6 @@
 //! Submodule providing a definition of a CSR matrix.
 use core::fmt::Debug;
+
 use crate::prelude::*;
 
 #[derive(Clone)]
@@ -27,7 +28,11 @@ where
     type Index = Idx;
 
     fn order(&self) -> Self::Index {
-        debug_assert_eq!(self.csr.number_of_columns(), self.csr.number_of_rows(), "The matrix is not square.");
+        debug_assert_eq!(
+            self.csr.number_of_columns(),
+            self.csr.number_of_rows(),
+            "The matrix is not square."
+        );
         self.csr.number_of_rows()
     }
 }
@@ -125,7 +130,8 @@ where
         = <CSR2D<SparseIndex, Idx, Idx> as SparseMatrix2D>::SparseRows<'a>
     where
         Self: 'a;
-    type SparseRowSizes<'a> = <CSR2D<SparseIndex, Idx, Idx> as SparseMatrix2D>::SparseRowSizes<'a>
+    type SparseRowSizes<'a>
+        = <CSR2D<SparseIndex, Idx, Idx> as SparseMatrix2D>::SparseRowSizes<'a>
     where
         Self: 'a;
 
@@ -167,9 +173,10 @@ where
 
     fn add(&mut self, (row, column): Self::Entry) -> Result<(), Self::Error> {
         self.csr.add((row, column))?;
-        // Since the matrix is square, the number of columns is equal to the number of row,
-        // and if the user happens to provide a row that is greater than the number of columns,
-        // we need to update the number of columns so as to keep the matrix square.
+        // Since the matrix is square, the number of columns is equal to the number of
+        // row, and if the user happens to provide a row that is greater than
+        // the number of columns, we need to update the number of columns so as
+        // to keep the matrix square.
         self.csr.number_of_columns = self.csr.number_of_columns.max(row + Idx::ONE);
         self.csr.number_of_rows = self.csr.number_of_rows.max(column + Idx::ONE);
         self.number_of_diagonal_values += Idx::from(row == column);

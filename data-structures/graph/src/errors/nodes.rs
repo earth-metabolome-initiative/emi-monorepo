@@ -17,11 +17,15 @@ impl<G: Graph + ?Sized> core::fmt::Debug for NodeError<G> {
     }
 }
 
-impl<G: Graph+ ?Sized> core::fmt::Display for NodeError<G> {
+impl<G: Graph + ?Sized> core::fmt::Display for NodeError<G> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            NodeError::UnknownSourceNodeId(id) => write!(f, "The node with id {id:?} does not exist."),
-            NodeError::UnknownNodeSymbol(symbol) => write!(f, "The node with symbol {symbol:?} does not exist."),
+            NodeError::UnknownSourceNodeId(id) => {
+                write!(f, "The node with id {id:?} does not exist.")
+            }
+            NodeError::UnknownNodeSymbol(symbol) => {
+                write!(f, "The node with symbol {symbol:?} does not exist.")
+            }
         }
     }
 }

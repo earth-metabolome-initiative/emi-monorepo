@@ -2,9 +2,7 @@
 
 use crate::{
     errors::builder::graph::GraphBuilderError,
-    traits::{
-        BidirectionalVocabulary, DirectedEdges, Graph, Vocabulary, VocabularyRef,
-    },
+    traits::{BidirectionalVocabulary, DirectedEdges, Graph, Vocabulary, VocabularyRef},
 };
 
 /// A generic graph.

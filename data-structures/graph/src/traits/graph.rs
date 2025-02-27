@@ -1,7 +1,8 @@
 //! Module defining a bipartite graph.
 
-use crate::prelude::*;
 use algebra::prelude::{IntoUsize, PositiveInteger, SparseMatrix2D, Symbol, TryFromUsize};
+
+use crate::prelude::*;
 
 /// Trait for a bipartite graph.
 pub trait Graph {
@@ -24,8 +25,10 @@ pub trait Graph {
             DestinationSymbol = Self::SourceNodeSymbol,
         >;
     /// The vocabulary holding the symbols of the destination nodes.
-    type Destinations: VocabularyRef<SourceSymbol = Self::DestinationNodeId, DestinationSymbol = Self::DestinationNodeSymbol>
-        + BidirectionalVocabulary<
+    type Destinations: VocabularyRef<
+            SourceSymbol = Self::DestinationNodeId,
+            DestinationSymbol = Self::DestinationNodeSymbol,
+        > + BidirectionalVocabulary<
             SourceSymbol = Self::DestinationNodeId,
             DestinationSymbol = Self::DestinationNodeSymbol,
         >;
@@ -82,12 +85,18 @@ pub trait Graph {
     }
 
     /// Returns the Symbol of the node with the given ID.
-    fn destination(&self, destination_id: &Self::DestinationNodeId) -> Option<&Self::DestinationNodeSymbol> {
+    fn destination(
+        &self,
+        destination_id: &Self::DestinationNodeId,
+    ) -> Option<&Self::DestinationNodeSymbol> {
         self.destination_vocabulary().convert_ref(destination_id)
     }
 
     /// Returns the ID of the node with the given symbol.
-    fn destination_id(&self, symbol: &Self::DestinationNodeSymbol) -> Option<Self::DestinationNodeId> {
+    fn destination_id(
+        &self,
+        symbol: &Self::DestinationNodeSymbol,
+    ) -> Option<Self::DestinationNodeId> {
         self.destination_vocabulary().invert(symbol)
     }
 
@@ -111,11 +120,10 @@ pub trait Graph {
     /// # Arguments
     ///
     /// * `source` - The identifier of the source node.
-    ///
     fn successors(
         &self,
         source: Self::SourceNodeId,
-    ) -> <<Self::Edges as Edges>::Matrix as SparseMatrix2D>::SparseRow<'_>{
+    ) -> <<Self::Edges as Edges>::Matrix as SparseMatrix2D>::SparseRow<'_> {
         self.edges().successors(source)
     }
 
@@ -124,13 +132,14 @@ pub trait Graph {
     /// # Arguments
     ///
     /// * `source` - The identifier of the source node.
-    ///
     fn out_degree(&self, source: Self::SourceNodeId) -> Self::DestinationNodeId {
         self.edges().out_degree(source)
     }
 
     /// Iterates across all out degrees of the graph.
-    fn out_degrees(&self) -> <<Self::Edges as Edges>::Matrix as SparseMatrix2D>::SparseRowSizes<'_> {
+    fn out_degrees(
+        &self,
+    ) -> <<Self::Edges as Edges>::Matrix as SparseMatrix2D>::SparseRowSizes<'_> {
         self.edges().out_degrees()
     }
 }

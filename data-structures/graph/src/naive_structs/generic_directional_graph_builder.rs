@@ -1,13 +1,14 @@
 //! Submodule providing a general builder to build a generic graph.
 
-use common_traits::prelude::{Builder, BuilderError};
 use core::marker::PhantomData;
+
+use common_traits::prelude::{Builder, BuilderError};
 
 use crate::{
     errors::builder::graph::GraphBuilderError,
     traits::{
-        DirectedGraph, DirectedGraphBuilder, GraphBuilderOptions,
-        UndirectedGraph, UndirectedGraphBuilder,
+        DirectedGraph, DirectedGraphBuilder, GraphBuilderOptions, UndirectedGraph,
+        UndirectedGraphBuilder,
     },
 };
 

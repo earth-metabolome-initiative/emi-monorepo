@@ -1,4 +1,5 @@
-//! A trait defining a conversion between a source symbol and a destination symbol.
+//! A trait defining a conversion between a source symbol and a destination
+//! symbol.
 
 use core::fmt::Debug;
 
@@ -6,7 +7,8 @@ use algebra::prelude::Symbol;
 
 use crate::errors::builder::vocabulary::VocabularyBuilderError;
 
-/// Trait defining a conversion between a source symbol and a destination symbol.
+/// Trait defining a conversion between a source symbol and a destination
+/// symbol.
 pub trait Vocabulary: Debug + Clone {
     /// The source symbol.
     type SourceSymbol: Symbol;
@@ -39,7 +41,8 @@ pub trait Vocabulary: Debug + Clone {
     fn destinations(&self) -> Self::Destinations<'_>;
 }
 
-/// Trait defining a conversion between a source symbol and a destination symbol reference.
+/// Trait defining a conversion between a source symbol and a destination symbol
+/// reference.
 pub trait VocabularyRef: Vocabulary {
     /// Iterator over the references of the destination symbols.
     type DestinationRefs<'a>: Iterator<Item = &'a Self::DestinationSymbol>
@@ -53,13 +56,15 @@ pub trait VocabularyRef: Vocabulary {
     fn destination_refs(&self) -> Self::DestinationRefs<'_>;
 }
 
-/// Trait defining a bidirectional conversion between a source symbol and a destination symbol.
+/// Trait defining a bidirectional conversion between a source symbol and a
+/// destination symbol.
 pub trait BidirectionalVocabulary: Vocabulary {
     /// Converts a destination symbol into a source symbol.
     fn invert(&self, destination: &Self::DestinationSymbol) -> Option<Self::SourceSymbol>;
 }
 
-/// Trait defining a bidirectional conversion between a destination symbol and a source symbol reference.
+/// Trait defining a bidirectional conversion between a destination symbol and a
+/// source symbol reference.
 pub trait BidirectionalVocabularyRef: BidirectionalVocabulary + VocabularyRef {
     /// Iterator over the references of the source symbols.
     type SourceRefs<'a>: Iterator<Item = &'a Self::SourceSymbol>
@@ -92,7 +97,6 @@ pub trait GrowableVocabulary: Vocabulary + Default {
     ///
     /// * If the source symbol is already in the vocabulary.
     /// * If the destination symbol is already in the vocabulary.
-    ///
     fn add(
         &mut self,
         source: Self::SourceSymbol,

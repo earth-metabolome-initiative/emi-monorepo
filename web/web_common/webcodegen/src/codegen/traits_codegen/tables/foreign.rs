@@ -1,12 +1,12 @@
-//! Submodule providing the code to generate the implementation of the Foreign traits for all requiring methods.
-
+//! Submodule providing the code to generate the implementation of the Foreign
+//! traits for all requiring methods.
 
 use std::path::Path;
 
 use diesel::PgConnection;
-use crate::Codegen;
-use crate::Table;
 use proc_macro2::TokenStream;
+
+use crate::{Codegen, Table};
 
 impl Codegen<'_> {
     /// Generates the Foreign traits implementation for the tables
@@ -28,14 +28,14 @@ impl Codegen<'_> {
         let mut table_foreign_main_module = TokenStream::new();
         for table in tables {
             // We create a file for each table
-			let foreign_trait_impls = table.foreign_key_traits(conn)?;
+            let foreign_trait_impls = table.foreign_key_traits(conn)?;
 
-			if foreign_trait_impls.is_empty() {
-				continue;
-			}
+            if foreign_trait_impls.is_empty() {
+                continue;
+            }
 
-			// impl Deletable for struct_ident
-			let foreign_trait_file = root.join(format!("{}.rs", table.snake_case_name()?));
+            // impl Deletable for struct_ident
+            let foreign_trait_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let snake_case_ident = table.snake_case_ident()?;
             std::fs::write(&foreign_trait_file, self.beautify_code(&foreign_trait_impls)?)?;
 

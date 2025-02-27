@@ -25,11 +25,10 @@ impl Table {
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If an error occurs while loading the columns
-    /// 
     pub fn requires_roles_table(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(self.columns(conn)?.iter().any(|c| c.is_updated_by(conn)))
     }
@@ -213,13 +212,12 @@ impl Table {
     /// * `table_catalog` - The catalog of the tables to create the functions
     ///   for.
     /// * `table_schema` - The schema of the tables to create the functions for.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If an error occurs while creating the roles tables
     /// * If an error occurs while loading the tables
     /// * If an error occurs while executing the SQL
-    /// 
     pub fn create_roles_tables(
         conn: &mut PgConnection,
         table_catalog: &str,

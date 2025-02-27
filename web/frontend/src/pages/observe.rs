@@ -266,10 +266,9 @@ impl Component for Observe {
                 }
             }
             PageSection::Taxa => {
-                let selected_taxon =
-                    ctx.link().callback(move |project: Option<Rc<Taxon>>| {
-                        ObserveMessage::SelectedTaxon(project)
-                    });
+                let selected_taxon = ctx.link().callback(move |project: Option<Rc<Taxon>>| {
+                    ObserveMessage::SelectedTaxon(project)
+                });
 
                 let on_click_back =
                     ctx.link().callback(|_| ObserveMessage::SetSection(PageSection::Location));

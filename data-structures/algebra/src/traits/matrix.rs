@@ -1,14 +1,14 @@
 //! Trait defining a matrix.
 
 mod matrix2d;
+mod matrix_mut;
 mod square_matrix;
 mod triangular_matrix;
-mod matrix_mut;
 
 pub use matrix2d::*;
+pub use matrix_mut::*;
 pub use square_matrix::*;
 pub use triangular_matrix::*;
-pub use matrix_mut::*;
 
 use super::{Coordinates, IntoUsize, PositiveInteger, Zero};
 

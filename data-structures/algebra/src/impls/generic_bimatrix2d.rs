@@ -1,8 +1,10 @@
-//! [`BiMatrix`] data structure, which provides a wrapper to a matrix and its transposed version.
+//! [`BiMatrix`] data structure, which provides a wrapper to a matrix and its
+//! transposed version.
 
 use crate::prelude::*;
 
-/// [`BiMatrix`] data structure, which provides a wrapper to a matrix and its transposed version.
+/// [`BiMatrix`] data structure, which provides a wrapper to a matrix and its
+/// transposed version.
 pub struct GenericBiMatrix2D<M: TransposableMatrix2D> {
     /// The matrix.
     matrix: M,
@@ -16,7 +18,6 @@ impl<M: TransposableMatrix2D> GenericBiMatrix2D<M> {
     /// # Arguments
     ///
     /// * `matrix` - The matrix.
-    ///
     pub fn new(matrix: M) -> Self {
         let transposed = matrix.transpose();
         Self { matrix, transposed }
@@ -77,7 +78,8 @@ where
         = M::SparseRows<'a>
     where
         Self: 'a;
-    type SparseRowSizes<'a> = M::SparseRowSizes<'a>
+    type SparseRowSizes<'a>
+        = M::SparseRowSizes<'a>
     where
         Self: 'a;
 

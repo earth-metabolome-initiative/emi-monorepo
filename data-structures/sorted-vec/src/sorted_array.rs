@@ -1,7 +1,8 @@
 //! Submodule for the `SortedArray` struct and its primary methods.
 
-use common_traits::transmute::TransmuteFrom;
 use core::ops::Index;
+
+use common_traits::transmute::TransmuteFrom;
 
 use crate::error::Error;
 

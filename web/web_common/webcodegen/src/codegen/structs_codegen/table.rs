@@ -3,8 +3,9 @@
 use std::path::Path;
 
 use diesel::PgConnection;
-use syn::Ident;
 use proc_macro2::TokenStream;
+use syn::Ident;
+
 use super::Codegen;
 use crate::Table;
 
@@ -33,20 +34,23 @@ impl Codegen<'_> {
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let table_struct = table.struct_ident()?;
             let table_content = table.to_syn(conn)?;
-            let foreign_key_methods = if self.enable_foreign_trait{
+            let foreign_key_methods = if self.enable_foreign_trait {
                 table.foreign_key_methods(conn)?
             } else {
                 TokenStream::new()
             };
             let from_unique_indices = table.from_unique_indices(conn)?;
 
-            std::fs::write(&table_file, self.beautify_code(&quote::quote!{
-                #table_content
-                impl #table_struct {
-                    #foreign_key_methods
-                    #from_unique_indices
-                }
-            })?)?;
+            std::fs::write(
+                &table_file,
+                self.beautify_code(&quote::quote! {
+                    #table_content
+                    impl #table_struct {
+                        #foreign_key_methods
+                        #from_unique_indices
+                    }
+                })?,
+            )?;
 
             table_main_module.extend(quote::quote! {
                 pub mod #table_identifier;

@@ -27,7 +27,11 @@ pub fn test_symmetric_edges() {
     assert_eq!(edges.degree(4), 2, "The node 4 should have 2 neighbors.");
     assert_eq!(edges.degree(5), 1, "The node 5 should have 1 neighbor.");
 
-    assert_eq!(edges.neighbors(0).collect::<Vec<_>>(), vec![], "The node 0 should have no neighbors.");
+    assert_eq!(
+        edges.neighbors(0).collect::<Vec<_>>(),
+        vec![],
+        "The node 0 should have no neighbors."
+    );
     assert_eq!(
         edges.neighbors(1).collect::<Vec<_>>(),
         vec![2, 3],
@@ -48,7 +52,11 @@ pub fn test_symmetric_edges() {
         vec![3, 5],
         "The node 4 should have neighbors 3 and 5."
     );
-    assert_eq!(edges.neighbors(5).collect::<Vec<_>>(), vec![4], "The node 5 should have neighbor 4.");
+    assert_eq!(
+        edges.neighbors(5).collect::<Vec<_>>(),
+        vec![4],
+        "The node 5 should have neighbor 4."
+    );
     assert_eq!(
         edges.edges().collect::<Vec<_>>(),
         vec![

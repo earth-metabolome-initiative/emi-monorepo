@@ -39,7 +39,8 @@ impl Codegen<'_> {
                 tables,
                 conn,
             )?;
-            let types_ident = Ident::new(crate::codegen::CODEGEN_TYPES_PATH, proc_macro2::Span::call_site());
+            let types_ident =
+                Ident::new(crate::codegen::CODEGEN_TYPES_PATH, proc_macro2::Span::call_site());
 
             submodule_file_content.extend(quote::quote! {
                 mod #types_ident;
@@ -47,9 +48,14 @@ impl Codegen<'_> {
         }
 
         if self.should_generate_table_traits() {
-            self.generate_table_traits(root.join(crate::codegen::CODEGEN_TABLES_PATH).as_path(), tables, conn)?;
+            self.generate_table_traits(
+                root.join(crate::codegen::CODEGEN_TABLES_PATH).as_path(),
+                tables,
+                conn,
+            )?;
 
-            let tables_ident = Ident::new(crate::codegen::CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());
+            let tables_ident =
+                Ident::new(crate::codegen::CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());
 
             submodule_file_content.extend(quote::quote! {
                 mod #tables_ident;

@@ -1,11 +1,13 @@
 //! Submodule defining the structs and methods for generating a report.
 
-use crate::{prelude::TimeTracker, task::CompletedTask};
+use std::{collections::HashMap, io::Write, path::Path};
+
 use chrono::{NaiveDateTime, TimeDelta};
 use chrono_humanize::{Accuracy, HumanTime, Tense};
 use plotters::prelude::*;
-use std::{collections::HashMap, io::Write, path::Path};
 use tabled::{Table, Tabled};
+
+use crate::{prelude::TimeTracker, task::CompletedTask};
 
 /// A report for a time tracker.
 pub struct Report {
@@ -139,7 +141,8 @@ impl Report {
         self.previous_reports.len() + 1
     }
 
-    /// Writes out a plot of the trends for all tasks in the report and saves it to the given file.
+    /// Writes out a plot of the trends for all tasks in the report and saves it
+    /// to the given file.
     pub fn plot(&self, path: &Path) -> std::io::Result<()> {
         let root = BitMapBackend::new(path, (800, 600)).into_drawing_area();
         root.fill(&WHITE).unwrap();
@@ -184,11 +187,16 @@ impl Report {
     /// Writes out the markdown report to a given file.
     pub fn write(&self, report_path: &Path, plot_path: &Path) -> std::io::Result<()> {
         let total_time = self.time_tracker.total_time().num_seconds() as f64;
-        let rows = self.time_tracker.tasks().map(|task| TableRow {
-            name: task.name(),
-            time: HumanTime::from(task.time()).to_text_en(Accuracy::Rough, Tense::Present),
-            percentage: format!("{:.2}%", task.time().num_seconds() as f64 / total_time * 100.0),
-            comment: self.task_comment(task).unwrap_or_default(),
+        let rows = self.time_tracker.tasks().map(|task| {
+            TableRow {
+                name: task.name(),
+                time: HumanTime::from(task.time()).to_text_en(Accuracy::Rough, Tense::Present),
+                percentage: format!(
+                    "{:.2}%",
+                    task.time().num_seconds() as f64 / total_time * 100.0
+                ),
+                comment: self.task_comment(task).unwrap_or_default(),
+            }
         });
         let table = Table::new(rows);
 

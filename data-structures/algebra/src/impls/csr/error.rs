@@ -1,9 +1,9 @@
 //! Enumeration for the errors associated with the CSR data structure.
 
-use crate::traits::{IntoUsize, Matrix2D, PositiveInteger};
 use core::fmt::Debug;
 
 use super::{SquareCSR2D, SymmetricCSR2D, UpperTriangularCSR2D, CSR2D};
+use crate::traits::{IntoUsize, Matrix2D, PositiveInteger};
 
 /// Enumeration for the errors associated with the CSR data structure.
 pub enum Error<M: Matrix2D> {
@@ -110,7 +110,8 @@ where
     }
 }
 
-impl<SparseIndex, Idx: PositiveInteger + IntoUsize> From<MutabilityError<SquareCSR2D<SparseIndex, Idx>>>
+impl<SparseIndex, Idx: PositiveInteger + IntoUsize>
+    From<MutabilityError<SquareCSR2D<SparseIndex, Idx>>>
     for MutabilityError<UpperTriangularCSR2D<SparseIndex, Idx>>
 where
     SquareCSR2D<SparseIndex, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
@@ -130,7 +131,8 @@ where
     }
 }
 
-impl<SparseIndex, Idx: PositiveInteger + IntoUsize> From<MutabilityError<UpperTriangularCSR2D<SparseIndex, Idx>>>
+impl<SparseIndex, Idx: PositiveInteger + IntoUsize>
+    From<MutabilityError<UpperTriangularCSR2D<SparseIndex, Idx>>>
     for MutabilityError<SymmetricCSR2D<SparseIndex, Idx>>
 where
     UpperTriangularCSR2D<SparseIndex, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,

@@ -1,11 +1,16 @@
-//! A generic edges builder that can be used to build a edges for any type of graph.
+//! A generic edges builder that can be used to build a edges for any type of
+//! graph.
 
-use crate::errors::builder::edges::EdgesBuilderError;
-use crate::traits::{Edges, EdgesBuilder, EdgesBuilderOptions, GrowableEdges};
 use algebra::{impls::MutabilityError, prelude::SparseMatrixMut};
 use common_traits::prelude::Builder;
 
-/// A generic edges builder that can be used to build a edges for any type of graph.
+use crate::{
+    errors::builder::edges::EdgesBuilderError,
+    traits::{Edges, EdgesBuilder, EdgesBuilderOptions, GrowableEdges},
+};
+
+/// A generic edges builder that can be used to build a edges for any type of
+/// graph.
 pub struct GenericEdgesBuilder<EdgeIterator, GE: GrowableEdges> {
     /// The edges to build the edges from.
     pub(super) edges: Option<EdgeIterator>,

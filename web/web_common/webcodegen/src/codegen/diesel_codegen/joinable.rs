@@ -85,10 +85,7 @@ impl Codegen<'_> {
             // We make sure that there is at least Some TokenStream for the table.
             // We create a TokenStream that is a Composite of all TS in the HashMap
 
-            let overall_token_stream: TokenStream = table_hashmap
-                .into_values()
-                .flatten()
-                .collect();
+            let overall_token_stream: TokenStream = table_hashmap.into_values().flatten().collect();
 
             if overall_token_stream.is_empty() {
                 continue;

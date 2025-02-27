@@ -8,11 +8,10 @@ use crate::errors::WebCodeGenError;
 
 impl crate::Table {
     /// Returns the `load_all` method for the table.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the table name cannot be converted to a snake case identifier.
-    /// 
     pub fn load_all_method(&self) -> Result<TokenStream, WebCodeGenError> {
         let table_name_ident = self.snake_case_ident()?;
 

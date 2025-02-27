@@ -9,7 +9,9 @@ use webcodegen::*;
 /// Test generation of [`Loadable`] traits for tables.
 async fn test_codegen_tables_loadable_traits() {
     let (docker, mut conn, database_name) =
-        setup_database_with_default_migrations("test_codegen_tables_loadable_traits").await.unwrap();
+        setup_database_with_default_migrations("test_codegen_tables_loadable_traits")
+            .await
+            .unwrap();
 
     let outcome = Codegen::default()
         .set_output_directory("tests/codegen_tables_loadable_traits".as_ref())

@@ -12,9 +12,9 @@ pub trait Builder: Default {
     type Attribute: Basic;
 
     /// Builds the object.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If an attribute was not set.
     /// * If the object could not be built.
     fn build(self) -> Result<Self::Object, Self::Error>;

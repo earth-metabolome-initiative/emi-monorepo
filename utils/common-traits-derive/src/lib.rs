@@ -8,9 +8,9 @@ use syn::{parse_macro_input, Generics, ImplGenerics, Item, TypeGenerics};
 
 #[proc_macro_attribute]
 /// Derive the `Basic` trait for a struct or enum.
-/// 
+///
 /// # Panics
-/// 
+///
 /// Panics if the input is not a struct or an enum.
 pub fn basic(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as Item);

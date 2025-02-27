@@ -9,7 +9,9 @@ use webcodegen::*;
 /// Test generation of [`Deletable`] traits for tables.
 async fn test_codegen_tables_deletable_traits() {
     let (docker, mut conn, database_name) =
-        setup_database_with_default_migrations("test_codegen_tables_deletable_traits").await.unwrap();
+        setup_database_with_default_migrations("test_codegen_tables_deletable_traits")
+            .await
+            .unwrap();
 
     let outcome = Codegen::default()
         .set_output_directory("tests/codegen_tables_deletable_traits".as_ref())

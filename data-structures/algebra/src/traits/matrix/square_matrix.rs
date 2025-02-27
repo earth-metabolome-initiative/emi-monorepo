@@ -1,8 +1,7 @@
 //! Submodule for the [`SquareMatrix`] trait.
 
-use crate::traits::{IntoUsize, PositiveInteger};
-
 use super::{Matrix2D, SparseMatrix2D, SymmetricMatrix2D};
+use crate::traits::{IntoUsize, PositiveInteger};
 
 /// Trait defining a square matrix.
 pub trait SquareMatrix: Matrix2D<RowIndex = Self::Index, ColumnIndex = Self::Index> {

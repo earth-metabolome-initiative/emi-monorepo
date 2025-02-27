@@ -2,7 +2,6 @@
 use std::path::Path;
 
 use csv::Reader;
-
 use inflector::Inflector;
 
 use super::csv_column_metadata::{CSVColumnMetadata, CSVColumnMetadataBuilder};

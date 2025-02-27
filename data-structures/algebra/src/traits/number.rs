@@ -1,6 +1,7 @@
 //! Trait defining a number.
 
 use common_traits::prelude::Serde;
+
 use super::{Bounded, One, Zero};
 
 /// Trait defining a number.

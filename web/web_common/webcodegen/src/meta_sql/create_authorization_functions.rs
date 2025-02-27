@@ -83,9 +83,9 @@ impl AuthorizationFunctionBuilder {
     /// * `table_catalog` - The catalog of the tables to create the functions
     ///   for.
     /// * `table_schema` - The schema of the tables to create the functions for.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If an error occurs while creating the functions and triggers
     /// * If the roles mechanism is incomplete
     /// * If the roles mechanism is not complete
@@ -93,7 +93,6 @@ impl AuthorizationFunctionBuilder {
     /// * If the table does not have a primary key column
     /// * If the table does not have a column named `updated_by`
     /// * If the table does not have a column named `created_by`
-    /// 
     pub fn create_authorization_functions_and_triggers(
         &self,
         conn: &mut PgConnection,
@@ -151,7 +150,8 @@ impl AuthorizationFunctionBuilder {
             let updator_check = "IF session_user_id = this_updated_by THEN
         RETURN TRUE;
     END IF;
-            ".to_owned();
+            "
+            .to_owned();
             if !columns_to_retrieve.contains(&updated_by) {
                 columns_to_retrieve.push(updated_by);
             }
@@ -163,7 +163,8 @@ impl AuthorizationFunctionBuilder {
             let creator_check = "IF session_user_id = this_created_by THEN
         RETURN TRUE;
     END IF;
-            ".to_owned();
+            "
+            .to_owned();
             if !columns_to_retrieve.contains(&created_by) {
                 columns_to_retrieve.push(created_by);
             }

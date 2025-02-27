@@ -1,17 +1,15 @@
 //! Webcommon traits generation
 use std::path::Path;
+mod attribute_traits;
 mod deletable;
 mod foreign;
-mod attribute_traits;
 mod loadable;
 
 use diesel::PgConnection;
-
 use proc_macro2::TokenStream;
-
-use crate::Codegen;
-use crate::Table;
 use syn::Ident;
+
+use crate::{Codegen, Table};
 
 impl Codegen<'_> {
     /// Code relative to generating all of the diesel code.
@@ -34,14 +32,9 @@ impl Codegen<'_> {
         let mut submodule_file_content = TokenStream::new();
 
         if self.enable_deletable_trait {
-            self.generate_deletable_impls(
-                root.join("deletable").as_path(),
-                tables,
-                conn,
-            )?;
+            self.generate_deletable_impls(root.join("deletable").as_path(), tables, conn)?;
 
-            let deletable_module_ident =
-                Ident::new("deletable", proc_macro2::Span::call_site());
+            let deletable_module_ident = Ident::new("deletable", proc_macro2::Span::call_site());
 
             submodule_file_content.extend(quote::quote! {
                 mod #deletable_module_ident;
@@ -49,14 +42,9 @@ impl Codegen<'_> {
         }
 
         if self.enable_loadable_trait {
-            self.generate_loadable_impls(
-                root.join("loadable").as_path(),
-                tables,
-                conn,
-            )?;
+            self.generate_loadable_impls(root.join("loadable").as_path(), tables, conn)?;
 
-            let loadable_module_ident =
-                Ident::new("loadable", proc_macro2::Span::call_site());
+            let loadable_module_ident = Ident::new("loadable", proc_macro2::Span::call_site());
 
             submodule_file_content.extend(quote::quote! {
                 mod #loadable_module_ident;
@@ -64,14 +52,9 @@ impl Codegen<'_> {
         }
 
         if self.enable_attribute_trait {
-            self.generate_attribute_impls(
-                root.join("attributes").as_path(),
-                tables,
-                conn,
-            )?;
+            self.generate_attribute_impls(root.join("attributes").as_path(), tables, conn)?;
 
-            let attribute_module_ident =
-                Ident::new("attributes", proc_macro2::Span::call_site());
+            let attribute_module_ident = Ident::new("attributes", proc_macro2::Span::call_site());
 
             submodule_file_content.extend(quote::quote! {
                 mod #attribute_module_ident;
@@ -79,14 +62,9 @@ impl Codegen<'_> {
         }
 
         if self.enable_foreign_trait {
-            self.generate_foreign_impls(
-                root.join("foreign").as_path(),
-                tables,
-                conn,
-            )?;
+            self.generate_foreign_impls(root.join("foreign").as_path(), tables, conn)?;
 
-            let foreign_module_ident =
-                Ident::new("foreign", proc_macro2::Span::call_site());
+            let foreign_module_ident = Ident::new("foreign", proc_macro2::Span::call_site());
 
             submodule_file_content.extend(quote::quote! {
                 mod #foreign_module_ident;

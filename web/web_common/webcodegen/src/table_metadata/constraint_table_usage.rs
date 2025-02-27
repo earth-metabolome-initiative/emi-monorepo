@@ -34,11 +34,10 @@ impl ConstraintTableUsage {
     ///
     /// A `Result` containing a vector of `ConstraintTableUsage` on success,
     /// or a `diesel::result::Error` on failure.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If an error occurs while loading the rows from the database.
-    /// 
     pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::constraint_table_usage;
         constraint_table_usage::table.load::<ConstraintTableUsage>(conn)

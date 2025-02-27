@@ -1,7 +1,8 @@
 //! Submodule implementing Edges-related traits for [`SquaredSquareCSR2D`].
 
-use crate::{errors::builder::edges::EdgesBuilderError, prelude::*};
 use algebra::prelude::*;
+
+use crate::{errors::builder::edges::EdgesBuilderError, prelude::*};
 
 impl<
         SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
@@ -42,4 +43,3 @@ impl<
         <Self as SparseMatrixMut>::with_sparse_shaped_capacity(shape, number_of_edges)
     }
 }
-

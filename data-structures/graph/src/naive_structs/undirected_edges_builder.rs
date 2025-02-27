@@ -1,4 +1,5 @@
-//! A generic edges builder that can be used to build a edges for any type of graph.
+//! A generic edges builder that can be used to build a edges for any type of
+//! graph.
 
 use std::marker::PhantomData;
 
@@ -14,7 +15,8 @@ use crate::{
     },
 };
 
-/// A generic edges builder that can be used to build a edges for any type of graph.
+/// A generic edges builder that can be used to build a edges for any type of
+/// graph.
 pub struct GenericUndirectedEdgesBuilder<EdgeIterator, GE: GrowableEdges, UE> {
     /// The inner builder for the edges.
     builder: GenericDirectedEdgesBuilder<EdgeIterator, GE>,
@@ -22,7 +24,9 @@ pub struct GenericUndirectedEdgesBuilder<EdgeIterator, GE: GrowableEdges, UE> {
     _undirected_edges: core::marker::PhantomData<UE>,
 }
 
-impl<EdgeIterator, GE: GrowableEdges, UE> Default for GenericUndirectedEdgesBuilder<EdgeIterator, GE, UE> {
+impl<EdgeIterator, GE: GrowableEdges, UE> Default
+    for GenericUndirectedEdgesBuilder<EdgeIterator, GE, UE>
+{
     fn default() -> Self {
         Self { builder: GenericDirectedEdgesBuilder::default(), _undirected_edges: PhantomData }
     }

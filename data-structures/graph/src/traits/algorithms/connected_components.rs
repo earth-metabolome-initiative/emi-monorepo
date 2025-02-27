@@ -57,7 +57,8 @@ where
         )
     }
 
-    /// Returns an iterator over the symbols of the nodes of a connected component.
+    /// Returns an iterator over the symbols of the nodes of a connected
+    /// component.
     pub fn nodes_of_component(
         &self,
         component_identifier: Marker,
@@ -71,7 +72,8 @@ where
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// Error type for connected components.
 pub enum ConnectedComponentsError {
-    /// The graph has too many connected components for the provided marker type.
+    /// The graph has too many connected components for the provided marker
+    /// type.
     TooManyComponents,
 }
 
@@ -107,10 +109,10 @@ impl<G: Graph + ?Sized> From<ConnectedComponentsError> for crate::errors::Error<
 /// # Type parameter
 ///
 /// - `Marker`: The type used to identify the connected components. This should
-///    be the smallest positive integer which is expected to be able to represent
-///    the number of connected components in the graph. On very large graphs which
-///    are expected to be strongly connected, choosing a smaller integer type may
-///    save a significant amount of memory.
+///   be the smallest positive integer which is expected to be able to represent
+///   the number of connected components in the graph. On very large graphs
+///   which are expected to be strongly connected, choosing a smaller integer
+///   type may save a significant amount of memory.
 pub trait ConnectedComponents<Marker: IntoUsize + PositiveInteger = usize>:
     UndirectedGraph
 {
@@ -118,7 +120,8 @@ pub trait ConnectedComponents<Marker: IntoUsize + PositiveInteger = usize>:
     ///
     /// # Errors
     ///
-    /// * If the graph has too many connected components for the provided marker type.
+    /// * If the graph has too many connected components for the provided marker
+    ///   type.
     /// * If the graph has too many nodes.
     fn connected_components(
         &self,
@@ -161,7 +164,8 @@ pub trait ConnectedComponents<Marker: IntoUsize + PositiveInteger = usize>:
                     temporary_frontier.extend(self.neighbors(neighbour));
                 }
 
-                // We swap the temporary frontier with the frontier to avoid allocating a new vector.
+                // We swap the temporary frontier with the frontier to avoid allocating a new
+                // vector.
                 std::mem::swap(&mut frontier, &mut temporary_frontier);
             }
 
@@ -175,7 +179,8 @@ pub trait ConnectedComponents<Marker: IntoUsize + PositiveInteger = usize>:
 
             number_of_components += Marker::ONE;
 
-            // If the number of components exceeds the maximum value of the marker type, return an error.
+            // If the number of components exceeds the maximum value of the marker type,
+            // return an error.
             if number_of_components == Marker::MAX {
                 return Err(ConnectedComponentsError::TooManyComponents.into());
             }

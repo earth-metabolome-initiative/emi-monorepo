@@ -3,7 +3,6 @@
 mod utils;
 
 use utils::*;
-
 use webcodegen::*;
 
 #[tokio::test]

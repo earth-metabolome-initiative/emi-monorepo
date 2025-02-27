@@ -1,5 +1,5 @@
-//! Trait implementing the conversion from `usize`, including the occasional error,
-//! depending on the compilation flags (whether target is 64 or 32 bits).
+//! Trait implementing the conversion from `usize`, including the occasional
+//! error, depending on the compilation flags (whether target is 64 or 32 bits).
 
 /// Trait defining the conversion from `usize`.
 pub trait TryFromUsize: Sized {
@@ -7,10 +7,10 @@ pub trait TryFromUsize: Sized {
     type Error;
 
     /// Converts the value from `usize`.
-	/// 
-	/// # Errors
-	/// 
-	/// * Returns an error if the conversion is not possible.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the conversion is not possible.
     fn try_from_usize(value: usize) -> Result<Self, Self::Error>;
 }
 
@@ -36,7 +36,8 @@ impl TryFromUsize for u64 {
 
     fn try_from_usize(value: usize) -> Result<Self, Self::Error> {
         // Since `u64` is either exactly `usize` when the target is 64 bits, or
-        // larger than `usize` when the target is 32 bits, the conversion is always safe.
+        // larger than `usize` when the target is 32 bits, the conversion is always
+        // safe.
         Ok(value as u64)
     }
 }
@@ -46,7 +47,8 @@ impl TryFromUsize for u32 {
     type Error = core::convert::Infallible;
 
     fn try_from_usize(value: usize) -> Result<Self, Self::Error> {
-        // Since `u32` is exactly `usize` when the target is 32 bits, the conversion is always safe.
+        // Since `u32` is exactly `usize` when the target is 32 bits, the conversion is
+        // always safe.
         Ok(value as u32)
     }
 }
@@ -94,33 +96,33 @@ impl TryFromUsize for i128 {
 }
 
 impl TryFromUsize for i64 {
-	type Error = core::num::TryFromIntError;
+    type Error = core::num::TryFromIntError;
 
-	fn try_from_usize(value: usize) -> Result<Self, Self::Error> {
-		i64::try_from(value)
-	}
+    fn try_from_usize(value: usize) -> Result<Self, Self::Error> {
+        i64::try_from(value)
+    }
 }
 
 impl TryFromUsize for i32 {
-	type Error = core::num::TryFromIntError;
+    type Error = core::num::TryFromIntError;
 
-	fn try_from_usize(value: usize) -> Result<Self, Self::Error> {
-		i32::try_from(value)
-	}
+    fn try_from_usize(value: usize) -> Result<Self, Self::Error> {
+        i32::try_from(value)
+    }
 }
 
 impl TryFromUsize for i16 {
-	type Error = core::num::TryFromIntError;
+    type Error = core::num::TryFromIntError;
 
-	fn try_from_usize(value: usize) -> Result<Self, Self::Error> {
-		i16::try_from(value)
-	}
+    fn try_from_usize(value: usize) -> Result<Self, Self::Error> {
+        i16::try_from(value)
+    }
 }
 
 impl TryFromUsize for i8 {
-	type Error = core::num::TryFromIntError;
+    type Error = core::num::TryFromIntError;
 
-	fn try_from_usize(value: usize) -> Result<Self, Self::Error> {
-		i8::try_from(value)
-	}
+    fn try_from_usize(value: usize) -> Result<Self, Self::Error> {
+        i8::try_from(value)
+    }
 }

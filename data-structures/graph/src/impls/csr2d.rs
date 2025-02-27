@@ -1,7 +1,8 @@
 //! Submodule implementing Edges for CSR2D.
 
-use crate::{errors::builder::edges::EdgesBuilderError, prelude::*};
 use algebra::prelude::*;
+
+use crate::{errors::builder::edges::EdgesBuilderError, prelude::*};
 
 impl<
         SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,

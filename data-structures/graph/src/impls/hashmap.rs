@@ -1,9 +1,11 @@
 //! Module implementing traits for the [`HashMap`] type.
 
-use crate::prelude::*;
-use algebra::prelude::Symbol;
 use core::iter::Cloned;
 use std::{collections::HashMap, hash::BuildHasher};
+
+use algebra::prelude::Symbol;
+
+use crate::prelude::*;
 
 impl<K: Symbol, V: Symbol, S: BuildHasher + Clone> Vocabulary for HashMap<K, V, S> {
     type SourceSymbol = K;

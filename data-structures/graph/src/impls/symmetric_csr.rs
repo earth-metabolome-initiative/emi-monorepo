@@ -1,7 +1,8 @@
 //! Submodule implementing Edges-related traits for [`SquaredSymmetricCSR2D`].
 
-use crate::prelude::*;
 use algebra::prelude::*;
+
+use crate::prelude::*;
 
 impl<
         SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,

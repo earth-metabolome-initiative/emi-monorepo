@@ -18,15 +18,15 @@ impl crate::Table {
     /// # Implementative details
     ///
     /// Since the foreign key methods from the [`Foreign`] trait and the `load`
-    /// method from the [`Loadable`] trait cover all foreign keys and the primary
-    /// keys, we only need to implement the methods relative to UNIQUE indices that
-    /// do not refer to neither those columns, even if they are UNIQUE indices.
+    /// method from the [`Loadable`] trait cover all foreign keys and the
+    /// primary keys, we only need to implement the methods relative to
+    /// UNIQUE indices that do not refer to neither those columns, even if
+    /// they are UNIQUE indices.
     ///
     /// # Errors
     ///
     /// * If building the table name fails.
     /// * If querying the database for the unique indices fails.
-    ///
     pub fn from_unique_indices(
         &self,
         conn: &mut diesel::PgConnection,

@@ -19,7 +19,6 @@ pub trait TransposedDirectedEdges:
     /// # Arguments
     ///
     /// * `destination` - The identifier of the destination node.
-    ///
     fn predecessors(
         &self,
         destination: Self::DestinationNodeId,
@@ -33,7 +32,6 @@ pub trait TransposedDirectedEdges:
     /// # Arguments
     ///
     /// * `destination` - The identifier of the destination node.
-    ///
     fn in_degree(&self, destination: Self::DestinationNodeId) -> Self::SourceNodeId {
         self.matrix().number_of_defined_values_in_column(destination)
     }
@@ -68,7 +66,6 @@ pub trait TransposedDirectedGraph:
     /// # Arguments
     ///
     /// * `destination` - The identifier of the destination node.
-    ///
     fn predecessors(
         &self,
         destination: Self::DestinationNodeId,
@@ -81,7 +78,6 @@ pub trait TransposedDirectedGraph:
     /// # Arguments
     ///
     /// * `destination` - The identifier of the destination node.
-    ///
     fn in_degree(&self, destination: Self::DestinationNodeId) -> Self::SourceNodeId {
         self.edges().in_degree(destination)
     }

@@ -10,11 +10,10 @@ use crate::{errors::WebCodeGenError, Table};
 
 impl Table {
     /// Returns all of the implementations of `Foreign<F>` for the table struct.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`.
-    /// 
     pub fn foreign_key_traits(
         &self,
         conn: &mut PgConnection,

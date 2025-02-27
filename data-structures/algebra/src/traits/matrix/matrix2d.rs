@@ -1,8 +1,7 @@
 //! Trait defining a bidimensional matrix.
 
-use crate::traits::{IntoUsize, Matrix, PositiveInteger, SparseMatrix};
-
 use super::SquareMatrix;
+use crate::traits::{IntoUsize, Matrix, PositiveInteger, SparseMatrix};
 
 /// Trait defining a bidimensional matrix.
 pub trait Matrix2D:
@@ -52,7 +51,6 @@ pub trait SparseMatrix2D: Matrix2D + SparseMatrix {
     /// # Arguments
     ///
     /// * `row`: The row index.
-    ///
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_>;
 
     /// Returns an iterator over all the columns of the matrix.
@@ -94,7 +92,8 @@ pub trait BiMatrix2D: Matrix2D {
     fn transposed(&self) -> &Self::TransposedMatrix;
 }
 
-/// Trait defining a sparse matrix which supports efficient operations on columns.
+/// Trait defining a sparse matrix which supports efficient operations on
+/// columns.
 pub trait SparseBiMatrix2D:
     BiMatrix2D<
         Matrix = <Self as SparseBiMatrix2D>::SparseMatrix,
@@ -114,7 +113,6 @@ pub trait SparseBiMatrix2D:
     /// # Arguments
     ///
     /// * `column`: The column index.
-    ///
     fn sparse_column(
         &self,
         column: Self::ColumnIndex,
@@ -127,7 +125,6 @@ pub trait SparseBiMatrix2D:
     /// # Arguments
     ///
     /// * `column` - The column index.
-    ///
     fn number_of_defined_values_in_column(&self, column: Self::ColumnIndex) -> Self::RowIndex {
         self.transposed().number_of_defined_values_in_row(column)
     }
@@ -137,7 +134,6 @@ pub trait SparseBiMatrix2D:
     /// # Arguments
     ///
     /// * `column` - The column index.
-    ///
     fn sparse_column_sizes(
         &self,
     ) -> <Self::SparseTransposedMatrix as SparseMatrix2D>::SparseRowSizes<'_> {

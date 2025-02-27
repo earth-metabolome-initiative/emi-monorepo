@@ -111,31 +111,28 @@ impl SQLOperator {
     }
 
     /// Returns the type of the left operand
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the left operand type is not currently supported
-    /// 
     pub fn left_operand_type(&self) -> Result<Type, WebCodeGenError> {
         postgres_type_to_diesel(self.left_operand_type.as_str(), false)
     }
 
     /// Returns the type of the right operand
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the right operand type is not currently supported
-    /// 
     pub fn right_operand_type(&self) -> Result<Type, WebCodeGenError> {
         postgres_type_to_diesel(self.right_operand_type.as_str(), false)
     }
 
     /// Returns the type of the result
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the result type is not currently supported
-    /// 
     pub fn result_type(&self) -> Result<Type, WebCodeGenError> {
         postgres_type_to_diesel(self.result_type.as_str(), false)
     }
@@ -156,11 +153,10 @@ impl SQLOperator {
     }
 
     /// Returns whether the operator includes `postgil_diesel` types
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the left, right or result types are not currently supported
-    /// 
     pub fn includes_postgres_diesel_types(&self) -> Result<bool, WebCodeGenError> {
         Ok(postgres_type_to_diesel_str(&self.left_operand_type)?
             == "postgis_diesel::sql_types::Geometry"

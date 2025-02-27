@@ -1,12 +1,12 @@
 //! Module implementing traits for the Vec type.
 
-use algebra::prelude::Symbol;
 #[cfg(all(not(feature = "std"), feature = "alloc"))]
 use alloc::vec::Vec;
+use core::{iter::Cloned, ops::Range};
+
+use algebra::prelude::Symbol;
 
 use crate::prelude::*;
-use core::iter::Cloned;
-use core::ops::Range;
 
 impl<V: Symbol> Vocabulary for Vec<V> {
     type SourceSymbol = usize;

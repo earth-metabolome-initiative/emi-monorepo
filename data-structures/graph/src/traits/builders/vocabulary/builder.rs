@@ -52,7 +52,6 @@ pub trait VocabularyBuilder:
     /// # Arguments
     ///
     /// * `number_of_symbols` - The expected number of symbols.
-    ///
     fn expected_number_of_symbols(self, number_of_symbols: usize) -> Self;
 
     /// Returns the expected number of symbols.
@@ -64,6 +63,5 @@ pub trait VocabularyBuilder:
     /// # Arguments
     ///
     /// * `symbols` - The iterator of symbols.
-    ///
     fn symbols(self, symbols: Self::Symbols) -> Self;
 }

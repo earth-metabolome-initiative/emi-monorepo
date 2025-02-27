@@ -162,11 +162,10 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> Result<&'static str, WebCod
 /// # Returns
 ///
 /// A `Type` representing the corresponding Diesel type.
-/// 
+///
 /// # Errors
-/// 
+///
 /// * Returns an error if the type is not supported.
-/// 
 pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<&str, WebCodeGenError> {
     Ok(match postgres_type {
         // Numeric types
@@ -234,11 +233,10 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<&str, WebCodeG
 /// # Returns
 ///
 /// A `Type` representing the corresponding Diesel type.
-/// 
+///
 /// # Errors
-/// 
+///
 /// * Returns an error if the type is not supported.
-/// 
 pub fn postgres_type_to_diesel(
     postgres_type: &str,
     nullable: bool,
@@ -586,11 +584,10 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// * If it is unknown how to implement the associated struct or enum.
-    /// 
     pub fn to_struct_or_enum(
         &self,
         conn: &mut PgConnection,
@@ -604,7 +601,7 @@ impl PgType {
                 let field_name = Ident::new(&attribute.attname, proc_macro2::Span::call_site());
                 let field_pg_type = attribute.pg_type(conn)?;
                 let field_type = field_pg_type.rust_type(false, conn)?;
-                
+
                 fields.push(quote! {
                     pub #field_name: #field_type
                 });
@@ -672,11 +669,10 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// * If it is unknown what type macros are needed.
-    /// 
     pub fn to_diesel_macro(&self) -> TokenStream {
         let postgres_struct_name = self.pg_binding_ident();
         let this_typname: &str = &self.typname;
@@ -707,11 +703,10 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// * If it is unknown what type implementations are needed.
-    /// 
     pub fn to_diesel_impls(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         let diesel_struct_path = self.diesel_type(false, conn)?;
         let rust_struct_path = self.rust_type(false, conn)?;

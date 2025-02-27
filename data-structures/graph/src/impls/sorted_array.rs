@@ -1,8 +1,8 @@
 //! Module implementing traits for the Vec type.
 
+use core::{iter::Cloned, ops::Range};
+
 use algebra::prelude::Symbol;
-use core::iter::Cloned;
-use core::ops::Range;
 use sorted_vec::prelude::SortedArray;
 
 impl<V: Symbol, const N: usize> crate::traits::Vocabulary for SortedArray<V, N> {

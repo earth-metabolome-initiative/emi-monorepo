@@ -1,17 +1,14 @@
-//! Submodule providing the code to generate the implementation of the [`Deletable`] traits for all requiring tables.
-
+//! Submodule providing the code to generate the implementation of the
+//! [`Deletable`] traits for all requiring tables.
 
 use std::path::Path;
 
 use diesel::PgConnection;
-use syn::Ident;
-use quote::quote;
 use proc_macro2::TokenStream;
+use quote::quote;
+use syn::Ident;
 
-
-use crate::errors::WebCodeGenError;
-use crate::Codegen;
-use crate::Table;
+use crate::{errors::WebCodeGenError, Codegen, Table};
 
 impl Codegen<'_> {
     /// Generates the [`Deletable`] traits implementation for the tables
@@ -32,8 +29,7 @@ impl Codegen<'_> {
         // collect all of the imported modules in a public one.
         let mut table_deletable_main_module = TokenStream::new();
         for table in tables {
-            
-            //First we need to check wether the table has a PK
+            // First we need to check wether the table has a PK
             if !table.has_primary_keys(conn)? {
                 continue;
             }
@@ -54,13 +50,13 @@ impl Codegen<'_> {
                     })
                 })
                 .collect::<Result<Vec<_>, WebCodeGenError>>()?;
-    
+
             // Join the where clauses with an and
             let where_clause = where_clause
                 .into_iter()
                 .reduce(|a, b| quote! { diesel::BoolExpressionMethods::and(#a, #b) })
                 .unwrap_or_default();
-    
+
             // impl Deletable for struct_ident
             std::fs::write(&table_file, self.beautify_code(&quote! {
                 impl web_common_traits::prelude::Deletable for #table_struct{

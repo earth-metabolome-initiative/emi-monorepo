@@ -48,7 +48,6 @@ pub trait EdgesBuilder:
     /// # Arguments
     ///
     /// * `number_of_edges` - The expected number of edges.
-    ///
     fn expected_number_of_edges(self, number_of_edges: <Self::Edges as Edges>::EdgeId) -> Self;
 
     /// Returns the expected number of edges.
@@ -60,7 +59,6 @@ pub trait EdgesBuilder:
     /// # Arguments
     ///
     /// * `shape` - The expected shape of the graph.
-    ///
     fn expected_shape(
         self,
         shape: <<Self::IntermediateEdges as GrowableEdges>::GrowableMatrix as SparseMatrixMut>::MinimalShape,
@@ -75,6 +73,5 @@ pub trait EdgesBuilder:
     /// # Arguments
     ///
     /// * `edges` - The iterator of edges.
-    ///
     fn edges(self, edges: Self::EdgeIterator) -> Self;
 }

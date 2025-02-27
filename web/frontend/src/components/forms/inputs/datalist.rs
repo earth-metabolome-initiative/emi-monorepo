@@ -151,21 +151,23 @@ where
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            DatalistMessage::Backend(message) => match message {
-                WebsocketMessage::SearchTable(results) => {
-                    self.number_of_search_queries -= 1;
-                    ctx.link().send_message(DatalistMessage::UpdateCandidates(
-                        bincode::deserialize::<Vec<Data>>(&results)
-                            .expect("Failed to convert row to data")
-                            .into_iter()
-                            .map(Rc::new)
-                            .collect::<Vec<Rc<Data>>>(),
-                    ));
+            DatalistMessage::Backend(message) => {
+                match message {
+                    WebsocketMessage::SearchTable(results) => {
+                        self.number_of_search_queries -= 1;
+                        ctx.link().send_message(DatalistMessage::UpdateCandidates(
+                            bincode::deserialize::<Vec<Data>>(&results)
+                                .expect("Failed to convert row to data")
+                                .into_iter()
+                                .map(Rc::new)
+                                .collect::<Vec<Rc<Data>>>(),
+                        ));
 
-                    true
+                        true
+                    }
+                    _ => false,
                 }
-                _ => false,
-            },
+            }
             DatalistMessage::UpdateCandidates(candidates) => {
                 self.candidates = candidates;
 

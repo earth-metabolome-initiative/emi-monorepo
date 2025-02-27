@@ -1,9 +1,9 @@
 //! Submodule for the `SortedVec` struct and its primary methods.
 
-use core::ops::Index;
-
 #[cfg(all(not(feature = "std"), feature = "alloc"))]
 use alloc::vec::Vec;
+use core::ops::Index;
+
 use common_traits::transmute::TransmuteFrom;
 
 use crate::error::Error;
@@ -130,7 +130,6 @@ impl<V: Ord> SortedVec<V> {
     /// # Errors
     ///
     /// * `Error::UnsortedPush(v)` if the value is not sorted.
-    ///
     pub fn push(&mut self, value: V) -> Result<(), Error<V>> {
         if self.last().is_some_and(|last| last >= &value) {
             Err(Error::UnsortedEntry(value))

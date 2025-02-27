@@ -17,7 +17,11 @@ impl Task {
 
     /// Marks the task as completed.
     pub fn complete(self) -> CompletedTask {
-        CompletedTask { name: self.name, start: self.start, end: chrono::Local::now().naive_local() }
+        CompletedTask {
+            name: self.name,
+            start: self.start,
+            end: chrono::Local::now().naive_local(),
+        }
     }
 }
 

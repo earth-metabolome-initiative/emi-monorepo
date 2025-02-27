@@ -1,4 +1,5 @@
-//! Submodule providing the code to generate the implementation of the attribute traits for all requiring methods.
+//! Submodule providing the code to generate the implementation of the attribute
+//! traits for all requiring methods.
 
 use std::path::Path;
 
@@ -7,8 +8,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
 
-use crate::Codegen;
-use crate::Table;
+use crate::{Codegen, Table};
 
 const ATTRIBUTE_TRAITS: &[(&str, &str)] = &[("Described", "description")];
 
@@ -33,9 +33,9 @@ impl Codegen<'_> {
         for table in tables {
             let columns = table.columns(conn)?;
             let struct_ident = table.import_struct_path()?;
-			let table_file = root.join(format!("{}.rs", table.snake_case_ident()?));
-			let table_snake_case_ident = table.snake_case_ident()?;
-			let mut attribute_traits = TokenStream::new();
+            let table_file = root.join(format!("{}.rs", table.snake_case_ident()?));
+            let table_snake_case_ident = table.snake_case_ident()?;
+            let mut attribute_traits = TokenStream::new();
             for (trait_name, attribute_name) in ATTRIBUTE_TRAITS {
                 let Some(column) = columns
                     .iter()
@@ -55,11 +55,11 @@ impl Codegen<'_> {
                 });
             }
 
-			if attribute_traits.is_empty() {
-				continue;
-			}
+            if attribute_traits.is_empty() {
+                continue;
+            }
 
-			std::fs::write(&table_file, self.beautify_code(&attribute_traits)?)?;
+            std::fs::write(&table_file, self.beautify_code(&attribute_traits)?)?;
 
             table_deletable_main_module.extend(quote::quote! {
                 mod #table_snake_case_ident;

@@ -38,16 +38,16 @@ impl<CSR: SparseMatrix2D> ExactSizeIterator for CSR2DRowSizes<'_, CSR> {
 impl<CSR: SparseMatrix2D> DoubleEndedIterator for CSR2DRowSizes<'_, CSR> {
     fn next_back(&mut self) -> Option<Self::Item> {
         (self.next_row <= self.back_row).then(|| {
-			self.back_row -= CSR::RowIndex::ONE;
-			self.csr2d.number_of_defined_values_in_row(self.back_row)
-		})
+            self.back_row -= CSR::RowIndex::ONE;
+            self.csr2d.number_of_defined_values_in_row(self.back_row)
+        })
     }
 }
 
 impl<'a, CSR: SparseMatrix2D> From<&'a CSR> for CSR2DRowSizes<'a, CSR> {
     fn from(csr2d: &'a CSR) -> Self {
         let next_row = CSR::RowIndex::ZERO;
-		let back_row = csr2d.number_of_rows() - CSR::RowIndex::ONE;
-		Self { csr2d, next_row, back_row }
+        let back_row = csr2d.number_of_rows() - CSR::RowIndex::ONE;
+        Self { csr2d, next_row, back_row }
     }
 }

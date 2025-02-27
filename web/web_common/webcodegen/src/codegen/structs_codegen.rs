@@ -4,11 +4,10 @@ use std::path::Path;
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
+use syn::Ident;
 
 use super::Codegen;
 use crate::Table;
-use syn::Ident;
-
 
 mod table;
 mod types;

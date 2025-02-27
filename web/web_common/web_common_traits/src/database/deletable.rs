@@ -12,7 +12,6 @@ pub trait Deletable {
     /// # Errors
     ///
     /// * Returns an error if the row cannot be deleted.
-    ///
     fn delete<'a>(
         &'a self,
         conn: &'a mut crate::prelude::DBConn,

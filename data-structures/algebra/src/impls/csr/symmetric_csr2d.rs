@@ -12,9 +12,7 @@ pub struct SymmetricCSR2D<SparseIndex, Idx> {
 
 impl<SparseIndex: Debug, Idx: Debug> Debug for SymmetricCSR2D<SparseIndex, Idx> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_struct("SymmetricCSR2D")
-            .field("csr", &self.csr)
-            .finish()
+        f.debug_struct("SymmetricCSR2D").field("csr", &self.csr).finish()
     }
 }
 
@@ -67,7 +65,10 @@ where
         Self { csr: SquareCSR2D::with_sparse_capacity(number_of_values) }
     }
 
-    fn with_sparse_shaped_capacity(order: Self::MinimalShape, number_of_values: Self::SparseIndex) -> Self {
+    fn with_sparse_shaped_capacity(
+        order: Self::MinimalShape,
+        number_of_values: Self::SparseIndex,
+    ) -> Self {
         Self { csr: SquareCSR2D::with_sparse_shaped_capacity(order, number_of_values) }
     }
 }
@@ -113,7 +114,8 @@ where
         = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::SparseRows<'a>
     where
         Self: 'a;
-    type SparseRowSizes<'a> = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::SparseRowSizes<'a>
+    type SparseRowSizes<'a>
+        = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::SparseRowSizes<'a>
     where
         Self: 'a;
 

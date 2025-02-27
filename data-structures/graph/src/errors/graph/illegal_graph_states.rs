@@ -1,15 +1,17 @@
-//! Submodule defining illegal graph states that, if reached, indicate a bug in some implementation
-//! of the graph traits.
+//! Submodule defining illegal graph states that, if reached, indicate a bug in
+//! some implementation of the graph traits.
+
+use algebra::prelude::Bounded;
 
 use crate::traits::Graph;
-use algebra::prelude::Bounded;
 
 #[derive(Clone, PartialEq, Eq)]
 /// Error enumeration relative to illegal graph states.
 pub enum IllegalGraphState<G: Graph + ?Sized> {
-    /// The maximal number of nodes of the graph is larger than the number of nodes that can be
-    /// represented by the graph's node ID type. This should be impossible to reach, and indicates
-    /// some bug in the implementation of the graph traits.
+    /// The maximal number of nodes of the graph is larger than the number of
+    /// nodes that can be represented by the graph's node ID type. This
+    /// should be impossible to reach, and indicates some bug in the
+    /// implementation of the graph traits.
     TooManyNodes {
         /// The number of nodes that was reported.
         number_of_nodes: usize,

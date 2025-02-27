@@ -1,11 +1,10 @@
 //! Module implementing traits for the Vec type.
 
-use algebra::prelude::{PositiveInteger, Symbol};
 #[cfg(all(not(feature = "std"), feature = "alloc"))]
 use alloc::vec::Vec;
+use core::{iter::Cloned, ops::Range};
 
-use core::iter::Cloned;
-use core::ops::Range;
+use algebra::prelude::{PositiveInteger, Symbol};
 
 impl<V: Symbol, const N: usize> crate::traits::Vocabulary for [V; N] {
     type SourceSymbol = usize;
@@ -56,7 +55,6 @@ impl<V: Symbol, const N: usize> crate::traits::BidirectionalVocabulary for [V; N
         self.iter().position(|v| v == destination)
     }
 }
-
 
 impl<NodeId: PositiveInteger> crate::traits::Edge for [NodeId; 2] {
     type SourceNodeId = NodeId;

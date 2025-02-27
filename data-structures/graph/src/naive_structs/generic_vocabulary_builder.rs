@@ -1,11 +1,13 @@
-//! A generic vocabulary builder that can be used to build a vocabulary for any type of graph.
+//! A generic vocabulary builder that can be used to build a vocabulary for any
+//! type of graph.
 
 use common_traits::prelude::{basic, Builder};
 
 use crate::traits::{GrowableVocabulary, Vocabulary, VocabularyBuilder, VocabularyBuilderOptions};
 
 #[basic]
-/// A generic vocabulary builder that can be used to build a vocabulary for any type of graph.
+/// A generic vocabulary builder that can be used to build a vocabulary for any
+/// type of graph.
 pub struct GenericVocabularyBuilder<Symbols, Vocabulary> {
     /// The symbols to build the vocabulary from.
     symbols: Option<Symbols>,
@@ -115,10 +117,12 @@ where
 
         if let Some(expected_number_of_symbols) = expected_number_of_symbols {
             if vocabulary.len() != expected_number_of_symbols {
-                return Err(crate::errors::builder::vocabulary::VocabularyBuilderError::NumberOfSymbols {
-				expected: expected_number_of_symbols,
-				actual: vocabulary.len(),
-			});
+                return Err(
+                    crate::errors::builder::vocabulary::VocabularyBuilderError::NumberOfSymbols {
+                        expected: expected_number_of_symbols,
+                        actual: vocabulary.len(),
+                    },
+                );
             }
         }
 

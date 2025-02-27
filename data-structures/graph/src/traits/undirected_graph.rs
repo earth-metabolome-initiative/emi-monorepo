@@ -63,7 +63,6 @@ pub trait UndirectedGraph:
     /// # Arguments
     ///
     /// * `id`: The identifier of the node.
-    ///
     fn neighbors(&self, id: Self::NodeId) -> <<Self::UndirectedEdges as UndirectedEdges>::SymmetricMatrix as SparseMatrix2D>::SparseRow<'_>{
         self.edges().neighbors(id)
     }
@@ -73,7 +72,6 @@ pub trait UndirectedGraph:
     /// # Arguments
     ///
     /// * `id`: The identifier of the node.
-    ///
     fn degree(&self, id: Self::NodeId) -> Self::NodeId {
         self.edges().degree(id)
     }

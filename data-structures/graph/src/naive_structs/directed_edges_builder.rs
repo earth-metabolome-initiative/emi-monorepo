@@ -1,4 +1,5 @@
-//! A generic edges builder that can be used to build a edges for any type of graph.
+//! A generic edges builder that can be used to build a edges for any type of
+//! graph.
 
 use algebra::{impls::MutabilityError, prelude::SparseMatrixMut};
 use common_traits::prelude::Builder;
@@ -9,7 +10,8 @@ use crate::{
     traits::{DirectedEdges, Edge, Edges, EdgesBuilder, EdgesBuilderOptions, GrowableEdges},
 };
 
-/// A generic edges builder that can be used to build a edges for any type of graph.
+/// A generic edges builder that can be used to build a edges for any type of
+/// graph.
 pub struct GenericDirectedEdgesBuilder<EdgeIterator, GE: GrowableEdges> {
     /// The inner builder for the edges.
     builder: GenericEdgesBuilder<EdgeIterator, GE>,

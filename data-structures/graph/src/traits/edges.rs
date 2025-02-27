@@ -1,7 +1,10 @@
 //! Trait defining a data structure to handle Edges, such as a simple edge list,
 //! or a ragged list or a compressed sparse row matrix.
 
-use algebra::prelude::{IntoUsize, MatrixMut, PositiveInteger, SparseMatrix, SparseMatrix2D, SparseMatrixMut, TryFromUsize};
+use algebra::prelude::{
+    IntoUsize, MatrixMut, PositiveInteger, SparseMatrix, SparseMatrix2D, SparseMatrixMut,
+    TryFromUsize,
+};
 
 use super::Edge;
 
@@ -36,7 +39,6 @@ pub trait Edges {
     /// # Arguments
     ///
     /// * `source` - The identifier of the source node.
-    ///
     fn successors(
         &self,
         source: Self::SourceNodeId,
@@ -49,7 +51,6 @@ pub trait Edges {
     /// # Arguments
     ///
     /// * `source` - The identifier of the source node.
-    ///
     fn out_degree(&self, source: Self::SourceNodeId) -> Self::DestinationNodeId {
         self.matrix().number_of_defined_values_in_row(source)
     }
@@ -63,7 +64,6 @@ pub trait Edges {
     fn edges(&self) -> <Self::Matrix as SparseMatrix>::SparseCoordinates<'_> {
         self.matrix().sparse_coordinates()
     }
-
 }
 
 /// Trait defining a data structure to handle edges that can grow dynamically.
@@ -74,24 +74,24 @@ pub trait GrowableEdges: Edges<Matrix = <Self as GrowableEdges>::GrowableMatrix>
     /// The error that may be returned when adding an edge.
     type Error: core::error::Error + From<<Self::GrowableMatrix as MatrixMut>::Error>;
 
-    /// Creates a new growable edges representation with the provided graph shape.
+    /// Creates a new growable edges representation with the provided graph
+    /// shape.
     ///
     /// # Arguments
     ///
     /// * `shape` - The shape of the graph.
     /// * `number_of_edges` - The number of edges.
-    ///
     fn with_shaped_capacity(
         shape: <Self::GrowableMatrix as SparseMatrixMut>::MinimalShape,
         number_of_edges: Self::EdgeId,
     ) -> Self;
 
-    /// Creates a new growable edges representation with the provided graph shape.
+    /// Creates a new growable edges representation with the provided graph
+    /// shape.
     ///
     /// # Arguments
     ///
     /// * `number_of_edges` - The number of edges.
-    ///
     fn with_capacity(number_of_edges: Self::EdgeId) -> Self;
 
     /// Returns a mutable reference to the underlying matrix.
@@ -109,7 +109,6 @@ pub trait GrowableEdges: Edges<Matrix = <Self as GrowableEdges>::GrowableMatrix>
     /// - The entries are not provided in the expected order.
     /// - The entry is out of bounds.
     /// - The entry is already defined.
-    ///
     fn add(&mut self, edge: Self::Edge) -> Result<(), Self::Error> {
         Ok(self.matrix_mut().add(edge)?)
     }

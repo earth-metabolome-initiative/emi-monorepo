@@ -12,9 +12,9 @@ pub enum AlgorithmError {
 }
 
 impl<G: Graph> From<AlgorithmError> for crate::errors::Error<G> {
-	fn from(error: AlgorithmError) -> Self {
-		crate::errors::Error::AlgorithmError(error)
-	}
+    fn from(error: AlgorithmError) -> Self {
+        crate::errors::Error::AlgorithmError(error)
+    }
 }
 
 impl core::fmt::Display for AlgorithmError {

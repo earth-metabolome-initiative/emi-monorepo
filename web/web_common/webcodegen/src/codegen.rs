@@ -172,8 +172,8 @@ impl<'a> Codegen<'a> {
     /// # Note
     ///
     /// Since the [`Deletable`] traits require the tables structs, enabling the
-    /// generation of the [`Deletable`] traits automatically enables the generation
-    /// of the tables structs.
+    /// generation of the [`Deletable`] traits automatically enables the
+    /// generation of the tables structs.
     pub fn enable_deletable_trait(mut self) -> Self {
         self = self.enable_table_structs();
         self.enable_deletable_trait = true;
@@ -188,7 +188,6 @@ impl<'a> Codegen<'a> {
     /// Since the Attribute traits require the tables structs, enabling the
     /// generation of the Attribute traits automatically enables the generation
     /// of the tables structs.
-    ///
     pub fn enable_attribute_trait(mut self) -> Self {
         self = self.enable_table_structs();
         self.enable_attribute_trait = true;
@@ -201,9 +200,8 @@ impl<'a> Codegen<'a> {
     /// # Note
     ///
     /// Since the [`Foreign`] traits require the tables structs, enabling the
-    /// generation of the [`Foreign`] traits automatically enables the generation
-    /// of the tables structs.
-    ///
+    /// generation of the [`Foreign`] traits automatically enables the
+    /// generation of the tables structs.
     pub fn enable_foreign_trait(mut self) -> Self {
         self = self.enable_loadable_trait();
         self.enable_foreign_trait = true;
@@ -212,13 +210,12 @@ impl<'a> Codegen<'a> {
 
     #[must_use]
     /// Whether to enable the generation of the [`Loadable`] traits.
-    /// 
+    ///
     /// # Note
-    /// 
+    ///
     /// Since the [`Loadable`] traits require the tables structs, enabling the
-    /// generation of the [`Loadable`] traits automatically enables the generation
-    /// of the tables structs.
-    /// 
+    /// generation of the [`Loadable`] traits automatically enables the
+    /// generation of the tables structs.
     pub fn enable_loadable_trait(mut self) -> Self {
         self = self.enable_table_structs();
         self.enable_loadable_trait = true;

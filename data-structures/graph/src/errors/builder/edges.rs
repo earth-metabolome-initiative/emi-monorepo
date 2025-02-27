@@ -13,7 +13,8 @@ use crate::traits::{Edges, EdgesBuilderOptions};
 pub enum EdgesBuilderError<E: Edges> {
     /// Error that occurs when building a edges.
     BuilderError(common_traits::builder::BuilderError<EdgesBuilderOptions>),
-    /// Whether the expected number of edges was not reached or it was overreached.
+    /// Whether the expected number of edges was not reached or it was
+    /// overreached.
     NumberOfEdges {
         /// The expected number of edges.
         expected: E::EdgeId,

@@ -1,10 +1,11 @@
 //! Module implementing traits for the Vec type.
 
-use crate::prelude::*;
+use core::{iter::Cloned, ops::Range};
+
 use algebra::prelude::Symbol;
-use core::iter::Cloned;
-use core::ops::Range;
 use sorted_vec::prelude::SortedVec;
+
+use crate::prelude::*;
 
 impl<V: Symbol> Vocabulary for SortedVec<V> {
     type SourceSymbol = usize;

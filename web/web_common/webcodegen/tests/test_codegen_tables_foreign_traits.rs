@@ -1,4 +1,5 @@
-//! Submodule to test the generation of the Foreign traits implementation for tables.
+//! Submodule to test the generation of the Foreign traits implementation for
+//! tables.
 
 mod utils;
 

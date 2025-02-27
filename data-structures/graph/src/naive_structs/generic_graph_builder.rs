@@ -1,7 +1,8 @@
 //! Submodule providing a general builder to build a generic graph.
 
-use common_traits::prelude::{Builder, BuilderError};
 use core::marker::PhantomData;
+
+use common_traits::prelude::{Builder, BuilderError};
 
 use crate::{
     errors::builder::graph::GraphBuilderError,
@@ -10,11 +11,11 @@ use crate::{
 
 /// Basic builder for a generic graph.
 pub struct GenericGraphBuilder<G: Graph> {
-	/// The sources of the graph.
+    /// The sources of the graph.
     sources: Option<G::Sources>,
-	/// The destinations of the graph.
+    /// The destinations of the graph.
     destinations: Option<G::Destinations>,
-	/// The edges of the graph.
+    /// The edges of the graph.
     edges: Option<G::Edges>,
     _graph: PhantomData<G>,
 }

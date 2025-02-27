@@ -1,8 +1,7 @@
 //! Submodule defining the trait for a directed edges builder.
 
-use crate::traits::DirectedEdges;
-
 use super::EdgesBuilder;
+use crate::traits::DirectedEdges;
 
 /// Trait for Options for building edges.
 pub trait DirectedEdgesBuilder:

@@ -9,7 +9,6 @@ use crate::errors::WebCodeGenError;
 /// about columns that are constrained by a unique or primary key constraint.
 ///
 /// For more details, see [`PostgreSQL`](https://www.postgresql.org/docs/current/infoschema-key-column-usage.html)
-/// 
 #[derive(Queryable, QueryableByName, Selectable, Debug)]
 #[diesel(table_name = crate::schema::key_column_usage)]
 pub struct KeyColumnUsage {

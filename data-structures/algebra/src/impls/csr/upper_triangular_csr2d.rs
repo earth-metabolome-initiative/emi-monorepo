@@ -201,7 +201,8 @@ where
 
         // First, we proceed to compute the number of elements in each column.
         for (row, column) in self.sparse_coordinates() {
-            // TODO! IF YOU INITIALIZE OFFSETS WITH THE OUT BOUND DEGREES, THERE IS NO NEED FOR ALL OF THE SPARSE ROW ACCESSES!
+            // TODO! IF YOU INITIALIZE OFFSETS WITH THE OUT BOUND DEGREES, THERE IS NO NEED
+            // FOR ALL OF THE SPARSE ROW ACCESSES!
             symmetric.offsets[row.into_usize() + 1] += SparseIndex::ONE;
             symmetric.offsets[column.into_usize() + 1] += SparseIndex::from(row != column);
         }
