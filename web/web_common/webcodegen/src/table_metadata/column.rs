@@ -1,18 +1,21 @@
 use diesel::{
-    pg::PgConnection, result::Error as DieselError, BoolExpressionMethods, ExpressionMethods,
-    JoinOnDsl, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
+    pg::PgConnection, result::Error as DieselError,
+    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
+    RunQueryDsl, Selectable, SelectableHelper,
 };
+
 use inflector::Inflector;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{Ident, Type};
 
 use super::{
+    check_constraint::CheckConstraint,
     pg_type::{rust_type_str, PgType},
     table::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS},
 };
 use crate::{
-    errors::WebCodeGenError, table_metadata::pg_type::postgres_type_to_diesel, KeyColumnUsage,
-    Table,
+    errors::WebCodeGenError,
+    table_metadata::pg_type::postgres_type_to_diesel, KeyColumnUsage, Table,
 };
 
 /// Struct defining the `information_schema.columns` table.
@@ -119,6 +122,69 @@ impl Column {
     /// Returns whether the column contains `PostGIS` geometry data
     pub fn is_geometry(&self, conn: &mut PgConnection) -> bool {
         self.geometry(conn).is_ok()
+    }
+
+    /// Returns all the check constraint associated to stzrictly and ONLY the current column.
+    ///
+    /// # Implementative Details
+    ///
+    /// Indeed there can be Check constraints that imply more than one column.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If their is an error while querying the `CheckConstraint`.
+    ///
+    /// # Returns
+    ///
+    /// * A `Vec` of all the `CheckConstraint`
+    pub fn check_constraints(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<CheckConstraint>, WebCodeGenError> {
+        use diesel::debug_query;
+        // use crate::schema::columns;
+        // columns::table.load::<CheckConstraint>(conn).map_err(WebCodeGenError::from)
+        // TODO write a query using Diesel.
+        // we need for sure the Check
+        // We first need to import the required table froms the schema.rs representation
+        use crate::schema::{check_constraints, constraint_column_usage};
+
+        let query_check_constraint = 
+        check_constraints::table
+            .inner_join(
+                constraint_column_usage::table.on(constraint_column_usage::constraint_name
+                    .eq(check_constraints::constraint_name)
+                    .and(
+                        constraint_column_usage::constraint_catalog
+                            .eq(check_constraints::constraint_catalog)
+                            .and(
+                                constraint_column_usage::constraint_schema
+                                    .eq(check_constraints::constraint_schema),
+                            ),
+                    )),
+            )
+            .filter(
+                constraint_column_usage::column_name.eq(&self.column_name).and(
+                    constraint_column_usage::table_catalog.eq(&self.table_catalog).and(
+                        constraint_column_usage::table_schema
+                            .eq(&self.table_schema)
+                            .and(constraint_column_usage::table_name.eq(&self.table_name)),
+                    ),
+                ),
+            )
+            .select(CheckConstraint::as_select());
+
+        
+        let debug_query = debug_query::<Pg, _>(&query_check_constraint).to_string();
+        
+        println!("{}", debug_query);
+
+        Ok(query_check_constraint.load(conn)?)
+            
     }
 
     /// Returns the associated geometry column if the column is a geometry
