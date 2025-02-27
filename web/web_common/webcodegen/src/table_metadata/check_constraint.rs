@@ -14,6 +14,7 @@ use crate::errors::WebCodeGenError;
 
 use super::{PgConstraint, PgProc};
 use super::Column;
+use super::{PgConstraint, PgProc};
 
 #[derive(Queryable, QueryableByName, Debug, Selectable)]
 #[diesel(table_name = crate::schema::check_constraints)]
