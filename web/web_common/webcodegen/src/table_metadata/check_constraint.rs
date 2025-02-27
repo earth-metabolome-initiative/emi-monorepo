@@ -8,8 +8,7 @@ use diesel::{
 
 use crate::errors::WebCodeGenError;
 
-use super::Column;
-use super::{PgConstraint, PgProc};
+use super::{PgConstraint, PgProc, Column};
 
 #[derive(Queryable, QueryableByName, Debug, Selectable)]
 #[diesel(table_name = crate::schema::check_constraints)]
