@@ -224,10 +224,35 @@ table! {
 }
 
 table! {
-    pg_catalog.pg_namespace (oid, nspname) {
+    pg_catalog.pg_namespace (oid) {
         oid -> Oid,
         nspname -> Text,
         nspowner -> Oid,
+    }
+}
+
+table! {
+    pg_catalog.pg_extension (oid) {
+        oid -> Oid,
+        extname -> Text,
+        extowner -> Oid,
+        extnamespace -> Oid,
+        extrelocatable -> Bool,
+        extversion -> Text,
+        extconfig -> Nullable<Array<Oid>>,
+        extcondition -> Nullable<Array<Text>>,
+    }
+}
+
+table! {
+    pg_catalog.pg_depend (classid, objid, objsubid) {
+        classid -> Oid,
+        objid -> Oid,
+        objsubid -> Integer,
+        refclassid -> Oid,
+        refobjid -> Oid,
+        refobjsubid -> Integer,
+        deptype -> Char,
     }
 }
 
@@ -517,6 +542,8 @@ allow_tables_to_appear_in_same_query!(
     pg_constraint,
     pg_class,
     pg_proc,
+    pg_extension,
+    pg_depend,
     pg_type,
     pg_enum,
     pg_trigger,
