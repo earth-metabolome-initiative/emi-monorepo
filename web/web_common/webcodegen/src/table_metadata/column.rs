@@ -1,9 +1,9 @@
 use diesel::{
-    pg::PgConnection, result::Error as DieselError,
-    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
-    RunQueryDsl, Selectable, SelectableHelper,
+    pg::PgConnection, result::Error as DieselError, BoolExpressionMethods, ExpressionMethods,
+    JoinOnDsl, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
 
+use diesel::OptionalExtension;
 use inflector::Inflector;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{Ident, Type};
@@ -14,8 +14,8 @@ use super::{
     table::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS},
 };
 use crate::{
-    errors::WebCodeGenError,
-    table_metadata::pg_type::postgres_type_to_diesel, KeyColumnUsage, Table,
+    errors::WebCodeGenError, table_metadata::pg_type::postgres_type_to_diesel, KeyColumnUsage,
+    Table,
 };
 
 /// Struct defining the `information_schema.columns` table.
@@ -153,8 +153,7 @@ impl Column {
         // We first need to import the required table froms the schema.rs representation
         use crate::schema::{check_constraints, constraint_column_usage};
 
-        let query_check_constraint = 
-        check_constraints::table
+        let query_check_constraint = check_constraints::table
             .inner_join(
                 constraint_column_usage::table.on(constraint_column_usage::constraint_name
                     .eq(check_constraints::constraint_name)
@@ -178,13 +177,11 @@ impl Column {
             )
             .select(CheckConstraint::as_select());
 
-        
-        let debug_query = debug_query::<Pg, _>(&query_check_constraint).to_string();
-        
+        let debug_query = debug_query::<diesel::pg::Pg, _>(&query_check_constraint).to_string();
+
         println!("{}", debug_query);
 
         Ok(query_check_constraint.load(conn)?)
-            
     }
 
     /// Returns the associated geometry column if the column is a geometry
@@ -515,6 +512,36 @@ impl Column {
     pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::columns;
         columns::table.load::<Column>(conn).map_err(WebCodeGenError::from)
+    }
+
+    /// Load a column with a given name fom a given table
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing a `Column` if the operation was
+    /// successful,
+    ///
+    /// # Errors
+    ///
+    /// If an error occurs while querying the database
+    pub fn load(
+        column_name: &str,
+        table_name: &str,
+        table_schema: &str,
+        conn: &mut PgConnection,
+    ) -> Result<Option<Self>, WebCodeGenError> {
+        use crate::schema::columns;
+
+        Ok(columns::table
+            .filter(columns::column_name.eq(column_name).and(
+                columns::table_name.eq(table_name).and(columns::table_schema.eq(table_schema)),
+            ))
+            .first(conn)
+            .optional()?)
     }
 
     /// Returns whether the column is a foreign key
