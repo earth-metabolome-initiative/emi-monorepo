@@ -3,7 +3,13 @@ use diesel::{
     Selectable,
 };
 
+use diesel::BoolExpressionMethods;
+use diesel::JoinOnDsl;
+use diesel::SelectableHelper;
+
 use crate::errors::WebCodeGenError;
+
+use super::Column;
 
 #[derive(Queryable, QueryableByName, Debug, Selectable)]
 #[diesel(table_name = crate::schema::check_constraints)]
@@ -39,6 +45,73 @@ impl CheckConstraint {
     ) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::check_constraints;
         check_constraints::table.load::<CheckConstraint>(conn).map_err(WebCodeGenError::from)
+    }
+
+    /// Returns all the columns associated to this check constraint
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If their is an error while querying the database.
+    ///
+    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
+        use crate::schema::{columns, constraint_column_usage};
+        Ok(columns::table
+            .inner_join(constraint_column_usage::table.on(
+                constraint_column_usage::constraint_name.eq(&self.constraint_name).and(
+                    constraint_column_usage::constraint_catalog.eq(&self.constraint_catalog).and(
+                        constraint_column_usage::constraint_schema.eq(&self.constraint_schema),
+                    ),
+                ),
+            ))
+            .filter(
+                constraint_column_usage::column_name.eq(&columns::column_name).and(
+                    constraint_column_usage::table_catalog.eq(&columns::table_catalog).and(
+                        constraint_column_usage::table_schema
+                            .eq(&columns::table_schema)
+                            .and(constraint_column_usage::table_name.eq(&columns::table_name)),
+                    ),
+                ),
+            )
+            .select(Column::as_select())
+            .load(conn)?)
+    }
+
+    /// Returns whether the check constraint is associated to a single column.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If their is an error while querying the database.
+    ///
+    pub fn is_single_column_constraint(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        self.columns(conn).map(|columns| columns.len() == 1)
+    }
+
+    /// Returns whether the check is associated to multiple columns.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If their is an error while querying the database.
+    ///
+    pub fn is_multi_column_constraint(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        self.columns(conn).map(|columns| columns.len() > 1)
     }
 
     /// Load all the check constraints from the database

@@ -1,12 +1,14 @@
 use diesel::{
     pg::PgConnection, result::Error as DieselError, BoolExpressionMethods, ExpressionMethods,
-    JoinOnDsl, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
+    JoinOnDsl, OptionalExtension, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
+    SelectableHelper,
 };
 use inflector::Inflector;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{Ident, Type};
 
 use super::{
+    check_constraint::CheckConstraint,
     pg_type::{rust_type_str, PgType},
     table::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS},
 };
@@ -119,6 +121,74 @@ impl Column {
     /// Returns whether the column contains `PostGIS` geometry data
     pub fn is_geometry(&self, conn: &mut PgConnection) -> bool {
         self.geometry(conn).is_ok()
+    }
+
+    /// Returns all the check constraint associated to the current column.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If their is an error while querying the [`CheckConstraint`].
+    ///
+    /// # Returns
+    ///
+    /// * A `Vec` of all the [`CheckConstraint`]
+    ///
+    pub fn check_constraints(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<CheckConstraint>, WebCodeGenError> {
+        use crate::schema::{check_constraints, constraint_column_usage};
+        Ok(check_constraints::table
+            .inner_join(
+                constraint_column_usage::table.on(constraint_column_usage::constraint_name
+                    .eq(check_constraints::constraint_name)
+                    .and(
+                        constraint_column_usage::constraint_catalog
+                            .eq(check_constraints::constraint_catalog)
+                            .and(
+                                constraint_column_usage::constraint_schema
+                                    .eq(check_constraints::constraint_schema),
+                            ),
+                    )),
+            )
+            .filter(
+                constraint_column_usage::column_name.eq(&self.column_name).and(
+                    constraint_column_usage::table_catalog.eq(&self.table_catalog).and(
+                        constraint_column_usage::table_schema
+                            .eq(&self.table_schema)
+                            .and(constraint_column_usage::table_name.eq(&self.table_name)),
+                    ),
+                ),
+            )
+            .select(CheckConstraint::as_select())
+            .load(conn)?)
+    }
+
+    /// Returns all single column check constraints associated to the current column.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If their is an error while querying the database.
+    ///
+    pub fn single_column_check_constraints(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<CheckConstraint>, WebCodeGenError> {
+        let mut single_column_check_constraints = vec![];
+        for check_constraint in self.check_constraints(conn)? {
+            if check_constraint.is_single_column_constraint(conn)? {
+                single_column_check_constraints.push(check_constraint);
+            }
+        }
+        Ok(single_column_check_constraints)
     }
 
     /// Returns the associated geometry column if the column is a geometry
@@ -449,6 +519,46 @@ impl Column {
     pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::columns;
         columns::table.load::<Column>(conn).map_err(WebCodeGenError::from)
+    }
+
+    /// Load a column with a given name fom a given table
+    ///
+    /// # Arguments
+    ///
+    /// * `column_name` - The name of the column
+    /// * `table_name` - The name of the table
+    /// * `table_schema` - The schema of the table
+    /// * `table_catalog` - The catalog of the table
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing a `Column` if the operation was
+    /// successful,
+    ///
+    /// # Errors
+    ///
+    /// If an error occurs while querying the database
+    pub fn load(
+        column_name: &str,
+        table_name: &str,
+        table_schema: &str,
+        table_catalog: &str,
+        conn: &mut PgConnection,
+    ) -> Result<Option<Self>, WebCodeGenError> {
+        use crate::schema::columns;
+
+        Ok(columns::table
+            .filter(
+                columns::column_name.eq(column_name).and(
+                    columns::table_name
+                        .eq(table_name)
+                        .and(columns::table_schema.eq(table_schema))
+                        .and(columns::table_catalog.eq(table_catalog)),
+                ),
+            )
+            .first(conn)
+            .optional()?)
     }
 
     /// Returns whether the column is a foreign key

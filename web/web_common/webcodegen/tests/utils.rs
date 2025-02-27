@@ -122,6 +122,31 @@ pub async fn setup_database_with_default_migrations(
     Ok((docker, conn, database_name))
 }
 
+/// Setup a database with a custom migration dir.
+///
+/// # Arguments
+///
+/// * `test_name` - The name of the test.
+///
+/// # Errors
+///
+/// * If the connection cannot be established.
+///
+/// # Panics
+///
+/// * If the container cannot be started.
+pub async fn setup_database_with_migrations(
+    test_name: &str,
+    migration: EmbeddedMigrations,
+) -> Result<(ContainerAsync<GenericImage>, PgConnection, String), diesel::ConnectionError> {
+    let port = random_port(test_name);
+    let database_name = format!("{}_db", test_name);
+    let docker = setup_docker(port, &database_name).await;
+    let mut conn = establish_connection_to_postgres(port, &database_name)?;
+    conn.run_pending_migrations(migration).unwrap();
+    Ok((docker, conn, database_name))
+}
+
 /// Generate a random port based on the test name.
 ///
 /// # Arguments
