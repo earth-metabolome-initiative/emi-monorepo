@@ -3,10 +3,10 @@
 use crate::PgExtension;
 use diesel::ExpressionMethods;
 use diesel::JoinOnDsl;
-use diesel::SelectableHelper;
 use diesel::OptionalExtension;
 use diesel::QueryDsl;
 use diesel::RunQueryDsl;
+use diesel::SelectableHelper;
 use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
 /// Represents the `pg_proc` system catalog table in `PostgreSQL`.
@@ -73,6 +73,36 @@ pub struct PgProc {
 }
 
 impl PgProc {
+    /// Returns the [`PgProc`] associated to the given `name` and `namespace`.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the function.
+    /// * `namespace` - The name of the namespace that contains the function.
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    ///
+    /// # Errors
+    ///
+    /// * If the function does not exist.
+    ///
+    pub fn load(
+        name: &str,
+        namespace: &str,
+        conn: &mut PgConnection,
+    ) -> Result<Option<PgProc>, diesel::result::Error> {
+        use crate::schema::pg_proc;
+        pg_proc::table
+            .filter(pg_proc::proname.eq(name))
+            .inner_join(
+                crate::schema::pg_namespace::table
+                    .on(pg_proc::pronamespace.eq(crate::schema::pg_namespace::oid)),
+            )
+            .filter(crate::schema::pg_namespace::nspname.eq(namespace))
+            .select(PgProc::as_select())
+            .first::<PgProc>(conn)
+            .optional()
+    }
+
     /// Returns the [`PgExtension`] that contains this function, if any.
     ///
     /// # Arguments
@@ -83,18 +113,15 @@ impl PgProc {
     ///
     /// * If the function is not contained in an extension
     ///
-    pub fn extension(&self, conn: &mut PgConnection) -> Result<Option<PgExtension>, diesel::result::Error> {
+    pub fn extension(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<PgExtension>, diesel::result::Error> {
         use crate::schema::{pg_depend, pg_extension};
-        pg_depend::table
-            // Join pg_depend to pg_extension using the extension's OID.
-            .inner_join(pg_extension::table.on(pg_depend::objid.eq(pg_extension::oid)))
-            // Filter rows where the function's OID is referenced.
-            .filter(pg_depend::refobjid.eq(self.oid))
-            // Only consider dependencies that mark extension membership.
-            .filter(pg_depend::deptype.eq("e"))
-            // Select all columns from pg_extension.
+        pg_extension::table
+            .inner_join(pg_depend::table.on(pg_extension::oid.eq(pg_depend::refobjid)))
+            .filter(pg_depend::objid.eq(self.oid))
             .select(PgExtension::as_select())
-            // Get the first matching extension, if one exists.
             .first::<PgExtension>(conn)
             .optional()
     }

@@ -52,6 +52,15 @@ async fn test_check_constraints_column() {
                 "Check constraint `{check_constraint_name}` has an unexpected number of functions",
                 check_constraint_name = check_constraint.constraint_name
             );
+
+            // None of these functions are expected to be associated with an extension.
+            for function in functions {
+                assert!(
+                    function.extension(&mut conn).unwrap().is_none(),
+                    "Function `{function_name}` is associated with an extension",
+                    function_name = function.proname
+                );
+            }
         }
     }
 

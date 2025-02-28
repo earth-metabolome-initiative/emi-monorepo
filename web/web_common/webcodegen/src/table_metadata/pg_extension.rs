@@ -12,19 +12,23 @@ use diesel::{Queryable, QueryableByName, Selectable};
 
 use crate::errors::WebCodeGenError;
 
+use super::PgProc;
+
 /// Represents the `pg_extension` system catalog table in `PostgreSQL`.
 /// This table stores information about extensions.
-#[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq)]
+#[derive(Queryable, QueryableByName, Selectable, Clone, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::pg_extension)]
 pub struct PgExtension {
     /// The OID of the extension.
     pub oid: u32,
     /// The name of the extension.
     pub extname: String,
-    /// The OID of the namespace that contains this extension.
-    pub extnamespace: u32,
     /// The OID of the owner of the extension.
     pub extowner: u32,
+    /// The OID of the namespace that contains this extension.
+    pub extnamespace: u32,
+    /// Whether the extension is relocatable.
+    pub extrelocatable: bool,
     /// The version of the extension.
     pub extversion: String,
     /// The schema of the extension.
@@ -34,7 +38,22 @@ pub struct PgExtension {
 }
 
 impl PgExtension {
-    /// Loads the extension with the given name amd namespace from the database.
+    /// Loads all of the [`PgExtension`]s from the database.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    ///
+    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
+        use crate::schema::pg_extension;
+        pg_extension::table.load(conn).map_err(WebCodeGenError::from)
+    }
+
+    /// Loads the [`PgExtension`] with the given name amd namespace from the database.
     ///
     /// # Arguments
     ///
@@ -59,6 +78,26 @@ impl PgExtension {
             .select(PgExtension::as_select())
             .first(conn)
             .optional()
+            .map_err(WebCodeGenError::from)
+    }
+
+    /// Returns all [`PgProc`] functions associated with this extension.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    ///
+    pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, WebCodeGenError> {
+        use crate::schema::{pg_depend, pg_proc};
+        pg_depend::table
+            .inner_join(pg_proc::table.on(pg_depend::objid.eq(pg_proc::oid)))
+            .filter(pg_depend::refobjid.eq(self.oid))
+            .select(PgProc::as_select())
+            .load(conn)
             .map_err(WebCodeGenError::from)
     }
 }
