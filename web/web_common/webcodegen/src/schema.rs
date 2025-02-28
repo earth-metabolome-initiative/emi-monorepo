@@ -212,22 +212,48 @@ table! {
         pronargdefaults -> SmallInt,
         prorettype -> Oid,
         proargtypes -> Array<Oid>,
-        proallargtypes -> Array<Oid>,
+        proallargtypes -> Nullable<Array<Oid>>,
         proargmodes -> Nullable<Array<Char>>,
         proargnames -> Nullable<Array<Text>>,
         proargdefaults -> Nullable<Array<Text>>,
+        protrftypes -> Nullable<Array<Oid>>,
         prosrc -> Text,
-        probin -> Bytea,
+        probin -> Nullable<Bytea>,
         prosqlbody -> Nullable<Text>,
-        proconfig -> Array<Text>,
+        proconfig -> Nullable<Array<Text>>,
     }
 }
 
 table! {
-    pg_catalog.pg_namespace (oid, nspname) {
+    pg_catalog.pg_namespace (oid) {
         oid -> Oid,
         nspname -> Text,
         nspowner -> Oid,
+    }
+}
+
+table! {
+    pg_catalog.pg_extension (oid) {
+        oid -> Oid,
+        extname -> Text,
+        extowner -> Oid,
+        extnamespace -> Oid,
+        extrelocatable -> Bool,
+        extversion -> Text,
+        extconfig -> Nullable<Array<Oid>>,
+        extcondition -> Nullable<Array<Text>>,
+    }
+}
+
+table! {
+    pg_catalog.pg_depend (classid, objid, objsubid) {
+        classid -> Oid,
+        objid -> Oid,
+        objsubid -> Integer,
+        refclassid -> Oid,
+        refobjid -> Oid,
+        refobjsubid -> Integer,
+        deptype -> Char,
     }
 }
 
@@ -344,13 +370,13 @@ table! {
         conislocal -> Bool,
         coninhcount -> SmallInt,
         connoinherit -> Bool,
-        conkey -> Array<SmallInt>,
-        confkey -> Array<SmallInt>,
-        conpfeqop -> Array<Oid>,
-        conppeqop -> Array<Oid>,
-        conffeqop -> Array<Oid>,
-        confdelsetcols -> Array<SmallInt>,
-        conexclop -> Array<Oid>,
+        conkey -> Nullable<Array<SmallInt>>,
+        confkey -> Nullable<Array<SmallInt>>,
+        conpfeqop -> Nullable<Array<Oid>>,
+        conppeqop -> Nullable<Array<Oid>>,
+        conffeqop -> Nullable<Array<Oid>>,
+        confdelsetcols -> Nullable<Array<SmallInt>>,
+        conexclop -> Nullable<Array<Oid>>,
     }
 }
 
@@ -517,6 +543,8 @@ allow_tables_to_appear_in_same_query!(
     pg_constraint,
     pg_class,
     pg_proc,
+    pg_extension,
+    pg_depend,
     pg_type,
     pg_enum,
     pg_trigger,

@@ -1,3 +1,6 @@
+use diesel::BoolExpressionMethods;
+use diesel::JoinOnDsl;
+use diesel::SelectableHelper;
 use diesel::{
     pg::PgConnection, ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl,
     Selectable,
@@ -9,7 +12,7 @@ use diesel::SelectableHelper;
 
 use crate::errors::WebCodeGenError;
 
-use super::Column;
+use super::{PgConstraint, PgProc, Column};
 
 #[derive(Queryable, QueryableByName, Debug, Selectable)]
 #[diesel(table_name = crate::schema::check_constraints)]
@@ -26,6 +29,45 @@ pub struct CheckConstraint {
 }
 
 impl CheckConstraint {
+    /// Returns the vector of [`PgProc`] functions that are used in the check clause
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    ///
+    pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, WebCodeGenError> {
+        Ok(self.pg_constraint(conn)?.functions(conn)?)
+    }
+
+    /// Returns the [`PgConstraint`] that corresponds to this check constraint
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    ///
+    pub fn pg_constraint(&self, conn: &mut PgConnection) -> Result<PgConstraint, WebCodeGenError> {
+        use crate::schema::{pg_constraint, pg_namespace};
+        pg_constraint::table
+            .inner_join(pg_namespace::table.on(pg_constraint::connamespace.eq(pg_namespace::oid)))
+            .filter(
+                pg_constraint::conname
+                    .eq(&self.constraint_name)
+                    .and(pg_constraint::contype.eq("c")),
+            )
+            .filter(pg_namespace::nspname.eq(&self.constraint_schema))
+            .select(PgConstraint::as_select())
+            .first(conn)
+            .map_err(WebCodeGenError::from)
+    }
+
     /// Load all the check constraints from the database
     ///
     /// # Arguments
