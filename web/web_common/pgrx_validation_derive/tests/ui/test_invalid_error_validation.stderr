@@ -1,0 +1,5 @@
+error: Function `is_not_empty` must return a `Result<(), validation_errors::Error>` to be decorated with `validation`, but returns `Result < (), String >`.
+ --> tests/ui/test_invalid_error_validation.rs:7:33
+  |
+7 | pub fn is_not_empty(_arg: &str) -> Result<(), String> {
+  |                                 ^

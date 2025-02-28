@@ -1,0 +1,7 @@
+error: Function `is_not_empty` must have at least one argument to be decorated with `validation`.
+ --> tests/ui/test_no_args_validation.rs:5:1
+  |
+5 | #[validation]
+  | ^^^^^^^^^^^^^
+  |
+  = note: this error originates in the attribute macro `validation` (in Nightly builds, run with -Z macro-backtrace for more info)

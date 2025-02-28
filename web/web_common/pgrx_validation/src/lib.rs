@@ -10,22 +10,29 @@ use pgrx::prelude::*;
 #[cfg(feature = "pgrx")]
 ::pgrx::pg_module_magic!();
 
-#[cfg_attr(feature = "pgrx", pg_extern)]
-fn hello_pgrx_validation() -> &'static str {
-    "Hello, pgrx_validation"
-}
+use pgrx_validation_derive::validation;
 
-#[cfg(any(test, feature = "pg_test"))]
-#[pg_schema]
-mod tests {
-    use pgrx::prelude::*;
-
-    #[pg_test]
-    fn test_hello_pgrx_validation() {
-        assert_eq!("Hello, pgrx_validation", crate::hello_pgrx_validation());
+#[validation]
+/// Validates that the given value is not empty.
+pub fn must_not_be_empty(value: &str) -> Result<(), validation_errors::Error> {
+    if value.is_empty() {
+        Err(validation_errors::Error::EmptyText)
+    } else {
+        Ok(())
     }
-
 }
+
+// #[cfg(any(test, feature = "pg_test"))]
+// #[pg_schema]
+// mod tests {
+//     use pgrx::prelude::*;
+
+//     #[pg_test]
+//     fn test_hello_pgrx_validation() {
+//         assert_eq!("Hello, pgrx_validation", crate::hello_pgrx_validation());
+//     }
+
+// }
 
 /// This module is required by `cargo pgrx test` invocations.
 /// It must be visible at the root of your extension crate.

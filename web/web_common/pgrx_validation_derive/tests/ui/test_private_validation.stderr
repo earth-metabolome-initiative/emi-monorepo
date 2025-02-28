@@ -1,0 +1,7 @@
+error: Function `is_not_empty` must be public to be decoraged with `validation` - add a `pub` keyword before the function definition if appropriate.
+ --> tests/ui/test_private_validation.rs:4:1
+  |
+4 | #[validation]
+  | ^^^^^^^^^^^^^
+  |
+  = note: this error originates in the attribute macro `validation` (in Nightly builds, run with -Z macro-backtrace for more info)
