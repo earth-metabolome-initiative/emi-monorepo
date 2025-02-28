@@ -12,8 +12,7 @@ Data validation is foundamental in any application. In a web application, data m
 
 Re-defining a validation multiple times is a waste of time, and prone to errors as if the validation rules are changed, they must be changed in multiple places. In this library, we define the validation rules in a single place, and then compile it to different targets.
 
-
-
+![mechanism](./mechanism.png)
 
 ## Getting started
 
