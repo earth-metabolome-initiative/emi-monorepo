@@ -20,7 +20,7 @@ async fn test_check_constraints_table() {
     .unwrap();
 
     for (table_name, expected_number_of_check_constraints) in
-        [("constrained_users", 1), ("constrained_samples", 2)]
+        [("constrained_users", 1), ("constrained_samples", 2), ("unconstrained_samples", 0)]
     {
         let table = Table::load(&mut conn, table_name, Some("public"), &database_name)
             .expect(&format!("Failed to retrieve table `{table_name}`"));

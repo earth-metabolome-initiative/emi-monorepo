@@ -80,3 +80,15 @@ CREATE TABLE constrained_samples (
     CHECK (check_strings_different(samplename, sanitized_samplename))
 );
 
+
+-- SQL query creating a mockup of the unconstrained samples table.
+CREATE TABLE unconstrained_samples (
+    id SERIAL PRIMARY KEY,
+    samplename VARCHAR(255) NOT NULL CHECK (check_non_empty_string(samplename)),
+    sanitized_samplename VARCHAR(255) NOT NULL CHECK (check_non_empty_string(sanitized_samplename)),
+    amount_initial INT NOT NULL CHECK (amount_initial > 10),
+    amount_final INT NOT NULL CHECK (amount_final > 2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (samplename),
+    UNIQUE (samplename, id)
+);
