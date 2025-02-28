@@ -1,0 +1,46 @@
+[package]
+name = "pgrx_validation"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[[bin]]
+name = "pgrx_embed_pgrx_validation"
+path = "./src/bin/pgrx_embed.rs"
+
+[features]
+default = []
+pgrx = ["dep:pgrx"]
+pg12 = ["pgrx", "pgrx/pg12", "pgrx-tests/pg12" ]
+pg13 = ["pgrx", "pgrx/pg13", "pgrx-tests/pg13" ]
+pg14 = ["pgrx", "pgrx/pg14", "pgrx-tests/pg14" ]
+pg15 = ["pgrx", "pgrx/pg15", "pgrx-tests/pg15" ]
+pg16 = ["pgrx", "pgrx/pg16", "pgrx-tests/pg16" ]
+pg17 = ["pgrx", "pgrx/pg17", "pgrx-tests/pg17" ]
+backend = []
+frontend = []
+pg_test = ["pgrx"]
+
+[dependencies]
+pgrx = {version = "=0.13.0", optional = true}
+
+[dev-dependencies]
+pgrx-tests = "=0.13.0"
+
+[lints.rust]
+missing_docs = "warn"
+unused_macro_rules = "forbid"
+unconditional_recursion = "forbid"
+unreachable_patterns = "forbid"
+unused_import_braces = "forbid"
+
+[profile.dev]
+panic = "unwind"
+
+[profile.release]
+panic = "unwind"
+opt-level = 3
+lto = "fat"
+codegen-units = 1
