@@ -959,6 +959,29 @@ impl Table {
             .load::<CheckConstraint>(conn)
     }
 
+    /// Returns all multi column check constraints associated to the current table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If their is an error while querying the database.
+    ///
+    pub fn multi_column_check_constraints(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<CheckConstraint>, WebCodeGenError> {
+        let mut multi_column_check_constraints = vec![];
+        for check_constraint in self.check_constraints(conn)? {
+            if check_constraint.is_multi_column_constraint(conn)? {
+                multi_column_check_constraints.push(check_constraint);
+            }
+        }
+        Ok(multi_column_check_constraints)
+    }
+
     /// Returns the list of Triggers associates to the current table.
     ///
     /// # Arguments

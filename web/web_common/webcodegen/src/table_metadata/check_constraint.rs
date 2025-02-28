@@ -6,10 +6,6 @@ use diesel::{
     Selectable,
 };
 
-use diesel::BoolExpressionMethods;
-use diesel::JoinOnDsl;
-use diesel::SelectableHelper;
-
 use crate::errors::WebCodeGenError;
 
 use super::{PgConstraint, PgProc, Column};
