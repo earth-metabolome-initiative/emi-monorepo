@@ -1,0 +1,11 @@
+services:
+  pgrx_builder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pgrx_builder
+    volumes:
+      - ../../..:/workspace  # Mount the entire monorepo
+      - ./pgrx_validation:/workspace/extension # Output directory
+    working_dir: /workspace/web/web_common/pgrx_validation
+    entrypoint: ["/workspace/web/web_common/pgrx_validation/build.sh"]

@@ -12,6 +12,8 @@ use pgrx::prelude::*;
 
 use pgrx_validation_derive::validation;
 
+pub const EXTENSION_NAME: &str = "pgrx_validation";
+
 #[validation]
 /// Validates that the given value is not empty.
 pub fn must_not_be_empty(value: &str) -> Result<(), validation_errors::Error> {

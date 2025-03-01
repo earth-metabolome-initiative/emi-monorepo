@@ -13,7 +13,7 @@ sudo apt update
 sudo apt -y install libreadline-dev bison flex
 ```
 
-Since we will be using `Docker` for testing, it is also necessary to have it installed. Please install it by following [the current version of the short tutorial made available here](https://github.com/LucaCappelletti94/linux-setup/blob/main/DOCKER.md).
+Since we will be using `Docker` for building and testing, it is also necessary to have it installed. Please install it by following [the current version of the short tutorial made available here](https://github.com/LucaCappelletti94/linux-setup/blob/main/DOCKER.md).
 
 ## Installation
 
@@ -42,23 +42,16 @@ cargo pgrx new my_extension
 
 ## Building the extension
 
-To build the extension, you can run:
+To build the extension into the local folder `./pgrx_validation`, you can run:
 
 ```bash
-cargo pgrx package
-```
-
-This will by default as output in the `./target/[debug|release]/extname-pgXX/` directory.
-
-To build the extension in an arbitrary directory:
-
-```bash
-cargo pgrx package --out-dir my_own_extension
+docker compose build
+docker compose up
 ```
 
 ## Testing the extension
 
-After having built the extension in a directory such as `my_own_extension` as described above, you can run the test suite which will create a temporary docker container with PostgreSQL by using [`testcontainers`](https://testcontainers.com/). It will then copy the `lib` and `extension` directories in the container by using `docker cp` and run the test migration using `cargo test`:
+After having built the extension in a directory such as `pgrx_validation` as described above, you can run the test suite which will create a temporary docker container with PostgreSQL by using [`testcontainers`](https://testcontainers.com/). It will then copy the `lib` and `extension` directories in the container by using `docker cp` and run the test migration using `cargo test`:
 
 ```bash
 cargo test --test test_migration
