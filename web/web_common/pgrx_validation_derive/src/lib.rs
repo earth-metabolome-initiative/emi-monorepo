@@ -94,7 +94,6 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
                     Ok(()) => true,
                     Err(e) => {
                         pgrx::error!("Validation failed: {:?}", e);
-                        false
                     }
                 }
             }

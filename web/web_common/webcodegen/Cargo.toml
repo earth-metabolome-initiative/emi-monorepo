@@ -30,6 +30,7 @@ web_common_traits = {workspace = true, features = ["backend"]}
 macaddr = "1.0.1"
 postgis_diesel.workspace = true
 diesel_full_text_search.workspace = true
+pgrx_validation.workspace = true
 
 [features]
 default = ["diesel", "serde"]

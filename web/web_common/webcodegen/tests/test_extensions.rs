@@ -25,11 +25,15 @@ async fn test_extensions_column() {
         .expect("Unable to query the database")
         .expect("Extension `pg_trgm` not found");
 
+    let pgrx_validation_extension = PgExtension::load("pgrx_validation", "public", &mut conn)
+        .expect("Unable to query the database")
+        .expect("Extension `pgrx_validation` not found");
+
     // We print all of the available extensions.
     let all_extensions = PgExtension::load_all(&mut conn).expect("Unable to query the database");
 
     // We check that the loaded extensions appear in the set of aLL extensions
-    for extension in [&uuid_extension, &pg_trgm_extension].iter() {
+    for extension in [&uuid_extension, &pg_trgm_extension, &pgrx_validation_extension].iter() {
         assert!(all_extensions.contains(extension), "Extension {:?} not found", extension);
     }
 
@@ -41,11 +45,17 @@ async fn test_extensions_column() {
         .functions(&mut conn)
         .expect("Failed to query the database for pg_trgm functions");
 
+    let pgrx_validation_functions = pgrx_validation_extension
+        .functions(&mut conn)
+        .expect("Failed to query the database for pgrx_validation functions");
+
     // We check that, for each of the loaded functions, the extension name is the same as the one we
     // loaded
-    for (all_functions, expected_extension) in
-        [(&uuid_functions, &uuid_extension), (&pg_trgm_functions, &pg_trgm_extension)]
-    {
+    for (all_functions, expected_extension) in [
+        (&uuid_functions, &uuid_extension),
+        (&pg_trgm_functions, &pg_trgm_extension),
+        (&pgrx_validation_functions, &pgrx_validation_extension),
+    ] {
         for function in all_functions.iter() {
             assert_eq!(
                 &function

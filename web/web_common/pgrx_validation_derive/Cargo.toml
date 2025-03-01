@@ -7,7 +7,6 @@ edition = "2021"
 syn.workspace = true
 quote.workspace = true
 proc-macro2.workspace = true
-proc-macro-crate = "3.2.0"
 
 [dev-dependencies]
 trybuild.workspace = true
@@ -15,9 +14,6 @@ validation-errors.workspace = true
 
 [lib]
 proc-macro = true
-
-[lint]
-workspace = true
 
 [features]
 pgrx = []
