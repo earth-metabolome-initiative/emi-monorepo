@@ -1,0 +1,5 @@
+error: Function `must_not_be_empty` must not be async to be decorated with `validation`.
+ --> tests/ui/test_async_validation.rs:7:5
+  |
+7 | pub async fn must_not_be_empty(_arg: &str) -> Result<(), validation_errors::Error> {
+  |     ^^^^^

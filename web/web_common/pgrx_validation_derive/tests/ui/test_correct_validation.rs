@@ -3,12 +3,23 @@
 use pgrx_validation_derive::validation;
 
 #[validation]
+/// A placeholder validation.
+/// 
+/// # Errors
+/// 
+/// * `Error::EmptyText` if the given argument is empty.
+/// 
 pub fn must_not_be_another_empty(_arg: &str) -> Result<(), validation_errors::Error> {
     Ok(())
 }
 
 #[validation]
 /// A simple validation function which returns the correct error type should pass.
+/// 
+/// # Errors
+/// 
+/// * `Error::EmptyText` if the given argument is empty.
+/// 
 pub fn must_not_be_empty(arg: &str) -> Result<(), validation_errors::Error> {
     must_not_be_another_empty(arg)?;
     Ok(())

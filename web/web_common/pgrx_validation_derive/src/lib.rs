@@ -61,6 +61,13 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
         return syn::Error::new(vis.span(), &error_message).to_compile_error().into();
     }
 
+    // Methods wrapped with a `validation` attribute must not be async.
+    if sig.asyncness.is_some() {
+        let error_message =
+            format!("Function `{fn_name}` must not be async to be decorated with `validation`.",);
+        return syn::Error::new(sig.asyncness.span(), &error_message).to_compile_error().into();
+    }
+
     // Since Postgres does not support generics, we need to ensure that the function does not have any.
     if !sig.generics.params.is_empty() {
         let error_message = format!(
@@ -104,6 +111,14 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
     if !function_name.starts_with("must_be_") && !function_name.starts_with("must_not_be_") {
         let error_message = format!(
             "Function `{fn_name}` must start with `must_be_` or `must_not_be_` to be decorated with `validation`.",
+        );
+        return syn::Error::new(fn_name.span(), &error_message).to_compile_error().into();
+    }
+
+    // We expect that a `validation` method has a doc comment.
+    if input_fn.attrs.is_empty() {
+        let error_message = format!(
+            "Function `{fn_name}` must have a doc comment to be decorated with `validation`.",
         );
         return syn::Error::new(fn_name.span(), &error_message).to_compile_error().into();
     }
