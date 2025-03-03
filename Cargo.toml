@@ -29,7 +29,7 @@ members = [
 
 [workspace.dependencies]
 actix-ws = "0.3.0"
-syn = { version = "2.0", features = ["full"] }
+syn = { version = "2.0", features = ["full", "visit-mut"] }
 quote = "1.0"
 proc-macro2 = "1.0"
 url = "2.5.4"
@@ -88,6 +88,7 @@ sorted-vec = { path = "data-structures/sorted-vec" }
 pgrx_validation = { path = "web/web_common/pgrx_validation" }
 pgrx_validation_derive = { path = "web/web_common/pgrx_validation_derive" }
 validation-errors = { path = "web/web_common/validation-errors" }
+validator = { version = "0.16", features = ["derive"] }
 
 [workspace.lints.rust]
 missing_docs = "forbid"
