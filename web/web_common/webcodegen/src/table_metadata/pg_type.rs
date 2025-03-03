@@ -121,7 +121,7 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> Result<&'static str, WebCod
         "oid" => "u32",
 
         // Text types
-        "character varying" | "text" | "name" | "xml" | "character" | "char" => "String",
+        "character varying" | "text" | "name" | "xml" | "character" | "char" | "citext" => "String",
 
         // Boolean types
         "boolean" => "bool",
@@ -178,6 +178,7 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<&str, WebCodeG
 
         // Text types
         "text" | "character varying" | "name" | "cstring" => "diesel::sql_types::Text",
+        "citext" => "diesel::sql_types::Citext",
         "char" => "diesel::sql_types::CChar",
         "bpchar" => "diesel::sql_types::Bpchar",
 

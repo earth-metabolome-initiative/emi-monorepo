@@ -5,9 +5,6 @@
 //! 
 
 #[cfg(feature = "pgrx")]
-use pgrx::prelude::*;
-
-#[cfg(feature = "pgrx")]
 ::pgrx::pg_module_magic!();
 
 use pgrx_validation_derive::validation;
@@ -24,8 +21,19 @@ pub fn must_not_be_empty(value: &str) -> Result<(), validation_errors::Error> {
     }
 }
 
+#[validation]
+/// Validates that the given value is a valid mail address.
+pub fn must_be_mail(value: &str) -> Result<(), validation_errors::Error> {
+    must_not_be_empty(value)?;
+    if validator::validate_email(value) {
+        Ok(())
+    } else {
+        Err(validation_errors::Error::InvalidMail)
+    }
+}
+
 // #[cfg(any(test, feature = "pg_test"))]
-// #[pg_schema]
+// #[pgrx::pg_schema]
 // mod tests {
 //     use pgrx::prelude::*;
 

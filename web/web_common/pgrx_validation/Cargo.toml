@@ -13,20 +13,21 @@ path = "./src/bin/pgrx_embed.rs"
 [features]
 default = []
 pgrx = ["dep:pgrx", "pgrx_validation_derive/pgrx"]
-pg12 = ["pgrx", "pgrx/pg12", "pgrx-tests/pg12" ]
-pg13 = ["pgrx", "pgrx/pg13", "pgrx-tests/pg13" ]
-pg14 = ["pgrx", "pgrx/pg14", "pgrx-tests/pg14" ]
-pg15 = ["pgrx", "pgrx/pg15", "pgrx-tests/pg15" ]
-pg16 = ["pgrx", "pgrx/pg16", "pgrx-tests/pg16" ]
-pg17 = ["pgrx", "pgrx/pg17", "pgrx-tests/pg17" ]
+pg12 = ["pgrx", "pgrx/pg12", "pgrx-tests/pg12"]
+pg13 = ["pgrx", "pgrx/pg13", "pgrx-tests/pg13"]
+pg14 = ["pgrx", "pgrx/pg14", "pgrx-tests/pg14"]
+pg15 = ["pgrx", "pgrx/pg15", "pgrx-tests/pg15"]
+pg16 = ["pgrx", "pgrx/pg16", "pgrx-tests/pg16"]
+pg17 = ["pgrx", "pgrx/pg17", "pgrx-tests/pg17"]
 backend = []
 frontend = []
 pg_test = ["pgrx"]
 
 [dependencies]
-pgrx = {version = "=0.13.0", optional = true}
+pgrx = { version = "=0.13.0", optional = true }
 pgrx_validation_derive.workspace = true
 validation-errors.workspace = true
+validator.workspace = true
 
 [dev-dependencies]
 pgrx-tests = "=0.13.0"

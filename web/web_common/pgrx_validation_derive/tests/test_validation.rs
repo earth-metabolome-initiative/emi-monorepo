@@ -12,5 +12,7 @@ fn test_illegal_validation() {
     t.compile_fail("tests/ui/test_return_bool_validation.rs");
     t.compile_fail("tests/ui/test_invalid_error_validation.rs");
     t.compile_fail("tests/ui/test_almost_correct_validation.rs");
+    t.compile_fail("tests/ui/test_not_must_validation.rs");
+    t.compile_fail("tests/ui/test_camelcased_validation.rs");
     t.pass("tests/ui/test_correct_validation.rs");
 }

@@ -1,0 +1,5 @@
+error: Function `MustNotBeEmpty` must be snake_case to be decorated with `validation`.
+ --> tests/ui/test_camelcased_validation.rs:7:8
+  |
+7 | pub fn MustNotBeEmpty(_arg: &str) -> Result<(), validation_errors::Error> {
+  |        ^^^^^^^^^^^^^^

@@ -46,7 +46,6 @@ reqwest.workspace = true
 email_address = "0.2.9"
 redis = { version = "0.24.0", features = ["tokio-comp"] }
 base64 = "0.21.7"
-validator = "0.16"
 image = "0.25.5"
 identicon-rs = "5.0.1"
 strsim = "0.11.1"

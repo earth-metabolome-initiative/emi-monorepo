@@ -2,7 +2,7 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL CHECK (username <> ''),
-    email VARCHAR(255) NOT NULL,
+    email CITEXT NOT NULL CHECK (must_be_mail(email)),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (username),
     UNIQUE (email),

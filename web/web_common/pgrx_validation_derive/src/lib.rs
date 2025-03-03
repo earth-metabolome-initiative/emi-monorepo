@@ -6,6 +6,28 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::parse_macro_input;
 use syn::spanned::Spanned;
+use syn::{visit_mut::VisitMut, Expr, ExprCall, ExprPath};
+
+struct MethodRenamer;
+
+impl VisitMut for MethodRenamer {
+    fn visit_expr_call_mut(&mut self, node: &mut ExprCall) {
+        if let Expr::Path(ExprPath { path, .. }) = node.func.as_mut() {
+            if let Some(ident) = path.get_ident() {
+                if let Some(ident) = ident.to_string().strip_prefix("must_be_") {
+                    path.segments[0].ident =
+                        syn::Ident::new(&format!("__inner_must_be_{}", ident), path.span());
+                } else if let Some(ident) = ident.to_string().strip_prefix("must_not_be_") {
+                    path.segments[0].ident =
+                        syn::Ident::new(&format!("__inner_must_not_be_{}", ident), path.span());
+                }
+            }
+        }
+
+        // Continue visiting other expressions within the method call.
+        syn::visit_mut::visit_expr_call_mut(self, node);
+    }
+}
 
 #[proc_macro_attribute]
 /// Transforms the provided validation function depending on the enabled crate features.
@@ -67,6 +89,25 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
         return syn::Error::new(sig.output.span(), &error_message).to_compile_error().into();
     }
 
+    // We expect the function name to be snake_case.
+    let function_name = fn_name.to_string();
+    if !function_name
+        .chars()
+        .all(|character: char| char::is_ascii_lowercase(&character) || character == '_')
+    {
+        let error_message =
+            format!("Function `{fn_name}` must be snake_case to be decorated with `validation`.",);
+        return syn::Error::new(fn_name.span(), &error_message).to_compile_error().into();
+    }
+
+    // We expect the function name to start with `must_be_` or `must_not_be_`.
+    if !function_name.starts_with("must_be_") && !function_name.starts_with("must_not_be_") {
+        let error_message = format!(
+            "Function `{fn_name}` must start with `must_be_` or `must_not_be_` to be decorated with `validation`.",
+        );
+        return syn::Error::new(fn_name.span(), &error_message).to_compile_error().into();
+    }
+
     // If the pgrx feature is enabled, transform the function.
     if cfg!(feature = "pgrx") {
         let inputs = &sig.inputs;
@@ -85,10 +126,16 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
         let mut inner_fn = input_fn.clone();
         inner_fn.sig.ident = inner_fn_name.clone();
 
+        // It may be the case that the function calls other `must_be_` or `must_not_be_` functions,
+        // which need to be converted into the `__inner_` version of the function. We need to replace
+        // the function calls with the new identifier, which is why we need to traverse the function body.
+        let mut renamer = MethodRenamer;
+        renamer.visit_item_fn_mut(&mut inner_fn);
+
         // Generate the wrapper function which will be exposed as a pg_extern.
         // It calls the inner function and converts the Result into a bool.
         let wrapper_fn = quote! {
-            #[pg_extern]
+            #[pgrx::pg_extern]
             pub fn #fn_name (#inputs) -> bool {
                 match #inner_fn_name(#(#arg_names),*) {
                     Ok(()) => true,

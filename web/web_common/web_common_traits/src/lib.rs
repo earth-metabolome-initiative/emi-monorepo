@@ -21,7 +21,7 @@ pub mod prelude {
     pub use crate::{
         attributes::*,
         connection::Connection,
-        database::{Deletable, Loadable},
+        database::{Deletable, Loadable, Foreign},
         filtrable::*,
         insert_operation::{InsertableRow, InsertableVariant, InsertableVariantBuilder},
         operation::Operation,
