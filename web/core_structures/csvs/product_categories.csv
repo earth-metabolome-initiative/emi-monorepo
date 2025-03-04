@@ -1,0 +1,3 @@
+name,icons.name,description
+Product,bag-shopping,"A generic product."
+Product.Instrument,microscope,"Represents any form of instrument."
