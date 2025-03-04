@@ -21,13 +21,11 @@ pg16 = ["pgrx", "pgrx/pg16", "pgrx-tests/pg16"]
 pg17 = ["pgrx", "pgrx/pg17", "pgrx-tests/pg17"]
 backend = []
 frontend = []
-pg_test = ["pgrx"]
+pg_test = ["pgrx", "dep:pgrx-tests"]
 
 [dependencies]
 pgrx = { version = "=0.13.0", optional = true }
 pgrx_validation_derive.workspace = true
 validation-errors.workspace = true
 validator.workspace = true
-
-[dev-dependencies]
-pgrx-tests = "=0.13.0"
+pgrx-tests = { version = "=0.13.0", optional = true }
