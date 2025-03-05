@@ -1,3 +1,4 @@
+use const_format::formatcp;
 use csqlv::{CSVSchemaBuilder, CSVSchemaError};
 use diesel::{connection::SimpleConnection, pg::PgConnection, Connection};
 use testcontainers::{
@@ -11,27 +12,11 @@ const DATABASE_PASSWORD: &str = "password";
 const DATABASE_USER: &str = "user";
 const DATABASE_PORT: u16 = 33676;
 
-fn establish_connection_to_postgres() -> PgConnection {
-    let database_url = format!(
-        "postgres://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:{DATABASE_PORT}/{DATABASE_NAME}",
-    );
+const DATABASE_URL: &str = formatcp!(
+    "postgres://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:{DATABASE_PORT}/{DATABASE_NAME}",
+);
 
-    let mut number_of_attempts = 0;
-
-    while let Err(e) = PgConnection::establish(&database_url) {
-        eprintln!("Failed to establish connection: {:?}", e);
-        std::thread::sleep(std::time::Duration::from_secs(1));
-        if number_of_attempts > 10 {
-            eprintln!("Failed to establish connection after 10 attempts");
-            std::process::exit(1);
-        }
-        number_of_attempts += 1;
-    }
-
-    PgConnection::establish(&database_url).unwrap()
-}
-
-async fn setup_postgres() -> ContainerAsync<GenericImage> {
+async fn setup_docker() -> ContainerAsync<GenericImage> {
     let local_absolute_path = std::env::current_dir().unwrap();
     let local_absolute_path = local_absolute_path.to_str().unwrap();
 
@@ -55,39 +40,33 @@ async fn setup_postgres() -> ContainerAsync<GenericImage> {
     container.unwrap()
 }
 
-async fn test_independent_csvs(conn: &mut PgConnection) -> Result<(), CSVSchemaError> {
+fn test_independent_csvs() -> Result<(), CSVSchemaError> {
     let schema = CSVSchemaBuilder::default()
         .container_directory("/app/csvs/independent_csvs")
         .singularize()
         .from_dir("./tests/independent_csvs")
         .unwrap();
 
-    let sql = schema.to_postgres()?;
-    conn.batch_execute(&sql).unwrap();
-
-    let delete_sql = schema.to_postgres_delete();
-    conn.batch_execute(&delete_sql).unwrap();
+    schema.connect_and_create::<PgConnection>(DATABASE_URL)?;
+    schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
 
     Ok(())
 }
 
-async fn test_tree_dependent_csvs(conn: &mut PgConnection) -> Result<(), CSVSchemaError> {
+fn test_tree_dependent_csvs() -> Result<(), CSVSchemaError> {
     let schema = CSVSchemaBuilder::default()
         .container_directory("/app/csvs/tree_dependent_csvs")
         .singularize()
         .from_dir("./tests/tree_dependent_csvs")
         .unwrap();
 
-    let sql = schema.to_postgres()?;
-    conn.batch_execute(&sql).unwrap();
-
-    let delete_sql = schema.to_postgres_delete();
-    conn.batch_execute(&delete_sql).unwrap();
+    schema.connect_and_create::<PgConnection>(DATABASE_URL)?;
+    schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
 
     Ok(())
 }
 
-async fn test_dag_dependent_csvs(conn: &mut PgConnection) -> Result<(), CSVSchemaError> {
+fn test_dag_dependent_csvs() -> Result<(), CSVSchemaError> {
     let schema = CSVSchemaBuilder::default()
         .container_directory("/app/csvs/dag_dependent_csvs")
         .include_gz()
@@ -95,16 +74,13 @@ async fn test_dag_dependent_csvs(conn: &mut PgConnection) -> Result<(), CSVSchem
         .from_dir("./tests/dag_dependent_csvs")
         .unwrap();
 
-    let sql = schema.to_postgres()?;
-    conn.batch_execute(&sql).unwrap();
-
-    let delete_sql = schema.to_postgres_delete();
-    conn.batch_execute(&delete_sql).unwrap();
+    schema.connect_and_create::<PgConnection>(DATABASE_URL)?;
+    schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
 
     Ok(())
 }
 
-async fn test_bands_csvs(conn: &mut PgConnection) -> Result<(), CSVSchemaError> {
+fn test_bands_csvs() -> Result<(), CSVSchemaError> {
     let schema = CSVSchemaBuilder::default()
         .include_gz()
         .singularize()
@@ -112,27 +88,32 @@ async fn test_bands_csvs(conn: &mut PgConnection) -> Result<(), CSVSchemaError> 
         .from_dir("./tests/bands")
         .unwrap();
 
-    let sql = schema.to_postgres()?;
-
-    println!("{}", sql);
-
-    conn.batch_execute(&sql).unwrap();
-
-    let delete_sql = schema.to_postgres_delete();
-    conn.batch_execute(&delete_sql).unwrap();
+    schema.connect_and_create::<PgConnection>(DATABASE_URL)?;
+    schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
 
     Ok(())
 }
 
 #[tokio::test]
 async fn test_user_table() {
-    let container = setup_postgres().await;
+    let container = setup_docker().await;
 
-    let mut conn = establish_connection_to_postgres();
-    test_independent_csvs(&mut conn).await.unwrap();
-    test_tree_dependent_csvs(&mut conn).await.unwrap();
-    test_dag_dependent_csvs(&mut conn).await.unwrap();
-    test_bands_csvs(&mut conn).await.unwrap();
+    if let Err(err) = test_independent_csvs() {
+        container.stop().await.expect("Failed to stop container.");
+        panic!("Failed to test independent CSVs: {:?}", err);
+    }
+    if let Err(err) = test_tree_dependent_csvs() {
+        container.stop().await.expect("Failed to stop container.");
+        panic!("Failed to test tree dependent CSVs: {:?}", err);
+    }
+    if let Err(err) = test_dag_dependent_csvs() {
+        container.stop().await.expect("Failed to stop container.");
+        panic!("Failed to test DAG dependent CSVs: {:?}", err);
+    }
+    if let Err(err) = test_bands_csvs() {
+        container.stop().await.expect("Failed to stop container.");
+        panic!("Failed to test bands CSVs: {:?}", err);
+    }
 
-    container.stop().await.unwrap();
+    container.stop().await.expect("Failed to stop container.");
 }

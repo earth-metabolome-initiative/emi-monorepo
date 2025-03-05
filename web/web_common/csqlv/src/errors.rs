@@ -43,6 +43,10 @@ pub enum CSVSchemaError {
     InvalidTemporaryTableName(String),
     /// Error indicating an empty column.
     EmptyColumn,
+    /// Error indicating a failure to connect to the database.
+    ConnectionError(diesel::ConnectionError),
+    /// Error indicating a failure to execute a migration.
+    MigrationError(diesel::result::Error),
 }
 
 impl From<csv::Error> for CSVSchemaError {
@@ -54,6 +58,18 @@ impl From<csv::Error> for CSVSchemaError {
 impl From<std::io::Error> for CSVSchemaError {
     fn from(err: std::io::Error) -> CSVSchemaError {
         CSVSchemaError::IOError(err)
+    }
+}
+
+impl From<diesel::ConnectionError> for CSVSchemaError {
+    fn from(err: diesel::ConnectionError) -> CSVSchemaError {
+        CSVSchemaError::ConnectionError(err)
+    }
+}
+
+impl From<diesel::result::Error> for CSVSchemaError {
+    fn from(err: diesel::result::Error) -> CSVSchemaError {
+        CSVSchemaError::MigrationError(err)
     }
 }
 
@@ -86,6 +102,8 @@ impl std::fmt::Display for CSVSchemaError {
                 write!(f, "Invalid temporary table name: {e}")
             }
             CSVSchemaError::EmptyColumn => write!(f, "Empty column"),
+            CSVSchemaError::ConnectionError(e) => write!(f, "Connection Error: {e}"),
+            CSVSchemaError::MigrationError(e) => write!(f, "Migration Error: {e}"),
         }
     }
 }

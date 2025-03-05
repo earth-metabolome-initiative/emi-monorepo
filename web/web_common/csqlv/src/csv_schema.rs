@@ -38,8 +38,8 @@ impl CSVSchema {
     /// by descending priority.
     ///
     /// # Implementative details
-    /// The priority score is determined by the score of the dependant tables
-    /// +1.
+    /// The priority score is determined by the score of the dependant tables + 1.
+    ///
     pub fn tables_with_priority(&self) -> Vec<(CSVTable<'_>, usize)> {
         let mut table_priority: std::collections::HashMap<CSVTable<'_>, usize> =
             std::collections::HashMap::new();
@@ -93,10 +93,10 @@ impl CSVSchema {
 
     #[must_use]
     /// Returns the SQL to generate the schema in `PostgreSQL`.
-    pub fn to_postgres(&self) -> Result<String, CSVSchemaError> {
+    pub fn to_sql(&self) -> Result<String, CSVSchemaError> {
         let mut sql = String::new();
         for table in self.tables_with_priority().iter().map(|(table, _)| table) {
-            sql.push_str(&table.to_postgres()?);
+            sql.push_str(&table.to_sql()?);
             sql.push('\n');
             sql.push_str(&table.populate()?);
             sql.push('\n');
@@ -105,17 +105,93 @@ impl CSVSchema {
     }
 
     #[must_use]
+    /// Connectes to the provided [`Connection`](diesel::Connection) and executes the SQL to
+    /// generate the schema.
+    ///
+    /// # Arguments
+    ///
+    /// * `url` - The url to connect to the database.
+    ///
+    /// # Errors
+    ///
+    /// * If the connection to the database fails.
+    ///
+    pub fn connect_and_create<C: diesel::Connection>(
+        &self,
+        url: &str,
+    ) -> Result<(), CSVSchemaError> {
+        let mut attempts = 0;
+        loop {
+            match C::establish(url) {
+                Err(err) => {
+                    if attempts >= 10 {
+                        return Err(err.into());
+                    }
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+                    attempts += 1;
+                }
+                Ok(mut conn) => return self.create(&mut conn),
+            }
+        }
+    }
+
+    #[must_use]
+    /// Executes the SQL to generate the schema in `PostgreSQL`.
+    pub fn create<C: diesel::Connection>(&self, conn: &mut C) -> Result<(), CSVSchemaError> {
+        let sql = self.to_sql()?;
+        Ok(conn.batch_execute(&sql)?)
+    }
+
+    #[must_use]
     /// Returns the SQL to delete all tables in the schema in `PostgreSQL`.
     ///
     /// # Implementative details
     /// The deletion happens following the reverse order of the foreign keys.
-    pub fn to_postgres_delete(&self) -> String {
+    pub fn to_sql_delete(&self) -> String {
         let mut sql = String::new();
         for table in self.tables_with_priority().into_iter().rev().map(|(table, _)| table) {
-            sql.push_str(&table.to_postgres_delete());
+            sql.push_str(&table.to_sql_delete());
             sql.push('\n');
         }
         sql
+    }
+
+    #[must_use]
+    /// Connectes to the provided [`Connection`](diesel::Connection) and executes the SQL to
+    /// delete the schema.
+    ///
+    /// # Arguments
+    ///
+    /// * `url` - The url to connect to the database.
+    ///
+    /// # Errors
+    ///
+    /// * If the connection to the database fails.
+    ///
+    pub fn connect_and_delete<C: diesel::Connection>(
+        &self,
+        url: &str,
+    ) -> Result<(), CSVSchemaError> {
+        let mut attempts = 0;
+        loop {
+            match C::establish(url) {
+                Err(err) => {
+                    if attempts >= 10 {
+                        return Err(err.into());
+                    }
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+                    attempts += 1;
+                }
+                Ok(mut conn) => return self.delete(&mut conn),
+            }
+        }
+    }
+
+    #[must_use]
+    /// Executes the SQL to delete the schema in `PostgreSQL`.
+    pub fn delete<C: diesel::Connection>(&self, conn: &mut C) -> Result<(), CSVSchemaError> {
+        let sql = self.to_sql_delete();
+        Ok(conn.batch_execute(&sql)?)
     }
 }
 

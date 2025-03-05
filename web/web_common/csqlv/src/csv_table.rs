@@ -83,16 +83,16 @@ impl<'a> CSVTable<'a> {
 
     #[must_use]
     /// Returns the name of the table.
-    pub fn to_postgres(&self) -> Result<String, CSVSchemaError> {
+    pub fn to_sql(&self) -> Result<String, CSVSchemaError> {
         let mut sql = format!("CREATE TABLE IF NOT EXISTS {} (\n", self.table_metadata.name);
         for column in &self.columns() {
             sql.push_str(&format!(
                 "    {} {}{}{}{}{},\n",
                 column.name()?,
                 if let Some(foreign_table) = &column.foreign_table() {
-                    foreign_table.primary_key().data_type().into_non_serial().to_postgres()
+                    foreign_table.primary_key().data_type().into_non_serial().to_sql()
                 } else {
-                    column.data_type().to_postgres()
+                    column.data_type().to_sql()
                 },
                 if column.is_primary_key() { " PRIMARY KEY" } else { "" },
                 if column.is_unique() { " UNIQUE" } else { "" },
@@ -116,7 +116,7 @@ impl<'a> CSVTable<'a> {
 
     #[must_use]
     /// Returns postgres SQL operation to delete the table.
-    pub fn to_postgres_delete(&self) -> String {
+    pub fn to_sql_delete(&self) -> String {
         format!("DROP TABLE IF EXISTS {} CASCADE;", self.table_metadata.name)
     }
 
@@ -134,7 +134,7 @@ impl<'a> CSVTable<'a> {
                     "    {}_{} {},\n",
                     foreign_table.name(),
                     column.foreign_column_name().unwrap(),
-                    column.data_type().to_postgres(),
+                    column.data_type().to_sql(),
                 ));
                 continue;
             }
@@ -142,7 +142,7 @@ impl<'a> CSVTable<'a> {
             sql.push_str(&format!(
                 "    {} {}{}{},\n",
                 column.name()?,
-                column.data_type().to_postgres(),
+                column.data_type().to_sql(),
                 if column.is_unique() { " UNIQUE" } else { "" },
                 if column.is_nullable() { "" } else { " NOT NULL" },
             ));

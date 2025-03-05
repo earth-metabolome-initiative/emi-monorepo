@@ -124,7 +124,7 @@ impl DataType {
     }
 
     /// Converts the data type to a string for use in SQL queries.
-    pub fn to_postgres(self) -> String {
+    pub fn to_sql(self) -> String {
         match self {
             DataType::Text => "TEXT".to_owned(),
             DataType::VarChar(size) => format!("VARCHAR({size})"),
