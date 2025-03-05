@@ -11,7 +11,7 @@ indicatif = "0.17.11"
 quote = "1.0.38"
 uuid.workspace = true
 inflector.workspace = true
-const_format = "0.2.34"
+const_format.workspace = true
 
 [dev-dependencies]
 testcontainers = {version="0.23.2"}
