@@ -532,27 +532,20 @@ table! {
 
 allow_tables_to_appear_in_same_query!(
     columns,
+    constraint_column_usage,
     key_column_usage,
     table_constraints,
-    referential_constraints,
-    constraint_column_usage,
-    constraint_table_usage,
-    check_constraints,
-    domain_constraints,
-    tables,
-    pg_constraint,
-    pg_class,
-    pg_proc,
-    pg_extension,
-    pg_depend,
-    pg_type,
-    pg_enum,
-    pg_trigger,
-    pg_operator,
-    pg_attribute,
-    pg_namespace,
-    pg_index,
-    pg_indexes,
-    geometry_columns,
-    geography_columns
+    tables
 );
+allow_tables_to_appear_in_same_query!(check_constraints, table_constraints);
+allow_tables_to_appear_in_same_query!(pg_trigger, pg_class, pg_namespace);
+allow_tables_to_appear_in_same_query!(pg_operator, pg_proc, pg_type);
+allow_tables_to_appear_in_same_query!(pg_namespace, pg_proc);
+allow_tables_to_appear_in_same_query!(pg_constraint, pg_depend, pg_proc);
+allow_tables_to_appear_in_same_query!(pg_attribute, pg_type);
+allow_tables_to_appear_in_same_query!(pg_depend, pg_extension);
+allow_tables_to_appear_in_same_query!(columns, pg_attribute, pg_class, pg_index);
+allow_tables_to_appear_in_same_query!(pg_extension, pg_namespace);
+allow_tables_to_appear_in_same_query!(key_column_usage, referential_constraints);
+allow_tables_to_appear_in_same_query!(check_constraints, constraint_column_usage);
+allow_tables_to_appear_in_same_query!(pg_constraint, pg_namespace);

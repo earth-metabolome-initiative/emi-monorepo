@@ -28,7 +28,7 @@ impl Codegen<'_> {
         let mut table_foreign_main_module = TokenStream::new();
         for table in tables {
             // We create a file for each table
-            let foreign_trait_impls = table.foreign_key_traits(conn)?;
+            let foreign_trait_impls = table.foreign_key_traits(conn, &self.syntax)?;
 
             if foreign_trait_impls.is_empty() {
                 continue;

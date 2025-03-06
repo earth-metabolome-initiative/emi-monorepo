@@ -22,7 +22,7 @@ async fn start_websocket(
     req: HttpRequest,
     stream: web::Payload,
     redis_client: web::Data<redis::Client>,
-    diesel_pool: web::Data<web_common_traits::prelude::DBPool>,
+    diesel_pool: web::Data<crate::DBPool>,
 ) -> Result<HttpResponse, Error> {
     let (res, mut session, stream) = actix_ws::handle(&req, stream)?;
 

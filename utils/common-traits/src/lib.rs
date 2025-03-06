@@ -8,8 +8,6 @@ pub mod transmute;
 
 /// Re-export of the core traits.
 pub mod prelude {
-    pub use common_traits_derive::basic;
-
     pub use super::{
         basic::Basic,
         builder::{Builder, BuilderError},

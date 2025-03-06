@@ -13,7 +13,13 @@ use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{parse_str, Ident, Type};
 
 use super::PgTrigger;
-use crate::{errors::WebCodeGenError, CheckConstraint, Column, PgIndex, TableConstraint};
+use crate::{
+    codegen::{
+        CODEGEN_DIESEL_MODULE, CODEGEN_DIRECTORY, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
+    },
+    errors::WebCodeGenError,
+    CheckConstraint, Column, PgIndex, TableConstraint,
+};
 
 /// Reserved Rust words that cannot be used as identifiers.
 pub const RESERVED_RUST_WORDS: [&str; 49] = [
@@ -197,7 +203,7 @@ impl Table {
     /// * If the snake case name cannot be generated.
     pub fn has_snake_case_name(&self) -> Result<bool, WebCodeGenError> {
         let snake_case_name = self.snake_case_name()?;
-        Ok(snake_case_name != self.table_name)
+        Ok(snake_case_name == self.table_name)
     }
 
     /// Returns the sanitized snake case syn Ident of the table.
@@ -270,7 +276,7 @@ impl Table {
     ) -> Result<Vec<Ident>, WebCodeGenError> {
         self.primary_key_columns(conn)?
             .into_iter()
-            .map(|column| column.sanitized_snake_case_ident())
+            .map(|column| column.snake_case_ident())
             .collect::<Result<Vec<Ident>, WebCodeGenError>>()
     }
 
@@ -809,7 +815,8 @@ impl Table {
     ///
     /// # Returns
     ///
-    /// The syn TokenStream representing the primary key attribute(s).
+    /// The syn [`TokenStream`](proc_macro2::TokenStream) representing the
+    /// primary key attribute(s).
     ///
     /// # Errors
     ///
@@ -830,14 +837,14 @@ impl Table {
         Ok(if primary_key_columns.len() == 1 {
             // If the primary key is a single column, we can just use the type of that
             // column.
-            let primary_key = primary_key_columns[0].sanitized_snake_case_ident()?;
+            let primary_key = primary_key_columns[0].snake_case_ident()?;
             quote! { #primary_key }
         } else {
             // If the primary key is a composite key, we need to construct a tuple of the
             // types.
             let primary_key_types = primary_key_columns
                 .iter()
-                .map(|column| column.sanitized_snake_case_ident())
+                .map(Column::snake_case_ident)
                 .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
             quote! { (#(#primary_key_types),*) }
         })
@@ -959,7 +966,8 @@ impl Table {
             .load::<CheckConstraint>(conn)
     }
 
-    /// Returns all multi column check constraints associated to the current table.
+    /// Returns all multi column check constraints associated to the current
+    /// table.
     ///
     /// # Arguments
     ///
@@ -968,7 +976,6 @@ impl Table {
     /// # Errors
     ///
     /// * If their is an error while querying the database.
-    ///
     pub fn multi_column_check_constraints(
         &self,
         conn: &mut PgConnection,
@@ -1018,12 +1025,7 @@ impl Table {
     pub fn import_diesel_path(&self) -> Result<syn::Type, WebCodeGenError> {
         let table_name = self.snake_case_name()?;
         Ok(syn::parse_str::<Type>(&format!(
-            "crate::{}::{}::{}::{}::{}",
-            crate::codegen::CODEGEN_DIRECTORY,
-            crate::codegen::CODEGEN_DIESEL_MODULE,
-            crate::codegen::CODEGEN_TABLES_PATH,
-            table_name,
-            table_name
+            "crate::{CODEGEN_DIRECTORY}::{CODEGEN_DIESEL_MODULE}::{CODEGEN_TABLES_PATH}::{table_name}::{table_name}",
         ))?)
     }
 
@@ -1039,10 +1041,7 @@ impl Table {
     pub fn import_struct_path(&self) -> Result<syn::Type, WebCodeGenError> {
         let table_name = self.snake_case_name()?;
         Ok(syn::parse_str::<Type>(&format!(
-            "crate::{}::{}::{}::{}::{}",
-            crate::codegen::CODEGEN_DIRECTORY,
-            crate::codegen::CODEGEN_STRUCTS_MODULE,
-            crate::codegen::CODEGEN_TABLES_PATH,
+            "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{}::{}",
             table_name,
             self.struct_name()?
         ))?)

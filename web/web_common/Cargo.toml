@@ -30,8 +30,8 @@ web_common_traits.workspace = true
 
 actix-ws = {workspace = true, optional = true}
 actix-web = { version = "4.9", optional = true }
-diesel = { workspace = true, optional = true }
-diesel-async = {workspace = true, optional = true}
+diesel = { workspace = true, default-features = false, features = ["extras", "sqlite"] }
+diesel-async = { workspace = true, default-features = false, features = ["bb8", "sqlite"] }
 chrono.workspace = true
 reqwest.workspace = true
 
@@ -85,7 +85,7 @@ features = [
 [features]
 # The `backend` feature is used to enable the implementation of the From trait
 # for types defined in third party crates in the backend.
-backend = [ "actix-web", "actix", "diesel", "diesel-async", "web_common_traits/backend", "actix-ws"]
+backend = [ "actix-web", "actix", "web_common_traits/backend", "actix-ws"]
 
 # The `frontend` feature is used to enable the implementation of the From trait
 # for types defined in third party crates in the frontend.

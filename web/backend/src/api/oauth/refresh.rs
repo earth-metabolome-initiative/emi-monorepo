@@ -2,6 +2,7 @@
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use core_structures::User;
 use web_common::api::{oauth::jwt_cookies::AccessToken, ApiError};
+use web_common_traits::database::Loadable;
 
 use crate::api::oauth::jwt_cookies::{
     eliminate_cookies, JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME,
@@ -24,7 +25,7 @@ use crate::api::oauth::jwt_cookies::{
 /// of the checks fail, we return an error.
 pub async fn refresh_access_token_handler(
     req: HttpRequest,
-    pool: web::Data<web_common_traits::prelude::DBPool>,
+    pool: web::Data<crate::DBPool>,
     redis_client: web::Data<redis::Client>,
 ) -> HttpResponse {
     match refresh_access_token(&req, &pool, &redis_client).await {
@@ -35,7 +36,7 @@ pub async fn refresh_access_token_handler(
 
 pub async fn refresh_access_token(
     req: &HttpRequest,
-    pool: &web::Data<web_common_traits::prelude::DBPool>,
+    pool: &web::Data<crate::DBPool>,
     redis_client: &web::Data<redis::Client>,
 ) -> Result<(User, AccessToken), HttpResponse> {
     let Some(refresh_cookie) = req.cookie(REFRESH_COOKIE_NAME) else {
@@ -68,7 +69,7 @@ pub async fn refresh_access_token(
     let mut connection = pool.get().await.map_err(ApiError::from)?;
 
     // If the user doesn't exist, we return an error, otherwise we return the user.
-    let Some(user) = User::from_id(&refresh_token.user_id(), &mut connection).await.ok().flatten()
+    let Some(user) = User::load(&refresh_token.user_id(), &mut connection).await.ok().flatten()
     else {
         return Err(eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::Unauthorized));
     };

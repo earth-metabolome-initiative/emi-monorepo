@@ -4,38 +4,50 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-diesel = { version = "2.2.7", features = ["postgres", "chrono", "uuid", "64-column-tables"] }
+diesel = { version = "2.2", features = [
+	"postgres",
+	"chrono",
+	"uuid",
+	"64-column-tables",
+] }
 itertools = "0.13.0"
 serde.workspace = true
 syn.workspace = true
 quote.workspace = true
 proc-macro2.workspace = true
 prettyplease = "0.2"
-snake-case-sanitizer = {path = "../snake-case-sanitizer"}
+snake-case-sanitizer = { path = "../snake-case-sanitizer" }
 common-traits.workspace = true
 inflector.workspace = true
 futures.workspace = true
 
 [dev-dependencies]
 diesel_migrations = "2.2.0"
-testcontainers = {version="0.23.2"}
+testcontainers = { version = "0.23.2" }
 tokio.workspace = true
 trybuild.workspace = true
 serde_json.workspace = true
 chrono.workspace = true
 ipnetwork = "0.20.0"
-diesel-async = {version="0.5.2", features = ["postgres", "pool"]}
 uuid.workspace = true
-web_common_traits = {workspace = true, features = ["backend"]}
+web_common_traits.workspace = true
 macaddr = "1.0.1"
 postgis_diesel.workspace = true
 diesel_full_text_search.workspace = true
+diesel-async = { workspace = true, default-features = false, features = [
+	"postgres",
+	"bb8",
+] }
 pgrx_validation.workspace = true
 
 [features]
-default = ["diesel", "serde"]
+default = ["diesel", "serde", "postgres"]
 serde = []
+backend = ["diesel", "web_common_traits/backend"]
+frontend = ["web_common_traits/frontend"]
 diesel = ["postgis_diesel/diesel"]
+# Feature used in the context of the tests.
+postgres = ["diesel"]
 postgres_17 = ["diesel"]
 
 [lints]

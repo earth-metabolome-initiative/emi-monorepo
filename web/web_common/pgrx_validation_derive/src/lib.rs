@@ -4,9 +4,7 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::parse_macro_input;
-use syn::spanned::Spanned;
-use syn::{visit_mut::VisitMut, Expr, ExprCall, ExprPath};
+use syn::{parse_macro_input, spanned::Spanned, visit_mut::VisitMut, Expr, ExprCall, ExprPath};
 
 struct MethodRenamer;
 
@@ -30,20 +28,23 @@ impl VisitMut for MethodRenamer {
 }
 
 #[proc_macro_attribute]
-/// Transforms the provided validation function depending on the enabled crate features.
+/// Transforms the provided validation function depending on the enabled crate
+/// features.
 ///
 /// # Implementation details
 ///
-/// The [`validation`] attrobute macro is meant to be used on functions that return a
-/// `Result<(), Error>`, where the error type is an enum defined in [`validation_errors::Error`].
+/// The [`validation`] attrobute macro is meant to be used on functions that
+/// return a `Result<(), Error>`, where the error type is an enum defined in
+/// [`validation_errors::Error`].
 ///
-/// When the feature flag `pgrx` is enabled, the function will be transformed into a `pg_extern` function
-/// which returns `bool` instead of `Result<(), validation_errors::Error>`. The function will return `true` if the validation
-/// passes, and will return `false` if the validation fails. If the validation fails, the function will
-/// also log an error message using the `pgrx::error!` macro. The Error
+/// When the feature flag `pgrx` is enabled, the function will be transformed
+/// into a `pg_extern` function which returns `bool` instead of `Result<(),
+/// validation_errors::Error>`. The function will return `true` if the
+/// validation passes, and will return `false` if the validation fails. If the
+/// validation fails, the function will also log an error message using the
+/// `pgrx::error!` macro. The Error
 ///
 /// The function is left unchanged when the `pgrx` feature flag is not enabled.
-///
 pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
     // Parse the input tokens into a syntax tree
     let input_fn = parse_macro_input!(item as syn::ItemFn);
@@ -53,7 +54,8 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let sig = &input_fn.sig;
     let fn_name = &sig.ident;
 
-    // Methods wrapped with a `validation` attribute must be `pub` to be exposed as a pg_extern.
+    // Methods wrapped with a `validation` attribute must be `pub` to be exposed as
+    // a pg_extern.
     if !matches!(vis, syn::Visibility::Public(_)) {
         let error_message = format!(
             "Function `{fn_name}` must be public to be decoraged with `validation` - add a `pub` keyword before the function definition if appropriate.",
@@ -68,7 +70,8 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
         return syn::Error::new(sig.asyncness.span(), &error_message).to_compile_error().into();
     }
 
-    // Since Postgres does not support generics, we need to ensure that the function does not have any.
+    // Since Postgres does not support generics, we need to ensure that the function
+    // does not have any.
     if !sig.generics.params.is_empty() {
         let error_message = format!(
             "Function `{fn_name}` must not have any generic parameters to be decorated with `validation`.",
@@ -76,7 +79,8 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
         return syn::Error::new(sig.generics.span(), &error_message).to_compile_error().into();
     }
 
-    // A validation only makes sense when the function receives one or more arguments.
+    // A validation only makes sense when the function receives one or more
+    // arguments.
     if sig.inputs.is_empty() {
         let error_message = format!(
             "Function `{fn_name}` must have at least one argument to be decorated with `validation`.",
@@ -128,11 +132,13 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
         let inputs = &sig.inputs;
 
         // Collect argument names to be passed along when calling the inner function.
-        let arg_names = inputs.iter().map(|arg| match arg {
-            syn::FnArg::Receiver(_) => quote! { self },
-            syn::FnArg::Typed(pat_type) => {
-                let pat = &pat_type.pat;
-                quote! { #pat }
+        let arg_names = inputs.iter().map(|arg| {
+            match arg {
+                syn::FnArg::Receiver(_) => quote! { self },
+                syn::FnArg::Typed(pat_type) => {
+                    let pat = &pat_type.pat;
+                    quote! { #pat }
+                }
             }
         });
 
@@ -141,9 +147,10 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
         let mut inner_fn = input_fn.clone();
         inner_fn.sig.ident = inner_fn_name.clone();
 
-        // It may be the case that the function calls other `must_be_` or `must_not_be_` functions,
-        // which need to be converted into the `__inner_` version of the function. We need to replace
-        // the function calls with the new identifier, which is why we need to traverse the function body.
+        // It may be the case that the function calls other `must_be_` or `must_not_be_`
+        // functions, which need to be converted into the `__inner_` version of
+        // the function. We need to replace the function calls with the new
+        // identifier, which is why we need to traverse the function body.
         let mut renamer = MethodRenamer;
         renamer.visit_item_fn_mut(&mut inner_fn);
 

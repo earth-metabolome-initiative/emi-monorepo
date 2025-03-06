@@ -6,9 +6,8 @@ use std::path::Path;
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::Ident;
 
-use crate::{errors::WebCodeGenError, Codegen, Table};
+use crate::{Codegen, Table};
 
 impl Codegen<'_> {
     /// Generates the [`Deletable`] traits implementation for the tables
@@ -28,43 +27,30 @@ impl Codegen<'_> {
         // We generate each table in a separate document under the provided root, and we
         // collect all of the imported modules in a public one.
         let mut table_deletable_main_module = TokenStream::new();
+        let feature_flag = self.syntax.as_feature_flag();
+        let connection_type = self.syntax.as_connection_type();
         for table in tables {
             // First we need to check wether the table has a PK
             if !table.has_primary_keys(conn)? {
                 continue;
             }
 
-            let primary_key_columns = table.primary_key_columns(conn)?;
             let table_struct = table.import_struct_path()?;
-            let table_diesel = table.import_diesel_path()?;
             let snake_case_ident = table.snake_case_ident()?;
             // We create a file for each table
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
 
-            let where_clause = primary_key_columns
-                .iter()
-                .map(|column| {
-                    let column_name: Ident = column.sanitized_snake_case_ident()?;
-                    Ok(quote! {
-                        diesel::ExpressionMethods::eq(#table_diesel::#column_name, &self.#column_name)
-                    })
-                })
-                .collect::<Result<Vec<_>, WebCodeGenError>>()?;
-
-            // Join the where clauses with an and
-            let where_clause = where_clause
-                .into_iter()
-                .reduce(|a, b| quote! { diesel::BoolExpressionMethods::and(#a, #b) })
-                .unwrap_or_default();
-
             // impl Deletable for struct_ident
             std::fs::write(&table_file, self.beautify_code(&quote! {
+                #feature_flag
                 impl web_common_traits::prelude::Deletable for #table_struct{
-                    #[cfg(feature = "diesel")]
-                    async fn delete<'a>(&'a self, conn: &'a mut web_common_traits::prelude::DBConn) -> Result<usize, diesel::result::Error> {
+                    type Conn = #connection_type;
+
+                    async fn delete(&self, conn: &mut Self::Conn) -> Result<usize, diesel::result::Error> {
                         use diesel_async::RunQueryDsl;
-                        use diesel::QueryDsl;
-                        diesel::delete(#table_diesel::table.filter(#where_clause)).execute(conn).await
+                        use diesel::{QueryDsl, Identifiable};
+                        use diesel::associations::HasTable;
+                        diesel::delete(Self::table().find(self.id())).execute(conn).await
                     }
                 }
             })?)?;

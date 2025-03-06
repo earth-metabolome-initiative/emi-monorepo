@@ -2,16 +2,12 @@
 
 /// Trait for a struct that has a foreign key.
 pub trait Foreign<T> {
-    #[cfg(feature = "backend")]
-    /// Returns the foreign key.
-    fn foreign(
-        &self,
-        conn: &mut crate::types::DBConn,
-    ) -> impl std::future::Future<Output = Result<Option<T>, diesel::result::Error>>;
+    /// The connection type of the table.
+    type Conn: diesel_async::AsyncConnection;
 
-    #[cfg(not(feature = "backend"))]
     /// Returns the foreign key.
     fn foreign(
         &self,
-    ) -> impl std::future::Future<Output = Result<Option<T>, std::convert::Infallible>>;
+        conn: &mut Self::Conn,
+    ) -> impl core::future::Future<Output = Result<T, diesel::result::Error>>;
 }

@@ -26,9 +26,7 @@ impl GitHubConfig {
     ///
     /// A `Result` containing the `GitHubConfig` if the environment variables
     /// are set, or an error message if they are not.
-    pub async fn from_env(
-        connection: &mut web_common_traits::prelude::DBConn,
-    ) -> Result<GitHubConfig, ApiError> {
+    pub async fn from_env(connection: &mut crate::Conn) -> Result<GitHubConfig, ApiError> {
         let Ok(client_secret) = env::var("GITHUB_CLIENT_SECRET") else {
             panic!("GITHUB_CLIENT_SECRET not set");
         };
@@ -63,7 +61,7 @@ struct GithubEmailMetadata {
 #[get("/github")]
 async fn github_oauth_handler(
     query: web::Query<QueryCode>,
-    pool: web::Data<web_common_traits::prelude::DBPool>,
+    pool: web::Data<crate::DBPool>,
     redis_client: web::Data<RedisClient>,
 ) -> impl Responder {
     let code = &query.code;
@@ -96,7 +94,7 @@ async fn github_oauth_handler(
 
 pub async fn get_github_oauth_token(
     authorization_code: &str,
-    pool: &web::Data<web_common_traits::prelude::DBPool>,
+    pool: &web::Data<crate::DBPool>,
 ) -> Result<GitHubOauthToken, ApiError> {
     let mut connection = pool.get().await?;
     let github_config = GitHubConfig::from_env(&mut connection).await?;

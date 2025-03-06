@@ -1,4 +1,5 @@
-//! Submodule to test code relative to retrieving metadata of Extensions from postgres
+//! Submodule to test code relative to retrieving metadata of Extensions from
+//! postgres
 
 mod utils;
 
@@ -49,8 +50,8 @@ async fn test_extensions_column() {
         .functions(&mut conn)
         .expect("Failed to query the database for pgrx_validation functions");
 
-    // We check that, for each of the loaded functions, the extension name is the same as the one we
-    // loaded
+    // We check that, for each of the loaded functions, the extension name is the
+    // same as the one we loaded
     for (all_functions, expected_extension) in [
         (&uuid_functions, &uuid_extension),
         (&pg_trgm_functions, &pg_trgm_extension),

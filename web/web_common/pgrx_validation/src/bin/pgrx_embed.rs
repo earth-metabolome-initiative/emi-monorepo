@@ -6,5 +6,5 @@
 #[cfg(not(feature = "pgrx"))]
 /// Stub function to allow compilation without Postgres
 fn main() {
-	println!("Hello, pgrx_validation");
+    println!("Hello, pgrx_validation");
 }

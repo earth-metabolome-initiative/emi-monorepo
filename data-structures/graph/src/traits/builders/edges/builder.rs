@@ -1,11 +1,11 @@
 //! Submodule defining the trait for Options for building a edges.
 
 use algebra::prelude::SparseMatrixMut;
-use common_traits::prelude::{basic, Builder};
+use common_traits::prelude::Builder;
 
 use crate::traits::{Edges, GrowableEdges};
 
-#[basic]
+#[derive(Clone, core::fmt::Debug)]
 /// Options for building a edges.
 pub enum EdgesBuilderOptions {
     /// The source of the edges.

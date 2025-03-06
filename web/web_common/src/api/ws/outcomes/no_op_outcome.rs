@@ -1,11 +1,10 @@
 //! Submodule defining the outcome of a no-op operation.
 
-use common_traits::prelude::basic;
 use web_common_traits::prelude::Outcome;
 
 use crate::api::ws::operations::NoOp;
 
-#[basic]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NoOpOutcome {
     /// The operation that was executed.
     pub operation: NoOp,

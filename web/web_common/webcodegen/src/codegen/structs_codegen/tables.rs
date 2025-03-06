@@ -4,10 +4,11 @@ use std::path::Path;
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
-use syn::Ident;
 
 use super::Codegen;
 use crate::Table;
+
+mod insertables;
 
 impl Codegen<'_> {
     /// Generate implementations of the structs representing rows of the tables
@@ -29,17 +30,16 @@ impl Codegen<'_> {
         // collect all of the imported modules in a public one.
         let mut table_main_module = TokenStream::new();
         for table in tables {
-            let table_identifier =
-                Ident::new(&table.snake_case_name()?, proc_macro2::Span::call_site());
+            let table_identifier = table.snake_case_ident()?;
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let table_struct = table.struct_ident()?;
             let table_content = table.to_syn(conn)?;
             let foreign_key_methods = if self.enable_foreign_trait {
-                table.foreign_key_methods(conn)?
+                table.foreign_key_methods(conn, &self.syntax)?
             } else {
                 TokenStream::new()
             };
-            let from_unique_indices = table.from_unique_indices(conn)?;
+            let from_unique_indices = table.from_unique_indices(conn, &self.syntax)?;
 
             std::fs::write(
                 &table_file,
@@ -54,6 +54,14 @@ impl Codegen<'_> {
 
             table_main_module.extend(quote::quote! {
                 pub mod #table_identifier;
+                pub use #table_identifier::#table_struct;
+            });
+        }
+
+        if self.enable_insertable_trait {
+            self.generate_insertable_structs(root.join("insertables").as_path(), tables, conn)?;
+            table_main_module.extend(quote::quote! {
+                pub mod insertables;
             });
         }
 

@@ -1,0 +1,22 @@
+[package]
+name = "core-structures"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+postgis_diesel.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+diesel = {workspace = true, default-features = false, features = ["extras"]}
+diesel-async = {workspace = true, default-features = false}
+web_common_traits.workspace = true
+serde = {workspace = true, optional = true}
+common-traits.workspace = true
+
+[features]
+default = ["serde"]
+serde = ["postgis_diesel/serde", "dep:serde"]
+postgres = ["diesel-async/postgres", "diesel/postgres", "postgis_diesel/diesel"]
+sqlite = ["diesel-async/sqlite", "diesel/sqlite", "diesel/returning_clauses_for_sqlite_3_35"]
+backend = ["postgres", "web_common_traits/backend"]
+frontend = ["sqlite", "web_common_traits/frontend"]

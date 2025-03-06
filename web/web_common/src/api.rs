@@ -7,10 +7,6 @@ pub mod form_traits;
 pub mod oauth;
 pub mod ws;
 
-use validator::{ValidationError, ValidationErrors};
-
-use crate::custom_validators::validation_errors::ValidationErrorToString;
-
 pub const ENDPOINT: &str = "/api";
 pub const FULL_ENDPOINT: &str = ENDPOINT;
 
@@ -176,19 +172,6 @@ impl From<serde_json::Error> for ApiError {
     }
 }
 
-impl From<ValidationErrors> for ApiError {
-    fn from(e: ValidationErrors) -> Self {
-        Self::BadRequest(e.convert_to_string())
-    }
-}
-
-impl From<ValidationError> for ApiError {
-    fn from(e: ValidationError) -> Self {
-        log::error!("Validation error: {:?}", e);
-        Self::BadRequest(e.convert_to_string())
-    }
-}
-
 impl From<bincode::ErrorKind> for ApiError {
     fn from(e: bincode::ErrorKind) -> Self {
         Self::BadRequest(vec![format!("Serialization failure: {}", e)])
@@ -302,7 +285,6 @@ impl From<image::ImageError> for ApiError {
     }
 }
 
-#[cfg(feature = "backend")]
 impl From<diesel_async::pooled_connection::bb8::RunError> for ApiError {
     fn from(e: diesel_async::pooled_connection::bb8::RunError) -> Self {
         log::error!("Database pool error: {:?}", e);

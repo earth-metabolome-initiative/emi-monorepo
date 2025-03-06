@@ -38,8 +38,8 @@ impl CSVSchema {
     /// by descending priority.
     ///
     /// # Implementative details
-    /// The priority score is determined by the score of the dependant tables + 1.
-    ///
+    /// The priority score is determined by the score of the dependant tables +
+    /// 1.
     pub fn tables_with_priority(&self) -> Vec<(CSVTable<'_>, usize)> {
         let mut table_priority: std::collections::HashMap<CSVTable<'_>, usize> =
             std::collections::HashMap::new();
@@ -105,8 +105,8 @@ impl CSVSchema {
     }
 
     #[must_use]
-    /// Connectes to the provided [`Connection`](diesel::Connection) and executes the SQL to
-    /// generate the schema.
+    /// Connectes to the provided [`Connection`](diesel::Connection) and
+    /// executes the SQL to generate the schema.
     ///
     /// # Arguments
     ///
@@ -115,7 +115,6 @@ impl CSVSchema {
     /// # Errors
     ///
     /// * If the connection to the database fails.
-    ///
     pub fn connect_and_create<C: diesel::Connection>(
         &self,
         url: &str,
@@ -157,8 +156,8 @@ impl CSVSchema {
     }
 
     #[must_use]
-    /// Connectes to the provided [`Connection`](diesel::Connection) and executes the SQL to
-    /// delete the schema.
+    /// Connectes to the provided [`Connection`](diesel::Connection) and
+    /// executes the SQL to delete the schema.
     ///
     /// # Arguments
     ///
@@ -167,7 +166,6 @@ impl CSVSchema {
     /// # Errors
     ///
     /// * If the connection to the database fails.
-    ///
     pub fn connect_and_delete<C: diesel::Connection>(
         &self,
         url: &str,

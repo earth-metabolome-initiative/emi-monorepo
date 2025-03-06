@@ -33,7 +33,7 @@ impl Table {
             .columns(conn)?
             .into_iter()
             .map(|column| {
-                let column_attribute: Ident = column.sanitized_snake_case_ident()?;
+                let column_attribute: Ident = column.snake_case_ident()?;
                 let column_type = column.rust_data_type(conn)?;
                 Ok(quote! {
                     pub #column_attribute: #column_type
@@ -46,7 +46,8 @@ impl Table {
         let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
 
         Ok(quote! {
-            #[common_traits::prelude::basic]
+            #[derive(Debug, Clone)]
+            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
             #diesel_derives_decorator
             #primary_key_decorator
             #[cfg_attr(feature = #columns_feature_flag_name, diesel(table_name = #table_path))]

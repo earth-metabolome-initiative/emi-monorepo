@@ -36,7 +36,7 @@ impl Table {
             .into_iter()
             .map(|column| {
                 let original_column_name = &column.column_name;
-                let column_attribute: Ident = column.sanitized_snake_case_ident()?;
+                let column_attribute: Ident = column.snake_case_ident()?;
                 let column_type = column.diesel_type(conn)?;
                 Ok(if original_column_name == &column_attribute.to_string() {
                     quote! {

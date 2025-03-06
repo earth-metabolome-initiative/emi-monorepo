@@ -19,6 +19,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use uuid::Uuid;
 use web_common::api::{oauth::jwt_cookies::*, ApiError};
+use web_common_traits::database::Loadable;
 
 /// Set a const with the expected cookie name.
 pub(crate) const REFRESH_COOKIE_NAME: &str = "refresh_token";
@@ -544,7 +545,7 @@ impl FromRequest for UserWrapper {
         // to be authenticated and it still exists in the redis database, we still need
         // to check whether the user exists in the database, as it may have been deleted
         // in the meantime.
-        let diesel_pool = match req.app_data::<web::Data<web_common_traits::prelude::DBPool>>() {
+        let diesel_pool = match req.app_data::<web::Data<crate::DBPool>>() {
             Some(pool) => pool.clone(),
             None => {
                 log::error!("Database pool not present in request");
@@ -598,7 +599,7 @@ impl FromRequest for UserWrapper {
             }
 
             // If the user doesn't exist, we return an error, otherwise we return the user.
-            let Ok(user) = User::from_id(&access_token.user_id(), &mut conn).await else {
+            let Ok(user) = User::load(&access_token.user_id(), &mut conn).await else {
                 return Err(ErrorInternalServerError(
                     json!({"status": "fail", "message": "Internal server error"}),
                 ));

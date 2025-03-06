@@ -111,9 +111,7 @@ where
         self.builder
             .edges
             .ok_or({
-                common_traits::prelude::BuilderError::IncompleteBuild {
-                    missing_attribute: EdgesBuilderOptions::Edges,
-                }
+                common_traits::prelude::BuilderError::IncompleteBuild(EdgesBuilderOptions::Edges)
             })?
             .into_iter()
             .try_for_each(|edge| {

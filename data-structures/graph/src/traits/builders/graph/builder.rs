@@ -2,11 +2,11 @@
 
 use core::fmt::Display;
 
-use common_traits::prelude::{basic, Builder};
+use common_traits::prelude::Builder;
 
 use crate::traits::{DirectedGraph, Graph, UndirectedGraph};
 
-#[basic]
+#[derive(Clone, Debug)]
 /// Options for building a graph.
 pub enum GraphBuilderOptions {
     /// The edges-list describing the edges in the graph.

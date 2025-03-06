@@ -136,7 +136,6 @@ impl Column {
     /// # Returns
     ///
     /// * A `Vec` of all the [`CheckConstraint`]
-    ///
     pub fn check_constraints(
         &self,
         conn: &mut PgConnection,
@@ -168,7 +167,8 @@ impl Column {
             .load(conn)?)
     }
 
-    /// Returns all single column check constraints associated to the current column.
+    /// Returns all single column check constraints associated to the current
+    /// column.
     ///
     /// # Arguments
     ///
@@ -177,7 +177,6 @@ impl Column {
     /// # Errors
     ///
     /// * If their is an error while querying the database.
-    ///
     pub fn single_column_check_constraints(
         &self,
         conn: &mut PgConnection,
@@ -304,7 +303,7 @@ impl Column {
         match rust_type_str(self.data_type_str(conn)?) {
             Ok(s) => {
                 if self.is_nullable() {
-                    Ok(syn::parse_str(&format!("Option<{}>", s))?)
+                    Ok(syn::parse_str(&format!("Option<{s}>"))?)
                 } else {
                     Ok(syn::parse_str(s)?)
                 }
@@ -383,7 +382,7 @@ impl Column {
     /// # Errors
     ///
     /// If an error occurs while sanitizing the column name
-    pub fn sanitized_snake_case_ident(&self) -> Result<Ident, WebCodeGenError> {
+    pub fn snake_case_ident(&self) -> Result<Ident, WebCodeGenError> {
         let snake_case_name = self.snake_case_name()?;
         if self.requires_diesel_sanitization()? {
             Ok(Ident::new(&format!("__{snake_case_name}"), proc_macro2::Span::call_site()))
@@ -391,6 +390,33 @@ impl Column {
             Ok(Ident::new_raw(&snake_case_name, proc_macro2::Span::call_site()))
         } else {
             Ok(Ident::new(&snake_case_name, proc_macro2::Span::call_site()))
+        }
+    }
+
+    /// Returns the sanitized camel case name of the table.
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while sanitizing the column name
+    pub fn camel_case_name(&self) -> Result<String, WebCodeGenError> {
+        let sanitizer = SnakeCaseSanizer::default()
+            .include_defaults()
+            .remove_leading_underscores()
+            .remove_trailing_underscores();
+        Ok(sanitizer.to_camel_case(&self.column_name)?)
+    }
+
+    /// Returns the sanitized camel case syn Ident of the table.
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while sanitizing the column name
+    pub fn camel_case_ident(&self) -> Result<Ident, WebCodeGenError> {
+        let camel_case_name = self.camel_case_name()?;
+        if RESERVED_RUST_WORDS.contains(&camel_case_name.as_str()) {
+            Ok(Ident::new_raw(&camel_case_name, proc_macro2::Span::call_site()))
+        } else {
+            Ok(Ident::new(&camel_case_name, proc_macro2::Span::call_site()))
         }
     }
 

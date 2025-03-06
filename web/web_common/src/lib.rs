@@ -3,7 +3,6 @@
 // either frontend or backend should be enabled");
 
 pub mod api;
-pub mod custom_validators;
 pub mod file_formats;
 pub mod macros;
 pub mod traits;

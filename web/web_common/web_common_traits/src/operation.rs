@@ -1,6 +1,6 @@
 //! Submodule providing the Operation trait.
 
-use common_traits::prelude::{basic, Basic};
+use common_traits::prelude::Basic;
 
 use crate::{operation_error::OperationError, outcome::Outcome};
 
@@ -13,16 +13,10 @@ pub trait Operation: Basic {
 
     /// Returns the identifier of the operation.
     fn id(&self) -> uuid::Uuid;
-
-    #[cfg(feature = "backend")]
-    /// Executes the operation.
-    fn execute(
-        self,
-        connection: &mut diesel::PgConnection,
-    ) -> impl std::future::Future<Output = Result<Self::Outcome, Self::Error>> + Send;
 }
 
-#[basic]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Generic operation.
 pub struct GenericOperation<O> {
     /// The identifier of the operation.
@@ -42,13 +36,5 @@ where
 
     fn id(&self) -> uuid::Uuid {
         self.id
-    }
-
-    #[cfg(feature = "backend")]
-    fn execute(
-        self,
-        connection: &mut diesel::PgConnection,
-    ) -> impl std::future::Future<Output = Result<Self::Outcome, Self::Error>> + Send {
-        self.operation.execute(connection)
     }
 }

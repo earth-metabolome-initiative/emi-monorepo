@@ -1,6 +1,5 @@
-use const_format::formatcp;
 use csqlv::{CSVSchemaBuilder, CSVSchemaError};
-use diesel::{connection::SimpleConnection, pg::PgConnection, Connection};
+use diesel::pg::PgConnection;
 use testcontainers::{
     core::{IntoContainerPort, Mount, WaitFor},
     runners::AsyncRunner,
@@ -12,7 +11,7 @@ const DATABASE_PASSWORD: &str = "password";
 const DATABASE_USER: &str = "user";
 const DATABASE_PORT: u16 = 33676;
 
-const DATABASE_URL: &str = formatcp!(
+const DATABASE_URL: &str = const_format::formatcp!(
     "postgres://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:{DATABASE_PORT}/{DATABASE_NAME}",
 );
 

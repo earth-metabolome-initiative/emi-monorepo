@@ -107,9 +107,7 @@ where
         let should_ignore_duplicates = self.should_ignore_duplicates();
         self.edges
             .ok_or({
-                common_traits::prelude::BuilderError::IncompleteBuild {
-                    missing_attribute: EdgesBuilderOptions::Edges,
-                }
+                common_traits::prelude::BuilderError::IncompleteBuild(EdgesBuilderOptions::Edges)
             })?
             .into_iter()
             .try_for_each(|edge| {

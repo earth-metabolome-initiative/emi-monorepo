@@ -9,11 +9,14 @@ use proc_macro2::TokenStream;
 use syn::File;
 mod diesel_codegen;
 mod structs_codegen;
+mod syntaxes;
 mod traits_codegen;
+
+pub use syntaxes::Syntax;
 
 use crate::{
     errors::{CodeGenerationError, WebCodeGenError},
-    Column, PgType, Table,
+    Column, PgExtension, PgType, Table,
 };
 
 pub const CODEGEN_DIRECTORY: &str = "codegen";
@@ -23,17 +26,29 @@ pub const CODEGEN_TRAITS_MODULE: &str = "traits_codegen";
 pub const CODEGEN_TABLES_PATH: &str = "tables";
 pub const CODEGEN_TYPES_PATH: &str = "types";
 pub const CODEGEN_JOINABLE_PATH: &str = "joinable";
+pub const CODEGEN_INSERTABLES_PATH: &str = "insertables";
+pub const CODEGEN_INSERTABLE_PATH: &str = "insertable";
+pub const CODEGEN_INSERTABLE_VARIANT_PATH: &str = "insertable_variant";
+pub const CODEGEN_INSERTABLE_BUILDER_PATH: &str = "insertable_variant_builder";
 
 #[derive(Debug, Default)]
 #[allow(clippy::struct_excessive_bools)]
 /// Struct for code generation.
 pub struct Codegen<'a> {
+    /// The users table to refer.
+    users_table: Option<&'a Table>,
     /// List of tables to ignore when generating code.
     tables_deny_list: Vec<&'a Table>,
+    /// List of extensions to take into consideration
+    /// when generating the CHECK constraints validations in
+    /// the generated code.
+    pub(crate) check_constraints_extensions: Vec<&'a PgExtension>,
     /// The output directory for the generated code.
     output_directory: Option<&'a Path>,
     /// Whether to make the code readable.
     beautify: bool,
+    /// The syntax to generate.
+    pub(crate) syntax: syntaxes::Syntax,
     /// Whether to generate the diesel `joinables`.
     pub(super) enable_joinables: bool,
     /// Whether to generate the diesel `allow_tables_to_appear_in_same_query`.
@@ -56,6 +71,8 @@ pub struct Codegen<'a> {
     pub(super) enable_foreign_trait: bool,
     /// Whether to enable the [`Loadable`] traits implementations.
     pub(super) enable_loadable_trait: bool,
+    /// Whether to enable the [`Insertable`] traits implementations.
+    pub(super) enable_insertable_trait: bool,
 }
 
 impl<'a> Codegen<'a> {
@@ -66,12 +83,28 @@ impl<'a> Codegen<'a> {
             || self.enable_attribute_trait
             || self.enable_foreign_trait
             || self.enable_loadable_trait
+            || self.enable_insertable_trait
+    }
+
+    #[must_use]
+    /// Sets the user table to refer to.
+    pub fn users(mut self, users_table: &'a Table) -> Self {
+        self.users_table = Some(users_table);
+        self
     }
 
     #[must_use]
     /// Adds a new table to the deny list.
     pub fn add_table_to_deny_list(mut self, table: &'a Table) -> Self {
         self.tables_deny_list.push(table);
+        self
+    }
+
+    #[must_use]
+    /// Adds a new extension to the list of extensions to consider
+    /// when generating the CHECK constraints validations in the generated code.
+    pub fn add_check_constraint_extension(mut self, extension: &'a PgExtension) -> Self {
+        self.check_constraints_extensions.push(extension);
         self
     }
 
@@ -106,6 +139,20 @@ impl<'a> Codegen<'a> {
     /// Whether to generate the SQL types.
     pub fn enable_sql_types(mut self) -> Self {
         self.enable_sql_types = true;
+        self
+    }
+
+    #[must_use]
+    /// Sets the `SQLite` syntax for the code generation.
+    pub fn sqlite(mut self) -> Self {
+        self.syntax = syntaxes::Syntax::SQLite;
+        self
+    }
+
+    #[must_use]
+    /// Sets the `PostgreSQL` syntax for the code generation.
+    pub fn postgresql(mut self) -> Self {
+        self.syntax = syntaxes::Syntax::PostgreSQL;
         self
     }
 
@@ -203,7 +250,7 @@ impl<'a> Codegen<'a> {
     /// generation of the [`Foreign`] traits automatically enables the
     /// generation of the tables structs.
     pub fn enable_foreign_trait(mut self) -> Self {
-        self = self.enable_loadable_trait();
+        self = self.enable_table_structs();
         self.enable_foreign_trait = true;
         self
     }
@@ -219,6 +266,20 @@ impl<'a> Codegen<'a> {
     pub fn enable_loadable_trait(mut self) -> Self {
         self = self.enable_table_structs();
         self.enable_loadable_trait = true;
+        self
+    }
+
+    #[must_use]
+    /// Whether to enable the generation of the [`Insertable`] traits.
+    ///
+    /// # Note
+    ///
+    /// Since the [`Insertable`] traits require the tables structs, enabling the
+    /// generation of the [`Insertable`] traits automatically enables the
+    /// generation of the tables structs.
+    pub fn enable_insertable_trait(mut self) -> Self {
+        self = self.enable_table_structs();
+        self.enable_insertable_trait = true;
         self
     }
 
@@ -361,6 +422,7 @@ impl<'a> Codegen<'a> {
             pub mod #diesel_codegen_ident;
 
             pub mod #structs_codegen_ident;
+            pub use #structs_codegen_ident::*;
 
             mod #traits_codegen_ident;
         })?;

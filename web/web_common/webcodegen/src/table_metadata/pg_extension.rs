@@ -1,22 +1,17 @@
-//! Submodule providing a struct [`PgExtension`] representing the `pg_extension` table.
+//! Submodule providing a struct [`PgExtension`] representing the `pg_extension`
+//! table.
 
-use diesel::BoolExpressionMethods;
-use diesel::ExpressionMethods;
-use diesel::JoinOnDsl;
-use diesel::OptionalExtension;
-use diesel::PgConnection;
-use diesel::QueryDsl;
-use diesel::RunQueryDsl;
-use diesel::SelectableHelper;
-use diesel::{Queryable, QueryableByName, Selectable};
-
-use crate::errors::WebCodeGenError;
+use diesel::{
+    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, OptionalExtension, PgConnection, QueryDsl,
+    Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
+};
 
 use super::PgProc;
+use crate::errors::WebCodeGenError;
 
 /// Represents the `pg_extension` system catalog table in `PostgreSQL`.
 /// This table stores information about extensions.
-#[derive(Queryable, QueryableByName, Selectable, Clone, Debug, PartialEq)]
+#[derive(Queryable, QueryableByName, Selectable, Clone, Debug, PartialEq, Eq, Hash)]
 #[diesel(table_name = crate::schema::pg_extension)]
 pub struct PgExtension {
     /// The OID of the extension.
@@ -37,6 +32,12 @@ pub struct PgExtension {
     pub extcondition: Option<Vec<String>>,
 }
 
+impl AsRef<PgExtension> for PgExtension {
+    fn as_ref(&self) -> &PgExtension {
+        self
+    }
+}
+
 impl PgExtension {
     /// Loads all of the [`PgExtension`]s from the database.
     ///
@@ -47,13 +48,13 @@ impl PgExtension {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    ///
     pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::pg_extension;
         pg_extension::table.load(conn).map_err(WebCodeGenError::from)
     }
 
-    /// Loads the [`PgExtension`] with the given name amd namespace from the database.
+    /// Loads the [`PgExtension`] with the given name amd namespace from the
+    /// database.
     ///
     /// # Arguments
     ///
@@ -64,14 +65,12 @@ impl PgExtension {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    ///
     pub fn load(
         name: &str,
         namespace: &str,
         conn: &mut PgConnection,
     ) -> Result<Option<Self>, WebCodeGenError> {
-        use crate::schema::pg_extension;
-        use crate::schema::pg_namespace;
+        use crate::schema::{pg_extension, pg_namespace};
         pg_extension::table
             .inner_join(pg_namespace::table.on(pg_extension::extnamespace.eq(pg_namespace::oid)))
             .filter(pg_extension::extname.eq(name).and(pg_namespace::nspname.eq(namespace)))
@@ -90,7 +89,6 @@ impl PgExtension {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    ///
     pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, WebCodeGenError> {
         use crate::schema::{pg_depend, pg_proc};
         pg_depend::table
@@ -99,5 +97,11 @@ impl PgExtension {
             .select(PgProc::as_select())
             .load(conn)
             .map_err(WebCodeGenError::from)
+    }
+
+    #[must_use]
+    /// Returns the [`Ident`](syn::Ident) for the [`PgExtension`].
+    pub fn ident(&self) -> syn::Ident {
+        syn::Ident::new(&self.extname, proc_macro2::Span::call_site())
     }
 }

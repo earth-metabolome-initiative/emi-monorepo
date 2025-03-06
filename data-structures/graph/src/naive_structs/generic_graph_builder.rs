@@ -9,6 +9,7 @@ use crate::{
     traits::{Graph, GraphBuilder, GraphBuilderOptions},
 };
 
+#[derive(Clone)]
 /// Basic builder for a generic graph.
 pub struct GenericGraphBuilder<G: Graph> {
     /// The sources of the graph.
@@ -60,15 +61,12 @@ where
     type Attribute = GraphBuilderOptions;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
-        let sources = self.sources.ok_or(BuilderError::IncompleteBuild {
-            missing_attribute: GraphBuilderOptions::Sources,
-        })?;
-        let destinations = self.destinations.ok_or(BuilderError::IncompleteBuild {
-            missing_attribute: GraphBuilderOptions::Destinations,
-        })?;
-        let edges = self.edges.ok_or(BuilderError::IncompleteBuild {
-            missing_attribute: GraphBuilderOptions::Edges,
-        })?;
+        let sources =
+            self.sources.ok_or(BuilderError::IncompleteBuild(GraphBuilderOptions::Sources))?;
+        let destinations = self
+            .destinations
+            .ok_or(BuilderError::IncompleteBuild(GraphBuilderOptions::Destinations))?;
+        let edges = self.edges.ok_or(BuilderError::IncompleteBuild(GraphBuilderOptions::Edges))?;
 
         G::try_from((sources, destinations, edges))
     }

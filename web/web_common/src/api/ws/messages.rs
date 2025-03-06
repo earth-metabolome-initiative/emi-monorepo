@@ -1,11 +1,7 @@
 //! Module providing the websocket messages used in the application.
-use core::fmt::Debug;
-
-use common_traits::prelude::*;
-
 use super::{operations::OperationMessage, outcomes::OutcomeMessage};
 
-#[basic]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 /// Structure representing the reason for closing a websocket connection.
 pub struct CloseReason {
     pub code: u16,
@@ -19,7 +15,7 @@ impl From<actix_ws::CloseReason> for CloseReason {
     }
 }
 
-#[basic]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 /// Enumeration for websocket messages sent from the frontend to the backend.
 pub enum FrontendMessage {
     /// Close the websocket connection.
@@ -28,7 +24,7 @@ pub enum FrontendMessage {
     Operation(OperationMessage),
 }
 
-#[basic]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 /// Enumeration for websocket messages sent from the backend to the frontend.
 pub enum BackendMessage {
     /// Close the websocket connection.

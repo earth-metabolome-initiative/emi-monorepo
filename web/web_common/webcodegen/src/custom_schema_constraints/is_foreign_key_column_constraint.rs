@@ -29,7 +29,7 @@ impl CustomColumnConstraint for IsForeignKeyConstraint {
         if column.column_name == self.column_name
             && column
                 .foreign_table(conn)?
-                .map_or(true, |(table, _)| table.table_name != self.table_name)
+                .is_none_or(|(table, _)| table.table_name != self.table_name)
         {
             return Err(WebCodeGenError::ConstraintError(ConstraintError::NotForeignKeyColumn {
                 table_name: self.table_name.clone(),
