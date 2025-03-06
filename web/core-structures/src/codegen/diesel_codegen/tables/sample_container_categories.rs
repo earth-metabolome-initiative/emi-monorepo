@@ -1,0 +1,2 @@
+#[cfg(feature = "diesel")]
+diesel::table! { public . sample_container_categories (id) { name -> diesel :: sql_types :: Text , volume -> diesel :: sql_types :: Text , unit_id -> diesel :: sql_types :: SmallInt , material_id -> diesel :: sql_types :: SmallInt , description -> diesel :: sql_types :: Text , icon_id -> diesel :: sql_types :: SmallInt , color_id -> diesel :: sql_types :: SmallInt , id -> diesel :: sql_types :: SmallInt } }

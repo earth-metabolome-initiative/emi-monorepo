@@ -1,0 +1,2 @@
+#[cfg(feature = "diesel")]
+diesel::table! { public . nameplates (id) { id -> diesel :: sql_types :: Integer , barcode -> diesel :: sql_types :: Text , project_id -> diesel :: sql_types :: Integer , geolocation -> postgis_diesel :: sql_types :: Geometry , created_by -> diesel :: sql_types :: Integer , updated_by -> diesel :: sql_types :: Integer , category_id -> diesel :: sql_types :: SmallInt , created_at -> diesel :: sql_types :: Timestamp , updated_at -> diesel :: sql_types :: Timestamp } }

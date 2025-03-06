@@ -1,0 +1,2 @@
+#[cfg(feature = "diesel")]
+diesel::table! { public . derived_samples (parent_sample_id , child_sample_id) { created_by -> diesel :: sql_types :: Integer , updated_by -> diesel :: sql_types :: Integer , parent_sample_id -> diesel :: sql_types :: Uuid , child_sample_id -> diesel :: sql_types :: Uuid , quantity -> diesel :: sql_types :: Double , unit_id -> diesel :: sql_types :: SmallInt , created_at -> diesel :: sql_types :: Timestamp , updated_at -> diesel :: sql_types :: Timestamp } }

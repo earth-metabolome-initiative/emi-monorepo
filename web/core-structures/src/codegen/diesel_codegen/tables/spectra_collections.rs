@@ -1,0 +1,2 @@
+#[cfg(feature = "diesel")]
+diesel::table! { public . spectra_collections (id) { id -> diesel :: sql_types :: Integer , notes -> diesel :: sql_types :: Nullable < diesel :: sql_types :: Text > , sample_id -> diesel :: sql_types :: Uuid , created_by -> diesel :: sql_types :: Integer , updated_by -> diesel :: sql_types :: Integer , created_at -> diesel :: sql_types :: Timestamp , updated_at -> diesel :: sql_types :: Timestamp } }

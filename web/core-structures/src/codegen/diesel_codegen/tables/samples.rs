@@ -1,0 +1,2 @@
+#[cfg(feature = "diesel")]
+diesel::table! { public . samples (id) { id -> diesel :: sql_types :: Uuid , container_id -> diesel :: sql_types :: Integer , notes -> diesel :: sql_types :: Nullable < diesel :: sql_types :: Text > , project_id -> diesel :: sql_types :: Integer , created_by -> diesel :: sql_types :: Integer , sampled_by -> diesel :: sql_types :: Integer , updated_by -> diesel :: sql_types :: Integer , created_at -> diesel :: sql_types :: Timestamp , updated_at -> diesel :: sql_types :: Timestamp , state_id -> diesel :: sql_types :: SmallInt } }
