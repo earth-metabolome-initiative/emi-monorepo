@@ -147,6 +147,7 @@ async fn setup_docker(
         .await
 }
 
+
 /// Setup a database with the default migrations.
 ///
 /// # Arguments
