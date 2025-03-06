@@ -418,7 +418,6 @@ impl<'a> Codegen<'a> {
             syn::Ident::new(CODEGEN_TRAITS_MODULE, proc_macro2::Span::call_site());
 
         let codegen_module_impl = self.beautify_code(&quote::quote! {
-            #[cfg(feature = "diesel")]
             pub mod #diesel_codegen_ident;
 
             pub mod #structs_codegen_ident;

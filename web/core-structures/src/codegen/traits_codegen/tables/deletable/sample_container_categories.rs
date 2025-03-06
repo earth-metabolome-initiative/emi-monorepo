@@ -1,2 +1,0 @@
-#[cfg(feature = "postgres")]
-impl web_common_traits :: prelude :: Deletable for crate :: codegen :: structs_codegen :: tables :: sample_container_categories :: SampleContainerCategory { type Conn = diesel_async :: AsyncPgConnection ; async fn delete (& self , conn : & mut Self :: Conn) -> Result < usize , diesel :: result :: Error > { use diesel_async :: RunQueryDsl ; use diesel :: { QueryDsl , Identifiable } ; use diesel :: associations :: HasTable ; diesel :: delete (Self :: table () . find (self . id ())) . execute (conn) . await } }

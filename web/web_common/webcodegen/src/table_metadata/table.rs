@@ -86,7 +86,7 @@ impl Table {
     pub fn diesel_feature_flag_name(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<&str, WebCodeGenError> {
+    ) -> Result<Option<&str>, WebCodeGenError> {
         let number_of_columns = self.columns(conn)?.len();
         if number_of_columns > 128 {
             Err(WebCodeGenError::ExcessiveNumberOfColumns(
@@ -94,13 +94,13 @@ impl Table {
                 number_of_columns,
             ))
         } else if number_of_columns > 64 {
-            Ok("128-column-tables")
+            Ok(Some("128-column-tables"))
         } else if number_of_columns > 32 {
-            Ok("64-column-tables")
+            Ok(Some("64-column-tables"))
         } else if number_of_columns > 16 {
-            Ok("32-column-tables")
+            Ok(Some("32-column-tables"))
         } else {
-            Ok("diesel")
+            Ok(None)
         }
     }
 
@@ -302,8 +302,14 @@ impl Table {
         let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
         Ok(if self.has_primary_keys(conn)? {
             let primary_key_identifiers = self.primary_key_identifiers(conn)?;
-            quote! {
-                #[cfg_attr(feature = #columns_feature_flag_name, diesel(primary_key(#(#primary_key_identifiers),*)))]
+            if let Some(columns_feature_flag_name) = columns_feature_flag_name {
+                quote! {
+                    #[cfg_attr(feature = #columns_feature_flag_name, diesel(primary_key(#(#primary_key_identifiers),*)))]
+                }
+            } else {
+                quote! {
+                    #[diesel(primary_key(#(#primary_key_identifiers),*))]
+                }
             }
         } else {
             TokenStream::new()
@@ -357,9 +363,13 @@ impl Table {
         let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
         Ok(if diesel_derives.is_empty() {
             TokenStream::new()
-        } else {
+        } else if let Some(columns_feature_flag_name) = columns_feature_flag_name {
             quote! {
                 #[cfg_attr(feature = #columns_feature_flag_name, derive(#(#diesel_derives),*))]
+            }
+        } else {
+            quote! {
+                #[derive(#(#diesel_derives),*)]
             }
         })
     }

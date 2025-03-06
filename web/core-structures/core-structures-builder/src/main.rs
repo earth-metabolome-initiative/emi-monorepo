@@ -61,22 +61,22 @@ pub async fn main() {
 
     // Next, we build the SQL associated with the CSVs present in the 'csvs'
     // directory
-    // let task = Task::new("Building Schema from CSVs");
-    // CSVSchemaBuilder::default()
-    //     // To show a loading bar while processing the CSVs
-    //     .verbose()
-    //     // To include compressed files such as .gz
-    //     .include_gz()
-    //     // For supporting running the tests within
-    //     // containers such as Docker
-    //     .singularize()
-    //     .container_directory("/app/csvs")
-    //     .from_dir("../csvs")
-    //     .unwrap()
-    //     .connect_and_create::<diesel::PgConnection>(DATABASE_URL)
-    //     .unwrap();
+    let task = Task::new("Building Schema from CSVs");
+    CSVSchemaBuilder::default()
+        // To show a loading bar while processing the CSVs
+        .verbose()
+        // To include compressed files such as .gz
+        .include_gz()
+        // For supporting running the tests within
+        // containers such as Docker
+        .singularize()
+        .container_directory("/app/csvs")
+        .from_dir("../csvs")
+        .unwrap()
+        .connect_and_create::<diesel::PgConnection>(DATABASE_URL)
+        .unwrap();
 
-    // time_tracker.add_completed_task(task);
+    time_tracker.add_completed_task(task);
 
     // We execute the migrations
     let task = Task::new("Executing Migrations");

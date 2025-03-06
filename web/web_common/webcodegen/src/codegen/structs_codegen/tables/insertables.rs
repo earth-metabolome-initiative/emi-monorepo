@@ -260,8 +260,8 @@ impl Codegen<'_> {
                             }
                         }
 
-                        #[cfg_attr(feature = "diesel", derive(diesel::Insertable))]
-                        #[cfg_attr(feature = "diesel", diesel(table_name = #table_diesel_ident))]
+                        #[derive(diesel::Insertable)]
+                        #[diesel(table_name = #table_diesel_ident)]
                         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
                         pub struct #insertable_variant_ident {
                             #(#insertable_attributes),*
@@ -276,7 +276,6 @@ impl Codegen<'_> {
                             #(#insertable_builder_methods)*
                         }
 
-                        #[cfg(feature = "diesel")]
                         impl common_traits::prelude::Builder for #insertable_builder_ident {
                             type Error = web_common_traits::database::InsertError<#insertable_enum>;
                             type Object = #insertable_variant_ident;
@@ -289,7 +288,6 @@ impl Codegen<'_> {
                             }
                         }
 
-                        #[cfg(feature = "diesel")]
                         impl TryFrom<#insertable_variant_ident> for #insertable_builder_ident {
                             type Error = <Self as common_traits::prelude::Builder>::Error;
                             fn try_from(insertable_variant: #insertable_variant_ident) -> Result<Self, Self::Error> {

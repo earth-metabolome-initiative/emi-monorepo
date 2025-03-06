@@ -45,12 +45,22 @@ impl Table {
         let primary_key_decorator = self.primary_key_decorator(conn)?;
         let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
 
+        let diesel_table = if let Some(columns_feature_flag_name) = columns_feature_flag_name {
+            quote! {
+                #[cfg_attr(feature = #columns_feature_flag_name, diesel(table_name = #table_path))]
+            }
+        } else {
+            quote! {
+                #[diesel(table_name = #table_path)]
+            }
+        };
+
         Ok(quote! {
             #[derive(Debug, Clone)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
             #diesel_derives_decorator
             #primary_key_decorator
-            #[cfg_attr(feature = #columns_feature_flag_name, diesel(table_name = #table_path))]
+            #diesel_table
             pub struct #struct_name {
                 #(#attributes),*
             }

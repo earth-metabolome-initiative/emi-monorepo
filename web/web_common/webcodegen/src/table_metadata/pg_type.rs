@@ -636,8 +636,8 @@ impl PgType {
             Ok(quote! {
                 #[derive(#(#derives),*)]
                 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-                #[cfg_attr(feature = "diesel", derive(diesel::deserialize::FromSqlRow, diesel::expression::AsExpression))]
-                #[cfg_attr(feature = "diesel", diesel(sql_type = #postgres_struct_name))]
+                #[derive(diesel::deserialize::FromSqlRow, diesel::expression::AsExpression)]
+                #[diesel(sql_type = #postgres_struct_name)]
                 pub struct #struct_name {
                     #(#fields),*
                 }
@@ -655,8 +655,8 @@ impl PgType {
             Ok(quote! {
                 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
                 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-                #[cfg_attr(feature = "diesel", derive(diesel::deserialize::FromSqlRow, diesel::expression::AsExpression))]
-                #[cfg_attr(feature = "diesel", diesel(sql_type = #postgres_struct_name))]
+                #[derive(diesel::deserialize::FromSqlRow, diesel::expression::AsExpression)]
+                #[diesel(sql_type = #postgres_struct_name)]
                 pub enum #struct_name {
                     #(#variant_names),*
                 }
@@ -686,7 +686,6 @@ impl PgType {
         let this_typname: &str = &self.typname;
         if self.is_composite() || self.is_enum() {
             quote! {
-                #[cfg(feature = "diesel")]
                 #[derive(diesel::query_builder::QueryId, diesel::sql_types::SqlType)]
                 #[diesel(postgres_type(name = #this_typname))]
                 pub struct #postgres_struct_name;
@@ -783,14 +782,14 @@ impl PgType {
             };
 
             Ok(quote! {
-                #[cfg(feature = "diesel")]
+                #[cfg(feature = "postgres")]
                 impl diesel::serialize::ToSql<#diesel_struct_path, diesel::pg::Pg> for #rust_struct_path {
                     fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, diesel::pg::Pg>) -> diesel::serialize::Result {
                         #to_sql_operation
                     }
                 }
 
-                #[cfg(feature = "diesel")]
+                #[cfg(feature = "postgres")]
                 impl diesel::deserialize::FromSql<#diesel_struct_path, diesel::pg::Pg> for #rust_struct_path {
                     fn from_sql(
                         bytes: <diesel::pg::Pg as diesel::backend::Backend>::RawValue<'_>,
@@ -815,7 +814,7 @@ impl PgType {
             }
 
             Ok(quote! {
-                #[cfg(feature = "diesel")]
+                #[cfg(feature = "postgres")]
                 impl diesel::serialize::ToSql<#diesel_struct_path, diesel::pg::Pg> for #rust_struct_path {
                     fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, diesel::pg::Pg>) -> diesel::serialize::Result {
                         match *self {
@@ -825,7 +824,7 @@ impl PgType {
                     }
                 }
 
-                #[cfg(feature = "diesel")]
+                #[cfg(feature = "postgres")]
                 impl diesel::deserialize::FromSql<#diesel_struct_path, diesel::pg::Pg> for #rust_struct_path {
                     fn from_sql(
                         bytes: <diesel::pg::Pg as diesel::backend::Backend>::RawValue<'_>,
