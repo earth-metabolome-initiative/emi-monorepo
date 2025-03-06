@@ -53,12 +53,9 @@ where
     type Attribute = GraphBuilderOptions;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
-        let nodes = self.nodes.ok_or(BuilderError::IncompleteBuild {
-            missing_attribute: GraphBuilderOptions::Sources,
-        })?;
-        let edges = self.edges.ok_or(BuilderError::IncompleteBuild {
-            missing_attribute: GraphBuilderOptions::Edges,
-        })?;
+        let nodes =
+            self.nodes.ok_or(BuilderError::IncompleteBuild(GraphBuilderOptions::Sources))?;
+        let edges = self.edges.ok_or(BuilderError::IncompleteBuild(GraphBuilderOptions::Edges))?;
 
         G::try_from((nodes, edges))
     }

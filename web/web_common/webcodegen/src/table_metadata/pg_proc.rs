@@ -1,18 +1,17 @@
 //! Submodule providing a struct [`PgProc`] representing the `pg_proc` table.
 
+use diesel::{
+    ExpressionMethods, JoinOnDsl, OptionalExtension, PgConnection, QueryDsl, Queryable,
+    QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
+};
+
 use crate::PgExtension;
-use diesel::ExpressionMethods;
-use diesel::JoinOnDsl;
-use diesel::OptionalExtension;
-use diesel::QueryDsl;
-use diesel::RunQueryDsl;
-use diesel::SelectableHelper;
-use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
 /// Represents the `pg_proc` system catalog table in `PostgreSQL`.
 /// This table stores information about functions and procedures.
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::pg_proc)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct PgProc {
     /// The OID of the function.
     pub oid: u32,
@@ -42,9 +41,11 @@ pub struct PgProc {
     pub proisstrict: bool,
     /// True if the function returns a set.
     pub proretset: bool,
-    /// The volatility category of the function ('i' for immutable, 's' for stable, 'v' for volatile).
+    /// The volatility category of the function ('i' for immutable, 's' for
+    /// stable, 'v' for volatile).
     pub provolatile: String,
-    /// The parallel safety category of the function ('u' for unsafe, 'r' for restricted, 's' for safe).
+    /// The parallel safety category of the function ('u' for unsafe, 'r' for
+    /// restricted, 's' for safe).
     pub proparallel: String,
     /// The number of arguments the function takes.
     pub pronargs: i16,
@@ -84,7 +85,6 @@ impl PgProc {
     /// # Errors
     ///
     /// * If the function does not exist.
-    ///
     pub fn load(
         name: &str,
         namespace: &str,
@@ -107,12 +107,12 @@ impl PgProc {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a `PgConnection`
+    /// * `conn` - A mutable reference to a
+    ///   [`PgConnection`](diesel::PgConnection).
     ///
     /// # Errors
     ///
     /// * If the function is not contained in an extension
-    ///
     pub fn extension(
         &self,
         conn: &mut PgConnection,
@@ -124,5 +124,11 @@ impl PgProc {
             .select(PgExtension::as_select())
             .first::<PgExtension>(conn)
             .optional()
+    }
+
+    #[must_use]
+    /// Returns the [`Ident`](syn::Ident) for the [`PgProc`].
+    pub fn ident(&self) -> syn::Ident {
+        syn::Ident::new(&self.proname, proc_macro2::Span::call_site())
     }
 }

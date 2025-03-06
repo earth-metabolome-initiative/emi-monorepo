@@ -10,7 +10,12 @@ use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{parse_str, Ident, Type};
 
 use super::{table::RESERVED_RUST_WORDS, PgAttribute, PgEnum};
-use crate::errors::WebCodeGenError;
+use crate::{
+    codegen::{
+        CODEGEN_DIESEL_MODULE, CODEGEN_DIRECTORY, CODEGEN_STRUCTS_MODULE, CODEGEN_TYPES_PATH,
+    },
+    errors::WebCodeGenError,
+};
 
 /// Constant listing types supporting `Copy`.
 const COPY_TYPES: [&str; 6] = ["i32", "i16", "i64", "f32", "f64", "bool"];
@@ -166,7 +171,14 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> Result<&'static str, WebCod
 /// # Errors
 ///
 /// * Returns an error if the type is not supported.
-pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<&str, WebCodeGenError> {
+pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<String, WebCodeGenError> {
+    if let Some(postgres_type) = postgres_type.strip_suffix("[]") {
+        return Ok(format!(
+            "diesel::sql_types::Array<{}>",
+            postgres_type_to_diesel_str(postgres_type)?
+        ));
+    }
+
     Ok(match postgres_type {
         // Numeric types
         "integer" | "int4" => "diesel::sql_types::Integer",
@@ -179,7 +191,7 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<&str, WebCodeG
         // Text types
         "text" | "character varying" | "name" | "cstring" => "diesel::sql_types::Text",
         "citext" => "diesel::sql_types::Citext",
-        "char" => "diesel::sql_types::CChar",
+        "char" | "character" => "diesel::sql_types::CChar",
         "bpchar" => "diesel::sql_types::Bpchar",
 
         // Boolean types
@@ -193,7 +205,7 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<&str, WebCodeG
         "interval" => "diesel::sql_types::Interval",
 
         // Binary types
-        "bytea" => "diesel::sql_types::Bytea",
+        "bytea" => "diesel::sql_types::Binary",
 
         // JSON types
         "json" => "diesel::sql_types::Json",
@@ -221,7 +233,8 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<&str, WebCodeG
         _ => {
             return Err(WebCodeGenError::UnknownDieselPostgresType(postgres_type.to_owned()));
         }
-    })
+    }
+    .to_owned())
 }
 
 /// Converts a `PostgreSQL` type to a `Diesel` type.
@@ -279,10 +292,7 @@ impl PgType {
             Err(error) => {
                 if self.is_composite() || self.is_enum() {
                     let mut struct_name = format!(
-                        "crate::{}::{}::{}::{}::{}",
-                        crate::codegen::CODEGEN_DIRECTORY,
-                        crate::codegen::CODEGEN_STRUCTS_MODULE,
-                        crate::codegen::CODEGEN_TYPES_PATH,
+                        "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TYPES_PATH}::{}::{}",
                         self.snake_case_name()?,
                         self.camelcased_name()
                     );
@@ -330,10 +340,7 @@ impl PgType {
                 if self.is_composite() || self.is_enum() {
                     let snake_case_name = self.snake_case_name()?;
                     let mut full_name = format!(
-                        "crate::{}::{}::{}::{snake_case_name}::{}",
-                        crate::codegen::CODEGEN_DIRECTORY,
-                        crate::codegen::CODEGEN_DIESEL_MODULE,
-                        crate::codegen::CODEGEN_TYPES_PATH,
+                        "crate::{CODEGEN_DIRECTORY}::{CODEGEN_DIESEL_MODULE}::{CODEGEN_TYPES_PATH}::{snake_case_name}::{}",
                         &self.pg_binding_name()
                     );
                     if nullable {
@@ -629,8 +636,8 @@ impl PgType {
             Ok(quote! {
                 #[derive(#(#derives),*)]
                 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-                #[cfg_attr(feature = "diesel", derive(diesel::deserialize::FromSqlRow, diesel::expression::AsExpression))]
-                #[cfg_attr(feature = "diesel", diesel(sql_type = #postgres_struct_name))]
+                #[derive(diesel::deserialize::FromSqlRow, diesel::expression::AsExpression)]
+                #[diesel(sql_type = #postgres_struct_name)]
                 pub struct #struct_name {
                     #(#fields),*
                 }
@@ -648,8 +655,8 @@ impl PgType {
             Ok(quote! {
                 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
                 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-                #[cfg_attr(feature = "diesel", derive(diesel::deserialize::FromSqlRow, diesel::expression::AsExpression))]
-                #[cfg_attr(feature = "diesel", diesel(sql_type = #postgres_struct_name))]
+                #[derive(diesel::deserialize::FromSqlRow, diesel::expression::AsExpression)]
+                #[diesel(sql_type = #postgres_struct_name)]
                 pub enum #struct_name {
                     #(#variant_names),*
                 }
@@ -679,7 +686,6 @@ impl PgType {
         let this_typname: &str = &self.typname;
         if self.is_composite() || self.is_enum() {
             quote! {
-                #[cfg(feature = "diesel")]
                 #[derive(diesel::query_builder::QueryId, diesel::sql_types::SqlType)]
                 #[diesel(postgres_type(name = #this_typname))]
                 pub struct #postgres_struct_name;
@@ -776,14 +782,14 @@ impl PgType {
             };
 
             Ok(quote! {
-                #[cfg(feature = "diesel")]
+                #[cfg(feature = "postgres")]
                 impl diesel::serialize::ToSql<#diesel_struct_path, diesel::pg::Pg> for #rust_struct_path {
                     fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, diesel::pg::Pg>) -> diesel::serialize::Result {
                         #to_sql_operation
                     }
                 }
 
-                #[cfg(feature = "diesel")]
+                #[cfg(feature = "postgres")]
                 impl diesel::deserialize::FromSql<#diesel_struct_path, diesel::pg::Pg> for #rust_struct_path {
                     fn from_sql(
                         bytes: <diesel::pg::Pg as diesel::backend::Backend>::RawValue<'_>,
@@ -808,7 +814,7 @@ impl PgType {
             }
 
             Ok(quote! {
-                #[cfg(feature = "diesel")]
+                #[cfg(feature = "postgres")]
                 impl diesel::serialize::ToSql<#diesel_struct_path, diesel::pg::Pg> for #rust_struct_path {
                     fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, diesel::pg::Pg>) -> diesel::serialize::Result {
                         match *self {
@@ -818,7 +824,7 @@ impl PgType {
                     }
                 }
 
-                #[cfg(feature = "diesel")]
+                #[cfg(feature = "postgres")]
                 impl diesel::deserialize::FromSql<#diesel_struct_path, diesel::pg::Pg> for #rust_struct_path {
                     fn from_sql(
                         bytes: <diesel::pg::Pg as diesel::backend::Backend>::RawValue<'_>,

@@ -22,3 +22,12 @@ impl std::fmt::Display for Error {
         }
     }
 }
+
+#[cfg(feature = "backend")]
+impl TryFrom<diesel::result::Error> for Error {
+    type Error = diesel::result::Error;
+
+    fn try_from(_error: diesel::result::Error) -> Result<Self, Self::Error> {
+        todo!()
+    }
+}

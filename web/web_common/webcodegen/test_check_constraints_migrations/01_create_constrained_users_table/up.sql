@@ -91,4 +91,23 @@ CREATE TABLE unconstrained_samples (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (samplename),
     UNIQUE (samplename, id)
+    CHECK (check_strings_different(username, email)),
+    CHECK (check_young_age(age) AND check_young_age(age) AND check_age(age))
+    CHECK (check_strings_different(username, email)),
+    CHECK (check_young_age(age) AND check_young_age(age) AND check_age(age))
+);
+
+
+-- SQL query creating a mockup of the constrained samples table.
+CREATE TABLE constrained_samples (
+    id SERIAL PRIMARY KEY,
+    samplename VARCHAR(255) NOT NULL CHECK (check_non_empty_string(samplename)),
+    sanitized_samplename VARCHAR(255) NOT NULL CHECK (check_non_empty_string(sanitized_samplename)),
+    amount_initial INT NOT NULL CHECK (amount_initial > 10),
+    amount_final INT NOT NULL CHECK (amount_final > 2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (samplename),
+    UNIQUE (samplename, id),
+    CHECK (check_values_different(amount_initial, amount_final)),
+    CHECK (check_strings_different(samplename, sanitized_samplename))
 );

@@ -9,7 +9,7 @@ use syn::Ident;
 use super::Codegen;
 use crate::Table;
 
-mod table;
+mod tables;
 mod types;
 
 impl Codegen<'_> {
@@ -57,12 +57,16 @@ impl Codegen<'_> {
             let tables_ident =
                 Ident::new(crate::codegen::CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());
 
+            let table_structs =
+                tables.iter().map(Table::struct_ident).collect::<Result<Vec<_>, _>>()?;
+
             submodule_file_content.extend(quote::quote! {
                 pub mod #tables_ident;
+                pub use #tables_ident::{#(#table_structs),*};
             });
         }
 
-        std::fs::write(&submodule_file, submodule_file_content.to_string())?;
+        std::fs::write(&submodule_file, self.beautify_code(&submodule_file_content)?)?;
 
         Ok(())
     }

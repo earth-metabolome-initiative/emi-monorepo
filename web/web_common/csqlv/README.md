@@ -36,7 +36,7 @@ let schema: CSVSchema = CSVSchemaBuilder::default()
     .from_dir("./tests/bands")
     .unwrap();
 
-let sql: String = schema.to_postgres().unwrap();
+let sql: String = schema.to_sql().unwrap();
 
 println!("{}", sql);
 ```

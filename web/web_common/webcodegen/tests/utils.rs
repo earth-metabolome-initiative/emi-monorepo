@@ -3,9 +3,8 @@
 use std::{
     hash::{DefaultHasher, Hash, Hasher},
     io::Write,
+    path::Path,
 };
-
-use std::path::Path;
 
 use diesel::{Connection, PgConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
@@ -21,7 +20,8 @@ const DEFAULT_MIGRATIONS: EmbeddedMigrations = embed_migrations!("./test_migrati
 const DATABASE_PASSWORD: &str = "password";
 const DATABASE_USER: &str = "user";
 
-/// Finds the first file matching the requested extension under the provided directory, recursively.
+/// Finds the first file matching the requested extension under the provided
+/// directory, recursively.
 ///
 /// # Arguments
 ///
@@ -36,7 +36,6 @@ const DATABASE_USER: &str = "user";
 ///
 /// * If the file cannot be found.
 /// * If the directory cannot be read.
-///
 fn find_file(directory: &str, extension: &str) -> Result<String, std::io::Error> {
     let mut stack = vec![std::path::PathBuf::from(directory)];
     while let Some(dir) = stack.pop() {

@@ -41,8 +41,7 @@ async fn test_check_constraints_column() {
 
         for check_constraint in column_check_constraints {
             let functions = check_constraint
-                .functions(&mut conn)
-                .expect(&format!(
+                .functions(&mut conn).expect(&format!(
                     "Failed to query functions for check constraint `{check_constraint_name}`",
                     check_constraint_name = check_constraint.constraint_name
                 ));
@@ -65,4 +64,3 @@ async fn test_check_constraints_column() {
     }
 
     docker.stop().await.unwrap();
-}

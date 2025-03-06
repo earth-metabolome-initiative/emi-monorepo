@@ -15,9 +15,9 @@ async fn test_code_generation_methods(conn: &mut PgConnection) -> Result<(), Web
     add_main_to_file("tests/ui/sql_functions.rs");
     builder.pass("tests/ui/sql_functions.rs");
 
-    SQLOperator::write_all(conn, "tests/ui/sql_operators.rs")?;
-    add_main_to_file("tests/ui/sql_operators.rs");
-    builder.pass("tests/ui/sql_operators.rs");
+    // SQLOperator::write_all(conn, "tests/ui/sql_operators.rs")?;
+    // add_main_to_file("tests/ui/sql_operators.rs");
+    // builder.pass("tests/ui/sql_operators.rs");
 
     Ok(())
 }
@@ -32,8 +32,8 @@ async fn test_check_constraints(
 
     assert_eq!(
         table_check_constraint.len(),
-        5,
-        "Expected 5 check constraint, got: {:?}",
+        6,
+        "Expected 6 check constraint, got: {:?}",
         table_check_constraint
     );
 

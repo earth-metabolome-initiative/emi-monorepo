@@ -4,7 +4,7 @@ use std::{error::Error, fmt::Display, marker::PhantomData};
 
 use web_common_traits::prelude::{Operation, OperationError};
 
-#[common_traits::prelude::basic]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 /// Error that cannot occur during operations.
 pub struct InfallibleOperationError<OPS> {
     _phantom: PhantomData<OPS>,

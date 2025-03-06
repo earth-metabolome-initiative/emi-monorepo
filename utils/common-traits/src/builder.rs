@@ -20,23 +20,26 @@ pub trait Builder: Default {
     fn build(self) -> Result<Self::Object, Self::Error>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 /// Errors that can commonly occur during building.
 pub enum BuilderError<A> {
     /// An attribute was not set.
-    IncompleteBuild {
-        /// The attribute that was not set.
-        missing_attribute: A,
-    },
+    IncompleteBuild(A),
 }
 
 impl<A: core::fmt::Display> core::fmt::Display for BuilderError<A> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::IncompleteBuild { missing_attribute } => {
+            Self::IncompleteBuild(missing_attribute) => {
                 write!(f, "Incomplete build: missing attribute: {missing_attribute}")
             }
         }
+    }
+}
+
+impl<A: core::fmt::Display> core::fmt::Debug for BuilderError<A> {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        <BuilderError<A> as core::fmt::Display>::fmt(self, f)
     }
 }
 

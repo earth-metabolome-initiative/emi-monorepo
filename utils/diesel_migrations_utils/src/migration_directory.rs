@@ -2,7 +2,7 @@
 
 use std::path::Path;
 
-use crate::{errors::Error, migration::Migration};
+use crate::{errors::Error, migration::Migration, prelude::MigrationKind};
 
 #[derive(Debug)]
 /// Struct representing a directory containing migrations.
@@ -62,12 +62,61 @@ impl MigrationDirectory {
     }
 
     /// Iterates on the up migrations.
-    pub fn ups(&self) -> Result<Vec<String>, Error> {
+    pub fn ups(&self) -> impl Iterator<Item = Result<String, Error>> + '_ {
         let path: &Path = Path::new(&self.directory);
-        self.migrations
-            .iter()
-            .map(|migration| migration.up(path))
-            .collect::<Result<Vec<String>, Error>>()
+        self.migrations.iter().map(|migration| migration.up(path))
+    }
+
+    /// Executes all the up migrations.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The connection to the database.
+    ///
+    /// # Returns
+    ///
+    /// The result of the execution of the migrations
+    ///
+    /// # Errors
+    ///
+    /// * If the execution of the migrations fails
+    pub fn execute_ups<C: diesel::Connection>(&self, conn: &mut C) -> Result<(), Error> {
+        for (migration_number, migration) in self.ups().enumerate() {
+            conn.batch_execute(&migration?).map_err(|error| {
+                Error::ExecutingMigrationFailed(migration_number as u64, MigrationKind::Up, error)
+            })?;
+        }
+        Ok(())
+    }
+
+    /// Connects and executes all the up migrations.
+    ///
+    /// # Arguments
+    ///
+    /// * `url` - The URL of the database.
+    ///
+    /// # Returns
+    ///
+    /// The result of the execution of the migrations
+    ///
+    /// # Errors
+    ///
+    /// * If the connection to the database fails
+    /// * If the execution of the migrations fails
+    pub fn connect_and_execute_ups<C: diesel::Connection>(&self, url: &str) -> Result<(), Error> {
+        let mut attempts = 0;
+        loop {
+            match C::establish(url) {
+                Err(err) => {
+                    if attempts >= 10 {
+                        return Err(err.into());
+                    }
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+                    attempts += 1;
+                }
+                Ok(mut conn) => return self.execute_ups(&mut conn),
+            }
+        }
     }
 
     /// Iterates on the down migrations.
@@ -77,6 +126,58 @@ impl MigrationDirectory {
             .iter()
             .map(|migration| migration.down(path))
             .collect::<Result<Vec<String>, Error>>()
+    }
+
+    /// Executes all the down migrations.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The connection to the database.
+    ///
+    /// # Returns
+    ///
+    /// The result of the execution of the migrations
+    ///
+    /// # Errors
+    ///
+    /// * If the execution of the migrations fails
+    pub fn execute_downs<C: diesel::Connection>(&self, conn: &mut C) -> Result<(), Error> {
+        for (migration_number, migration) in self.downs()?.iter().enumerate() {
+            conn.batch_execute(migration).map_err(|error| {
+                Error::ExecutingMigrationFailed(migration_number as u64, MigrationKind::Down, error)
+            })?;
+        }
+        Ok(())
+    }
+
+    /// Connects and executes all the down migrations.
+    ///
+    /// # Arguments
+    ///
+    /// * `url` - The URL of the database.
+    ///
+    /// # Returns
+    ///
+    /// The result of the execution of the migrations
+    ///
+    /// # Errors
+    ///
+    /// * If the connection to the database fails
+    /// * If the execution of the migrations fails
+    pub fn connect_and_execute_downs<C: diesel::Connection>(&self, url: &str) -> Result<(), Error> {
+        let mut attempts = 0;
+        loop {
+            match C::establish(url) {
+                Err(err) => {
+                    if attempts >= 10 {
+                        return Err(err.into());
+                    }
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+                    attempts += 1;
+                }
+                Ok(mut conn) => return self.execute_downs(&mut conn),
+            }
+        }
     }
 
     #[must_use]

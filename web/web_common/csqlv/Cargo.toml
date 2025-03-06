@@ -11,6 +11,7 @@ indicatif = "0.17.11"
 quote = "1.0.38"
 uuid.workspace = true
 inflector.workspace = true
+const_format.workspace = true
 
 [dev-dependencies]
 testcontainers = {version="0.23.2"}
@@ -19,11 +20,10 @@ trybuild.workspace = true
 serde_json = "1.0.138"
 chrono.workspace = true
 ipnetwork = "0.20.0"
-diesel-async.workspace = true
 macaddr = "1.0.1"
 postgis_diesel.workspace = true
+diesel = {workspace = true, features = ["postgres"]}
 
 [features]
 default = [ "serde"]
 serde = []
-diesel = []

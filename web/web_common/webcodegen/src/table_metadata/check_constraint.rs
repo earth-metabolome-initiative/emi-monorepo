@@ -1,14 +1,10 @@
-use diesel::BoolExpressionMethods;
-use diesel::JoinOnDsl;
-use diesel::SelectableHelper;
 use diesel::{
-    pg::PgConnection, ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl,
-    Selectable,
+    pg::PgConnection, BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable,
+    QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
 
+use super::{Column, PgConstraint, PgExtension, PgProc};
 use crate::errors::WebCodeGenError;
-
-use super::{PgConstraint, PgProc, Column};
 
 #[derive(Queryable, QueryableByName, Debug, Selectable)]
 #[diesel(table_name = crate::schema::check_constraints)]
@@ -25,7 +21,100 @@ pub struct CheckConstraint {
 }
 
 impl CheckConstraint {
-    /// Returns the vector of [`PgProc`] functions that are used in the check clause
+    /// Returns the [`TokenStream`](proc_macro2::TokenStream) of the check
+    /// clause, including all functions specified from the provided
+    /// extensions, and considering the provided column as the one to
+    /// be primarily checked.
+    ///
+    /// # Arguments
+    ///
+    /// * `column` - The column to be primarily checked
+    /// * `extensions` - The extensions to consider
+    /// * `use_self` - Whether the other columns should be assumed as from the
+    ///   `self`
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    ///
+    /// # Returns
+    ///
+    /// * `None` if the provided column is not involved in the check clause
+    /// * `None` if the provided `extensions` are not involved in the check
+    ///   clause
+    pub fn to_syn<E: AsRef<PgExtension>>(
+        &self,
+        column: &Column,
+        extensions: &[E],
+        conn: &mut PgConnection,
+    ) -> Result<Option<proc_macro2::TokenStream>, WebCodeGenError> {
+        let involved_columns = self.columns(conn)?;
+        if !involved_columns.contains(column) {
+            return Ok(None);
+        }
+        let involved_functions = self
+            .functions(conn)?
+            .into_iter()
+            .filter(|function| {
+                function.extension(conn).ok().flatten().is_some_and(|extension| {
+                    extensions.iter().any(|ext| ext.as_ref() == &extension)
+                })
+            })
+            .collect::<Vec<PgProc>>();
+        if involved_functions.is_empty() {
+            return Ok(None);
+        }
+        // At this time, we know how to handle either the case of:
+        //
+        // 1. A single column check constraint with multiple functions, each one
+        //    expecting the column.
+        // 2. A multi-column check constraint with a single function expecting all the
+        //    columns.
+        //
+        if involved_columns.len() == 1 {
+            let column_ident = column.snake_case_ident()?;
+            // Case 1 described above.
+            return involved_functions
+                .into_iter()
+                .map(|function| {
+                    let function_ident = function.ident();
+                    let extension_ident = if let Some(extension) = function.extension(conn)? {
+                        extension.ident()
+                    } else {
+                        unreachable!("The extension must be present")
+                    };
+                    Ok(quote::quote! {
+                        #extension_ident::#function_ident(#column_ident)?;
+                    })
+                })
+                .collect::<Result<proc_macro2::TokenStream, WebCodeGenError>>()
+                .map(Some);
+        }
+
+        if involved_columns.len() > 1 && involved_functions.len() == 1 {
+            // Case 2 described above.
+            let function = &involved_functions[0];
+            let function_ident = function.ident();
+            let extension_ident = if let Some(extension) = function.extension(conn)? {
+                extension.ident()
+            } else {
+                unreachable!("The extension must be present")
+            };
+            let column_idents = involved_columns
+                .iter()
+                .map(Column::snake_case_ident)
+                .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+            return Ok(Some(quote::quote! {
+                #extension_ident::#function_ident(#(#column_idents),*)?;
+            }));
+        }
+
+        unimplemented!("It is currently unsupported to handle the provided check constraint")
+    }
+
+    /// Returns the vector of [`PgProc`] functions that are used in the check
+    /// clause
     ///
     /// # Arguments
     ///
@@ -34,7 +123,6 @@ impl CheckConstraint {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    ///
     pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, WebCodeGenError> {
         Ok(self.pg_constraint(conn)?.functions(conn)?)
     }
@@ -48,7 +136,6 @@ impl CheckConstraint {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    ///
     pub fn pg_constraint(&self, conn: &mut PgConnection) -> Result<PgConstraint, WebCodeGenError> {
         use crate::schema::{pg_constraint, pg_namespace};
         pg_constraint::table
@@ -94,7 +181,6 @@ impl CheckConstraint {
     /// # Errors
     ///
     /// * If their is an error while querying the database.
-    ///
     pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
         use crate::schema::{columns, constraint_column_usage};
         Ok(columns::table
@@ -127,7 +213,6 @@ impl CheckConstraint {
     /// # Errors
     ///
     /// * If their is an error while querying the database.
-    ///
     pub fn is_single_column_constraint(
         &self,
         conn: &mut PgConnection,
@@ -144,7 +229,6 @@ impl CheckConstraint {
     /// # Errors
     ///
     /// * If their is an error while querying the database.
-    ///
     pub fn is_multi_column_constraint(
         &self,
         conn: &mut PgConnection,

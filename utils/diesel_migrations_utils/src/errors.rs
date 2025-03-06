@@ -2,7 +2,7 @@
 
 use crate::prelude::MigrationKind;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 /// Enumeration of errors that may occour with the migrations utility.
 pub enum Error {
     /// Error raised when the directory is not a valid migration.
@@ -24,10 +24,20 @@ pub enum Error {
     },
     /// When reading a migration fails
     ReadingMigrationFailed(u64, MigrationKind, String),
+    /// Failed to connect to the database
+    ConnectionFailed(diesel::ConnectionError),
+    /// When executing a migration fails
+    ExecutingMigrationFailed(u64, MigrationKind, diesel::result::Error),
 }
 
 impl From<std::io::Error> for Error {
     fn from(error: std::io::Error) -> Self {
         Error::InvalidMigration(error.to_string())
+    }
+}
+
+impl From<diesel::ConnectionError> for Error {
+    fn from(error: diesel::ConnectionError) -> Self {
+        Error::ConnectionFailed(error)
     }
 }

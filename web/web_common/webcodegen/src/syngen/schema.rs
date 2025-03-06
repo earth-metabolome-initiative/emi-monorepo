@@ -36,7 +36,7 @@ impl Table {
             .into_iter()
             .map(|column| {
                 let original_column_name = &column.column_name;
-                let column_attribute: Ident = column.sanitized_snake_case_ident()?;
+                let column_attribute: Ident = column.snake_case_ident()?;
                 let column_type = column.diesel_type(conn)?;
                 Ok(if original_column_name == &column_attribute.to_string() {
                     quote! {
@@ -64,7 +64,11 @@ impl Table {
             }
         };
 
-        let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
+        let columns_feature_flag = if let Some(columns_feature_flag_name) = self.diesel_feature_flag_name(conn)? {
+            quote! {#[cfg(feature = #columns_feature_flag_name)]}
+        } else {
+            TokenStream::new()
+        };
 
         let sql_name = if self.has_snake_case_name()? {
             TokenStream::new()
@@ -73,7 +77,7 @@ impl Table {
         };
 
         Ok(quote! {
-            #[cfg(feature = #columns_feature_flag_name)]
+            #columns_feature_flag
             diesel::table! {
                 #sql_name
                 #table_schema.#sanitized_table_name_ident #primary_key_names {

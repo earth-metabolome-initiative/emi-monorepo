@@ -1,10 +1,11 @@
 //! Submodule defining the trait for Options for building a vocabulary.
 
-use common_traits::prelude::{basic, Builder};
+use common_traits::prelude::Builder;
 
 use crate::traits::{GrowableVocabulary, Vocabulary};
 
-#[basic]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Options for building a vocabulary.
 pub enum VocabularyBuilderOptions {
     /// The symbol from which to load the vocabulary.

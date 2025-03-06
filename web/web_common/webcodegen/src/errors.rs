@@ -56,6 +56,8 @@ pub enum WebCodeGenError {
 pub enum CodeGenerationError {
     /// When the generation directory was not provided.
     GenerationDirectoryNotProvided,
+    /// When the user table has not been specified.
+    UserTableNotProvided,
 }
 
 impl From<DieselError> for WebCodeGenError {

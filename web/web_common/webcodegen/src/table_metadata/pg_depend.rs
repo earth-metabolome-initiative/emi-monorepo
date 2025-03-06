@@ -1,9 +1,11 @@
-//! Submodule providing a struct [`PgDepend`] representing the `pg_depend` table.
+//! Submodule providing a struct [`PgDepend`] representing the `pg_depend`
+//! table.
 
 use diesel::{Queryable, QueryableByName, Selectable};
 
 /// Represents the `pg_depend` system catalog table in `PostgreSQL`.
-/// This table stores information about the dependency relationships between database objects.
+/// This table stores information about the dependency relationships between
+/// database objects.
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::pg_depend)]
 pub struct PgDepend {

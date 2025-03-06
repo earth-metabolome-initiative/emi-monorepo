@@ -31,7 +31,6 @@ async fn test_check_constraints_table() {
                 table_name = table_name
             ));
 
-
         assert_eq!(
             table_check_constraints.len(),
             expected_number_of_check_constraints,

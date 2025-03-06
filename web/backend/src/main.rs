@@ -36,13 +36,12 @@ async fn main() -> std::io::Result<()> {
         std::env::var("DOCKER_DATABASE_URL").expect("DOCKER_DATABASE_URL must be set");
 
     // create db connection pool
-    let pool: web_common_traits::prelude::DBPool =
-        diesel_async::pooled_connection::bb8::Pool::builder()
-            .build(diesel_async::pooled_connection::AsyncDieselConnectionManager::<
-                diesel_async::AsyncPgConnection,
-            >::new(database_url))
-            .await
-            .expect("Error creating database pool");
+    let pool: backend::DBPool = diesel_async::pooled_connection::bb8::Pool::builder()
+        .build(diesel_async::pooled_connection::AsyncDieselConnectionManager::<
+            diesel_async::AsyncPgConnection,
+        >::new(database_url))
+        .await
+        .expect("Error creating database pool");
 
     let redis_client =
         Client::open(std::env::var("REDIS_URL").expect("REDIS_URL must be set").as_str())

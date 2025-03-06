@@ -4,10 +4,11 @@ use std::env;
 use actix_web::{get, web, HttpResponse, Responder};
 use core_structures::LoginProvider;
 use web_common::api::{oauth::providers::*, ApiError};
+use web_common_traits::database::Loadable;
 
 #[get("/providers")]
 /// Returns a list of available OAuth2 providers.
-async fn get_providers(pool: web::Data<web_common_traits::prelude::DBPool>) -> impl Responder {
+async fn get_providers(pool: web::Data<crate::DBPool>) -> impl Responder {
     let mut conn = pool.get().await.expect("couldn't get db connection from pool");
     let Ok(providers) = LoginProvider::load_all(&mut conn).await else {
         return HttpResponse::InternalServerError().json(ApiError::internal_server_error());

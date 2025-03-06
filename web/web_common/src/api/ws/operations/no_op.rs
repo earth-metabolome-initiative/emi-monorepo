@@ -1,11 +1,10 @@
 //! Test operation that does nothing.
 
-use common_traits::prelude::basic;
 use web_common_traits::prelude::Operation;
 
 use crate::api::ws::{operation_errors::InfallibleOperationError, outcomes::NoOpOutcome};
 
-#[basic]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NoOp {
     id: uuid::Uuid,
 }
@@ -16,13 +15,5 @@ impl Operation for NoOp {
 
     fn id(&self) -> uuid::Uuid {
         self.id
-    }
-
-    #[cfg(feature = "backend")]
-    async fn execute(
-        self,
-        _connection: &mut diesel::PgConnection,
-    ) -> Result<Self::Outcome, Self::Error> {
-        Ok(NoOpOutcome::from(self))
     }
 }

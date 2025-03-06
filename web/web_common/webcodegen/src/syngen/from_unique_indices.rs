@@ -3,7 +3,6 @@
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::Ident;
 
 use crate::errors::WebCodeGenError;
 
@@ -30,10 +29,13 @@ impl crate::Table {
     pub fn from_unique_indices(
         &self,
         conn: &mut diesel::PgConnection,
+        syntax: &crate::codegen::Syntax,
     ) -> Result<TokenStream, WebCodeGenError> {
         let struct_name = self.struct_ident()?;
         let table_name_ident = self.import_diesel_path()?;
         let primary_keys = self.primary_key_columns(conn)?;
+        let syntax_flag = syntax.as_feature_flag();
+        let syntax_connection = syntax.as_connection_type();
 
         self.unique_indices(conn)?
             .into_iter()
@@ -59,35 +61,37 @@ impl crate::Table {
                 let method_ident = syn::Ident::new(&method_name, struct_name.span());
                 let method_arguments = columns
                     .iter()
-                    .map(|c| {
-                        let column_name = Ident::new(&c.column_name, struct_name.span());
-                        let column_type = c.rust_ref_data_type(conn)?;
+                    .map(|column| {
+                        let column_name = column.snake_case_ident()?;
+                        let column_type = column.rust_ref_data_type(conn)?;
                         Ok(quote! { #column_name: #column_type })
                     })
                     .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
                 let filter = columns
                     .iter()
-                    .map(|c| {
-                        let column_name = Ident::new(&c.column_name, struct_name.span());
-                        quote! { diesel::ExpressionMethods::eq(#table_name_ident::#column_name, #column_name) }
+                    .map(|column| {
+                        let column_name = column.snake_case_ident()?;
+                        Ok(quote! { diesel::ExpressionMethods::eq(#table_name_ident::#column_name, #column_name) })
                     })
-                    .fold(quote! {}, |acc, filter| {
-                        if acc.is_empty() {
+                    .try_fold(quote! {}, |acc: TokenStream, filter: Result<TokenStream, WebCodeGenError>| {
+                        let filter = filter?;
+                        Ok::<TokenStream, WebCodeGenError>(if acc.is_empty() {
                             filter
                         } else {
                             quote! {diesel::BoolExpressionMethods::and(#acc, #filter) }
-                        }
-                    });
+                        })
+                    })?;
 
                 Ok(quote! {
-                    #[cfg(feature = "diesel")]
+                    #syntax_flag
                     pub async fn #method_ident(
                         #(#method_arguments),*,
-                        conn: &mut web_common_traits::prelude::DBConn
+                        conn: &mut #syntax_connection
                     ) -> Result<Option<Self>, diesel::result::Error> {
                         use diesel_async::RunQueryDsl;
+                        use diesel::associations::HasTable;
                         use diesel::{QueryDsl, OptionalExtension};
-                        #table_name_ident::table
+                        Self::table()
                             .filter(#filter)
                             .first::<Self>(conn)
                             .await

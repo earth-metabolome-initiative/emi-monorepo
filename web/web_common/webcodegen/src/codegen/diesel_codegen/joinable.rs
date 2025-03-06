@@ -31,8 +31,7 @@ impl Codegen<'_> {
         // We will now iterate on the various tables
         for table in tables {
             // We retrieve the table identifier
-            let table_identifier =
-                Ident::new(&table.snake_case_name()?, proc_macro2::Span::call_site());
+            let table_identifier = table.snake_case_ident()?;
             // We create a file for each table
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
 
@@ -67,7 +66,7 @@ impl Codegen<'_> {
                 let foreign_table_identifier =
                     Ident::new(&foreign_table.snake_case_name()?, proc_macro2::Span::call_site());
                 // We retrieve the foreign_key identifer
-                let foreign_key_identifier = foreign_key.sanitized_snake_case_ident()?;
+                let foreign_key_identifier = foreign_key.snake_case_ident()?;
                 // Using TokeStream we write the  joinable!(table -> foreign_table
                 // (foreign_key));
 

@@ -25,6 +25,6 @@ pub use meta_sql::AuthorizationFunctionBuilder;
 pub use postgis::{GeographyColumn, GeometryColumn};
 pub use table_metadata::{
     CheckConstraint, Column, ConstraintColumnUsage, ConstraintTableUsage, DomainConstraint,
-    KeyColumnUsage, PGClass, PgAttribute, PgEnum, PgIndex, PgType, ReferentialConstraint,
-    SQLFunction, SQLOperator, Table, TableConstraint, PgProc, PgExtension, PgDepend
+    KeyColumnUsage, PGClass, PgAttribute, PgDepend, PgEnum, PgExtension, PgIndex, PgProc, PgType,
+    ReferentialConstraint, SQLFunction, SQLOperator, Table, TableConstraint,
 };

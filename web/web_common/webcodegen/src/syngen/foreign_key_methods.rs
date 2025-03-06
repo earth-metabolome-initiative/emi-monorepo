@@ -6,7 +6,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
 
-use crate::{errors::WebCodeGenError, Table};
+use crate::{codegen::Syntax, errors::WebCodeGenError, Table};
 
 impl Table {
     /// Returns all of the implementations of `Foreign<F>` for the table struct.
@@ -14,9 +14,11 @@ impl Table {
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`.
+    /// * `syntax` - The syntax to use for the code generation.
     pub fn foreign_key_traits(
         &self,
         conn: &mut PgConnection,
+        syntax: &Syntax,
     ) -> Result<TokenStream, WebCodeGenError> {
         let struct_path = self.import_struct_path()?;
         let foreign_keys = self.foreign_keys(conn)?;
@@ -29,10 +31,11 @@ impl Table {
             if &foreign_key_table == self {
                 continue;
             }
+
             if foreign_key.is_nullable() {
-                // If the foreign key is nullable, we don't want to write the trait for it.
                 continue;
             }
+
             if foreign_keys_and_tables.iter().any(|(table, _)| table == &foreign_key_table) {
                 // If we have already written the trait for this table, we remove the other
                 // occurrences.
@@ -42,21 +45,27 @@ impl Table {
             foreign_keys_and_tables.push((foreign_key_table, foreign_key));
         }
 
+        let syntax_feature_flag = syntax.as_feature_flag();
+        let connection = syntax.as_connection_type();
+
         foreign_keys_and_tables
             .into_iter()
             .map(|(foreign_key_table, column)| {
                 let foreign_key_struct_path = foreign_key_table.import_struct_path()?;
 
-                let method_name: Ident = if column.column_name.ends_with("_id") {
-                    Ident::new(&column.column_name[..column.column_name.len() - 3], proc_macro2::Span::call_site())
+                let column_name = column.snake_case_name()?;
+                let method_name: Ident = if column_name.ends_with("_id") {
+                    Ident::new(&column_name[..column_name.len() - 3], proc_macro2::Span::call_site())
                 } else {
-                    Ident::new(&column.column_name, proc_macro2::Span::call_site())
+                    Ident::new(&column_name, proc_macro2::Span::call_site())
                 };
 
                 Ok(quote! {
+                    #syntax_feature_flag
                     impl web_common_traits::prelude::Foreign<#foreign_key_struct_path> for #struct_path {
-                        #[cfg(feature = "diesel")]
-                        async fn foreign(&self, conn: &mut web_common_traits::prelude::DBConn) -> Result<Option<#foreign_key_struct_path>, diesel::result::Error> {
+                        type Conn = #connection;
+
+                        async fn foreign(&self, conn: &mut Self::Conn) -> Result<#foreign_key_struct_path, diesel::result::Error> {
                             self.#method_name(conn).await
                         }
                     }
@@ -68,7 +77,11 @@ impl Table {
     pub fn foreign_key_methods(
         &self,
         conn: &mut PgConnection,
+        syntax: &Syntax,
     ) -> Result<TokenStream, WebCodeGenError> {
+        let feature_flag = syntax.as_feature_flag();
+        let connection = syntax.as_connection_type();
+
         self
             .foreign_keys(conn)?
             .into_iter()
@@ -79,40 +92,46 @@ impl Table {
                 } else {
                     Ident::new(&column.column_name, proc_macro2::Span::call_site())
                 };
-                let current_column_ident: Ident = column.sanitized_snake_case_ident()?;
+                let current_column_ident: Ident = column.snake_case_ident()?;
                 let foreign_key_struct_path = foreign_key_table.import_struct_path()?;
 
-                // If the current column has a Nullable (Option) type, the return type of the method should be an Option
-                let return_type_ident = if column.is_nullable() {
-                    quote! { Option<#foreign_key_struct_path> }
+                let optional = if column.is_nullable() {
+                    quote! { .map(Some) }
                 } else {
-                    quote! { #foreign_key_struct_path }
+                    TokenStream::new()
                 };
 
-                // Analogously, we check before executing the query whether the current column is None. If so,
-                // we return None as well.
-                let column_value_retrieval = if column.is_nullable() {
-                    quote! {
-                        self.#current_column_ident.as_ref() else {
+                let return_statement: syn::Type = if column.is_nullable() {
+                    syn::parse_quote! { Option<#foreign_key_struct_path> }
+                } else {
+                    foreign_key_struct_path.clone()
+                };
+
+                // Analogously, we check before executing the query whether the current column is None.
+                // If so, we return None as well.
+
+                let (column_value_retrieval, column_attribute) = if column.is_nullable() {
+                    (quote! {
+                        let Some(#current_column_ident) = self.#current_column_ident.as_ref() else {
                             return Ok(None);
-                        }
-                    }
+                        };
+                    }, quote! { #current_column_ident })
                 } else {
-                    quote! {
-                        &self.#current_column_ident
-                    }
-                };
-
-                let stricter_flag_name = if self.columns(conn)?.len() > foreign_key_table.columns(conn)?.len() {
-                    self.diesel_feature_flag_name(conn)?
-                } else {
-                    foreign_key_table.diesel_feature_flag_name(conn)?
+                    (TokenStream::new(), quote! { &self.#current_column_ident })
                 };
 
                 Ok(quote! {
-                    #[cfg(feature = #stricter_flag_name)]
-                    pub async fn #method_name(&self, conn: &mut web_common_traits::prelude::DBConn) -> Result<Option<#return_type_ident>, diesel::result::Error> {
-                        <#foreign_key_struct_path as web_common_traits::prelude::Loadable>::load(#column_value_retrieval, conn).await
+                    #feature_flag
+                    pub async fn #method_name(&self, conn: &mut #connection) -> Result<#return_statement, diesel::result::Error> {
+                        use diesel_async::RunQueryDsl;
+                        use diesel::associations::HasTable;
+                        use diesel::QueryDsl;
+                        #column_value_retrieval
+                        #foreign_key_struct_path::table()
+                            .find(#column_attribute)
+                            .first::<#foreign_key_struct_path>(conn)
+                            .await
+                            #optional
                     }
                 })
             }).collect::<Result<TokenStream, WebCodeGenError>>()
