@@ -6,6 +6,8 @@ use diesel::{
 use super::{Column, PgConstraint, PgExtension, PgProc};
 use crate::errors::WebCodeGenError;
 
+use super::Column;
+
 #[derive(Queryable, QueryableByName, Debug, Selectable)]
 #[diesel(table_name = crate::schema::check_constraints)]
 /// A struct representing a check constraint
