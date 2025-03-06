@@ -80,6 +80,7 @@ CREATE TABLE constrained_samples (
     CHECK (check_strings_different(samplename, sanitized_samplename))
 );
 
+<<<<<<< HEAD
 
 -- SQL query creating a mockup of the unconstrained samples table.
 CREATE TABLE unconstrained_samples (
@@ -111,3 +112,5 @@ CREATE TABLE constrained_samples (
     CHECK (check_values_different(amount_initial, amount_final)),
     CHECK (check_strings_different(samplename, sanitized_samplename))
 );
+=======
+>>>>>>> c91f54dd (test for check constraints at the table level)
