@@ -91,4 +91,6 @@ CREATE TABLE unconstrained_samples (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (samplename),
     UNIQUE (samplename, id)
+    CHECK (check_strings_different(username, email)),
+    CHECK (check_young_age(age) AND check_young_age(age) AND check_age(age))
 );

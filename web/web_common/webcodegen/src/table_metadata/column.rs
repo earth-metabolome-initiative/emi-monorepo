@@ -3,8 +3,6 @@ use diesel::{
     JoinOnDsl, OptionalExtension, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
     SelectableHelper,
 };
-
-use diesel::OptionalExtension;
 use inflector::Inflector;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{Ident, Type};
