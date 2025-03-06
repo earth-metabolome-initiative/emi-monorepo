@@ -64,3 +64,4 @@ async fn test_check_constraints_column() {
     }
 
     docker.stop().await.unwrap();
+}
