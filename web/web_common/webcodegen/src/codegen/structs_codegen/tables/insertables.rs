@@ -169,6 +169,9 @@ impl Codegen<'_> {
                     })
                 })
                 .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+
+            let insertable_variant_methods = table.foreign_key_methods(conn, &self.syntax)?;
+
             let insertable_builder_attributes = columns
                 .iter()
                 .map(|column| {
@@ -265,6 +268,10 @@ impl Codegen<'_> {
                         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
                         pub struct #insertable_variant_ident {
                             #(#insertable_attributes),*
+                        }
+
+                        impl #insertable_variant_ident {
+                            #insertable_variant_methods
                         }
 
                         #[derive(Default)]

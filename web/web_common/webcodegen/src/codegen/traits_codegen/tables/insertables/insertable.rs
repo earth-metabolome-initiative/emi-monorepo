@@ -1,5 +1,5 @@
 //! Submodule providing the code to generate the implementation of the
-//! [`Insertable`] trait for all required tables.
+//! [`Insertable`](web_common_traits::database::Insertable) trait for all required tables.
 
 use std::path::Path;
 
@@ -10,7 +10,7 @@ use crate::{Codegen, Table};
 
 impl Table {
     /// Returns whether the table allows for the implementation of the
-    /// [`Insertable`] trait.
+    /// [`Insertable`](web_common_traits::database::Insertable) trait.
     ///
     /// # Arguments
     ///
@@ -19,7 +19,7 @@ impl Table {
     /// # Returns
     ///
     /// A boolean indicating whether the table allows for the implementation of
-    /// the [`Insertable`] trait.
+    /// the [`Insertable`](web_common_traits::database::Insertable) trait.
     ///
     /// # Errors
     ///
@@ -33,7 +33,7 @@ impl Table {
 }
 
 impl Codegen<'_> {
-    /// Generates the [`Insertable`] trait implementation for the tables
+    /// Generates the [`Insertable`](web_common_traits::database::Insertable) trait implementation for the tables
     ///
     /// # Arguments
     ///

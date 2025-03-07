@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS samples (
     state_id SMALLINT NOT NULL DEFAULT 1,
     FOREIGN KEY (container_id) REFERENCES sample_containers(id) ON DELETE CASCADE,
     FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
-    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (sampled_by) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    FOREIGN KEY (sampled_by) REFERENCES users(id),
+    FOREIGN KEY (updated_by) REFERENCES users(id),
     FOREIGN KEY (state_id) REFERENCES sample_states(id)
 );

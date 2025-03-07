@@ -5,12 +5,16 @@ mod deletable;
 mod foreign;
 mod insertables;
 mod loadable;
+mod updatables;
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use syn::Ident;
 
-use crate::{codegen::CODEGEN_INSERTABLES_PATH, Codegen, Table};
+use crate::{
+    codegen::{CODEGEN_INSERTABLES_PATH, CODEGEN_UPDATABLES_PATH},
+    Codegen, Table,
+};
 
 impl Codegen<'_> {
     /// Code relative to generating all of the diesel code.
@@ -80,6 +84,17 @@ impl Codegen<'_> {
 
             submodule_file_content.extend(quote::quote! {
                 mod #insertable_module_ident;
+            });
+        }
+
+        if self.enable_updatable_trait {
+            self.generate_updatables_impls(&root.join(CODEGEN_UPDATABLES_PATH), tables, conn)?;
+
+            let updatable_module_ident =
+                Ident::new(CODEGEN_UPDATABLES_PATH, proc_macro2::Span::call_site());
+
+            submodule_file_content.extend(quote::quote! {
+                mod #updatable_module_ident;
             });
         }
 

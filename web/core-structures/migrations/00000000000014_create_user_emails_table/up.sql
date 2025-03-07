@@ -6,9 +6,9 @@
 CREATE TABLE IF NOT EXISTS user_emails (
     id INTEGER PRIMARY KEY,
     email text NOT NULL,
-    created_by INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    created_by INTEGER NOT NULL REFERENCES users (id),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    login_provider_id SMALLINT NOT NULL REFERENCES login_providers (id) ON DELETE CASCADE,
+    login_provider_id SMALLINT NOT NULL REFERENCES login_providers (id),
     primary_email BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT unique_email_provider UNIQUE (email, login_provider_id)
 );

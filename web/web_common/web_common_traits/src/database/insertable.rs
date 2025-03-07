@@ -23,22 +23,32 @@ pub trait InsertableVariant {
     /// The associated row type which can be inserted into the database.
     type Row: Insertable<InsertableVariant = Self, InsertableBuilder = Self::InsertableBuilder>;
     /// The type of connection to the database.
-    type Conn: diesel_async::AsyncConnection;
+    type Conn;
     /// The builder type which can be constructed in the frontend or backend to
     /// create the insertable variant.
     type InsertableBuilder: InsertableBuilder<Row = Self::Row, Product = Self>;
+    /// The expected user ID type.
+    type UserId;
 
     /// Inserts the row into the database.
     ///
     /// # Arguments
     ///
+    /// * `user_id` - The user ID.
     /// * `conn` - The connection to the database.
     ///
     /// # Returns
     ///
     /// The inserted row, if the operation was successful.
+    /// 
+    /// # Errors
+    /// 
+    /// * If the row cannot be inserted.
+    /// * If the user is not authorized to insert the row.
+    /// 
     fn insert(
         self,
+        user_id: &Self::UserId,
         conn: &mut Self::Conn,
     ) -> impl core::future::Future<
         Output = Result<
@@ -72,6 +82,8 @@ pub enum InsertError<A> {
     ValidationError(validation_errors::Error),
     /// A diesel error occurred.
     DieselError(diesel::result::Error),
+    /// A server error occurred.
+    ServerError(server_errors::Error),
 }
 
 impl<A: core::fmt::Display> core::error::Error for InsertError<A> {}
@@ -79,9 +91,10 @@ impl<A: core::fmt::Display> core::error::Error for InsertError<A> {}
 impl<A: core::fmt::Display> core::fmt::Display for InsertError<A> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertError::BuilderError(error) => write!(f, "BuilderError({:?})", error),
-            InsertError::ValidationError(error) => write!(f, "ValidationError({:?})", error),
-            InsertError::DieselError(error) => write!(f, "DieselError({:?})", error),
+            InsertError::BuilderError(error) => <BuilderError<A> as core::fmt::Display>::fmt(error, f),
+            InsertError::ValidationError(error) => <validation_errors::Error as core::fmt::Display>::fmt(error, f),
+            InsertError::DieselError(error) => <diesel::result::Error as core::fmt::Display>::fmt(error, f),
+            InsertError::ServerError(error) => <server_errors::Error as core::fmt::Display>::fmt(error, f),
         }
     }
 }
@@ -107,5 +120,11 @@ impl<A> From<validation_errors::Error> for InsertError<A> {
 impl<A> From<diesel::result::Error> for InsertError<A> {
     fn from(error: diesel::result::Error) -> Self {
         InsertError::DieselError(error)
+    }
+}
+
+impl<A> From<server_errors::Error> for InsertError<A> {
+    fn from(error: server_errors::Error) -> Self {
+        InsertError::ServerError(error)
     }
 }

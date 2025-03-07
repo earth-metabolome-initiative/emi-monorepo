@@ -44,25 +44,10 @@ async fn test_check_constraints(
     Ok(())
 }
 
-async fn test_create_roles_tables(
-    database_name: &str,
-    conn: &mut PgConnection,
-) -> Result<(), WebCodeGenError> {
-    let query_result = Table::create_roles_tables(conn, &database_name, None);
-
-    assert!(
-        query_result.is_ok(),
-        "Failed to create roles tables using SQL, got error: {query_result:?}"
-    );
-    Ok(())
-}
-
 #[tokio::test]
 async fn test_user_table() {
     let (docker, mut conn, database_name) =
         setup_database_with_default_migrations("test_table_properties").await.unwrap();
-
-    test_create_roles_tables(&database_name, &mut conn).await.unwrap();
 
     // We attempt to create the update triggers for the tables
     // that have an `updated_at` column

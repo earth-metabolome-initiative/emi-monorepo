@@ -58,6 +58,14 @@ pub enum CodeGenerationError {
     GenerationDirectoryNotProvided,
     /// When the user table has not been specified.
     UserTableNotProvided,
+    /// When the project table has not been specified.
+    ProjectTableNotProvided,
+    /// When the teams table has not been specified.
+    TeamsTableNotProvided,
+    /// When the team members table has not been specified.
+    TeamMembersTableNotProvided,
+    /// When the team projects table has not been specified.
+    TeamProjectsTableNotProvided,
 }
 
 impl From<DieselError> for WebCodeGenError {

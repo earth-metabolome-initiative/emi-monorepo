@@ -29,9 +29,13 @@ impl Codegen<'_> {
         let mut table_deletable_main_module = TokenStream::new();
         let feature_flag = self.syntax.as_feature_flag();
         let connection_type = self.syntax.as_connection_type();
+        let Some(user_table) = self.users_table else {
+            return Err(crate::errors::CodeGenerationError::UserTableNotProvided.into());
+        };
+        let user_table_id = user_table.primary_key_type(conn)?;
         for table in tables {
             // First we need to check wether the table has a PK
-            if !table.has_primary_keys(conn)? {
+            if !table.allows_updatable(conn)? {
                 continue;
             }
 
@@ -45,12 +49,23 @@ impl Codegen<'_> {
                 #feature_flag
                 impl web_common_traits::prelude::Deletable for #table_struct{
                     type Conn = #connection_type;
+                    type UserId = #user_table_id;
 
-                    async fn delete(&self, conn: &mut Self::Conn) -> Result<usize, diesel::result::Error> {
+                    async fn delete(
+                        &self,
+                        user_id: &Self::UserId,
+                        conn: &mut Self::Conn
+                    ) -> Result<bool, web_common_traits::database::DeleteError> {
                         use diesel_async::RunQueryDsl;
                         use diesel::{QueryDsl, Identifiable};
                         use diesel::associations::HasTable;
-                        diesel::delete(Self::table().find(self.id())).execute(conn).await
+                        use web_common_traits::database::Updatable;
+
+                        if !self.can_update(user_id, conn).await? {
+                            return Err(server_errors::Error::Unauthorized.into());
+                        }
+
+                        Ok(diesel::delete(Self::table().find(self.id())).execute(conn).await.map(|x| x > 0)?)
                     }
                 }
             })?)?;

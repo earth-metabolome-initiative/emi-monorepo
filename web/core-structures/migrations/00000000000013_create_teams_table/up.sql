@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS teams (
     FOREIGN KEY (color_id) REFERENCES colors(id),
     FOREIGN KEY (state_id) REFERENCES team_states(id),
     FOREIGN KEY (parent_team_id) REFERENCES teams(id) ON DELETE CASCADE,
-    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    FOREIGN KEY (updated_by) REFERENCES users(id),
     CONSTRAINT parent_team_circularity CHECK (parent_team_id != id)
 );
 
@@ -41,4 +41,16 @@ $$ LANGUAGE plpgsql IMMUTABLE STRICT PARALLEL SAFE;
 
 CREATE INDEX IF NOT EXISTS teams_name_description_trgm_idx ON teams USING gin (
   concat_teams_name_description(name, description) gin_trgm_ops
+);
+
+CREATE TABLE IF NOT EXISTS team_members (
+  team_id INTEGER NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+  member_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  PRIMARY KEY (team_id, member_id)
+);
+
+CREATE TABLE IF NOT EXISTS team_projects (
+  team_id INTEGER NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+  project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  PRIMARY KEY (team_id, project_id)
 );
