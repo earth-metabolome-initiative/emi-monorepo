@@ -104,7 +104,7 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let function_name = fn_name.to_string();
     if !function_name
         .chars()
-        .all(|character: char| char::is_ascii_lowercase(&character) || character == '_')
+        .all(|character: char| character.is_ascii_lowercase() || character.is_ascii_digit() || character == '_')
     {
         let error_message =
             format!("Function `{fn_name}` must be snake_case to be decorated with `validation`.",);

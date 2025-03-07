@@ -48,7 +48,7 @@ pub fn must_be_strictly_positive_double(value: f64) -> Result<(), validation_err
 
 #[validation]
 /// Control that the float is strictly positive (0, ...].
-pub fn must_be_strictly_positive_float(value: f32) -> Result<(), validation_errors::Error> {
+pub fn must_be_strictly_positive_f32(value: f32) -> Result<(), validation_errors::Error> {
     if value > 0.0 {
         Ok(())
     } else {
@@ -104,18 +104,18 @@ mod tests {
     }
 
     #[test]
-    fn test_must_be_strictly_positive_float() {
-        assert!(must_be_strictly_positive_float(3.0 as f32).is_ok());
+    fn test_must_be_strictly_positive_f32() {
+        assert!(must_be_strictly_positive_f32(3.0 as f32).is_ok());
         assert_eq!(
-            must_be_strictly_positive_float(-3.0 as f32).unwrap_err(),
+            must_be_strictly_positive_f32(-3.0 as f32).unwrap_err(),
             validation_errors::Error::UnexpectedNegativeOrZeroValue
         );
         assert_eq!(
-            must_be_strictly_positive_float(0.0 as f32).unwrap_err(),
+            must_be_strictly_positive_f32(0.0 as f32).unwrap_err(),
             validation_errors::Error::UnexpectedNegativeOrZeroValue
         );
         assert_eq!(
-            must_be_strictly_positive_float(-0.0 as f32).unwrap_err(),
+            must_be_strictly_positive_f32(-0.0 as f32).unwrap_err(),
             validation_errors::Error::UnexpectedNegativeOrZeroValue
         )
     }
