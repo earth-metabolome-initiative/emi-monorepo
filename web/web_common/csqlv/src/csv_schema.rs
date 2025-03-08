@@ -24,13 +24,9 @@ impl CSVSchema {
         self.table_metadatas.len()
     }
 
-    #[must_use]
     /// Returns the tables in the schema.
-    pub fn tables(&self) -> Vec<CSVTable<'_>> {
-        self.table_metadatas
-            .iter()
-            .map(|table_metadata| CSVTable { schema: self, table_metadata })
-            .collect()
+    pub fn tables(&self) -> impl Iterator<Item = CSVTable<'_>> {
+        self.table_metadatas.iter().map(|table_metadata| CSVTable { schema: self, table_metadata })
     }
 
     #[must_use]
@@ -50,9 +46,8 @@ impl CSVSchema {
             for table in self.tables() {
                 let priority = table
                     .dependant_tables()
-                    .iter()
-                    .filter(|dependant_table| dependant_table != &&table)
-                    .map(|dependant_table| table_priority.get(dependant_table).unwrap_or(&0))
+                    .filter(|dependant_table| dependant_table != &table)
+                    .map(|dependant_table| table_priority.get(&dependant_table).unwrap_or(&0))
                     .max()
                     .copied()
                     .map_or(0, |x| x + 1);
@@ -84,14 +79,13 @@ impl CSVSchema {
     /// * If the provided table name does not exist in the schema.
     pub fn table_from_name(&self, table_name: &str) -> Result<CSVTable<'_>, CSVSchemaError> {
         let table_metadata = self
-            .table_metadatas
-            .iter()
-            .find(|table| table.name == table_name)
-            .ok_or(CSVSchemaError::InvalidTableName(table_name.to_string()))?;
+            .table_metadatas.binary_search_by_key(&table_name, |table| &table.name)
+            .ok()
+            .map(|index| &self.table_metadatas[index])
+            .ok_or(CSVSchemaError::InvalidTableName(table_name.to_owned()))?;
         Ok(CSVTable { schema: self, table_metadata })
     }
 
-    #[must_use]
     /// Returns the SQL to generate the schema in `PostgreSQL`.
     pub fn to_sql(&self) -> Result<String, CSVSchemaError> {
         let mut sql = String::new();
@@ -104,7 +98,6 @@ impl CSVSchema {
         Ok(sql)
     }
 
-    #[must_use]
     /// Connectes to the provided [`Connection`](diesel::Connection) and
     /// executes the SQL to generate the schema.
     ///
@@ -134,7 +127,6 @@ impl CSVSchema {
         }
     }
 
-    #[must_use]
     /// Executes the SQL to generate the schema in `PostgreSQL`.
     pub fn create<C: diesel::Connection>(&self, conn: &mut C) -> Result<(), CSVSchemaError> {
         let sql = self.to_sql()?;
@@ -155,7 +147,6 @@ impl CSVSchema {
         sql
     }
 
-    #[must_use]
     /// Connectes to the provided [`Connection`](diesel::Connection) and
     /// executes the SQL to delete the schema.
     ///
@@ -185,7 +176,6 @@ impl CSVSchema {
         }
     }
 
-    #[must_use]
     /// Executes the SQL to delete the schema in `PostgreSQL`.
     pub fn delete<C: diesel::Connection>(&self, conn: &mut C) -> Result<(), CSVSchemaError> {
         let sql = self.to_sql_delete();
@@ -276,9 +266,8 @@ impl CSVSchemaBuilder {
             indicatif::ProgressBar::hidden()
         };
 
-        // Next, we iterate in parallel over the list of files to process
-        // each file in a separate thread.
-        let table_metadatas = paths
+        // Next, we iterate over the list of files to process.
+        let mut table_metadatas = paths
             .iter()
             .progress_with(progress_bar)
             .filter(|path| {
@@ -296,14 +285,13 @@ impl CSVSchemaBuilder {
             })
             .collect::<Result<Vec<_>, CSVSchemaError>>()?;
 
-        // We check that the tables have unique names.
-        let unique_names = table_metadatas
-            .iter()
-            .map(|table| table.name.clone())
-            .collect::<std::collections::HashSet<_>>();
+        table_metadatas.sort_unstable_by(|a, b| a.name.cmp(&b.name));
 
-        if unique_names.len() != table_metadatas.len() {
-            return Err(CSVSchemaError::DuplicateTable("Duplicate table name".to_string()));
+        // We check that the tables have unique names.
+        for window in table_metadatas.windows(2) {
+            if window[0].name == window[1].name {
+                return Err(CSVSchemaError::DuplicateTable(window[0].name.clone()));
+            }
         }
 
         // We check that there are no loops in the schema caused by foreign keys.
@@ -322,9 +310,12 @@ impl CSVSchemaBuilder {
                 for column in &table.columns {
                     if let Some(foreign_table_name) = &column.foreign_table_name {
                         let foreign_table = table_metadatas
-                            .iter()
-                            .find(|table| table.name == *foreign_table_name)
-                            .unwrap();
+                            .binary_search_by_key(&foreign_table_name, |table| &table.name)
+                            .ok()
+                            .map(|index| &table_metadatas[index])
+                            .ok_or(CSVSchemaError::InvalidTableName(
+                                foreign_table_name.clone(),
+                            ))?;
 
                         if original_table == foreign_table {
                             return Err(CSVSchemaError::Loop(original_table.name.clone()));

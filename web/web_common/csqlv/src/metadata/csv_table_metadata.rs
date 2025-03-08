@@ -15,10 +15,15 @@ use crate::{
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a CSV table.
 pub struct CSVTableMetadata {
+    /// Name of the table.
     pub(crate) name: String,
+    /// Path of the CSV file.
     pub(crate) path: String,
+    /// Whether the table name should be singularized.
     pub(crate) singularize: bool,
+    /// Number of rows in the table.
     pub(crate) number_of_rows: u64,
+    /// Columns of the table.
     pub(crate) columns: Vec<CSVColumnMetadata>,
 }
 
@@ -34,7 +39,7 @@ impl CSVTableMetadata {
     /// Returns the name of the table to use as foreign key.
     pub fn foreign_table_name(&self) -> String {
         if self.singularize {
-            Inflector::default().singularize(&self.name)
+            Inflector.singularize(&self.name)
         } else {
             self.name.clone()
         }
@@ -106,11 +111,9 @@ impl CSVTableMetadata {
         singularize: bool,
     ) -> Result<Self, CSVSchemaError> {
         // We check that the provided path ends with .csv or .csv.gz
-        let (table_name, delimiter) = if let (Some(table_name), Some(delimiter)) =
+        let (Some(table_name), Some(delimiter)) =
             (file_name_without_extension(path), delimiter_from_path(path))
-        {
-            (table_name, delimiter)
-        } else {
+        else {
             return Err(CSVSchemaError::InvalidPath(path.to_string_lossy().to_string()));
         };
 
@@ -158,16 +161,14 @@ impl CSVTableMetadata {
                 if let (Some(foreign_table_name), Some(foreign_column_name)) =
                     (&column.foreign_table_name, &column.foreign_column_name)
                 {
-                    let foreign_table = schema
-                        .tables()
-                        .into_iter()
-                        .find(|table| table.name() == *foreign_table_name)
-                        .ok_or(CSVSchemaError::UnknownForeignKey {
+                    let Ok(foreign_table) = schema.table_from_name(foreign_table_name) else {
+                        return Err(CSVSchemaError::UnknownForeignKey {
                             table_name: self.name.clone(),
                             column_name: column.name(schema)?,
                             foreign_table_name: foreign_table_name.clone(),
                             foreign_column_name: foreign_column_name.clone(),
-                        })?;
+                        });
+                    };
 
                     if !foreign_table.has_column(foreign_column_name) {
                         return Err(CSVSchemaError::UnknownForeignKey {

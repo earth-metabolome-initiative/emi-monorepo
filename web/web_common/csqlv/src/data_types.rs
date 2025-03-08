@@ -100,11 +100,9 @@ impl DataType {
     pub fn into_serial(self) -> Result<DataType, CSVSchemaError> {
         match self {
             DataType::SmallInt => Ok(DataType::SmallSerial),
-            DataType::Integer => Ok(DataType::Serial),
-            DataType::BigInt => Ok(DataType::BigSerial),
-            DataType::Serial => Ok(DataType::Serial),
+            DataType::Integer | DataType::Serial => Ok(DataType::Serial),
             DataType::SmallSerial => Ok(DataType::SmallSerial),
-            DataType::BigSerial => Ok(DataType::BigSerial),
+            DataType::BigSerial | DataType::BigInt => Ok(DataType::BigSerial),
             error => {
                 Err(CSVSchemaError::UnknownDataType(format!(
                     "Unknown Serial variant for {error:?}",
