@@ -18,13 +18,13 @@ use crate::{
 };
 
 /// Constant listing types supporting `Copy`.
-const COPY_TYPES: [&str; 6] = ["i32", "i16", "i64", "f32", "f64", "bool"];
+pub(crate) const COPY_TYPES: [&str; 6] = ["i32", "i16", "i64", "f32", "f64", "bool"];
 
 /// Constant listing types supporting `Eq`.
-const EQ_TYPES: [&str; 4] = ["i32", "i16", "i64", "bool"];
+pub(crate) const EQ_TYPES: [&str; 4] = ["i32", "i16", "i64", "bool"];
 
 /// Constant listing types supporting `Hash`.
-const HASH_TYPES: [&str; 4] = ["i32", "i16", "i64", "bool"];
+pub(crate) const HASH_TYPES: [&str; 4] = ["i32", "i16", "i64", "bool"];
 
 /// Represents a `PostgreSQL` type.
 ///
@@ -60,9 +60,6 @@ pub struct PgType {
     pub typdelim: String,
     /// The relation ID for a composite type.
     pub typrelid: u32,
-    /// The subscript function for the type.
-    #[cfg(feature = "postgres_17")]
-    pub typsubscript: u32,
     /// The element type of an array type.
     pub typelem: u32,
     /// The array type of a base type.

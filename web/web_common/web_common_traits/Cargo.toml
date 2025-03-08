@@ -14,7 +14,7 @@ server-errors.workspace = true
 
 [features]
 frontend = ["server-errors/frontend"]
-backend = ["server-errors/backend", "validation-errors/backend"]
+backend = ["server-errors/backend"]
 serde = ["dep:serde", "common-traits/serde"]
 
 [lints]

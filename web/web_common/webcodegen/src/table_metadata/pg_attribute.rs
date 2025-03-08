@@ -38,9 +38,6 @@ pub struct PgAttribute {
     pub attalign: String,
     /// The storage strategy for the column.
     pub attstorage: String,
-    /// The compression method for the column (PostgreSQL 17+).
-    #[cfg(feature = "postgres_17")]
-    pub attcompression: String,
     /// Whether the column is marked as NOT NULL.
     pub attnotnull: bool,
     /// Whether the column has a default value.

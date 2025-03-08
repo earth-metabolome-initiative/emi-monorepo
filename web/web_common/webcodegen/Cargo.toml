@@ -8,7 +8,6 @@ diesel = { version = "2.2", features = [
 	"postgres",
 	"chrono",
 	"uuid",
-	"64-column-tables",
 ] }
 itertools = "0.13.0"
 serde.workspace = true
@@ -21,6 +20,7 @@ common-traits.workspace = true
 inflector.workspace = true
 futures.workspace = true
 server-errors.workspace = true
+time-requirements.workspace = true
 
 [dev-dependencies]
 diesel_migrations = "2.2.0"
@@ -49,7 +49,6 @@ frontend = ["web_common_traits/frontend"]
 diesel = ["postgis_diesel/diesel"]
 # Feature used in the context of the tests.
 postgres = ["diesel"]
-postgres_17 = ["diesel"]
 
 [lints]
 workspace = true

@@ -10,8 +10,7 @@ use taxonomy_fetcher::{
 };
 use time_requirements::prelude::*;
 use webcodegen::{
-    Codegen, CompatibleForeignTypeConstraint, CustomColumnConstraint, CustomTableConstraint,
-    LowercaseColumnConstraint, LowercaseTableConstraint, Table,
+    Codegen, CompatibleForeignTypeConstraint, CustomColumnConstraint, CustomTableConstraint, LowercaseColumnConstraint, LowercaseTableConstraint, PgExtension, Table
 };
 
 const DATABASE_NAME: &str = "development.db";
@@ -109,7 +108,6 @@ pub async fn main() {
     // We write to the target directory the generated structs
 
     // Generate the code associated with the database
-    let task = Task::new("Generating Code");
     let users =
         Table::load(&mut conn, "users", None, DATABASE_NAME).expect("Failed to load `users` table");
     let projects = Table::load(&mut conn, "projects", None, DATABASE_NAME)
@@ -120,22 +118,27 @@ pub async fn main() {
         .expect("Failed to load `team_members` table");
     let team_projects = Table::load(&mut conn, "team_projects", None, DATABASE_NAME)
         .expect("Failed to load `team_projects` table");
-    Codegen::default()
-        .users(&users)
-        .projects(&projects)
-        .teams(&teams)
-        .team_members(&team_members)
-        .team_projects(&team_projects)
-        .set_output_directory(out_dir.as_ref())
-        .enable_loadable_trait()
-        .enable_deletable_trait()
-        .enable_insertable_trait()
-        .enable_foreign_trait()
-        .enable_updatable_trait()
-        .beautify()
-        .generate(&mut conn, DATABASE_NAME, None)
-        .unwrap();
-    time_tracker.add_completed_task(task);
+    let pgrx_validation = PgExtension::load("pgrx_validation", "public", &mut conn)
+        .expect("Failed to query the database")
+        .expect("Failed to load `pgrx_validation` extension, maybe it is not installed");
+    time_tracker.extend(
+        Codegen::default()
+            .users(&users)
+            .projects(&projects)
+            .teams(&teams)
+            .team_members(&team_members)
+            .team_projects(&team_projects)
+            .add_check_constraint_extension(&pgrx_validation)
+            .set_output_directory(out_dir.as_ref())
+            .enable_loadable_trait()
+            .enable_deletable_trait()
+            .enable_insertable_trait()
+            .enable_foreign_trait()
+            .enable_updatable_trait()
+            .beautify()
+            .generate(&mut conn, DATABASE_NAME, None)
+            .unwrap(),
+    );
 
     // We save the time tracker
     time_tracker.save(Path::new("./time_tracker")).unwrap();

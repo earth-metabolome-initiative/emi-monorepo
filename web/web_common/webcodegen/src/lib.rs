@@ -21,7 +21,6 @@ pub use custom_schema_constraints::{
     IsForeignKeyConstraint, LowercaseColumnConstraint, LowercaseTableConstraint,
     NotNullColumnConstraint,
 };
-pub use meta_sql::AuthorizationFunctionBuilder;
 pub use postgis::{GeographyColumn, GeometryColumn};
 pub use table_metadata::{
     CheckConstraint, Column, ConstraintColumnUsage, ConstraintTableUsage, DomainConstraint,

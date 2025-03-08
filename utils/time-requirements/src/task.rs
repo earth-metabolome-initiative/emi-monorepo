@@ -25,15 +25,15 @@ impl Task {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize, Hash)]
 /// A completed task.
 pub struct CompletedTask {
     /// The name of the task.
-    name: String,
+    pub(crate) name: String,
     /// The start time of the task.
-    start: chrono::NaiveDateTime,
+    pub(crate) start: chrono::NaiveDateTime,
     /// The end time of the task.
-    end: chrono::NaiveDateTime,
+    pub(crate) end: chrono::NaiveDateTime,
 }
 
 impl CompletedTask {

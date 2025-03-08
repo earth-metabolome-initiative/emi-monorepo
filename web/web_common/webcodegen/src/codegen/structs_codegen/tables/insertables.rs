@@ -208,7 +208,7 @@ impl Codegen<'_> {
                         let column_type = column.rust_data_type(conn)?;
 
                         let check_constraints = column.check_constraints(conn)?.into_iter().map(|constraint| {
-                            Ok(constraint.to_syn(column, self.check_constraints_extensions.as_slice(), conn)?.unwrap_or_default())
+                            Ok(constraint.to_syn(column, self.check_constraints_extensions.as_slice(), true, true, conn)?.unwrap_or_default())
                         }).collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
                         // TODO! Add `async` check for UNIQUE constraint when generating the code.

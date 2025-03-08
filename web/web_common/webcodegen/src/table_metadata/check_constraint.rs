@@ -2,6 +2,7 @@ use diesel::{
     pg::PgConnection, BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable,
     QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
+use proc_macro2::TokenStream;
 
 use super::{Column, PgConstraint, PgExtension, PgProc};
 use crate::errors::WebCodeGenError;
@@ -32,6 +33,7 @@ impl CheckConstraint {
     /// * `extensions` - The extensions to consider
     /// * `use_self` - Whether the other columns should be assumed as from the
     ///   `self`
+    /// * `use_option` - Whether the other columns should be assumed as Options
     /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
@@ -47,6 +49,8 @@ impl CheckConstraint {
         &self,
         column: &Column,
         extensions: &[E],
+        use_self: bool,
+        use_option: bool,
         conn: &mut PgConnection,
     ) -> Result<Option<proc_macro2::TokenStream>, WebCodeGenError> {
         let involved_columns = self.columns(conn)?;
@@ -74,6 +78,12 @@ impl CheckConstraint {
         //
         if involved_columns.len() == 1 {
             let column_ident = column.snake_case_ident()?;
+            let column_ident: TokenStream = if column.is_copiable(conn)? {
+                quote::quote! { #column_ident }
+            } else {
+                quote::quote! { &#column_ident }
+            };
+
             // Case 1 described above.
             return involved_functions
                 .into_iter()
@@ -103,11 +113,68 @@ impl CheckConstraint {
             };
             let column_idents = involved_columns
                 .iter()
-                .map(Column::snake_case_ident)
+                .map(|involved_column| {
+                    let involved_column_ident = involved_column.snake_case_ident()?;
+                    let mut involved_column_ident: TokenStream =
+                        quote::quote! { #involved_column_ident };
+
+                    if !use_option && use_self && involved_column != column {
+                        involved_column_ident = quote::quote! { self.#involved_column_ident };
+                    };
+
+                    Ok(if use_option && involved_column != column || involved_column.is_copiable(conn)? {
+                        involved_column_ident
+                    } else {
+                        quote::quote! { &#involved_column_ident }
+                    })
+                })
                 .collect::<Result<Vec<_>, WebCodeGenError>>()?;
-            return Ok(Some(quote::quote! {
+
+            let mut call = quote::quote! {
                 #extension_ident::#function_ident(#(#column_idents),*)?;
-            }));
+            };
+
+            if use_option {
+                let mut right_column_idents = Vec::new();
+                let mut left_column_idents = Vec::new();
+                for involved_column in involved_columns {
+                    if &involved_column == column {
+                        continue;
+                    }
+                    let involved_column_ident = involved_column.snake_case_ident()?;
+                    let mut involved_column_ident: TokenStream =
+                        quote::quote! { #involved_column_ident };
+                    left_column_idents.push(quote::quote! { Some(#involved_column_ident) });
+
+                    if use_self {
+                        involved_column_ident = quote::quote! { self.#involved_column_ident };
+                    };
+
+                    if !involved_column.is_copiable(conn)? {
+                        involved_column_ident = quote::quote! { #involved_column_ident.as_ref() };
+                    }
+
+                    right_column_idents.push(involved_column_ident.clone());
+                }
+
+                let (left_assigment_side, right_assignment_side) = if right_column_idents.len() > 1
+                {
+                    (
+                        quote::quote! { (#(#left_column_idents),*) },
+                        quote::quote! {(#(#right_column_idents),*) },
+                    )
+                } else {
+                    (left_column_idents[0].clone(), right_column_idents[0].clone())
+                };
+
+                call = quote::quote! {
+                    if let #left_assigment_side = #right_assignment_side {
+                        #call
+                    }
+                };
+            }
+
+            return Ok(Some(call));
         }
 
         unimplemented!("It is currently unsupported to handle the provided check constraint")
