@@ -54,11 +54,6 @@ async fn test_user_table() {
 
     Table::create_update_triggers(&mut conn, &database_name, None).unwrap();
 
-    AuthorizationFunctionBuilder::default()
-        .add_childless_table(Table::load(&mut conn, "users", None, &database_name).unwrap())
-        .create_authorization_functions_and_triggers(&mut conn, &database_name, None)
-        .unwrap();
-
     test_code_generation_methods(&mut conn).await.unwrap();
 
     // We try to load all elements of each type, so to ensure

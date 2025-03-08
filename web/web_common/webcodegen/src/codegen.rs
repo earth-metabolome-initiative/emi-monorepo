@@ -13,6 +13,7 @@ mod syntaxes;
 mod traits_codegen;
 
 pub use syntaxes::Syntax;
+use time_requirements::prelude::{Task, TimeTracker};
 
 use crate::{
     errors::{CodeGenerationError, WebCodeGenError},
@@ -73,17 +74,26 @@ pub struct Codegen<'a> {
     pub(super) enable_type_structs: bool,
     /// Whether to enable the generation of the type traits implementations.
     pub(super) enable_type_impls: bool,
-    /// Whether to enable the [`Deletable`](web_common_traits::database::Deletable) traits implementations.
+    /// Whether to enable the
+    /// [`Deletable`](web_common_traits::database::Deletable) traits
+    /// implementations.
     pub(super) enable_deletable_trait: bool,
     /// Whether to enable the attribute traits implementations.
     pub(super) enable_attribute_trait: bool,
-    /// Whether to enable the [`Foreign`](web_common_traits::database::Foreign) traits implementations.
+    /// Whether to enable the [`Foreign`](web_common_traits::database::Foreign)
+    /// traits implementations.
     pub(super) enable_foreign_trait: bool,
-    /// Whether to enable the [`Loadable`](web_common_traits::database::Loadable) traits implementations.
+    /// Whether to enable the
+    /// [`Loadable`](web_common_traits::database::Loadable) traits
+    /// implementations.
     pub(super) enable_loadable_trait: bool,
-    /// Whether to enable the [`Insertable`](web_common_traits::database::Insertable) traits implementations.
+    /// Whether to enable the
+    /// [`Insertable`](web_common_traits::database::Insertable) traits
+    /// implementations.
     pub(super) enable_insertable_trait: bool,
-    /// Whether to enable the [`Updatable`](web_common_traits::database::Updatable) traits implementations.
+    /// Whether to enable the
+    /// [`Updatable`](web_common_traits::database::Updatable) traits
+    /// implementations.
     pub(super) enable_updatable_trait: bool,
 }
 
@@ -298,13 +308,15 @@ impl<'a> Codegen<'a> {
     }
 
     #[must_use]
-    /// Whether to enable the generation of the [`Loadable`](web_common_traits::database::Loadable) traits.
+    /// Whether to enable the generation of the
+    /// [`Loadable`](web_common_traits::database::Loadable) traits.
     ///
     /// # Note
     ///
-    /// Since the [`Loadable`](web_common_traits::database::Loadable) traits require the tables structs, enabling the
-    /// generation of the [`Loadable`](web_common_traits::database::Loadable) traits automatically enables the
-    /// generation of the tables structs.
+    /// Since the [`Loadable`](web_common_traits::database::Loadable) traits
+    /// require the tables structs, enabling the generation of the
+    /// [`Loadable`](web_common_traits::database::Loadable) traits automatically
+    /// enables the generation of the tables structs.
     pub fn enable_loadable_trait(mut self) -> Self {
         self = self.enable_table_structs();
         self.enable_loadable_trait = true;
@@ -312,13 +324,15 @@ impl<'a> Codegen<'a> {
     }
 
     #[must_use]
-    /// Whether to enable the generation of the [`Insertable`](web_common_traits::database::Insertable) traits.
+    /// Whether to enable the generation of the
+    /// [`Insertable`](web_common_traits::database::Insertable) traits.
     ///
     /// # Note
     ///
-    /// Since the [`Insertable`](web_common_traits::database::Insertable) traits require the tables structs, enabling the
-    /// generation of the [`Insertable`](web_common_traits::database::Insertable) traits automatically enables the
-    /// generation of the tables structs.
+    /// Since the [`Insertable`](web_common_traits::database::Insertable) traits
+    /// require the tables structs, enabling the generation of the
+    /// [`Insertable`](web_common_traits::database::Insertable) traits
+    /// automatically enables the generation of the tables structs.
     pub fn enable_insertable_trait(mut self) -> Self {
         self = self.enable_updatable_trait();
         self.enable_insertable_trait = true;
@@ -326,13 +340,15 @@ impl<'a> Codegen<'a> {
     }
 
     #[must_use]
-    /// Whether to enable the generation of the [`Updatable`](web_common_traits::database::Updatable) traits.
+    /// Whether to enable the generation of the
+    /// [`Updatable`](web_common_traits::database::Updatable) traits.
     ///
     /// # Note
     ///
-    /// Since the [`Updatable`](web_common_traits::database::Updatable) traits require the tables structs, enabling the
-    /// generation of the [`Updatable`](web_common_traits::database::Updatable) traits automatically enables the
-    /// generation of the tables structs.
+    /// Since the [`Updatable`](web_common_traits::database::Updatable) traits
+    /// require the tables structs, enabling the generation of the
+    /// [`Updatable`](web_common_traits::database::Updatable) traits
+    /// automatically enables the generation of the tables structs.
     pub fn enable_updatable_trait(mut self) -> Self {
         self = self.enable_foreign_trait();
         self.enable_updatable_trait = true;
@@ -435,7 +451,10 @@ impl<'a> Codegen<'a> {
         conn: &mut PgConnection,
         table_catalog: &str,
         table_schema: Option<&str>,
-    ) -> Result<(), WebCodeGenError> {
+    ) -> Result<TimeTracker, WebCodeGenError> {
+        let mut time_tracker = TimeTracker::new("Code generation");
+
+        let task = Task::new("Retrieving tables");
         let mut tables = Table::load_all(conn, table_catalog, table_schema)?
             .into_iter()
             .filter(|table| !(table.is_temporary() || table.is_view()))
@@ -443,28 +462,29 @@ impl<'a> Codegen<'a> {
             .collect::<Vec<Table>>();
 
         tables.sort_unstable();
+        time_tracker.add_completed_task(task);
 
         let codegen_directory = self.get_output_directory()?.join(CODEGEN_DIRECTORY);
         std::fs::create_dir_all(&codegen_directory)?;
         let codegen_module = codegen_directory.with_extension("rs");
 
-        self.generate_diesel_code(
+        time_tracker.extend(self.generate_diesel_code(
             codegen_directory.as_path().join(CODEGEN_DIESEL_MODULE).as_path(),
             &tables,
             conn,
-        )?;
+        )?);
 
-        self.generate_structs_code(
+        time_tracker.extend(self.generate_structs_code(
             codegen_directory.as_path().join(CODEGEN_STRUCTS_MODULE).as_path(),
             &tables,
             conn,
-        )?;
+        )?);
 
-        self.generate_web_common_traits_implementations(
+        time_tracker.extend(self.generate_web_common_traits_implementations(
             codegen_directory.as_path().join(CODEGEN_TRAITS_MODULE).as_path(),
             &tables,
             conn,
-        )?;
+        )?);
 
         let diesel_codegen_ident =
             syn::Ident::new(CODEGEN_DIESEL_MODULE, proc_macro2::Span::call_site());
@@ -484,6 +504,6 @@ impl<'a> Codegen<'a> {
 
         std::fs::write(&codegen_module, codegen_module_impl)?;
 
-        Ok(())
+        Ok(time_tracker)
     }
 }

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use diesel::{
     pg::PgConnection, result::Error as DieselError, BoolExpressionMethods, ExpressionMethods,
@@ -68,65 +68,6 @@ pub struct Table {
 }
 
 impl Table {
-    /// Returns the correct diesel feature flag for the number of columns in the
-    /// table.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A string representing the diesel feature flag for the number of columns
-    /// in the table.
-    ///
-    /// # Errors
-    ///
-    /// * If the number of columns exceeds 128.
-    pub fn diesel_feature_flag_name(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Option<&str>, WebCodeGenError> {
-        let number_of_columns = self.columns(conn)?.len();
-        if number_of_columns > 128 {
-            Err(WebCodeGenError::ExcessiveNumberOfColumns(
-                Box::new(self.clone()),
-                number_of_columns,
-            ))
-        } else if number_of_columns > 64 {
-            Ok(Some("128-column-tables"))
-        } else if number_of_columns > 32 {
-            Ok(Some("64-column-tables"))
-        } else if number_of_columns > 16 {
-            Ok(Some("32-column-tables"))
-        } else {
-            Ok(None)
-        }
-    }
-
-    /// Returns the correct diesel feature flag for the number of columns in the
-    /// table.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A `TokenStream` representing the diesel feature flag for the number of
-    /// columns in the table.
-    ///
-    /// # Errors
-    ///
-    /// * If the diesel feature flag name cannot be generated.
-    pub fn diesel_column_feature_flag(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<TokenStream, WebCodeGenError> {
-        let flag_name = self.diesel_feature_flag_name(conn)?;
-        Ok(quote! {#[cfg(feature = #flag_name)]})
-    }
-
     #[must_use]
     /// Returns whether the table is a view.
     pub fn is_view(&self) -> bool {
@@ -299,17 +240,10 @@ impl Table {
     ) -> Result<TokenStream, WebCodeGenError> {
         // In some cases, the table will not have a primary key. In which case, we
         // cannot specify the primary key decorator on the struct.
-        let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
         Ok(if self.has_primary_keys(conn)? {
             let primary_key_identifiers = self.primary_key_identifiers(conn)?;
-            if let Some(columns_feature_flag_name) = columns_feature_flag_name {
-                quote! {
-                    #[cfg_attr(feature = #columns_feature_flag_name, diesel(primary_key(#(#primary_key_identifiers),*)))]
-                }
-            } else {
-                quote! {
-                    #[diesel(primary_key(#(#primary_key_identifiers),*))]
-                }
+            quote! {
+                #[diesel(primary_key(#(#primary_key_identifiers),*))]
             }
         } else {
             TokenStream::new()
@@ -360,13 +294,8 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
         let diesel_derives = self.diesel_derives(conn)?;
-        let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
         Ok(if diesel_derives.is_empty() {
             TokenStream::new()
-        } else if let Some(columns_feature_flag_name) = columns_feature_flag_name {
-            quote! {
-                #[cfg_attr(feature = #columns_feature_flag_name, derive(#(#diesel_derives),*))]
-            }
         } else {
             quote! {
                 #[derive(#(#diesel_derives),*)]
@@ -417,19 +346,18 @@ impl Table {
     }
 
     /// Returns the parent tables of the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A vector of tables that are parents to the current table.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the parent tables cannot be loaded from the database.
-    /// 
     pub fn parent_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
         let mut tables = Vec::new();
         for column in self.parent_keys(conn)? {
@@ -474,15 +402,13 @@ impl Table {
     ///
     /// * If the foreign tables cannot be loaded from the database.
     pub fn foreign_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
-        let mut tables = Vec::new();
+        let mut tables = HashSet::new();
         for column in self.foreign_keys(conn)? {
             if let Some((foreign_table, _)) = column.foreign_table(conn)? {
-                if !tables.contains(&foreign_table) {
-                    tables.push(foreign_table);
-                }
+                tables.insert(foreign_table);
             }
         }
-        Ok(tables)
+        Ok(tables.into_iter().collect())
     }
 
     /// Returns the set of children tables of the table.
@@ -559,17 +485,15 @@ impl Table {
     ///
     /// * If the sibling tables cannot be loaded from the database.
     pub fn sibling_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
-        let mut tables = Vec::new();
-        for parent_table in self.parent_keys(conn)? {
-            if let Some((foreign_table, _)) = parent_table.foreign_table(conn)? {
-                for child_table in foreign_table.children_tables(conn)? {
-                    if child_table != *self && !tables.contains(&child_table) {
-                        tables.push(child_table);
-                    }
+        let mut tables = HashSet::new();
+        for parent_table in self.parent_tables(conn)? {
+            for child_table in parent_table.children_tables(conn)? {
+                if child_table != *self {
+                    tables.insert(child_table);
                 }
             }
         }
-        Ok(tables)
+        Ok(tables.into_iter().collect())
     }
 
     /// Returns whether the table has user-associated columns.
@@ -945,11 +869,11 @@ impl Table {
     /// * If the table does not have primary keys.
     /// * If the primary key columns cannot be loaded from the database.
     pub fn primary_key_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
-        if !self.has_primary_keys(conn)? {
+        let primary_key_columns = self.primary_key_columns(conn)?;
+
+        if primary_key_columns.is_empty() {
             return Err(WebCodeGenError::NoPrimaryKeyColumn(Box::new(self.clone())));
         }
-
-        let primary_key_columns = self.primary_key_columns(conn)?;
 
         // We construct the rust type or tuple of rust types that represent the primary
         // key.
@@ -987,10 +911,6 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
-        if !self.has_primary_keys(conn)? {
-            return Err(WebCodeGenError::NoPrimaryKeyColumn(Box::new(self.clone())));
-        }
-
         let primary_key_columns = self.primary_key_columns(conn)?;
 
         // We construct the rust type or tuple of rust types that represent the primary

@@ -44,11 +44,8 @@ impl Codegen<'_> {
 
         for table in tables {
             let mut submodule_token_stream = TokenStream::new();
-            for foreign_table in table
-                .foreign_tables(conn)?
-                .into_iter()
-                .chain(table.sibling_tables(conn)?)
-            {
+            let table_name = table.snake_case_ident()?;
+            for foreign_table in table.foreign_tables(conn)? {
                 // if the foreign table is the same as table we continue
                 if &foreign_table == table {
                     continue;
@@ -67,7 +64,6 @@ impl Codegen<'_> {
                 table_hashset.insert((table, foreign_table_ref));
 
                 // with the correct tables
-                let table_name = table.snake_case_ident()?;
                 let foreign_table_name = foreign_table.snake_case_ident()?;
                 let foreign_table_path = foreign_table.import_diesel_path()?;
                 submodule_token_stream.extend(quote::quote! {
@@ -77,6 +73,22 @@ impl Codegen<'_> {
                         #foreign_table_name
                     );
                 });
+            }
+
+            // If the user has specified a `team_members` table, we additional
+            // generate the join with the `team_projects` table. These tables
+            // are siblings, but if we were to 
+            if let (Some(team_members), Some(team_projects)) = (self.team_members_table, self.team_projects_table) {
+                if table == team_members {
+                    let foreign_table_path = team_projects.import_diesel_path()?;
+                    submodule_token_stream.extend(quote::quote! {
+                        use #foreign_table_path;
+                        diesel::allow_tables_to_appear_in_same_query!(
+                            #table_name,
+                            team_projects
+                        );
+                    });
+                }
             }
 
             // it out to the expected file.

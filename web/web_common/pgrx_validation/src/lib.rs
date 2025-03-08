@@ -22,6 +22,26 @@ pub fn must_not_be_empty(value: &str) -> Result<(), validation_errors::Error> {
 }
 
 #[validation]
+/// Validates that two provided strings are distinct.
+/// 
+/// # Arguments
+/// 
+/// * `left` a string
+/// * `right` a string
+/// 
+/// # Errors
+/// 
+/// * `validation_errors::Error::NotDistinct` if the two strings are equal.
+///
+pub fn must_be_distinct(left: &str, right: &str) -> Result<(), validation_errors::Error> {
+    if left == right {
+        Err(validation_errors::Error::NotDistinct)
+    } else {
+        Ok(())
+    }
+}
+
+#[validation]
 /// Validates that the given value is a valid mail address.
 pub fn must_be_mail(value: &str) -> Result<(), validation_errors::Error> {
     must_not_be_empty(value)?;
@@ -118,6 +138,12 @@ mod tests {
             must_be_strictly_positive_f32(-0.0 as f32).unwrap_err(),
             validation_errors::Error::UnexpectedNegativeOrZeroValue
         )
+    }
+
+    #[test]
+    fn test_must_be_distinct() {
+        assert!(must_be_distinct("marco", "visani").is_ok());
+        assert_eq!(must_be_distinct("marco", "marco").unwrap_err(), validation_errors::Error::NotDistinct);
     }
 }
 

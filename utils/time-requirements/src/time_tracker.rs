@@ -2,13 +2,15 @@
 
 use crate::task::{CompletedTask, Task};
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 /// A tracker for tasks.
 pub struct TimeTracker {
     /// Name of the overall project.
     name: String,
     /// The tasks being tracked.
     tasks: Vec<CompletedTask>,
+    /// The sub-trackers being tracked.
+    sub_trackers: Vec<TimeTracker>,
     /// Start of the project.
     start: chrono::NaiveDateTime,
 }
@@ -19,8 +21,39 @@ impl TimeTracker {
         Self {
             name: name.to_string(),
             tasks: Vec::new(),
+            sub_trackers: Vec::new(),
             start: chrono::Local::now().naive_local(),
         }
+    }
+
+    /// Returns the sub-trackers.
+    pub(crate) fn sub_trackers(&self) -> &[TimeTracker] {
+        &self.sub_trackers
+    }
+
+    /// Returns a reference to the requested sub-tracker, if it exists.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `name` - The name of the sub-tracker to retrieve.
+    /// 
+    pub(crate) fn sub_tracker_by_name(&self, name: &str) -> Option<&TimeTracker> {
+        self.sub_trackers.iter().find(|tracker| tracker.name() == name)
+    }
+
+    /// Converts the tracker into a completed task.
+    pub fn to_completed_task(&self) -> CompletedTask {
+        CompletedTask {
+            name: self.name.clone(),
+            start: self.start,
+            end: self.start + self.total_time(),
+        }
+    }
+
+    /// Extends the tracker from another tracker.
+    pub fn extend(&mut self, other: TimeTracker) {
+        self.tasks.push(other.to_completed_task());
+        self.sub_trackers.push(other);
     }
 
     /// Adds a task to the tracker.

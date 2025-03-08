@@ -13,6 +13,7 @@ web_common_traits.workspace = true
 serde = {workspace = true, optional = true}
 common-traits.workspace = true
 server-errors.workspace = true
+pgrx_validation.workspace = true
 
 [features]
 default = ["serde"]

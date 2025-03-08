@@ -66,7 +66,7 @@ font_awesome = { path = "utils/font_awesome" }
 testcontainers = { version = "0.23.2" }
 web_common = { path = "web/web_common" }
 web_common_traits = { path = "web/web_common/web_common_traits" }
-webcodegen = { path = "web/web_common/webcodegen", features = ["postgres_17"] }
+webcodegen = { path = "web/web_common/webcodegen"}
 diesel_migrations_utils = { path = "utils/diesel_migrations_utils" }
 common-traits = { path = "utils/common-traits" }
 inflector = { path = "utils/inflector" }

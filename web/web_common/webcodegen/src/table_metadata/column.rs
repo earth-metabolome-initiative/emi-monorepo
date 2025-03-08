@@ -54,23 +54,23 @@ pub struct Column {
     /// Precision of the interval data type
     pub interval_precision: Option<i32>,
     /// Catalog name of the character set
-    pub character_set_catalog: Option<String>,
+    /// pub character_set_catalog: Option<String>,
     /// Schema name of the character set
-    pub character_set_schema: Option<String>,
+    /// pub character_set_schema: Option<String>,
     /// Name of the character set
-    pub character_set_name: Option<String>,
+    /// pub character_set_name: Option<String>,
     /// Catalog name of the collation
-    pub collation_catalog: Option<String>,
+    /// pub collation_catalog: Option<String>,
     /// Schema name of the collation
-    pub collation_schema: Option<String>,
+    /// pub collation_schema: Option<String>,
     /// Name of the collation
-    pub collation_name: Option<String>,
+    /// pub collation_name: Option<String>,
     /// Catalog name of the domain
-    pub domain_catalog: Option<String>,
+    /// pub domain_catalog: Option<String>,
     /// Schema name of the domain
-    pub domain_schema: Option<String>,
+    /// pub domain_schema: Option<String>,
     /// Name of the domain
-    pub domain_name: Option<String>,
+    /// pub domain_name: Option<String>,
     /// Catalog name of the underlying type of the column
     pub udt_catalog: Option<String>,
     /// Schema name of the underlying type of the column
@@ -92,17 +92,17 @@ pub struct Column {
     /// Indicates if the column is an identity column
     pub is_identity: Option<String>,
     /// Generation expression of the identity column
-    pub identity_generation: Option<String>,
+    /// pub identity_generation: Option<String>,
     /// Start value of the identity column
-    pub identity_start: Option<String>,
+    /// pub identity_start: Option<String>,
     /// Increment value of the identity column
-    pub identity_increment: Option<String>,
+    /// pub identity_increment: Option<String>,
     /// Maximum value of the identity column
-    pub identity_maximum: Option<String>,
+    /// pub identity_maximum: Option<String>,
     /// Minimum value of the identity column
-    pub identity_minimum: Option<String>,
+    /// pub identity_minimum: Option<String>,
     /// Indicates if the identity column cycles
-    pub identity_cycle: Option<String>,
+    /// pub identity_cycle: Option<String>,
     /// Indicates if the column is generated ("ALWAYS" or "NEVER")
     pub is_generated: String,
     /// Generation expression of the column
@@ -116,6 +116,23 @@ impl Column {
     /// Returns the raw data type of the column
     pub fn raw_data_type(&self) -> &str {
         &self.data_type
+    }
+
+    /// Returns whether the data type associated to the column is copiable.
+    pub fn is_copiable(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        if let Ok(geometry) = self.geometry(conn) {
+            return Ok(geometry.supports_copy());
+        }
+        match rust_type_str(self.data_type_str(conn)?) {
+            Ok(s) => Ok(COPY_TYPES.contains(&s)),
+            Err(error) => {
+                if self.has_custom_type() {
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.supports_copy(conn)?)
+                } else {
+                    Err(error)
+                }
+            }
+        }
     }
 
     /// Returns whether the column contains `PostGIS` geometry data
