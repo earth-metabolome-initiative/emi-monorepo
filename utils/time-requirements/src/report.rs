@@ -241,7 +241,7 @@ impl Report {
         self.plot(plot_path)?;
 
         writeln!(file, "{}", self.text(0))?;
-        writeln!(file, "\n![Plot]({})\n", plot_path.to_string_lossy())?;
+        writeln!(file, "\n![Plot]({})", plot_path.to_string_lossy())?;
 
         Ok(())
     }
