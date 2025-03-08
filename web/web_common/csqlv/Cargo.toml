@@ -27,3 +27,6 @@ diesel = {workspace = true, features = ["postgres"]}
 [features]
 default = [ "serde"]
 serde = []
+
+[lint]
+workspace = true
