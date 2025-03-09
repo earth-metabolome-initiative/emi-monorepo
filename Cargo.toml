@@ -22,7 +22,7 @@ members = [
     "utils/time-requirements",
     "data-structures/graph",
     "data-structures/algebra",
-    "data-structures/sorted-vec",
+    "data-structures/sorted-vec", "io/injection-sequence-handler",
 ]
 
 [workspace.dependencies]
