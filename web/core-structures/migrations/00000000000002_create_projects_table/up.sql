@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS projects (
     FOREIGN KEY (parent_project_id) REFERENCES projects(id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES users(id),
     FOREIGN KEY (updated_by) REFERENCES users(id),
-    CONSTRAINT project_parent CHECK (id != parent_project_id),
+    CONSTRAINT project_parent CHECK (must_be_distinct_i32(parent_project_id, id)),
     CONSTRAINT name_description CHECK (must_be_distinct(name, description))
 );
 

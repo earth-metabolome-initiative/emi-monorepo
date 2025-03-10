@@ -18,13 +18,13 @@ use crate::{
 };
 
 /// Constant listing types supporting `Copy`.
-pub const COPY_TYPES: [&str; 6] = ["i32", "i16", "i64", "f32", "f64", "bool"];
+pub(crate) const COPY_TYPES: [&str; 7] = ["i32", "i16", "i64", "f32", "f64", "bool", "rosetta_uuid::Uuid"];
 
 /// Constant listing types supporting `Eq`.
-pub(crate) const EQ_TYPES: [&str; 4] = ["i32", "i16", "i64", "bool"];
+pub(crate) const EQ_TYPES: [&str; 5] = ["i32", "i16", "i64", "bool", "rosetta_uuid::Uuid"];
 
 /// Constant listing types supporting `Hash`.
-pub(crate) const HASH_TYPES: [&str; 4] = ["i32", "i16", "i64", "bool"];
+pub(crate) const HASH_TYPES: [&str; 5] = ["i32", "i16", "i64", "bool", "rosetta_uuid::Uuid"];
 
 /// Represents a `PostgreSQL` type.
 ///
@@ -156,7 +156,7 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S, conn: &mut PgConnection) -> Re
         "geometry" => panic!("Geometry type not supported"),
 
         // UUID type
-        "uuid" => "uuid::Uuid",
+        "uuid" => "rosetta_uuid::Uuid",
 
         other => return Err(WebCodeGenError::UnknownPostgresRustType(other.to_owned())),
     })
@@ -233,7 +233,7 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<String, WebCod
         "geography" => "postgis_diesel::sql_types::Geography",
 
         // Other
-        "uuid" => "diesel::sql_types::Uuid",
+        "uuid" => "rosetta_uuid::diesel_impls::Uuid",
 
         _ => {
             return Err(WebCodeGenError::UnknownDieselPostgresType(postgres_type.to_owned()));

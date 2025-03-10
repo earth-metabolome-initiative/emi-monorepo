@@ -1,5 +1,7 @@
 //! Submodule providing a data type enumeration.
-use uuid::Uuid;
+use std::str::FromStr;
+
+use rosetta_uuid::Uuid;
 
 use crate::errors::CSVSchemaError;
 
@@ -47,7 +49,7 @@ impl DataType {
             return vec![DataType::Null];
         }
 
-        if Uuid::parse_str(value).is_ok() {
+        if Uuid::from_str(value).is_ok() {
             return vec![DataType::Uuid, DataType::Text, DataType::VarChar(value.len())];
         }
 

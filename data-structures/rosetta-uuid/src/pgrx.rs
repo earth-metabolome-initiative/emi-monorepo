@@ -1,9 +1,6 @@
 //! Implementation of the traits to allow for [`PGRX`](https://docs.rs/pgrx/latest/pgrx/)
 
-use core::fmt::Write;
-use std::ops::{Deref, DerefMut};
-
-use pgrx::{FromDatum, IntoDatum, PgMemoryContexts, pg_sys};
+use pgrx::{FromDatum, IntoDatum, pg_sys};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -36,9 +33,6 @@ impl IntoDatum for crate::Uuid {
 impl FromDatum for crate::Uuid {
     #[inline]
     #[allow(unsafe_code)]
-    /// # Safety
-    ///
-    /// Refer to the trait documentation for [`FromDatum`](pgrx::FromDatum)
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
@@ -48,29 +42,32 @@ impl FromDatum for crate::Uuid {
     }
 }
 
-// impl std::fmt::Display for Uuid {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//         write!(f, "{self:-x}")
-//     }
-// }
-
-// impl<'a> std::fmt::LowerHex for Uuid {
-//     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error>
-// {         self.format(f, UuidFormatCase::Lowercase)
-//     }
-// }
-
-// impl<'a> std::fmt::UpperHex for Uuid {
-//     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error>
-// {         self.format(f, UuidFormatCase::Uppercase)
-//     }
-// }
-
 unsafe impl SqlTranslatable for crate::Uuid {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-		pgrx::Uuid::argument_sql()
+        pgrx::Uuid::argument_sql()
     }
     fn return_sql() -> Result<Returns, ReturnsError> {
-		pgrx::Uuid::return_sql()
+        pgrx::Uuid::return_sql()
+    }
+}
+
+unsafe impl<'fcx> pgrx::callconv::ArgAbi<'fcx> for crate::Uuid {
+    unsafe fn unbox_arg_unchecked(arg: pgrx::callconv::Arg<'_, 'fcx>) -> Self {
+        unsafe { <pgrx::Uuid as pgrx::callconv::ArgAbi<'fcx>>::unbox_arg_unchecked(arg).into() }
+    }
+
+    unsafe fn unbox_nullable_arg(arg: pgrx::callconv::Arg<'_, 'fcx>) -> pgrx::nullable::Nullable<Self> {
+        unsafe {
+            <pgrx::Uuid as pgrx::callconv::ArgAbi<'fcx>>::unbox_nullable_arg(arg).map(Into::into)
+        }
+    }
+}
+
+unsafe impl pgrx::callconv::BoxRet for crate::Uuid {
+    unsafe fn box_into<'fcx>(
+        self,
+        fcinfo: &mut pgrx::callconv::FcInfo<'fcx>,
+    ) -> pgrx::datum::Datum<'fcx> {
+        unsafe { <pgrx::Uuid as pgrx::callconv::BoxRet>::box_into(self.into(), fcinfo) }
     }
 }
