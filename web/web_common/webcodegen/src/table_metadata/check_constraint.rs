@@ -2,12 +2,20 @@ use diesel::{
     pg::PgConnection, BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable,
     QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream};
+use sqlparser::{
+    ast::{
+        BinaryOperator, Expr, FunctionArg, FunctionArgExpr, FunctionArgumentList, FunctionArguments,
+    },
+    dialect::PostgreSqlDialect,
+    parser::Parser,
+};
+use syn::Ident;
 
-use super::{Column, PgConstraint, PgExtension, PgProc};
-use crate::errors::WebCodeGenError;
+use super::{Column, PgConstraint, PgExtension, PgOperator, PgProc, PgType};
+use crate::errors::{CheckConstraintError, UnsupportedCheckConstraintErrorSyntax, WebCodeGenError};
 
-#[derive(Queryable, QueryableByName, Debug, Selectable)]
+#[derive(Queryable, QueryableByName, Debug, Clone, Selectable)]
 #[diesel(table_name = crate::schema::check_constraints)]
 /// A struct representing a check constraint
 pub struct CheckConstraint {
@@ -21,19 +29,608 @@ pub struct CheckConstraint {
     pub check_clause: String,
 }
 
-impl CheckConstraint {
-    /// Returns the [`TokenStream`](proc_macro2::TokenStream) of the check
-    /// clause, including all functions specified from the provided
-    /// extensions, and considering the provided column as the one to
-    /// be primarily checked.
+struct TranslateExpression<'a, C1, C2> {
+    check_constraint: &'a CheckConstraint,
+    contextual_columns: &'a [C1],
+    self_columns: &'a [C2],
+    involved_columns: &'a [Column],
+    functions: &'a [PgProc],
+    attributes_enumeration: &'a syn::Ident,
+}
+
+#[derive(Debug, PartialEq)]
+enum ReturningType {
+    Result,
+    Boolean,
+    Textual,
+    Numeric,
+    Custom(PgType),
+}
+
+impl TryFrom<PgType> for ReturningType {
+    type Error = WebCodeGenError;
+
+    fn try_from(ty: PgType) -> Result<Self, Self::Error> {
+        if ty.is_boolean()? {
+            Ok(ReturningType::Boolean)
+        } else if ty.is_numeric()? {
+            Ok(ReturningType::Numeric)
+        } else if ty.is_text()? {
+            Ok(ReturningType::Textual)
+        } else {
+            Ok(ReturningType::Custom(ty))
+        }
+    }
+}
+
+impl<C1, C2> TranslateExpression<'_, C1, C2>
+where
+    C1: AsRef<Column>,
+    C2: AsRef<Column>,
+{
+    /// Returns a reference to the column that corresponds to the provided
+    /// column. It gives first priority to the columns in the
+    /// `contextual_columns` and then to the columns in the `self_columns`.
     ///
     /// # Arguments
     ///
-    /// * `column` - The column to be primarily checked
+    /// * `column` - The column to get
+    ///
+    /// # Returns
+    ///
+    /// * A tuple containing the column and a boolean indicating whether the
+    ///  column was found in the `contextual_columns` or not
+    ///
+    /// # Errors
+    ///
+    /// * If the column does not exist
+    fn get_column(&self, column: &Column) -> Result<(&Column, bool), WebCodeGenError> {
+        if let Some(contextual_column) =
+            self.contextual_columns.iter().find(|c| c.as_ref().column_name == column.column_name)
+        {
+            Ok((contextual_column.as_ref(), true))
+        } else if let Some(self_column) =
+            self.self_columns.iter().find(|c| c.as_ref().column_name == column.column_name)
+        {
+            Ok((self_column.as_ref(), false))
+        } else {
+            Err(CheckConstraintError::NoInvolvedColumns(
+                Box::new(column.clone()),
+                Box::new(self.check_constraint.clone()),
+            )
+            .into())
+        }
+    }
+
+    /// Returns the formatted column for use as an argument.
+    ///
+    /// # Arguments
+    ///
+    /// * `column` - The column to format
+    /// * `unpacking` - Whether to unpack the column
+    ///
+    /// # Returns
+    ///
+    /// * The formatted column
+    ///
+    /// # Errors
+    ///
+    /// * If the column does not exist
+    fn formatted_column(
+        &self,
+        column: &Column,
+        unpacking: bool,
+        conn: &mut PgConnection,
+    ) -> Result<proc_macro2::TokenStream, WebCodeGenError> {
+        let (argument_column, is_contextual) = self.get_column(column)?;
+        let column_ident = argument_column.snake_case_ident()?;
+        let mut column_ident = if is_contextual {
+            quote::quote! { #column_ident }
+        } else {
+            quote::quote! { self.#column_ident }
+        };
+
+        if (unpacking || !argument_column.is_nullable()) && !argument_column.supports_copy(conn)? {
+            column_ident = quote::quote! { #column_ident.as_ref() };
+        }
+
+        Ok(column_ident)
+    }
+
+    /// Returns whether the provide column is nullable.
+    fn is_nullable(&self, column: &Column) -> Result<bool, WebCodeGenError> {
+        self.get_column(column).map(|(column, _)| column.is_nullable())
+    }
+
+    /// Returns reference to the requested function by name.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the function
+    ///
+    /// # Returns
+    ///
+    /// * A reference to the function if it exists
+    ///
+    /// # Errors
+    ///
+    /// * If the function does not exist
+    fn get_function_by_name(&self, name: &str) -> Result<&PgProc, WebCodeGenError> {
+        self.functions
+            .iter()
+            .find(|f| f.proname == name)
+            .ok_or_else(|| WebCodeGenError::UnknownPostgresProc(name.to_string()))
+    }
+
+    /// Returns reference to the requested involved column by name.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the column
+    ///
+    /// # Returns
+    ///
+    /// * A reference to the column if it exists
+    ///
+    /// # Errors
+    ///
+    /// * If the column does not exist
+    fn get_involved_column_by_name(&self, name: &str) -> Result<&Column, WebCodeGenError> {
+        self.involved_columns
+            .iter()
+            .find(|c| c.column_name == name)
+            .ok_or_else(|| WebCodeGenError::ColumnNotFound(name.to_string()))
+    }
+
+    /// Translates the provided function argument to a
+    /// [`TokenStream`](proc_macro2::TokenStream)
+    fn parse_function_argument_expr(
+        &self,
+        arg: &FunctionArgExpr,
+        arg_type: &PgType,
+        conn: &mut PgConnection,
+    ) -> Result<(proc_macro2::TokenStream, Option<&'_ Column>), WebCodeGenError> {
+        match arg {
+            FunctionArgExpr::Expr(expr) => {
+                let (token_stream, scoped_columns, _returning_type) =
+                    self.parse(expr, Some(arg_type), conn)?;
+                if scoped_columns.len() > 1 {
+                    return Err(CheckConstraintError::UnsupportedSyntax(
+                        Box::new(self.check_constraint.clone()),
+                        UnsupportedCheckConstraintErrorSyntax::ExpectedSingleScopedColumn(
+                            scoped_columns.len(),
+                        ),
+                    )
+                    .into());
+                }
+                Ok((token_stream, scoped_columns.first().copied()))
+            }
+            FunctionArgExpr::QualifiedWildcard(_) => {
+                unimplemented!("QualifiedWildcard not supported");
+            }
+            FunctionArgExpr::Wildcard => {
+                unimplemented!("Wildcard not supported");
+            }
+        }
+    }
+
+    /// Translates the provided function argument to a
+    /// [`TokenStream`](proc_macro2::TokenStream)
+    fn parse_function_argument(
+        &self,
+        arg: &FunctionArg,
+        arg_type: &PgType,
+        conn: &mut PgConnection,
+    ) -> Result<(proc_macro2::TokenStream, Option<&'_ Column>), WebCodeGenError> {
+        match arg {
+            FunctionArg::Named { .. } => {
+                unimplemented!("Named arguments not supported");
+            }
+            FunctionArg::ExprNamed { .. } => {
+                unimplemented!("ExprNamed arguments not supported");
+            }
+            FunctionArg::Unnamed(arg) => self.parse_function_argument_expr(arg, arg_type, conn),
+        }
+    }
+
+    /// Translates the provided list of function arguments to a
+    /// [`TokenStream`](proc_macro2::TokenStream)
+    fn parse_function_argument_list(
+        &self,
+        args: &FunctionArgumentList,
+        argument_types: &[PgType],
+        conn: &mut PgConnection,
+    ) -> Result<(Vec<proc_macro2::TokenStream>, Vec<&'_ Column>), WebCodeGenError> {
+        let mut token_stream = Vec::with_capacity(args.args.len());
+        let mut columns = Vec::new();
+        assert_eq!(args.args.len(), argument_types.len());
+        for entry in args
+            .args
+            .iter()
+            .zip(argument_types.iter())
+            .map(|(arg, arg_type)| self.parse_function_argument(arg, arg_type, conn))
+        {
+            let (column_token_stream, column) = entry?;
+            token_stream.push(column_token_stream);
+            columns.extend(column);
+        }
+        Ok((token_stream, columns))
+    }
+
+    /// Translates the provided function arguments to a
+    /// [`TokenStream`](proc_macro2::TokenStream)
+    fn parse_function_arguments(
+        &self,
+        args: &FunctionArguments,
+        argument_types: &[PgType],
+        conn: &mut PgConnection,
+    ) -> Result<(Vec<proc_macro2::TokenStream>, Vec<&'_ Column>), WebCodeGenError> {
+        match args {
+            FunctionArguments::None => Ok((Vec::new(), Vec::new())),
+            FunctionArguments::Subquery(_) => {
+                unimplemented!("Subquery arguments not supported");
+            }
+            FunctionArguments::List(args) => {
+                self.parse_function_argument_list(args, argument_types, conn)
+            }
+        }
+    }
+
+    /// Translates the provided SQL function call to a
+    /// [`TokenStream`](proc_macro2::TokenStream)
+    fn parse_function(
+        &self,
+        sqlparser::ast::Function {
+            name,
+            uses_odbc_syntax,
+            parameters,
+            args,
+            filter,
+            null_treatment,
+            over,
+            within_group,
+        }: &sqlparser::ast::Function,
+        conn: &mut PgConnection,
+    ) -> Result<(proc_macro2::TokenStream, ReturningType), WebCodeGenError> {
+        if !within_group.is_empty() {
+            unimplemented!("WithinGroup not supported");
+        }
+        if null_treatment.is_some() {
+            unimplemented!("NullTreatment not supported");
+        }
+        if !matches!(parameters, FunctionArguments::None) {
+            unimplemented!("Parameters not supported");
+        }
+        if over.is_some() {
+            unimplemented!("Over not supported");
+        }
+        if filter.is_some() {
+            unimplemented!("Filter not supported");
+        }
+        if *uses_odbc_syntax {
+            unimplemented!("ODBC syntax not supported");
+        }
+        let function = self.get_function_by_name(&name.to_string())?;
+        let argument_types = function.argument_types(conn)?;
+        let (args, scoped_columns) = self.parse_function_arguments(&args, &argument_types, conn)?;
+        let function_path = function.path(conn)?;
+
+        let map_err = if function.returns_result(conn)? {
+            let validation_crate = Ident::new("validation_errors", Span::call_site());
+            let attributes_enumeration = self.attributes_enumeration;
+            let validation_error = match scoped_columns.len() {
+                0 => {
+                    return Err(CheckConstraintError::UnsupportedSyntax(
+                        Box::new(self.check_constraint.clone()),
+                        UnsupportedCheckConstraintErrorSyntax::ExpectedScopedColumn,
+                    )
+                    .into());
+                }
+                1 => {
+                    quote::quote! {
+                        #validation_crate::SingleFieldError
+                    }
+                }
+                2 => {
+                    quote::quote! {
+                        #validation_crate::DoubleFieldError
+                    }
+                }
+                _ => {
+                    unimplemented!("More than two scoped columns not supported");
+                }
+            };
+
+            let attributes = scoped_columns
+                .into_iter()
+                .map(|scoped_column| {
+                    let camel_cased = scoped_column.camel_case_ident()?;
+                    Ok(quote::quote! { #attributes_enumeration::#camel_cased })
+                })
+                .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+
+            quote::quote! {
+                .map_err(|e: #validation_error| e.rename(#(#attributes),* ))
+            }
+        } else {
+            TokenStream::new()
+        };
+
+        Ok((
+            quote::quote! {
+                #function_path(#(#args),*)#map_err
+            },
+            if function.returns_result(conn)? {
+                ReturningType::Result
+            } else {
+                ReturningType::try_from(function.return_type(conn)?)?
+            },
+        ))
+    }
+
+    /// Verifies that the [`CastKind`](sqlparser::ast::CastKind) is supported
+    ///
+    /// # Arguments
+    ///
+    /// * `kind` - The [`CastKind`](sqlparser::ast::CastKind) to verify
+    ///
+    /// # Errors
+    ///
+    /// * If the provided [`CastKind`](sqlparser::ast::CastKind) is not
+    ///   supported
+    fn verify_cast_kind(&self, kind: &sqlparser::ast::CastKind) -> Result<(), WebCodeGenError> {
+        match kind {
+            sqlparser::ast::CastKind::DoubleColon => Ok(()),
+            _ => {
+                unimplemented!("Unsupported cast kind: {:?}", kind);
+            }
+        }
+    }
+
+    /// Parses the provided [`Value`](sqlparser::ast::Value) to a
+    /// [`TokenStream`](proc_macro2::TokenStream)
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The [`Value`](sqlparser::ast::Value) to parse
+    /// * `type_hint` - The [`PgType`](crate::table_metadata::PgType) of the
+    /// value
+    ///
+    /// # Errors
+    ///
+    /// * If the provided [`Value`](sqlparser::ast::Value) is not supported
+    fn parse_value(
+        &self,
+        value: &sqlparser::ast::Value,
+        type_hint: Option<&PgType>,
+    ) -> Result<(proc_macro2::TokenStream, ReturningType), WebCodeGenError> {
+        match value {
+            sqlparser::ast::Value::Boolean(value) => {
+                Ok((quote::quote! { #value }, ReturningType::Boolean))
+            }
+            sqlparser::ast::Value::Number(value, _) => {
+                match type_hint {
+                    Some(type_hint) => Ok((type_hint.cast(value)?, ReturningType::Numeric)),
+                    None => {
+                        unimplemented!("Number without type hint not supported");
+                    }
+                }
+            }
+            sqlparser::ast::Value::SingleQuotedString(value) => {
+                Ok((quote::quote! { #value }, ReturningType::Textual))
+            }
+            other => {
+                unimplemented!("Unsupported value: {:?}", other);
+            }
+        }
+    }
+
+    /// Parses the provided [`ValueWithSpan`](sqlparser::ast::ValueWithSpan) to
+    /// a [`TokenStream`](proc_macro2::TokenStream)
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The [`ValueWithSpan`](sqlparser::ast::ValueWithSpan) to
+    ///   parse
+    /// * `type_hint` - The [`PgType`](crate::table_metadata::PgType) of the
+    ///  value
+    ///
+    /// # Errors
+    ///
+    /// * If the provided [`ValueWithSpan`](sqlparser::ast::ValueWithSpan) is
+    ///   not supported
+    fn parse_value_with_span(
+        &self,
+        value: &sqlparser::ast::ValueWithSpan,
+        type_hint: Option<&PgType>,
+    ) -> Result<(proc_macro2::TokenStream, ReturningType), WebCodeGenError> {
+        self.parse_value(&value.value, type_hint)
+    }
+
+    /// Translates the provided expression to a
+    /// [`TokenStream`](proc_macro2::TokenStream)
+    fn parse(
+        &self,
+        expr: &Expr,
+        type_hint: Option<&PgType>,
+        conn: &mut PgConnection,
+    ) -> Result<(proc_macro2::TokenStream, Vec<&'_ Column>, ReturningType), WebCodeGenError> {
+        match expr {
+            Expr::Function(function) => {
+                let (token_stream, returning_type) = self.parse_function(&function, conn)?;
+                Ok((token_stream, Vec::new(), returning_type))
+            }
+            Expr::Cast { kind, expr, data_type: _, format } => {
+                self.verify_cast_kind(kind)?;
+                if format.is_some() {
+                    unimplemented!("Format not supported");
+                }
+                self.parse(expr, type_hint, conn)
+            }
+            Expr::Nested(expr) => self.parse(expr, type_hint, conn),
+            Expr::Identifier(ident) => {
+                let involved_column = self.get_involved_column_by_name(&ident.value)?;
+                Ok((
+                    self.formatted_column(&involved_column, false, conn)?,
+                    vec![involved_column],
+                    ReturningType::Custom(involved_column.pg_type(conn)?),
+                ))
+            }
+            Expr::BinaryOp { left, op, right } => {
+                match op {
+                    BinaryOperator::And => {
+                        let (left, left_scoped_columns, left_returning_type) =
+                            self.parse(left, None, conn)?;
+                        let (right, right_scoped_columns, right_returning_type) =
+                            self.parse(right, None, conn)?;
+                        if !left_scoped_columns.is_empty() || !right_scoped_columns.is_empty() {
+                            unimplemented!("Scoped columns not supported");
+                        }
+                        if matches!(left_returning_type, ReturningType::Boolean)
+                            && matches!(right_returning_type, ReturningType::Boolean)
+                        {
+                            Ok((
+                                quote::quote! {
+                                    #left && #right
+                                },
+                                Vec::new(),
+                                ReturningType::Boolean,
+                            ))
+                        } else if matches!(left_returning_type, ReturningType::Result)
+                            || matches!(right_returning_type, ReturningType::Result)
+                        {
+                            Ok((
+                                quote::quote! {
+                                    #left.and_then(|_| #right)
+                                },
+                                Vec::new(),
+                                ReturningType::Result,
+                            ))
+                        } else {
+                            unimplemented!("Unsupported binary operation");
+                        }
+                    }
+                    BinaryOperator::Or => {
+                        let (left, left_scoped_columns, left_returning_type) =
+                            self.parse(left, None, conn)?;
+                        let (right, right_scoped_columns, right_returning_type) =
+                            self.parse(right, None, conn)?;
+                        if !left_scoped_columns.is_empty() || !right_scoped_columns.is_empty() {
+                            unimplemented!("Scoped columns not supported");
+                        }
+                        if matches!(left_returning_type, ReturningType::Boolean)
+                            && matches!(right_returning_type, ReturningType::Boolean)
+                        {
+                            Ok((
+                                quote::quote! {
+                                    #left || #right
+                                },
+                                Vec::new(),
+                                ReturningType::Boolean,
+                            ))
+                        } else if matches!(left_returning_type, ReturningType::Result)
+                            || matches!(right_returning_type, ReturningType::Result)
+                        {
+                            Ok((
+                                quote::quote! {
+                                    #left.or_else(|_| #right)
+                                },
+                                Vec::new(),
+                                ReturningType::Result,
+                            ))
+                        } else {
+                            unimplemented!("Unsupported binary operation");
+                        }
+                    }
+                    BinaryOperator::NotEq | BinaryOperator::Eq => {
+                        let (left, _, left_returning_type) = self.parse(left, None, conn)?;
+                        let (right, _, right_returning_type) = self.parse(right, None, conn)?;
+                        if left_returning_type != right_returning_type {
+                            unimplemented!("Equality between different types not supported");
+                        }
+                        let operator_symbol: syn::BinOp = match op {
+                            BinaryOperator::Eq => syn::BinOp::Eq(syn::token::EqEq::default()),
+                            BinaryOperator::NotEq => syn::BinOp::Ne(syn::token::Ne::default()),
+                            _ => unreachable!(),
+                        };
+                        Ok((
+                            quote::quote! {
+                                #left #operator_symbol #right
+                            },
+                            Vec::new(),
+                            ReturningType::Boolean,
+                        ))
+                    }
+                    BinaryOperator::Plus
+                    | BinaryOperator::Minus
+                    | BinaryOperator::Multiply
+                    | BinaryOperator::Divide
+                    | BinaryOperator::Modulo => {
+                        let (left, _, left_returning_type) = self.parse(left, type_hint, conn)?;
+                        let (right, _, right_returning_type) =
+                            self.parse(right, type_hint, conn)?;
+                        if matches!(left_returning_type, ReturningType::Numeric)
+                            && matches!(right_returning_type, ReturningType::Numeric)
+                        {
+                            let operator_symbol: syn::BinOp = match op {
+                                BinaryOperator::Plus => {
+                                    syn::BinOp::Add(syn::token::Plus::default())
+                                }
+                                BinaryOperator::Minus => {
+                                    syn::BinOp::Sub(syn::token::Minus::default())
+                                }
+                                BinaryOperator::Multiply => {
+                                    syn::BinOp::Mul(syn::token::Star::default())
+                                }
+                                BinaryOperator::Divide => {
+                                    syn::BinOp::Div(syn::token::Slash::default())
+                                }
+                                BinaryOperator::Modulo => {
+                                    syn::BinOp::Rem(syn::token::Percent::default())
+                                }
+                                _ => unreachable!(),
+                            };
+                            Ok((
+                                quote::quote! {
+                                    #left #operator_symbol #right
+                                },
+                                Vec::new(),
+                                ReturningType::Numeric,
+                            ))
+                        } else {
+                            unimplemented!(
+                                "Unsupported binary operation {} between {:?} and {:?}",
+                                op,
+                                left_returning_type,
+                                right_returning_type
+                            );
+                        }
+                    }
+                    _operator => {
+                        unimplemented!("Unsupported binary operator: {:?}", _operator);
+                    }
+                }
+            }
+            Expr::Value(value) => {
+                let (token_stream, returning_type) =
+                    self.parse_value_with_span(value, type_hint)?;
+                Ok((token_stream, Vec::new(), returning_type))
+            }
+            _ => unimplemented!("Unsupported expression: {:?}", expr),
+        }
+    }
+}
+
+impl CheckConstraint {
+    /// Returns the [`TokenStream`](proc_macro2::TokenStream) of the check
+    /// clause, including all functions specified from the provided
+    /// extensions.
+    ///
+    /// # Arguments
+    ///
+    /// * `contextual_columns` - The columns available in the context
+    /// * `self_columns` - The columns that are part of the current table
     /// * `extensions` - The extensions to consider
-    /// * `use_self` - Whether the other columns should be assumed as from the
-    ///   `self`
-    /// * `use_option` - Whether the other columns should be assumed as Options
     /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
@@ -45,139 +642,112 @@ impl CheckConstraint {
     /// * `None` if the provided column is not involved in the check clause
     /// * `None` if the provided `extensions` are not involved in the check
     ///   clause
-    pub fn to_syn<E: AsRef<PgExtension>>(
+    pub fn to_syn<E: AsRef<PgExtension>, C1: AsRef<Column>, C2: AsRef<Column>>(
         &self,
-        column: &Column,
+        contextual_columns: &[C1],
+        self_columns: &[C2],
         extensions: &[E],
-        use_self: bool,
-        use_option: bool,
+        attributes_enumeration: &syn::Ident,
         conn: &mut PgConnection,
-    ) -> Result<Option<proc_macro2::TokenStream>, WebCodeGenError> {
-        let involved_columns = self.columns(conn)?;
-        if !involved_columns.contains(column) {
-            return Ok(None);
-        }
-        let involved_functions = self
-            .functions(conn)?
-            .into_iter()
-            .filter(|function| {
-                function.extension(conn).ok().flatten().is_some_and(|extension| {
-                    extensions.iter().any(|ext| ext.as_ref() == &extension)
-                })
-            })
-            .collect::<Vec<PgProc>>();
-        if involved_functions.is_empty() {
-            return Ok(None);
-        }
-        // At this time, we know how to handle either the case of:
-        //
-        // 1. A single column check constraint with multiple functions, each one
-        //    expecting the column.
-        // 2. A multi-column check constraint with a single function expecting all the
-        //    columns.
-        //
-        if involved_columns.len() == 1 {
-            let column_ident = column.snake_case_ident()?;
-            let column_ident: TokenStream = if column.is_copiable(conn)? {
-                quote::quote! { #column_ident }
-            } else {
-                quote::quote! { &#column_ident }
+    ) -> Result<proc_macro2::TokenStream, WebCodeGenError> {
+        let functions = self.functions(conn)?;
+        let operators = self.operators(conn)?;
+
+        // If any of the functions are not from the provided extensions,
+        // then it is not possible to generate the check clause.
+        for f in &functions {
+            let Some(extension) = f.extension(conn)? else {
+                return Err(CheckConstraintError::FunctionNotFromProvidedExtensions(
+                    Box::new(f.clone()),
+                    Box::new(self.clone()),
+                )
+                .into());
             };
-
-            // Case 1 described above.
-            return involved_functions
-                .into_iter()
-                .map(|function| {
-                    let function_ident = function.ident();
-                    let extension_ident = if let Some(extension) = function.extension(conn)? {
-                        extension.ident()
-                    } else {
-                        unreachable!("The extension must be present")
-                    };
-                    Ok(quote::quote! {
-                        #extension_ident::#function_ident(#column_ident)?;
-                    })
-                })
-                .collect::<Result<proc_macro2::TokenStream, WebCodeGenError>>()
-                .map(Some);
-        }
-
-        if involved_columns.len() > 1 && involved_functions.len() == 1 {
-            // Case 2 described above.
-            let function = &involved_functions[0];
-            let function_ident = function.ident();
-            let extension_ident = if let Some(extension) = function.extension(conn)? {
-                extension.ident()
-            } else {
-                unreachable!("The extension must be present")
-            };
-            let column_idents = involved_columns
-                .iter()
-                .map(|involved_column| {
-                    let involved_column_ident = involved_column.snake_case_ident()?;
-                    let mut involved_column_ident: TokenStream =
-                        quote::quote! { #involved_column_ident };
-
-                    if !use_option && use_self && involved_column != column {
-                        involved_column_ident = quote::quote! { self.#involved_column_ident };
-                    };
-
-                    Ok(if use_option && involved_column != column || involved_column.is_copiable(conn)? {
-                        involved_column_ident
-                    } else {
-                        quote::quote! { &#involved_column_ident }
-                    })
-                })
-                .collect::<Result<Vec<_>, WebCodeGenError>>()?;
-
-            let mut call = quote::quote! {
-                #extension_ident::#function_ident(#(#column_idents),*)?;
-            };
-
-            if use_option {
-                let mut right_column_idents = Vec::new();
-                let mut left_column_idents = Vec::new();
-                for involved_column in involved_columns {
-                    if &involved_column == column {
-                        continue;
-                    }
-                    let involved_column_ident = involved_column.snake_case_ident()?;
-                    let mut involved_column_ident: TokenStream =
-                        quote::quote! { #involved_column_ident };
-                    left_column_idents.push(quote::quote! { Some(#involved_column_ident) });
-
-                    if use_self {
-                        involved_column_ident = quote::quote! { self.#involved_column_ident };
-                    };
-
-                    if !involved_column.is_copiable(conn)? {
-                        involved_column_ident = quote::quote! { #involved_column_ident.as_ref() };
-                    }
-
-                    right_column_idents.push(involved_column_ident.clone());
-                }
-
-                let (left_assigment_side, right_assignment_side) = if right_column_idents.len() > 1
-                {
-                    (
-                        quote::quote! { (#(#left_column_idents),*) },
-                        quote::quote! {(#(#right_column_idents),*) },
-                    )
-                } else {
-                    (left_column_idents[0].clone(), right_column_idents[0].clone())
-                };
-
-                call = quote::quote! {
-                    if let #left_assigment_side = #right_assignment_side {
-                        #call
-                    }
-                };
+            if !extensions.iter().any(|e| e.as_ref() == &extension) {
+                return Err(CheckConstraintError::FunctionNotFromProvidedExtensions(
+                    Box::new(f.clone()),
+                    Box::new(self.clone()),
+                )
+                .into());
             }
-
-            return Ok(Some(call));
         }
 
-        unimplemented!("It is currently unsupported to handle the provided check constraint")
+        // If any of the operators are not plain Rust operators, then it is not
+        // possible to generate the check clause.
+        if !operators.is_empty() {
+            return Err(CheckConstraintError::OperatorsNotSupported.into());
+        }
+
+        let parsed_check_clause = Parser::new(&PostgreSqlDialect {})
+            .try_with_sql(&self.check_clause)
+            .expect("Failed to parse check clause")
+            .parse_expr()
+            .expect("Failed to parse check clause");
+
+        let involved_columns = self.columns(conn)?;
+        let translator = TranslateExpression {
+            check_constraint: self,
+            contextual_columns,
+            self_columns,
+            involved_columns: involved_columns.as_slice(),
+            attributes_enumeration,
+            functions: &functions,
+        };
+
+        let (mut translated_check_clause, scoped_columns, returning_type) =
+            translator.parse(&parsed_check_clause, None, conn)?;
+
+        if !scoped_columns.is_empty() {
+            return Err(CheckConstraintError::UnsupportedSyntax(
+                Box::new(self.clone()),
+                UnsupportedCheckConstraintErrorSyntax::ExpectedNoScopedColumn(scoped_columns.len()),
+            )
+            .into());
+        }
+
+        if !matches!(returning_type, ReturningType::Result) {
+            return Err(
+                CheckConstraintError::TopLevelExpressionNotResult(Box::new(self.clone())).into()
+            );
+        }
+
+        translated_check_clause = quote::quote! {
+            #translated_check_clause?;
+        };
+
+        let optional_involved_columns = involved_columns
+            .iter()
+            .filter(|involved_column| translator.is_nullable(involved_column).unwrap_or(false))
+            .collect::<Vec<_>>();
+
+        if !optional_involved_columns.is_empty() {
+            let mut left_assignment = Vec::new();
+            let mut right_assignment = Vec::new();
+            for optional_involved_column in optional_involved_columns {
+                let column_ident = optional_involved_column.snake_case_ident()?;
+                let formatted_column =
+                    translator.formatted_column(optional_involved_column, true, conn)?;
+                left_assignment.push(quote::quote! { Some(#column_ident) });
+                right_assignment.push(formatted_column);
+            }
+            let left_assignment = if left_assignment.len() > 1 {
+                quote::quote! { (#(#left_assignment),*) }
+            } else {
+                quote::quote! { #(#left_assignment)* }
+            };
+            let right_assignment = if right_assignment.len() > 1 {
+                quote::quote! { (#(#right_assignment),*) }
+            } else {
+                quote::quote! { #(#right_assignment)* }
+            };
+            translated_check_clause = quote::quote! {
+                if let #left_assignment = #right_assignment {
+                    #translated_check_clause
+                }
+            };
+        }
+
+        Ok(translated_check_clause)
     }
 
     /// Returns the vector of [`PgProc`] functions that are used in the check
@@ -192,6 +762,20 @@ impl CheckConstraint {
     /// * If an error occurs while querying the database
     pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, WebCodeGenError> {
         Ok(self.pg_constraint(conn)?.functions(conn)?)
+    }
+
+    /// Returns the vector of [`PgOperator`] operators that are used in the
+    /// check clause
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn operators(&self, conn: &mut PgConnection) -> Result<Vec<PgOperator>, WebCodeGenError> {
+        Ok(self.pg_constraint(conn)?.operators(conn)?)
     }
 
     /// Returns the [`PgConstraint`] that corresponds to this check constraint

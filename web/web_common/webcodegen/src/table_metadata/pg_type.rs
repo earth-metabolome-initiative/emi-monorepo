@@ -1,4 +1,4 @@
-//! Submodule providing the `PgType` struct and associated methods.
+//! Submodule providing the [`PgType`] struct and associated methods.
 
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, Queryable,
@@ -117,7 +117,7 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> Result<&'static str, WebCod
         "integer" => "i32",
         "smallint" => "i16",
         "bigint" => "i64",
-        "real" => "f32",
+        "real" | "float4" => "f32",
         "double precision" | "float8" | "numeric" => "f64",
         "money" => "BigDecimal",
         "oid" => "u32",
@@ -126,7 +126,7 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> Result<&'static str, WebCod
         "character varying" | "text" | "name" | "xml" | "character" | "char" | "citext" => "String",
 
         // Boolean types
-        "boolean" => "bool",
+        "boolean" | "bool" => "bool",
 
         // Temporal types
         "timestamp with time zone" | "timestamp without time zone" => "chrono::NaiveDateTime",
@@ -178,7 +178,7 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<String, WebCod
 
     Ok(match postgres_type {
         // Numeric types
-        "integer" | "int4" => "diesel::sql_types::Integer",
+        "integer" | "i32" => "diesel::sql_types::Integer",
         "smallint" | "int2" => "diesel::sql_types::SmallInt",
         "bigint" | "int8" => "diesel::sql_types::BigInt",
         "real" | "float4" => "diesel::sql_types::Float",
@@ -564,13 +564,14 @@ impl PgType {
     }
 
     #[must_use]
-    /// Returns the `CamelCased` name of the `PgType` for the Postgres binding.
+    /// Returns the `CamelCased` name of the [`PgType`] for the Postgres
+    /// binding.
     pub fn pg_binding_name(&self) -> String {
         format!("Pg{}", self.camelcased_name())
     }
 
     #[must_use]
-    /// Returns the `CamelCased` Ident of the `PgType` for the Diesel binding.
+    /// Returns the `CamelCased` Ident of the [`PgType`] for the Diesel binding.
     pub fn pg_binding_ident(&self) -> Ident {
         Ident::new(&self.pg_binding_name(), proc_macro2::Span::call_site())
     }
@@ -839,7 +840,7 @@ impl PgType {
         }
     }
 
-    /// Returns a new `PgType` struct from the given type name.
+    /// Returns a new [`PgType`] struct from the given type name.
     ///
     /// # Arguments
     ///
@@ -848,8 +849,8 @@ impl PgType {
     ///
     /// # Returns
     ///
-    /// A Result containing the `PgType` struct if the type exists, or an error
-    /// if it does not.
+    /// A Result containing the [`PgType`] struct if the type exists, or an
+    /// error if it does not.
     ///
     /// # Errors
     ///
@@ -857,6 +858,108 @@ impl PgType {
     pub fn from_name(type_name: &str, conn: &mut PgConnection) -> Result<Self, WebCodeGenError> {
         use crate::schema::pg_type;
         Ok(pg_type::table.filter(pg_type::typname.eq(type_name)).first::<PgType>(conn)?)
+    }
+
+    #[must_use]
+    /// Returns whether the [`PgType`] is a boolean.
+    pub fn is_boolean(&self) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname)? == "bool")
+    }
+
+    #[must_use]
+    /// Returns whether the [`PgType`] is a text type.
+    pub fn is_text(&self) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname)? == "String")
+    }
+
+    #[must_use]
+    /// Returns whether the [`PgType`] is a numeric type.
+    pub fn is_numeric(&self) -> Result<bool, WebCodeGenError> {
+        let rust_type = rust_type_str(&self.typname)?;
+        Ok(rust_type == "i32"
+            || rust_type == "i16"
+            || rust_type == "i64"
+            || rust_type == "f32"
+            || rust_type == "f64")
+    }
+
+    #[must_use]
+    /// Returns the tokenstream of the provided string casted to the required
+    /// type.
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The value to cast.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing the tokenstream of the provided string casted to the
+    /// required type, or an error if the type is not supported.
+    pub fn cast(&self, value: &str) -> Result<TokenStream, WebCodeGenError> {
+        match rust_type_str(&self.typname)? {
+            "i16" => {
+                let value = value.parse::<i16>()?;
+                Ok(quote! {
+                    #value
+                })
+            }
+            "i32" => {
+                let value = value.parse::<i32>()?;
+                Ok(quote! {
+                    #value
+                })
+            }
+            "i64" => {
+                let value = value.parse::<i64>()?;
+                Ok(quote! {
+                    #value
+                })
+            }
+            "f32" => {
+                let value = value.parse::<f32>()?;
+                Ok(quote! {
+                    #value
+                })
+            }
+            "f64" => {
+                let value = value.parse::<f64>()?;
+                Ok(quote! {
+                    #value
+                })
+            }
+            "bool" => {
+                let value = value.parse::<bool>()?;
+                Ok(quote! {
+                    #value
+                })
+            }
+            _ => {
+                Err(WebCodeGenError::UnsupportedTypeCasting(
+                    value.to_owned(),
+                    Box::new(self.clone()),
+                ))
+            }
+        }
+    }
+
+    /// Returns the [`PgType`] struct from the given OID.
+    ///
+    /// # Arguments
+    ///
+    /// * `oid` - The OID of the type.
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing the [`PgType`] struct if the type exists, or an
+    /// error if it does not.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
+    pub fn from_oid(oid: u32, conn: &mut PgConnection) -> Result<Self, diesel::result::Error> {
+        use crate::schema::pg_type;
+        Ok(pg_type::table.filter(pg_type::oid.eq(oid)).first::<PgType>(conn)?)
     }
 
     /// Returns the attributes of the type, if it is a composite type.

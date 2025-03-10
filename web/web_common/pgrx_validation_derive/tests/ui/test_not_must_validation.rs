@@ -4,7 +4,7 @@ use pgrx_validation_derive::validation;
 
 #[validation]
 /// A validation which does not adhere to the standard naming conventions should fail.
-pub fn other_must_not_be_empty(_arg: &str) -> Result<(), validation_errors::Error> {
+pub fn other_must_not_be_empty(_arg: &str) -> Result<(), validation_errors::SingleFieldError> {
     Ok(())
 }
 

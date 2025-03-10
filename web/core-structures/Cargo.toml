@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 postgis_diesel.workspace = true
-uuid.workspace = true
+rosetta-uuid.workspace = true
 chrono.workspace = true
 diesel = {workspace = true, default-features = false, features = ["extras"]}
 diesel-async = {workspace = true, default-features = false}

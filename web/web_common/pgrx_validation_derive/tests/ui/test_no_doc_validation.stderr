@@ -1,5 +1,5 @@
 error: Function `must_not_be_empty` must have a doc comment to be decorated with `validation`.
  --> tests/ui/test_no_doc_validation.rs:6:8
   |
-6 | pub fn must_not_be_empty(_arg: &str) -> Result<(), validation_errors::Error> {
+6 | pub fn must_not_be_empty(_arg: &str) -> Result<(), validation_errors::SingleFieldError> {
   |        ^^^^^^^^^^^^^^^^^

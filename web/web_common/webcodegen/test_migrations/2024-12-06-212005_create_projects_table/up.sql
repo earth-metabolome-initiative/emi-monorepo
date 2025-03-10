@@ -6,7 +6,8 @@ CREATE TABLE projects (
     created_by INTEGER NOT NULL REFERENCES users(id),
     updated_by INTEGER NOT NULL REFERENCES users(id),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT must_have_valid_parent_project_id CHECK (must_be_distinct_i32(parent_project_id, id))
 );
 
 CREATE TABLE IF NOT EXISTS team_projects (

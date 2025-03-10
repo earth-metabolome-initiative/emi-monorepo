@@ -75,55 +75,69 @@ pub trait InsertableBuilder:
 
 /// Enumeration of the possible errors associated to the frontend insert
 /// operations.
-pub enum InsertError<A> {
+pub enum InsertError<FieldName> {
     /// A build error occurred.
-    BuilderError(BuilderError<A>),
+    BuilderError(BuilderError<FieldName>),
     /// A validation error occurred.
-    ValidationError(validation_errors::Error),
+    ValidationError(validation_errors::Error<FieldName>),
     /// A diesel error occurred.
     DieselError(diesel::result::Error),
     /// A server error occurred.
     ServerError(server_errors::Error),
 }
 
-impl<A: core::fmt::Display> core::error::Error for InsertError<A> {}
+impl<FieldName: core::fmt::Display> core::error::Error for InsertError<FieldName> {}
 
-impl<A: core::fmt::Display> core::fmt::Display for InsertError<A> {
+impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertError::BuilderError(error) => <BuilderError<A> as core::fmt::Display>::fmt(error, f),
-            InsertError::ValidationError(error) => <validation_errors::Error as core::fmt::Display>::fmt(error, f),
+            InsertError::BuilderError(error) => <BuilderError<FieldName> as core::fmt::Display>::fmt(error, f),
+            InsertError::ValidationError(error) => <validation_errors::Error<FieldName> as core::fmt::Display>::fmt(error, f),
             InsertError::DieselError(error) => <diesel::result::Error as core::fmt::Display>::fmt(error, f),
             InsertError::ServerError(error) => <server_errors::Error as core::fmt::Display>::fmt(error, f),
         }
     }
 }
 
-impl<A: core::fmt::Display> core::fmt::Debug for InsertError<A> {
+impl<FieldName: core::fmt::Display> core::fmt::Debug for InsertError<FieldName> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
-        <InsertError<A> as core::fmt::Display>::fmt(self, f)
+        <InsertError<FieldName> as core::fmt::Display>::fmt(self, f)
     }
 }
 
-impl<A> From<BuilderError<A>> for InsertError<A> {
-    fn from(error: BuilderError<A>) -> Self {
+impl<FieldName> From<BuilderError<FieldName>> for InsertError<FieldName> {
+    fn from(error: BuilderError<FieldName>) -> Self {
         InsertError::BuilderError(error)
     }
 }
 
-impl<A> From<validation_errors::Error> for InsertError<A> {
-    fn from(error: validation_errors::Error) -> Self {
+impl<FieldName> From<validation_errors::Error<FieldName>> for InsertError<FieldName> {
+    fn from(error: validation_errors::Error<FieldName>) -> Self {
         InsertError::ValidationError(error)
     }
 }
 
-impl<A> From<diesel::result::Error> for InsertError<A> {
+impl<FieldName> From<validation_errors::SingleFieldError<FieldName>> for InsertError<FieldName> {
+    fn from(error: validation_errors::SingleFieldError<FieldName>) -> Self {
+        let validation_error: validation_errors::Error<FieldName> = error.into();
+        validation_error.into()
+    }
+}
+
+impl<FieldName> From<validation_errors::DoubleFieldError<FieldName>> for InsertError<FieldName> {
+    fn from(error: validation_errors::DoubleFieldError<FieldName>) -> Self {
+        let validation_error: validation_errors::Error<FieldName> = error.into();
+        validation_error.into()
+    }
+}
+
+impl<FieldName> From<diesel::result::Error> for InsertError<FieldName> {
     fn from(error: diesel::result::Error) -> Self {
         InsertError::DieselError(error)
     }
 }
 
-impl<A> From<server_errors::Error> for InsertError<A> {
+impl<FieldName> From<server_errors::Error> for InsertError<FieldName> {
     fn from(error: server_errors::Error) -> Self {
         InsertError::ServerError(error)
     }
