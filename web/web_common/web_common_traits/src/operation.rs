@@ -12,7 +12,7 @@ pub trait Operation: Basic {
     type Error: OperationError<Operation = Self>;
 
     /// Returns the identifier of the operation.
-    fn id(&self) -> uuid::Uuid;
+    fn id(&self) -> rosetta_uuid::Uuid;
 }
 
 #[derive(Debug, Clone)]
@@ -20,7 +20,7 @@ pub trait Operation: Basic {
 /// Generic operation.
 pub struct GenericOperation<O> {
     /// The identifier of the operation.
-    id: uuid::Uuid,
+    id: rosetta_uuid::Uuid,
     /// The inner operation.
     operation: O,
 }
@@ -34,7 +34,7 @@ where
     type Outcome = <O as Operation>::Outcome;
     type Error = <O as Operation>::Error;
 
-    fn id(&self) -> uuid::Uuid {
+    fn id(&self) -> rosetta_uuid::Uuid {
         self.id
     }
 }

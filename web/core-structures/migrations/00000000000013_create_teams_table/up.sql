@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS teams (
     -- change to integer and the change it to serial in a new directoy
     id INTEGER PRIMARY KEY,
     -- a name of the team
-    name TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL UNIQUE CHECK (must_not_be_empty(name)),
     -- a description of the team
     description TEXT NOT NULL,
     icon_id SMALLINT NOT NULL DEFAULT 1387,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS teams (
     FOREIGN KEY (parent_team_id) REFERENCES teams(id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES users(id),
     FOREIGN KEY (updated_by) REFERENCES users(id),
-    CONSTRAINT parent_team_circularity CHECK (parent_team_id != id)
+    CONSTRAINT parent_team_circularity CHECK (must_be_distinct_i32(parent_team_id, id))
 );
 
 CREATE OR REPLACE FUNCTION concat_teams_name_description(

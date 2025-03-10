@@ -124,7 +124,7 @@ where
     ) -> Result<proc_macro2::TokenStream, WebCodeGenError> {
         let (argument_column, is_contextual) = self.get_column(column)?;
         let column_ident = argument_column.snake_case_ident()?;
-        let mut column_ident = if is_contextual {
+        let mut column_ident = if is_contextual || !unpacking{
             quote::quote! { #column_ident }
         } else {
             quote::quote! { self.#column_ident }

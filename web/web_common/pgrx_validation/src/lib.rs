@@ -84,8 +84,8 @@ pub fn must_be_distinct_i32(
 /// * `validation_errors::DoubleFieldError::NotDistinct((), ())` if the two
 ///   integers are equal.
 pub fn must_be_distinct_uuid(
-    left: uuid::Uuid,
-    right: uuid::Uuid,
+    left: rosetta_uuid::Uuid,
+    right: rosetta_uuid::Uuid,
 ) -> Result<(), validation_errors::DoubleFieldError> {
     if left == right {
         Err(validation_errors::DoubleFieldError::NotDistinct((), ()))

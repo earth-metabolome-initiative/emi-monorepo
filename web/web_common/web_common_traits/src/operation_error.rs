@@ -16,7 +16,7 @@ pub trait OperationError: Error + Basic {
     fn operation(&self) -> &Self::Operation;
 
     /// Returns the identifier of the operation.
-    fn id(&self) -> uuid::Uuid {
+    fn id(&self) -> rosetta_uuid::Uuid {
         self.operation().id()
     }
 }
