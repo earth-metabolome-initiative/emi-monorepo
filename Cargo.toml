@@ -26,10 +26,10 @@ members = [
     "utils/time-requirements",
     "data-structures/graph",
     "data-structures/algebra",
-    "data-structures/sorted-vec",
     "data-migrations/directus-migration/directus-migration-builder",
     "data-migrations/directus-migration",
     "data-structures/rosetta-uuid",
+    "data-structures/sorted-vec", "data-structures/mass-spectrometry", "utils/functional-properties",
 ]
 
 [workspace.dependencies]
@@ -73,6 +73,7 @@ web_common_traits = { path = "web/web_common/web_common_traits" }
 webcodegen = { path = "web/web_common/webcodegen" }
 diesel_migrations_utils = { path = "utils/diesel_migrations_utils" }
 common-traits = { path = "utils/common-traits" }
+functional-properties = { path = "utils/functional-properties" }
 inflector = { path = "utils/inflector" }
 core-structures = { path = "web/core-structures" }
 core-structures-builder = { path = "web/core-structures/core-structures-builder" }
