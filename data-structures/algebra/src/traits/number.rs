@@ -29,6 +29,9 @@ pub trait Number:
 {
 }
 
+/// Trait defining a positive number.
+pub trait PositiveNumber: Number {}
+
 impl Number for i8 {}
 impl Number for i16 {}
 impl Number for i32 {}
