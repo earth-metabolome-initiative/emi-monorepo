@@ -11,8 +11,8 @@ use crate::{
     codegen::{
         CODEGEN_DIRECTORY, CODEGEN_INSERTABLES_PATH, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
     },
-    errors::WebCodeGenError,
-    Codegen, Table,
+    errors::{CheckConstraintError, CodeGenerationError, WebCodeGenError},
+    Codegen, Column, Table,
 };
 
 impl Table {
@@ -135,20 +135,23 @@ impl Codegen<'_> {
                 continue;
             }
 
-            let columns = table
-                .columns(conn)?
-                .into_iter()
-                .filter(|column| !column.is_always_automatically_generated())
+            let all_columns = table.columns(conn)?;
+
+            let insertable_columns = all_columns
+                .iter()
+                .filter(|column| !column.is_automatically_generated())
                 .collect::<Vec<_>>();
+            let nullable_insertable_columns: Vec<Column> =
+                insertable_columns.iter().map(|column| column.to_nullable()).collect();
 
             let insertable_enum = table.insertable_enum_ident()?;
             let insertable_variant_ident = table.insertable_variant_ident()?;
             let insertable_builder_ident = table.insertable_builder_ident()?;
-            let insertable_enum_variants = columns
+            let insertable_enum_variants = insertable_columns
                 .iter()
                 .map(|column| column.camel_case_ident())
                 .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
-            let display_insertable_enum_variants = columns
+            let display_insertable_enum_variants = insertable_columns
                 .iter()
                 .map(|column| {
                     let enum_variant = column.camel_case_ident()?;
@@ -159,7 +162,7 @@ impl Codegen<'_> {
                 })
                 .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
-            let insertable_attributes = columns
+            let insertable_attributes = insertable_columns
                 .iter()
                 .map(|column| {
                     let column_name = column.snake_case_ident()?;
@@ -172,23 +175,17 @@ impl Codegen<'_> {
 
             let insertable_variant_methods = table.foreign_key_methods(conn, &self.syntax)?;
 
-            let insertable_builder_attributes = columns
+            let insertable_builder_attributes = nullable_insertable_columns
                 .iter()
                 .map(|column| {
                     let column_name = column.snake_case_ident()?;
                     let column_type = column.rust_data_type(conn)?;
-                    Ok(if column.is_nullable() {
-                        quote::quote! {
-                            #column_name: #column_type
-                        }
-                    } else {
-                        quote::quote! {
-                            #column_name: Option<#column_type>
-                        }
+                    Ok(quote::quote! {
+                        #column_name: #column_type
                     })
                 })
                 .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
-            let populating_product = columns.iter().map(|column| {
+            let populating_product = insertable_columns.iter().map(|column| {
                     let column_ident = column.snake_case_ident()?;
                     Ok(if column.is_nullable() {
                         quote::quote! {
@@ -201,15 +198,21 @@ impl Codegen<'_> {
                         }
                     })
                 }).collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
-            let insertable_builder_methods = columns
+            let insertable_builder_methods = insertable_columns
                     .iter()
                     .map(|column| {
                         let column_name = column.snake_case_ident()?;
                         let column_type = column.rust_data_type(conn)?;
 
                         let check_constraints = column.check_constraints(conn)?.into_iter().map(|constraint| {
-                            Ok(constraint.to_syn(column, self.check_constraints_extensions.as_slice(), true, true, conn)?.unwrap_or_default())
-                        }).collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+                            let outcome = constraint.to_syn(&[column], &nullable_insertable_columns, self.check_constraints_extensions.as_slice(), &insertable_enum, conn);
+                            if let Err(WebCodeGenError::CodeGenerationError(CodeGenerationError::CheckConstraintError(CheckConstraintError::NoInvolvedColumns(unknown_column, _)))) = &outcome {
+                                if all_columns.contains(unknown_column.as_ref()) && !insertable_columns.contains(&unknown_column.as_ref()) {
+                                    return Ok(TokenStream::new());
+                                }
+                            }
+                            outcome
+                        }).collect::<Result<TokenStream, WebCodeGenError>>()?;
 
                         // TODO! Add `async` check for UNIQUE constraint when generating the code.
                         // Such check should only be active when the user is online.
@@ -225,7 +228,7 @@ impl Codegen<'_> {
                         };
                         Ok(quote::quote! {
                             pub fn #column_name(mut self, #column_name: #column_type) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-                                #(#check_constraints)*
+                                #check_constraints
                                 #column_assignment
                                 Ok(self)
                             }
@@ -235,7 +238,7 @@ impl Codegen<'_> {
 
             let table_diesel_ident = table.import_diesel_path()?;
 
-            let insertable_variant_builder_assignments = columns
+            let insertable_variant_builder_assignments = insertable_columns
                 .iter()
                 .map(|column| {
                     let column_name = column.snake_case_ident()?;

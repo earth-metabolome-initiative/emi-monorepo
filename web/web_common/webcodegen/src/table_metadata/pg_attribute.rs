@@ -68,7 +68,7 @@ pub struct PgAttribute {
 }
 
 impl PgAttribute {
-    /// Returns the `PgType` associated to the `PgAttribute`.
+    /// Returns the [`PgType`] associated to the `PgAttribute`.
     ///
     /// # Errors
     ///

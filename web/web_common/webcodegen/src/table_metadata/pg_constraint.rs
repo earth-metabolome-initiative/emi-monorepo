@@ -6,7 +6,7 @@ use diesel::{
     SelectableHelper,
 };
 
-use super::PgProc;
+use super::{PgProc, PgOperator};
 
 /// Represents the `pg_constraint` system catalog table in `PostgreSQL`.
 /// This table stores information about constraints on tables and columns.
@@ -105,5 +105,33 @@ impl PgConstraint {
             // Select all columns from pg_proc.
             .select(PgProc::as_select())
             .load::<PgProc>(conn)
+    }
+
+    /// Returns the vector of [`PgOperator`] functions that are used in the
+    /// constraint.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Errors
+    /// 
+    /// * If an error occurs while querying the database
+    /// 
+    pub fn operators(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<PgOperator>, diesel::result::Error> {
+        use crate::schema::{pg_constraint, pg_depend, pg_operator};
+        pg_constraint::table
+            // Join to pg_depend where the constraint's OID is recorded as the dependent.
+            .inner_join(pg_depend::table.on(pg_constraint::oid.eq(pg_depend::objid)))
+            // Then join to pg_operator using the referenced operator OID.
+            .inner_join(pg_operator::table.on(pg_depend::refobjid.eq(pg_operator::oid)))
+            // Filter for this specific constraint.
+            .filter(pg_constraint::oid.eq(self.oid))
+            // Select all columns from pg_operator.
+            .select(PgOperator::as_select())
+            .load::<PgOperator>(conn)
     }
 }

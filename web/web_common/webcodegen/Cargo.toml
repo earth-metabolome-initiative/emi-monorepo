@@ -21,6 +21,7 @@ inflector.workspace = true
 futures.workspace = true
 server-errors.workspace = true
 time-requirements.workspace = true
+sqlparser.workspace = true
 
 [dev-dependencies]
 diesel_migrations = "2.2.0"
@@ -30,7 +31,7 @@ trybuild.workspace = true
 serde_json.workspace = true
 chrono.workspace = true
 ipnetwork = "0.20.0"
-uuid.workspace = true
+rosetta-uuid.workspace = true
 web_common_traits.workspace = true
 macaddr = "1.0.1"
 postgis_diesel.workspace = true
@@ -39,7 +40,9 @@ diesel-async = { workspace = true, default-features = false, features = [
 	"postgres",
 	"bb8",
 ] }
+validation-errors.workspace = true
 pgrx_validation.workspace = true
+
 
 [features]
 default = ["diesel", "serde", "postgres"]

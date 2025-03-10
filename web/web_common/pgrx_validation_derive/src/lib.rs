@@ -58,7 +58,7 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
     // a pg_extern.
     if !matches!(vis, syn::Visibility::Public(_)) {
         let error_message = format!(
-            "Function `{fn_name}` must be public to be decoraged with `validation` - add a `pub` keyword before the function definition if appropriate.",
+            "Function `{fn_name}` must be public to be decorated with `validation` - add a `pub` keyword before the function definition if appropriate.",
         );
         return syn::Error::new(vis.span(), &error_message).to_compile_error().into();
     }
@@ -88,10 +88,11 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
         return syn::Error::new(sig.inputs.span(), &error_message).to_compile_error().into();
     }
 
-    // We expect the function to return a `Result<(), validation_errors::Error>`.
+    // We expect the function to return a `Result<(), validation_errors::SingleFieldError>`
+    // or `Result<(), validation_errors::DoubleFieldError>`.
     if !is_result_unit_pgrx_error(&sig.output) {
         let error_message = format!(
-            "Function `{fn_name}` must return a `Result<(), validation_errors::Error>` to be decorated with `validation`, but returns `{output}`.",
+            "Function `{fn_name}` must return a `Result<(), validation_errors::SingleFieldError>` or `Result<(), validation_errors::DoubleFieldError>` to be decorated with `validation`, but returns `{output}`.",
             output = match &sig.output {
                 syn::ReturnType::Type(_, ty) => quote!(#ty).to_string(),
                 syn::ReturnType::Default => "()".to_string(),
@@ -104,7 +105,7 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let function_name = fn_name.to_string();
     if !function_name
         .chars()
-        .all(|character: char| character.is_ascii_lowercase() || character.is_ascii_digit() || character == '_')
+        .all(|character: char| character.is_ascii_lowercase() || character.is_numeric() || character == '_')
     {
         let error_message =
             format!("Function `{fn_name}` must be snake_case to be decorated with `validation`.",);
@@ -181,7 +182,8 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 }
 
-/// Determines if the return type is `Result<(), validation_errors::Error>`
+/// Determines if the return type is `Result<(), validation_errors::SingleFieldError>` or
+/// `Result<(), validation_errors::DoubleFieldError>`.
 fn is_result_unit_pgrx_error(output: &syn::ReturnType) -> bool {
     match output {
         syn::ReturnType::Type(_, ty) => {
@@ -202,7 +204,8 @@ fn is_result_unit_pgrx_error(output: &syn::ReturnType) -> bool {
                                 return false;
                             }
 
-                            // Second generic argument: Must be `validation_errors::Error`
+                            // Second generic argument: Must be `validation_errors::SingleFieldError`
+                            // or `validation_errors::DoubleFieldError`
                             if let Some(syn::GenericArgument::Type(syn::Type::Path(error_path))) =
                                 iter.next()
                             {
@@ -222,5 +225,5 @@ fn is_result_unit_pgrx_error(output: &syn::ReturnType) -> bool {
 fn is_pgrx_validation_error(path: &syn::TypePath) -> bool {
     path.path.segments.len() == 2
         && path.path.segments[0].ident == "validation_errors"
-        && path.path.segments[1].ident == "Error"
+        && (path.path.segments[1].ident == "SingleFieldError" || path.path.segments[1].ident == "DoubleFieldError")
 }

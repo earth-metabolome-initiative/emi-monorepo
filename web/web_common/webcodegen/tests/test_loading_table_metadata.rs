@@ -6,22 +6,6 @@ mod utils;
 use utils::*;
 use webcodegen::{errors::WebCodeGenError, *};
 
-async fn test_code_generation_methods(conn: &mut PgConnection) -> Result<(), WebCodeGenError> {
-    // We create the `./tests/ui` directory if it does not exist
-    std::fs::create_dir_all("tests/ui")?;
-
-    let builder = trybuild::TestCases::new();
-    SQLFunction::write_all(conn, "tests/ui/sql_functions.rs")?;
-    add_main_to_file("tests/ui/sql_functions.rs");
-    builder.pass("tests/ui/sql_functions.rs");
-
-    // SQLOperator::write_all(conn, "tests/ui/sql_operators.rs")?;
-    // add_main_to_file("tests/ui/sql_operators.rs");
-    // builder.pass("tests/ui/sql_operators.rs");
-
-    Ok(())
-}
-
 async fn test_check_constraints(
     database_name: &str,
     conn: &mut PgConnection,
@@ -53,8 +37,6 @@ async fn test_user_table() {
     // that have an `updated_at` column
 
     Table::create_update_triggers(&mut conn, &database_name, None).unwrap();
-
-    test_code_generation_methods(&mut conn).await.unwrap();
 
     // We try to load all elements of each type, so to ensure
     // that the structs are actually compatible with the schema

@@ -1,4 +1,4 @@
-error: Function `is_not_empty` must be public to be decoraged with `validation` - add a `pub` keyword before the function definition if appropriate.
+error: Function `is_not_empty` must be public to be decorated with `validation` - add a `pub` keyword before the function definition if appropriate.
  --> tests/ui/test_private_validation.rs:4:1
   |
 4 | #[validation]

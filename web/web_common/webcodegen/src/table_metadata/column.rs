@@ -111,7 +111,23 @@ pub struct Column {
     pub is_updatable: String,
 }
 
+impl AsRef<Column> for Column {
+    fn as_ref(&self) -> &Column {
+        self
+    }
+}
+
 impl Column {
+    /// Returns the column as a nullable column
+    pub fn into_nullable(self) -> Self {
+        Self { __is_nullable: "YES".to_string(), ..self }
+    }
+
+    /// Returns the column as a nullable column
+    pub fn to_nullable(&self) -> Self {
+        self.clone().into_nullable()
+    }
+
     #[must_use]
     /// Returns the raw data type of the column
     pub fn raw_data_type(&self) -> &str {
@@ -119,7 +135,7 @@ impl Column {
     }
 
     /// Returns whether the data type associated to the column is copiable.
-    pub fn is_copiable(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+    pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         if let Ok(geometry) = self.geometry(conn) {
             return Ok(geometry.supports_copy());
         }
@@ -277,6 +293,34 @@ impl Column {
         } else {
             &self.data_type
         })
+    }
+
+    /// Returns the [`PgType`] associated with the column
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the [`PgType`] of the column if the operation was
+    /// successful, or a `WebCodeGenError` if an error occurred
+    ///
+    /// # Errors
+    ///
+    /// If an error occurs while querying the database
+    pub fn pg_type(&self, conn: &mut PgConnection) -> Result<PgType, diesel::result::Error> {
+        use crate::schema::{pg_attribute, pg_class, pg_namespace, pg_type};
+
+        pg_type::table
+            .inner_join(pg_attribute::table.on(pg_attribute::atttypid.eq(pg_type::oid)))
+            .inner_join(pg_class::table.on(pg_attribute::attrelid.eq(pg_class::oid)))
+            .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
+            .filter(pg_class::relname.eq(&self.table_name))
+            .filter(pg_namespace::nspname.eq(&self.table_schema))
+            .filter(pg_attribute::attname.eq(&self.column_name))
+            .select(PgType::as_select())
+            .first::<PgType>(conn)
     }
 
     /// Returns the string data type
@@ -755,19 +799,21 @@ impl Column {
             .optional()
     }
 
-    /// Returns whether the column is a foreign key with `ON DELETE CASCADE` constraint.
+    /// Returns whether the column is a foreign key with `ON DELETE CASCADE`
+    /// constraint.
     ///
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If an error occurs while querying the database
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A `bool` indicating whether the column is a foreign key with `ON DELETE CASCADE` constraint
+    ///
+    /// A `bool` indicating whether the column is a foreign key with `ON DELETE
+    /// CASCADE` constraint
     pub fn is_foreign_key_on_delete_cascade(&self, conn: &mut PgConnection) -> bool {
         use crate::schema::{key_column_usage, referential_constraints};
         key_column_usage::table
@@ -808,15 +854,15 @@ impl Column {
 
     #[must_use]
     /// Returns the getter method name for the column.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If an error occurs while sanitizing the column name
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A `Result` containing the getter method name if the operation was successful,
-    /// 
+    ///
+    /// A `Result` containing the getter method name if the operation was
+    /// successful,
     pub fn getter_name(&self) -> Result<String, WebCodeGenError> {
         let mut snake_case_name = self.snake_case_name()?;
         if let Some(stripped_snake_case_name) = snake_case_name.strip_suffix("_id") {
@@ -827,15 +873,15 @@ impl Column {
 
     #[must_use]
     /// Returns the getter method ident for the column.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If an error occurs while sanitizing the column name
-    /// 
+    ///
     /// # Returns
-    /// 
-    /// A `Result` containing the getter method ident if the operation was successful,
-    /// 
+    ///
+    /// A `Result` containing the getter method ident if the operation was
+    /// successful,
     pub fn getter_ident(&self) -> Result<Ident, WebCodeGenError> {
         let getter_name = self.getter_name()?;
         if RESERVED_RUST_WORDS.contains(&getter_name.as_str()) {

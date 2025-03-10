@@ -4,12 +4,15 @@ use diesel::{
     ExpressionMethods, JoinOnDsl, OptionalExtension, PgConnection, QueryDsl, Queryable,
     QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
+use syn::punctuated::Punctuated;
 
-use crate::PgExtension;
+use crate::{errors::WebCodeGenError, PgExtension};
+
+use super::PgType;
 
 /// Represents the `pg_proc` system catalog table in `PostgreSQL`.
 /// This table stores information about functions and procedures.
-#[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq)]
+#[derive(Queryable, QueryableByName, Selectable, Debug, Clone, PartialEq)]
 #[diesel(table_name = crate::schema::pg_proc)]
 #[allow(clippy::struct_excessive_bools)]
 pub struct PgProc {
@@ -74,6 +77,52 @@ pub struct PgProc {
 }
 
 impl PgProc {
+    /// Returns whether the current function may be return a `Result`.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    /// 
+    /// # Errors
+    /// 
+    /// * If the return type does not exist.
+    /// 
+    pub fn returns_result(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        if self.proname.starts_with("must_be_") || self.proname.starts_with("must_not_be_") {
+            Ok(self.return_type(conn)?.is_boolean()?)
+        } else {
+            Ok(false)
+        }
+    }
+
+    /// Returns the `Vec` of [`PgType`] representing the types of the arguments
+    /// of the function.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    /// 
+    /// # Errors
+    /// 
+    /// * If the provided connection is invalid.
+    /// 
+    pub fn argument_types(&self, conn: &mut PgConnection) -> Result<Vec<PgType>, diesel::result::Error> {
+        self.proargtypes.iter().map(|oid| PgType::from_oid(*oid, conn)).collect()
+    }
+
+    /// Returns the return [`PgType`] associated to the function.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    ///
+    /// # Errors
+    ///
+    /// * If the return type does not exist.
+    pub fn return_type(&self, conn: &mut PgConnection) -> Result<PgType, diesel::result::Error> {
+        PgType::from_oid(self.prorettype, conn)
+    }
+
     /// Returns the [`PgProc`] associated to the given `name` and `namespace`.
     ///
     /// # Arguments
@@ -127,8 +176,15 @@ impl PgProc {
     }
 
     #[must_use]
-    /// Returns the [`Ident`](syn::Ident) for the [`PgProc`].
-    pub fn ident(&self) -> syn::Ident {
-        syn::Ident::new(&self.proname, proc_macro2::Span::call_site())
+    /// Returns the path to the function.
+    pub fn path(&self, conn: &mut PgConnection) -> Result<syn::Path, diesel::result::Error> {
+        let extension = self.extension(conn)?;
+        let extension = extension.map(|ext| ext.ident());
+        let ident = syn::Ident::new(&self.proname, proc_macro2::Span::call_site());
+        let segments: Vec<syn::PathSegment> = match extension {
+            Some(extension) => vec![extension.into(), ident.into()],
+            None => vec![ident.into()],
+        };
+        Ok(syn::Path { leading_colon: None, segments: Punctuated::from_iter(segments) })
     }
 }

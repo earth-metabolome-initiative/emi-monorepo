@@ -9,7 +9,7 @@ use pgrx_validation_derive::validation;
 /// 
 /// * `Error::EmptyText` if the given argument is empty.
 /// 
-pub fn must_not_be_another_empty(_arg: &str) -> Result<(), validation_errors::Error> {
+pub fn must_not_be_another_empty(_arg: &str) -> Result<(), validation_errors::SingleFieldError> {
     Ok(())
 }
 
@@ -20,7 +20,7 @@ pub fn must_not_be_another_empty(_arg: &str) -> Result<(), validation_errors::Er
 /// 
 /// * `Error::EmptyText` if the given argument is empty.
 /// 
-pub fn must_not_be_empty(arg: &str) -> Result<(), validation_errors::Error> {
+pub fn must_not_be_empty(arg: &str) -> Result<(), validation_errors::SingleFieldError> {
     must_not_be_another_empty(arg)?;
     Ok(())
 }

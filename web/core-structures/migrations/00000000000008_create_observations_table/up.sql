@@ -18,5 +18,5 @@ CREATE TABLE IF NOT EXISTS observations (
     FOREIGN KEY (organism_id) REFERENCES organisms(id),
     FOREIGN KEY (sample_id) REFERENCES samples(id),
     FOREIGN KEY (subject_id) REFERENCES observation_subjects(id),
-    CONSTRAINT observation_parent CHECK (id != parent_observation_id)
+    CONSTRAINT observation_parent CHECK (must_be_distinct_uuid(parent_observation_id, id))
 );

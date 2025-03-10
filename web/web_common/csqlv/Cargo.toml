@@ -9,7 +9,7 @@ diesel.workspace = true
 flate2 = "1.0.35"
 indicatif = "0.17.11"
 quote = "1.0.38"
-uuid.workspace = true
+rosetta-uuid.workspace = true
 inflector.workspace = true
 const_format.workspace = true
 

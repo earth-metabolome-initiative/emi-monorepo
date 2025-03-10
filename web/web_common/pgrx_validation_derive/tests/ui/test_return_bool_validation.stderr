@@ -1,5 +1,5 @@
-error: Function `is_not_empty` must return a `Result<(), validation_errors::Error>` to be decorated with `validation`, but returns `bool`.
+error: Function `is_not_empty` must return a `Result<(), validation_errors::SingleFieldError>` or `Result<(), validation_errors::DoubleFieldError>` to be decorated with `validation`, but returns `bool`.
  --> tests/ui/test_return_bool_validation.rs:7:33
   |
 7 | pub fn is_not_empty(_arg: &str) -> bool {
-  |                                 ^
+  |                                 ^^^^^^^

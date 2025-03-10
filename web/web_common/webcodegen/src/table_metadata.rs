@@ -18,8 +18,7 @@ mod pg_trigger;
 mod pg_type;
 mod pg_setting;
 mod referential_constraint;
-mod sql_function;
-mod sql_operator;
+mod pg_operator;
 mod table;
 mod table_constraint;
 
@@ -41,7 +40,6 @@ pub use pg_trigger::PgTrigger;
 pub use pg_type::PgType;
 pub use pg_setting::PgSetting;
 pub use referential_constraint::ReferentialConstraint;
-pub use sql_function::SQLFunction;
-pub use sql_operator::SQLOperator;
+pub use pg_operator::PgOperator;
 pub use table::Table;
 pub use table_constraint::TableConstraint;
