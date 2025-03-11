@@ -29,6 +29,7 @@ members = [
     "data-migrations/directus-migration/directus-migration-builder",
     "data-migrations/directus-migration",
     "data-structures/rosetta-uuid",
+    "utils/pg2sqlite",
 ]
 
 [workspace.dependencies]
