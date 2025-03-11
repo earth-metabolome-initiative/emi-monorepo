@@ -1,8 +1,12 @@
 //! Submodule defining a single Spectrum collection trait.
 
 use algebra::prelude::*;
+use common_traits::builder::Builder;
 
-use crate::prelude::Annotation;
+use crate::{
+    prelude::Annotation,
+    structs::{GreedySharedPeaks, iterators::shared_peaks::GreedySharedPeaksBuilder},
+};
 
 /// Trait for a single Spectrum.
 pub trait Spectrum {
