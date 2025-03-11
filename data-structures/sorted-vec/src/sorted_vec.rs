@@ -114,7 +114,7 @@ impl<V> SortedVec<V> {
     }
 }
 
-impl<V: Ord> SortedVec<V> {
+impl<V: PartialOrd> SortedVec<V> {
     #[must_use]
     /// Returns whether the vector is sorted.
     pub fn is_sorted(&self) -> bool {
