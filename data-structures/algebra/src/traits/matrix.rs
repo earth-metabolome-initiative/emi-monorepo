@@ -4,11 +4,13 @@ mod matrix2d;
 mod matrix_mut;
 mod square_matrix;
 mod triangular_matrix;
+mod valued_matrix2d;
 
 pub use matrix2d::*;
 pub use matrix_mut::*;
 pub use square_matrix::*;
 pub use triangular_matrix::*;
+pub use valued_matrix2d::*;
 
 use super::{Coordinates, IntoUsize, PositiveInteger, Zero};
 
@@ -24,10 +26,21 @@ pub trait Matrix {
     }
 }
 
-/// Trait defining a matrix with values.
-pub trait ValuedMatrix: Matrix {
+/// Trait defining a matrix with values that can be computed on the fly.
+pub trait ImplicitValuedMatrix: Matrix {
     /// Type of the values of the matrix.
     type Value;
+
+    /// Returns the value at the given coordinates.
+    ///
+    /// # Arguments
+    ///
+    /// * `coordinates` - Coordinates of the value to get.
+    ///
+    /// # Returns
+    ///
+    /// The value at the given coordinates.
+    fn value(&self, coordinates: &Self::Coordinates) -> Self::Value;
 }
 
 /// Trait defining a sparse matrix.
