@@ -1,0 +1,14 @@
+[package]
+name = "pg2sqlite"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sqlparser.workspace = true
+indicatif.workspace = true
+
+[dev-dependencies]
+diesel = {workspace = true, features = ["sqlite"]}
+
+[lints]
+workspace = true
