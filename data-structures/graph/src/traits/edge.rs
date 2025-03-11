@@ -25,3 +25,12 @@ pub trait Edge: Debug + Clone {
         self.source() == self.destination()
     }
 }
+
+/// Trait defining an attributed edge.
+pub trait AttributedEdge: Edge {
+    /// Type of the attribute.
+    type Attribute;
+
+    /// Returns the attribute of the edge.
+    fn attribute(&self) -> Self::Attribute;
+}
