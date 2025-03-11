@@ -1,16 +1,21 @@
 //! Submodule defining a single Spectrum collection trait.
 
 use algebra::prelude::*;
+use common_traits::builder::Builder;
 
-use crate::prelude::Annotation;
+use crate::{
+    prelude::Annotation,
+    structs::{GreedySharedPeaks, iterators::shared_peaks::GreedySharedPeaksBuilder},
+};
 
 /// Trait for a single Spectrum.
 pub trait Spectrum {
     /// The type of the Intensity.
-    type Intensity: PositiveNumber;
+    type Intensity: Number;
     /// The type of the mass over charge.
-    type Mz: PositiveNumber;
-    /// Iterator over the intensities in the Spectrum, sorted by mass over charge.
+    type Mz: Number;
+    /// Iterator over the intensities in the Spectrum, sorted by mass over
+    /// charge.
     type SortedIntensitiesIter<'a>: Iterator<Item = Self::Intensity>
     where
         Self: 'a;
@@ -34,6 +39,30 @@ pub trait Spectrum {
 
     /// Returns an iterator over the peaks in the Spectrum.
     fn peaks(&self) -> Self::SortedPeaksIter<'_>;
+
+    /// Returns the precursor mass over charge.
+    fn precursor_mz(&self) -> Self::Mz;
+
+    /// Returns an iterator over the shared peaks between two Spectra, within a
+    /// given tolerance and right-shift.
+    fn greedy_shared_peaks<'spectra, Other>(
+        &'spectra self,
+        other: &'spectra Other,
+        tolerance: Self::Mz,
+        right_shift: Self::Mz,
+    ) -> GreedySharedPeaks<'spectra, Self, Other>
+    where
+        Self: Sized,
+        Other: Sized + Spectrum<Mz = Self::Mz>,
+    {
+        GreedySharedPeaksBuilder::default()
+            .left(self)
+            .right(other)
+            .tolerance(tolerance)
+            .right_shift(right_shift)
+            .build()
+            .unwrap()
+    }
 }
 
 /// Trait for [`Spectrum`] with annotations.
