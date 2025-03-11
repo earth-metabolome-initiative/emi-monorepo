@@ -7,6 +7,7 @@ edition = "2024"
 algebra.workspace = true
 functional-properties.workspace = true
 common-traits.workspace = true
+sorted-vec.workspace = true
 
 [lints]
 workspace = true
