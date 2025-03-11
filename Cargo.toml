@@ -27,6 +27,7 @@ members = [
     "data-structures/algebra",
     "data-structures/sorted-vec",
     "data-structures/rosetta-uuid",
+    "utils/pg2sqlite",
 ]
 
 [workspace.dependencies]
