@@ -61,10 +61,21 @@ impl<M: Matrix> Matrix for &M {
     }
 }
 
-/// Trait defining a matrix with values.
-pub trait ValuedMatrix: Matrix {
+/// Trait defining a matrix with values that can be computed on the fly.
+pub trait ImplicitValuedMatrix: Matrix {
     /// Type of the values of the matrix.
     type Value;
+
+    /// Returns the value at the given coordinates.
+    ///
+    /// # Arguments
+    ///
+    /// * `coordinates` - Coordinates of the value to get.
+    ///
+    /// # Returns
+    ///
+    /// The value at the given coordinates.
+    fn value(&self, coordinates: &Self::Coordinates) -> Self::Value;
 }
 
 impl<M: ValuedMatrix> ValuedMatrix for &M {
