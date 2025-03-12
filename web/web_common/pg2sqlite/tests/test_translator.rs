@@ -8,7 +8,7 @@ use pg2sqlite::prelude::Pg2Sqlite;
 pub fn test_translator() {
     let translated_migrations = Pg2Sqlite::default()
         .verbose()
-        .ups("../../web/core-structures/migrations")
+        .ups("../../core-structures/migrations")
         .expect("Failed to load the migrations")
         .translate()
         .expect("Failed to translate the migrations");

@@ -12,6 +12,8 @@ pub struct Pg2Sqlite {
     pub pg_statements: Vec<Statement>,
     /// Whether to show a loading bar of the translation progress.
     pub verbose: bool,
+    /// Whether to drop check constraints containing unsupported functions.
+    pub remove_unsupported_check_constraints: bool,
 }
 
 impl Pg2Sqlite {
@@ -25,6 +27,12 @@ impl Pg2Sqlite {
     /// translated.
     pub fn statement(mut self, statement: Statement) -> Self {
         self.pg_statements.push(statement);
+        self
+    }
+
+    /// Sets to drop check constraints containing unsupported functions.
+    pub fn remove_unsupported_check_constraints(mut self) -> Self {
+        self.remove_unsupported_check_constraints = true;
         self
     }
 
@@ -44,12 +52,15 @@ impl Pg2Sqlite {
     /// # Errors
     ///
     /// * If the SQL statement could not be parsed.
-    pub fn sql(self, statement: &str) -> Result<Self, crate::errors::Error> {
+    pub fn sql(mut self, statement: &str) -> Result<Self, crate::errors::Error> {
         let stmt = sqlparser::parser::Parser::parse_sql(
             &sqlparser::dialect::PostgreSqlDialect {},
             statement,
         )?;
-        Ok(self.statement(stmt[0].clone()))
+        for statement in stmt {
+            self = self.statement(statement);
+        }
+        Ok(self)
     }
 
     /// Adds a new path with an SQL file to be parsed and added to the set of
@@ -140,6 +151,7 @@ impl Pg2Sqlite {
             .iter()
             .progress_with(bar)
             .map(|statement| statement.translate(&self))
-            .collect()
+            .collect::<Result<Vec<Vec<Statement>>, crate::errors::Error>>()
+            .map(|statements| statements.into_iter().flatten().collect())
     }
 }
