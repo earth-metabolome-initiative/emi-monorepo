@@ -7,13 +7,14 @@ use crate::prelude::{Pg2Sqlite, Translator};
 
 impl Translator for Statement {
     type Schema = Pg2Sqlite;
-    type SQLiteEntry = Statement;
+    type SQLiteEntry = Vec<Statement>;
 
     fn translate(&self, schema: &Self::Schema) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         Ok(match self {
-            Self::CreateTable(create_table) => Self::CreateTable(create_table.translate(schema)?),
+            Self::CreateTable(create_table) => vec![Self::CreateTable(create_table.translate(schema)?)],
+            Self::CreateIndex(create_index) => create_index.translate(schema)?,
             unsupported_statement => {
-                unimplemented!("Unsupported statement: {:?}", unsupported_statement)
+                unimplemented!("Unsupported PostgreSQL statement: `{}` - Parsed as: {unsupported_statement:?}", unsupported_statement.to_string())
             }
         })
     }

@@ -14,6 +14,7 @@ members = [
     "web/web_common/pgrx_validation_derive",
     "web/web_common/validation-errors",
     "web/web_common/server-errors",
+    "web/web_common/pg2sqlite",
     "data-retrieval/taxonomy-fetcher",
     "data-retrieval/downloader",
     "web/core-structures",
@@ -27,7 +28,6 @@ members = [
     "data-structures/algebra",
     "data-structures/sorted-vec",
     "data-structures/rosetta-uuid",
-    "utils/pg2sqlite",
 ]
 
 [workspace.dependencies]

@@ -10,6 +10,8 @@ pub enum Error {
 	ParserError(ParserError),
 	/// Error that may occur during the reading of a file.
 	IoError(std::io::Error),
+	/// Error when a function is not available in the schema.
+	UndefinedFunction(String),
 }
 
 impl From<ParserError> for Error {

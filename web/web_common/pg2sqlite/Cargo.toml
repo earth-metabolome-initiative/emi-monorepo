@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 sqlparser.workspace = true
 indicatif.workspace = true
+webcodegen.workspace = true
 
 [dev-dependencies]
 diesel = {workspace = true, features = ["sqlite"]}
