@@ -57,7 +57,7 @@ pub fn test_square_directed_edges() {
         "The node 5 should have successor 4."
     );
     assert_eq!(
-        edges.edges().collect::<Vec<_>>(),
+        edges.sparse_coordinates().collect::<Vec<_>>(),
         vec![(1, 2), (1, 3), (2, 2), (2, 3), (3, 4), (4, 5),],
         "The edges are not correctly stored."
     );
@@ -67,7 +67,7 @@ pub fn test_square_directed_edges() {
 /// First simple test for triangular edges.
 pub fn test_triangular_directed_edges() {
     let edges: Vec<(usize, usize)> = vec![(1, 2), (1, 3), (2, 2), (2, 3), (3, 4), (4, 5)];
-    let edges: UpperTriangularCSR2D<usize, usize> = GenericDirectedEdgesBuilder::default()
+    let edges: UpperTriangularCSR2D<usize, usize> = GenericEdgesBuilder::default()
         .expected_number_of_edges(edges.len())
         .edges(edges.into_iter())
         .build()
@@ -116,7 +116,7 @@ pub fn test_triangular_directed_edges() {
         "The node 5 should have successor 4."
     );
     assert_eq!(
-        edges.edges().collect::<Vec<_>>(),
+        edges.sparse_coordinates().collect::<Vec<_>>(),
         vec![(1, 2), (1, 3), (2, 2), (2, 3), (3, 4), (4, 5),],
         "The edges are not correctly stored."
     );

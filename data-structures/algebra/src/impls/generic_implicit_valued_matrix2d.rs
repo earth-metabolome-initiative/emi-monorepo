@@ -2,74 +2,141 @@
 
 use core::marker::PhantomData;
 
-use crate::traits::{ImplicitValuedMatrix, ImplicitValuedMatrix2D, Matrix2D, Vector};
+use crate::traits::{
+    ImplicitValuedMatrix, ImplicitValuedSparseMatrix, ImplicitValuedSparseRowIteraror, Matrix2D,
+    SparseMatrix, SparseMatrix2D, SparseValuedMatrix, ValuedMatrix, ValuedMatrix2D,
+    ValuedSparseMatrix2D,
+};
 
 /// A 2D matrix with implicit values.
-pub struct GenericImplicitValuedMatrix2D<Sources, Destinations, Value, ImplicitValueMap> {
-    sources: Sources,
-    destinations: Destinations,
-    function: ImplicitValueMap,
+pub struct GenericImplicitValuedMatrix2D<M, Map, Value> {
+    matrix: M,
+    map: Map,
     _value: PhantomData<Value>,
 }
 
-impl<Sources, Destinations, Value, ImplicitValueMap> Matrix2D
-    for GenericImplicitValuedMatrix2D<Sources, Destinations, Value, ImplicitValueMap>
-where
-    Sources: Vector,
-    Destinations: Vector,
-{
-    type RowIndex = <Sources as Vector>::Index;
-    type ColumnIndex = <Destinations as Vector>::Index;
+impl<M: Matrix2D, Map, Value> Matrix2D for GenericImplicitValuedMatrix2D<M, Map, Value> {
+    /// Type of the row index.
+    type RowIndex = M::RowIndex;
+    /// Type of the column index.
+    type ColumnIndex = M::ColumnIndex;
 
+    /// Returns the number of rows of the matrix.
     fn number_of_rows(&self) -> Self::RowIndex {
-        self.sources.len()
+        self.matrix.number_of_rows()
     }
 
+    /// Returns the number of columns of the matrix.
     fn number_of_columns(&self) -> Self::ColumnIndex {
-        self.destinations.len()
+        self.matrix.number_of_columns()
     }
 }
 
-impl<Sources, Destinations, Value, ImplicitValueMap> ImplicitValuedMatrix
-    for GenericImplicitValuedMatrix2D<Sources, Destinations, Value, ImplicitValueMap>
-where
-    Sources: Vector,
-    Destinations: Vector,
-    ImplicitValueMap:
-        for<'a> Fn(&'a <Sources as Vector>::Value, &'a <Destinations as Vector>::Value) -> Value,
+impl<M: SparseMatrix + Matrix2D, Map, Value> SparseMatrix
+    for GenericImplicitValuedMatrix2D<M, Map, Value>
 {
+    type SparseCoordinates<'a>
+        = M::SparseCoordinates<'a>
+    where
+        Self: 'a;
+    type SparseIndex = M::SparseIndex;
+
+    fn number_of_defined_values(&self) -> Self::SparseIndex {
+        self.matrix.number_of_defined_values()
+    }
+
+    fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_> {
+        self.matrix.sparse_coordinates()
+    }
+}
+
+impl<M: SparseMatrix2D, Map, Value> SparseMatrix2D
+    for GenericImplicitValuedMatrix2D<M, Map, Value>
+{
+    type SparseColumns<'a>
+        = M::SparseColumns<'a>
+    where
+        Self: 'a;
+    type SparseRow<'a>
+        = M::SparseRow<'a>
+    where
+        Self: 'a;
+    type SparseRowSizes<'a>
+        = M::SparseRowSizes<'a>
+    where
+        Self: 'a;
+    type SparseRows<'a>
+        = M::SparseRows<'a>
+    where
+        Self: 'a;
+
+    fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
+        self.matrix.sparse_row(row)
+    }
+
+    fn sparse_columns(&self) -> Self::SparseColumns<'_> {
+        self.matrix.sparse_columns()
+    }
+
+    fn sparse_rows(&self) -> Self::SparseRows<'_> {
+        self.matrix.sparse_rows()
+    }
+
+    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
+        self.matrix.sparse_row_sizes()
+    }
+
+    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
+        self.matrix.number_of_defined_values_in_row(row)
+    }
+
+    fn rank(&self, row: Self::RowIndex) -> Self::SparseIndex {
+        self.matrix.rank(row)
+    }
+}
+
+impl<M: Matrix2D, Map, Value> ValuedMatrix for GenericImplicitValuedMatrix2D<M, Map, Value> {
     type Value = Value;
+}
 
-    fn value(
-        &self,
-        &(row, column): &(<Self as Matrix2D>::RowIndex, <Self as Matrix2D>::ColumnIndex),
-    ) -> Value {
-        (self.function)(&self.sources[row], &self.destinations[column])
+impl<M: Matrix2D, Map, Value> ValuedMatrix2D for GenericImplicitValuedMatrix2D<M, Map, Value> {}
+
+impl<M: Matrix2D, Map, Value> ImplicitValuedMatrix for GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    Map: Fn(&M::Coordinates) -> Self::Value,
+{
+    fn implicit_value(&self, coordinates: &Self::Coordinates) -> Self::Value {
+        (self.map)(coordinates)
     }
 }
 
-impl<Sources, Destinations, Value, ImplicitValueMap> ImplicitValuedMatrix2D
-    for GenericImplicitValuedMatrix2D<Sources, Destinations, Value, ImplicitValueMap>
+impl<M: SparseMatrix, Map, Value> SparseValuedMatrix
+    for GenericImplicitValuedMatrix2D<M, Map, Value>
 where
-    Sources: Vector,
-    Destinations: Vector,
-    ImplicitValueMap:
-        for<'a> Fn(&'a <Sources as Vector>::Value, &'a <Destinations as Vector>::Value) -> Value,
+    M: SparseMatrix2D + ImplicitValuedMatrix,
+    Map: Fn(&M::Coordinates) -> Self::Value,
 {
-    type RowIndices<'a>
-        = <Sources as Vector>::Indices<'a>
-    where
-        Self: 'a;
-    type ColumnIndices<'a>
-        = <Destinations as Vector>::Indices<'a>
+    type SparseValues<'a>
+        = <Self as ImplicitValuedSparseMatrix>::SparseImplicitValues<'a>
     where
         Self: 'a;
 
-    fn row_indices(&self) -> Self::RowIndices<'_> {
-        self.sources.indices()
+    fn sparse_values(&self) -> Self::SparseValues<'_> {
+        self.sparse_implicit_values()
     }
+}
 
-    fn column_indices(&self) -> Self::ColumnIndices<'_> {
-        self.destinations.indices()
+impl<M: Matrix2D, Map, Value> ValuedSparseMatrix2D for GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: SparseMatrix2D + ImplicitValuedMatrix,
+    Map: Fn(&M::Coordinates) -> Self::Value,
+{
+    type SparseRowValues<'a>
+        = ImplicitValuedSparseRowIteraror<'a, Self>
+    where
+        Self: 'a;
+
+    fn sparse_row_values(&self, row: Self::RowIndex) -> Self::SparseRowValues<'_> {
+        ImplicitValuedSparseRowIteraror::new(self, row)
     }
 }

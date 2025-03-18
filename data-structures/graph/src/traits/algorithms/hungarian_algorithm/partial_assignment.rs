@@ -1,0 +1,125 @@
+//! Submodule providing the structs to represent the state of the partial
+//! assignment in the context of the Hungarian algorithm.
+
+use algebra::prelude::{IntoUsize, Zero};
+
+use super::{augmenting_alternating_path::SuccessorMarker, AugmentingAlternatingPath, Dual};
+use crate::traits::{
+    BipartiteGraph, BipartiteWeightedMonoplexGraph, MonoplexGraph, WeightedMonoplexGraph,
+};
+
+pub(super) struct PartialAssignment<G: BipartiteWeightedMonoplexGraph + ?Sized> {
+    /// The left nodes assigned to the right nodes.
+    pub(super) successors: Vec<Option<G::RightNodeId>>,
+    /// The right nodes assigned to the left nodes.
+    pub(super) predecessors: Vec<Option<G::LeftNodeId>>,
+    /// The number of assigned nodes.
+    pub(super) number_of_assigned_nodes: usize,
+}
+
+impl<'graph, G: BipartiteWeightedMonoplexGraph + ?Sized> From<&Dual<'graph, G>>
+    for PartialAssignment<G>
+{
+    /// Greedily assigns all of the available admissible cells according to the
+    /// provided dual solution.
+    ///
+    /// # Arguments
+    ///
+    /// * `dual`: The dual solution.
+    ///
+    /// # Implementative details
+    ///
+    /// A tuple `(i, j)` is admissible if the following conditions are met:
+    ///
+    /// * The right node `i` is not assigned.
+    /// * The left node `j` is not assigned.
+    /// * The weight of the edge `(i, j)` is equal to the sum of the dual
+    ///   weights of the right node i and the left node `j`, i.e. the associated
+    ///   value in the dual graph is zero.
+    fn from(dual: &Dual<'graph, G>) -> Self {
+        let mut assignment = PartialAssignment {
+            successors: vec![None; dual.number_of_right_nodes()],
+            predecessors: vec![None; dual.number_of_left_nodes()],
+            number_of_assigned_nodes: 0,
+        };
+
+        // We iterate over the right nodes.
+        dual.sparse_weights().zip(dual.sparse_coordinates()).for_each(
+            |(weight, (source_id, destination_id)): (
+                G::Weight,
+                (G::LeftNodeId, G::RightNodeId),
+            )| {
+                if assignment.has_no_predecessor(destination_id)
+                    && assignment.has_no_successor(source_id)
+                    && weight == G::Weight::ZERO
+                {
+                    assignment.predecessors[destination_id.into_usize()] = Some(source_id);
+                    assignment.successors[source_id.into_usize()] = Some(destination_id);
+                    assignment.number_of_assigned_nodes += 1;
+                }
+            },
+        );
+
+        assignment
+    }
+}
+
+impl<G: BipartiteWeightedMonoplexGraph + ?Sized> PartialAssignment<G> {
+    /// Returns whether the assignment is complete.
+    pub fn is_complete(&self) -> bool {
+        self.number_of_assigned_nodes == self.successors.len().min(self.predecessors.len())
+    }
+
+    /// Returns whether the provided right now has no predecessor.
+    pub fn has_no_predecessor(&self, right_node_node_id: G::RightNodeId) -> bool {
+        self.predecessor(right_node_node_id).is_none()
+    }
+
+    /// Returns the assigned left node to the provided right node.
+    pub fn predecessor(&self, right_node_node_id: G::RightNodeId) -> Option<G::LeftNodeId> {
+        self.predecessors[right_node_node_id.into_usize()]
+    }
+
+    /// Returns whether the provided left node is assigned.
+    pub fn has_successor(&self, left_node_node_id: G::LeftNodeId) -> bool {
+        self.successor(left_node_node_id).is_some()
+    }
+
+    /// Returns whether the provided left now has no successor.
+    pub fn has_no_successor(&self, left_node_node_id: G::LeftNodeId) -> bool {
+        self.successor(left_node_node_id).is_none()
+    }
+
+    /// Returns the assigned right node to the provided left node.
+    pub fn successor(&self, left_node_node_id: G::LeftNodeId) -> Option<G::RightNodeId> {
+        self.successors[left_node_node_id.into_usize()]
+    }
+
+    /// Executes a new primal iteration.
+    pub fn update(
+        &mut self,
+        mut path_end: G::RightNodeId,
+        augmenting_path: &AugmentingAlternatingPath<G>,
+    ) {
+        loop {
+            let predecessor = augmenting_path.predecessor(path_end).expect(
+                "The predecessor of the path end should always be defined when updating the assignment.",
+            );
+            self.successors[predecessor.into_usize()] = Some(path_end);
+            self.predecessors[path_end.into_usize()] = Some(predecessor);
+            self.number_of_assigned_nodes += 1;
+
+            match augmenting_path.successor(predecessor).expect(
+                "The successor of the predecessor should always be defined when updating the assignment.",
+            ) {
+                SuccessorMarker::Successor(successor) => {
+                    path_end = successor;
+                    self.number_of_assigned_nodes -= 1;
+                }
+                SuccessorMarker::Source => {
+                    break;
+                }
+            }
+        }
+    }
+}

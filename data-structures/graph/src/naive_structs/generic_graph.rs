@@ -1,55 +1,62 @@
-//! Simple generic graph implementation.
+//! Submodule providing a naively implemented generic Monoparted Graph.
 
+use algebra::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
+
+use super::generic_monoplex_monopartite_graph_builder::MonoplexMonopartiteGraphBuilderError;
 use crate::{
-    errors::builder::graph::GraphBuilderError,
-    traits::{BidirectionalVocabulary, Edges, Graph, Vocabulary, VocabularyRef},
+    errors::MonopartiteError,
+    traits::{
+        BidirectionalVocabulary, Edges, Graph, MonopartiteGraph, MonoplexGraph, Vocabulary,
+        VocabularyRef,
+    },
 };
 
-/// A generic graph.
-pub struct GenericGraph<Sources, Destinations, Edges> {
-    /// The sources of the graph.
-    sources: Sources,
-    /// The destinations of the graph.
-    destinations: Destinations,
+/// Struct representing a generic graph.
+pub struct GenericGraph<Nodes, Edges> {
+    /// The nodes of the graph.
+    nodes: Nodes,
     /// The edges of the graph.
     edges: Edges,
 }
 
-impl<S, D, E> TryFrom<(S, D, E)> for GenericGraph<S, D, E>
-where
-    Self: Graph,
-{
-    type Error = GraphBuilderError<GenericGraph<S, D, E>>;
+impl<Nodes, Edges> TryFrom<(Nodes, Edges)> for GenericGraph<Nodes, Edges> {
+    type Error = MonoplexMonopartiteGraphBuilderError;
 
-    fn try_from((sources, destinations, edges): (S, D, E)) -> Result<Self, Self::Error> {
-        // TODO! CHECK COMPATIBILITY!
-        Ok(Self { sources, destinations, edges })
+    fn try_from((nodes, edges): (Nodes, Edges)) -> Result<Self, Self::Error> {
+        Ok(Self { nodes, edges })
     }
 }
 
-impl<S, D, E> Graph for GenericGraph<S, D, E>
+impl<Nodes, Edges> Graph for GenericGraph<Nodes, Edges>
 where
-    S: BidirectionalVocabulary + VocabularyRef + Vocabulary<SourceSymbol = E::SourceNodeId>,
-    D: BidirectionalVocabulary + VocabularyRef + Vocabulary<SourceSymbol = E::DestinationNodeId>,
+    Nodes: Vocabulary,
+{
+    fn is_empty(&self) -> bool {
+        self.nodes.is_empty()
+    }
+}
+
+impl<Nodes, Edges> MonopartiteGraph for GenericGraph<Nodes, Edges>
+where
+    Nodes: VocabularyRef + BidirectionalVocabulary,
+    Nodes::SourceSymbol: PositiveInteger + IntoUsize + TryFromUsize,
+{
+    type NodeId = Nodes::SourceSymbol;
+    type NodeSymbol = Nodes::DestinationSymbol;
+    type Nodes = Nodes;
+
+    fn nodes_vocabulary(&self) -> &Self::Nodes {
+        &self.nodes
+    }
+}
+
+impl<Nodes, E> MonoplexGraph for GenericGraph<Nodes, E>
+where
+    Nodes: Vocabulary,
     E: Edges,
 {
-    type SourceNodeId = E::SourceNodeId;
-    type DestinationNodeId = E::DestinationNodeId;
-    type SourceNodeSymbol = S::DestinationSymbol;
-    type DestinationNodeSymbol = D::DestinationSymbol;
-    type Sources = S;
-    type Destinations = D;
-    type Edges = E;
-    type EdgeId = E::EdgeId;
     type Edge = E::Edge;
-
-    fn source_vocabulary(&self) -> &Self::Sources {
-        &self.sources
-    }
-
-    fn destination_vocabulary(&self) -> &Self::Destinations {
-        &self.destinations
-    }
+    type Edges = E;
 
     fn edges(&self) -> &Self::Edges {
         &self.edges

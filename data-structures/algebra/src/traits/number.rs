@@ -17,6 +17,7 @@ pub trait Number:
     + Zero
     + Bounded
     + Serde
+    + core::iter::Sum
     + core::ops::Add<Output = Self>
     + core::ops::Sub<Output = Self>
     + core::ops::Mul<Output = Self>

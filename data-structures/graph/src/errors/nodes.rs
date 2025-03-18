@@ -1,26 +1,26 @@
 //! Submodule defining common errors relative to nodes.
 
-use crate::traits::Graph;
+use crate::traits::{MonopartiteGraph, Vocabulary};
 
 /// Error enumeration relative to nodes.
 #[derive(Clone, PartialEq, Eq)]
-pub enum NodeError<G: Graph + ?Sized> {
+pub enum NodeError<V: Vocabulary> {
     /// The node does not exist.
-    UnknownSourceNodeId(G::SourceNodeId),
+    UnknownNodeId(V::SourceSymbol),
     /// The node symbol does not exist.
-    UnknownNodeSymbol(G::SourceNodeSymbol),
+    UnknownNodeSymbol(V::DestinationSymbol),
 }
 
-impl<G: Graph + ?Sized> core::fmt::Debug for NodeError<G> {
+impl<V: Vocabulary> core::fmt::Debug for NodeError<V> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         <Self as core::fmt::Display>::fmt(self, f)
     }
 }
 
-impl<G: Graph + ?Sized> core::fmt::Display for NodeError<G> {
+impl<V: Vocabulary> core::fmt::Display for NodeError<V> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            NodeError::UnknownSourceNodeId(id) => {
+            NodeError::UnknownNodeId(id) => {
                 write!(f, "The node with id {id:?} does not exist.")
             }
             NodeError::UnknownNodeSymbol(symbol) => {
@@ -30,10 +30,10 @@ impl<G: Graph + ?Sized> core::fmt::Display for NodeError<G> {
     }
 }
 
-impl<G: Graph> core::error::Error for NodeError<G> {}
+impl<V: Vocabulary> core::error::Error for NodeError<V> {}
 
-impl<G: Graph> From<NodeError<G>> for super::Error<G> {
-    fn from(error: NodeError<G>) -> Self {
-        super::Error::NodeError(error)
+impl<G: MonopartiteGraph> From<NodeError<G::Nodes>> for super::MonopartiteError<G> {
+    fn from(error: NodeError<G::Nodes>) -> Self {
+        super::MonopartiteError::NodeError(error)
     }
 }
