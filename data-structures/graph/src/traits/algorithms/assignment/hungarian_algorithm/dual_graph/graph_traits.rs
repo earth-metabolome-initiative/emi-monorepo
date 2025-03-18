@@ -5,8 +5,12 @@ use super::{Dual, DualEdges};
 use crate::traits::{BipartiteGraph, BipartiteWeightedMonoplexGraph, Graph, MonoplexGraph};
 
 impl<G: BipartiteWeightedMonoplexGraph + ?Sized> Graph for Dual<'_, G> {
-    fn is_empty(&self) -> bool {
-        self.graph.is_empty()
+    fn has_edges(&self) -> bool {
+        self.graph.has_edges()
+    }
+
+    fn has_nodes(&self) -> bool {
+        self.graph.has_nodes()
     }
 }
 impl<G: BipartiteWeightedMonoplexGraph + ?Sized> BipartiteGraph for Dual<'_, G> {
