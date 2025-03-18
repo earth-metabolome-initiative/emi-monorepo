@@ -1,6 +1,8 @@
 //! Submodule providing the structs to represent the state of the partial
 //! assignment in the context of the Hungarian algorithm.
 
+use std::collections::HashMap;
+
 use algebra::prelude::{IntoUsize, Zero};
 
 use super::{augmenting_alternating_path::SuccessorMarker, AugmentingAlternatingPath, Dual};
@@ -8,13 +10,30 @@ use crate::traits::{
     BipartiteGraph, BipartiteWeightedMonoplexGraph, MonoplexGraph, WeightedMonoplexGraph,
 };
 
-pub(super) struct PartialAssignment<G: BipartiteWeightedMonoplexGraph + ?Sized> {
+pub struct PartialAssignment<G: BipartiteWeightedMonoplexGraph + ?Sized> {
     /// The left nodes assigned to the right nodes.
     pub(super) successors: Vec<Option<G::RightNodeId>>,
     /// The right nodes assigned to the left nodes.
     pub(super) predecessors: Vec<Option<G::LeftNodeId>>,
     /// The number of assigned nodes.
     pub(super) number_of_assigned_nodes: usize,
+}
+
+impl<G: BipartiteWeightedMonoplexGraph + ?Sized, S: core::hash::BuildHasher + Default> From<PartialAssignment<G>>
+    for HashMap<G::LeftNodeId, (G::RightNodeId, G::Weight), S>
+{
+    fn from(value: PartialAssignment<G>) -> Self {
+        let mut map = HashMap::default();
+        value.successors.iter().flatten().for_each(|right_node_id| {
+            map.insert(
+                value.predecessors[right_node_id.into_usize()].expect(
+                    "The predecessor of the right node should always be defined when converting a partial assignment to a HashMap.",
+                ),
+                (*right_node_id, G::Weight::ZERO),
+            );
+        });
+        map
+    }
 }
 
 impl<'graph, G: BipartiteWeightedMonoplexGraph + ?Sized> From<&Dual<'graph, G>>
@@ -96,7 +115,7 @@ impl<G: BipartiteWeightedMonoplexGraph + ?Sized> PartialAssignment<G> {
     }
 
     /// Executes a new primal iteration.
-    pub fn update(
+    pub(super) fn update(
         &mut self,
         mut path_end: G::RightNodeId,
         augmenting_path: &AugmentingAlternatingPath<G>,

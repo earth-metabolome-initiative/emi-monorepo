@@ -1,7 +1,7 @@
 //! Trait defining a bidimensional matrix.
 
 use super::SquareMatrix;
-use crate::traits::{IntoUsize, Matrix, PositiveInteger, SparseMatrix};
+use crate::{impls::ranged::SimpleRanged, traits::{IntoUsize, Zero, Matrix, PositiveInteger, SparseMatrix}};
 
 /// Trait defining a bidimensional matrix.
 pub trait Matrix2D:
@@ -17,6 +17,16 @@ pub trait Matrix2D:
 
     /// Returns the number of columns of the matrix.
     fn number_of_columns(&self) -> Self::ColumnIndex;
+
+    /// Returns an iterator over the rows of the matrix.
+    fn row_indices(&self) -> SimpleRanged<Self::RowIndex> {
+        SimpleRanged::new(Self::RowIndex::ZERO, self.number_of_rows())
+    }
+
+    /// Returns an iterator over the columns of the matrix.
+    fn column_indices(&self) -> SimpleRanged<Self::ColumnIndex> {
+        SimpleRanged::new(Self::ColumnIndex::ZERO, self.number_of_columns())
+    }
 }
 
 impl<M: Matrix2D> Matrix for M {

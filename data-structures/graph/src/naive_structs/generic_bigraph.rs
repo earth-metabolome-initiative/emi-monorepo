@@ -17,6 +17,21 @@ pub struct GenericBiGraph<LeftNodes, RightNodes, Edges> {
     edges: Edges,
 }
 
+impl<LeftNodes, RightNodes, Edges> core::fmt::Debug for GenericBiGraph<LeftNodes, RightNodes, Edges>
+where
+    LeftNodes: core::fmt::Debug,
+    RightNodes: core::fmt::Debug,
+    Edges: core::fmt::Debug,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("GenericBiGraph")
+            .field("left_nodes", &self.left_nodes)
+            .field("right_nodes", &self.right_nodes)
+            .field("edges", &self.edges)
+            .finish()
+    }
+}
+
 impl<LeftNodes, RightNodes, Edges> TryFrom<(LeftNodes, RightNodes, Edges)>
     for GenericBiGraph<LeftNodes, RightNodes, Edges>
 {
@@ -48,9 +63,14 @@ impl<LeftNodes, RightNodes, E> Graph for GenericBiGraph<LeftNodes, RightNodes, E
 where
     LeftNodes: Vocabulary,
     RightNodes: Vocabulary,
+    E: Edges<SourceNodeId = LeftNodes::SourceSymbol, DestinationNodeId = RightNodes::SourceSymbol>,
 {
-    fn is_empty(&self) -> bool {
-        self.left_nodes.is_empty() && self.right_nodes.is_empty()
+    fn has_edges(&self) -> bool {
+        self.edges.has_edges()
+    }
+
+    fn has_nodes(&self) -> bool {
+        !self.left_nodes.is_empty() && !self.right_nodes.is_empty()
     }
 }
 
@@ -60,6 +80,7 @@ where
     RightNodes: Vocabulary + VocabularyRef + BidirectionalVocabulary,
     LeftNodes::SourceSymbol: PositiveInteger + IntoUsize + TryFromUsize,
     RightNodes::SourceSymbol: PositiveInteger + IntoUsize + TryFromUsize,
+    E: Edges<SourceNodeId = LeftNodes::SourceSymbol, DestinationNodeId = RightNodes::SourceSymbol>,
 {
     type LeftNodeId = LeftNodes::SourceSymbol;
     type RightNodeId = RightNodes::SourceSymbol;
@@ -79,7 +100,7 @@ where
 
 impl<LeftNodes, RightNodes, E> MonoplexGraph for GenericBiGraph<LeftNodes, RightNodes, E>
 where
-    E: Edges,
+    E: Edges<SourceNodeId = LeftNodes::SourceSymbol, DestinationNodeId = RightNodes::SourceSymbol>,
     LeftNodes: Vocabulary,
     RightNodes: Vocabulary,
 {
