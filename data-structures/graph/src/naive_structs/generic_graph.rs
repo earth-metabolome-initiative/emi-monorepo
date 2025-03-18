@@ -3,12 +3,9 @@
 use algebra::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use super::generic_monoplex_monopartite_graph_builder::MonoplexMonopartiteGraphBuilderError;
-use crate::{
-    errors::MonopartiteError,
-    traits::{
-        BidirectionalVocabulary, Edges, Graph, MonopartiteGraph, MonoplexGraph, Vocabulary,
-        VocabularyRef,
-    },
+use crate::traits::{
+    BidirectionalVocabulary, Edges, Graph, MonopartiteGraph, MonoplexGraph, Vocabulary,
+    VocabularyRef,
 };
 
 /// Struct representing a generic graph.
@@ -17,6 +14,16 @@ pub struct GenericGraph<Nodes, Edges> {
     nodes: Nodes,
     /// The edges of the graph.
     edges: Edges,
+}
+
+impl<Nodes, Edges> Default for GenericGraph<Nodes, Edges>
+where
+    Nodes: Default,
+    Edges: Default,
+{
+    fn default() -> Self {
+        Self { nodes: Nodes::default(), edges: Edges::default() }
+    }
 }
 
 impl<Nodes, Edges> TryFrom<(Nodes, Edges)> for GenericGraph<Nodes, Edges> {
