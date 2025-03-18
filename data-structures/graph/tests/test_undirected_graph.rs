@@ -21,8 +21,11 @@ pub fn test_undirected_graph() {
         .edges(edges.into_iter())
         .build()
         .unwrap();
-    let graph: UndiGraph<usize> =
-        GenericDirectionalGraphBuilder::default().nodes(nodes).edges(edges).build().unwrap();
+    let graph: UndiGraph<usize> = GenericMonoplexMonopartiteGraphBuilder::default()
+        .nodes(nodes)
+        .edges(edges)
+        .build()
+        .unwrap();
 
     assert_eq!(graph.number_of_nodes(), 6);
     assert_eq!(graph.number_of_edges(), 10);

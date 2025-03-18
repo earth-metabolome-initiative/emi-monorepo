@@ -10,6 +10,8 @@ pub mod csr2d_view;
 pub use csr2d_view::CSR2DView;
 pub mod csr2d_rows;
 pub use csr2d_rows::CSR2DRows;
+pub mod csr2d_columns;
+pub use csr2d_columns::CSR2DColumns;
 pub mod error;
 pub use error::*;
 pub mod symmetric_csr2d;

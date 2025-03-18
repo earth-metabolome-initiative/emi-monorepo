@@ -4,8 +4,8 @@ use super::EdgesBuilder;
 use crate::traits::DirectedEdges;
 
 /// Trait for Options for building edges.
-pub trait DirectedEdgesBuilder:
-    EdgesBuilder<Edges = <Self as DirectedEdgesBuilder>::DirectedEdges>
+pub trait DirectedMonopartiteEdgesBuilder:
+    EdgesBuilder<Edges = <Self as DirectedMonopartiteEdgesBuilder>::DirectedEdges>
 {
     /// The type of the edges being built.
     type DirectedEdges: DirectedEdges;

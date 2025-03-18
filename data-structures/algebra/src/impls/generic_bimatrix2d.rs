@@ -5,14 +5,18 @@ use crate::prelude::*;
 
 /// [`BiMatrix`] data structure, which provides a wrapper to a matrix and its
 /// transposed version.
-pub struct GenericBiMatrix2D<M: TransposableMatrix2D> {
+pub struct GenericBiMatrix2D<M, T> {
     /// The matrix.
     matrix: M,
     /// The transposed matrix.
-    transposed: M::Transposed,
+    transposed: T,
 }
 
-impl<M: TransposableMatrix2D> GenericBiMatrix2D<M> {
+impl<
+        T: Matrix2D,
+        M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
+    > GenericBiMatrix2D<M, T>
+{
     /// Creates a new instance of `GenericBiMatrix2D`.
     ///
     /// # Arguments
@@ -24,10 +28,10 @@ impl<M: TransposableMatrix2D> GenericBiMatrix2D<M> {
     }
 }
 
-impl<M> Matrix2D for GenericBiMatrix2D<M>
+impl<M, T> Matrix2D for GenericBiMatrix2D<M, T>
 where
-    M: TransposableMatrix2D,
-    M: Matrix2D,
+    T: Matrix2D,
+    M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
 {
     type ColumnIndex = M::ColumnIndex;
     type RowIndex = M::RowIndex;
@@ -41,9 +45,10 @@ where
     }
 }
 
-impl<M> SparseMatrix for GenericBiMatrix2D<M>
+impl<M, T> SparseMatrix for GenericBiMatrix2D<M, T>
 where
-    M: TransposableMatrix2D,
+    T: Matrix2D,
+    M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
     M: SparseMatrix,
 {
     type SparseIndex = M::SparseIndex;
@@ -61,9 +66,10 @@ where
     }
 }
 
-impl<M> SparseMatrix2D for GenericBiMatrix2D<M>
+impl<M, T> SparseMatrix2D for GenericBiMatrix2D<M, T>
 where
-    M: TransposableMatrix2D,
+    T: Matrix2D,
+    M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
     M: SparseMatrix2D,
 {
     type SparseRow<'a>
@@ -108,31 +114,29 @@ where
     }
 }
 
-impl<M> TransposableMatrix2D for GenericBiMatrix2D<M>
+impl<T, M> TransposableMatrix2D<T> for GenericBiMatrix2D<M, T>
 where
-    M: TransposableMatrix2D,
-    M::Transposed: Clone,
+    T: Matrix2D + Clone,
+    M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
 {
-    /// The type of the transposed matrix.
-    type Transposed = M::Transposed;
-
-    fn transpose(&self) -> Self::Transposed {
+    fn transpose(&self) -> T {
         self.transposed.clone()
     }
 }
 
-impl<M> crate::traits::BiMatrix2D for GenericBiMatrix2D<M>
+impl<T, M> crate::traits::BiMatrix2D for GenericBiMatrix2D<M, T>
 where
-    M: TransposableMatrix2D + SparseMatrix2D,
+    T: Matrix2D + Clone,
+    M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex> + SparseMatrix2D,
 {
     type Matrix = M;
-    type TransposedMatrix = M::Transposed;
+    type TransposedMatrix = T;
 
     fn matrix(&self) -> &Self::Matrix {
         &self.matrix
     }
 
-    fn transposed(&self) -> &<Self::Matrix as TransposableMatrix2D>::Transposed {
+    fn transposed(&self) -> &T {
         &self.transposed
     }
 }

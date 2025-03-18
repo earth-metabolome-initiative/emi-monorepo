@@ -146,14 +146,12 @@ where
 }
 
 impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize>
-    TransposableMatrix2D for SymmetricCSR2D<SparseIndex, Idx>
+    TransposableMatrix2D<Self> for SymmetricCSR2D<SparseIndex, Idx>
 where
     Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
     SquareCSR2D<SparseIndex, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
 {
-    type Transposed = Self;
-
-    fn transpose(&self) -> Self::Transposed {
+    fn transpose(&self) -> Self {
         self.clone()
     }
 }

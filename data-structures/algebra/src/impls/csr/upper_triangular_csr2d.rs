@@ -161,18 +161,13 @@ where
 impl<
         SparseIndex: PositiveInteger + IntoUsize,
         Idx: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
-    > TransposableMatrix2D for UpperTriangularCSR2D<SparseIndex, Idx>
+    > TransposableMatrix2D<SquareCSR2D<SparseIndex, Idx>> for UpperTriangularCSR2D<SparseIndex, Idx>
 where
     Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-    SquareCSR2D<SparseIndex, Idx>: TransposableMatrix2D<
-        RowIndex = Idx,
-        ColumnIndex = Idx,
-        Transposed = SquareCSR2D<SparseIndex, Idx>,
-    >,
+    SquareCSR2D<SparseIndex, Idx>:
+        TransposableMatrix2D<SquareCSR2D<SparseIndex, Idx>, RowIndex = Idx, ColumnIndex = Idx>,
 {
-    type Transposed = SquareCSR2D<SparseIndex, Idx>;
-
-    fn transpose(&self) -> Self::Transposed {
+    fn transpose(&self) -> SquareCSR2D<SparseIndex, Idx> {
         self.csr.transpose()
     }
 }
