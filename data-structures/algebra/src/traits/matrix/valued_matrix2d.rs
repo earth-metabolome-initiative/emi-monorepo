@@ -107,7 +107,7 @@ pub trait ValuedSparseMatrix2D: SparseMatrix2D + ValuedMatrix2D + SparseValuedMa
     where
         Self::Value: TotalOrd,
     {
-        self.sparse_rows().map(move |row| self.sparse_row_max_value(row))
+        self.row_indices().map(move |row| self.sparse_row_max_value(row))
     }
 
     /// Returns an iterator over the minimum values of the rows.
@@ -120,7 +120,7 @@ pub trait ValuedSparseMatrix2D: SparseMatrix2D + ValuedMatrix2D + SparseValuedMa
     where
         Self::Value: TotalOrd,
     {
-        self.sparse_rows().map(move |row| self.sparse_row_min_value(row))
+        self.row_indices().map(move |row| self.sparse_row_min_value(row))
     }
 }
 

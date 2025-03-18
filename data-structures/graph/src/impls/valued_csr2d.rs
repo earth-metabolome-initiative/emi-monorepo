@@ -1,4 +1,4 @@
-//! Submodule implementing Edges for ValuedCSR2D.
+//! Submodule implementing Edges for [`ValuedCSR2D`](algebra::prelude::ValuedCSR2D).
 
 use algebra::prelude::*;
 
@@ -10,10 +10,8 @@ impl<
         ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
         Value: Number,
     > Edges for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
-where
-    Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
-    type Edge = (<Self as Matrix2D>::RowIndex, <Self as Matrix2D>::ColumnIndex, Value);
+    type Edge = (RowIndex, ColumnIndex, Value);
     type SourceNodeId = RowIndex;
     type DestinationNodeId = ColumnIndex;
     type EdgeId = SparseIndex;
@@ -27,14 +25,9 @@ where
 impl<
         SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
         RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
+        ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + From<SparseIndex>,
         Value: Number,
     > GrowableEdges for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
-where
-    Self: SparseMatrixMut<SparseIndex = SparseIndex>
-        + MatrixMut<Entry = (RowIndex, ColumnIndex, Value)>
-        + Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
-    EdgesBuilderError<Self>: From<<Self as MatrixMut>::Error>,
 {
     type GrowableMatrix = Self;
     type Error = EdgesBuilderError<Self>;

@@ -26,6 +26,19 @@ where
     }
 }
 
+impl<Nodes, Edges> core::fmt::Debug for GenericGraph<Nodes, Edges>
+where
+    Nodes: core::fmt::Debug,
+    Edges: core::fmt::Debug,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("GenericGraph")
+            .field("nodes", &self.nodes)
+            .field("edges", &self.edges)
+            .finish()
+    }
+}
+
 impl<Nodes, Edges> TryFrom<(Nodes, Edges)> for GenericGraph<Nodes, Edges> {
     type Error = MonoplexMonopartiteGraphBuilderError;
 
@@ -34,19 +47,25 @@ impl<Nodes, Edges> TryFrom<(Nodes, Edges)> for GenericGraph<Nodes, Edges> {
     }
 }
 
-impl<Nodes, Edges> Graph for GenericGraph<Nodes, Edges>
+impl<Nodes, E> Graph for GenericGraph<Nodes, E>
 where
     Nodes: Vocabulary,
+    E: Edges<SourceNodeId = Nodes::SourceSymbol, DestinationNodeId = Nodes::SourceSymbol>,
 {
-    fn is_empty(&self) -> bool {
-        self.nodes.is_empty()
+    fn has_edges(&self) -> bool {
+        self.edges.has_edges()
+    }
+
+    fn has_nodes(&self) -> bool {
+        !self.nodes.is_empty()
     }
 }
 
-impl<Nodes, Edges> MonopartiteGraph for GenericGraph<Nodes, Edges>
+impl<Nodes, E> MonopartiteGraph for GenericGraph<Nodes, E>
 where
     Nodes: VocabularyRef + BidirectionalVocabulary,
     Nodes::SourceSymbol: PositiveInteger + IntoUsize + TryFromUsize,
+    E: Edges<SourceNodeId = Nodes::SourceSymbol, DestinationNodeId = Nodes::SourceSymbol>,
 {
     type NodeId = Nodes::SourceSymbol;
     type NodeSymbol = Nodes::DestinationSymbol;
@@ -60,7 +79,7 @@ where
 impl<Nodes, E> MonoplexGraph for GenericGraph<Nodes, E>
 where
     Nodes: Vocabulary,
-    E: Edges,
+    E: Edges<SourceNodeId = Nodes::SourceSymbol, DestinationNodeId = Nodes::SourceSymbol>,
 {
     type Edge = E::Edge;
     type Edges = E;

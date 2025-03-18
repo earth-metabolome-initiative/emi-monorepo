@@ -34,6 +34,11 @@ pub trait Edges {
         self.matrix().number_of_defined_values()
     }
 
+    /// Returns whether the graph has any edges.
+    fn has_edges(&self) -> bool {
+        !self.matrix().is_empty()
+    }
+
     /// Returns the successors of the node with the given identifier.
     ///
     /// # Arguments
