@@ -2,6 +2,8 @@
 
 pub mod csr2d;
 pub use csr2d::CSR2D;
+pub mod valued_csr2d;
+pub use valued_csr2d::ValuedCSR2D;
 pub mod upper_triangular_csr2d;
 pub use upper_triangular_csr2d::UpperTriangularCSR2D;
 pub mod square_csr2d;
