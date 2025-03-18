@@ -36,7 +36,19 @@ pub struct HungarianAssignment<'graph, G: BipartiteWeightedMonoplexGraph + ?Size
     /// The cost of the assignment.
     cost: G::Weight,
     /// The assignment itself.
-    assignment: Vec<(G::LeftNodeId, G::RightNodeId)>,
+    assignments: Vec<(G::LeftNodeId, G::RightNodeId)>,
+}
+
+impl<G: BipartiteWeightedMonoplexGraph + ?Sized> HungarianAssignment<'_, G> {
+    /// Return the cost of the assignment.
+    pub fn cost(&self) -> G::Weight {
+        self.cost
+    }
+
+    /// Return the assignments.
+    pub fn assignments(&self) -> &[(G::LeftNodeId, G::RightNodeId)] {
+        &self.assignments
+    }
 }
 
 /// Trait providing an implementation of the Hungarian algorithm.
@@ -48,7 +60,7 @@ pub trait HungarianAlgorithm: BipartiteWeightedMonoplexGraph {
             return Ok(HungarianAssignment {
                 graph: self,
                 cost: Self::Weight::ZERO,
-                assignment: vec![],
+                assignments: vec![],
             });
         }
 
@@ -68,7 +80,9 @@ pub trait HungarianAlgorithm: BipartiteWeightedMonoplexGraph {
             let path_end: Self::RightNodeId = 'external: loop {
                 while augmenting_path.has_unpropagated_labels() {
                     // We propagate the labels.
-                    if let Some(path_end) = augmenting_path.propagate_labels(&partial_assignment, &dual) {
+                    if let Some(path_end) =
+                        augmenting_path.propagate_labels(&partial_assignment, &dual)
+                    {
                         break 'external path_end;
                     }
                 }
@@ -80,6 +94,8 @@ pub trait HungarianAlgorithm: BipartiteWeightedMonoplexGraph {
             partial_assignment.update(path_end, &augmenting_path);
         }
 
-        Ok(HungarianAssignment { graph: self, cost: Self::Weight::ZERO, assignment: vec![] })
+        Ok(HungarianAssignment { graph: self, cost: Self::Weight::ZERO, assignments: vec![] })
     }
 }
+
+impl<G: BipartiteWeightedMonoplexGraph + ?Sized> HungarianAlgorithm for G {}

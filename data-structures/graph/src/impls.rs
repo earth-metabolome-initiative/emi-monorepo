@@ -16,6 +16,8 @@ mod tuple;
 #[cfg(any(feature = "std", feature = "alloc"))]
 mod csr2d;
 #[cfg(any(feature = "std", feature = "alloc"))]
+mod valued_csr2d;
+#[cfg(any(feature = "std", feature = "alloc"))]
 mod squared_csr2d;
 #[cfg(any(feature = "std", feature = "alloc"))]
 mod symmetric_csr;
