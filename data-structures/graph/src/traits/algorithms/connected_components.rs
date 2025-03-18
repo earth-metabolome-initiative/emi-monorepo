@@ -2,10 +2,10 @@
 
 use algebra::prelude::*;
 
-use crate::traits::{Graph, UndirectedGraph};
+use crate::traits::{MonopartiteGraph, UndirectedMonopartiteMonoplexGraph};
 
 /// Connected components object.
-pub struct ConnectedComponentsResult<'a, G: UndirectedGraph + ?Sized, Marker = usize> {
+pub struct ConnectedComponentsResult<'a, G: UndirectedMonopartiteMonoplexGraph + ?Sized, Marker = usize> {
     /// Identifiers of the connected components.
     component_identifiers: Vec<Marker>,
     /// Underlying graph.
@@ -18,7 +18,8 @@ pub struct ConnectedComponentsResult<'a, G: UndirectedGraph + ?Sized, Marker = u
     smallest_component_size: G::NodeId,
 }
 
-impl<G: UndirectedGraph + ?Sized, Marker: PositiveInteger> ConnectedComponentsResult<'_, G, Marker>
+impl<G: UndirectedMonopartiteMonoplexGraph + ?Sized, Marker: PositiveInteger>
+    ConnectedComponentsResult<'_, G, Marker>
 where
     G::NodeId: IntoUsize,
 {
@@ -90,17 +91,19 @@ impl std::fmt::Display for ConnectedComponentsError {
     }
 }
 
-impl From<ConnectedComponentsError> for crate::errors::algorithms::AlgorithmError {
+impl From<ConnectedComponentsError>
+    for crate::errors::monopartite_graph_error::algorithms::MonopartiteAlgorithmError
+{
     fn from(error: ConnectedComponentsError) -> Self {
-        crate::errors::algorithms::AlgorithmError::ConnectedComponentsError(error)
+        Self::ConnectedComponentsError(error)
     }
 }
 
-impl<G: Graph + ?Sized> From<ConnectedComponentsError> for crate::errors::Error<G> {
+impl<G: MonopartiteGraph + ?Sized> From<ConnectedComponentsError>
+    for crate::errors::MonopartiteError<G>
+{
     fn from(error: ConnectedComponentsError) -> Self {
-        crate::errors::Error::AlgorithmError(
-            crate::errors::algorithms::AlgorithmError::ConnectedComponentsError(error),
-        )
+        Self::AlgorithmError(error.into())
     }
 }
 
@@ -114,7 +117,7 @@ impl<G: Graph + ?Sized> From<ConnectedComponentsError> for crate::errors::Error<
 ///   which are expected to be strongly connected, choosing a smaller integer
 ///   type may save a significant amount of memory.
 pub trait ConnectedComponents<Marker: IntoUsize + PositiveInteger = usize>:
-    UndirectedGraph
+    UndirectedMonopartiteMonoplexGraph
 {
     /// Returns the number of connected components in the graph.
     ///
@@ -125,15 +128,16 @@ pub trait ConnectedComponents<Marker: IntoUsize + PositiveInteger = usize>:
     /// * If the graph has too many nodes.
     fn connected_components(
         &self,
-    ) -> Result<ConnectedComponentsResult<'_, Self, Marker>, crate::errors::Error<Self>> {
+    ) -> Result<ConnectedComponentsResult<'_, Self, Marker>, crate::errors::MonopartiteError<Self>>
+    {
         let mut component_identifiers: Vec<Marker> =
             vec![Marker::MAX; self.number_of_nodes().into_usize()];
         let mut number_of_components: Marker = Marker::ZERO;
         let mut largest_component_size: Self::NodeId = Self::NodeId::ZERO;
         let mut smallest_component_size: Self::NodeId = self.number_of_nodes();
 
-        let mut frontier = Vec::new();
-        let mut temporary_frontier = Vec::new();
+        let mut frontier: Vec<Self::NodeId> = Vec::new();
+        let mut temporary_frontier: Vec<Self::NodeId> = Vec::new();
 
         for node in self.node_ids() {
             // If the node is already marked as part of a component, skip it.
@@ -196,9 +200,7 @@ pub trait ConnectedComponents<Marker: IntoUsize + PositiveInteger = usize>:
     }
 }
 
-impl<G: UndirectedGraph + ?Sized, Marker: IntoUsize + PositiveInteger> ConnectedComponents<Marker>
-    for G
-where
-    Self: UndirectedGraph,
+impl<G: UndirectedMonopartiteMonoplexGraph + ?Sized, Marker: IntoUsize + PositiveInteger>
+    ConnectedComponents<Marker> for G
 {
 }

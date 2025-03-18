@@ -2,100 +2,28 @@
 
 use algebra::prelude::*;
 
-use super::DirectedEdges;
+use super::{DirectedEdges, TransposedEdges};
 
 /// Trait defining the properties of a transposed directed graph.
 pub trait TransposedDirectedEdges:
-    super::DirectedEdges<DirectedMatrix = <Self as TransposedDirectedEdges>::BiMatrix>
+    TransposedEdges<BiMatrix = <Self as TransposedDirectedEdges>::DirectedBiMatrix> + DirectedEdges
 {
     /// The type of matrix required to store the transposed edges.
-    type BiMatrix: SparseBiMatrix2D<
+    type DirectedBiMatrix: SparseBiMatrix2D<
         RowIndex = Self::SourceNodeId,
         ColumnIndex = Self::DestinationNodeId,
     >;
-
-    /// Returns the predecessors of the node with the given identifier.
-    ///
-    /// # Arguments
-    ///
-    /// * `destination` - The identifier of the destination node.
-    fn predecessors(
-        &self,
-        destination: Self::DestinationNodeId,
-    ) -> <<Self::BiMatrix as SparseBiMatrix2D>::SparseTransposedMatrix as SparseMatrix2D>::SparseRow<'_>
-    {
-        self.matrix().sparse_column(destination)
-    }
-
-    /// Returns the inbound degree of the node with the given identifier.
-    ///
-    /// # Arguments
-    ///
-    /// * `destination` - The identifier of the destination node.
-    fn in_degree(&self, destination: Self::DestinationNodeId) -> Self::SourceNodeId {
-        self.matrix().number_of_defined_values_in_column(destination)
-    }
-
-    /// Returns an iterator over the in-boynd degrees of the nodes.
-    fn in_degrees(&self) -> <<Self::BiMatrix as SparseBiMatrix2D>::SparseTransposedMatrix as SparseMatrix2D>::SparseRowSizes<'_>{
-        self.matrix().sparse_column_sizes()
-    }
 }
 
-impl<E: DirectedEdges> TransposedDirectedEdges for E
+impl<E> TransposedDirectedEdges for E
 where
-    E::DirectedMatrix:
-        SparseBiMatrix2D<RowIndex = E::SourceNodeId, ColumnIndex = E::DestinationNodeId>,
+    E: DirectedEdges + TransposedEdges,
+    E::BiMatrix: SparseBiMatrix2D<RowIndex = E::SourceNodeId, ColumnIndex = E::DestinationNodeId>,
 {
-    type BiMatrix = E::DirectedMatrix;
+    type DirectedBiMatrix = E::BiMatrix;
 }
 
 /// Trait defining the properties of a directed graph.
-pub trait TransposedDirectedGraph:
-    super::DirectedGraph<DirectedEdges = <Self as TransposedDirectedGraph>::TransposedDirectedEdges>
-{
-    /// The directed edges of the graph.
-    type TransposedDirectedEdges: TransposedDirectedEdges<
-        SourceNodeId = Self::SourceNodeId,
-        DestinationNodeId = Self::DestinationNodeId,
-        Edge = Self::Edge,
-    >;
+pub trait TransposedDirectedGraph: super::TransposedGraph + super::DirectedGraph {}
 
-    /// Returns the predecessors of the node with the given identifier.
-    ///
-    /// # Arguments
-    ///
-    /// * `destination` - The identifier of the destination node.
-    fn predecessors(
-        &self,
-        destination: Self::DestinationNodeId,
-    ) -> <<<Self::TransposedDirectedEdges as TransposedDirectedEdges>::BiMatrix as SparseBiMatrix2D>::SparseTransposedMatrix as SparseMatrix2D>::SparseRow<'_>{
-        self.edges().predecessors(destination)
-    }
-
-    /// Returns the inbound degree of the node with the given identifier.
-    ///
-    /// # Arguments
-    ///
-    /// * `destination` - The identifier of the destination node.
-    fn in_degree(&self, destination: Self::DestinationNodeId) -> Self::SourceNodeId {
-        self.edges().in_degree(destination)
-    }
-
-    /// Returns an iterator over the in-boynd degrees of the nodes.
-    fn in_degrees(&self) -> <<<Self::TransposedDirectedEdges as TransposedDirectedEdges>::BiMatrix as SparseBiMatrix2D>::SparseTransposedMatrix as SparseMatrix2D>::SparseRowSizes<'_>{
-        self.edges().in_degrees()
-    }
-}
-
-impl<G> TransposedDirectedGraph for G
-where
-    G: super::DirectedGraph,
-    G::DirectedEdges: TransposedDirectedEdges<
-        SourceNodeId = G::SourceNodeId,
-        DestinationNodeId = G::DestinationNodeId,
-        Edge = G::Edge,
-    >,
-{
-    type TransposedDirectedEdges = G::DirectedEdges;
-}
+impl<G> TransposedDirectedGraph for G where G: super::DirectedGraph + super::TransposedGraph {}

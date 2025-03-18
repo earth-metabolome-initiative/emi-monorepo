@@ -58,7 +58,7 @@ pub fn test_symmetric_edges() {
         "The node 5 should have neighbor 4."
     );
     assert_eq!(
-        edges.edges().collect::<Vec<_>>(),
+        edges.sparse_coordinates().collect::<Vec<_>>(),
         vec![
             (1, 2),
             (1, 3),

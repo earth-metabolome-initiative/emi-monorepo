@@ -1,5 +1,5 @@
 //! Submodule providing a definition of a CSR matrix.
-use core::{fmt::Debug, iter::repeat};
+use core::{fmt::Debug, iter::repeat_n};
 
 use crate::prelude::*;
 
@@ -217,10 +217,10 @@ where
         } else if row.into_usize() >= self.offsets.len() - 1 {
             // If the row is the next row, we can add the entry at the end of the column
             // indices.
-            self.offsets.extend(
-                repeat(self.number_of_defined_values())
-                    .take((row.into_usize() + 1) - self.offsets.len()),
-            );
+            self.offsets.extend(repeat_n(
+                self.number_of_defined_values(),
+                (row.into_usize() + 1) - self.offsets.len(),
+            ));
             self.column_indices.push(column);
             self.number_of_columns = self.number_of_columns.max(column + ColumnIndex::ONE);
             self.number_of_rows = self.number_of_rows.max(row + RowIndex::ONE);
@@ -237,17 +237,16 @@ impl<
         SparseIndex: PositiveInteger + IntoUsize,
         RowIndex: PositiveInteger + IntoUsize,
         ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
-    > TransposableMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    > TransposableMatrix2D<CSR2D<SparseIndex, ColumnIndex, RowIndex>>
+    for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
     CSR2D<SparseIndex, ColumnIndex, RowIndex>:
         Matrix2D<RowIndex = ColumnIndex, ColumnIndex = RowIndex>,
 {
-    type Transposed = CSR2D<SparseIndex, ColumnIndex, RowIndex>;
-
-    fn transpose(&self) -> Self::Transposed {
+    fn transpose(&self) -> CSR2D<SparseIndex, ColumnIndex, RowIndex> {
         // We initialize the transposed matrix.
-        let mut transposed: Self::Transposed = Self::Transposed {
+        let mut transposed: CSR2D<SparseIndex, ColumnIndex, RowIndex> = CSR2D {
             offsets: vec![SparseIndex::ZERO; self.number_of_columns().into_usize() + 1],
             number_of_columns: self.number_of_rows(),
             number_of_rows: self.number_of_columns(),

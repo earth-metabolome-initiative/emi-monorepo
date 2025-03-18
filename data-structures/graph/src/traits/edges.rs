@@ -61,7 +61,7 @@ pub trait Edges {
     }
 
     /// Returns the iterator of the edges.
-    fn edges(&self) -> <Self::Matrix as SparseMatrix>::SparseCoordinates<'_> {
+    fn sparse_coordinates(&self) -> <Self::Matrix as SparseMatrix>::SparseCoordinates<'_> {
         self.matrix().sparse_coordinates()
     }
 }
