@@ -3,7 +3,7 @@
 
 use core::fmt::Debug;
 
-use super::CSR2D;
+use super::{MutabilityError, CSR2D};
 use crate::traits::{
     IntoUsize, Matrix, Matrix2D, MatrixMut, One, PositiveInteger, SparseMatrix, SparseMatrix2D,
     SparseMatrixMut, SparseValuedMatrix, ValuedMatrix, ValuedMatrix2D, ValuedSparseMatrix2D, Zero,
@@ -28,7 +28,7 @@ impl<SparseIndex: Zero, RowIndex: Zero, ColumnIndex: Zero, Value> Default
     for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 {
     fn default() -> Self {
-        Self { csr: Default::default(), values: Default::default() }
+        Self { csr: CSR2D::default(), values: Vec::default() }
     }
 }
 
@@ -119,11 +119,14 @@ where
 impl<SparseIndex: Zero, RowIndex: Zero, ColumnIndex: Zero, Value> MatrixMut
     for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 where
-    CSR2D<SparseIndex, RowIndex, ColumnIndex>: MatrixMut<Entry = (RowIndex, ColumnIndex)>
+    CSR2D<SparseIndex, RowIndex, ColumnIndex>: MatrixMut<
+        Entry = (RowIndex, ColumnIndex),
+        Error = MutabilityError<CSR2D<SparseIndex, RowIndex, ColumnIndex>>,
+    >
         + Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
     type Entry = (RowIndex, ColumnIndex, Value);
-    type Error = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as MatrixMut>::Error;
+    type Error = MutabilityError<Self>;
 
     fn add(&mut self, (row, column, value): Self::Entry) -> Result<(), Self::Error> {
         self.csr.add((row, column))?;
@@ -141,7 +144,7 @@ impl<
 where
     CSR2D<SparseIndex, RowIndex, ColumnIndex>: SparseMatrixMut
         + Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>
-        + MatrixMut<Entry = (RowIndex, ColumnIndex)>,
+        + MatrixMut<Entry = (RowIndex, ColumnIndex), Error = MutabilityError<CSR2D<SparseIndex, RowIndex, ColumnIndex>>>,
 {
     type MinimalShape =
         <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SparseMatrixMut>::MinimalShape;

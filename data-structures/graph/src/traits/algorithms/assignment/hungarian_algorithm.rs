@@ -1,8 +1,6 @@
 //! Submodule providing a trait providing an implementation of the Hungarian
 //! algorithm.
 
-use algebra::prelude::Zero;
-
 use crate::traits::BipartiteWeightedMonoplexGraph;
 
 mod augmenting_alternating_path;
@@ -13,55 +11,43 @@ use augmenting_alternating_path::AugmentingAlternatingPath;
 use dual_graph::Dual;
 use partial_assignment::PartialAssignment;
 
+use super::Assignment;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// Errors that may occur when executing the Hungarian algorithm.
 pub enum HungarianAlgorithmError {
-    /// Temporary entry in the error enum.
-    N,
+    /// Error that occurs when the graph has no edges.
+    NoEdges,
 }
 
 impl core::fmt::Display for HungarianAlgorithmError {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            HungarianAlgorithmError::N => write!(f, "N"),
+            HungarianAlgorithmError::NoEdges => write!(f, "The graph has no edges."),
         }
     }
 }
 
-/// Struct representing the resulting assignment of the Hungarian algorithm.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct HungarianAssignment<'graph, G: BipartiteWeightedMonoplexGraph + ?Sized> {
-    /// The associated graph.
-    graph: &'graph G,
-    /// The cost of the assignment.
-    cost: G::Weight,
-    /// The assignment itself.
-    assignments: Vec<(G::LeftNodeId, G::RightNodeId)>,
-}
-
-impl<G: BipartiteWeightedMonoplexGraph + ?Sized> HungarianAssignment<'_, G> {
-    /// Return the cost of the assignment.
-    pub fn cost(&self) -> G::Weight {
-        self.cost
-    }
-
-    /// Return the assignments.
-    pub fn assignments(&self) -> &[(G::LeftNodeId, G::RightNodeId)] {
-        &self.assignments
-    }
-}
-
 /// Trait providing an implementation of the Hungarian algorithm.
-pub trait HungarianAlgorithm: BipartiteWeightedMonoplexGraph {
+pub trait HungarianAlgorithm<A>: BipartiteWeightedMonoplexGraph
+where
+    A: Assignment + From<PartialAssignment<Self>>,
+{
     /// Return the assignment as assigned by the Hungarian algorithm.
-    fn hungarian(&self) -> Result<HungarianAssignment<'_, Self>, HungarianAlgorithmError> {
+    /// 
+    /// # Errors
+    /// 
+    /// * If the graph has no edges, an error is returned.
+    /// 
+    fn hungarian(&self) -> Result<A, HungarianAlgorithmError> {
         // If the graph is empty, we return an empty assignment.
-        if self.is_empty() {
-            return Ok(HungarianAssignment {
-                graph: self,
-                cost: Self::Weight::ZERO,
-                assignments: vec![],
-            });
+        if !self.has_nodes() {
+            return Ok(Default::default());
+        }
+
+        // If the graph has nodes, but no edges, we return an error.
+        if !self.has_edges() {
+            return Err(HungarianAlgorithmError::NoEdges);
         }
 
         // We start by initializing the dual solution.
@@ -94,8 +80,13 @@ pub trait HungarianAlgorithm: BipartiteWeightedMonoplexGraph {
             partial_assignment.update(path_end, &augmenting_path);
         }
 
-        Ok(HungarianAssignment { graph: self, cost: Self::Weight::ZERO, assignments: vec![] })
+        Ok(partial_assignment.into())
     }
 }
 
-impl<G: BipartiteWeightedMonoplexGraph + ?Sized> HungarianAlgorithm for G {}
+impl<A, G> HungarianAlgorithm<A> for G
+where
+    G: BipartiteWeightedMonoplexGraph + ?Sized,
+    A: Assignment + From<PartialAssignment<G>>,
+{
+}

@@ -2,4 +2,4 @@
 
 pub mod connected_components;
 pub use connected_components::ConnectedComponents;
-pub use hungarian_algorithm::HungarianAlgorithm;
+pub use assignment::{HungarianAlgorithm, Assignment};
