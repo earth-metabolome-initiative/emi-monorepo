@@ -14,6 +14,8 @@ pub struct CSR2D<SparseIndex, RowIndex, ColumnIndex> {
     pub(super) number_of_rows: RowIndex,
     /// The column indices.
     pub(super) column_indices: Vec<ColumnIndex>,
+    /// The number of non-empty rows.
+    pub(super) number_of_non_empty_rows: RowIndex,
 }
 
 impl<SparseIndex: Debug, RowIndex: Debug, ColumnIndex: Debug> Debug
@@ -25,6 +27,7 @@ impl<SparseIndex: Debug, RowIndex: Debug, ColumnIndex: Debug> Debug
             .field("number_of_columns", &self.number_of_columns)
             .field("number_of_rows", &self.number_of_rows)
             .field("column_indices", &self.column_indices)
+            .field("number_of_non_empty_rows", &self.number_of_non_empty_rows)
             .finish()
     }
 }
@@ -38,6 +41,7 @@ impl<SparseIndex: Zero, RowIndex: Zero, ColumnIndex: Zero> Default
             number_of_columns: ColumnIndex::ZERO,
             number_of_rows: RowIndex::ZERO,
             column_indices: Vec::new(),
+            number_of_non_empty_rows: RowIndex::ZERO,
         }
     }
 }
@@ -67,6 +71,7 @@ where
             number_of_columns,
             number_of_rows,
             column_indices: Vec::with_capacity(number_of_values.into_usize()),
+            number_of_non_empty_rows: RowIndex::ZERO,
         }
     }
 }
@@ -145,6 +150,14 @@ where
         = CSR2DRowSizes<'a, Self>
     where
         Self: 'a;
+    type EmptyRowIndices<'a>
+        = CSR2DEmptyRowIndices<'a, Self>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a>
+        = CSR2DNonEmptyRowIndices<'a, Self>
+    where
+        Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         let start = self.rank(row).into_usize();
@@ -174,12 +187,27 @@ where
         }
     }
 
-    /// Returns the rank for the provided row.
     fn rank(&self, row: RowIndex) -> SparseIndex {
         if self.offsets.len() <= row.into_usize() && row <= self.number_of_rows() {
             return self.number_of_defined_values();
         }
         self.offsets[row.into_usize()]
+    }
+
+    fn number_of_non_empty_rows(&self) -> Self::RowIndex {
+        self.number_of_non_empty_rows
+    }
+
+    fn number_of_empty_rows(&self) -> Self::RowIndex {
+        self.number_of_rows() - self.number_of_non_empty_rows()
+    }
+
+    fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
+        self.into()
+    }
+
+    fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
+        self.into()
     }
 }
 
@@ -221,6 +249,7 @@ where
                 self.number_of_defined_values(),
                 (row.into_usize() + 1) - self.offsets.len(),
             ));
+            self.number_of_non_empty_rows += RowIndex::ONE;
             self.column_indices.push(column);
             self.number_of_columns = self.number_of_columns.max(column + ColumnIndex::ONE);
             self.number_of_rows = self.number_of_rows.max(row + RowIndex::ONE);
@@ -251,6 +280,7 @@ where
             number_of_columns: self.number_of_rows(),
             number_of_rows: self.number_of_columns(),
             column_indices: vec![RowIndex::ZERO; self.number_of_defined_values().into_usize()],
+            number_of_non_empty_rows: self.number_of_columns(),
         };
 
         // First, we proceed to compute the number of elements in each column.
@@ -262,6 +292,8 @@ where
         let mut prefix_sum = SparseIndex::ZERO;
         for offset in &mut transposed.offsets {
             prefix_sum += *offset;
+            transposed.number_of_non_empty_rows +=
+                if *offset > SparseIndex::ZERO { ColumnIndex::ONE } else { ColumnIndex::ZERO };
             *offset = prefix_sum;
         }
 
