@@ -32,18 +32,36 @@ impl<G: BipartiteWeightedMonoplexGraph + ?Sized> Dual<'_, G> {
     /// # Arguments
     ///
     /// * `left_node_id`: The identifier of the left node.
-    pub fn zero_weight_successors(
+    pub(super) fn zero_weight_successors(
         &self,
         left_node_id: G::LeftNodeId,
     ) -> impl Iterator<Item = G::RightNodeId> + '_ {
         self.edges.zero_weight_successors(left_node_id)
     }
 
+    /// Returns the reconstructed weight for the provided node tuple.
+    pub(super) fn reconstructed_weight(
+        &self,
+        left_node_id: G::LeftNodeId,
+        right_node_id: G::RightNodeId,
+    ) -> Option<G::Weight> {
+        if let (Some(left_node_weight), Some(right_node_weight)) =
+            (self.edges.left_node_weight(left_node_id), self.edges.right_node_weight(right_node_id))
+        {
+            Some(left_node_weight + right_node_weight)
+        } else {
+            None
+        }
+    }
+
     /// Executes an iteration of the dual algorithm.
-    pub fn update(&mut self, augmenting_alternating_path: &mut AugmentingAlternatingPath<G>) {
-        let delta = augmenting_alternating_path.minimum_unlabelled_path_cost().expect(
-            "The minimum unlabelled path cost should always be defined when updating the dual weights.",
-        );
+    pub(super) fn update(
+        &mut self,
+        augmenting_alternating_path: &mut AugmentingAlternatingPath<G>,
+    ) -> bool {
+        let Some(delta) = augmenting_alternating_path.minimum_unlabelled_path_cost() else {
+            return false;
+        };
 
         for left_node_id in self.graph.left_node_ids() {
             if augmenting_alternating_path.has_successor_label(left_node_id) {
@@ -60,10 +78,22 @@ impl<G: BipartiteWeightedMonoplexGraph + ?Sized> Dual<'_, G> {
                     // Changes the cost of the path associated to
                     // `right_node_id`.
                     let left_node_id = augmenting_alternating_path.path_source(right_node_id);
-                    augmenting_alternating_path.predecessor_label(right_node_id, left_node_id);
+                    let path_weight = self.reconstructed_weight(left_node_id, right_node_id).map(
+                        |reconstructed_weight| {
+                            reconstructed_weight
+                                + augmenting_alternating_path.path_cost(right_node_id)
+                        },
+                    );
+                    augmenting_alternating_path.predecessor_label(
+                        right_node_id,
+                        left_node_id,
+                        path_weight,
+                    );
                     augmenting_alternating_path.add_right_node_to_queue(right_node_id);
                 }
             }
         }
+
+        true
     }
 }

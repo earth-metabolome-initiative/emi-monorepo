@@ -12,7 +12,7 @@ pub(super) struct AugmentingAlternatingPath<G: BipartiteWeightedMonoplexGraph + 
     /// The labels of the left nodes.
     successor_labels: Vec<Option<SuccessorMarker<G>>>,
     /// The labels of the right nodes.
-    predecessor_labels: Vec<Option<G::LeftNodeId>>,
+    predecessor_labels: Vec<Option<(G::LeftNodeId, Option<G::Weight>)>>,
     /// The left node labels to explore.
     left_nodes_queue: Vec<G::LeftNodeId>,
     /// The right node labels to explore.
@@ -119,7 +119,7 @@ impl<'graph, G: BipartiteWeightedMonoplexGraph + ?Sized> AugmentingAlternatingPa
     /// # Arguments
     ///
     /// * `right_node_id`: The right node identifier.
-    pub(super) fn predecessor(&self, right_node_id: G::RightNodeId) -> Option<G::LeftNodeId> {
+    pub(super) fn predecessor(&self, right_node_id: G::RightNodeId) -> Option<(G::LeftNodeId, Option<G::Weight>)> {
         self.predecessor_labels[right_node_id.into_usize()]
     }
 
@@ -147,12 +147,15 @@ impl<'graph, G: BipartiteWeightedMonoplexGraph + ?Sized> AugmentingAlternatingPa
     ///
     /// * `right_node_id`: The right node identifier.
     /// * `predecessor_label`: The predecessor label.
+    /// * `predecessor_weight`: The predecessor weight. If None, it represents the maximum weight.
+    /// 
     pub(super) fn predecessor_label(
         &mut self,
         right_node_id: G::RightNodeId,
         predecessor_label: G::LeftNodeId,
+        predecessor_weight: Option<G::Weight>,
     ) {
-        self.predecessor_labels[right_node_id.into_usize()] = Some(predecessor_label);
+        self.predecessor_labels[right_node_id.into_usize()] = Some((predecessor_label, predecessor_weight));
     }
 
     /// Returns the source of the path associated to the given right node.
@@ -160,6 +163,13 @@ impl<'graph, G: BipartiteWeightedMonoplexGraph + ?Sized> AugmentingAlternatingPa
         self.path_costs[right_node_id.into_usize()]
             .expect("The path cost should exist for the provided right node identifier.")
             .1
+    }
+
+    /// Returns the path cost associated to the provided right node.
+    pub(super) fn path_cost(&self, right_node_id: G::RightNodeId) -> G::Weight {
+        self.path_costs[right_node_id.into_usize()]
+            .expect("The path cost should exist for the provided right node identifier.")
+            .0
     }
 
     /// Labels the successor of the provided left node.
@@ -227,8 +237,9 @@ impl<G: BipartiteWeightedMonoplexGraph + ?Sized> AugmentingAlternatingPath<G> {
             if self.has_predecessor_label(right_node_id) {
                 continue;
             }
+            let reconstructed_weight = dual.reconstructed_weight(k, right_node_id);
             self.right_nodes_queue.push(right_node_id);
-            self.predecessor_labels[right_node_id.into_usize()] = Some(k);
+            self.predecessor_labels[right_node_id.into_usize()] = Some((k, reconstructed_weight));
         }
     }
 
