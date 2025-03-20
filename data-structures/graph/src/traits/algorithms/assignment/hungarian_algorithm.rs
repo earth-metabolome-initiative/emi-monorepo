@@ -34,11 +34,10 @@ where
     A: Assignment + From<PartialAssignment<Self>>,
 {
     /// Return the assignment as assigned by the Hungarian algorithm.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the graph has no edges, an error is returned.
-    /// 
     fn hungarian(&self) -> Result<A, HungarianAlgorithmError> {
         // If the graph is empty, we return an empty assignment.
         if !self.has_nodes() {
@@ -55,13 +54,12 @@ where
         // Next, we initialize the partial assignment, which currsponds
         // to the primal solution.
         let mut partial_assignment: PartialAssignment<Self> = PartialAssignment::from(&dual);
-
+        // We initialize the augmenting alternating paths.
+        let mut augmenting_path: AugmentingAlternatingPath<Self> =
+            AugmentingAlternatingPath::new(&dual, &partial_assignment);
+        
         // While the assignment is not complete
-        while !partial_assignment.is_complete(&self) {
-            // We initialize the augmenting alternating paths.
-            let mut augmenting_path: AugmentingAlternatingPath<Self> =
-                AugmentingAlternatingPath::new(&dual, &partial_assignment);
-
+        'outer: while !partial_assignment.is_complete(&self) {
             // While we have not identified an augmenting path
             let path_end: Self::RightNodeId = 'external: loop {
                 while augmenting_path.has_unpropagated_labels() {
@@ -73,7 +71,9 @@ where
                     }
                 }
                 // We update the dual weights.
-                dual.update(&mut augmenting_path);
+                if !dual.update(&mut augmenting_path) {
+                    break 'outer;
+                }
             };
             // We update the assignment by executing a new
             // primal iteration.

@@ -36,6 +36,24 @@ impl<E: WeightedEdges + ?Sized> DualEdges<'_, E> {
         self.matrix.increase_left_node_weight(left_node_id, value);
     }
 
+    /// Returns the weight of the left node.
+    ///
+    /// # Arguments
+    ///
+    /// * `left_node_id`: The identifier of the left node.
+    pub(super) fn left_node_weight(&self, left_node_id: E::SourceNodeId) -> Option<E::Weight> {
+        self.matrix.left_node_weight(left_node_id)
+    }
+
+    /// Returns the weight of the right node.
+    ///
+    /// # Arguments
+    ///
+    /// * `right_node_id`: The identifier of the right node.
+    pub(super) fn right_node_weight(&self, right_node_id: E::DestinationNodeId) -> Option<E::Weight> {
+        self.matrix.right_node_weight(right_node_id)
+    }
+
     /// Reduces the weight of the right node by the provided value.
     ///
     /// # Arguments
