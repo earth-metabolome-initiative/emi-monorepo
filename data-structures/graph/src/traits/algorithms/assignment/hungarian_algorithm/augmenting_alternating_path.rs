@@ -1,10 +1,10 @@
 //! Submodule providing an implementation of the augmenting alternating path to
 //! be used in the context of the Hungarian algorithm.
 
-use algebra::prelude::{IntoUsize, TotalOrd};
+use algebra::prelude::{IntoUsize, TotalOrd, Zero};
 
 use super::{Dual, PartialAssignment};
-use crate::traits::{BipartiteGraph, BipartiteWeightedMonoplexGraph, WeightedMonoplexGraph};
+use crate::traits::{BipartiteGraph, BipartiteWeightedMonoplexGraph, MonoplexBipartiteGraph, WeightedMonoplexGraph};
 
 /// Struct employed in the context of the Hungarian Algorithm
 /// to represent the augmenting alternating path.
@@ -46,7 +46,7 @@ impl<'graph, G: BipartiteWeightedMonoplexGraph + ?Sized> AugmentingAlternatingPa
         let mut left_nodes_queue = Vec::new();
         let mut path_costs = vec![None; dual.number_of_right_nodes()];
 
-        for left_node_id in dual.left_node_ids() {
+        for left_node_id in dual.left_partition_non_singleton_ids() {
             if partial_assignment.has_successor(left_node_id) {
                 continue;
             }
@@ -54,7 +54,7 @@ impl<'graph, G: BipartiteWeightedMonoplexGraph + ?Sized> AugmentingAlternatingPa
             left_nodes_queue.push(left_node_id);
             let (minimum_cost, right_node_id) =
                 dual.min_successor_weight_and_id(left_node_id).expect(
-                    "The minimum cost and the corresponding right node identifier should exist.",
+                    &format!("The minimum cost and the corresponding right node identifier should exist for the provided left node identifier {left_node_id}"),
                 );
             path_costs[right_node_id.into_usize()] = Some((minimum_cost, left_node_id));
         }
@@ -91,17 +91,18 @@ impl<'graph, G: BipartiteWeightedMonoplexGraph + ?Sized> AugmentingAlternatingPa
     /// * `right_node_id`: The right node identifier.
     /// * `value`: The value to reduce the path cost by.
     pub(super) fn reduce_path_cost(&mut self, right_node_id: G::RightNodeId, value: G::Weight) {
-        let (cost, left_node_id) = self.path_cost_and_left_node_id(right_node_id);
-        self.path_costs[right_node_id.into_usize()] = Some((cost - value, left_node_id));
+        if let Some((cost, _))=  self.path_costs[right_node_id.into_usize()].as_mut() {
+            // We only update the cost if it is known, as when it is `None` it is representing
+            // an infinite cost, and therefore `infinity - x = infinity`.
+            *cost -= value;
+        } 
     }
 
-    /// Returns the path cost and the corresponding left node identifier.
-    pub(super) fn path_cost_and_left_node_id(
-        &self,
-        right_node_id: G::RightNodeId,
-    ) -> (G::Weight, G::LeftNodeId) {
+    /// Returns whether the provided right node has a zero path cost.
+    pub(super) fn has_zero_path_cost(&self, right_node_id: G::RightNodeId) -> bool {
         self.path_costs[right_node_id.into_usize()]
-            .expect("The path cost should exist for the provided right node identifier.")
+            .map(|(cost, _)| cost == G::Weight::ZERO)
+            .unwrap_or(false)
     }
 
     /// Returns whether the provided right node has a predecessor label.
@@ -152,6 +153,13 @@ impl<'graph, G: BipartiteWeightedMonoplexGraph + ?Sized> AugmentingAlternatingPa
         predecessor_label: G::LeftNodeId,
     ) {
         self.predecessor_labels[right_node_id.into_usize()] = Some(predecessor_label);
+    }
+
+    /// Returns the source of the path associated to the given right node.
+    pub(super) fn path_source(&self, right_node_id: G::RightNodeId) -> G::LeftNodeId {
+        self.path_costs[right_node_id.into_usize()]
+            .expect("The path cost should exist for the provided right node identifier.")
+            .1
     }
 
     /// Labels the successor of the provided left node.

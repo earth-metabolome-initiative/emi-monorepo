@@ -57,7 +57,7 @@ where
         let mut partial_assignment: PartialAssignment<Self> = PartialAssignment::from(&dual);
 
         // While the assignment is not complete
-        while !partial_assignment.is_complete() {
+        while !partial_assignment.is_complete(&self) {
             // We initialize the augmenting alternating paths.
             let mut augmenting_path: AugmentingAlternatingPath<Self> =
                 AugmentingAlternatingPath::new(&dual, &partial_assignment);

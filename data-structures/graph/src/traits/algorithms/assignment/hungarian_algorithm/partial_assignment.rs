@@ -19,8 +19,8 @@ pub struct PartialAssignment<G: BipartiteWeightedMonoplexGraph + ?Sized> {
     pub(super) number_of_assigned_nodes: usize,
 }
 
-impl<G: BipartiteWeightedMonoplexGraph + ?Sized, S: core::hash::BuildHasher + Default> From<PartialAssignment<G>>
-    for HashMap<G::LeftNodeId, (G::RightNodeId, G::Weight), S>
+impl<G: BipartiteWeightedMonoplexGraph + ?Sized, S: core::hash::BuildHasher + Default>
+    From<PartialAssignment<G>> for HashMap<G::LeftNodeId, (G::RightNodeId, G::Weight), S>
 {
     fn from(value: PartialAssignment<G>) -> Self {
         let mut map = HashMap::default();
@@ -57,8 +57,8 @@ impl<'graph, G: BipartiteWeightedMonoplexGraph + ?Sized> From<&Dual<'graph, G>>
     ///   value in the dual graph is zero.
     fn from(dual: &Dual<'graph, G>) -> Self {
         let mut assignment = PartialAssignment {
-            successors: vec![None; dual.number_of_right_nodes()],
-            predecessors: vec![None; dual.number_of_left_nodes()],
+            successors: vec![None; dual.number_of_left_nodes()],
+            predecessors: vec![None; dual.number_of_right_nodes()],
             number_of_assigned_nodes: 0,
         };
 
@@ -85,8 +85,12 @@ impl<'graph, G: BipartiteWeightedMonoplexGraph + ?Sized> From<&Dual<'graph, G>>
 
 impl<G: BipartiteWeightedMonoplexGraph + ?Sized> PartialAssignment<G> {
     /// Returns whether the assignment is complete.
-    pub fn is_complete(&self) -> bool {
-        self.number_of_assigned_nodes == self.successors.len().min(self.predecessors.len())
+    pub fn is_complete(&self, graph: &G) -> bool {
+        self.number_of_assigned_nodes
+            == graph
+                .number_of_non_singletons_in_left_partition()
+                .into_usize()
+                .min(self.predecessors.len())
     }
 
     /// Returns whether the provided right now has no predecessor.
@@ -96,7 +100,7 @@ impl<G: BipartiteWeightedMonoplexGraph + ?Sized> PartialAssignment<G> {
 
     /// Returns the assigned left node to the provided right node.
     pub fn predecessor(&self, right_node_node_id: G::RightNodeId) -> Option<G::LeftNodeId> {
-        self.predecessors[right_node_node_id.into_usize()]
+        self.predecessors.get(right_node_node_id.into_usize()).and_then(|predecessor| *predecessor)
     }
 
     /// Returns whether the provided left node is assigned.
@@ -111,7 +115,7 @@ impl<G: BipartiteWeightedMonoplexGraph + ?Sized> PartialAssignment<G> {
 
     /// Returns the assigned right node to the provided left node.
     pub fn successor(&self, left_node_node_id: G::LeftNodeId) -> Option<G::RightNodeId> {
-        self.successors[left_node_node_id.into_usize()]
+        self.successors.get(left_node_node_id.into_usize()).and_then(|successor| *successor)
     }
 
     /// Executes a new primal iteration.
