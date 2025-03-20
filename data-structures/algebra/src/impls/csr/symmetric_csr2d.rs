@@ -178,6 +178,8 @@ where
         = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::NonEmptyRowIndices<'a>
     where
         Self: 'a;
+    type EmptyRowIndices<'a> = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::EmptyRowIndices<'a> where Self: 'a;
+    type NonEmptyRowIndices<'a> = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::NonEmptyRowIndices<'a> where Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.csr.sparse_row(row)
@@ -245,6 +247,22 @@ where
 
     fn select_row(&self, sparse_index: Self::SparseIndex) -> Self::RowIndex {
         self.csr.select_row(sparse_index)
+    }
+
+    fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
+        self.csr.empty_row_indices()
+    }
+
+    fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
+        self.csr.non_empty_row_indices()
+    }
+
+    fn number_of_empty_rows(&self) -> Self::RowIndex {
+        self.csr.number_of_empty_rows()
+    }
+
+    fn number_of_non_empty_rows(&self) -> Self::RowIndex {
+        self.csr.number_of_non_empty_rows()
     }
 }
 

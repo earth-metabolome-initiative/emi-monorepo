@@ -131,6 +131,14 @@ where
         = M::NonEmptyRowIndices<'a>
     where
         Self: 'a;
+    type EmptyRowIndices<'a>
+        = M::EmptyRowIndices<'a>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a>
+        = M::NonEmptyRowIndices<'a>
+    where
+        Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.matrix.sparse_row(row)
@@ -197,6 +205,22 @@ where
 
     fn select_column(&self, sparse_index: Self::SparseIndex) -> Self::ColumnIndex {
         self.matrix.select_column(sparse_index)
+    }
+
+    fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
+        self.matrix.empty_row_indices()
+    }
+
+    fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
+        self.matrix.non_empty_row_indices()
+    }
+
+    fn number_of_empty_rows(&self) -> Self::RowIndex {
+        self.matrix.number_of_empty_rows()
+    }
+
+    fn number_of_non_empty_rows(&self) -> Self::RowIndex {
+        self.matrix.number_of_non_empty_rows()
     }
 }
 

@@ -70,6 +70,12 @@ where
         = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SparseMatrix2D>::SparseRowSizes<'a>
     where
         Self: 'a;
+    type EmptyRowIndices<'a> = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SparseMatrix2D>::EmptyRowIndices<'a>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a> = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SparseMatrix2D>::NonEmptyRowIndices<'a>
+    where
+        Self: 'a;
 
     fn sparse_rows(&self) -> Self::SparseRows<'_> {
         self.csr.sparse_rows()
@@ -93,6 +99,22 @@ where
 
     fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
         self.csr.number_of_defined_values_in_row(row)
+    }
+
+    fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
+        self.csr.empty_row_indices()
+    }
+
+    fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
+        self.csr.non_empty_row_indices()
+    }
+
+    fn number_of_empty_rows(&self) -> Self::RowIndex {
+        self.csr.number_of_empty_rows()
+    }
+
+    fn number_of_non_empty_rows(&self) -> Self::RowIndex {
+        self.csr.number_of_non_empty_rows()
     }
 }
 

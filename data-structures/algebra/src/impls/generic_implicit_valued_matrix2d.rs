@@ -251,6 +251,14 @@ impl<M: SparseMatrix2D, Map, Value> SparseMatrix2D
         = M::SparseRows<'a>
     where
         Self: 'a;
+    type EmptyRowIndices<'a>
+        = M::EmptyRowIndices<'a>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a>
+        = M::NonEmptyRowIndices<'a>
+    where
+        Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.matrix.sparse_row(row)
@@ -274,6 +282,22 @@ impl<M: SparseMatrix2D, Map, Value> SparseMatrix2D
 
     fn rank(&self, row: Self::RowIndex) -> Self::SparseIndex {
         self.matrix.rank(row)
+    }
+
+    fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
+        self.matrix.empty_row_indices()
+    }
+
+    fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
+        self.matrix.non_empty_row_indices()
+    }
+
+    fn number_of_empty_rows(&self) -> Self::RowIndex {
+        self.matrix.number_of_empty_rows()
+    }
+
+    fn number_of_non_empty_rows(&self) -> Self::RowIndex {
+        self.matrix.number_of_non_empty_rows()
     }
 }
 

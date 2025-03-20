@@ -226,6 +226,14 @@ where
         = CSR2DNonEmptyRowIndices<'a, Self>
     where
         Self: 'a;
+    type EmptyRowIndices<'a>
+        = CSR2DEmptyRowIndices<'a, Self>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a>
+        = CSR2DNonEmptyRowIndices<'a, Self>
+    where
+        Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         let start = self.rank_row(row).into_usize();

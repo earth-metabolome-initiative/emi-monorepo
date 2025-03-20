@@ -176,6 +176,12 @@ where
         = crate::impls::CSR2DNonEmptyRowIndices<'a, Self>
     where
         Self: 'a;
+    type EmptyRowIndices<'a> = crate::impls::CSR2DEmptyRowIndices<'a, Self>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a> = crate::impls::CSR2DNonEmptyRowIndices<'a, Self>
+    where
+        Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.ranges[row.into_usize()].clone()
