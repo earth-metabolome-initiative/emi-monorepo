@@ -2,8 +2,8 @@
 //! struct used in the context of the Hungarian algorithm.
 
 use algebra::prelude::{
-    Matrix2D, Number, SparseMatrix, SparseMatrix2D, SparseValuedMatrix, ValuedMatrix,
-    ValuedMatrix2D, ValuedSparseMatrix2D, Zero,
+    Bounded, Matrix2D, Number, SparseMatrix, SparseMatrix2D, SparseValuedMatrix, TotalOrd,
+    ValuedMatrix, ValuedMatrix2D, ValuedSparseMatrix2D, Zero,
 };
 
 use super::DualMatrix;
@@ -60,7 +60,7 @@ impl<M: ValuedSparseMatrix2D + ?Sized> ValuedMatrix for DualMatrix<'_, M> {
 
 impl<M: ValuedSparseMatrix2D + ?Sized> ValuedMatrix2D for DualMatrix<'_, M> {}
 
-impl< M: ValuedSparseMatrix2D + ?Sized> SparseMatrix2D for DualMatrix<'_, M> {
+impl<M: ValuedSparseMatrix2D + ?Sized> SparseMatrix2D for DualMatrix<'_, M> {
     type SparseColumns<'a>
         = M::SparseColumns<'a>
     where
@@ -75,6 +75,14 @@ impl< M: ValuedSparseMatrix2D + ?Sized> SparseMatrix2D for DualMatrix<'_, M> {
         Self: 'a;
     type SparseRowSizes<'a>
         = M::SparseRowSizes<'a>
+    where
+        Self: 'a;
+    type EmptyRowIndices<'a>
+        = M::EmptyRowIndices<'a>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a>
+        = M::NonEmptyRowIndices<'a>
     where
         Self: 'a;
 
@@ -101,6 +109,22 @@ impl< M: ValuedSparseMatrix2D + ?Sized> SparseMatrix2D for DualMatrix<'_, M> {
     fn rank(&self, row: Self::RowIndex) -> Self::SparseIndex {
         self.matrix.rank(row)
     }
+
+    fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
+        self.matrix.empty_row_indices()
+    }
+
+    fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
+        self.matrix.non_empty_row_indices()
+    }
+
+    fn number_of_empty_rows(&self) -> Self::RowIndex {
+        self.matrix.number_of_empty_rows()
+    }
+
+    fn number_of_non_empty_rows(&self) -> Self::RowIndex {
+        self.matrix.number_of_non_empty_rows()
+    }
 }
 
 impl<M: ValuedSparseMatrix2D + ?Sized> ValuedSparseMatrix2D for DualMatrix<'_, M>
@@ -111,6 +135,19 @@ where
         = SparseRowValuesIterator<'a, M>
     where
         Self: 'a;
+
+    fn sparse_row_min_value_and_column(
+        &self,
+        row: Self::RowIndex,
+    ) -> Option<(Self::Value, Self::ColumnIndex)>
+    where
+        Self::Value: algebra::prelude::TotalOrd,
+    {
+        self.sparse_row_values(row)
+            .zip(self.sparse_row(row))
+            .min_by(|(_, value1), (_, value2)| value1.total_cmp(value2))
+            .or(Some((Self::Value::MAX, Self::ColumnIndex::ZERO)))
+    }
 
     fn sparse_row_values(&self, row: Self::RowIndex) -> Self::SparseRowValues<'_> {
         SparseRowValuesIterator {
@@ -151,8 +188,7 @@ where
     }
 }
 
-impl<M: ValuedSparseMatrix2D + ?Sized> core::iter::ExactSizeIterator
-    for SparseValuesIterator<'_, M>
+impl<M: ValuedSparseMatrix2D + ?Sized> core::iter::ExactSizeIterator for SparseValuesIterator<'_, M>
 where
     M::Value: Number,
 {
