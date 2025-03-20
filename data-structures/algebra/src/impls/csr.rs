@@ -22,3 +22,7 @@ pub mod csr2d_row_sizes;
 pub use csr2d_row_sizes::CSR2DRowSizes;
 pub mod valued_csr2d_columns;
 pub use valued_csr2d_columns::ValuedCSR2DColumns;
+pub mod csr2d_empty_rows_indices;
+pub use csr2d_empty_rows_indices::CSR2DEmptyRowIndices;
+pub mod csr2d_non_empty_rows_indices;
+pub use csr2d_non_empty_rows_indices::CSR2DNonEmptyRowIndices;

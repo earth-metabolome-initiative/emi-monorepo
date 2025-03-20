@@ -118,6 +118,8 @@ where
         = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::SparseRowSizes<'a>
     where
         Self: 'a;
+    type EmptyRowIndices<'a> = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::EmptyRowIndices<'a> where Self: 'a;
+    type NonEmptyRowIndices<'a> = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::NonEmptyRowIndices<'a> where Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.csr.sparse_row(row)
@@ -139,9 +141,24 @@ where
         self.csr.sparse_row_sizes()
     }
 
-    /// Returns the rank for the provided row.
     fn rank(&self, row: Idx) -> Self::SparseIndex {
         self.csr.rank(row)
+    }
+
+    fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
+        self.csr.empty_row_indices()
+    }
+
+    fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
+        self.csr.non_empty_row_indices()
+    }
+
+    fn number_of_empty_rows(&self) -> Self::RowIndex {
+        self.csr.number_of_empty_rows()
+    }
+
+    fn number_of_non_empty_rows(&self) -> Self::RowIndex {
+        self.csr.number_of_non_empty_rows()
     }
 }
 

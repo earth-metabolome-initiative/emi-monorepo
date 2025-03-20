@@ -88,6 +88,14 @@ where
         = M::SparseRowSizes<'a>
     where
         Self: 'a;
+    type EmptyRowIndices<'a>
+        = M::EmptyRowIndices<'a>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a>
+        = M::NonEmptyRowIndices<'a>
+    where
+        Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.matrix.sparse_row(row)
@@ -112,6 +120,22 @@ where
     fn rank(&self, row: Self::RowIndex) -> Self::SparseIndex {
         self.matrix.rank(row)
     }
+
+    fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
+        self.matrix.empty_row_indices()
+    }
+
+    fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
+        self.matrix.non_empty_row_indices()
+    }
+
+    fn number_of_empty_rows(&self) -> Self::RowIndex {
+        self.matrix.number_of_empty_rows()
+    }
+
+    fn number_of_non_empty_rows(&self) -> Self::RowIndex {
+        self.matrix.number_of_non_empty_rows()
+    }
 }
 
 impl<T, M> TransposableMatrix2D<T> for GenericBiMatrix2D<M, T>
@@ -127,7 +151,8 @@ where
 impl<T, M> crate::traits::BiMatrix2D for GenericBiMatrix2D<M, T>
 where
     T: Matrix2D + Clone,
-    M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex> + SparseMatrix2D,
+    M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>
+        + SparseMatrix2D,
 {
     type Matrix = M;
     type TransposedMatrix = T;

@@ -55,6 +55,16 @@ pub trait SparseMatrix2D: Matrix2D + SparseMatrix {
         + DoubleEndedIterator<Item = Self::ColumnIndex>
     where
         Self: 'a;
+    /// Iterator over the row indices of the empty rows.
+    type EmptyRowIndices<'a>: ExactSizeIterator<Item = Self::RowIndex>
+        + DoubleEndedIterator<Item = Self::RowIndex>
+    where
+        Self: 'a;
+    /// Iterator over the row indices of the non-empty rows.
+    type NonEmptyRowIndices<'a>: ExactSizeIterator<Item = Self::RowIndex>
+        + DoubleEndedIterator<Item = Self::RowIndex>
+    where
+        Self: 'a;
 
     /// Returns an iterator over the sparse columns of a row.
     ///
@@ -77,6 +87,18 @@ pub trait SparseMatrix2D: Matrix2D + SparseMatrix {
 
     /// Returns the rank of a row.
     fn rank(&self, row: Self::RowIndex) -> Self::SparseIndex;
+
+    /// Returns the number of empty rows.
+    fn number_of_empty_rows(&self) -> Self::RowIndex;
+
+    /// Returns the number of non-empty rows.
+    fn number_of_non_empty_rows(&self) -> Self::RowIndex;
+
+    /// Returns an iterator over the row indices of the empty rows.
+    fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_>;
+
+    /// Returns an iterator over the row indices of the non-empty rows.
+    fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_>;
 }
 
 /// Trait defining a transposable bidimensional matrix.

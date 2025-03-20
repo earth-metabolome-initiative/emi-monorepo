@@ -15,6 +15,8 @@ pub struct RangedCSR2D<SparseIndex, RowIndex, R: Ranged> {
     pub(super) number_of_rows: RowIndex,
     /// The destination ranges.
     pub(super) ranges: Vec<R>,
+    /// The number of non-empty rows.
+    pub(super) number_of_non_empty_rows: RowIndex,
 }
 
 impl<SparseIndex: Debug, RowIndex: Debug, R: Ranged> Debug
@@ -39,6 +41,7 @@ impl<SparseIndex: Zero, RowIndex: Zero, R: Ranged> Default
             number_of_columns: R::Step::ZERO,
             number_of_rows: RowIndex::ZERO,
             ranges: Vec::new(),
+            number_of_non_empty_rows: RowIndex::ZERO,
         }
     }
 }
@@ -66,6 +69,7 @@ where
             number_of_columns,
             number_of_rows,
             ranges: Vec::with_capacity(number_of_rows.into_usize()),
+            number_of_non_empty_rows: RowIndex::ZERO,
         }
     }
 }
@@ -132,6 +136,12 @@ where
         = crate::impls::CSR2DRowSizes<'a, Self>
     where
         Self: 'a;
+    type EmptyRowIndices<'a> = crate::impls::CSR2DEmptyRowIndices<'a, Self>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a> = crate::impls::CSR2DNonEmptyRowIndices<'a, Self>
+    where
+        Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.ranges[row.into_usize()].clone()
@@ -153,9 +163,24 @@ where
         self.ranges[row.into_usize()].number_of_elements()
     }
 
-    /// Returns the rank for the provided row.
     fn rank(&self, _row: RowIndex) -> SparseIndex {
         unimplemented!()
+    }
+
+    fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
+        self.into()
+    }
+
+    fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
+        self.into()
+    }
+
+    fn number_of_empty_rows(&self) -> Self::RowIndex {
+        self.number_of_rows() - self.number_of_non_empty_rows()
+    }
+
+    fn number_of_non_empty_rows(&self) -> Self::RowIndex {
+        self.number_of_non_empty_rows
     }
 }
 
@@ -186,6 +211,10 @@ where
                     return Err(MutabilityError::UnorderedColumnIndex(column))
                 }
             }
+        }
+
+        if range.number_of_elements() == R::Step::ONE {
+            self.number_of_non_empty_rows += RowIndex::ONE;
         }
 
         Ok(())
