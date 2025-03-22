@@ -1,12 +1,11 @@
-//! Submodule providing the [`ValuedCsr2D`] type, a 2D CSR matrix which stores
+//! Submodule providing the `ValuedCsr2D` type, a 2D CSR matrix which stores
 //! values in addition to the row and column indices.
 
 use core::fmt::Debug;
 
 use super::{MutabilityError, CSR2D};
 use crate::traits::{
-    IntoUsize, Matrix, Matrix2D, MatrixMut, One, PositiveInteger, SparseMatrix, SparseMatrix2D,
-    SparseMatrixMut, SparseValuedMatrix, ValuedMatrix, ValuedMatrix2D, ValuedSparseMatrix2D, Zero,
+    IntoUsize, Matrix, Matrix2D, Matrix2DRef, MatrixMut, One, PositiveInteger, SparseMatrix, SparseMatrix2D, SparseMatrixMut, SparseValuedMatrix, ValuedMatrix, ValuedMatrix2D, ValuedSparseMatrix2D, Zero
 };
 
 /// A 2D CSR matrix which stores values in addition to the row and column
@@ -46,6 +45,20 @@ where
 
     fn number_of_rows(&self) -> Self::RowIndex {
         self.csr.number_of_rows()
+    }
+}
+
+impl<SparseIndex, RowIndex, ColumnIndex, Value> Matrix2DRef
+    for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
+where
+    CSR2D<SparseIndex, RowIndex, ColumnIndex>: Matrix2DRef,
+{
+    fn number_of_columns_ref(&self) -> &Self::ColumnIndex {
+        self.csr.number_of_columns_ref()
+    }
+
+    fn number_of_rows_ref(&self) -> &Self::RowIndex {
+        self.csr.number_of_rows_ref()
     }
 }
 

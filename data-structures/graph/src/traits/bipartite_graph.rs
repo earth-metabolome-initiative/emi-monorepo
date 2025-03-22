@@ -5,7 +5,7 @@
 
 use algebra::prelude::{IntoUsize, PositiveInteger, Symbol, TryFromUsize};
 
-use super::{BidirectionalVocabulary, Graph, Vocabulary, VocabularyRef};
+use super::{BidirectionalVocabulary, Graph, Vocabulary};
 
 /// Trait defining the properties of a bipartite graph.
 pub trait BipartiteGraph: Graph {
@@ -18,19 +18,15 @@ pub trait BipartiteGraph: Graph {
     /// The symbol of the right node.
     type RightNodeSymbol: Symbol;
     /// The vocabulary holding the symbols of the left nodes.
-    type LeftNodes: VocabularyRef<SourceSymbol = Self::LeftNodeId, DestinationSymbol = Self::LeftNodeSymbol>
-        + BidirectionalVocabulary<
-            SourceSymbol = Self::LeftNodeId,
-            DestinationSymbol = Self::LeftNodeSymbol,
-        >;
+    type LeftNodes: BidirectionalVocabulary<
+        SourceSymbol = Self::LeftNodeId,
+        DestinationSymbol = Self::LeftNodeSymbol,
+    >;
     /// The vocabulary holding the symbols of the right nodes.
-    type RightNodes: VocabularyRef<
-            SourceSymbol = Self::RightNodeId,
-            DestinationSymbol = Self::RightNodeSymbol,
-        > + BidirectionalVocabulary<
-            SourceSymbol = Self::RightNodeId,
-            DestinationSymbol = Self::RightNodeSymbol,
-        >;
+    type RightNodes: BidirectionalVocabulary<
+        SourceSymbol = Self::RightNodeId,
+        DestinationSymbol = Self::RightNodeSymbol,
+    >;
 
     /// Returns a reference to the vocabulary of the left nodes.
     fn left_nodes_vocabulary(&self) -> &Self::LeftNodes;
@@ -41,13 +37,13 @@ pub trait BipartiteGraph: Graph {
     }
 
     /// Returns an iterator over the left node symbols in the graph.
-    fn left_nodes(&self) -> <Self::LeftNodes as VocabularyRef>::DestinationRefs<'_> {
-        self.left_nodes_vocabulary().destination_refs()
+    fn left_nodes(&self) -> <Self::LeftNodes as Vocabulary>::Destinations<'_> {
+        self.left_nodes_vocabulary().destinations()
     }
 
     /// Returns the Symbol of the node with the given ID.
-    fn left_node(&self, left_node_id: &Self::LeftNodeId) -> Option<&Self::LeftNodeSymbol> {
-        self.left_nodes_vocabulary().convert_ref(left_node_id)
+    fn left_node(&self, left_node_id: &Self::LeftNodeId) -> Option<Self::LeftNodeSymbol> {
+        self.left_nodes_vocabulary().convert(left_node_id)
     }
 
     /// Returns the ID of the node with the given symbol.
@@ -69,23 +65,17 @@ pub trait BipartiteGraph: Graph {
     }
 
     /// Returns an iterator over the node symbols in the graph.
-    fn right_nodes(&self) -> <Self::RightNodes as VocabularyRef>::DestinationRefs<'_> {
-        self.right_nodes_vocabulary().destination_refs()
+    fn right_nodes(&self) -> <Self::RightNodes as Vocabulary>::Destinations<'_> {
+        self.right_nodes_vocabulary().destinations()
     }
 
     /// Returns the Symbol of the node with the given ID.
-    fn right_node(
-        &self,
-        right_node_id: &Self::RightNodeId,
-    ) -> Option<&Self::RightNodeSymbol> {
-        self.right_nodes_vocabulary().convert_ref(right_node_id)
+    fn right_node(&self, right_node_id: &Self::RightNodeId) -> Option<Self::RightNodeSymbol> {
+        self.right_nodes_vocabulary().convert(right_node_id)
     }
 
     /// Returns the ID of the node with the given symbol.
-    fn right_node_id(
-        &self,
-        symbol: &Self::RightNodeSymbol,
-    ) -> Option<Self::RightNodeId> {
+    fn right_node_id(&self, symbol: &Self::RightNodeSymbol) -> Option<Self::RightNodeId> {
         self.right_nodes_vocabulary().invert(symbol)
     }
 

@@ -7,4 +7,5 @@ pub mod structs;
 pub mod prelude {
     pub use crate::traits::*;
     pub use crate::structs::*;
+    pub use functional_properties::similarity::ScalarSimilarity;
 }

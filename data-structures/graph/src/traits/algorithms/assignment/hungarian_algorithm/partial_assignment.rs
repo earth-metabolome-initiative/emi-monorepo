@@ -39,6 +39,25 @@ impl<G: BipartiteWeightedMonoplexGraph + ?Sized, S: core::hash::BuildHasher + De
     }
 }
 
+impl<G: BipartiteWeightedMonoplexGraph + ?Sized>
+    From<PartialAssignment<G>> for Vec<(G::LeftNodeId, G::RightNodeId, G::Weight)>
+{
+    fn from(value: PartialAssignment<G>) -> Self {
+        value.predecessors.iter().flatten().copied().map(|(left_node_id, weight)| {
+            let Some(weight) = weight else {
+                return None;
+            };
+            Some((
+                left_node_id,
+                value.successors[left_node_id.into_usize()].expect(
+                    "The predecessor of the right node should always be defined when converting a partial assignment to a Vec.",
+                ),
+                weight,
+            ))
+        }).flatten().collect()
+    }
+}
+
 impl<'graph, G: BipartiteWeightedMonoplexGraph + ?Sized> From<&Dual<'graph, G>>
     for PartialAssignment<G>
 {

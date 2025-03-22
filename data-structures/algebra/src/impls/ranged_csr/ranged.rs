@@ -78,7 +78,13 @@ where
             return Err(RangedError::DuplicateElement);
         }
 
-        if element + N::ONE == self.start {
+        // If the range is currently completely empty,
+        // we need to set the start and end relative to the element.
+        if self.start == self.end {
+            self.start = element;
+            self.end = element + N::ONE;
+            Ok(())
+        } else if element + N::ONE == self.start {
             self.start = element;
             Ok(())
         } else if element == self.end {

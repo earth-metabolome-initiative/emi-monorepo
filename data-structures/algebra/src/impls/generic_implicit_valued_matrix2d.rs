@@ -1,21 +1,37 @@
 //! Submodule proving a 2D matrix with implicit values.
 
-use core::marker::PhantomData;
-
 use crate::traits::{
     ImplicitValuedMatrix, ImplicitValuedSparseMatrix, ImplicitValuedSparseRowIteraror, Matrix2D,
-    SparseMatrix, SparseMatrix2D, SparseValuedMatrix, ValuedMatrix, ValuedMatrix2D,
+    Matrix2DRef, SparseMatrix, SparseMatrix2D, SparseValuedMatrix, ValuedMatrix, ValuedMatrix2D,
     ValuedSparseMatrix2D,
 };
 
 /// A 2D matrix with implicit values.
-pub struct GenericImplicitValuedMatrix2D<M, Map, Value> {
+pub struct GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: Matrix2D,
+    Map: Fn(M::Coordinates) -> Value,
+{
     matrix: M,
     map: Map,
-    _value: PhantomData<Value>,
 }
 
-impl<M: Matrix2D, Map, Value> Matrix2D for GenericImplicitValuedMatrix2D<M, Map, Value> {
+impl<M, Map, Value> GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: Matrix2D,
+    Map: Fn(M::Coordinates) -> Value,
+{
+    /// Creates a new [`GenericImplicitValuedMatrix2D`].
+    pub fn new(matrix: M, map: Map) -> Self {
+        Self { matrix, map }
+    }
+}
+
+impl<M, Map, Value> Matrix2D for GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: Matrix2D,
+    Map: Fn(M::Coordinates) -> Value,
+{
     /// Type of the row index.
     type RowIndex = M::RowIndex;
     /// Type of the column index.
@@ -32,8 +48,24 @@ impl<M: Matrix2D, Map, Value> Matrix2D for GenericImplicitValuedMatrix2D<M, Map,
     }
 }
 
-impl<M: SparseMatrix + Matrix2D, Map, Value> SparseMatrix
-    for GenericImplicitValuedMatrix2D<M, Map, Value>
+impl<M, Map, Value> Matrix2DRef for GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: Matrix2DRef,
+    Map: Fn(M::Coordinates) -> Value,
+{
+    fn number_of_rows_ref(&self) -> &Self::RowIndex {
+        self.matrix.number_of_rows_ref()
+    }
+
+    fn number_of_columns_ref(&self) -> &Self::ColumnIndex {
+        self.matrix.number_of_columns_ref()
+    }
+}
+
+impl<M, Map, Value> SparseMatrix for GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: SparseMatrix2D,
+    Map: Fn(M::Coordinates) -> Value,
 {
     type SparseCoordinates<'a>
         = M::SparseCoordinates<'a>
@@ -50,8 +82,10 @@ impl<M: SparseMatrix + Matrix2D, Map, Value> SparseMatrix
     }
 }
 
-impl<M: SparseMatrix2D, Map, Value> SparseMatrix2D
-    for GenericImplicitValuedMatrix2D<M, Map, Value>
+impl<M, Map, Value> SparseMatrix2D for GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: SparseMatrix2D,
+    Map: Fn(M::Coordinates) -> Value,
 {
     type SparseColumns<'a>
         = M::SparseColumns<'a>
@@ -119,26 +153,36 @@ impl<M: SparseMatrix2D, Map, Value> SparseMatrix2D
     }
 }
 
-impl<M: Matrix2D, Map, Value> ValuedMatrix for GenericImplicitValuedMatrix2D<M, Map, Value> {
+impl<M, Map, Value> ValuedMatrix for GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: Matrix2D,
+    Map: Fn(M::Coordinates) -> Value,
+{
     type Value = Value;
 }
 
-impl<M: Matrix2D, Map, Value> ValuedMatrix2D for GenericImplicitValuedMatrix2D<M, Map, Value> {}
-
-impl<M: Matrix2D, Map, Value> ImplicitValuedMatrix for GenericImplicitValuedMatrix2D<M, Map, Value>
+impl<M: Matrix2D, Map, Value> ValuedMatrix2D for GenericImplicitValuedMatrix2D<M, Map, Value>
 where
-    Map: Fn(&M::Coordinates) -> Self::Value,
+    M: Matrix2D,
+    Map: Fn(M::Coordinates) -> Value,
+{
+}
+
+impl<M, Map, Value> ImplicitValuedMatrix for GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: Matrix2D,
+    Map: Fn(M::Coordinates) -> Value,
 {
     fn implicit_value(&self, coordinates: &Self::Coordinates) -> Self::Value {
-        (self.map)(coordinates)
+        (self.map)(*coordinates)
     }
 }
 
-impl<M: SparseMatrix, Map, Value> SparseValuedMatrix
+impl<M, Map, Value> SparseValuedMatrix
     for GenericImplicitValuedMatrix2D<M, Map, Value>
 where
-    M: SparseMatrix2D + ImplicitValuedMatrix,
-    Map: Fn(&M::Coordinates) -> Self::Value,
+    M: SparseMatrix2D,
+    Map: Fn(M::Coordinates) -> Value,
 {
     type SparseValues<'a>
         = <Self as ImplicitValuedSparseMatrix>::SparseImplicitValues<'a>
@@ -150,10 +194,10 @@ where
     }
 }
 
-impl<M: Matrix2D, Map, Value> ValuedSparseMatrix2D for GenericImplicitValuedMatrix2D<M, Map, Value>
+impl<M, Map, Value> ValuedSparseMatrix2D for GenericImplicitValuedMatrix2D<M, Map, Value>
 where
-    M: SparseMatrix2D + ImplicitValuedMatrix,
-    Map: Fn(&M::Coordinates) -> Self::Value,
+    M: SparseMatrix2D,
+    Map: Fn(M::Coordinates) -> Value,
 {
     type SparseRowValues<'a>
         = ImplicitValuedSparseRowIteraror<'a, Self>

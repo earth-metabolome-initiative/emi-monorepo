@@ -5,7 +5,7 @@
 
 use algebra::prelude::*;
 
-use super::{BidirectionalVocabulary, Edges, Vocabulary, VocabularyRef};
+use super::{BidirectionalVocabulary, Edges, Vocabulary};
 
 /// Trait defining the properties of the monopartited edges of a graph.
 pub trait MonopartiteEdges:
@@ -50,8 +50,10 @@ pub trait MonopartiteGraph: super::Graph {
     /// The symbol of the node.
     type NodeSymbol: Symbol;
     /// The vocabulary holding the symbols of the nodes.
-    type Nodes: VocabularyRef<SourceSymbol = Self::NodeId, DestinationSymbol = Self::NodeSymbol>
-        + BidirectionalVocabulary<SourceSymbol = Self::NodeId, DestinationSymbol = Self::NodeSymbol>;
+    type Nodes: BidirectionalVocabulary<
+        SourceSymbol = Self::NodeId,
+        DestinationSymbol = Self::NodeSymbol,
+    >;
 
     /// Returns the nodes vocabulary.
     fn nodes_vocabulary(&self) -> &Self::Nodes;
@@ -62,8 +64,8 @@ pub trait MonopartiteGraph: super::Graph {
     }
 
     /// Returns the iterator over the node symbols.
-    fn nodes(&self) -> <Self::Nodes as VocabularyRef>::DestinationRefs<'_> {
-        self.nodes_vocabulary().destination_refs()
+    fn nodes(&self) -> <Self::Nodes as Vocabulary>::Destinations<'_> {
+        self.nodes_vocabulary().destinations()
     }
 
     /// Returns the number of nodes in the graph.
