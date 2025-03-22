@@ -89,6 +89,18 @@ impl<SparseIndex, RowIndex: PositiveInteger + IntoUsize + TryFromUsize, R: Range
     }
 }
 
+impl<SparseIndex, RowIndex: PositiveInteger + IntoUsize + TryFromUsize, R: Ranged> Matrix2DRef
+    for RangedCSR2D<SparseIndex, RowIndex, R>
+{
+    fn number_of_columns_ref(&self) -> &Self::ColumnIndex {
+        &self.number_of_columns
+    }
+
+    fn number_of_rows_ref(&self) -> &Self::RowIndex {
+        &self.number_of_rows
+    }
+}
+
 impl<
         SparseIndex: PositiveInteger + IntoUsize,
         RowIndex: PositiveInteger + IntoUsize,
@@ -136,10 +148,12 @@ where
         = crate::impls::CSR2DRowSizes<'a, Self>
     where
         Self: 'a;
-    type EmptyRowIndices<'a> = crate::impls::CSR2DEmptyRowIndices<'a, Self>
+    type EmptyRowIndices<'a>
+        = crate::impls::CSR2DEmptyRowIndices<'a, Self>
     where
         Self: 'a;
-    type NonEmptyRowIndices<'a> = crate::impls::CSR2DNonEmptyRowIndices<'a, Self>
+    type NonEmptyRowIndices<'a>
+        = crate::impls::CSR2DNonEmptyRowIndices<'a, Self>
     where
         Self: 'a;
 
@@ -212,6 +226,8 @@ where
                 }
             }
         }
+
+        self.number_of_defined_values += SparseIndex::ONE;
 
         if range.number_of_elements() == R::Step::ONE {
             self.number_of_non_empty_rows += RowIndex::ONE;

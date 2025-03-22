@@ -5,7 +5,7 @@ use crate::traits::{assignment::hungarian_algorithm::HungarianAlgorithmError, Bi
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// Errors that may occur when executing algorithms on a [`BipartiteGraph`].
 pub enum BipartiteAlgorithmError {
-    /// Error raised while executing the [`HungarianAlgorithm`].
+    /// Error raised while executing the `HungarianAlgorithm`.
     HungarianAlgorithm(HungarianAlgorithmError),
 }
 

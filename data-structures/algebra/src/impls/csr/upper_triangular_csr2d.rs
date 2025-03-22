@@ -167,7 +167,7 @@ where
         + Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
 {
     type Entry = Self::Coordinates;
-    type Error = super::MutabilityError<Self>;
+    type Error = crate::error::MutabilityError<Self>;
 
     fn add(&mut self, (row, column): Self::Entry) -> Result<(), Self::Error> {
         if row > column {
