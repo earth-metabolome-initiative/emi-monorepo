@@ -1,7 +1,10 @@
 //! Trait defining a bidimensional matrix.
 
 use super::SquareMatrix;
-use crate::{impls::ranged::SimpleRanged, traits::{IntoUsize, Zero, Matrix, PositiveInteger, SparseMatrix}};
+use crate::{
+    impls::ranged::SimpleRanged,
+    traits::{IntoUsize, Matrix, PositiveInteger, SparseMatrix, Zero},
+};
 
 /// Trait defining a bidimensional matrix.
 pub trait Matrix2D:
@@ -31,6 +34,16 @@ pub trait Matrix2D:
 
 impl<M: Matrix2D> Matrix for M {
     type Coordinates = (<Self as Matrix2D>::RowIndex, <Self as Matrix2D>::ColumnIndex);
+}
+
+/// Trait defining a bidimensional matrix which can return references to
+/// the number of rows and columns.
+pub trait Matrix2DRef: Matrix2D {
+    /// Returns a reference to the number of rows of the matrix.
+    fn number_of_rows_ref(&self) -> &Self::RowIndex;
+
+    /// Returns a reference to the number of columns of the matrix.
+    fn number_of_columns_ref(&self) -> &Self::ColumnIndex;
 }
 
 /// Trait defining a sparse bidimensional matrix.

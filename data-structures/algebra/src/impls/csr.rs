@@ -2,8 +2,6 @@
 
 pub mod csr2d;
 pub use csr2d::CSR2D;
-pub mod valued_csr2d;
-pub use valued_csr2d::ValuedCSR2D;
 pub mod upper_triangular_csr2d;
 pub use upper_triangular_csr2d::UpperTriangularCSR2D;
 pub mod square_csr2d;
@@ -14,14 +12,10 @@ pub mod csr2d_rows;
 pub use csr2d_rows::CSR2DRows;
 pub mod csr2d_columns;
 pub use csr2d_columns::CSR2DColumns;
-pub mod error;
-pub use error::*;
 pub mod symmetric_csr2d;
 pub use symmetric_csr2d::SymmetricCSR2D;
 pub mod csr2d_row_sizes;
 pub use csr2d_row_sizes::CSR2DRowSizes;
-pub mod valued_csr2d_columns;
-pub use valued_csr2d_columns::ValuedCSR2DColumns;
 pub mod csr2d_empty_rows_indices;
 pub use csr2d_empty_rows_indices::CSR2DEmptyRowIndices;
 pub mod csr2d_non_empty_rows_indices;

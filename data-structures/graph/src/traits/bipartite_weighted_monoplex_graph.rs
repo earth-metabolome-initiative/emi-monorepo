@@ -8,12 +8,10 @@
 //! * It is monoplex, i.e. it has only one type of edge.
 
 use super::{MonoplexBipartiteGraph, WeightedEdges, WeightedMonoplexGraph};
-use crate::traits::BipartiteGraph;
 
 /// Trait implemented by bipartite weighted monoplex graphs.
 pub trait BipartiteWeightedMonoplexGraph:
-    BipartiteGraph
-    + WeightedMonoplexGraph<
+    WeightedMonoplexGraph<
         WeightedEdges = <Self as BipartiteWeightedMonoplexGraph>::BipartiteWeightedEdges,
     > + MonoplexBipartiteGraph<
         MonoplexBipartiteEdges = <Self as BipartiteWeightedMonoplexGraph>::BipartiteWeightedEdges,
@@ -30,7 +28,7 @@ pub trait BipartiteWeightedMonoplexGraph:
 
 impl<G> BipartiteWeightedMonoplexGraph for G
 where
-    G: BipartiteGraph + WeightedMonoplexGraph,
+    G: WeightedMonoplexGraph + MonoplexBipartiteGraph<MonoplexBipartiteEdges = G::WeightedEdges>,
     <G as WeightedMonoplexGraph>::WeightedEdges: WeightedEdges<
         SourceNodeId = G::LeftNodeId,
         DestinationNodeId = G::RightNodeId,

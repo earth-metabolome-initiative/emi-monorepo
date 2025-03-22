@@ -52,6 +52,22 @@ where
     fn precursor_mz(&self) -> Self::Mz {
         self.precursor_mz
     }
+
+    fn intensity_nth(&self, n: usize) -> Self::Intensity {
+        self.intensity[n]
+    }
+
+    fn mz_nth(&self, n: usize) -> Self::Mz {
+        self.mz[n]
+    }
+
+    fn peak_nth(&self, n: usize) -> (Self::Mz, Self::Intensity) {
+        (self.mz_nth(n), self.intensity_nth(n))
+    }
+
+    fn mz_from(&self, index: usize) -> Self::SortedMzIter<'_> {
+        self.mz[index..].iter().copied()
+    }
 }
 
 impl<Mz, Intensity> SpectrumMut for GenericSpectrum<Mz, Intensity>

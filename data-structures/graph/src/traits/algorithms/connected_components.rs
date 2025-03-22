@@ -5,7 +5,7 @@ use algebra::prelude::*;
 use crate::traits::{MonopartiteGraph, UndirectedMonopartiteMonoplexGraph};
 
 /// Connected components object.
-pub struct ConnectedComponentsResult<'a, G: UndirectedMonopartiteMonoplexGraph + ?Sized, Marker = usize> {
+pub struct ConnectedComponentsResult<'a, G: MonopartiteGraph, Marker = usize> {
     /// Identifiers of the connected components.
     component_identifiers: Vec<Marker>,
     /// Underlying graph.
@@ -18,7 +18,7 @@ pub struct ConnectedComponentsResult<'a, G: UndirectedMonopartiteMonoplexGraph +
     smallest_component_size: G::NodeId,
 }
 
-impl<G: UndirectedMonopartiteMonoplexGraph + ?Sized, Marker: PositiveInteger>
+impl<G: UndirectedMonopartiteMonoplexGraph, Marker: PositiveInteger>
     ConnectedComponentsResult<'_, G, Marker>
 where
     G::NodeId: IntoUsize,
@@ -63,7 +63,7 @@ where
     pub fn nodes_of_component(
         &self,
         component_identifier: Marker,
-    ) -> impl Iterator<Item = &G::NodeSymbol> {
+    ) -> impl Iterator<Item = G::NodeSymbol> + '_ {
         self.graph.nodes().zip(self.component_identifiers.iter()).filter_map(
             move |(symbol, &component)| (component == component_identifier).then_some(symbol),
         )
@@ -99,7 +99,7 @@ impl From<ConnectedComponentsError>
     }
 }
 
-impl<G: MonopartiteGraph + ?Sized> From<ConnectedComponentsError>
+impl<G: MonopartiteGraph> From<ConnectedComponentsError>
     for crate::errors::MonopartiteError<G>
 {
     fn from(error: ConnectedComponentsError) -> Self {
@@ -117,7 +117,7 @@ impl<G: MonopartiteGraph + ?Sized> From<ConnectedComponentsError>
 ///   which are expected to be strongly connected, choosing a smaller integer
 ///   type may save a significant amount of memory.
 pub trait ConnectedComponents<Marker: IntoUsize + PositiveInteger = usize>:
-    UndirectedMonopartiteMonoplexGraph
+    UndirectedMonopartiteMonoplexGraph + Sized
 {
     /// Returns the number of connected components in the graph.
     ///
@@ -200,7 +200,7 @@ pub trait ConnectedComponents<Marker: IntoUsize + PositiveInteger = usize>:
     }
 }
 
-impl<G: UndirectedMonopartiteMonoplexGraph + ?Sized, Marker: IntoUsize + PositiveInteger>
+impl<G: UndirectedMonopartiteMonoplexGraph, Marker: IntoUsize + PositiveInteger>
     ConnectedComponents<Marker> for G
 {
 }

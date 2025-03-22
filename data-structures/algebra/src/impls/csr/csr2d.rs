@@ -104,6 +104,21 @@ impl<
 }
 
 impl<
+        SparseIndex,
+        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        ColumnIndex: PositiveInteger + IntoUsize,
+    > Matrix2DRef for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+{
+    fn number_of_rows_ref(&self) -> &Self::RowIndex {
+        &self.number_of_rows
+    }
+
+    fn number_of_columns_ref(&self) -> &Self::ColumnIndex {
+        &self.number_of_columns
+    }
+}
+
+impl<
         SparseIndex: PositiveInteger + IntoUsize,
         RowIndex: PositiveInteger + IntoUsize,
         ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
@@ -220,7 +235,7 @@ where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
     type Entry = Self::Coordinates;
-    type Error = super::MutabilityError<Self>;
+    type Error = crate::error::MutabilityError<Self>;
 
     fn add(&mut self, (row, column): Self::Entry) -> Result<(), Self::Error> {
         if !self.is_empty() && row.into_usize() == self.offsets.len() - 2 {

@@ -1,9 +1,9 @@
-//! [`BiMatrix`] data structure, which provides a wrapper to a matrix and its
+//! [`GenericBiMatrix2D`] data structure, which provides a wrapper to a matrix and its
 //! transposed version.
 
 use crate::prelude::*;
 
-/// [`BiMatrix`] data structure, which provides a wrapper to a matrix and its
+/// [`GenericBiMatrix2D`] data structure, which provides a wrapper to a matrix and its
 /// transposed version.
 pub struct GenericBiMatrix2D<M, T> {
     /// The matrix.
@@ -17,7 +17,7 @@ impl<
         M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
     > GenericBiMatrix2D<M, T>
 {
-    /// Creates a new instance of `GenericBiMatrix2D`.
+    /// Creates a new instance of [`GenericBiMatrix2D`].
     ///
     /// # Arguments
     ///

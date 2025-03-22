@@ -11,7 +11,7 @@ pub mod spectrum;
 pub mod spectrum_annotation;
 pub mod spectrum_mut;
 
-pub use reference_spectra::{CocaineSpectrum, GlucoseSpectrum, HydroxyCholesterolSpectrum};
+pub use reference_spectra::{CocaineSpectrum, GlucoseSpectrum, HydroxyCholesterolSpectrum, PhenylalanineSpectrum};
 pub use spectra::Spectra;
 pub use spectral_filter::SpectralFilter;
 pub use spectral_pipeline::SpectralPipeline;

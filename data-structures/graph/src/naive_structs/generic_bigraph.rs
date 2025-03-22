@@ -4,7 +4,7 @@ use algebra::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use super::generic_monoplex_bipartite_graph_builder::MonoplexBipartiteGraphBuilderError;
 use crate::traits::{
-    BidirectionalVocabulary, BipartiteGraph, Edges, Graph, MonoplexGraph, Vocabulary, VocabularyRef,
+    BidirectionalVocabulary, BipartiteGraph, Edges, Graph, MonoplexGraph, Vocabulary,
 };
 
 /// Struct representing a generic bigraph.
@@ -76,8 +76,8 @@ where
 
 impl<LeftNodes, RightNodes, E> BipartiteGraph for GenericBiGraph<LeftNodes, RightNodes, E>
 where
-    LeftNodes: Vocabulary + VocabularyRef + BidirectionalVocabulary,
-    RightNodes: Vocabulary + VocabularyRef + BidirectionalVocabulary,
+    LeftNodes: Vocabulary + BidirectionalVocabulary,
+    RightNodes: Vocabulary + BidirectionalVocabulary,
     LeftNodes::SourceSymbol: PositiveInteger + IntoUsize + TryFromUsize,
     RightNodes::SourceSymbol: PositiveInteger + IntoUsize + TryFromUsize,
     E: Edges<SourceNodeId = LeftNodes::SourceSymbol, DestinationNodeId = RightNodes::SourceSymbol>,
