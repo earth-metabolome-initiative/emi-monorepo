@@ -35,11 +35,12 @@ pub trait Assignment: Default {
 }
 
 /// Implements the Assignment trait for the `HashMap` data structure.
-impl<K, V, W, S: std::hash::BuildHasher + Default> Assignment for std::collections::HashMap<K, (V, W), S>
+impl<K, V, W, S: std::hash::BuildHasher + Default> Assignment
+    for std::collections::HashMap<K, (V, W), S>
 where
     K: PositiveInteger,
-	V: PositiveInteger,
-	W: Number
+    V: PositiveInteger,
+    W: Number,
 {
     type LeftNodeId = K;
     type RightNodeId = V;
@@ -70,6 +71,56 @@ where
     /// Returns the total cost of the assignment.
     fn cost(&self) -> Self::Weight {
         self.iter().map(|(_, (_, weight))| *weight).sum()
+    }
+
+    /// Returns the number of assigned nodes.
+    fn number_of_assigned_nodes(&self) -> usize {
+        self.len()
+    }
+}
+
+/// Implements the Assignment trait for the `Vec` data structure.
+impl<K, V, W> Assignment for Vec<(K, V, W)>
+where
+    K: PositiveInteger,
+    V: PositiveInteger,
+    W: Number,
+{
+    type LeftNodeId = K;
+    type RightNodeId = V;
+    type Weight = W;
+
+    /// Returns the assigned left node to the provided right node.
+    fn predecessor(
+        &self,
+        right_node_node_id: Self::RightNodeId,
+    ) -> Option<(Self::LeftNodeId, Self::Weight)> {
+        self.iter().find_map(|(left_node_id, assigned_right_node_id, weight)| {
+            if *assigned_right_node_id == right_node_node_id {
+                Some((*left_node_id, *weight))
+            } else {
+                None
+            }
+        })
+    }
+
+    /// Returns the assigned right node to the provided left node.
+    fn successor(
+        &self,
+        left_node_node_id: Self::LeftNodeId,
+    ) -> Option<(Self::RightNodeId, Self::Weight)> {
+        self.iter().find_map(|(assigned_left_node_id, right_node_id, weight)| {
+            if *assigned_left_node_id == left_node_node_id {
+                Some((*right_node_id, *weight))
+            } else {
+                None
+            }
+        })
+    }
+
+    /// Returns the total cost of the assignment.
+    fn cost(&self) -> Self::Weight {
+        self.iter().map(|(_, _, weight)| *weight).sum()
     }
 
     /// Returns the number of assigned nodes.

@@ -4,18 +4,18 @@
 use dual_edges::DualEdges;
 
 use super::AugmentingAlternatingPath;
-use crate::traits::BipartiteWeightedMonoplexGraph;
+use crate::traits::{BipartiteWeightedMonoplexGraph, MonoplexGraph, WeightedMonoplexGraph};
 
 mod dual_edges;
 mod graph_traits;
 
 /// Struct employed in the context of the Hungarian Algorithm
 /// to represent the dual weighted graph.
-pub(super) struct Dual<'graph, G: BipartiteWeightedMonoplexGraph + ?Sized> {
+pub(super) struct Dual<'graph, G: WeightedMonoplexGraph + ?Sized> {
     /// The associated dual graph.
     graph: &'graph G,
     /// The underlying edges.
-    edges: DualEdges<'graph, G::Edges>,
+    edges: DualEdges<'graph, <G as MonoplexGraph>::Edges>,
 }
 
 impl<'graph, G: BipartiteWeightedMonoplexGraph + ?Sized> From<&'graph G> for Dual<'graph, G> {

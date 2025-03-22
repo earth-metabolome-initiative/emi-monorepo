@@ -232,8 +232,10 @@ where
     }
 }
 
-impl<M: SparseMatrix2D, Map, Value> SparseMatrix2D
-    for GenericImplicitValuedMatrix2D<M, Map, Value>
+impl<M, Map, Value> SparseMatrix2D for GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: SparseMatrix2D,
+    Map: Fn(M::Coordinates) -> Value,
 {
     type SparseColumns<'a>
         = M::SparseColumns<'a>
@@ -301,7 +303,11 @@ impl<M: SparseMatrix2D, Map, Value> SparseMatrix2D
     }
 }
 
-impl<M: Matrix2D, Map, Value> ValuedMatrix for GenericImplicitValuedMatrix2D<M, Map, Value> {
+impl<M, Map, Value> ValuedMatrix for GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: Matrix2D,
+    Map: Fn(M::Coordinates) -> Value,
+{
     type Value = Value;
 }
 

@@ -57,7 +57,7 @@ where
         // We initialize the augmenting alternating paths.
         let mut augmenting_path: AugmentingAlternatingPath<Self> =
             AugmentingAlternatingPath::new(&dual, &partial_assignment);
-        
+
         // While the assignment is not complete
         'outer: while !partial_assignment.is_complete(&self) {
             // While we have not identified an augmenting path
@@ -86,7 +86,7 @@ where
 
 impl<A, G> HungarianAlgorithm<A> for G
 where
-    G: BipartiteWeightedMonoplexGraph + ?Sized,
+    G: BipartiteWeightedMonoplexGraph,
     A: Assignment + From<PartialAssignment<G>>,
 {
 }

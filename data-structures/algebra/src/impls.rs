@@ -12,6 +12,9 @@ pub mod valued_matrix;
 pub mod vec;
 mod vector;
 pub mod generic_iterators;
+pub mod error;
+pub mod valued_matrix;
+pub mod valued_matrix_columns;
 
 pub use csr::*;
 pub use error::{Error, MutabilityError};
@@ -24,3 +27,6 @@ pub use ranged_csr::*;
 pub use valued_matrix::*;
 pub use vec::VecMatrix2D;
 pub use generic_iterators::*;
+pub use error::{Error, MutabilityError};
+pub use valued_matrix::*;
+pub use valued_matrix_columns::*;
