@@ -1,7 +1,7 @@
 //! Submodule providing the structs to represent the state of the partial
 //! assignment in the context of the Hungarian algorithm.
 
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Debug};
 
 use algebra::prelude::{IntoUsize, Zero};
 
@@ -17,6 +17,16 @@ pub struct PartialAssignment<G: BipartiteWeightedMonoplexGraph + ?Sized> {
     pub(super) predecessors: Vec<Option<(G::LeftNodeId, Option<G::Weight>)>>,
     /// The number of assigned nodes.
     pub(super) number_of_assigned_nodes: usize,
+}
+
+impl<G: BipartiteWeightedMonoplexGraph + ?Sized> Debug for PartialAssignment<G> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("PartialAssignment")
+            .field("successors", &self.successors)
+            .field("predecessors", &self.predecessors)
+            .field("number_of_assigned_nodes", &self.number_of_assigned_nodes)
+            .finish()
+    }
 }
 
 impl<G: BipartiteWeightedMonoplexGraph + ?Sized, S: core::hash::BuildHasher + Default>
