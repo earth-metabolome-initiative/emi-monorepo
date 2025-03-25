@@ -2,11 +2,10 @@
 
 use ::graph::prelude::{Assignment, HungarianAlgorithm};
 use algebra::{
-    impls::{ranged::SimpleRanged, GenericImplicitValuedMatrix2D, RangedCSR2D},
-    prelude::{Number, Pow, Sqrt, Zero},
+    impls::{GenericImplicitValuedMatrix2D, RangedCSR2D, ranged::SimpleRanged},
+    prelude::{Number, One, Pow, Sqrt, Zero},
 };
 use functional_properties::prelude::ScalarSimilarity;
-use graph::traits::Edges;
 
 use crate::traits::{ScalarSpectralSimilarity, Spectrum};
 
@@ -20,24 +19,36 @@ pub struct HungarianCosine<EXP, MZ> {
     mz_tolerance: MZ,
 }
 
-impl<EXP, MZ> HungarianCosine<EXP, MZ> {
+impl<EXP: Number, MZ: Number> HungarianCosine<EXP, MZ> {
     /// Creates a new instance of the Hungarian cosine distance.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `mz_power`: The power to which the mass/charge ratio is raised.
     /// * `intensity_power`: The power to which the intensity is raised.
-    /// * `mz_tolerance`: The tolerance for the mass-shift of the mass/charge ratio.
-    /// 
+    /// * `mz_tolerance`: The tolerance for the mass-shift of the mass/charge
+    ///   ratio.
+    ///
     /// # Returns
-    /// 
+    ///
     /// A new instance of the Hungarian cosine distance.
     pub fn new(mz_power: EXP, intensity_power: EXP, mz_tolerance: MZ) -> Self {
-        Self {
-            mz_power,
-            intensity_power,
-            mz_tolerance,
-        }
+        Self { mz_power, intensity_power, mz_tolerance }
+    }
+
+    /// Returns the tolerance for the mass-shift of the mass/charge ratio.
+    pub fn mz_tolerance(&self) -> MZ {
+        self.mz_tolerance
+    }
+
+    /// Returns the power to which the mass/charge ratio is raised.
+    pub fn mz_power(&self) -> EXP {
+        self.mz_power
+    }
+
+    /// Returns the power to which the intensity is raised.
+    pub fn intensity_power(&self) -> EXP {
+        self.intensity_power
     }
 }
 
@@ -48,7 +59,7 @@ where
     S1: Spectrum<Intensity = <S1 as Spectrum>::Mz>,
     S2: Spectrum<Intensity = S1::Mz, Mz = S1::Mz>,
 {
-    type Similarity = S1::Mz;
+    type Similarity = (S1::Mz, u16);
 
     fn similarity(&self, left: &S1, right: &S2) -> Self::Similarity {
         let mut left_peak_products = Vec::with_capacity(left.len());
@@ -79,15 +90,17 @@ where
             |(i, j)| left_peak_products[i as usize] * right_peak_products[j as usize],
         );
 
-        println!("Initial graph {}", map.number_of_edges());
-
         let Ok(matching): Result<Vec<(u16, u16, S1::Mz)>, _> = map.hungarian() else {
-            return S1::Mz::ZERO;
+            return (S1::Mz::ZERO, 0);
         };
 
-        println!("Matching {:?}", matching);
+        let similarity = matching.cost() / (left_peak_norm * right_peak_norm);
 
-        matching.cost() / (left_peak_norm * right_peak_norm)
+        if similarity > S1::Mz::ONE {
+            (S1::Mz::ONE, matching.len() as u16)
+        } else {
+            (similarity, matching.len() as u16)
+        }
     }
 }
 
