@@ -1,14 +1,20 @@
 //! Trait defining a matrix.
 
+mod dense_matrix;
+mod dense_matrix2d;
 mod matrix2d;
 mod matrix_mut;
+mod sparse_matrix2d;
 mod square_matrix;
 mod transposed_valued_matrix2d;
 mod triangular_matrix;
 mod valued_matrix2d;
 
+pub use dense_matrix::*;
+pub use dense_matrix2d::*;
 pub use matrix2d::*;
 pub use matrix_mut::*;
+pub use sparse_matrix2d::*;
 pub use square_matrix::*;
 pub use transposed_valued_matrix2d::*;
 pub use triangular_matrix::*;
@@ -26,6 +32,16 @@ pub trait Matrix {
     /// Returns the number of dimensions of this matrix.
     fn dimensions() -> usize {
         Self::Coordinates::dimensions()
+    }
+
+    #[must_use]
+    /// Returns the shape of the matrix.
+    fn shape(&self) -> Vec<usize>;
+
+    #[must_use]
+    /// Returns the total number of values in the matrix.
+    fn total_values(&self) -> usize {
+        self.shape().iter().product()
     }
 }
 
@@ -62,6 +78,13 @@ pub trait SparseMatrix: Matrix {
 
     /// Returns the number of defined elements in the matrix.
     fn number_of_defined_values(&self) -> Self::SparseIndex;
+
+    /// Returns the density of the matrix.
+    fn density(&self) -> f64 {
+        let defined_values = self.number_of_defined_values().into_usize();
+        let total_values = self.total_values();
+        defined_values as f64 / total_values as f64
+    }
 
     /// Returns an iterator of the sparse coordinates of the matrix.
     fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_>;
