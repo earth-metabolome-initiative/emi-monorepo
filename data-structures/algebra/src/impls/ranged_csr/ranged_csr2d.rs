@@ -228,6 +228,8 @@ where
         }
 
         self.number_of_defined_values += SparseIndex::ONE;
+        self.number_of_columns = self.number_of_columns.max(column + R::Step::ONE);
+        self.number_of_rows = self.number_of_rows.max(row + RowIndex::ONE);
 
         if range.number_of_elements() == R::Step::ONE {
             self.number_of_non_empty_rows += RowIndex::ONE;
