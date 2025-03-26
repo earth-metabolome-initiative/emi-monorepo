@@ -1,7 +1,7 @@
 //! Submodule providing a trait providing an implementation of the Hungarian
 //! algorithm.
 
-use crate::traits::BipartiteWeightedMonoplexGraph;
+use crate::traits::{BipartiteGraph, BipartiteWeightedMonoplexGraph, HopcroftKarp, Assignment};
 
 mod augmenting_alternating_path;
 mod dual_graph;
@@ -11,19 +11,22 @@ use augmenting_alternating_path::AugmentingAlternatingPath;
 use dual_graph::Dual;
 use partial_assignment::PartialAssignment;
 
-use super::Assignment;
+use super::WeightedAssignment;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// Errors that may occur when executing the Hungarian algorithm.
 pub enum HungarianAlgorithmError {
     /// Error that occurs when the graph has no edges.
     NoEdges,
+    /// When the procedure failed to find a valid assignment.
+    NoAssignment,
 }
 
 impl core::fmt::Display for HungarianAlgorithmError {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             HungarianAlgorithmError::NoEdges => write!(f, "The graph has no edges."),
+            HungarianAlgorithmError::NoAssignment => write!(f, "No valid assignment found."),
         }
     }
 }
@@ -31,7 +34,10 @@ impl core::fmt::Display for HungarianAlgorithmError {
 /// Trait providing an implementation of the Hungarian algorithm.
 pub trait HungarianAlgorithm<A>: BipartiteWeightedMonoplexGraph
 where
-    A: Assignment + From<PartialAssignment<Self>>,
+    A: WeightedAssignment + From<PartialAssignment<Self>>,
+    Self: HopcroftKarp<
+        Vec<(<Self as BipartiteGraph>::LeftNodeId, <Self as BipartiteGraph>::RightNodeId)>,
+    >,
 {
     /// Return the assignment as assigned by the Hungarian algorithm.
     ///
@@ -72,12 +78,30 @@ where
                 }
                 // We update the dual weights.
                 if !dual.update(&mut augmenting_path) {
+                    println!("No dual update");
                     break 'outer;
                 }
             };
             // We update the assignment by executing a new
             // primal iteration.
             partial_assignment.update(path_end, &augmenting_path);
+        }
+
+        if !partial_assignment.is_complete(&self) {
+            println!(
+                "Found {} assignments out of {}, {}, with {} possible edges to use",
+                partial_assignment.number_of_assigned_nodes,
+                self.number_of_non_singletons_in_left_partition(),
+                self.number_of_right_nodes(),
+                self.number_of_edges()
+            );
+            println!("{}", self.to_mb_dot());
+            let assignment: Vec<(
+                <Self as BipartiteGraph>::LeftNodeId,
+                <Self as BipartiteGraph>::RightNodeId,
+            )> = self.hopcroft_karp().unwrap();
+            println!("{}", assignment.number_of_assigned_nodes());
+            return Err(HungarianAlgorithmError::NoAssignment);
         }
 
         Ok(partial_assignment.into())
@@ -87,6 +111,6 @@ where
 impl<A, G> HungarianAlgorithm<A> for G
 where
     G: BipartiteWeightedMonoplexGraph,
-    A: Assignment + From<PartialAssignment<G>>,
+    A: WeightedAssignment + From<PartialAssignment<G>>,
 {
 }

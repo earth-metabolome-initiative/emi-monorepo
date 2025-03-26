@@ -54,6 +54,12 @@ pub trait SparseMatrix2D: Matrix2D + SparseMatrix {
     /// Returns the number of non-empty rows.
     fn number_of_non_empty_rows(&self) -> Self::RowIndex;
 
+    /// Returns the number of empty columns.
+    fn number_of_empty_columns(&self) -> Self::ColumnIndex;
+
+    /// Returns the number of non-empty columns.
+    fn number_of_non_empty_columns(&self) -> Self::ColumnIndex;
+
     /// Returns an iterator over the row indices of the empty rows.
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_>;
 

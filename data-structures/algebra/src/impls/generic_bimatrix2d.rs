@@ -222,6 +222,14 @@ where
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         self.matrix.number_of_non_empty_rows()
     }
+
+    fn number_of_empty_columns(&self) -> Self::ColumnIndex {
+        self.transposed.number_of_empty_rows()
+    }
+
+    fn number_of_non_empty_columns(&self) -> Self::ColumnIndex {
+        self.transposed.number_of_non_empty_rows()
+    }
 }
 
 impl<T, M> TransposableMatrix2D<T> for GenericBiMatrix2D<M, T>

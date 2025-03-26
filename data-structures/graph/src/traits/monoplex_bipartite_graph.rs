@@ -34,6 +34,16 @@ pub trait MonoplexBipartiteGraph:
         self.edges().matrix().number_of_non_empty_rows()
     }
 
+    /// Returns the number of singletons in the right partition.
+    fn number_of_singletons_in_right_partition(&self) -> <Self as BipartiteGraph>::RightNodeId {
+        self.edges().matrix().number_of_empty_columns()
+    }
+
+    /// Returns the number of non-singletons in the right partition.
+    fn number_of_non_singletons_in_right_partition(&self) -> <Self as BipartiteGraph>::RightNodeId {
+        self.edges().matrix().number_of_non_empty_columns()
+    }
+
     /// Returns an iterator over the singletons in the left partition.
     fn left_partition_singleton_ids(
         &self,
