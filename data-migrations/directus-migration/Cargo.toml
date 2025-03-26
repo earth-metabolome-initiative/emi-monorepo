@@ -14,10 +14,11 @@ postgis_diesel.workspace = true
 web_common_traits.workspace = true
 tokio.workspace = true
 const_format.workspace = true
+core-structures.workspace = true
 
 [features]
 default = ["serde", "64-column-tables"]
 serde = []
-postgres = ["diesel-async/postgres", "diesel/extras", "postgis_diesel/diesel"]
+postgres = ["diesel-async/postgres", "diesel/extras", "postgis_diesel/diesel", "core-structures/postgres"]
 32-column-tables = ["postgres"]
 64-column-tables = ["32-column-tables", "diesel/64-column-tables"]
