@@ -160,6 +160,14 @@ where
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         self.csr.number_of_non_empty_rows()
     }
+
+    fn number_of_empty_columns(&self) -> Self::ColumnIndex {
+        self.csr.number_of_empty_columns()
+    }
+
+    fn number_of_non_empty_columns(&self) -> Self::ColumnIndex {
+        self.csr.number_of_non_empty_columns()
+    }
 }
 
 impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize>

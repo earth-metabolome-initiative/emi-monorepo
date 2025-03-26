@@ -196,6 +196,22 @@ where
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         self.number_of_non_empty_rows
     }
+
+    fn number_of_empty_columns(&self) -> Self::ColumnIndex {
+        self.number_of_columns() - self.number_of_non_empty_columns()
+    }
+
+    fn number_of_non_empty_columns(&self) -> Self::ColumnIndex {
+        let mut non_empty_columns = vec![false; self.number_of_columns().into_usize()];
+        let mut number_of_non_empty_columns = Self::ColumnIndex::ZERO;
+        for column in self.sparse_columns() {
+            if !non_empty_columns[column.into_usize()] {
+                number_of_non_empty_columns += Self::ColumnIndex::ONE;
+                non_empty_columns[column.into_usize()] = true;
+            }
+        }
+        number_of_non_empty_columns
+    }
 }
 
 impl<

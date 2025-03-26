@@ -163,7 +163,6 @@ where
         self.csr.sparse_row_sizes()
     }
 
-    /// Returns the rank for the provided row.
     fn rank(&self, row: Idx) -> Self::SparseIndex {
         self.csr.rank(row)
     }
@@ -182,6 +181,14 @@ where
 
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         self.csr.number_of_non_empty_rows()
+    }
+
+    fn number_of_empty_columns(&self) -> Self::ColumnIndex {
+        self.csr.number_of_empty_columns()
+    }
+
+    fn number_of_non_empty_columns(&self) -> Self::ColumnIndex {
+        self.csr.number_of_non_empty_columns()
     }
 }
 

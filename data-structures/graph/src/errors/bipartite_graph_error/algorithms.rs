@@ -1,6 +1,6 @@
 //! Errors raised in algorithms defined for [`BipartiteGraph`]s.
 
-use crate::traits::{assignment::hungarian_algorithm::HungarianAlgorithmError, BipartiteGraph};
+use crate::traits::{weighted_assignment::hungarian_algorithm::HungarianAlgorithmError, BipartiteGraph};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// Errors that may occur when executing algorithms on a [`BipartiteGraph`].

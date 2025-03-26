@@ -3,10 +3,7 @@
 use algebra::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use super::generic_monoplex_monopartite_graph_builder::MonoplexMonopartiteGraphBuilderError;
-use crate::traits::{
-    BidirectionalVocabulary, Edges, Graph, MonopartiteGraph, MonoplexGraph, Vocabulary,
-    VocabularyRef,
-};
+use crate::traits::{BidirectionalVocabulary, Edges, Graph, MonopartiteGraph, MonoplexGraph};
 
 /// Struct representing a generic graph.
 pub struct GenericGraph<Nodes, Edges> {
@@ -49,7 +46,8 @@ impl<Nodes, Edges> TryFrom<(Nodes, Edges)> for GenericGraph<Nodes, Edges> {
 
 impl<Nodes, E> Graph for GenericGraph<Nodes, E>
 where
-    Nodes: Vocabulary,
+    Nodes: BidirectionalVocabulary,
+    Nodes::SourceSymbol: PositiveInteger + IntoUsize + TryFromUsize,
     E: Edges<SourceNodeId = Nodes::SourceSymbol, DestinationNodeId = Nodes::SourceSymbol>,
 {
     fn has_edges(&self) -> bool {
@@ -63,7 +61,7 @@ where
 
 impl<Nodes, E> MonopartiteGraph for GenericGraph<Nodes, E>
 where
-    Nodes: VocabularyRef + BidirectionalVocabulary,
+    Nodes: BidirectionalVocabulary,
     Nodes::SourceSymbol: PositiveInteger + IntoUsize + TryFromUsize,
     E: Edges<SourceNodeId = Nodes::SourceSymbol, DestinationNodeId = Nodes::SourceSymbol>,
 {
@@ -78,7 +76,8 @@ where
 
 impl<Nodes, E> MonoplexGraph for GenericGraph<Nodes, E>
 where
-    Nodes: Vocabulary,
+    Nodes: BidirectionalVocabulary,
+    Nodes::SourceSymbol: PositiveInteger + IntoUsize + TryFromUsize,
     E: Edges<SourceNodeId = Nodes::SourceSymbol, DestinationNodeId = Nodes::SourceSymbol>,
 {
     type Edge = E::Edge;

@@ -49,8 +49,8 @@ impl<G: BipartiteWeightedMonoplexGraph + ?Sized, S: core::hash::BuildHasher + De
     }
 }
 
-impl<G: BipartiteWeightedMonoplexGraph + ?Sized>
-    From<PartialAssignment<G>> for Vec<(G::LeftNodeId, G::RightNodeId, G::Weight)>
+impl<G: BipartiteWeightedMonoplexGraph + ?Sized> From<PartialAssignment<G>>
+    for Vec<(G::LeftNodeId, G::RightNodeId, G::Weight)>
 {
     fn from(value: PartialAssignment<G>) -> Self {
         value.predecessors.iter().flatten().copied().map(|(left_node_id, weight)| {
@@ -120,10 +120,10 @@ impl<G: BipartiteWeightedMonoplexGraph + ?Sized> PartialAssignment<G> {
     /// Returns whether the assignment is complete.
     pub(super) fn is_complete(&self, graph: &G) -> bool {
         self.number_of_assigned_nodes
-            == graph
+            >= graph
                 .number_of_non_singletons_in_left_partition()
                 .into_usize()
-                .min(self.predecessors.len())
+                .min(graph.number_of_non_singletons_in_right_partition().into_usize())
     }
 
     /// Returns whether the provided right now has no predecessor.
