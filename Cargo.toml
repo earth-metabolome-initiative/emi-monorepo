@@ -50,7 +50,7 @@ sqlparser = { git = "https://github.com/LucaCappelletti94/sqlparser-rs.git", bra
 diesel = { version = "2.2", default-features = false, features = ["extras"] }
 diesel-async = { version = "0.5", default-features = false }
 diesel_full_text_search = "2.2"
-postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel.git", branch = "master", features = [
+postgis_diesel = { version = "2.5.0", features = [
     "serde",
 ], default-features = false }
 uuid = { version = "1.13", features = ["serde", "v4", "js"] }
@@ -75,7 +75,6 @@ core-structures-builder = { path = "web/core-structures/core-structures-builder"
 regex = "1.11"
 plotters = "0.3.7"
 futures = "0.3.31"
-config = "0.14.1"
 wasm-bindgen-futures = "0.4.50"
 trybuild = "1"
 const_format = "0.2.34"
