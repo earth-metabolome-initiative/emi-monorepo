@@ -131,7 +131,7 @@ impl Codegen<'_> {
         let mut insertables_main_module = TokenStream::new();
 
         for table in tables {
-            if !table.allows_insertable(conn)? {
+            if !self.is_table_insertable(table, conn)? {
                 continue;
             }
 
@@ -300,7 +300,7 @@ impl Codegen<'_> {
             let table_identifier = table.snake_case_ident()?;
             insertables_main_module.extend(quote::quote! {
                 mod #table_identifier;
-                pub use #table_identifier::{#insertable_variant_ident, #insertable_builder_ident};
+                pub use #table_identifier::{#insertable_variant_ident, #insertable_builder_ident, #insertable_enum};
             });
         }
 

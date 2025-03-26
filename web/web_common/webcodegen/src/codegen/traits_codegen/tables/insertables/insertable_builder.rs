@@ -33,7 +33,7 @@ impl Codegen<'_> {
         let syntax_flag = self.syntax.as_feature_flag();
 
         for table in tables {
-            if !table.allows_insertable(conn)? {
+            if !self.is_table_insertable(table, conn)? {
                 continue;
             }
             // We create a file for each table

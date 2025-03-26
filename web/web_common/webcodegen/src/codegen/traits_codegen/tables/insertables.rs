@@ -15,10 +15,29 @@ use crate::{
     codegen::{
         CODEGEN_INSERTABLE_BUILDER_PATH, CODEGEN_INSERTABLE_PATH, CODEGEN_INSERTABLE_VARIANT_PATH,
     },
+    errors::WebCodeGenError,
     Codegen, Table,
 };
 
 impl Codegen<'_> {
+    /// Returns wether the table should be insertable or not
+    ///
+    ///  # Arguments
+    /// 
+    ///  * `table` - The passed table
+    ///  * `conn` - A mutable reference to a `PgConnection`.
+    /// 
+    ///  # Errors
+    /// 
+    /// * If the database connection fails.
+    pub(crate) fn is_table_insertable(
+        &self,
+        table: &Table,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        Ok(table.has_created_by_column(conn)?
+            || self.users_table.map_or(false, |users_table| users_table == table))
+    }
     /// Generates the [`Insertable`] and [`Insertable`]-adjacent traits
     /// implementation for the tables
     ///
