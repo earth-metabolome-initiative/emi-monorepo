@@ -60,9 +60,6 @@ pub struct PgType {
     pub typdelim: String,
     /// The relation ID for a composite type.
     pub typrelid: u32,
-    /// The subscript function for the type.
-    #[cfg(feature = "postgres_17")]
-    pub typsubscript: u32,
     /// The element type of an array type.
     pub typelem: u32,
     /// The array type of a base type.

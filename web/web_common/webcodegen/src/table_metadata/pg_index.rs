@@ -39,8 +39,6 @@ pub struct PgIndex {
     pub indnkeyatts: i16,
     /// `true` if the index enforces uniqueness.
     pub indisunique: bool,
-    /// `true` if NULL values are treated as distinct in unique constraints.
-    pub indnullsnotdistinct: bool,
     /// `true` if this is the primary key index for the table.
     pub indisprimary: bool,
     /// `true` if this index enforces an exclusion constraint.
