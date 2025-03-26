@@ -119,7 +119,7 @@ pub async fn main() {
         .enable_deletable_trait()
         .enable_insertable_trait()
         .enable_foreign_trait()
-        // .beautify()
+        .beautify()
         .generate(&mut conn, DATABASE_NAME, None)
         .unwrap();
     time_tracker.add_completed_task(task);
