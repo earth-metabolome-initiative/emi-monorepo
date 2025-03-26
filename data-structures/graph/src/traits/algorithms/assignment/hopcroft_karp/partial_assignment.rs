@@ -98,22 +98,17 @@ impl<'a, G: MonoplexBipartiteGraph + ?Sized, Distance: Number> PartialAssignment
         while !frontier.is_empty() {
             let mut tmp_frontier = Vec::new();
             for left_node_id in frontier {
-                if self.left_distance(Some(left_node_id)) < self.null_distance {
-                    if self.left_distance(Some(left_node_id)) == Distance::MAX - Distance::ONE {
+                let left_distance = self.left_distances[left_node_id.into_usize()];
+                if left_distance < self.null_distance {
+                    if left_distance == Distance::MAX - Distance::ONE {
                         return Err(HopcroftKarpError::InsufficientDistanceType);
                     }
                     for right_node_id in self.graph.successors(left_node_id) {
-                        match self.predecessors[right_node_id.into_usize()] {
-                            Some(predecessor) => {
-                                if self.left_distances[predecessor.into_usize()] == Distance::MAX {
-                                    self.left_distances[predecessor.into_usize()] =
-                                        left_distance + Distance::ONE;
-                                    tmp_frontier.push(predecessor);
-                                }
-                            }
-                            None => {
-                                self.null_distance = left_distance + Distance::ONE;
-                            }
+                        let maybe_predecessor_id = self.predecessors[right_node_id.into_usize()];
+                        let predecessor_distance = self.left_distance_mut(maybe_predecessor_id);
+                        if *predecessor_distance == Distance::MAX {
+                            *predecessor_distance = left_distance + Distance::ONE;
+                            tmp_frontier.extend(maybe_predecessor_id);
                         }
                     }
                 }
@@ -154,16 +149,16 @@ impl<'a, G: MonoplexBipartiteGraph + ?Sized, Distance: Number> PartialAssignment
 		let Some(left_node_id) = left_node_id else {
 			return true;
 		};
-        for right_node_id in self.graph.successors(left_node_id) {
-            if let Some(predecessor) = self.predecessors[right_node_id.into_usize()] {
-                if self.left_distances[predecessor.into_usize()]
-                    == self.left_distances[left_node_id.into_usize()] + Distance::ONE
-                {
-                    if self.dfs(predecessor) {
-                        self.successors[left_node_id.into_usize()] = Some(right_node_id);
-                        self.predecessors[right_node_id.into_usize()] = Some(left_node_id);
-                        return true;
-                    }
+        let left_distance = self.left_distances[left_node_id.into_usize()];
+        for successor_id in self.graph.successors(left_node_id) {
+            let maybe_predecessor_id = self.predecessors[successor_id.into_usize()];
+            if self.left_distance(maybe_predecessor_id)
+                == left_distance + Distance::ONE
+            {
+                if self.dfs(maybe_predecessor_id) {
+                    self.successors[left_node_id.into_usize()] = Some(successor_id);
+                    self.predecessors[successor_id.into_usize()] = Some(left_node_id);
+                    return true;
                 }
             }
         }

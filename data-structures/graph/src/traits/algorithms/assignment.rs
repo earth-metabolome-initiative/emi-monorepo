@@ -11,6 +11,15 @@ pub trait Assignment {
     type LeftNodeId;
     /// The right node id
     type RightNodeId;
+    /// Iterator over the assignments of the left node ids to the right node
+    /// ids.
+    type Assignments<'a>: Iterator<Item = (Self::LeftNodeId, Self::RightNodeId)>
+    where
+        Self: 'a;
+
+    /// Returns an iterator over the assignments of the left node ids to the
+    /// right node ids.
+    fn assignments(&self) -> Self::Assignments<'_>;
 
     /// Returns the assigned left node to the provided right node.
     fn predecessor(&self, right_node_node_id: Self::RightNodeId) -> Option<Self::LeftNodeId>;
@@ -27,6 +36,17 @@ impl<K: PositiveInteger, V: PositiveInteger, S: std::hash::BuildHasher + Default
 {
     type LeftNodeId = K;
     type RightNodeId = V;
+    type Assignments<'a>
+        = core::iter::Zip<
+        core::iter::Copied<std::collections::hash_map::Keys<'a, K, V>>,
+        core::iter::Copied<std::collections::hash_map::Values<'a, K, V>>,
+    >
+    where
+        Self: 'a;
+
+    fn assignments(&self) -> Self::Assignments<'_> {
+        self.keys().copied().zip(self.values().copied())
+    }
 
     /// Returns the assigned left node to the provided right node.
     fn predecessor(&self, right_node_node_id: Self::RightNodeId) -> Option<Self::LeftNodeId> {
@@ -57,6 +77,15 @@ where
 {
     type LeftNodeId = K;
     type RightNodeId = V;
+    type Assignments<'a>
+        = core::iter::Copied<core::slice::Iter<'a, (Self::LeftNodeId, Self::RightNodeId)>>
+    where
+        K: 'a,
+        V: 'a;
+
+    fn assignments(&self) -> Self::Assignments<'_> {
+        self.iter().copied()
+    }
 
     fn predecessor(&self, right_node_node_id: Self::RightNodeId) -> Option<Self::LeftNodeId> {
         self.iter().find_map(|(left_node_id, assigned_right_node_id)| {

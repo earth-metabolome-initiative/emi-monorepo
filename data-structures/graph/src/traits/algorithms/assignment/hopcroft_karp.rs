@@ -30,7 +30,7 @@ where
         while partial_assignment.bfs()? {
             for left_node_id in self.left_node_ids() {
                 if !partial_assignment.has_successor(left_node_id) {
-                    partial_assignment.dfs(left_node_id);
+                    partial_assignment.dfs(Some(left_node_id));
                 }
             }
         }
