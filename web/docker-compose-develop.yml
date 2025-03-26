@@ -3,7 +3,7 @@ services:
   postgres:
     container_name: ${POSTGRES_DOCKER_NAME}
     build:
-      context: ./core_structures
+      context: ./core-structures
       dockerfile: Dockerfile
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       # - ${POSTGRES_DATABASE_DIRECTORY}:/var/lib/postgresql/data
-      - ./core_structures:/app
+      - ./core-structures:/app
     ports:
       - "${PGPORT}:5432"
     networks:
@@ -100,28 +100,28 @@ services:
   #     - develop_frontend
   #     - develop_backend
 
-  nginx:
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
-    build:
-      context: ./nginx
-    volumes:
-      - ./nginx:/app
-    environment:
-      ACTIX_PORT: ${ACTIX_PORT}
-      TRUNK_PORT: ${TRUNK_PORT}
-      NGINX_HTTPS_PORT: ${NGINX_HTTPS_PORT}
-      DOMAIN: ${DOMAIN}
-      NGINX_WORKER_PROCESSES: ${NGINX_WORKER_PROCESSES}
-    ports:
-      - "${NGINX_HTTPS_PORT}:${NGINX_HTTPS_PORT}"
-    # depends_on:
-    #   - actix-server
-    #   - yew-frontend
-    networks:
-      - develop_frontend
-      - develop_backend
-    restart: on-failure
+  # nginx:
+  #   stdin_open: true # docker run -i
+  #   tty: true        # docker run -t
+  #   build:
+  #     context: ./nginx
+  #   volumes:
+  #     - ./nginx:/app
+  #   environment:
+  #     ACTIX_PORT: ${ACTIX_PORT}
+  #     TRUNK_PORT: ${TRUNK_PORT}
+  #     NGINX_HTTPS_PORT: ${NGINX_HTTPS_PORT}
+  #     DOMAIN: ${DOMAIN}
+  #     NGINX_WORKER_PROCESSES: ${NGINX_WORKER_PROCESSES}
+  #   ports:
+  #     - "${NGINX_HTTPS_PORT}:${NGINX_HTTPS_PORT}"
+  #   # depends_on:
+  #   #   - actix-server
+  #   #   - yew-frontend
+  #   networks:
+  #     - develop_frontend
+  #     - develop_backend
+  #   restart: on-failure
 
 networks:
   develop_frontend:
