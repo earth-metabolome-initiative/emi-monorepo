@@ -224,6 +224,22 @@ where
     fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
         self.into()
     }
+
+    fn number_of_empty_columns(&self) -> Self::ColumnIndex {
+        self.number_of_columns() - self.number_of_non_empty_columns()
+    }
+
+    fn number_of_non_empty_columns(&self) -> Self::ColumnIndex {
+        let mut non_empty_columns = vec![false; self.number_of_columns().into_usize()];
+        let mut number_of_non_empty_columns = ColumnIndex::ZERO;
+        for column in self.sparse_columns() {
+            if !non_empty_columns[column.into_usize()] {
+                number_of_non_empty_columns += ColumnIndex::ONE;
+            }
+            non_empty_columns[column.into_usize()] = true;
+        }
+        number_of_non_empty_columns
+    }
 }
 
 impl<

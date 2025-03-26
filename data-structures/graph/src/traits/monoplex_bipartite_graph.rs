@@ -5,7 +5,7 @@
 //! * They are bipartite, i.e., they have two types of nodes.
 //! * They are monoplex, i.e., they have only one type of edges.
 
-use algebra::prelude::{SparseMatrix2D, Zero};
+use algebra::prelude::{SparseMatrix2D, Zero, IntoUsize};
 
 use super::{BipartiteGraph, Edges, MonoplexGraph};
 
@@ -34,6 +34,16 @@ pub trait MonoplexBipartiteGraph:
         self.edges().matrix().number_of_non_empty_rows()
     }
 
+    /// Returns the number of singletons in the right partition.
+    fn number_of_singletons_in_right_partition(&self) -> <Self as BipartiteGraph>::RightNodeId {
+        self.edges().matrix().number_of_empty_columns()
+    }
+
+    /// Returns the number of non-singletons in the right partition.
+    fn number_of_non_singletons_in_right_partition(&self) -> <Self as BipartiteGraph>::RightNodeId {
+        self.edges().matrix().number_of_non_empty_columns()
+    }
+
     /// Returns an iterator over the singletons in the left partition.
     fn left_partition_singleton_ids(
         &self,
@@ -48,6 +58,31 @@ pub trait MonoplexBipartiteGraph:
     ) -> <<Self::MonoplexBipartiteEdges as Edges>::Matrix as SparseMatrix2D>::NonEmptyRowIndices<'_>
     {
         self.edges().matrix().non_empty_row_indices()
+    }
+
+    /// Returns a DOT representation for the Monoplex Bipartite Graph.
+    fn to_mb_dot(&self) -> String {
+        let mut dot = String::new();
+        dot.push_str("graph {\n");
+
+        for left_node_id in self.left_node_ids() {
+            dot.push_str(&format!("  L{} [color=red];\n", left_node_id.into_usize()));
+        }
+
+        for right_node_id in self.right_node_ids() {
+            dot.push_str(&format!("  R{} [color=blue];\n", right_node_id.into_usize()));
+        }
+
+        for (src, dst) in self.edges().sparse_coordinates() {
+            dot.push_str(&format!(
+                "  L{} -> R{};\n",
+                src.into_usize(),
+                dst.into_usize()
+            ));
+        }
+
+        dot.push_str("}\n");
+        dot
     }
 }
 
