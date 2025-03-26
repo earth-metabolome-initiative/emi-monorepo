@@ -1,11 +1,12 @@
 //! Implementation of the cosine distance for mass spectra.
 
-use ::graph::prelude::{Assignment, HungarianAlgorithm};
+use ::graph::prelude::{WeightedAssignment, HungarianAlgorithm};
 use algebra::{
     impls::{GenericImplicitValuedMatrix2D, RangedCSR2D, ranged::SimpleRanged},
-    prelude::{Number, One, Pow, Sqrt, Zero},
+    prelude::{Number, One, Pow, SparseMatrix2D, Sqrt, Zero},
 };
 use functional_properties::prelude::ScalarSimilarity;
+use graph::traits::Edges;
 
 use crate::traits::{ScalarSpectralSimilarity, Spectrum};
 
@@ -90,9 +91,17 @@ where
             |(i, j)| left_peak_products[i as usize] * right_peak_products[j as usize],
         );
 
-        let Ok(matching): Result<Vec<(u16, u16, S1::Mz)>, _> = map.hungarian() else {
+        if !map.has_edges() {
             return (S1::Mz::ZERO, 0);
-        };
+        }
+
+        println!(
+            "left node: {}, right nodes: {}",
+            map.number_of_non_empty_rows(),
+            map.number_of_non_empty_columns()
+        );
+        let matching: Vec<(u16, u16, S1::Mz)> =
+            map.hungarian().expect("Failed to compute the Hungarian algorithm");
 
         let similarity = matching.cost() / (left_peak_norm * right_peak_norm);
 

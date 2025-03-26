@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use ::graph::{prelude::*, traits::assignment::hungarian_algorithm::HungarianAlgorithmError};
+use ::graph::{prelude::*, traits::weighted_assignment::hungarian_algorithm::HungarianAlgorithmError};
 use algebra::{
     impls::{ranged::SimpleRanged, GenericImplicitValuedMatrix2D, RangedCSR2D, CSR2D},
     prelude::ValuedCSR2D,

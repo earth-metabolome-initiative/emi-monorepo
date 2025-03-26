@@ -125,6 +125,14 @@ impl<M: ValuedSparseMatrix2D + ?Sized> SparseMatrix2D for DualMatrix<'_, M> {
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         self.matrix.number_of_non_empty_rows()
     }
+    
+    fn number_of_empty_columns(&self) -> Self::ColumnIndex {
+        self.matrix.number_of_empty_columns()
+    }
+
+    fn number_of_non_empty_columns(&self) -> Self::ColumnIndex {
+        self.matrix.number_of_non_empty_columns()
+    }
 }
 
 impl<M: ValuedSparseMatrix2D + ?Sized> ValuedSparseMatrix2D for DualMatrix<'_, M>
