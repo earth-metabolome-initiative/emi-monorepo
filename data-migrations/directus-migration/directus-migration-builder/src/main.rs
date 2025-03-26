@@ -1,41 +1,31 @@
 //! Build the core structures.
 use std::path::Path;
 
-use config::{Config, File};
 use diesel::{Connection, pg::PgConnection};
 use time_requirements::prelude::*;
 use webcodegen::{Codegen, Table};
+
+const DATABASE_NAME: &str = "directus";
+const DATABASE_PASSWORD: &str = "directus_dbgi";
+const DATABASE_USER: &str = "directus";
+const DATABASE_PORT: u16 = 5434;
+const HOSTNAME: &str = "134.21.20.118";
+const DATABASE_URL: &str = const_format::formatcp!(
+    "postgres://{DATABASE_USER}:{DATABASE_PASSWORD}@{HOSTNAME}:{DATABASE_PORT}/{DATABASE_NAME}",
+);
 
 #[tokio::main]
 pub async fn main() {
     // Get the output directory
     let out_dir = Path::new("../src");
 
-    // Load the configuration
-    let settings = Config::builder()
-        .add_source(File::with_name("config.ini"))
-        .build()
-        .expect("Failed to load configuration file");
-
-    // Extract the database settings
-    let database_name: String = settings.get("database.name").expect("Missing database.name");
-    let database_password: String =
-        settings.get("database.password").expect("Missing database.password");
-    let database_user: String = settings.get("database.user").expect("Missing database.user");
-    let database_port: u16 = settings.get("database.port").expect("Missing database.port");
-    let database_host: String = settings.get("database.host").expect("Missing database.host");
-
-    let database_url = format!(
-        "postgres://{database_user}:{database_password}@{database_host}:{database_port}/{database_name}",
-    );
-
     // We ensure that the migrations directory has all expected properties.
     let mut time_tracker = TimeTracker::new("Building Directus Structures");
 
-    let mut conn = PgConnection::establish(&database_url).unwrap();
+    let mut conn = PgConnection::establish(DATABASE_URL).unwrap();
 
     // We write to the target directory the generated structs
-    let curation_data = Table::load(&mut conn, "Curation_Data", None, "directus").unwrap();
+    let curation_data = Table::load(&mut conn, "Curation_Data", None, DATABASE_NAME).unwrap();
 
     // Generate the code associated with the database
     let task = Task::new("Generating Code");
@@ -45,9 +35,12 @@ pub async fn main() {
         .enable_loadable_trait()
         .enable_foreign_trait()
         .beautify()
-        .generate(&mut conn, "directus", None)
+        .generate(&mut conn, DATABASE_NAME, None)
         .unwrap();
     time_tracker.add_completed_task(task);
+
+    // We create the directory `time_tracker` if it does not already exist
+    std::fs::create_dir_all("./time_tracker").unwrap();
 
     // We save the time tracker
     time_tracker.save(Path::new("./time_tracker")).unwrap();
