@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS derived_samples (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     parent_sample_id UUID NOT NULL,
     child_sample_id UUID NOT NULL,
-    quantity FLOAT NOT NULL CHECK (must_be_strictly_positive_float(quantity)),
+    quantity FLOAT NOT NULL,
     unit_id SMALLINT NOT NULL,
     PRIMARY KEY (parent_sample_id, child_sample_id),
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
