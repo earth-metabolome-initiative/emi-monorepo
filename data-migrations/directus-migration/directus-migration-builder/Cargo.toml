@@ -1,0 +1,14 @@
+[package]
+name = "directus-migration-builder"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio.workspace = true
+webcodegen.workspace = true
+diesel_migrations_utils.workspace = true
+time-requirements.workspace = true
+quote.workspace = true
+const_format.workspace = true
+config.workspace = true
+diesel = {workspace=true, features = ["postgres"]}
