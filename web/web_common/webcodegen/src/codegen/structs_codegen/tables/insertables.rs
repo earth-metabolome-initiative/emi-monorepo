@@ -138,7 +138,7 @@ impl Codegen<'_> {
             let columns = table
                 .columns(conn)?
                 .into_iter()
-                .filter(|column| !column.is_automatically_generated())
+                .filter(|column| !column.is_always_automatically_generated())
                 .collect::<Vec<_>>();
 
             let insertable_enum = table.insertable_enum_ident()?;

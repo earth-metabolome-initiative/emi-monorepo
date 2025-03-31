@@ -479,12 +479,14 @@ impl Column {
     /// # Returns
     ///
     /// A `bool` indicating whether the column is automatically generated
-    pub fn is_automatically_generated(&self) -> bool {
+    pub fn is_always_automatically_generated(&self) -> bool {
         self.is_generated == "ALWAYS"
-            || self.column_default.as_ref().is_some_and(|d| d.starts_with("nextval"))
-            || self.column_default.as_ref().is_some_and(|d| d.starts_with("CURRENT_TIMESTAMP"))
-            || self.column_default.as_ref().is_some_and(|d| d.starts_with("NOW()"))
             || self.is_identity.as_ref().is_some_and(|i| i == "YES")
+    }
+
+    /// Returns whether the current column has a DEFAULT value
+    pub fn has_default(&self) -> bool {
+        self.column_default.is_some()
     }
 
     /// Returns whether the column contains the update user and is defined by
