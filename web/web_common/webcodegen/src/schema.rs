@@ -1,6 +1,28 @@
 use diesel::prelude::{allow_tables_to_appear_in_same_query, table};
 
 table! {
+    pg_catalog.pg_settings (name) {
+        name -> Text,
+        setting -> Text,
+        unit -> Nullable<Text>,
+        category -> Text,
+        short_desc -> Text,
+        extra_desc -> Nullable<Text>,
+        context -> Text,
+        vartype -> Text,
+        source -> Text,
+        min_val -> Nullable<Text>,
+        max_val -> Nullable<Text>,
+        enumvals -> Nullable<Array<Text>>,
+        boot_val -> Nullable<Text>,
+        reset_val -> Nullable<Text>,
+        sourcefile -> Nullable<Text>,
+        sourceline -> Nullable<Integer>,
+        pending_restart -> Nullable<Bool>,
+    }
+}
+
+table! {
     information_schema.tables (table_catalog, table_schema, table_name) {
         table_catalog -> Text,
         table_schema -> Text,
