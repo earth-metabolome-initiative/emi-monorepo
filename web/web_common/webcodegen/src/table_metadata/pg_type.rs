@@ -9,7 +9,7 @@ use quote::quote;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{parse_str, Ident, Type};
 
-use super::{table::RESERVED_RUST_WORDS, PgAttribute, PgEnum};
+use super::{table::RESERVED_RUST_WORDS, PgAttribute, PgSetting, PgEnum};
 use crate::{
     codegen::{
         CODEGEN_DIESEL_MODULE, CODEGEN_DIRECTORY, CODEGEN_STRUCTS_MODULE, CODEGEN_TYPES_PATH,
@@ -111,7 +111,7 @@ pub struct PgType {
 /// # Panics
 ///
 /// Panics if the type is not supported.
-pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> Result<&'static str, WebCodeGenError> {
+pub fn rust_type_str<S: AsRef<str>>(type_name: S, conn: &mut PgConnection) -> Result<&'static str, WebCodeGenError> {
     Ok(match type_name.as_ref() {
         // Numeric types
         "integer" => "i32",
@@ -129,7 +129,14 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> Result<&'static str, WebCod
         "boolean" => "bool",
 
         // Temporal types
-        "timestamp with time zone" | "timestamp without time zone" => "chrono::NaiveDateTime",
+        "timestamp without time zone" => "chrono::NaiveDateTime",
+        "timestamp with time zone" => {
+            let time_zone = PgSetting::time_zone(conn)?;
+            match time_zone.setting.as_str() {
+                "UTC" => "chrono::DateTime<chrono::Utc>",
+                unknown_time_zone => unimplemented!("Time zone `{unknown_time_zone}` not supported"),
+            }
+        },
         "date" => "chrono::NaiveDate",
         "time without time zone" | "time with time zone" => "chrono::NaiveTime",
         "interval" => "chrono::Duration",
@@ -284,7 +291,7 @@ impl PgType {
         optional: bool,
         conn: &mut PgConnection,
     ) -> Result<Type, WebCodeGenError> {
-        match rust_type_str(&self.typname) {
+        match rust_type_str(&self.typname, conn) {
             Ok(rust_type) => Ok(parse_str::<Type>(rust_type)?),
             Err(error) => {
                 if self.is_composite() || self.is_enum() {
@@ -496,7 +503,7 @@ impl PgType {
                 .ok_or(WebCodeGenError::MissingBaseType(Box::new(self.clone())))
                 .and_then(|base_type| base_type.supports_copy(conn))
         } else {
-            Ok(COPY_TYPES.contains(&rust_type_str(&self.typname)?))
+            Ok(COPY_TYPES.contains(&rust_type_str(&self.typname, conn)?))
         }
     }
 
@@ -520,7 +527,7 @@ impl PgType {
                 .into_iter()
                 .try_fold(true, |acc, attribute| attribute.supports_hash(conn).map(|b| acc && b))
         } else {
-            Ok(HASH_TYPES.contains(&rust_type_str(&self.typname)?))
+            Ok(HASH_TYPES.contains(&rust_type_str(&self.typname, conn)?))
         }
     }
 
@@ -544,7 +551,7 @@ impl PgType {
                 .into_iter()
                 .try_fold(true, |acc, attribute| attribute.supports_eq(conn).map(|b| acc && b))
         } else {
-            Ok(EQ_TYPES.contains(&rust_type_str(&self.typname)?))
+            Ok(EQ_TYPES.contains(&rust_type_str(&self.typname, conn)?))
         }
     }
 

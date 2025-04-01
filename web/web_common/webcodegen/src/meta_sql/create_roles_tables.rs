@@ -120,7 +120,7 @@ impl Table {
             users.primary_key_columns(conn)?[0].data_type_str(conn)?
         ));
 
-        create_table.push_str("created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n");
+        create_table.push_str("created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,\n");
 
         // We build the primary key using the primary key columns of the reference table
         create_table.push_str(&format!(

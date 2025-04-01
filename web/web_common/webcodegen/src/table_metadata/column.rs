@@ -252,7 +252,7 @@ impl Column {
         if let Ok(geometry) = self.geometry(conn) {
             return Ok(geometry.str_rust_type().to_owned());
         }
-        match rust_type_str(self.data_type_str(conn)?) {
+        match rust_type_str(self.data_type_str(conn)?, conn) {
             Ok(s) => Ok(s.to_string()),
             Err(error) => {
                 if self.has_custom_type() {
@@ -300,7 +300,7 @@ impl Column {
         if let Ok(geometry) = self.geometry(conn) {
             return geometry.rust_type(self.is_nullable());
         }
-        match rust_type_str(self.data_type_str(conn)?) {
+        match rust_type_str(self.data_type_str(conn)?, conn) {
             Ok(s) => {
                 if self.is_nullable() {
                     Ok(syn::parse_str(&format!("Option<{s}>"))?)
