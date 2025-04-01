@@ -7,7 +7,7 @@
 )]
 pub struct DirectusNotification {
     pub id: i32,
-    pub timestamp: Option<chrono::NaiveDateTime>,
+    pub timestamp: Option<chrono::DateTime<chrono::Utc>>,
     pub status: Option<String>,
     pub recipient: uuid::Uuid,
     pub sender: Option<uuid::Uuid>,

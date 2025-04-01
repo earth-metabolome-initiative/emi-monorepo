@@ -27,7 +27,7 @@ pub struct DirectusUser {
     pub status: String,
     pub role: Option<uuid::Uuid>,
     pub token: Option<String>,
-    pub last_access: Option<chrono::NaiveDateTime>,
+    pub last_access: Option<chrono::DateTime<chrono::Utc>>,
     pub last_page: Option<String>,
     pub provider: String,
     pub external_identifier: Option<String>,

@@ -8,6 +8,6 @@
 pub struct DirectusMigration {
     pub version: String,
     pub name: String,
-    pub timestamp: Option<chrono::NaiveDateTime>,
+    pub timestamp: Option<chrono::DateTime<chrono::Utc>>,
 }
 impl DirectusMigration {}

@@ -10,7 +10,7 @@ pub struct DirectusDashboard {
     pub name: String,
     pub icon: String,
     pub note: Option<String>,
-    pub date_created: Option<chrono::NaiveDateTime>,
+    pub date_created: Option<chrono::DateTime<chrono::Utc>>,
     pub user_created: Option<uuid::Uuid>,
     pub color: Option<String>,
 }

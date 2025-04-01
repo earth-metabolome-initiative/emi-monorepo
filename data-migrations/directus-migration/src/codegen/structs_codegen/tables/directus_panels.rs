@@ -19,7 +19,7 @@ pub struct DirectusPanel {
     pub width: i32,
     pub height: i32,
     pub options: Option<serde_json::Value>,
-    pub date_created: Option<chrono::NaiveDateTime>,
+    pub date_created: Option<chrono::DateTime<chrono::Utc>>,
     pub user_created: Option<uuid::Uuid>,
 }
 impl DirectusPanel {

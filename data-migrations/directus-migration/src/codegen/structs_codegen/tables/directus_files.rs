@@ -20,9 +20,9 @@ pub struct DirectusFile {
     pub r#type: Option<String>,
     pub folder: Option<uuid::Uuid>,
     pub uploaded_by: Option<uuid::Uuid>,
-    pub created_on: chrono::NaiveDateTime,
+    pub created_on: chrono::DateTime<chrono::Utc>,
     pub modified_by: Option<uuid::Uuid>,
-    pub modified_on: chrono::NaiveDateTime,
+    pub modified_on: chrono::DateTime<chrono::Utc>,
     pub charset: Option<String>,
     pub filesize: Option<i64>,
     pub width: Option<i32>,
@@ -37,7 +37,7 @@ pub struct DirectusFile {
     pub focal_point_y: Option<i32>,
     pub tus_id: Option<String>,
     pub tus_data: Option<serde_json::Value>,
-    pub uploaded_on: Option<chrono::NaiveDateTime>,
+    pub uploaded_on: Option<chrono::DateTime<chrono::Utc>>,
 }
 impl DirectusFile {
     #[cfg(feature = "postgres")]

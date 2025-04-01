@@ -7,9 +7,9 @@ pub struct Brand {
     pub id: i32,
     pub status: String,
     pub user_created: Option<uuid::Uuid>,
-    pub date_created: Option<chrono::NaiveDateTime>,
+    pub date_created: Option<chrono::DateTime<chrono::Utc>>,
     pub user_updated: Option<uuid::Uuid>,
-    pub date_updated: Option<chrono::NaiveDateTime>,
+    pub date_updated: Option<chrono::DateTime<chrono::Utc>>,
     pub brand: String,
 }
 impl Brand {

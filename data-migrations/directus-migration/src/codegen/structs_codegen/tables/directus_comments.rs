@@ -10,8 +10,8 @@ pub struct DirectusComment {
     pub collection: String,
     pub item: String,
     pub comment: String,
-    pub date_created: Option<chrono::NaiveDateTime>,
-    pub date_updated: Option<chrono::NaiveDateTime>,
+    pub date_created: Option<chrono::DateTime<chrono::Utc>>,
+    pub date_updated: Option<chrono::DateTime<chrono::Utc>>,
     pub user_created: Option<uuid::Uuid>,
     pub user_updated: Option<uuid::Uuid>,
 }

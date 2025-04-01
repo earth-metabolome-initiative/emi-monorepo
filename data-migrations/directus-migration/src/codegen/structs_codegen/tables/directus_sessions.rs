@@ -8,7 +8,7 @@
 pub struct DirectusSession {
     pub token: String,
     pub user: Option<uuid::Uuid>,
-    pub expires: chrono::NaiveDateTime,
+    pub expires: chrono::DateTime<chrono::Utc>,
     pub ip: Option<String>,
     pub user_agent: Option<String>,
     pub share: Option<uuid::Uuid>,

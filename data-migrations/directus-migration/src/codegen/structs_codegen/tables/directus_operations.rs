@@ -16,7 +16,7 @@ pub struct DirectusOperation {
     pub resolve: Option<uuid::Uuid>,
     pub reject: Option<uuid::Uuid>,
     pub flow: uuid::Uuid,
-    pub date_created: Option<chrono::NaiveDateTime>,
+    pub date_created: Option<chrono::DateTime<chrono::Utc>>,
     pub user_created: Option<uuid::Uuid>,
 }
 impl DirectusOperation {

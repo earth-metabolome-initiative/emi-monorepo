@@ -16,7 +16,7 @@ pub struct DirectusFlow {
     pub accountability: Option<String>,
     pub options: Option<serde_json::Value>,
     pub operation: Option<uuid::Uuid>,
-    pub date_created: Option<chrono::NaiveDateTime>,
+    pub date_created: Option<chrono::DateTime<chrono::Utc>>,
     pub user_created: Option<uuid::Uuid>,
 }
 impl DirectusFlow {

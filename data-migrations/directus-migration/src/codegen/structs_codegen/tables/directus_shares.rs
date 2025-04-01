@@ -13,9 +13,9 @@ pub struct DirectusShare {
     pub role: Option<uuid::Uuid>,
     pub password: Option<String>,
     pub user_created: Option<uuid::Uuid>,
-    pub date_created: Option<chrono::NaiveDateTime>,
-    pub date_start: Option<chrono::NaiveDateTime>,
-    pub date_end: Option<chrono::NaiveDateTime>,
+    pub date_created: Option<chrono::DateTime<chrono::Utc>>,
+    pub date_start: Option<chrono::DateTime<chrono::Utc>>,
+    pub date_end: Option<chrono::DateTime<chrono::Utc>>,
     pub times_used: Option<i32>,
     pub max_uses: Option<i32>,
 }
