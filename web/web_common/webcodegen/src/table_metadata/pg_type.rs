@@ -18,7 +18,7 @@ use crate::{
 };
 
 /// Constant listing types supporting `Copy`.
-const COPY_TYPES: [&str; 6] = ["i32", "i16", "i64", "f32", "f64", "bool"];
+pub const COPY_TYPES: [&str; 6] = ["i32", "i16", "i64", "f32", "f64", "bool"];
 
 /// Constant listing types supporting `Eq`.
 const EQ_TYPES: [&str; 4] = ["i32", "i16", "i64", "bool"];

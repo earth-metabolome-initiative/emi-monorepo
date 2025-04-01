@@ -9,7 +9,7 @@ use syn::{Ident, Type};
 
 use super::{
     check_constraint::CheckConstraint,
-    pg_type::{rust_type_str, PgType},
+    pg_type::{rust_type_str, COPY_TYPES, PgType},
     table::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS},
 };
 use crate::{
@@ -432,6 +432,28 @@ impl Column {
         self.__is_nullable == "YES"
     }
 
+    /// Returns whether the column type implements copy.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        if let Ok(_geometry) = self.geometry(conn) {
+            unimplemented!("TODO")
+        }
+        match rust_type_str(self.data_type_str(conn)?, conn) {
+            Ok(s) => Ok(COPY_TYPES.contains(&s)),
+            Err(error) => {
+                if self.has_custom_type() {
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.supports_copy(conn)?)
+                } else {
+                    Err(error)
+                }
+            }
+        }
+    }
+
     /// Returns the diesel type of the column
     ///
     /// # Arguments
@@ -481,6 +503,7 @@ impl Column {
     /// A `bool` indicating whether the column is automatically generated
     pub fn is_always_automatically_generated(&self) -> bool {
         self.is_generated == "ALWAYS"
+            || self.column_default.as_ref().is_some_and(|d| d.starts_with("nextval"))
             || self.is_identity.as_ref().is_some_and(|i| i == "YES")
     }
 
