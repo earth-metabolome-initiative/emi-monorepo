@@ -1,7 +1,6 @@
 mod codegen;
 mod error;
-use codegen::diesel_codegen::tables::directus_sessions;
-use codegen::{Brand as DirectusBrand, DirectusUser};
+use codegen::{Brand as DirectusBrand, DirectusUser, FieldDatum as DirectusFieldDatum};
 use core_structures::{Brand as PortalBrand, BrandState as PortalBrandState, User, UserEmail};
 use diesel_async::{AsyncConnection, AsyncPgConnection, RunQueryDsl};
 use web_common_traits::database::{Insertable, InsertableBuilder, InsertableVariant, Loadable};
@@ -26,6 +25,7 @@ const PORTAL_DATABASE_URL: &str = const_format::formatcp!(
 
 async fn get_user(
     directus_user: &DirectusUser,
+    directus_conn: &mut AsyncPgConnection,
     portal_conn: &mut AsyncPgConnection,
 ) -> Result<User, error::Error> {
     let email: &str =
@@ -33,6 +33,18 @@ async fn get_user(
     if let Some(stored_email) = UserEmail::from_email(email, portal_conn).await? {
         return Ok(stored_email.created_by(portal_conn).await?);
     }
+
+    let imputed_created_at: chrono::DateTime<chrono::Utc> =
+        DirectusFieldDatum::from_user_created(directus_conn, directus_user)
+            .await?
+            .into_iter()
+            .filter_map(|field_datum| field_datum.date_created)
+            .min()
+            .or(directus_user.last_access)
+            .ok_or(error::Error::MissingDate(
+                "directus_users".to_owned(),
+                "last_access".to_owned(),
+            ))?;
 
     let new_user = User::new()
         .first_name(
@@ -47,6 +59,10 @@ async fn get_user(
                 .clone()
                 .ok_or(error::Error::MissingLastName(directus_user.id))?,
         )?
+        .created_at(imputed_created_at)?
+        .updated_at(directus_user.last_access.ok_or_else(|| {
+            error::Error::MissingDate("directus_users".to_owned(), "last_access".to_owned())
+        })?)?
         .build()?
         .insert(portal_conn)
         .await?;
@@ -54,6 +70,8 @@ async fn get_user(
     let _new_email = UserEmail::new()
         .created_by(new_user.id)?
         .email(directus_user.email.clone().ok_or(error::Error::MissingEmail(directus_user.id))?)?
+        .created_at(imputed_created_at)?
+        .primary_email(true)?
         .build()?
         .insert(portal_conn)
         .await?;
@@ -88,20 +106,25 @@ async fn insert_missing_brands(
             .ok_or(error::Error::UnknownBrandStatus(directus_brand.status.clone()))?;
         let directus_created_by =
             directus_brand.user_created(directus_conn).await?.ok_or(error::Error::MissingUser)?;
-        let portal_created_by = get_user(&directus_created_by, portal_conn).await?;
+        let portal_created_by = get_user(&directus_created_by, directus_conn, portal_conn).await?;
         let directus_updated_by =
             directus_brand.user_updated(directus_conn).await?.ok_or(error::Error::MissingUser)?;
-        let portal_updated_by = get_user(&directus_updated_by, portal_conn).await?;
+        let portal_updated_by = get_user(&directus_updated_by, directus_conn, portal_conn).await?;
 
         let _portal_brand = PortalBrand::new()
             .brand_state_id(brand_state.id)?
             .created_by(portal_created_by.id)?
-            .created_at(directus_brand.date_created.ok_or(error::Error::MissingDate)?)?
-            .updated_at(directus_brand.date_updated.ok_or(error::Error::MissingDate)?)?
+            .created_at(directus_brand.date_created.ok_or_else(|| {
+                error::Error::MissingDate("directus_brands".to_owned(), "date_created".to_owned())
+            })?)?
+            .updated_at(directus_brand.date_updated.ok_or_else(|| {
+                error::Error::MissingDate("directus_brands".to_owned(), "date_updated".to_owned())
+            })?)?
             .updated_by(portal_updated_by.id)?
             .name(directus_brand.brand.clone())?
             .build()?
-            .insert(portal_conn).await?;
+            .insert(portal_conn)
+            .await?;
     }
 
     let portal_brands = PortalBrand::load_all(portal_conn).await?;
@@ -118,7 +141,7 @@ async fn transact_migration(
 ) -> Result<(), error::Error> {
     let directus_users = DirectusUser::load_all(directus_conn).await?;
     for directus_user in directus_users {
-        let _portal_user = get_user(&directus_user, portal_conn).await?;
+        let _portal_user = get_user(&directus_user, directus_conn, portal_conn).await?;
     }
 
     let directus_brands = DirectusBrand::load_all(directus_conn).await?;

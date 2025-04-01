@@ -15,7 +15,7 @@ pub enum Error{
     /// Missing user
     MissingUser,
     /// Missing date
-    MissingDate,
+    MissingDate(String, String),
     /// Unknown brand status
     UnknownBrandStatus(String),
     /// Failed to establish database connection
