@@ -11,7 +11,7 @@ use taxonomy_fetcher::{
 use time_requirements::prelude::*;
 use webcodegen::{
     Codegen, CompatibleForeignTypeConstraint, CustomColumnConstraint, CustomTableConstraint,
-    LowercaseColumnConstraint, LowercaseTableConstraint, Table,
+    HasSpecificTypeConstraint, LowercaseColumnConstraint, LowercaseTableConstraint, Table,
 };
 
 const DATABASE_NAME: &str = "development.db";
@@ -52,12 +52,12 @@ pub async fn main() {
     time_tracker.add_completed_task(task);
 
     // We retrieve and build the latest version of the NCBI taxonomy
-    let task = Task::new("Fetching NCBI Taxonomy");
-    let taxonomy: NCBITaxonomy = NCBITaxonomyBuilder::latest().build().await.unwrap();
-    time_tracker.add_completed_task(task);
-    let task = Task::new("Creating Taxonomy CSV");
-    taxonomy.to_csv("../csvs/taxa.csv").unwrap();
-    time_tracker.add_completed_task(task);
+    // let task = Task::new("Fetching NCBI Taxonomy");
+    // let taxonomy: NCBITaxonomy = NCBITaxonomyBuilder::latest().build().await.unwrap();
+    // time_tracker.add_completed_task(task);
+    // let task = Task::new("Creating Taxonomy CSV");
+    // taxonomy.to_csv("../csvs/taxa.csv").unwrap();
+    // time_tracker.add_completed_task(task);
 
     // Next, we build the SQL associated with the CSVs present in the 'csvs'
     // directory
@@ -101,17 +101,30 @@ pub async fn main() {
 
     // We check that the database follows the expected constraints.
     let task = Task::new("Checking Constraints");
+    let users_table =
+        Table::load(&mut conn, "users", None, DATABASE_NAME).expect("Failed to load `users` table");
+
     CompatibleForeignTypeConstraint::default().check_all(DATABASE_NAME, None, &mut conn).unwrap();
     LowercaseColumnConstraint::default().check_all(DATABASE_NAME, None, &mut conn).unwrap();
     LowercaseTableConstraint::default().check_all(DATABASE_NAME, None, &mut conn).unwrap();
+    HasSpecificTypeConstraint::new("created_by", "integer")
+        .check_all(DATABASE_NAME, None, &mut conn)
+        .unwrap();
+    HasSpecificTypeConstraint::new("updated_by", "integer")
+        .check_all(DATABASE_NAME, None, &mut conn)
+        .unwrap();
+    HasSpecificTypeConstraint::new("created_at", "timestamp with time zone")
+        .check_all(DATABASE_NAME, None, &mut conn)
+        .unwrap();
+    HasSpecificTypeConstraint::new("updated_at", "timestamp with time zone")
+        .check_all(DATABASE_NAME, None, &mut conn)
+        .unwrap();
     time_tracker.add_completed_task(task);
 
     // We write to the target directory the generated structs
 
     // Generate the code associated with the database
     let task = Task::new("Generating Code");
-    let users_table =
-        Table::load(&mut conn, "users", None, DATABASE_NAME).expect("Failed to load `users` table");
     Codegen::default()
         .users(&users_table)
         .set_output_directory(out_dir.as_ref())
