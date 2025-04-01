@@ -35,6 +35,22 @@ impl DirectusRevision {
             .await
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_activity(
+        conn: &mut diesel_async::AsyncPgConnection,
+        activity: &crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions::dsl::activity
+                    .eq(activity.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn parent(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -59,6 +75,22 @@ impl DirectusRevision {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_parent(
+        conn: &mut diesel_async::AsyncPgConnection,
+        parent: &crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions::dsl::parent
+                    .eq(parent.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn version(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -81,5 +113,21 @@ impl DirectusRevision {
             >(conn)
             .await
             .map(Some)
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_version(
+        conn: &mut diesel_async::AsyncPgConnection,
+        version: &crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions::dsl::version
+                    .eq(&version.id),
+            )
+            .load::<Self>(conn)
+            .await
     }
 }

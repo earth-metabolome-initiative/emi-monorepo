@@ -36,6 +36,22 @@ impl DirectusNotification {
             .await
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_recipient(
+        conn: &mut diesel_async::AsyncPgConnection,
+        recipient: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_notifications::directus_notifications::dsl::recipient
+                    .eq(&recipient.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn sender(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -56,5 +72,21 @@ impl DirectusNotification {
             >(conn)
             .await
             .map(Some)
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_sender(
+        conn: &mut diesel_async::AsyncPgConnection,
+        sender: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_notifications::directus_notifications::dsl::sender
+                    .eq(&sender.id),
+            )
+            .load::<Self>(conn)
+            .await
     }
 }

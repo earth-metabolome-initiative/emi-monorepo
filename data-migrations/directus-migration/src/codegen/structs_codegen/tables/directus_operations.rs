@@ -45,6 +45,22 @@ impl DirectusOperation {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_resolve(
+        conn: &mut diesel_async::AsyncPgConnection,
+        resolve: &crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_operations::directus_operations::dsl::resolve
+                    .eq(&resolve.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn reject(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -69,6 +85,22 @@ impl DirectusOperation {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_reject(
+        conn: &mut diesel_async::AsyncPgConnection,
+        reject: &crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_operations::directus_operations::dsl::reject
+                    .eq(&reject.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn flow(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -84,6 +116,22 @@ impl DirectusOperation {
             .first::<
                 crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow,
             >(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_flow(
+        conn: &mut diesel_async::AsyncPgConnection,
+        flow: &crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_operations::directus_operations::dsl::flow
+                    .eq(&flow.id),
+            )
+            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -107,5 +155,21 @@ impl DirectusOperation {
             >(conn)
             .await
             .map(Some)
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_user_created(
+        conn: &mut diesel_async::AsyncPgConnection,
+        user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_operations::directus_operations::dsl::user_created
+                    .eq(&user_created.id),
+            )
+            .load::<Self>(conn)
+            .await
     }
 }

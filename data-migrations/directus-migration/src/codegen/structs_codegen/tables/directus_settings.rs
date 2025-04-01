@@ -70,6 +70,22 @@ impl DirectusSetting {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_project_logo(
+        conn: &mut diesel_async::AsyncPgConnection,
+        project_logo: &crate::codegen::structs_codegen::tables::directus_files::DirectusFile,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::dsl::project_logo
+                    .eq(&project_logo.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn public_foreground(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -92,6 +108,22 @@ impl DirectusSetting {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_public_foreground(
+        conn: &mut diesel_async::AsyncPgConnection,
+        public_foreground: &crate::codegen::structs_codegen::tables::directus_files::DirectusFile,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::dsl::public_foreground
+                    .eq(&public_foreground.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn public_background(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -112,6 +144,22 @@ impl DirectusSetting {
             >(conn)
             .await
             .map(Some)
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_public_background(
+        conn: &mut diesel_async::AsyncPgConnection,
+        public_background: &crate::codegen::structs_codegen::tables::directus_files::DirectusFile,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::dsl::public_background
+                    .eq(&public_background.id),
+            )
+            .load::<Self>(conn)
+            .await
     }
     #[cfg(feature = "postgres")]
     pub async fn storage_default_folder(
@@ -138,6 +186,22 @@ impl DirectusSetting {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_storage_default_folder(
+        conn: &mut diesel_async::AsyncPgConnection,
+        storage_default_folder: &crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::dsl::storage_default_folder
+                    .eq(&storage_default_folder.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn public_favicon(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -160,6 +224,22 @@ impl DirectusSetting {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_public_favicon(
+        conn: &mut diesel_async::AsyncPgConnection,
+        public_favicon: &crate::codegen::structs_codegen::tables::directus_files::DirectusFile,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::dsl::public_favicon
+                    .eq(&public_favicon.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn public_registration_role(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -180,5 +260,21 @@ impl DirectusSetting {
             >(conn)
             .await
             .map(Some)
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_public_registration_role(
+        conn: &mut diesel_async::AsyncPgConnection,
+        public_registration_role: &crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::dsl::public_registration_role
+                    .eq(&public_registration_role.id),
+            )
+            .load::<Self>(conn)
+            .await
     }
 }

@@ -65,6 +65,22 @@ impl DirectusFile {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_folder(
+        conn: &mut diesel_async::AsyncPgConnection,
+        folder: &crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_files::directus_files::dsl::folder
+                    .eq(&folder.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn uploaded_by(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -87,6 +103,22 @@ impl DirectusFile {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_uploaded_by(
+        conn: &mut diesel_async::AsyncPgConnection,
+        uploaded_by: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_files::directus_files::dsl::uploaded_by
+                    .eq(&uploaded_by.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn modified_by(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -107,5 +139,21 @@ impl DirectusFile {
             >(conn)
             .await
             .map(Some)
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_modified_by(
+        conn: &mut diesel_async::AsyncPgConnection,
+        modified_by: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_files::directus_files::dsl::modified_by
+                    .eq(&modified_by.id),
+            )
+            .load::<Self>(conn)
+            .await
     }
 }

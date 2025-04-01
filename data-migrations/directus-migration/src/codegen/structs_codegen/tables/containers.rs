@@ -54,6 +54,22 @@ impl Container {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_user_created(
+        conn: &mut diesel_async::AsyncPgConnection,
+        user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::containers::containers::dsl::user_created
+                    .eq(&user_created.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn user_updated(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -74,6 +90,22 @@ impl Container {
             >(conn)
             .await
             .map(Some)
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_user_updated(
+        conn: &mut diesel_async::AsyncPgConnection,
+        user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::containers::containers::dsl::user_updated
+                    .eq(&user_updated.id),
+            )
+            .load::<Self>(conn)
+            .await
     }
     #[cfg(feature = "postgres")]
     pub async fn container_model(
@@ -100,6 +132,22 @@ impl Container {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_container_model(
+        conn: &mut diesel_async::AsyncPgConnection,
+        container_model: &crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::containers::containers::dsl::container_model
+                    .eq(container_model.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn location(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -122,6 +170,22 @@ impl Container {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_location(
+        conn: &mut diesel_async::AsyncPgConnection,
+        location: &crate::codegen::structs_codegen::tables::universities::University,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::containers::containers::dsl::location
+                    .eq(location.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn parent_container(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -142,6 +206,22 @@ impl Container {
             >(conn)
             .await
             .map(Some)
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_parent_container(
+        conn: &mut diesel_async::AsyncPgConnection,
+        parent_container: &crate::codegen::structs_codegen::tables::containers::Container,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::containers::containers::dsl::parent_container
+                    .eq(parent_container.id),
+            )
+            .load::<Self>(conn)
+            .await
     }
     #[cfg(feature = "postgres")]
     pub async fn from_container_id(

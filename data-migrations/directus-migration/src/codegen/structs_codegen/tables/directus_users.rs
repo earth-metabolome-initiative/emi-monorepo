@@ -63,6 +63,22 @@ impl DirectusUser {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_role(
+        conn: &mut diesel_async::AsyncPgConnection,
+        role: &crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::role
+                    .eq(&role.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn from_email(
         email: Option<&str>,
         conn: &mut diesel_async::AsyncPgConnection,

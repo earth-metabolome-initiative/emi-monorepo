@@ -46,6 +46,22 @@ impl ContainerModel {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_user_created(
+        conn: &mut diesel_async::AsyncPgConnection,
+        user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::user_created
+                    .eq(&user_created.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn user_updated(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -68,6 +84,22 @@ impl ContainerModel {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_user_updated(
+        conn: &mut diesel_async::AsyncPgConnection,
+        user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::user_updated
+                    .eq(&user_updated.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn container_type(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -83,6 +115,22 @@ impl ContainerModel {
             .first::<
                 crate::codegen::structs_codegen::tables::container_types::ContainerType,
             >(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_container_type(
+        conn: &mut diesel_async::AsyncPgConnection,
+        container_type: &crate::codegen::structs_codegen::tables::container_types::ContainerType,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::container_type
+                    .eq(container_type.id),
+            )
+            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -102,6 +150,22 @@ impl ContainerModel {
             .await
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_volume_unit(
+        conn: &mut diesel_async::AsyncPgConnection,
+        volume_unit: &crate::codegen::structs_codegen::tables::si_units::SiUnit,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::volume_unit
+                    .eq(volume_unit.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn brand(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -115,6 +179,22 @@ impl ContainerModel {
         crate::codegen::structs_codegen::tables::brands::Brand::table()
             .find(&self.brand)
             .first::<crate::codegen::structs_codegen::tables::brands::Brand>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_brand(
+        conn: &mut diesel_async::AsyncPgConnection,
+        brand: &crate::codegen::structs_codegen::tables::brands::Brand,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::brand
+                    .eq(brand.id),
+            )
+            .load::<Self>(conn)
             .await
     }
 }

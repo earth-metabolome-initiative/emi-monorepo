@@ -58,4 +58,20 @@ impl DirectusCollection {
             .await
             .map(Some)
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_group(
+        conn: &mut diesel_async::AsyncPgConnection,
+        group: &crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::dsl::group
+                    .eq(&group.collection),
+            )
+            .load::<Self>(conn)
+            .await
+    }
 }

@@ -54,6 +54,22 @@ impl ExtractionDatum {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_user_created(
+        conn: &mut diesel_async::AsyncPgConnection,
+        user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::extraction_data::extraction_data::dsl::user_created
+                    .eq(&user_created.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn user_updated(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -76,6 +92,22 @@ impl ExtractionDatum {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_user_updated(
+        conn: &mut diesel_async::AsyncPgConnection,
+        user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::extraction_data::extraction_data::dsl::user_updated
+                    .eq(&user_updated.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn dried_weight_unit(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -89,6 +121,22 @@ impl ExtractionDatum {
         crate::codegen::structs_codegen::tables::si_units::SiUnit::table()
             .find(&self.dried_weight_unit)
             .first::<crate::codegen::structs_codegen::tables::si_units::SiUnit>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_dried_weight_unit(
+        conn: &mut diesel_async::AsyncPgConnection,
+        dried_weight_unit: &crate::codegen::structs_codegen::tables::si_units::SiUnit,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::extraction_data::extraction_data::dsl::dried_weight_unit
+                    .eq(dried_weight_unit.id),
+            )
+            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -116,6 +164,22 @@ impl ExtractionDatum {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_extraction_method(
+        conn: &mut diesel_async::AsyncPgConnection,
+        extraction_method: &crate::codegen::structs_codegen::tables::extraction_methods::ExtractionMethod,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::extraction_data::extraction_data::dsl::extraction_method
+                    .eq(extraction_method.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn batch(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -134,6 +198,22 @@ impl ExtractionDatum {
             .first::<crate::codegen::structs_codegen::tables::batches::Batch>(conn)
             .await
             .map(Some)
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_batch(
+        conn: &mut diesel_async::AsyncPgConnection,
+        batch: &crate::codegen::structs_codegen::tables::batches::Batch,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::extraction_data::extraction_data::dsl::batch
+                    .eq(batch.id),
+            )
+            .load::<Self>(conn)
+            .await
     }
     #[cfg(feature = "postgres")]
     pub async fn solvent_volume_unit(
@@ -156,6 +236,22 @@ impl ExtractionDatum {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_solvent_volume_unit(
+        conn: &mut diesel_async::AsyncPgConnection,
+        solvent_volume_unit: &crate::codegen::structs_codegen::tables::si_units::SiUnit,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::extraction_data::extraction_data::dsl::solvent_volume_unit
+                    .eq(solvent_volume_unit.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn sample_container(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -171,6 +267,22 @@ impl ExtractionDatum {
             .first::<
                 crate::codegen::structs_codegen::tables::containers::Container,
             >(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_sample_container(
+        conn: &mut diesel_async::AsyncPgConnection,
+        sample_container: &crate::codegen::structs_codegen::tables::containers::Container,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::extraction_data::extraction_data::dsl::sample_container
+                    .eq(sample_container.id),
+            )
+            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -196,6 +308,22 @@ impl ExtractionDatum {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_parent_container(
+        conn: &mut diesel_async::AsyncPgConnection,
+        parent_container: &crate::codegen::structs_codegen::tables::containers::Container,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::extraction_data::extraction_data::dsl::parent_container
+                    .eq(parent_container.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn parent_sample_container(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -211,6 +339,22 @@ impl ExtractionDatum {
             .first::<
                 crate::codegen::structs_codegen::tables::containers::Container,
             >(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_parent_sample_container(
+        conn: &mut diesel_async::AsyncPgConnection,
+        parent_sample_container: &crate::codegen::structs_codegen::tables::containers::Container,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::extraction_data::extraction_data::dsl::parent_sample_container
+                    .eq(parent_sample_container.id),
+            )
+            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -236,5 +380,21 @@ impl ExtractionDatum {
             >(conn)
             .await
             .map(Some)
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_extraction_container(
+        conn: &mut diesel_async::AsyncPgConnection,
+        extraction_container: &crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::extraction_data::extraction_data::dsl::extraction_container
+                    .eq(extraction_container.id),
+            )
+            .load::<Self>(conn)
+            .await
     }
 }
