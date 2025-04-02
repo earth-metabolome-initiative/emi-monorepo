@@ -1,0 +1,3 @@
+CREATE TABLE IF NOT EXISTS instrument_models (
+    id SERIAL PRIMARY KEY
+);
