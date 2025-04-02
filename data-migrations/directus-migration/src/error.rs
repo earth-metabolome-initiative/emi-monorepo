@@ -1,5 +1,6 @@
 //! Enumeration of errors that may occur during directus migration
 
+use crate::codegen::{DirectusUser, Brand as DirectusBrand, InstrumentType as DirectusInstrumentType};
 use web_common_traits::database::InsertError;
 use core_structures::{codegen::structs_codegen::tables::insertables::InsertableUserAttributes, tables::insertables::{InsertableBrandAttributes, InsertableUserEmailAttributes}};
 
@@ -12,12 +13,16 @@ pub enum Error{
     MissingFirstName(uuid::Uuid),
     /// Missing last name
     MissingLastName(uuid::Uuid),
-    /// Missing user
-    MissingUser,
+    /// Missing instrument name
+    MissingInstrumentTypeName(Box<DirectusInstrumentType>),
+    /// A brand is missing a user
+    BrandWithMissingUser(Box<DirectusBrand>),
     /// Missing date
     MissingDate(String, String),
     /// Unknown brand status
     UnknownBrandStatus(String),
+    /// Unknown instrument type
+    UnknownInstrumentType(Box<DirectusInstrumentType>),
     /// Failed to establish database connection
     ConnectionFailed(diesel::ConnectionError),
     /// Failed to execute a query
@@ -27,7 +32,9 @@ pub enum Error{
     /// Failed to insert Email
     MailInsertError(InsertError<InsertableUserEmailAttributes>),
     /// Failed to insert brand
-    BrandInsertError(InsertError<InsertableBrandAttributes>)
+    BrandInsertError(InsertError<InsertableBrandAttributes>),
+    /// User never logged in
+    UserNeverLoggedIn(Box<DirectusUser>)
 }
 
 impl From<diesel::ConnectionError> for Error{
