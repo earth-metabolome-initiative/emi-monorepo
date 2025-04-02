@@ -8,3 +8,5 @@ mod insert_missing_users;
 pub use insert_missing_users::insert_missing_users;
 mod ensure_instrument_types_compatibility;
 pub use ensure_instrument_types_compatibility::ensure_instrument_types_compatibility;
+mod insert_missing_instrument_models;
+pub use insert_missing_instrument_models::insert_missing_instrument_models;

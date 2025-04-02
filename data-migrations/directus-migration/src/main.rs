@@ -2,7 +2,10 @@ mod codegen;
 mod error;
 mod migrations;
 use diesel_async::{AsyncConnection, AsyncPgConnection};
-use migrations::{insert_missing_brands, insert_missing_users, ensure_instrument_types_compatibility};
+use migrations::{
+    ensure_instrument_types_compatibility, insert_missing_brands, insert_missing_instrument_models,
+    insert_missing_users,
+};
 
 const DIRECTUS_DATABASE_NAME: &str = "directus";
 const DIRECTUS_DATABASE_PASSWORD: &str = "directus_dbgi";
@@ -29,6 +32,7 @@ async fn transact_migration(
     insert_missing_users(directus_conn, portal_conn).await?;
     insert_missing_brands(directus_conn, portal_conn).await?;
     ensure_instrument_types_compatibility(directus_conn, portal_conn).await?;
+    insert_missing_instrument_models(directus_conn, portal_conn).await?;
 
     Ok(())
 }
