@@ -11,7 +11,8 @@ use taxonomy_fetcher::{
 use time_requirements::prelude::*;
 use webcodegen::{
     Codegen, CompatibleForeignTypeConstraint, CustomColumnConstraint, CustomTableConstraint,
-    HasSpecificTypeConstraint, LowercaseColumnConstraint, LowercaseTableConstraint, Table,
+    HasSpecificTypeConstraint, LowercaseColumnConstraint, LowercaseTableConstraint,
+    NotNullColumnConstraint, Table,
 };
 
 const DATABASE_NAME: &str = "development.db";
@@ -119,6 +120,10 @@ pub async fn main() {
     HasSpecificTypeConstraint::new("updated_at", "timestamp with time zone")
         .check_all(DATABASE_NAME, None, &mut conn)
         .unwrap();
+    NotNullColumnConstraint::new("created_by").check_all(DATABASE_NAME, None, &mut conn).unwrap();
+    NotNullColumnConstraint::new("updated_by").check_all(DATABASE_NAME, None, &mut conn).unwrap();
+    NotNullColumnConstraint::new("created_at").check_all(DATABASE_NAME, None, &mut conn).unwrap();
+    NotNullColumnConstraint::new("updated_at").check_all(DATABASE_NAME, None, &mut conn).unwrap();
     time_tracker.add_completed_task(task);
 
     // We write to the target directory the generated structs
