@@ -2,11 +2,11 @@
 use std::path::Path;
 
 use csqlv::CSVSchemaBuilder;
-use diesel::{Connection, pg::PgConnection};
+use diesel::{pg::PgConnection, Connection};
 use diesel_migrations_utils::prelude::*;
 use taxonomy_fetcher::{
-    Rank, Taxonomy, TaxonomyBuilder,
     impls::ncbi::{NCBIRank, NCBITaxonomy, NCBITaxonomyBuilder},
+    Rank, Taxonomy, TaxonomyBuilder,
 };
 use time_requirements::prelude::*;
 use webcodegen::{Codegen, Table};
@@ -47,9 +47,9 @@ pub async fn main() {
 
     // We retrieve and build the latest version of the NCBI taxonomy
     // let task = Task::new("Fetching NCBI Taxonomy");
-    // let taxonomy: NCBITaxonomy = NCBITaxonomyBuilder::latest().build().await.unwrap();
-    // time_tracker.add_completed_task(task);
-    // let task = Task::new("Creating Taxonomy CSV");
+    // let taxonomy: NCBITaxonomy =
+    // NCBITaxonomyBuilder::latest().build().await.unwrap(); time_tracker.
+    // add_completed_task(task); let task = Task::new("Creating Taxonomy CSV");
     // taxonomy.to_csv("../csvs/taxa.csv").unwrap();
     // time_tracker.add_completed_task(task);
 
