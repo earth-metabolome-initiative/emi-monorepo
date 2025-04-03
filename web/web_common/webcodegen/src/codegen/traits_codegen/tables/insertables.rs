@@ -35,8 +35,7 @@ impl Codegen<'_> {
         table: &Table,
         conn: &mut PgConnection,
     ) -> Result<bool, WebCodeGenError> {
-        Ok(table.has_created_by_column(conn)?
-            || self.users_table.map_or(false, |users_table| users_table == table))
+        Ok(true)
     }
     /// Generates the [`Insertable`] and [`Insertable`]-adjacent traits
     /// implementation for the tables

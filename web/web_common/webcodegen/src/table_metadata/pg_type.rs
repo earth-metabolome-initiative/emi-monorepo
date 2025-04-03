@@ -227,9 +227,10 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<String, WebCod
         "tsquery" => "diesel_full_text_search::TsQuery",
 
         // GIS types
-        "geometry" | "geography" | "point" | "polygon" | "geometry(Point,4326)" | "line" => {
+        "geometry" | "point" | "polygon" | "geometry(Point,4326)" | "line" => {
             "postgis_diesel::sql_types::Geometry"
         }
+        "geography" => "postgis_diesel::sql_types::Geography",
 
         // Other
         "uuid" => "diesel::sql_types::Uuid",

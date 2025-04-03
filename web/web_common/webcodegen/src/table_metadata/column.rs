@@ -213,6 +213,29 @@ impl Column {
             .first::<crate::GeometryColumn>(conn)?)
     }
 
+    /// Returns the associated geography column if the column is a geography column.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Errors
+    /// 
+    /// * If an error occurs while querying the database
+    /// 
+    pub fn geography(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<crate::GeographyColumn, WebCodeGenError> {
+        use crate::schema::geography_columns;
+
+        Ok(geography_columns::table
+            .filter(geography_columns::f_table_name.eq(&self.table_name))
+            .filter(geography_columns::f_table_schema.eq(&self.table_schema))
+            .filter(geography_columns::f_geography_column.eq(&self.column_name))
+            .first::<crate::GeographyColumn>(conn)?)
+    }
+
     /// Returns the data type associated with the column as repo
     ///
     /// # Arguments
@@ -251,6 +274,9 @@ impl Column {
     pub fn str_rust_data_type(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
         if let Ok(geometry) = self.geometry(conn) {
             return Ok(geometry.str_rust_type().to_owned());
+        }
+        if let Ok(geography) = self.geography(conn) {
+            return Ok(geography.str_rust_type().to_owned());
         }
         match rust_type_str(self.data_type_str(conn)?, conn) {
             Ok(s) => Ok(s.to_string()),
@@ -299,6 +325,9 @@ impl Column {
     pub fn rust_data_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
         if let Ok(geometry) = self.geometry(conn) {
             return geometry.rust_type(self.is_nullable());
+        }
+        if let Ok(geography) = self.geography(conn) {
+            return geography.rust_type(self.is_nullable());
         }
         match rust_type_str(self.data_type_str(conn)?, conn) {
             Ok(s) => {
@@ -439,8 +468,11 @@ impl Column {
     /// * `conn` - A mutable reference to a `PgConnection`
     ///
     pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        if let Ok(_geometry) = self.geometry(conn) {
-            unimplemented!("TODO")
+        if let Ok(geometry) = self.geometry(conn) {
+            return Ok(geometry.supports_copy());
+        }
+        if let Ok(geography) = self.geography(conn) {
+            return Ok(geography.supports_copy());
         }
         match rust_type_str(self.data_type_str(conn)?, conn) {
             Ok(s) => Ok(COPY_TYPES.contains(&s)),

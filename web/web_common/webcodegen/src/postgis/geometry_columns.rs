@@ -52,6 +52,21 @@ impl GeometryColumn {
         }
     }
 
+    #[must_use]
+    /// Returns whether the underlying rust type supports the `Copy` trait.
+    pub fn supports_copy(&self) -> bool {
+        match self.str_rust_type() {
+            "postgis_diesel::types::Point" => true,
+            "postgis_diesel::types::LineString" => false,
+            "postgis_diesel::types::Polygon" => false,
+            "postgis_diesel::types::MultiPoint" => false,
+            "postgis_diesel::types::MultiLineString" => false,
+            "postgis_diesel::types::MultiPolygon" => false,
+            "postgis_diesel::types::GeometryCollection" => false,
+            _ => panic!("Unknown geometry type: {}", self.str_rust_type()),
+        }
+    }
+
     /// Returns the rust type of the geometry column.
     ///
     /// # Arguments
