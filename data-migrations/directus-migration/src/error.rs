@@ -2,11 +2,11 @@
 
 use crate::codegen::{
     Brand as DirectusBrand, DirectusUser, InstrumentModel as DirectusInstrumentModel,
-    InstrumentType as DirectusInstrumentType,
+    InstrumentType as DirectusInstrumentType, Instrument as DirectusInstrument,
 };
 use core_structures::{
     codegen::structs_codegen::tables::insertables::InsertableUserAttributes,
-    tables::insertables::{InsertableBrandAttributes, InsertableInstrumentModelAttributes, InsertableUserEmailAttributes},
+    tables::insertables::{InsertableBrandAttributes, InsertableInstrumentAttributes, InsertableInstrumentModelAttributes, InsertableUserEmailAttributes},
 };
 use web_common_traits::database::InsertError;
 
@@ -25,6 +25,8 @@ pub enum Error {
     BrandWithMissingUser(Box<DirectusBrand>),
     /// Instrument model is missing the creator user
     InstrumentModelWithMissingUser(Box<DirectusInstrumentModel>),
+    /// Instrument is missing the creator user
+    InstrumentWithMissingUser(Box<DirectusInstrument>),
     /// Missing date
     MissingDate(String, String),
     /// Unknown brand status
@@ -33,6 +35,10 @@ pub enum Error {
     UnknownInstrumentType(Box<DirectusInstrumentType>),
     /// Unknown brand
     UnknownBrand(Box<DirectusBrand>),
+    /// Unknown instrument state
+    UnknownInstrumentState(String),
+    /// Unknown instrument model
+    UnknownInstrumentModel(Box<DirectusInstrumentModel>),
     /// Failed to establish database connection
     ConnectionFailed(diesel::ConnectionError),
     /// Failed to execute a query
@@ -45,6 +51,8 @@ pub enum Error {
     BrandInsertError(InsertError<InsertableBrandAttributes>),
     /// Failed to insert instrument model.
     InstrumentModelInsertError(InsertError<InsertableInstrumentModelAttributes>),
+    /// Failed to insert instrument
+    InstrumentInsertError(InsertError<InsertableInstrumentAttributes>),
     /// User never logged in
     UserNeverLoggedIn(Box<DirectusUser>),
 }
@@ -82,5 +90,11 @@ impl From<InsertError<InsertableBrandAttributes>> for Error {
 impl From<InsertError<InsertableInstrumentModelAttributes>> for Error {
     fn from(value: InsertError<InsertableInstrumentModelAttributes>) -> Self {
         Error::InstrumentModelInsertError(value)
+    }
+}
+
+impl From<InsertError<InsertableInstrumentAttributes>> for Error {
+    fn from(value: InsertError<InsertableInstrumentAttributes>) -> Self {
+        Error::InstrumentInsertError(value)
     }
 }

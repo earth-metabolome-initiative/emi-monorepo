@@ -4,7 +4,7 @@
 use diesel_async::AsyncPgConnection;
 
 use super::get_user;
-use crate::codegen::{Brand as DirectusBrand, InstrumentModel as DirectusInstrumentModel};
+use crate::codegen::InstrumentModel as DirectusInstrumentModel;
 use core_structures::{
     Brand as PortalBrand, InstrumentModel as PortalInstrumentModel,
     InstrumentType as PortalInstrumentType,
@@ -23,7 +23,7 @@ use web_common_traits::prelude::Builder;
 ///
 /// * If the insertion fails, an error of type `error::Error` is returned.
 ///
-pub async fn insert_missing_instrument_models(
+pub(crate) async fn insert_missing_instrument_models(
     directus_conn: &mut AsyncPgConnection,
     portal_conn: &mut AsyncPgConnection,
 ) -> Result<(), crate::error::Error> {
@@ -77,7 +77,7 @@ pub async fn insert_missing_instrument_models(
         let portal_created_by = get_user(&directus_created_by, directus_conn, portal_conn).await?;
         let portal_updated_by = get_user(&directus_updated_by, directus_conn, portal_conn).await?;
 
-        let portal_instrument_model = PortalInstrumentModel::new()
+        let _portal_instrument_model = PortalInstrumentModel::new()
             .name(directus_instrument_model.instrument_model)?
             .brand_id(portal_brand.id)?
             .instrument_type_id(portal_instrument_type.id)?
