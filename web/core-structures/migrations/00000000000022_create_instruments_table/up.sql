@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS instruments (
+	id SERIAL PRIMARY KEY,
+	instrument_model_id INT NOT NULL REFERENCES instrument_models(id),
+	instrument_state_id SMALLINT NOT NULL REFERENCES instrument_states(id) DEFAULT 1,
+	qrcode UUID NOT NULL,
+	created_by INT NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_by INT NOT NULL REFERENCES users(id),
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
