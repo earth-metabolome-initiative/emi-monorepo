@@ -10,7 +10,7 @@ pub struct Instrument {
     pub date_created: Option<chrono::DateTime<chrono::Utc>>,
     pub user_updated: Option<uuid::Uuid>,
     pub date_updated: Option<chrono::DateTime<chrono::Utc>>,
-    pub uuid_instrument: Option<uuid::Uuid>,
+    pub uuid_instrument: uuid::Uuid,
     pub instrument_id: String,
     pub instrument_location: Option<i32>,
     pub instrument_model: i32,

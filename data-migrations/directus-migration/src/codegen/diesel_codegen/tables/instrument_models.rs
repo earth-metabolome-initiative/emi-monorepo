@@ -6,5 +6,6 @@ diesel::table! {
     diesel::sql_types::Timestamptz >, user_updated -> diesel::sql_types::Nullable <
     diesel::sql_types::Uuid >, date_updated -> diesel::sql_types::Nullable <
     diesel::sql_types::Timestamptz >, instrument_type -> diesel::sql_types::Integer,
-    instrument_model -> diesel::sql_types::Text, brand -> diesel::sql_types::Integer }
+    instrument_model -> diesel::sql_types::Text, brand -> diesel::sql_types::Integer,
+    barcode -> diesel::sql_types::Nullable < diesel::sql_types::Text > }
 }

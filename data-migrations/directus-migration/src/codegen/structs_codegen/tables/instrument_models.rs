@@ -15,6 +15,7 @@ pub struct InstrumentModel {
     pub instrument_type: i32,
     pub instrument_model: String,
     pub brand: i32,
+    pub barcode: Option<String>,
 }
 impl InstrumentModel {
     #[cfg(feature = "postgres")]
