@@ -120,6 +120,9 @@ pub async fn main() {
     HasSpecificTypeConstraint::new("updated_at", "timestamp with time zone")
         .check_all(DATABASE_NAME, None, &mut conn)
         .unwrap();
+    HasSpecificTypeConstraint::new("qrcode", "uuid")
+        .check_all(DATABASE_NAME, None, &mut conn)
+        .unwrap();
     NotNullColumnConstraint::new("created_by").check_all(DATABASE_NAME, None, &mut conn).unwrap();
     NotNullColumnConstraint::new("updated_by").check_all(DATABASE_NAME, None, &mut conn).unwrap();
     NotNullColumnConstraint::new("created_at").check_all(DATABASE_NAME, None, &mut conn).unwrap();
