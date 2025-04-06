@@ -1,28 +1,28 @@
 //! Submodule providing an iterator over the indices of non-empty rows in a CSR
 //! matrix.
 
-use core::iter::Zip;
-
 use crate::{
     impls::ranged::SimpleRanged,
-    traits::{IntoUsize, One, SparseMatrix2D, Zero},
+    traits::{IntoUsize, One, SizedRowsSparseMatrix2D, Zero},
 };
 
 /// Iterator over the indices of non-empty rows in a CSR matrix.
-pub struct CSR2DNonEmptyRowIndices<'a, CSR: SparseMatrix2D> {
+pub struct CSR2DNonEmptyRowIndices<'a, CSR: SizedRowsSparseMatrix2D> {
     /// The CSR matrix.
     csr2d: &'a CSR,
     /// The iterator of the row indices and their sizes.
-    row_sizes: Zip<SimpleRanged<CSR::RowIndex>, CSR::SparseRowSizes<'a>>,
+    row_sizes: (SimpleRanged<CSR::RowIndex>, CSR::SparseRowSizes<'a>),
     /// The number of non-empty rows returned so far.
     returned_non_empty_rows: CSR::RowIndex,
 }
 
-impl<'a, CSR: SparseMatrix2D> Iterator for CSR2DNonEmptyRowIndices<'a, CSR> {
+impl<'a, CSR: SizedRowsSparseMatrix2D> Iterator for CSR2DNonEmptyRowIndices<'a, CSR> {
     type Item = CSR::RowIndex;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some((row_index, row_size)) = self.row_sizes.next() {
+        while let (Some(row_index), Some(row_size)) =
+            (self.row_sizes.0.next(), self.row_sizes.1.next())
+        {
             if row_size > CSR::ColumnIndex::ZERO {
                 self.returned_non_empty_rows += CSR::RowIndex::ONE;
                 return Some(row_index);
@@ -32,15 +32,17 @@ impl<'a, CSR: SparseMatrix2D> Iterator for CSR2DNonEmptyRowIndices<'a, CSR> {
     }
 }
 
-impl<'a, CSR: SparseMatrix2D> ExactSizeIterator for CSR2DNonEmptyRowIndices<'a, CSR> {
+impl<'a, CSR: SizedRowsSparseMatrix2D> ExactSizeIterator for CSR2DNonEmptyRowIndices<'a, CSR> {
     fn len(&self) -> usize {
         (self.csr2d.number_of_rows() - self.returned_non_empty_rows).into_usize()
     }
 }
 
-impl<'a, CSR: SparseMatrix2D> DoubleEndedIterator for CSR2DNonEmptyRowIndices<'a, CSR> {
+impl<'a, CSR: SizedRowsSparseMatrix2D> DoubleEndedIterator for CSR2DNonEmptyRowIndices<'a, CSR> {
     fn next_back(&mut self) -> Option<Self::Item> {
-        while let Some((row_index, row_size)) = self.row_sizes.next_back() {
+        while let (Some(row_index), Some(row_size)) =
+            (self.row_sizes.0.next_back(), self.row_sizes.1.next_back())
+        {
             if row_size > CSR::ColumnIndex::ZERO {
                 self.returned_non_empty_rows += CSR::RowIndex::ONE;
                 return Some(row_index);
@@ -50,12 +52,12 @@ impl<'a, CSR: SparseMatrix2D> DoubleEndedIterator for CSR2DNonEmptyRowIndices<'a
     }
 }
 
-impl<'a, CSR: SparseMatrix2D> From<&'a CSR> for CSR2DNonEmptyRowIndices<'a, CSR> {
-	fn from(csr2d: &'a CSR) -> Self {
-		CSR2DNonEmptyRowIndices {
-			csr2d,
-			row_sizes: csr2d.row_indices().zip(csr2d.sparse_row_sizes()),
-			returned_non_empty_rows: CSR::RowIndex::ZERO,
-		}
-	}
+impl<'a, CSR: SizedRowsSparseMatrix2D> From<&'a CSR> for CSR2DNonEmptyRowIndices<'a, CSR> {
+    fn from(csr2d: &'a CSR) -> Self {
+        CSR2DNonEmptyRowIndices {
+            csr2d,
+            row_sizes: (csr2d.row_indices(), csr2d.sparse_row_sizes()),
+            returned_non_empty_rows: CSR::RowIndex::ZERO,
+        }
+    }
 }

@@ -28,7 +28,7 @@ impl<M: Matrix2D> core::fmt::Display for Error<M> {
 }
 
 /// Enumeration for the errors associated with failed mutable operations.
-pub enum MutabilityError<M: Matrix2D> {
+pub enum MutabilityError<M: Matrix2D + ?Sized> {
     /// Unexpected row index.
     UnorderedRowIndex(M::RowIndex),
     /// Unexpected column index.
@@ -37,6 +37,15 @@ pub enum MutabilityError<M: Matrix2D> {
     DuplicatedEntry(M::Coordinates),
     /// Entry out of bounds.
     OutOfBounds(M::Coordinates),
+    /// When the row index type has been maxed out and it cannot
+    /// be incremented anymore.
+    MaxedOutRowIndex,
+    /// When the column index type has been maxed out and it cannot
+    /// be incremented anymore.
+    MaxedOutColumnIndex,
+    /// When the sparse index type has been maxed out and it cannot
+    /// be incremented anymore.
+    MaxedOutSparseIndex,
 }
 
 impl<M: Matrix2D> Debug for MutabilityError<M> {
@@ -66,6 +75,15 @@ impl<M: Matrix2D> core::fmt::Display for MutabilityError<M> {
             MutabilityError::OutOfBounds(coordinates) => {
                 write!(f, "Entry out of expected bounds: {coordinates:?}")
             }
+            MutabilityError::MaxedOutRowIndex => {
+                write!(f, "Row index type has been maxed out")
+            }
+            MutabilityError::MaxedOutColumnIndex => {
+                write!(f, "Column index type has been maxed out")
+            }
+            MutabilityError::MaxedOutSparseIndex => {
+                write!(f, "Sparse index type has been maxed out")
+            }
         }
     }
 }
@@ -86,6 +104,9 @@ where
                 MutabilityError::DuplicatedEntry(coordinates)
             }
             MutabilityError::OutOfBounds(coordinates) => MutabilityError::OutOfBounds(coordinates),
+            MutabilityError::MaxedOutRowIndex => MutabilityError::MaxedOutRowIndex,
+            MutabilityError::MaxedOutColumnIndex => MutabilityError::MaxedOutColumnIndex,
+            MutabilityError::MaxedOutSparseIndex => MutabilityError::MaxedOutSparseIndex,
         }
     }
 }
@@ -106,6 +127,9 @@ where
                 MutabilityError::DuplicatedEntry(coordinates)
             }
             MutabilityError::OutOfBounds(coordinates) => MutabilityError::OutOfBounds(coordinates),
+            MutabilityError::MaxedOutRowIndex => MutabilityError::MaxedOutRowIndex,
+            MutabilityError::MaxedOutColumnIndex => MutabilityError::MaxedOutColumnIndex,
+            MutabilityError::MaxedOutSparseIndex => MutabilityError::MaxedOutSparseIndex,
         }
     }
 }
@@ -127,6 +151,9 @@ where
                 MutabilityError::DuplicatedEntry(coordinates)
             }
             MutabilityError::OutOfBounds(coordinates) => MutabilityError::OutOfBounds(coordinates),
+            MutabilityError::MaxedOutRowIndex => MutabilityError::MaxedOutRowIndex,
+            MutabilityError::MaxedOutColumnIndex => MutabilityError::MaxedOutColumnIndex,
+            MutabilityError::MaxedOutSparseIndex => MutabilityError::MaxedOutSparseIndex,
         }
     }
 }
@@ -148,6 +175,9 @@ where
                 MutabilityError::DuplicatedEntry(coordinates)
             }
             MutabilityError::OutOfBounds(coordinates) => MutabilityError::OutOfBounds(coordinates),
+            MutabilityError::MaxedOutRowIndex => MutabilityError::MaxedOutRowIndex,
+            MutabilityError::MaxedOutColumnIndex => MutabilityError::MaxedOutColumnIndex,
+            MutabilityError::MaxedOutSparseIndex => MutabilityError::MaxedOutSparseIndex,
         }
     }
 }
@@ -171,6 +201,9 @@ where
                 MutabilityError::DuplicatedEntry(coordinates)
             }
             MutabilityError::OutOfBounds(coordinates) => MutabilityError::OutOfBounds(coordinates),
+            MutabilityError::MaxedOutRowIndex => MutabilityError::MaxedOutRowIndex,
+            MutabilityError::MaxedOutColumnIndex => MutabilityError::MaxedOutColumnIndex,
+            MutabilityError::MaxedOutSparseIndex => MutabilityError::MaxedOutSparseIndex,
         }
     }
 }

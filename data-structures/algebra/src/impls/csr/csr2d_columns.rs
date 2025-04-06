@@ -30,13 +30,18 @@ impl<CSR: SparseMatrix2D> Iterator for CSR2DColumns<'_, CSR> {
             }
         })
     }
+}
 
-    fn size_hint(&self) -> (usize, Option<usize>) {
-        let next_row_rank = self.csr2d.rank(self.next_row).into_usize();
+impl<'matrix, CSR: SizedSparseMatrix2D> ExactSizeIterator for CSR2DColumns<'matrix, CSR>
+where
+    CSR::SparseRow<'matrix>: ExactSizeIterator,
+{
+    fn len(&self) -> usize {
+        let next_row_rank = self.csr2d.rank_row(self.next_row).into_usize();
         let already_observed_in_next_row =
             self.csr2d.number_of_defined_values_in_row(self.next_row).into_usize()
                 - self.next.len();
-        let back_row_rank = self.csr2d.rank(self.back_row).into_usize();
+        let back_row_rank = self.csr2d.rank_row(self.back_row).into_usize();
         let already_observed_in_back_row =
             self.csr2d.number_of_defined_values_in_row(self.back_row).into_usize()
                 - self.back.len();
@@ -44,13 +49,7 @@ impl<CSR: SparseMatrix2D> Iterator for CSR2DColumns<'_, CSR> {
             - next_row_rank
             - already_observed_in_next_row
             - already_observed_in_back_row;
-        (remaining, Some(remaining))
-    }
-}
-
-impl<CSR: SparseMatrix2D> ExactSizeIterator for CSR2DColumns<'_, CSR> {
-    fn len(&self) -> usize {
-        self.size_hint().0
+        remaining
     }
 }
 

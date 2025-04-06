@@ -1,10 +1,12 @@
 //! Trait implementing the conversion from `usize`, including the occasional
 //! error, depending on the compilation flags (whether target is 64 or 32 bits).
 
+use std::fmt::Debug;
+
 /// Trait defining the conversion from `usize`.
 pub trait TryFromUsize: Sized {
     /// The error type.
-    type Error;
+    type Error: Debug;
 
     /// Converts the value from `usize`.
     ///

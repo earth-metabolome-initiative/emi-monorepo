@@ -20,3 +20,7 @@ pub mod csr2d_empty_rows_indices;
 pub use csr2d_empty_rows_indices::CSR2DEmptyRowIndices;
 pub mod csr2d_non_empty_rows_indices;
 pub use csr2d_non_empty_rows_indices::CSR2DNonEmptyRowIndices;
+mod csr2d_values;
+pub use csr2d_values::M2DValues;
+#[cfg(feature = "arbitrary")]
+mod arbitrary_impl;

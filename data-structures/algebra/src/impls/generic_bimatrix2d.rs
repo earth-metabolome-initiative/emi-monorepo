@@ -1,10 +1,10 @@
-//! [`GenericBiMatrix2D`] data structure, which provides a wrapper to a matrix and its
-//! transposed version.
+//! [`GenericBiMatrix2D`] data structure, which provides a wrapper to a matrix
+//! and its transposed version.
 
 use crate::prelude::*;
 
-/// [`GenericBiMatrix2D`] data structure, which provides a wrapper to a matrix and its
-/// transposed version.
+/// [`GenericBiMatrix2D`] data structure, which provides a wrapper to a matrix
+/// and its transposed version.
 pub struct GenericBiMatrix2D<M, T> {
     /// The matrix.
     matrix: M,
@@ -25,6 +25,18 @@ impl<
     pub fn new(matrix: M) -> Self {
         let transposed = matrix.transpose();
         Self { matrix, transposed }
+    }
+}
+
+impl<M, T> Matrix for GenericBiMatrix2D<M, T>
+where
+    T: Matrix2D,
+    M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
+{
+    type Coordinates = (M::RowIndex, M::ColumnIndex);
+
+    fn shape(&self) -> Vec<usize> {
+        vec![self.number_of_rows().into_usize(), self.number_of_columns().into_usize()]
     }
 }
 
@@ -57,12 +69,31 @@ where
     where
         Self: 'a;
 
+    fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_> {
+        self.matrix.sparse_coordinates()
+    }
+
+    fn is_empty(&self) -> bool {
+        self.matrix.is_empty()
+    }
+}
+
+impl<M, T> SizedSparseMatrix for GenericBiMatrix2D<M, T>
+where
+    T: Matrix2D,
+    M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
+    M: SizedSparseMatrix,
+{
     fn number_of_defined_values(&self) -> Self::SparseIndex {
         self.matrix.number_of_defined_values()
     }
 
-    fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_> {
-        self.matrix.sparse_coordinates()
+    fn select(&self, sparse_index: Self::SparseIndex) -> Self::Coordinates {
+        self.matrix.select(sparse_index)
+    }
+
+    fn rank(&self, coordinates: &Self::Coordinates) -> Self::SparseIndex {
+        self.matrix.rank(coordinates)
     }
 }
 
@@ -84,10 +115,7 @@ where
         = M::SparseRows<'a>
     where
         Self: 'a;
-    type SparseRowSizes<'a>
-        = M::SparseRowSizes<'a>
-    where
-        Self: 'a;
+
     type EmptyRowIndices<'a>
         = M::EmptyRowIndices<'a>
     where
@@ -109,18 +137,6 @@ where
         self.matrix.sparse_rows()
     }
 
-    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
-        self.matrix.number_of_defined_values_in_row(row)
-    }
-
-    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
-        self.matrix.sparse_row_sizes()
-    }
-
-    fn rank(&self, row: Self::RowIndex) -> Self::SparseIndex {
-        self.matrix.rank(row)
-    }
-
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
         self.matrix.empty_row_indices()
     }
@@ -136,13 +152,44 @@ where
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         self.matrix.number_of_non_empty_rows()
     }
+}
 
-    fn number_of_empty_columns(&self) -> Self::ColumnIndex {
-        self.transposed.number_of_empty_rows()
+impl<M, T> SizedRowsSparseMatrix2D for GenericBiMatrix2D<M, T>
+where
+    T: SizedRowsSparseMatrix2D,
+    M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
+    M: SizedRowsSparseMatrix2D,
+{
+    type SparseRowSizes<'a>
+        = M::SparseRowSizes<'a>
+    where
+        Self: 'a;
+
+    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
+        self.matrix.number_of_defined_values_in_row(row)
     }
 
-    fn number_of_non_empty_columns(&self) -> Self::ColumnIndex {
-        self.transposed.number_of_non_empty_rows()
+    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
+        self.matrix.sparse_row_sizes()
+    }
+}
+
+impl<M, T> SizedSparseMatrix2D for GenericBiMatrix2D<M, T>
+where
+    T: SizedSparseMatrix2D,
+    M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
+    M: SizedSparseMatrix2D,
+{
+    fn rank_row(&self, row: Self::RowIndex) -> Self::SparseIndex {
+        self.matrix.rank_row(row)
+    }
+
+    fn select_row(&self, sparse_index: Self::SparseIndex) -> Self::RowIndex {
+        self.matrix.select_row(sparse_index)
+    }
+
+    fn select_column(&self, sparse_index: Self::SparseIndex) -> Self::ColumnIndex {
+        self.matrix.select_column(sparse_index)
     }
 }
 
