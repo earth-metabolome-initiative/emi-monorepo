@@ -227,8 +227,12 @@ where
         self.matrix.number_of_defined_values()
     }
 
-    fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_> {
-        self.matrix.sparse_coordinates()
+    fn select(&self, sparse_index: Self::SparseIndex) -> Self::Coordinates {
+        self.matrix.select(sparse_index)
+    }
+
+    fn rank(&self, coordinates: &Self::Coordinates) -> Self::SparseIndex {
+        self.matrix.rank(coordinates)
     }
 }
 
@@ -243,10 +247,6 @@ where
         Self: 'a;
     type SparseRow<'a>
         = M::SparseRow<'a>
-    where
-        Self: 'a;
-    type SparseRowSizes<'a>
-        = M::SparseRowSizes<'a>
     where
         Self: 'a;
     type SparseRows<'a>
@@ -274,18 +274,6 @@ where
         self.matrix.sparse_rows()
     }
 
-    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
-        self.matrix.sparse_row_sizes()
-    }
-
-    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
-        self.matrix.number_of_defined_values_in_row(row)
-    }
-
-    fn rank(&self, row: Self::RowIndex) -> Self::SparseIndex {
-        self.matrix.rank(row)
-    }
-
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
         self.matrix.empty_row_indices()
     }
@@ -301,13 +289,42 @@ where
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         self.matrix.number_of_non_empty_rows()
     }
+}
 
-    fn number_of_empty_columns(&self) -> Self::ColumnIndex {
-        self.matrix.number_of_empty_columns()
+impl<M, Map, Value> SizedRowsSparseMatrix2D for GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: SizedRowsSparseMatrix2D,
+    Map: Fn(M::Coordinates) -> Value,
+{
+    type SparseRowSizes<'a>
+        = M::SparseRowSizes<'a>
+    where
+        Self: 'a;
+
+    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
+        self.matrix.sparse_row_sizes()
     }
 
-    fn number_of_non_empty_columns(&self) -> Self::ColumnIndex {
-        self.matrix.number_of_non_empty_columns()
+    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
+        self.matrix.number_of_defined_values_in_row(row)
+    }
+}
+
+impl<M, Map, Value> SizedSparseMatrix2D for GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: SizedSparseMatrix2D,
+    Map: Fn(M::Coordinates) -> Value,
+{
+    fn rank_row(&self, row: Self::RowIndex) -> Self::SparseIndex {
+        self.matrix.rank_row(row)
+    }
+
+    fn select_row(&self, sparse_index: Self::SparseIndex) -> Self::RowIndex {
+        self.matrix.select_row(sparse_index)
+    }
+
+    fn select_column(&self, sparse_index: Self::SparseIndex) -> Self::ColumnIndex {
+        self.matrix.select_column(sparse_index)
     }
 }
 

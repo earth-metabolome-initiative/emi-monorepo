@@ -212,21 +212,27 @@ where
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         self.number_of_non_empty_rows
     }
+}
 
-    fn number_of_empty_columns(&self) -> Self::ColumnIndex {
-        self.number_of_columns() - self.number_of_non_empty_columns()
+impl<
+        SparseIndex: PositiveInteger + IntoUsize,
+        RowIndex: PositiveInteger + IntoUsize,
+        R: Ranged,
+    > SizedRowsSparseMatrix2D for RangedCSR2D<SparseIndex, RowIndex, R>
+where
+    Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = R::Step>,
+{
+    type SparseRowSizes<'a>
+        = crate::impls::CSR2DRowSizes<'a, Self>
+    where
+        Self: 'a;
+
+    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
+        self.into()
     }
 
-    fn number_of_non_empty_columns(&self) -> Self::ColumnIndex {
-        let mut non_empty_columns = vec![false; self.number_of_columns().into_usize()];
-        let mut number_of_non_empty_columns = Self::ColumnIndex::ZERO;
-        for column in self.sparse_columns() {
-            if !non_empty_columns[column.into_usize()] {
-                number_of_non_empty_columns += Self::ColumnIndex::ONE;
-                non_empty_columns[column.into_usize()] = true;
-            }
-        }
-        number_of_non_empty_columns
+    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
+        self.ranges[row.into_usize()].number_of_elements()
     }
 }
 

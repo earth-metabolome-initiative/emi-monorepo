@@ -264,21 +264,35 @@ where
     fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
         self.into()
     }
+}
 
-    fn number_of_empty_columns(&self) -> Self::ColumnIndex {
-        self.number_of_columns() - self.number_of_non_empty_columns()
+impl<
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    > SizedSparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+where
+    Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
+{
+    fn rank_row(&self, row: RowIndex) -> SparseIndex {
+        if self.offsets.len() <= row.into_usize() && row <= self.number_of_rows() {
+            return self.number_of_defined_values();
+        }
+        self.offsets[row.into_usize()]
     }
 
-    fn number_of_non_empty_columns(&self) -> Self::ColumnIndex {
-        let mut non_empty_columns = vec![false; self.number_of_columns().into_usize()];
-        let mut number_of_non_empty_columns = ColumnIndex::ZERO;
-        for column in self.sparse_columns() {
-            if !non_empty_columns[column.into_usize()] {
-                number_of_non_empty_columns += ColumnIndex::ONE;
-            }
-            non_empty_columns[column.into_usize()] = true;
-        }
-        number_of_non_empty_columns
+    fn select_row(&self, sparse_index: Self::SparseIndex) -> Self::RowIndex {
+        Self::RowIndex::try_from_usize(
+            self.offsets.binary_search(&sparse_index).unwrap_or_else(|x| x),
+        ).unwrap_or_else(|_| {
+            unreachable!(
+                "The Matrix is in an illegal state where a sparse index is greater than the number of defined values."
+            )
+        })
+    }
+
+    fn select_column(&self, sparse_index: Self::SparseIndex) -> Self::ColumnIndex {
+        self.column_indices[sparse_index.into_usize()]
     }
 }
 

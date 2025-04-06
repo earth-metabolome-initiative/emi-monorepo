@@ -178,8 +178,6 @@ where
         = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::NonEmptyRowIndices<'a>
     where
         Self: 'a;
-    type EmptyRowIndices<'a> = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::EmptyRowIndices<'a> where Self: 'a;
-    type NonEmptyRowIndices<'a> = <SquareCSR2D<SparseIndex, Idx> as SparseMatrix2D>::NonEmptyRowIndices<'a> where Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.csr.sparse_row(row)
@@ -264,13 +262,45 @@ where
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         self.csr.number_of_non_empty_rows()
     }
+}
 
-    fn number_of_empty_columns(&self) -> Self::ColumnIndex {
-        self.csr.number_of_empty_columns()
+impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize>
+    SizedRowsSparseMatrix2D for SymmetricCSR2D<SparseIndex, Idx>
+where
+    Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    SquareCSR2D<SparseIndex, Idx>:
+        SizedRowsSparseMatrix2D<RowIndex = Idx, ColumnIndex = Idx, SparseIndex = SparseIndex>,
+{
+    type SparseRowSizes<'a>
+        = <SquareCSR2D<SparseIndex, Idx> as SizedRowsSparseMatrix2D>::SparseRowSizes<'a>
+    where
+        Self: 'a;
+    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
+        self.csr.number_of_defined_values_in_row(row)
     }
 
-    fn number_of_non_empty_columns(&self) -> Self::ColumnIndex {
-        self.csr.number_of_non_empty_columns()
+    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
+        self.csr.sparse_row_sizes()
+    }
+}
+
+impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize> SizedSparseMatrix2D
+    for SymmetricCSR2D<SparseIndex, Idx>
+where
+    Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    SquareCSR2D<SparseIndex, Idx>:
+        SizedSparseMatrix2D<RowIndex = Idx, ColumnIndex = Idx, SparseIndex = SparseIndex>,
+{
+    fn rank_row(&self, row: Idx) -> Self::SparseIndex {
+        self.csr.rank_row(row)
+    }
+
+    fn select_column(&self, sparse_index: Self::SparseIndex) -> Self::ColumnIndex {
+        self.csr.select_column(sparse_index)
+    }
+
+    fn select_row(&self, sparse_index: Self::SparseIndex) -> Self::RowIndex {
+        self.csr.select_row(sparse_index)
     }
 }
 

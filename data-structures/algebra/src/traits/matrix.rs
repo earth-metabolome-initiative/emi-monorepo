@@ -67,6 +67,10 @@ pub trait ValuedMatrix: Matrix {
     type Value;
 }
 
+impl<M: ValuedMatrix> ValuedMatrix for &M {
+    type Value = M::Value;
+}
+
 /// Trait defining a matrix with values that can be computed on the fly.
 pub trait ImplicitValuedMatrix: ValuedMatrix {
     /// Returns the implicit value at the given coordinates.
@@ -311,11 +315,10 @@ where
     }
 }
 
-/// Trait defining a sparse valued matrix.
-pub trait SparseValuedMatrix: SparseMatrix + ValuedMatrix {
-    /// Iterator over the sparse values of the matrix.
-    type SparseValues<'a>: ExactSizeIterator<Item = Self::Value>
-        + DoubleEndedIterator<Item = Self::Value>
+/// Trait defining a dense valued matrix.
+pub trait DenseValuedMatrix: DenseMatrix + ValuedMatrix {
+    /// Iterator over the dense values of the matrix.
+    type Values<'a>: Iterator<Item = Self::Value> + DoubleEndedIterator<Item = Self::Value>
     where
         Self: 'a;
 
@@ -324,7 +327,7 @@ pub trait SparseValuedMatrix: SparseMatrix + ValuedMatrix {
     where
         Self::Value: TotalOrd,
     {
-        self.sparse_values().max_by(TotalOrd::total_cmp)
+        self.values().max_by(TotalOrd::total_cmp)
     }
 
     /// Returns the smallest value in the matrix.
@@ -332,17 +335,92 @@ pub trait SparseValuedMatrix: SparseMatrix + ValuedMatrix {
     where
         Self::Value: TotalOrd,
     {
+        self.values().min_by(TotalOrd::total_cmp)
+    }
+
+    /// Returns the value associated to the provided coordinates.
+    fn value(
+        &self,
+        coordinates: Self::Coordinates,
+    ) -> Self::Value;
+
+    /// Returns an iterator of the values of the matrix.
+    fn values(&self) -> Self::Values<'_>;
+}
+
+impl<M: DenseValuedMatrix> DenseValuedMatrix for &M {
+    type Values<'a> = M::Values<'a>
+    where
+        Self: 'a;
+
+    fn value(
+        &self,
+        coordinates: Self::Coordinates,
+    ) -> Self::Value {
+        (*self).value(coordinates)
+    }
+
+    fn values(&self) -> Self::Values<'_> {
+        (*self).values()
+    }
+}
+
+/// Trait defining a sparse valued matrix.
+pub trait SparseValuedMatrix: SparseMatrix + ValuedMatrix {
+    /// Iterator over the sparse values of the matrix.
+    type SparseValues<'a>: Iterator<Item = Self::Value> + DoubleEndedIterator<Item = Self::Value>
+    where
+        Self: 'a;
+
+    /// Returns the largest value in the matrix.
+    fn max_sparse_value(&self) -> Option<Self::Value>
+    where
+        Self::Value: TotalOrd,
+    {
+        self.sparse_values().max_by(TotalOrd::total_cmp)
+    }
+
+    /// Returns the smallest value in the matrix.
+    fn min_sparse_value(&self) -> Option<Self::Value>
+    where
+        Self::Value: TotalOrd,
+    {
         self.sparse_values().min_by(TotalOrd::total_cmp)
     }
 
-    /// Returns an iterator of the sparse coordinates of the matrix.
+    /// Returns an iterator of the sparse values of the matrix.
     fn sparse_values(&self) -> Self::SparseValues<'_>;
 }
 
-/// Trait defining a bidimensional matrix.
+impl<M: SparseValuedMatrix> SparseValuedMatrix for &M {
+    type SparseValues<'a>
+        = M::SparseValues<'a>
+    where
+        Self: 'a;
+
+    fn sparse_values(&self) -> Self::SparseValues<'_> {
+        (*self).sparse_values()
+    }
+}
+
+/// Trait defining a sparse valued matrix.
+pub trait SizedSparseValuedMatrix: SizedSparseMatrix + SparseValuedMatrix {
+    /// Returns the value associated to the provided sparse index.
+    ///
+    /// # Arguments
+    ///
+    /// * `sparse_index`: The sparse index of the value to get.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the sparse index is out of bounds.
+    fn select_value(&self, sparse_index: Self::SparseIndex) -> Self::Value;
+}
+
+/// Trait defining a bi-dimensional matrix.
 pub trait ImplicitValuedSparseMatrix: SparseValuedMatrix + ImplicitValuedMatrix {
     /// Iterator over the sparse columns of a row.
-    type SparseImplicitValues<'a>: ExactSizeIterator<Item = Self::Value>
+    type SparseImplicitValues<'a>: Iterator<Item = Self::Value>
         + DoubleEndedIterator<Item = Self::Value>
     where
         Self: 'a;
@@ -356,7 +434,7 @@ where
     M: SparseValuedMatrix + ImplicitValuedMatrix,
 {
     type SparseImplicitValues<'a>
-        = ImplicitValuedSparseIteraror<'a, M>
+        = ImplicitValuedSparseIterator<'a, M>
     where
         M: 'a;
 

@@ -227,6 +227,9 @@ where
                 MutabilityError::DuplicatedEntry(coordinates)
             }
             MutabilityError::OutOfBounds(coordinates) => MutabilityError::OutOfBounds(coordinates),
+            MutabilityError::MaxedOutRowIndex => MutabilityError::MaxedOutRowIndex,
+            MutabilityError::MaxedOutColumnIndex => MutabilityError::MaxedOutColumnIndex,
+            MutabilityError::MaxedOutSparseIndex => MutabilityError::MaxedOutSparseIndex,
         }
     }
 }
