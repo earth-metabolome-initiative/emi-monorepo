@@ -28,7 +28,7 @@ pub trait MatrixMut: Matrix + Default {
     fn add(&mut self, entry: Self::Entry) -> Result<(), Self::Error>;
 }
 
-/// Trait defining a bidimensional mutable matrix.
+/// Trait defining a bi-dimensional mutable matrix.
 pub trait SparseMatrixMut: MatrixMut + SparseMatrix {
     /// Type describing the shape of the matrix.
     type MinimalShape: core::fmt::Debug + Copy;

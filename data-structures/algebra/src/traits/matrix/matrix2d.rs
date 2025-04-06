@@ -32,11 +32,16 @@ pub trait Matrix2D:
     }
 }
 
-impl<M: Matrix2D> Matrix for M {
-    type Coordinates = (<Self as Matrix2D>::RowIndex, <Self as Matrix2D>::ColumnIndex);
+impl<M: Matrix2D> Matrix2D for &M {
+    type RowIndex = M::RowIndex;
+    type ColumnIndex = M::ColumnIndex;
 
-    fn shape(&self) -> Vec<usize> {
-        vec![self.number_of_rows().into_usize(), self.number_of_columns().into_usize()]
+    fn number_of_rows(&self) -> Self::RowIndex {
+        (*self).number_of_rows()
+    }
+
+    fn number_of_columns(&self) -> Self::ColumnIndex {
+        (*self).number_of_columns()
     }
 }
 

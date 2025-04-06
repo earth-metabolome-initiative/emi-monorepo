@@ -2,4 +2,4 @@
 //! algebraic structures.
 
 pub mod implicit_valued_sparse_iterator;
-pub use implicit_valued_sparse_iterator::ImplicitValuedSparseIteraror;
+pub use implicit_valued_sparse_iterator::ImplicitValuedSparseIterator;

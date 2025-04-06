@@ -5,14 +5,53 @@ use core::fmt::Debug;
 
 use super::{MutabilityError, CSR2D};
 use crate::traits::{
-    IntoUsize, Matrix, Matrix2D, Matrix2DRef, MatrixMut, One, PositiveInteger, SparseMatrix, SparseMatrix2D, SparseMatrixMut, SparseValuedMatrix, ValuedMatrix, ValuedMatrix2D, ValuedSparseMatrix2D, Zero
+    IntoUsize, Matrix, Matrix2D, Matrix2DRef, MatrixMut, One, PositiveInteger,
+    SizedRowsSparseMatrix2D, SizedSparseMatrix, SizedSparseMatrix2D, SizedSparseValuedMatrix,
+    SparseMatrix, SparseMatrix2D, SparseMatrixMut, SparseValuedMatrix, TryFromUsize, ValuedMatrix,
+    ValuedMatrix2D, SparseValuedMatrix2D, Zero,
 };
+
+#[cfg(feature = "arbitrary")]
+mod arbitrary_impl;
 
 /// A 2D CSR matrix which stores values in addition to the row and column
 /// indices.
 pub struct ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value> {
     csr: CSR2D<SparseIndex, RowIndex, ColumnIndex>,
     values: Vec<Value>,
+}
+
+impl<
+        SparseIndex: PositiveInteger + TryFromUsize + IntoUsize,
+        RowIndex: TryFromUsize + PositiveInteger + IntoUsize,
+        ColumnIndex: TryFromUsize + PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+        Value,
+        const ROWS: usize,
+        const COLS: usize,
+    > TryFrom<[[Value; COLS]; ROWS]> for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
+{
+    type Error = MutabilityError<Self>;
+
+    fn try_from(value: [[Value; COLS]; ROWS]) -> Result<Self, Self::Error> {
+        let mut valued_csr: ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value> =
+            ValuedCSR2D::with_sparse_shaped_capacity(
+                (
+                    RowIndex::try_from_usize(ROWS)
+                        .map_err(|_| MutabilityError::<Self>::MaxedOutRowIndex)?,
+                    ColumnIndex::try_from_usize(COLS)
+                        .map_err(|_| MutabilityError::<Self>::MaxedOutColumnIndex)?,
+                ),
+                SparseIndex::try_from_usize(ROWS * COLS)
+                    .map_err(|_| MutabilityError::<Self>::MaxedOutSparseIndex)?,
+            );
+        for (row, row_values) in valued_csr.row_indices().zip(value) {
+            for (column, value) in valued_csr.column_indices().zip(row_values) {
+                valued_csr.add((row, column, value)).expect("Failed to add value to ValuedCSR2D");
+            }
+        }
+
+        Ok(valued_csr)
+    }
 }
 
 impl<SparseIndex: Debug, RowIndex: Debug, ColumnIndex: Debug, Value: Debug> Debug
@@ -28,6 +67,21 @@ impl<SparseIndex: Zero, RowIndex: Zero, ColumnIndex: Zero, Value> Default
 {
     fn default() -> Self {
         Self { csr: CSR2D::default(), values: Vec::default() }
+    }
+}
+
+impl<SparseIndex, RowIndex, ColumnIndex, Value> Matrix
+    for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
+where
+    CSR2D<SparseIndex, RowIndex, ColumnIndex>: Matrix2D,
+{
+    type Coordinates = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as Matrix>::Coordinates;
+
+    fn shape(&self) -> Vec<usize> {
+        vec![
+            self.number_of_rows().into_usize(),
+            self.number_of_columns().into_usize(),
+        ]
     }
 }
 
@@ -79,14 +133,12 @@ where
         = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SparseMatrix2D>::SparseRows<'a>
     where
         Self: 'a;
-    type SparseRowSizes<'a>
-        = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SparseMatrix2D>::SparseRowSizes<'a>
+    type EmptyRowIndices<'a>
+        = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SparseMatrix2D>::EmptyRowIndices<'a>
     where
         Self: 'a;
-    type EmptyRowIndices<'a> = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SparseMatrix2D>::EmptyRowIndices<'a>
-    where
-        Self: 'a;
-    type NonEmptyRowIndices<'a> = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SparseMatrix2D>::NonEmptyRowIndices<'a>
+    type NonEmptyRowIndices<'a>
+        = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SparseMatrix2D>::NonEmptyRowIndices<'a>
     where
         Self: 'a;
 
@@ -100,18 +152,6 @@ where
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.csr.sparse_row(row)
-    }
-
-    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
-        self.csr.sparse_row_sizes()
-    }
-
-    fn rank(&self, row: Self::RowIndex) -> Self::SparseIndex {
-        self.csr.rank(row)
-    }
-
-    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
-        self.csr.number_of_defined_values_in_row(row)
     }
 
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
@@ -129,13 +169,42 @@ where
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         self.csr.number_of_non_empty_rows()
     }
+}
 
-    fn number_of_empty_columns(&self) -> Self::ColumnIndex {
-        self.csr.number_of_empty_columns()
+impl<SparseIndex, RowIndex, ColumnIndex, Value> SizedRowsSparseMatrix2D
+    for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
+where
+    CSR2D<SparseIndex, RowIndex, ColumnIndex>: SizedRowsSparseMatrix2D,
+{
+    type SparseRowSizes<'a>
+        = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SizedRowsSparseMatrix2D>::SparseRowSizes<'a>
+    where
+        Self: 'a;
+
+    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
+        self.csr.sparse_row_sizes()
     }
 
-    fn number_of_non_empty_columns(&self) -> Self::ColumnIndex {
-        self.csr.number_of_non_empty_columns()
+    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
+        self.csr.number_of_defined_values_in_row(row)
+    }
+}
+
+impl<SparseIndex, RowIndex, ColumnIndex, Value> SizedSparseMatrix2D
+    for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
+where
+    CSR2D<SparseIndex, RowIndex, ColumnIndex>: SizedSparseMatrix2D,
+{
+    fn rank_row(&self, row: Self::RowIndex) -> Self::SparseIndex {
+        self.csr.rank_row(row)
+    }
+
+    fn select_row(&self, sparse_index: Self::SparseIndex) -> Self::RowIndex {
+        self.csr.select_row(sparse_index)
+    }
+
+    fn select_column(&self, sparse_index: Self::SparseIndex) -> Self::ColumnIndex {
+        self.csr.select_column(sparse_index)
     }
 }
 
@@ -150,12 +219,30 @@ where
     where
         Self: 'a;
 
+    fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_> {
+        self.csr.sparse_coordinates()
+    }
+
+    fn is_empty(&self) -> bool {
+        self.csr.is_empty()
+    }
+}
+
+impl<SparseIndex, RowIndex, ColumnIndex, Value> SizedSparseMatrix
+    for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
+where
+    CSR2D<SparseIndex, RowIndex, ColumnIndex>: SizedSparseMatrix2D,
+{
     fn number_of_defined_values(&self) -> Self::SparseIndex {
         self.csr.number_of_defined_values()
     }
 
-    fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_> {
-        self.csr.sparse_coordinates()
+    fn select(&self, sparse_index: Self::SparseIndex) -> Self::Coordinates {
+        self.csr.select(sparse_index)
+    }
+
+    fn rank(&self, coordinates: &Self::Coordinates) -> Self::SparseIndex {
+        self.csr.rank(coordinates)
     }
 }
 
@@ -163,10 +250,9 @@ impl<SparseIndex: Zero, RowIndex: Zero, ColumnIndex: Zero, Value> MatrixMut
     for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 where
     CSR2D<SparseIndex, RowIndex, ColumnIndex>: MatrixMut<
-        Entry = (RowIndex, ColumnIndex),
-        Error = MutabilityError<CSR2D<SparseIndex, RowIndex, ColumnIndex>>,
-    >
-        + Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
+            Entry = (RowIndex, ColumnIndex),
+            Error = MutabilityError<CSR2D<SparseIndex, RowIndex, ColumnIndex>>,
+        > + Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
     type Entry = (RowIndex, ColumnIndex, Value);
     type Error = MutabilityError<Self>;
@@ -179,15 +265,18 @@ where
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize,
-        RowIndex: PositiveInteger + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + From<SparseIndex>,
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
         Value,
     > SparseMatrixMut for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 where
     CSR2D<SparseIndex, RowIndex, ColumnIndex>: SparseMatrixMut
         + Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>
-        + MatrixMut<Entry = (RowIndex, ColumnIndex), Error = MutabilityError<CSR2D<SparseIndex, RowIndex, ColumnIndex>>>,
+        + MatrixMut<
+            Entry = (RowIndex, ColumnIndex),
+            Error = MutabilityError<CSR2D<SparseIndex, RowIndex, ColumnIndex>>,
+        >,
 {
     type MinimalShape =
         <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SparseMatrixMut>::MinimalShape;
@@ -241,10 +330,24 @@ where
     }
 }
 
-impl<SparseIndex, RowIndex, ColumnIndex, Value> ValuedSparseMatrix2D
+impl<SparseIndex, RowIndex, ColumnIndex, Value> SizedSparseValuedMatrix
     for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 where
-    Self: SparseMatrix2D + SparseValuedMatrix<Value = Value>,
+    Self: SparseValuedMatrix<Value = Value>,
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    Self::Value: Clone,
+{
+    fn select_value(&self, sparse_index: Self::SparseIndex) -> Self::Value {
+        self.values[sparse_index.into_usize()].clone()
+    }
+}
+
+impl<SparseIndex, RowIndex, ColumnIndex, Value> SparseValuedMatrix2D
+    for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
+where
+    Self: SizedSparseMatrix2D + SparseValuedMatrix<Value = Value>,
     Self::Value: Clone,
 {
     type SparseRowValues<'a>
@@ -253,8 +356,8 @@ where
         Self: 'a;
 
     fn sparse_row_values(&self, row: Self::RowIndex) -> Self::SparseRowValues<'_> {
-        let start = self.rank(row).into_usize();
-        let end = self.rank(row + Self::RowIndex::ONE).into_usize();
+        let start = self.rank_row(row).into_usize();
+        let end = self.rank_row(row + Self::RowIndex::ONE).into_usize();
         self.values[start..end].iter().cloned()
     }
 }

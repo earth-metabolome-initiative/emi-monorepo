@@ -5,7 +5,7 @@ use core::iter::{repeat_n, RepeatN};
 use crate::prelude::*;
 
 /// Iterator of the sparse coordinates of the CSR2D matrix.
-pub struct CSR2DRows<'a, CSR: SparseMatrix2D> {
+pub struct CSR2DRows<'a, CSR: SizedRowsSparseMatrix2D> {
     /// The CSR matrix.
     csr2d: &'a CSR,
     /// The row index.
@@ -18,7 +18,7 @@ pub struct CSR2DRows<'a, CSR: SparseMatrix2D> {
     back: RepeatN<CSR::RowIndex>,
 }
 
-impl<CSR: SparseMatrix2D> Iterator for CSR2DRows<'_, CSR> {
+impl<CSR: SizedRowsSparseMatrix2D> Iterator for CSR2DRows<'_, CSR> {
     type Item = CSR::RowIndex;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -35,13 +35,15 @@ impl<CSR: SparseMatrix2D> Iterator for CSR2DRows<'_, CSR> {
             }
         })
     }
+}
 
-    fn size_hint(&self) -> (usize, Option<usize>) {
-        let next_row_rank = self.csr2d.rank(self.next_row).into_usize();
+impl<CSR: SizedSparseMatrix2D> ExactSizeIterator for CSR2DRows<'_, CSR> {
+    fn len(&self) -> usize {
+        let next_row_rank = self.csr2d.rank_row(self.next_row).into_usize();
         let already_observed_in_next_row =
             self.csr2d.number_of_defined_values_in_row(self.next_row).into_usize()
                 - self.next.len();
-        let back_row_rank = self.csr2d.rank(self.back_row).into_usize();
+        let back_row_rank = self.csr2d.rank_row(self.back_row).into_usize();
         let already_observed_in_back_row =
             self.csr2d.number_of_defined_values_in_row(self.back_row).into_usize()
                 - self.back.len();
@@ -49,17 +51,11 @@ impl<CSR: SparseMatrix2D> Iterator for CSR2DRows<'_, CSR> {
             - next_row_rank
             - already_observed_in_next_row
             - already_observed_in_back_row;
-        (remaining, Some(remaining))
+        remaining
     }
 }
 
-impl<CSR: SparseMatrix2D> ExactSizeIterator for CSR2DRows<'_, CSR> {
-    fn len(&self) -> usize {
-        self.size_hint().0
-    }
-}
-
-impl<CSR: SparseMatrix2D> DoubleEndedIterator for CSR2DRows<'_, CSR> {
+impl<CSR: SizedRowsSparseMatrix2D> DoubleEndedIterator for CSR2DRows<'_, CSR> {
     fn next_back(&mut self) -> Option<Self::Item> {
         self.back.next().or_else(|| {
             self.back_row -= CSR::RowIndex::ONE;
@@ -76,7 +72,7 @@ impl<CSR: SparseMatrix2D> DoubleEndedIterator for CSR2DRows<'_, CSR> {
     }
 }
 
-impl<'a, CSR: SparseMatrix2D> From<&'a CSR> for CSR2DRows<'a, CSR> {
+impl<'a, CSR: SizedRowsSparseMatrix2D> From<&'a CSR> for CSR2DRows<'a, CSR> {
     fn from(csr2d: &'a CSR) -> Self {
         let next_row = CSR::RowIndex::ZERO;
         let back_row = csr2d.number_of_rows() - CSR::RowIndex::ONE;
