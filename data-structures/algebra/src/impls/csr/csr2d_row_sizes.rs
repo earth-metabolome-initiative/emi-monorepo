@@ -3,7 +3,7 @@
 use crate::prelude::*;
 
 /// Iterator of the sparse coordinates of the CSR2D matrix.
-pub struct CSR2DRowSizes<'a, CSR: SparseMatrix2D> {
+pub struct CSR2DRowSizes<'a, CSR: SizedRowsSparseMatrix2D> {
     /// The CSR matrix.
     csr2d: &'a CSR,
     /// The row index.
@@ -12,7 +12,7 @@ pub struct CSR2DRowSizes<'a, CSR: SparseMatrix2D> {
     back_row: CSR::RowIndex,
 }
 
-impl<CSR: SparseMatrix2D> Iterator for CSR2DRowSizes<'_, CSR> {
+impl<CSR: SizedRowsSparseMatrix2D> Iterator for CSR2DRowSizes<'_, CSR> {
     type Item = CSR::ColumnIndex;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -29,13 +29,13 @@ impl<CSR: SparseMatrix2D> Iterator for CSR2DRowSizes<'_, CSR> {
     }
 }
 
-impl<CSR: SparseMatrix2D> ExactSizeIterator for CSR2DRowSizes<'_, CSR> {
+impl<CSR: SizedRowsSparseMatrix2D> ExactSizeIterator for CSR2DRowSizes<'_, CSR> {
     fn len(&self) -> usize {
         self.size_hint().0
     }
 }
 
-impl<CSR: SparseMatrix2D> DoubleEndedIterator for CSR2DRowSizes<'_, CSR> {
+impl<CSR: SizedRowsSparseMatrix2D> DoubleEndedIterator for CSR2DRowSizes<'_, CSR> {
     fn next_back(&mut self) -> Option<Self::Item> {
         (self.next_row <= self.back_row).then(|| {
             self.back_row -= CSR::RowIndex::ONE;
@@ -44,7 +44,7 @@ impl<CSR: SparseMatrix2D> DoubleEndedIterator for CSR2DRowSizes<'_, CSR> {
     }
 }
 
-impl<'a, CSR: SparseMatrix2D> From<&'a CSR> for CSR2DRowSizes<'a, CSR> {
+impl<'a, CSR: SizedRowsSparseMatrix2D> From<&'a CSR> for CSR2DRowSizes<'a, CSR> {
     fn from(csr2d: &'a CSR) -> Self {
         let next_row = CSR::RowIndex::ZERO;
         let back_row = csr2d.number_of_rows() - CSR::RowIndex::ONE;

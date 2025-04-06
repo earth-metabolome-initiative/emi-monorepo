@@ -2,7 +2,7 @@
 
 use common_traits::prelude::Serde;
 
-use super::{Bounded, One, TotalOrd, Zero};
+use super::{Bounded, Finite, One, TotalOrd, Zero};
 
 /// Trait defining a number.
 pub trait Number:
@@ -15,6 +15,7 @@ pub trait Number:
     + TotalOrd
     + One
     + Zero
+    + Finite
     + Bounded
     + Serde
     + core::iter::Sum
