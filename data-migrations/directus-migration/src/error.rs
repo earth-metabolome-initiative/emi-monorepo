@@ -3,10 +3,11 @@
 use crate::codegen::{
     Brand as DirectusBrand, DirectusUser, InstrumentModel as DirectusInstrumentModel,
     InstrumentType as DirectusInstrumentType, Instrument as DirectusInstrument,
+    Room as DirectusRoom
 };
 use core_structures::{
     codegen::structs_codegen::tables::insertables::InsertableUserAttributes,
-    tables::insertables::{InsertableBrandAttributes, InsertableInstrumentAttributes, InsertableInstrumentModelAttributes, InsertableUserEmailAttributes},
+    tables::insertables::{InsertableAddressAttributes, InsertableBrandAttributes, InsertableCityAttributes, InsertableInstrumentAttributes, InsertableInstrumentModelAttributes, InsertableRoomAttributes, InsertableUserEmailAttributes},
 };
 use web_common_traits::database::InsertError;
 
@@ -27,8 +28,12 @@ pub enum Error {
     InstrumentModelWithMissingUser(Box<DirectusInstrumentModel>),
     /// Instrument is missing the creator user
     InstrumentWithMissingUser(Box<DirectusInstrument>),
+    /// Room is missing the creator user
+    RoomWithMissingUser(Box<DirectusRoom>),
     /// Missing date
     MissingDate(String, String),
+    /// Missing geolocation
+    InvalidGeolocation(postgis_diesel::types::GeometryContainer<postgis_diesel::types::Point>),
     /// Unknown brand status
     UnknownBrandStatus(String),
     /// Unknown instrument type
@@ -37,6 +42,8 @@ pub enum Error {
     UnknownBrand(Box<DirectusBrand>),
     /// Unknown instrument state
     UnknownInstrumentState(String),
+    /// Unknown country
+    UnknownCountry(String),
     /// Unknown instrument model
     UnknownInstrumentModel(Box<DirectusInstrumentModel>),
     /// Failed to establish database connection
@@ -53,6 +60,12 @@ pub enum Error {
     InstrumentModelInsertError(InsertError<InsertableInstrumentModelAttributes>),
     /// Failed to insert instrument
     InstrumentInsertError(InsertError<InsertableInstrumentAttributes>),
+    /// Failed to insert a new city
+    CityInsertError(InsertError<InsertableCityAttributes>),
+    /// Failed to insert a new address
+    AddressInsertError(InsertError<InsertableAddressAttributes>),
+    /// Failed to insert a new room
+    RoomInsertError(InsertError<InsertableRoomAttributes>),
     /// User never logged in
     UserNeverLoggedIn(Box<DirectusUser>),
 }
@@ -96,5 +109,23 @@ impl From<InsertError<InsertableInstrumentModelAttributes>> for Error {
 impl From<InsertError<InsertableInstrumentAttributes>> for Error {
     fn from(value: InsertError<InsertableInstrumentAttributes>) -> Self {
         Error::InstrumentInsertError(value)
+    }
+}
+
+impl From<InsertError<InsertableCityAttributes>> for Error {
+    fn from(value: InsertError<InsertableCityAttributes>) -> Self {
+        Error::CityInsertError(value)
+    }
+}
+
+impl From<InsertError<InsertableAddressAttributes>> for Error {
+    fn from(value: InsertError<InsertableAddressAttributes>) -> Self {
+        Error::AddressInsertError(value)
+    }
+}
+
+impl From<InsertError<InsertableRoomAttributes>> for Error {
+    fn from(value: InsertError<InsertableRoomAttributes>) -> Self {
+        Error::RoomInsertError(value)
     }
 }

@@ -6,8 +6,8 @@ use diesel_async::AsyncPgConnection;
 use super::get_user;
 use crate::codegen::Instrument as DirectusInstrument;
 use core_structures::{
-    Instrument as PortalInstrument, InstrumentModel as PortalInstrumentModel,
-    InstrumentState as PortalInstrumentState,
+    Instrument as PortalInstrument, InstrumentLocation as PortalInstrumentLocation,
+    InstrumentModel as PortalInstrumentModel, InstrumentState as PortalInstrumentState,
 };
 use web_common_traits::database::{Insertable, InsertableVariant, Loadable};
 use web_common_traits::prelude::Builder;
@@ -78,7 +78,7 @@ pub(crate) async fn insert_missing_instruments(
             .insert(portal_conn)
             .await?;
 
-		// TODO! Add the geolocation and room information!
+        // TODO! Add the geolocation and room information!
     }
     Ok(())
 }
