@@ -99,6 +99,7 @@ impl Table {
                 let current_column_ident: Ident = column.snake_case_ident()?;
                 let foreign_key_column_ident: Ident = foreign_key_column.snake_case_ident()?;
                 let foreign_key_struct_path = foreign_key_table.import_struct_path()?;
+                let foreign_key_diesel_path = foreign_key_table.import_diesel_path()?;
 
                 let optional = if column.is_nullable() {
                     quote! { .map(Some) }
@@ -136,15 +137,20 @@ impl Table {
                     }
                 };
 
+                // We build the where statement to filter for the `from_method_name`
+                let self_where_statement = quote!{
+                    #foreign_key_diesel_path::dsl::#foreign_key_column_ident.eq(#column_attribute)
+                };
+
                 Ok(quote! {
                     #feature_flag
                     pub async fn #method_name(&self, conn: &mut #connection) -> Result<#return_statement, diesel::result::Error> {
                         use diesel_async::RunQueryDsl;
                         use diesel::associations::HasTable;
-                        use diesel::QueryDsl;
+                        use diesel::{QueryDsl, ExpressionMethods};
                         #column_value_retrieval
                         #foreign_key_struct_path::table()
-                            .find(#column_attribute)
+                            .filter(#self_where_statement)
                             .first::<#foreign_key_struct_path>(conn)
                             .await
                             #optional
