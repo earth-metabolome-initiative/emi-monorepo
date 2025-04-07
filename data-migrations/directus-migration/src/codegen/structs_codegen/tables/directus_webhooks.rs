@@ -29,12 +29,15 @@ impl DirectusWebhook {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(migrated_flow) = self.migrated_flow.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow::table()
-            .find(migrated_flow)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_flows::directus_flows::dsl::id
+                    .eq(migrated_flow),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow,
             >(conn)

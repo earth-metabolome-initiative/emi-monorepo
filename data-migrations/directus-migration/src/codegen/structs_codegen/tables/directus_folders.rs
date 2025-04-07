@@ -23,12 +23,15 @@ impl DirectusFolder {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(parent) = self.parent.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder::table()
-            .find(parent)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_folders::directus_folders::dsl::id
+                    .eq(parent),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder,
             >(conn)

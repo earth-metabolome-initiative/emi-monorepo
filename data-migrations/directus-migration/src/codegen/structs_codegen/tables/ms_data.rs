@@ -39,12 +39,15 @@ impl MsDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(user_created)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(user_created),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)
@@ -77,12 +80,15 @@ impl MsDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(user_updated)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(user_updated),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)
@@ -115,9 +121,12 @@ impl MsDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::si_units::SiUnit::table()
-            .find(&self.injection_volume_unit)
+            .filter(
+                crate::codegen::diesel_codegen::tables::si_units::si_units::dsl::id
+                    .eq(&self.injection_volume_unit),
+            )
             .first::<crate::codegen::structs_codegen::tables::si_units::SiUnit>(conn)
             .await
     }
@@ -147,9 +156,12 @@ impl MsDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::injection_methods::InjectionMethod::table()
-            .find(&self.injection_method)
+            .filter(
+                crate::codegen::diesel_codegen::tables::injection_methods::injection_methods::dsl::id
+                    .eq(&self.injection_method),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::injection_methods::InjectionMethod,
             >(conn)
@@ -181,9 +193,12 @@ impl MsDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::instruments::Instrument::table()
-            .find(&self.instrument_used)
+            .filter(
+                crate::codegen::diesel_codegen::tables::instruments::instruments::dsl::id
+                    .eq(&self.instrument_used),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::instruments::Instrument,
             >(conn)
@@ -215,12 +230,15 @@ impl MsDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(batch) = self.batch.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::batches::Batch::table()
-            .find(batch)
+            .filter(
+                crate::codegen::diesel_codegen::tables::batches::batches::dsl::id
+                    .eq(batch),
+            )
             .first::<crate::codegen::structs_codegen::tables::batches::Batch>(conn)
             .await
             .map(Some)
@@ -251,9 +269,12 @@ impl MsDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::containers::Container::table()
-            .find(&self.parent_sample_container)
+            .filter(
+                crate::codegen::diesel_codegen::tables::containers::containers::dsl::id
+                    .eq(&self.parent_sample_container),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::containers::Container,
             >(conn)

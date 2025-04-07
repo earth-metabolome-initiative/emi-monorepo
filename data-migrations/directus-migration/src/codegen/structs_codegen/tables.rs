@@ -1,3 +1,5 @@
+pub mod addresses;
+pub use addresses::Address;
 pub mod aliquoting_data;
 pub use aliquoting_data::AliquotingDatum;
 pub mod batch_types;

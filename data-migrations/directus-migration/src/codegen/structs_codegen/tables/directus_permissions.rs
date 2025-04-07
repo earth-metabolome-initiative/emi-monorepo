@@ -26,9 +26,12 @@ impl DirectusPermission {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy::table()
-            .find(&self.policy)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_policies::directus_policies::dsl::id
+                    .eq(&self.policy),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy,
             >(conn)

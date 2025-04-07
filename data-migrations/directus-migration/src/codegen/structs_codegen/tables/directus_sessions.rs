@@ -26,12 +26,15 @@ impl DirectusSession {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user) = self.user.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(user)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(user),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)
@@ -64,12 +67,15 @@ impl DirectusSession {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(share) = self.share.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_shares::DirectusShare::table()
-            .find(share)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_shares::directus_shares::dsl::id
+                    .eq(share),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_shares::DirectusShare,
             >(conn)

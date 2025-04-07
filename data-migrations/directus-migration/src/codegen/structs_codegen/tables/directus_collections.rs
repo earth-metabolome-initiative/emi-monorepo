@@ -46,12 +46,15 @@ impl DirectusCollection {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(group) = self.group.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection::table()
-            .find(group)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::dsl::collection
+                    .eq(group),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection,
             >(conn)

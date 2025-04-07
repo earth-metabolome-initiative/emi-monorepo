@@ -52,12 +52,15 @@ impl DirectusFile {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(folder) = self.folder.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder::table()
-            .find(folder)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_folders::directus_folders::dsl::id
+                    .eq(folder),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder,
             >(conn)
@@ -90,12 +93,15 @@ impl DirectusFile {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(uploaded_by) = self.uploaded_by.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(uploaded_by)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(uploaded_by),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)
@@ -128,12 +134,15 @@ impl DirectusFile {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(modified_by) = self.modified_by.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(modified_by)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(modified_by),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)

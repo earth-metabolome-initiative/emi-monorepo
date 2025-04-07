@@ -57,12 +57,15 @@ impl DirectusSetting {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(project_logo) = self.project_logo.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_files::DirectusFile::table()
-            .find(project_logo)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_files::directus_files::dsl::id
+                    .eq(project_logo),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_files::DirectusFile,
             >(conn)
@@ -95,12 +98,15 @@ impl DirectusSetting {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(public_foreground) = self.public_foreground.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_files::DirectusFile::table()
-            .find(public_foreground)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_files::directus_files::dsl::id
+                    .eq(public_foreground),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_files::DirectusFile,
             >(conn)
@@ -133,12 +139,15 @@ impl DirectusSetting {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(public_background) = self.public_background.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_files::DirectusFile::table()
-            .find(public_background)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_files::directus_files::dsl::id
+                    .eq(public_background),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_files::DirectusFile,
             >(conn)
@@ -173,12 +182,15 @@ impl DirectusSetting {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(storage_default_folder) = self.storage_default_folder.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder::table()
-            .find(storage_default_folder)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_folders::directus_folders::dsl::id
+                    .eq(storage_default_folder),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder,
             >(conn)
@@ -211,12 +223,15 @@ impl DirectusSetting {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(public_favicon) = self.public_favicon.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_files::DirectusFile::table()
-            .find(public_favicon)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_files::directus_files::dsl::id
+                    .eq(public_favicon),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_files::DirectusFile,
             >(conn)
@@ -249,12 +264,15 @@ impl DirectusSetting {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(public_registration_role) = self.public_registration_role.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_roles::DirectusRole::table()
-            .find(public_registration_role)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_roles::directus_roles::dsl::id
+                    .eq(public_registration_role),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
             >(conn)

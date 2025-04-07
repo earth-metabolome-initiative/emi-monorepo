@@ -30,12 +30,15 @@ impl AliquotingDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(user_created)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(user_created),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)
@@ -68,12 +71,15 @@ impl AliquotingDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(user_updated)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(user_updated),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)
@@ -106,9 +112,12 @@ impl AliquotingDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::containers::Container::table()
-            .find(&self.sample_container)
+            .filter(
+                crate::codegen::diesel_codegen::tables::containers::containers::dsl::id
+                    .eq(&self.sample_container),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::containers::Container,
             >(conn)
@@ -140,9 +149,12 @@ impl AliquotingDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::si_units::SiUnit::table()
-            .find(&self.aliquot_volume_unit)
+            .filter(
+                crate::codegen::diesel_codegen::tables::si_units::si_units::dsl::id
+                    .eq(&self.aliquot_volume_unit),
+            )
             .first::<crate::codegen::structs_codegen::tables::si_units::SiUnit>(conn)
             .await
     }
@@ -172,9 +184,12 @@ impl AliquotingDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::containers::Container::table()
-            .find(&self.parent_container)
+            .filter(
+                crate::codegen::diesel_codegen::tables::containers::containers::dsl::id
+                    .eq(&self.parent_container),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::containers::Container,
             >(conn)
@@ -206,9 +221,12 @@ impl AliquotingDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::containers::Container::table()
-            .find(&self.parent_sample_container)
+            .filter(
+                crate::codegen::diesel_codegen::tables::containers::containers::dsl::id
+                    .eq(&self.parent_sample_container),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::containers::Container,
             >(conn)

@@ -26,9 +26,12 @@ impl DirectusRevision {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity::table()
-            .find(&self.activity)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_activity::directus_activity::dsl::id
+                    .eq(&self.activity),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity,
             >(conn)
@@ -62,12 +65,15 @@ impl DirectusRevision {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(parent) = self.parent.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision::table()
-            .find(parent)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions::dsl::id
+                    .eq(parent),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision,
             >(conn)
@@ -102,12 +108,15 @@ impl DirectusRevision {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(version) = self.version.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion::table()
-            .find(version)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_versions::directus_versions::dsl::id
+                    .eq(version),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion,
             >(conn)

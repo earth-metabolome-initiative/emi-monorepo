@@ -29,12 +29,15 @@ impl DriedSamplesDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(user_created)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(user_created),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)
@@ -67,12 +70,15 @@ impl DriedSamplesDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(user_updated)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(user_updated),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)
@@ -105,9 +111,12 @@ impl DriedSamplesDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::containers::Container::table()
-            .find(&self.sample_container)
+            .filter(
+                crate::codegen::diesel_codegen::tables::containers::containers::dsl::id
+                    .eq(&self.sample_container),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::containers::Container,
             >(conn)
@@ -139,12 +148,15 @@ impl DriedSamplesDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(parent_container) = self.parent_container.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::containers::Container::table()
-            .find(parent_container)
+            .filter(
+                crate::codegen::diesel_codegen::tables::containers::containers::dsl::id
+                    .eq(parent_container),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::containers::Container,
             >(conn)
@@ -177,12 +189,15 @@ impl DriedSamplesDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(batch) = self.batch.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::batches::Batch::table()
-            .find(batch)
+            .filter(
+                crate::codegen::diesel_codegen::tables::batches::batches::dsl::id
+                    .eq(batch),
+            )
             .first::<crate::codegen::structs_codegen::tables::batches::Batch>(conn)
             .await
             .map(Some)
@@ -213,12 +228,15 @@ impl DriedSamplesDatum {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(field_data) = self.field_data.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::field_data::FieldDatum::table()
-            .find(field_data)
+            .filter(
+                crate::codegen::diesel_codegen::tables::field_data::field_data::dsl::id
+                    .eq(field_data),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::field_data::FieldDatum,
             >(conn)

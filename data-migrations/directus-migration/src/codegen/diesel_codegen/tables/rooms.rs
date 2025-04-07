@@ -6,5 +6,6 @@ diesel::table! {
     diesel::sql_types::Nullable < diesel::sql_types::Uuid >, date_updated ->
     diesel::sql_types::Nullable < diesel::sql_types::Timestamptz >, building ->
     diesel::sql_types::Integer, room_name -> diesel::sql_types::Text, comment ->
-    diesel::sql_types::Text }
+    diesel::sql_types::Text, address -> diesel::sql_types::Integer, geolocation ->
+    postgis_diesel::sql_types::Geometry, qr_code -> diesel::sql_types::Uuid }
 }

@@ -1,3 +1,4 @@
+pub mod addresses;
 pub mod aliquoting_data;
 pub mod batch_types;
 pub mod batches;

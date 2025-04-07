@@ -13,6 +13,11 @@ pub struct Room {
     pub building: i32,
     pub room_name: String,
     pub comment: String,
+    pub address: i32,
+    pub geolocation: postgis_diesel::types::GeometryContainer<
+        postgis_diesel::types::Point,
+    >,
+    pub qr_code: uuid::Uuid,
 }
 impl Room {
     #[cfg(feature = "postgres")]
@@ -25,12 +30,15 @@ impl Room {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(user_created)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(user_created),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)
@@ -63,12 +71,15 @@ impl Room {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(user_updated)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(user_updated),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)
@@ -101,9 +112,12 @@ impl Room {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::buildings::Building::table()
-            .find(&self.building)
+            .filter(
+                crate::codegen::diesel_codegen::tables::buildings::buildings::dsl::id
+                    .eq(&self.building),
+            )
             .first::<crate::codegen::structs_codegen::tables::buildings::Building>(conn)
             .await
     }
@@ -119,6 +133,41 @@ impl Room {
             .filter(
                 crate::codegen::diesel_codegen::tables::rooms::rooms::dsl::building
                     .eq(building.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn address(
+        &self,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::addresses::Address,
+        diesel::result::Error,
+    > {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        crate::codegen::structs_codegen::tables::addresses::Address::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::addresses::addresses::dsl::id
+                    .eq(&self.address),
+            )
+            .first::<crate::codegen::structs_codegen::tables::addresses::Address>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_address(
+        conn: &mut diesel_async::AsyncPgConnection,
+        address: &crate::codegen::structs_codegen::tables::addresses::Address,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::rooms::rooms::dsl::address
+                    .eq(address.id),
             )
             .load::<Self>(conn)
             .await

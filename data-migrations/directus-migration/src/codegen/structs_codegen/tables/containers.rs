@@ -41,12 +41,15 @@ impl Container {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(user_created)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(user_created),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)
@@ -79,12 +82,15 @@ impl Container {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(user_updated)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(user_updated),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)
@@ -119,12 +125,15 @@ impl Container {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(container_model) = self.container_model.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::container_models::ContainerModel::table()
-            .find(container_model)
+            .filter(
+                crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::id
+                    .eq(container_model),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::container_models::ContainerModel,
             >(conn)
@@ -157,12 +166,15 @@ impl Container {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(location) = self.location.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::universities::University::table()
-            .find(location)
+            .filter(
+                crate::codegen::diesel_codegen::tables::universities::universities::dsl::id
+                    .eq(location),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::universities::University,
             >(conn)
@@ -195,12 +207,15 @@ impl Container {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(parent_container) = self.parent_container.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::containers::Container::table()
-            .find(parent_container)
+            .filter(
+                crate::codegen::diesel_codegen::tables::containers::containers::dsl::id
+                    .eq(parent_container),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::containers::Container,
             >(conn)

@@ -23,12 +23,15 @@ impl DirectusRole {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(parent) = self.parent.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_roles::DirectusRole::table()
-            .find(parent)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_roles::directus_roles::dsl::id
+                    .eq(parent),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
             >(conn)

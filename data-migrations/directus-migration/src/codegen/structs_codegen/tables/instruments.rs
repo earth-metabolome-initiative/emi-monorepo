@@ -12,8 +12,8 @@ pub struct Instrument {
     pub date_updated: Option<chrono::DateTime<chrono::Utc>>,
     pub uuid_instrument: uuid::Uuid,
     pub instrument_id: String,
-    pub instrument_location: Option<i32>,
     pub instrument_model: i32,
+    pub instrument_location: Option<i32>,
 }
 impl Instrument {
     #[cfg(feature = "postgres")]
@@ -26,12 +26,15 @@ impl Instrument {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(user_created)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(user_created),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)
@@ -64,12 +67,15 @@ impl Instrument {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(user_updated)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(user_updated),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)
@@ -93,44 +99,6 @@ impl Instrument {
             .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn instrument_location(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::containers::Container>,
-        diesel::result::Error,
-    > {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::QueryDsl;
-        let Some(instrument_location) = self.instrument_location.as_ref() else {
-            return Ok(None);
-        };
-        crate::codegen::structs_codegen::tables::containers::Container::table()
-            .find(instrument_location)
-            .first::<
-                crate::codegen::structs_codegen::tables::containers::Container,
-            >(conn)
-            .await
-            .map(Some)
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_instrument_location(
-        conn: &mut diesel_async::AsyncPgConnection,
-        instrument_location: &crate::codegen::structs_codegen::tables::containers::Container,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::instruments::instruments::dsl::instrument_location
-                    .eq(instrument_location.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn instrument_model(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -140,9 +108,12 @@ impl Instrument {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel::table()
-            .find(&self.instrument_model)
+            .filter(
+                crate::codegen::diesel_codegen::tables::instrument_models::instrument_models::dsl::id
+                    .eq(&self.instrument_model),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
             >(conn)
@@ -160,6 +131,45 @@ impl Instrument {
             .filter(
                 crate::codegen::diesel_codegen::tables::instruments::instruments::dsl::instrument_model
                     .eq(instrument_model.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn instrument_location(
+        &self,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::rooms::Room>,
+        diesel::result::Error,
+    > {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        let Some(instrument_location) = self.instrument_location.as_ref() else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::rooms::Room::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::rooms::rooms::dsl::id
+                    .eq(instrument_location),
+            )
+            .first::<crate::codegen::structs_codegen::tables::rooms::Room>(conn)
+            .await
+            .map(Some)
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_instrument_location(
+        conn: &mut diesel_async::AsyncPgConnection,
+        instrument_location: &crate::codegen::structs_codegen::tables::rooms::Room,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::instruments::instruments::dsl::instrument_location
+                    .eq(instrument_location.id),
             )
             .load::<Self>(conn)
             .await

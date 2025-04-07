@@ -23,12 +23,15 @@ impl DirectusAccess {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(role) = self.role.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_roles::DirectusRole::table()
-            .find(role)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_roles::directus_roles::dsl::id
+                    .eq(role),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
             >(conn)
@@ -61,12 +64,15 @@ impl DirectusAccess {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user) = self.user.as_ref() else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .find(user)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
+                    .eq(user),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
             >(conn)
@@ -99,9 +105,12 @@ impl DirectusAccess {
     > {
         use diesel_async::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel::QueryDsl;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy::table()
-            .find(&self.policy)
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_policies::directus_policies::dsl::id
+                    .eq(&self.policy),
+            )
             .first::<
                 crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy,
             >(conn)

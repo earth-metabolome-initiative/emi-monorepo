@@ -1,3 +1,4 @@
+mod addresses;
 mod aliquoting_data;
 mod batch_types;
 mod batches;
