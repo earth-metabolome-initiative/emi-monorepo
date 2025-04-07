@@ -1,4 +1,0 @@
-CREATE TABLE IF NOT EXISTS postal_codes (
-	id SERIAL PRIMARY KEY,
-	postal_code TEXT NOT NULL
-);

@@ -1,5 +1,0 @@
-CREATE TABLE IF NOT EXISTS streets (
-	id SERIAL PRIMARY KEY,
-	name TEXT NOT NULL,
-	city_id INTEGER NOT NULL REFERENCES cities(id)
-);
