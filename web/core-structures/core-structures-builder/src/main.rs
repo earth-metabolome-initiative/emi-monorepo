@@ -9,19 +9,12 @@ use taxonomy_fetcher::{
     impls::ncbi::{NCBIRank, NCBITaxonomy, NCBITaxonomyBuilder},
 };
 use time_requirements::prelude::*;
-use webcodegen::{
-    Codegen, CompatibleForeignTypeConstraint, CustomColumnConstraint, CustomTableConstraint,
-    HasSpecificTypeConstraint, LowercaseColumnConstraint, LowercaseTableConstraint,
-    NotNullColumnConstraint, Table,
-};
+use webcodegen::{Codegen, Table};
 
-const DATABASE_NAME: &str = "development.db";
-const DATABASE_PASSWORD: &str = "password";
-const DATABASE_USER: &str = "user";
-const DATABASE_PORT: u16 = 15032;
-const DATABASE_URL: &str = const_format::formatcp!(
-    "postgres://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:{DATABASE_PORT}/{DATABASE_NAME}",
-);
+mod consistency_constraints;
+use consistency_constraints::execute_consistency_constraint_checks;
+mod constants;
+use constants::{DATABASE_NAME, DATABASE_URL};
 
 #[tokio::main]
 pub async fn main() {
@@ -105,28 +98,8 @@ pub async fn main() {
     let users_table =
         Table::load(&mut conn, "users", None, DATABASE_NAME).expect("Failed to load `users` table");
 
-    CompatibleForeignTypeConstraint::default().check_all(DATABASE_NAME, None, &mut conn).unwrap();
-    LowercaseColumnConstraint::default().check_all(DATABASE_NAME, None, &mut conn).unwrap();
-    LowercaseTableConstraint::default().check_all(DATABASE_NAME, None, &mut conn).unwrap();
-    HasSpecificTypeConstraint::new("created_by", "integer")
-        .check_all(DATABASE_NAME, None, &mut conn)
-        .unwrap();
-    HasSpecificTypeConstraint::new("updated_by", "integer")
-        .check_all(DATABASE_NAME, None, &mut conn)
-        .unwrap();
-    HasSpecificTypeConstraint::new("created_at", "timestamp with time zone")
-        .check_all(DATABASE_NAME, None, &mut conn)
-        .unwrap();
-    HasSpecificTypeConstraint::new("updated_at", "timestamp with time zone")
-        .check_all(DATABASE_NAME, None, &mut conn)
-        .unwrap();
-    HasSpecificTypeConstraint::new("qrcode", "uuid")
-        .check_all(DATABASE_NAME, None, &mut conn)
-        .unwrap();
-    NotNullColumnConstraint::new("created_by").check_all(DATABASE_NAME, None, &mut conn).unwrap();
-    NotNullColumnConstraint::new("updated_by").check_all(DATABASE_NAME, None, &mut conn).unwrap();
-    NotNullColumnConstraint::new("created_at").check_all(DATABASE_NAME, None, &mut conn).unwrap();
-    NotNullColumnConstraint::new("updated_at").check_all(DATABASE_NAME, None, &mut conn).unwrap();
+    execute_consistency_constraint_checks(&mut conn).unwrap();
+
     time_tracker.add_completed_task(task);
 
     // We write to the target directory the generated structs
