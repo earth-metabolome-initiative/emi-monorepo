@@ -48,6 +48,7 @@ impl GeometryColumn {
             "MULTILINESTRING" => "postgis_diesel::types::MultiLineString",
             "MULTIPOLYGON" => "postgis_diesel::types::MultiPolygon",
             "GEOMETRYCOLLECTION" => "postgis_diesel::types::GeometryCollection",
+            "GEOMETRY" => "postgis_diesel::types::GeometryContainer<postgis_diesel::types::Point>",
             unknown => panic!("Unknown geometry type: {unknown}"),
         }
     }
