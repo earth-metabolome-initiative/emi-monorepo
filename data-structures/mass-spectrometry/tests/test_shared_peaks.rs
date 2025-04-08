@@ -3,8 +3,8 @@
 // use mass_spectrometry::{
 //     prelude::GenericSpectrum,
 //     traits::{
-//         CocaineSpectrum, GlucoseSpectrum, HydroxyCholesterolSpectrum, Spectrum,
-//         PhenylalanineSpectrum,
+//         CocaineSpectrum, GlucoseSpectrum, HydroxyCholesterolSpectrum,
+// Spectrum,         PhenylalanineSpectrum,
 //     },
 // };
 
@@ -17,10 +17,12 @@
 //         GenericSpectrum::hydroxy_cholesterol(),
 //         GenericSpectrum::phenylalanine(),
 //     ] {
-//         let greedy_shared_peaks = spectrum.greedy_shared_peaks(&spectrum, 0.1_f32, 0.0_f32);
+//         let greedy_shared_peaks = spectrum.greedy_shared_peaks(&spectrum,
+// 0.1_f32, 0.0_f32);
 
 //         let greedy_shared_peaks: Vec<_> = greedy_shared_peaks.collect();
-//         let cocaine_peaks: Vec<(f32, f32)> = spectrum.peaks().collect::<Vec<_>>();
+//         let cocaine_peaks: Vec<(f32, f32)> =
+// spectrum.peaks().collect::<Vec<_>>();
 
 //         assert_eq!(greedy_shared_peaks.len(), cocaine_peaks.len());
 //         for ((left_peak, right_peak), cocaine_peak) in
@@ -39,7 +41,8 @@
 //     let glucose: GenericSpectrum<f32, f32> = GenericSpectrum::glucose();
 
 //     let greedy_shared_peaks =
-//         cocaine.greedy_shared_peaks(&glucose, 1.0_f32, 0.0_f32).collect::<Vec<_>>();
+//         cocaine.greedy_shared_peaks(&glucose, 1.0_f32,
+// 0.0_f32).collect::<Vec<_>>();
 
 //     assert_eq!(greedy_shared_peaks.len(), 3);
 //     assert_eq!(

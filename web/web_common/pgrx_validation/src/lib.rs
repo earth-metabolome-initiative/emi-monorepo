@@ -2,7 +2,6 @@
 //!
 //! * Postgres database, when compiling with `cargo pgrx package`
 //! * Rust, when compiling with `cargo build`
-//!
 
 #[cfg(feature = "pgrx")]
 ::pgrx::pg_module_magic!();
@@ -60,8 +59,9 @@ pub fn must_be_strictly_positive_float(value: f32) -> Result<(), validation_erro
 #[cfg(any(test, feature = "pg_test"))]
 #[cfg_attr(feature = "pgrx", pgrx::pg_schema)]
 mod tests {
-    use super::*;
     use pgrx::prelude::*;
+
+    use super::*;
 
     #[pg_test]
     #[should_panic]

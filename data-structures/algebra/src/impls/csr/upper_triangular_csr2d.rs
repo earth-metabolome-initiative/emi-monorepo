@@ -8,7 +8,8 @@ pub struct UpperTriangularCSR2D<SparseIndex, Idx> {
     csr: SquareCSR2D<SparseIndex, Idx>,
 }
 
-impl<SparseIndex, Idx: PositiveInteger + IntoUsize> Matrix for UpperTriangularCSR2D<SparseIndex, Idx>
+impl<SparseIndex, Idx: PositiveInteger + IntoUsize> Matrix
+    for UpperTriangularCSR2D<SparseIndex, Idx>
 where
     SquareCSR2D<SparseIndex, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
 {
@@ -128,8 +129,8 @@ where
     }
 }
 
-impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize> RankSelectSparseMatrix
-    for UpperTriangularCSR2D<SparseIndex, Idx>
+impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize>
+    RankSelectSparseMatrix for UpperTriangularCSR2D<SparseIndex, Idx>
 where
     Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
     SquareCSR2D<SparseIndex, Idx>:

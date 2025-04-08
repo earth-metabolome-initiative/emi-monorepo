@@ -14,7 +14,7 @@ pub enum BipartiteError<G: BipartiteGraph + ?Sized> {
     IllegalGraphState(IllegalBipartiteGraphState<G>),
     /// Error relative to left nodes partition.
     LeftNodeError(NodeError<G::LeftNodes>),
-	/// Error relative to right nodes partition.
+    /// Error relative to right nodes partition.
     RightNodeError(NodeError<G::RightNodes>),
     /// Error relative to algorithms.
     AlgorithmError(BipartiteAlgorithmError),
@@ -32,8 +32,8 @@ impl<G: BipartiteGraph + ?Sized> core::fmt::Display for BipartiteError<G> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::IllegalGraphState(e) => write!(f, "{e}"),
-			Self::LeftNodeError(e) => write!(f, "{e}"),
-			Self::RightNodeError(e) => write!(f, "{e}"),
+            Self::LeftNodeError(e) => write!(f, "{e}"),
+            Self::RightNodeError(e) => write!(f, "{e}"),
             Self::AlgorithmError(e) => write!(f, "{e}"),
         }
     }

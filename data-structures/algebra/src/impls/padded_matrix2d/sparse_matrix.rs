@@ -5,7 +5,8 @@ use super::{padded_coordinates::PaddedCoordinates, PaddedMatrix2D};
 use crate::{
     impls::{ranged::SimpleRanged, CSR2DColumns},
     traits::{
-        IntoUsize, Matrix2D, SizedRowsSparseMatrix2D, SizedSparseMatrix, SparseMatrix, SparseMatrix2D, TryFromUsize, Zero
+        IntoUsize, Matrix2D, SizedRowsSparseMatrix2D, SizedSparseMatrix, SparseMatrix,
+        SparseMatrix2D, TryFromUsize, Zero,
     },
 };
 

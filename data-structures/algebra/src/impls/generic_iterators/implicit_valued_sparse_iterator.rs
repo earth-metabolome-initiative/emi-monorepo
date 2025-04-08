@@ -25,7 +25,8 @@ impl<M: ImplicitValuedSparseMatrix> Iterator for ImplicitValuedSparseIterator<'_
     }
 }
 
-impl<'matrix, M: ImplicitValuedSparseMatrix> ExactSizeIterator for ImplicitValuedSparseIterator<'matrix, M>
+impl<'matrix, M: ImplicitValuedSparseMatrix> ExactSizeIterator
+    for ImplicitValuedSparseIterator<'matrix, M>
 where
     M::SparseCoordinates<'matrix>: ExactSizeIterator,
 {
