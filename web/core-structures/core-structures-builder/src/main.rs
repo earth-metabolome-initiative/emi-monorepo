@@ -9,7 +9,7 @@ use taxonomy_fetcher::{
     Rank, Taxonomy, TaxonomyBuilder,
 };
 use time_requirements::prelude::*;
-use webcodegen::{Codegen, Table};
+use webcodegen::{Codegen, PgExtension, Table};
 
 mod consistency_constraints;
 use consistency_constraints::execute_consistency_constraint_checks;
@@ -95,8 +95,6 @@ pub async fn main() {
 
     // We check that the database follows the expected constraints.
     let task = Task::new("Checking Constraints");
-    let users_table =
-        Table::load(&mut conn, "users", None, DATABASE_NAME).expect("Failed to load `users` table");
 
     execute_consistency_constraint_checks(&mut conn).unwrap();
 
