@@ -38,9 +38,6 @@ impl Codegen<'_> {
         let user_id_type = user_table.primary_key_type(conn)?;
 
         for table in tables {
-            if !self.is_table_insertable(table, conn)? {
-                continue;
-            }
             // We create a file for each table
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let table_path = table.import_struct_path()?;

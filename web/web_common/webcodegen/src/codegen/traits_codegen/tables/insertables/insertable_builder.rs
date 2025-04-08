@@ -3,7 +3,6 @@
 
 use std::path::Path;
 
-use diesel::PgConnection;
 use proc_macro2::TokenStream;
 
 use crate::{Codegen, Table};
@@ -15,7 +14,6 @@ impl Codegen<'_> {
     ///
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
-    /// * `conn` - A mutable reference to a `PgConnection`.
     ///
     /// # Errors
     ///
@@ -25,7 +23,6 @@ impl Codegen<'_> {
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
 
@@ -33,9 +30,6 @@ impl Codegen<'_> {
         let syntax_flag = self.syntax.as_feature_flag();
 
         for table in tables {
-            if !self.is_table_insertable(table, conn)? {
-                continue;
-            }
             // We create a file for each table
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let table_path = table.import_struct_path()?;

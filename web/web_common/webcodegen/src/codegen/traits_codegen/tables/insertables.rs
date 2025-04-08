@@ -15,28 +15,10 @@ use crate::{
     codegen::{
         CODEGEN_INSERTABLE_BUILDER_PATH, CODEGEN_INSERTABLE_PATH, CODEGEN_INSERTABLE_VARIANT_PATH,
     },
-    errors::WebCodeGenError,
     Codegen, Table,
 };
 
 impl Codegen<'_> {
-    /// Returns wether the table should be insertable or not
-    ///
-    ///  # Arguments
-    ///
-    ///  * `table` - The passed table
-    ///  * `conn` - A mutable reference to a `PgConnection`.
-    ///
-    ///  # Errors
-    ///
-    /// * If the database connection fails.
-    pub(crate) fn is_table_insertable(
-        &self,
-        table: &Table,
-        conn: &mut PgConnection,
-    ) -> Result<bool, WebCodeGenError> {
-        Ok(true)
-    }
     /// Generates the [`Insertable`] and [`Insertable`]-adjacent traits
     /// implementation for the tables
     ///
@@ -58,7 +40,7 @@ impl Codegen<'_> {
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
 
-        self.generate_insertable_impls(&root.join(CODEGEN_INSERTABLE_PATH), tables, conn)?;
+        self.generate_insertable_impls(&root.join(CODEGEN_INSERTABLE_PATH), tables)?;
         self.generate_insertable_variant_impls(
             &root.join(CODEGEN_INSERTABLE_VARIANT_PATH),
             tables,
@@ -67,7 +49,6 @@ impl Codegen<'_> {
         self.generate_insertable_builder_impls(
             &root.join(CODEGEN_INSERTABLE_BUILDER_PATH),
             tables,
-            conn,
         )?;
 
         let insertable_module = Ident::new(CODEGEN_INSERTABLE_PATH, proc_macro2::Span::call_site());
