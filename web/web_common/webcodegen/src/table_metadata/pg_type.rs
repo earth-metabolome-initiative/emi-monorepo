@@ -870,20 +870,20 @@ impl PgType {
 
     #[must_use]
     /// Returns whether the [`PgType`] is a boolean.
-    pub fn is_boolean(&self) -> Result<bool, WebCodeGenError> {
-        Ok(rust_type_str(&self.typname)? == "bool")
+    pub fn is_boolean(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "bool")
     }
 
     #[must_use]
     /// Returns whether the [`PgType`] is a text type.
-    pub fn is_text(&self) -> Result<bool, WebCodeGenError> {
-        Ok(rust_type_str(&self.typname)? == "String")
+    pub fn is_text(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "String")
     }
 
     #[must_use]
     /// Returns whether the [`PgType`] is a numeric type.
-    pub fn is_numeric(&self) -> Result<bool, WebCodeGenError> {
-        let rust_type = rust_type_str(&self.typname)?;
+    pub fn is_numeric(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        let rust_type = rust_type_str(&self.typname, conn)?;
         Ok(rust_type == "i32"
             || rust_type == "i16"
             || rust_type == "i64"
@@ -898,13 +898,14 @@ impl PgType {
     /// # Arguments
     ///
     /// * `value` - The value to cast.
+    /// * `conn` - The Postgres connection.
     ///
     /// # Returns
     ///
     /// A Result containing the tokenstream of the provided string casted to the
     /// required type, or an error if the type is not supported.
-    pub fn cast(&self, value: &str) -> Result<TokenStream, WebCodeGenError> {
-        match rust_type_str(&self.typname)? {
+    pub fn cast(&self, value: &str, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
+        match rust_type_str(&self.typname, conn)? {
             "i16" => {
                 let value = value.parse::<i16>()?;
                 Ok(quote! {

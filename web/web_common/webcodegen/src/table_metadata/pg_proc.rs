@@ -89,7 +89,7 @@ impl PgProc {
     /// 
     pub fn returns_result(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         if self.proname.starts_with("must_be_") || self.proname.starts_with("must_not_be_") {
-            Ok(self.return_type(conn)?.is_boolean()?)
+            Ok(self.return_type(conn)?.is_boolean(conn)?)
         } else {
             Ok(false)
         }

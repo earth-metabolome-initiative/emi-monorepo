@@ -516,12 +516,6 @@ impl Table {
         Ok(self.columns(conn)?.iter().any(|column| column.is_session_user_generated(conn)))
     }
 
-    #[must_use]
-    /// Returns whether the table IS the `users` table.
-    pub fn is_users_table(&self) -> bool {
-        self.table_name == "users"
-    }
-
     /// Returns whether the table has an `created_by` column.
     ///
     /// # Arguments

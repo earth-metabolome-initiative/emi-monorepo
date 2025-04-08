@@ -1,7 +1,7 @@
 -- SQL query creating a mockup of the users table.
 CREATE TABLE teams (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL CHECK must_not_be_empty(name),
+    name TEXT NOT NULL CHECK (must_not_be_empty(name)),
     created_by INTEGER NOT NULL REFERENCES users(id),
     updated_by INTEGER NOT NULL REFERENCES users(id),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,

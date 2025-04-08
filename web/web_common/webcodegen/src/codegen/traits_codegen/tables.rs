@@ -113,19 +113,6 @@ impl Codegen<'_> {
             tracker.add_completed_task(task);
         }
 
-        if self.enable_updatable_trait {
-            let task = Task::new("Generate Updatable Traits");
-            self.generate_updatables_impls(&root.join(CODEGEN_UPDATABLES_PATH), tables, conn)?;
-
-            let updatable_module_ident =
-                Ident::new(CODEGEN_UPDATABLES_PATH, proc_macro2::Span::call_site());
-
-            submodule_file_content.extend(quote::quote! {
-                mod #updatable_module_ident;
-            });
-            tracker.add_completed_task(task);
-        }
-
         std::fs::write(&submodule_file, submodule_file_content.to_string())?;
 
         Ok(tracker)

@@ -39,6 +39,11 @@ impl Codegen<'_> {
             } else {
                 TokenStream::new()
             };
+            let from_foreign_key_methods = if self.enable_foreign_trait {
+                table.from_foreign_key_methods(conn, &self.syntax)?
+            } else {
+                TokenStream::new()
+            };
             let from_unique_indices = table.from_unique_indices(conn, &self.syntax)?;
 
             std::fs::write(
@@ -47,6 +52,7 @@ impl Codegen<'_> {
                     #table_content
                     impl #table_struct {
                         #foreign_key_methods
+                        #from_foreign_key_methods
                         #from_unique_indices
                     }
                 })?,

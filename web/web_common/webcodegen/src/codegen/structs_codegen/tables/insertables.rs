@@ -135,9 +135,9 @@ impl Codegen<'_> {
                 continue;
             }
 
-            let columns = table
-                .columns(conn)?
-                .into_iter()
+            let all_columns = table.columns(conn)?;
+            let insertable_columns = all_columns
+                .iter()
                 .filter(|column| !column.is_always_automatically_generated())
                 .collect::<Vec<_>>();
             let nullable_insertable_columns: Vec<Column> =

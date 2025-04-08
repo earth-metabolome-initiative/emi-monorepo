@@ -75,20 +75,13 @@ impl Table {
     ) -> Result<TokenStream, WebCodeGenError> {
         let feature_flag = syntax.as_feature_flag();
         let connection = syntax.as_connection_type();
-        let current_table_diesel_path = self.import_diesel_path()?;
 
         self
             .foreign_keys(conn)?
             .into_iter()
             .map(|column| {
                 let (foreign_key_table, foreign_key_column) = column.foreign_table(conn).unwrap().unwrap();
-                let method_name: Ident = if column.column_name.ends_with("_id") {
-                    Ident::new(&column.column_name[..column.column_name.len() - 3], proc_macro2::Span::call_site())
-                } else {
-                    Ident::new(&column.column_name, proc_macro2::Span::call_site())
-                };
-
-                let from_method_name: Ident = Ident::new(&format!("from_{}", column.column_name), proc_macro2::Span::call_site());
+                let method_ident: Ident = column.getter_ident()?;
 
                 let current_column_ident: Ident = column.snake_case_ident()?;
                 let foreign_key_column_ident: Ident = foreign_key_column.snake_case_ident()?;
@@ -120,18 +113,7 @@ impl Table {
                     (TokenStream::new(), quote! { &self.#current_column_ident })
                 };
 
-                // We build the where statement to filter for the `from_method_name`
-                let where_statement = if foreign_key_column.supports_copy(conn)? {
-                    quote!{
-                        #current_table_diesel_path::dsl::#current_column_ident.eq(#current_column_ident.#foreign_key_column_ident)
-                    }
-                } else {
-                    quote!{
-                        #current_table_diesel_path::dsl::#current_column_ident.eq(&#current_column_ident.#foreign_key_column_ident)
-                    }
-                };
-
-                // We build the where statement to filter for the `from_method_name`
+                // We build the where statement to filter for the `from_method_ident`
                 let self_where_statement = quote!{
                     #foreign_key_diesel_path::dsl::#foreign_key_column_ident.eq(#column_attribute)
                 };
@@ -149,9 +131,45 @@ impl Table {
                             .await
                             #optional
                     }
+                })
+            }).collect::<Result<TokenStream, WebCodeGenError>>()
+    }
 
+    /// Returns the Syn `TokenStream` for the from foreign key methods.
+    pub fn from_foreign_key_methods(
+        &self,
+        conn: &mut PgConnection,
+        syntax: &Syntax,
+    ) -> Result<TokenStream, WebCodeGenError> {
+        let feature_flag = syntax.as_feature_flag();
+        let connection = syntax.as_connection_type();
+        let current_table_diesel_path = self.import_diesel_path()?;
+
+        self
+            .foreign_keys(conn)?
+            .into_iter()
+            .map(|column| {
+                let (foreign_key_table, foreign_key_column) = column.foreign_table(conn).unwrap().unwrap();
+                let from_method_ident: Ident = Ident::new(&format!("from_{}", column.column_name), proc_macro2::Span::call_site());
+
+                let current_column_ident: Ident = column.snake_case_ident()?;
+                let foreign_key_column_ident: Ident = foreign_key_column.snake_case_ident()?;
+                let foreign_key_struct_path = foreign_key_table.import_struct_path()?;
+
+                // We build the where statement to filter for the `from_method_ident`
+                let where_statement = if foreign_key_column.supports_copy(conn)? {
+                    quote!{
+                        #current_table_diesel_path::dsl::#current_column_ident.eq(#current_column_ident.#foreign_key_column_ident)
+                    }
+                } else {
+                    quote!{
+                        #current_table_diesel_path::dsl::#current_column_ident.eq(&#current_column_ident.#foreign_key_column_ident)
+                    }
+                };
+
+                Ok(quote! {
                     #feature_flag
-                    pub async fn #from_method_name(conn: &mut #connection, #current_column_ident: &#foreign_key_struct_path) -> Result<Vec<Self>, diesel::result::Error> {
+                    pub async fn #from_method_ident(conn: &mut #connection, #current_column_ident: &#foreign_key_struct_path) -> Result<Vec<Self>, diesel::result::Error> {
                         use diesel_async::RunQueryDsl;
                         use diesel::associations::HasTable;
                         use diesel::{QueryDsl, ExpressionMethods};

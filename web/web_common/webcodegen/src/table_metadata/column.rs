@@ -134,23 +134,6 @@ impl Column {
         &self.data_type
     }
 
-    /// Returns whether the data type associated to the column is copiable.
-    pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        if let Ok(geometry) = self.geometry(conn) {
-            return Ok(geometry.supports_copy());
-        }
-        match rust_type_str(self.data_type_str(conn)?) {
-            Ok(s) => Ok(COPY_TYPES.contains(&s)),
-            Err(error) => {
-                if self.has_custom_type() {
-                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.supports_copy(conn)?)
-                } else {
-                    Err(error)
-                }
-            }
-        }
-    }
-
     /// Returns whether the column contains `PostGIS` geometry data
     pub fn is_geometry(&self, conn: &mut PgConnection) -> bool {
         self.geometry(conn).is_ok()
@@ -631,14 +614,14 @@ impl Column {
     /// Returns whether the column is a timestamp which has to be updated at
     /// each update operation
     pub fn is_updated_at(&self) -> bool {
-        self.column_name == "updated_at" && self.data_type == "timestamp without time zone"
+        self.column_name == "updated_at" && self.data_type == "timestamp with time zone"
     }
 
     #[must_use]
     /// Returns whether the column is a timestamp which has to be set at the
     /// insert operation
     pub fn is_created_at(&self) -> bool {
-        self.column_name == "created_at" && self.data_type == "timestamp without time zone"
+        self.column_name == "created_at" && self.data_type == "timestamp with time zone"
     }
 
     /// Returns whether the column is a session user generated column

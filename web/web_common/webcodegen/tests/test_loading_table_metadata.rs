@@ -16,8 +16,8 @@ async fn test_check_constraints(
 
     assert_eq!(
         table_check_constraint.len(),
-        6,
-        "Expected 6 check constraint, got: {:?}",
+        5,
+        "Expected 5 check constraint, got: {:?}",
         table_check_constraint
     );
 

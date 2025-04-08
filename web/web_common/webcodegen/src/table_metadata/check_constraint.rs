@@ -47,15 +47,13 @@ enum ReturningType {
     Custom(PgType),
 }
 
-impl TryFrom<PgType> for ReturningType {
-    type Error = WebCodeGenError;
-
-    fn try_from(ty: PgType) -> Result<Self, Self::Error> {
-        if ty.is_boolean()? {
+impl ReturningType {
+    fn try_from_pg_type(ty: PgType, conn: &mut PgConnection) -> Result<Self, WebCodeGenError> {
+        if ty.is_boolean(conn)? {
             Ok(ReturningType::Boolean)
-        } else if ty.is_numeric()? {
+        } else if ty.is_numeric(conn)? {
             Ok(ReturningType::Numeric)
-        } else if ty.is_text()? {
+        } else if ty.is_text(conn)? {
             Ok(ReturningType::Textual)
         } else {
             Ok(ReturningType::Custom(ty))
@@ -124,7 +122,7 @@ where
     ) -> Result<proc_macro2::TokenStream, WebCodeGenError> {
         let (argument_column, is_contextual) = self.get_column(column)?;
         let column_ident = argument_column.snake_case_ident()?;
-        let mut column_ident = if is_contextual || !unpacking{
+        let mut column_ident = if is_contextual || !unpacking {
             quote::quote! { #column_ident }
         } else {
             quote::quote! { self.#column_ident }
@@ -363,7 +361,7 @@ where
             if function.returns_result(conn)? {
                 ReturningType::Result
             } else {
-                ReturningType::try_from(function.return_type(conn)?)?
+                ReturningType::try_from_pg_type(function.return_type(conn)?, conn)?
             },
         ))
     }
@@ -403,6 +401,7 @@ where
         &self,
         value: &sqlparser::ast::Value,
         type_hint: Option<&PgType>,
+        conn: &mut PgConnection,
     ) -> Result<(proc_macro2::TokenStream, ReturningType), WebCodeGenError> {
         match value {
             sqlparser::ast::Value::Boolean(value) => {
@@ -410,7 +409,7 @@ where
             }
             sqlparser::ast::Value::Number(value, _) => {
                 match type_hint {
-                    Some(type_hint) => Ok((type_hint.cast(value)?, ReturningType::Numeric)),
+                    Some(type_hint) => Ok((type_hint.cast(value, conn)?, ReturningType::Numeric)),
                     None => {
                         unimplemented!("Number without type hint not supported");
                     }
@@ -434,6 +433,7 @@ where
     ///   parse
     /// * `type_hint` - The [`PgType`](crate::table_metadata::PgType) of the
     ///  value
+    /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
     ///
@@ -443,8 +443,9 @@ where
         &self,
         value: &sqlparser::ast::ValueWithSpan,
         type_hint: Option<&PgType>,
+        conn: &mut PgConnection,
     ) -> Result<(proc_macro2::TokenStream, ReturningType), WebCodeGenError> {
-        self.parse_value(&value.value, type_hint)
+        self.parse_value(&value.value, type_hint, conn)
     }
 
     /// Translates the provided expression to a
@@ -546,7 +547,7 @@ where
                         let (left, _, left_returning_type) = self.parse(left, None, conn)?;
                         let (right, _, right_returning_type) = self.parse(right, None, conn)?;
                         if left_returning_type != right_returning_type {
-                            unimplemented!("Equality between different types not supported");
+                            unimplemented!("Equality between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}", self.check_constraint);
                         }
                         let operator_symbol: syn::BinOp = match op {
                             BinaryOperator::Eq => syn::BinOp::Eq(syn::token::EqEq::default()),
@@ -613,7 +614,7 @@ where
             }
             Expr::Value(value) => {
                 let (token_stream, returning_type) =
-                    self.parse_value_with_span(value, type_hint)?;
+                    self.parse_value_with_span(value, type_hint, conn)?;
                 Ok((token_stream, Vec::new(), returning_type))
             }
             _ => unimplemented!("Unsupported expression: {:?}", expr),
