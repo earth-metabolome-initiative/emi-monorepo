@@ -1,12 +1,14 @@
 //! Errors raised in algorithms defined for [`BipartiteGraph`]s.
 
-use crate::traits::{weighted_assignment::hungarian_algorithm::HungarianAlgorithmError, BipartiteGraph};
+use algebra::prelude::LAPJVError;
+
+use crate::traits::BipartiteGraph;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// Errors that may occur when executing algorithms on a [`BipartiteGraph`].
 pub enum BipartiteAlgorithmError {
-    /// Error raised while executing the `HungarianAlgorithm`.
-    HungarianAlgorithm(HungarianAlgorithmError),
+    /// Error raised while executing the `LAPMOD` algorithm.
+    LAPMOD(LAPJVError),
 }
 
 impl<G: BipartiteGraph> From<BipartiteAlgorithmError> for crate::errors::BipartiteError<G> {
@@ -18,7 +20,7 @@ impl<G: BipartiteGraph> From<BipartiteAlgorithmError> for crate::errors::Biparti
 impl core::fmt::Display for BipartiteAlgorithmError {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            BipartiteAlgorithmError::HungarianAlgorithm(e) => write!(f, "{e}"),
+            BipartiteAlgorithmError::LAPMOD(e) => write!(f, "{e}"),
         }
     }
 }

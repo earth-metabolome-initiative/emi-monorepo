@@ -3,7 +3,7 @@
 //! A transposed monoplex graph is a graph where the edges are of a single type
 //! and it is possible to efficiently access the predecessors of a node.
 
-use algebra::prelude::{SparseBiMatrix2D, SparseMatrix2D};
+use algebra::prelude::{SizedRowsSparseMatrix2D, SparseBiMatrix2D, SparseMatrix2D};
 
 use super::{Edges, MonoplexGraph, TransposedEdges, TransposedGraph};
 
@@ -49,7 +49,7 @@ pub trait TransposedMonoplexGraph:
     /// An iterator over the inbound degrees of the nodes.
 	fn in_degrees(
 		&self
-    ) -> <<<Self::TransposedEdges as TransposedEdges>::BiMatrix as SparseBiMatrix2D>::SparseTransposedMatrix as SparseMatrix2D>::SparseRowSizes<'_>{
+    ) -> <<<Self::TransposedEdges as TransposedEdges>::BiMatrix as SparseBiMatrix2D>::SparseTransposedMatrix as SizedRowsSparseMatrix2D>::SparseRowSizes<'_>{
         self.edges().in_degrees()
     }
 }

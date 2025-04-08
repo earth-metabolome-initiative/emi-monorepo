@@ -1,10 +1,9 @@
 //! Submodule providing the traits for a generic graph that has weighted edges.
 
-use algebra::prelude::{ValuedSparseBiMatrix2D, ValuedSparseMatrix2D};
+use algebra::prelude::{SparseValuedMatrix2D, ValuedSizedSparseBiMatrix2D};
 
 use super::{
-    Edges, TransposedEdges, TransposedMonoplexGraph, WeightedEdges,
-    WeightedMonoplexGraph,
+    Edges, TransposedEdges, TransposedMonoplexGraph, WeightedEdges, WeightedMonoplexGraph,
 };
 
 /// Trait defining an edge data structure that has weighted edges.
@@ -13,10 +12,11 @@ pub trait TransposedWeightedEdges:
     + WeightedEdges<WeightedMatrix = <Self as TransposedWeightedEdges>::WeightedBiMatrix>
 {
     /// The type of the underlying matrix.
-    type WeightedBiMatrix: ValuedSparseBiMatrix2D<
+    type WeightedBiMatrix: ValuedSizedSparseBiMatrix2D<
         Value = <Self as WeightedEdges>::Weight,
         RowIndex = Self::SourceNodeId,
         ColumnIndex = Self::DestinationNodeId,
+        SparseIndex = Self::EdgeId,
     >;
 
     /// Returns the weights of the predecessors of a node.
@@ -31,7 +31,7 @@ pub trait TransposedWeightedEdges:
     fn predecessor_weights(
         &self,
         destination_node_id: Self::DestinationNodeId,
-    ) ->  <<Self::WeightedBiMatrix as ValuedSparseBiMatrix2D>::ValuedSparseTransposedMatrix as ValuedSparseMatrix2D>::SparseRowValues<'_>{
+    ) ->  <<Self::WeightedBiMatrix as ValuedSizedSparseBiMatrix2D>::ValuedSparseTransposedMatrix as SparseValuedMatrix2D>::SparseRowValues<'_>{
         self.matrix().sparse_column_values(destination_node_id)
     }
 
@@ -71,7 +71,12 @@ pub trait TransposedWeightedEdges:
 impl<E> TransposedWeightedEdges for E
 where
     E: WeightedEdges,
-    E::WeightedMatrix: ValuedSparseBiMatrix2D,
+    E::WeightedMatrix: ValuedSizedSparseBiMatrix2D<
+        RowIndex = E::SourceNodeId,
+        ColumnIndex = E::DestinationNodeId,
+        SparseIndex = E::EdgeId,
+        Value = E::Weight,
+    >,
 {
     type WeightedBiMatrix = E::WeightedMatrix;
 }
@@ -101,7 +106,7 @@ pub trait TransposedWeightedMonoplexGraph:
     fn predecessor_weights(
         &self,
         destination_node_id: <Self::TransposedWeightedEdges as Edges>::DestinationNodeId,
-    ) -> <<<Self::TransposedWeightedEdges as TransposedWeightedEdges>::WeightedBiMatrix as ValuedSparseBiMatrix2D>::ValuedSparseTransposedMatrix as ValuedSparseMatrix2D>::SparseRowValues<'_>{
+    ) -> <<<Self::TransposedWeightedEdges as TransposedWeightedEdges>::WeightedBiMatrix as ValuedSizedSparseBiMatrix2D>::ValuedSparseTransposedMatrix as SparseValuedMatrix2D>::SparseRowValues<'_>{
         self.edges().predecessor_weights(destination_node_id)
     }
 

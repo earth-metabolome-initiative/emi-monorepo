@@ -1,6 +1,6 @@
 //! Submodule providing the traits for a generic graph that has weighted edges.
 
-use algebra::prelude::{Number, SparseValuedMatrix, ValuedSparseMatrix2D};
+use algebra::prelude::{Number, SparseValuedMatrix, SparseValuedMatrix2D};
 
 use super::{AttributedEdge, Edges, MonoplexGraph};
 
@@ -41,7 +41,7 @@ pub trait WeightedEdges:
         DestinationNodeId = Self::DestinationNodeId,
     >;
     /// The type of the underlying matrix.
-    type WeightedMatrix: ValuedSparseMatrix2D<
+    type WeightedMatrix: SparseValuedMatrix2D<
         Value = Self::Weight,
         RowIndex = Self::SourceNodeId,
         ColumnIndex = Self::DestinationNodeId,
@@ -60,7 +60,7 @@ pub trait WeightedEdges:
     fn successor_weights(
         &self,
         source_node_id: Self::SourceNodeId,
-    ) -> <Self::WeightedMatrix as ValuedSparseMatrix2D>::SparseRowValues<'_> {
+    ) -> <Self::WeightedMatrix as SparseValuedMatrix2D>::SparseRowValues<'_> {
         self.matrix().sparse_row_values(source_node_id)
     }
 
@@ -136,7 +136,7 @@ impl<E> WeightedEdges for E
 where
     E: Edges,
     E::Edge: WeightedEdge,
-    E::Matrix: ValuedSparseMatrix2D<Value = <E::Edge as WeightedEdge>::Weight>,
+    E::Matrix: SparseValuedMatrix2D<Value = <E::Edge as WeightedEdge>::Weight>,
 {
     type Weight = <E::Edge as WeightedEdge>::Weight;
     type WeightedEdge = E::Edge;
@@ -169,7 +169,7 @@ pub trait WeightedMonoplexGraph:
     fn successor_weights(
         &self,
         source_node_id: <Self::WeightedEdges as Edges>::SourceNodeId,
-    ) -> <<Self::WeightedEdges as WeightedEdges>::WeightedMatrix as ValuedSparseMatrix2D>::SparseRowValues<'_>
+    ) -> <<Self::WeightedEdges as WeightedEdges>::WeightedMatrix as SparseValuedMatrix2D>::SparseRowValues<'_>
     {
         self.edges().successor_weights(source_node_id)
     }

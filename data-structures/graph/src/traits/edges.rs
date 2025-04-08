@@ -2,8 +2,8 @@
 //! or a ragged list or a compressed sparse row matrix.
 
 use algebra::prelude::{
-    IntoUsize, MatrixMut, PositiveInteger, SparseMatrix, SparseMatrix2D, SparseMatrixMut,
-    TryFromUsize,
+    IntoUsize, MatrixMut, PositiveInteger, SizedRowsSparseMatrix2D, SizedSparseMatrix,
+    SparseMatrix, SparseMatrix2D, SparseMatrixMut, TryFromUsize,
 };
 
 use super::Edge;
@@ -20,7 +20,7 @@ pub trait Edges {
     /// The type of the edge identifier.
     type EdgeId: PositiveInteger + IntoUsize + TryFromUsize;
     /// The underlying matrix type.
-    type Matrix: SparseMatrix2D<
+    type Matrix: SizedRowsSparseMatrix2D<
         RowIndex = Self::SourceNodeId,
         ColumnIndex = Self::DestinationNodeId,
         SparseIndex = Self::EdgeId,
@@ -61,7 +61,7 @@ pub trait Edges {
     }
 
     /// Returns an iterator over the out degrees of the nodes.
-    fn out_degrees(&self) -> <Self::Matrix as SparseMatrix2D>::SparseRowSizes<'_> {
+    fn out_degrees(&self) -> <Self::Matrix as SizedRowsSparseMatrix2D>::SparseRowSizes<'_> {
         self.matrix().sparse_row_sizes()
     }
 

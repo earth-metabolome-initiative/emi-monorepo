@@ -26,7 +26,7 @@ impl<
 impl<
         SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
         RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + From<SparseIndex>,
+        ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
         Value: Number,
     > GrowableEdges for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 {

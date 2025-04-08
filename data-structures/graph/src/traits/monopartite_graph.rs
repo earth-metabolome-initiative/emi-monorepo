@@ -12,11 +12,11 @@ pub trait MonopartiteEdges:
     Edges<
     SourceNodeId = <Self as MonopartiteEdges>::NodeId,
     DestinationNodeId = <Self as MonopartiteEdges>::NodeId,
-    Matrix = <Self as MonopartiteEdges>::MonopartitedMatrix,
+    Matrix = <Self as MonopartiteEdges>::MonopartiteMatrix,
 >
 {
     /// The monopartited matrix of the graph.
-    type MonopartitedMatrix: SparseSquareMatrix<Index = Self::NodeId>;
+    type MonopartiteMatrix: SparseSquareMatrix<Index = Self::NodeId>;
 
     /// The identifier of the node.
     type NodeId: PositiveInteger + IntoUsize + TryFromUsize;
@@ -35,7 +35,7 @@ where
     E: Edges<DestinationNodeId = <E as Edges>::SourceNodeId>,
     E::Matrix: SparseSquareMatrix<Index = E::SourceNodeId>,
 {
-    type MonopartitedMatrix = E::Matrix;
+    type MonopartiteMatrix = E::Matrix;
     type NodeId = E::SourceNodeId;
 
     fn number_of_self_loops(&self) -> Self::NodeId {

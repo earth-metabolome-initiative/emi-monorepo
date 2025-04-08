@@ -5,17 +5,21 @@
 //! * All nodes are of the same type.
 //! * All edges are bidirectional.
 
-use algebra::prelude::{SparseBiMatrix2D, SparseMatrix2D, SparseSymmetricMatrix2D};
+use algebra::prelude::{
+    SizedRowsSparseMatrix2D, SizedSparseBiMatrix2D, SparseMatrix2D, SparseSymmetricMatrix2D,
+};
 
 use super::{MonopartiteEdges, MonoplexMonopartiteGraph, TransposedEdges, TransposedGraph};
 
 /// Trait defining the properties of a directed graph.
-pub trait UndirectedMonopartiteEdges: MonopartiteEdges<
-        MonopartitedMatrix = <Self as UndirectedMonopartiteEdges>::SymmetricSquaredMatrix,
+pub trait UndirectedMonopartiteEdges:
+    MonopartiteEdges<
+        MonopartiteMatrix = <Self as UndirectedMonopartiteEdges>::SymmetricSquaredMatrix,
     > + TransposedEdges<BiMatrix = <Self as UndirectedMonopartiteEdges>::SymmetricSquaredMatrix>
 {
     /// Neighbors of a node.
-    type SymmetricSquaredMatrix: SparseSymmetricMatrix2D<Index = Self::NodeId>;
+    type SymmetricSquaredMatrix: SparseSymmetricMatrix2D<Index = Self::NodeId>
+        + SizedSparseBiMatrix2D;
 
     /// Returns the neighbors of the node with the given identifier.
     fn neighbors(
@@ -35,15 +39,21 @@ pub trait UndirectedMonopartiteEdges: MonopartiteEdges<
     }
 
     /// Returns the iterator over the degrees of the nodes in the graph.
-    fn degrees(&self) -> <Self::SymmetricSquaredMatrix as SparseMatrix2D>::SparseRowSizes<'_> {
+    fn degrees(
+        &self,
+    ) -> <Self::SymmetricSquaredMatrix as SizedRowsSparseMatrix2D>::SparseRowSizes<'_> {
         self.matrix().sparse_row_sizes()
     }
 }
 
 impl<E> UndirectedMonopartiteEdges for E
 where
-    E: TransposedEdges + MonopartiteEdges<MonopartitedMatrix = E::BiMatrix>,
-    E::BiMatrix: SparseSymmetricMatrix2D<Index = E::NodeId>,
+    E: TransposedEdges + MonopartiteEdges<MonopartiteMatrix = E::BiMatrix>,
+    E::BiMatrix: SparseSymmetricMatrix2D<Index = E::NodeId, SparseIndex = E::EdgeId>
+        + SizedSparseBiMatrix2D<
+            SizedSparseMatrix = <E::BiMatrix as SparseSymmetricMatrix2D>::SymmetricSparseMatrix,
+            SizedSparseTransposedMatrix = <E::BiMatrix as SparseSymmetricMatrix2D>::SymmetricSparseMatrix,
+        >,
 {
     type SymmetricSquaredMatrix = E::BiMatrix;
 }
@@ -69,7 +79,7 @@ pub trait UndirectedMonopartiteMonoplexGraph: MonoplexMonopartiteGraph<
     }
 
     /// Returns the iterator over the degrees of the nodes in the graph.
-    fn degrees(&self) -> <<Self::UndirectedMonopartiteEdges as UndirectedMonopartiteEdges>::SymmetricSquaredMatrix as SparseMatrix2D>::SparseRowSizes<'_>{
+    fn degrees(&self) -> <<Self::UndirectedMonopartiteEdges as UndirectedMonopartiteEdges>::SymmetricSquaredMatrix as SizedRowsSparseMatrix2D>::SparseRowSizes<'_>{
         self.edges().degrees()
     }
 }
