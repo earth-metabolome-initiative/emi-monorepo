@@ -219,57 +219,6 @@ where
     }
 }
 
-impl<SparseIndex, RowIndex, ColumnIndex, Value> SizedRowsSparseMatrix2D
-    for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
-where
-    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
-    CSR2D<SparseIndex, RowIndex, ColumnIndex>: SizedRowsSparseMatrix2D<
-        RowIndex = RowIndex,
-        ColumnIndex = ColumnIndex,
-        SparseIndex = SparseIndex,
-    >,
-{
-    type SparseRowSizes<'a>
-        = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SizedRowsSparseMatrix2D>::SparseRowSizes<'a>
-    where
-        Self: 'a;
-
-    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
-        self.csr.sparse_row_sizes()
-    }
-
-    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
-        self.csr.number_of_defined_values_in_row(row)
-    }
-}
-
-impl<SparseIndex, RowIndex, ColumnIndex, Value> SizedSparseMatrix2D
-    for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
-where
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
-    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    CSR2D<SparseIndex, RowIndex, ColumnIndex>: SizedSparseMatrix2D<
-        RowIndex = RowIndex,
-        ColumnIndex = ColumnIndex,
-        SparseIndex = SparseIndex,
-    >,
-{
-    fn rank_row(&self, row: Self::RowIndex) -> Self::SparseIndex {
-        self.csr.rank_row(row)
-    }
-
-    fn select_row(&self, sparse_index: Self::SparseIndex) -> Self::RowIndex {
-        self.csr.select_row(sparse_index)
-    }
-
-    fn select_column(&self, sparse_index: Self::SparseIndex) -> Self::ColumnIndex {
-        self.csr.select_column(sparse_index)
-    }
-}
-
 impl<SparseIndex, RowIndex, ColumnIndex, Value> SparseMatrix
     for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 where

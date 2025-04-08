@@ -226,15 +226,7 @@ where
         = CSR2DNonEmptyRowIndices<'a, Self>
     where
         Self: 'a;
-    type EmptyRowIndices<'a>
-        = CSR2DEmptyRowIndices<'a, Self>
-    where
-        Self: 'a;
-    type NonEmptyRowIndices<'a>
-        = CSR2DNonEmptyRowIndices<'a, Self>
-    where
-        Self: 'a;
-
+        
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         let start = self.rank_row(row).into_usize();
         let end = self.rank_row(row + RowIndex::ONE).into_usize();
@@ -263,36 +255,6 @@ where
 
     fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
         self.into()
-    }
-}
-
-impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
-    > SizedSparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
-where
-    Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
-{
-    fn rank_row(&self, row: RowIndex) -> SparseIndex {
-        if self.offsets.len() <= row.into_usize() && row <= self.number_of_rows() {
-            return self.number_of_defined_values();
-        }
-        self.offsets[row.into_usize()]
-    }
-
-    fn select_row(&self, sparse_index: Self::SparseIndex) -> Self::RowIndex {
-        Self::RowIndex::try_from_usize(
-            self.offsets.binary_search(&sparse_index).unwrap_or_else(|x| x),
-        ).unwrap_or_else(|_| {
-            unreachable!(
-                "The Matrix is in an illegal state where a sparse index is greater than the number of defined values."
-            )
-        })
-    }
-
-    fn select_column(&self, sparse_index: Self::SparseIndex) -> Self::ColumnIndex {
-        self.column_indices[sparse_index.into_usize()]
     }
 }
 

@@ -131,14 +131,6 @@ where
         = M::NonEmptyRowIndices<'a>
     where
         Self: 'a;
-    type EmptyRowIndices<'a>
-        = M::EmptyRowIndices<'a>
-    where
-        Self: 'a;
-    type NonEmptyRowIndices<'a>
-        = M::NonEmptyRowIndices<'a>
-    where
-        Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.matrix.sparse_row(row)
@@ -150,61 +142,6 @@ where
 
     fn sparse_rows(&self) -> Self::SparseRows<'_> {
         self.matrix.sparse_rows()
-    }
-
-    fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
-        self.matrix.empty_row_indices()
-    }
-
-    fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
-        self.matrix.non_empty_row_indices()
-    }
-
-    fn number_of_empty_rows(&self) -> Self::RowIndex {
-        self.matrix.number_of_empty_rows()
-    }
-
-    fn number_of_non_empty_rows(&self) -> Self::RowIndex {
-        self.matrix.number_of_non_empty_rows()
-    }
-}
-
-impl<M, T> SizedRowsSparseMatrix2D for GenericBiMatrix2D<M, T>
-where
-    T: SizedRowsSparseMatrix2D,
-    M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
-    M: SizedRowsSparseMatrix2D,
-{
-    type SparseRowSizes<'a>
-        = M::SparseRowSizes<'a>
-    where
-        Self: 'a;
-
-    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
-        self.matrix.number_of_defined_values_in_row(row)
-    }
-
-    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
-        self.matrix.sparse_row_sizes()
-    }
-}
-
-impl<M, T> SizedSparseMatrix2D for GenericBiMatrix2D<M, T>
-where
-    T: SizedSparseMatrix2D,
-    M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
-    M: SizedSparseMatrix2D,
-{
-    fn rank_row(&self, row: Self::RowIndex) -> Self::SparseIndex {
-        self.matrix.rank_row(row)
-    }
-
-    fn select_row(&self, sparse_index: Self::SparseIndex) -> Self::RowIndex {
-        self.matrix.select_row(sparse_index)
-    }
-
-    fn select_column(&self, sparse_index: Self::SparseIndex) -> Self::ColumnIndex {
-        self.matrix.select_column(sparse_index)
     }
 
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {

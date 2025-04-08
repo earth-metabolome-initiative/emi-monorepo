@@ -176,14 +176,6 @@ where
         = crate::impls::CSR2DNonEmptyRowIndices<'a, Self>
     where
         Self: 'a;
-    type EmptyRowIndices<'a>
-        = crate::impls::CSR2DEmptyRowIndices<'a, Self>
-    where
-        Self: 'a;
-    type NonEmptyRowIndices<'a>
-        = crate::impls::CSR2DNonEmptyRowIndices<'a, Self>
-    where
-        Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.ranges[row.into_usize()].clone()
@@ -211,28 +203,6 @@ where
 
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         self.number_of_non_empty_rows
-    }
-}
-
-impl<
-        SparseIndex: PositiveInteger + IntoUsize,
-        RowIndex: PositiveInteger + IntoUsize,
-        R: Ranged,
-    > SizedRowsSparseMatrix2D for RangedCSR2D<SparseIndex, RowIndex, R>
-where
-    Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = R::Step>,
-{
-    type SparseRowSizes<'a>
-        = crate::impls::CSR2DRowSizes<'a, Self>
-    where
-        Self: 'a;
-
-    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
-        self.into()
-    }
-
-    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
-        self.ranges[row.into_usize()].number_of_elements()
     }
 }
 

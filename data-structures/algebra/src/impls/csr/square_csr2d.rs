@@ -194,14 +194,6 @@ where
         = <CSR2D<SparseIndex, Idx, Idx> as SparseMatrix2D>::NonEmptyRowIndices<'a>
     where
         Self: 'a;
-    type EmptyRowIndices<'a>
-        = <CSR2D<SparseIndex, Idx, Idx> as SparseMatrix2D>::EmptyRowIndices<'a>
-    where
-        Self: 'a;
-    type NonEmptyRowIndices<'a>
-        = <CSR2D<SparseIndex, Idx, Idx> as SparseMatrix2D>::NonEmptyRowIndices<'a>
-    where
-        Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.csr.sparse_row(row)
@@ -213,62 +205,6 @@ where
 
     fn sparse_rows(&self) -> Self::SparseRows<'_> {
         self.csr.sparse_rows()
-    }
-
-    fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
-        self.csr.empty_row_indices()
-    }
-
-    fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
-        self.csr.non_empty_row_indices()
-    }
-
-    fn number_of_empty_rows(&self) -> Self::RowIndex {
-        self.csr.number_of_empty_rows()
-    }
-
-    fn number_of_non_empty_rows(&self) -> Self::RowIndex {
-        self.csr.number_of_non_empty_rows()
-    }
-}
-
-impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize>
-    SizedRowsSparseMatrix2D for SquareCSR2D<SparseIndex, Idx>
-where
-    Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-    CSR2D<SparseIndex, Idx, Idx>:
-        SizedRowsSparseMatrix2D<SparseIndex = SparseIndex, RowIndex = Idx, ColumnIndex = Idx>,
-{
-    type SparseRowSizes<'a>
-        = <CSR2D<SparseIndex, Idx, Idx> as SizedRowsSparseMatrix2D>::SparseRowSizes<'a>
-    where
-        Self: 'a;
-    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
-        self.csr.number_of_defined_values_in_row(row)
-    }
-
-    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
-        self.csr.sparse_row_sizes()
-    }
-}
-
-impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize> SizedSparseMatrix2D
-    for SquareCSR2D<SparseIndex, Idx>
-where
-    Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
-    CSR2D<SparseIndex, Idx, Idx>:
-        SizedSparseMatrix2D<SparseIndex = SparseIndex, RowIndex = Idx, ColumnIndex = Idx>,
-{
-    fn rank_row(&self, row: Idx) -> Self::SparseIndex {
-        self.csr.rank_row(row)
-    }
-
-    fn select_row(&self, sparse_index: Self::SparseIndex) -> Self::RowIndex {
-        self.csr.select_row(sparse_index)
-    }
-
-    fn select_column(&self, sparse_index: Self::SparseIndex) -> Self::ColumnIndex {
-        self.csr.select_column(sparse_index)
     }
 
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {

@@ -207,29 +207,3 @@ where
         }
     }
 }
-
-impl<SparseIndex, RowIndex, ColumnIndex, Value>
-    From<MutabilityError<CSR2D<SparseIndex, RowIndex, ColumnIndex>>>
-    for MutabilityError<ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>>
-where
-    CSR2D<SparseIndex, RowIndex, ColumnIndex>:
-        Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
-    ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>:
-        Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
-{
-    fn from(error: MutabilityError<CSR2D<SparseIndex, RowIndex, ColumnIndex>>) -> Self {
-        match error {
-            MutabilityError::UnorderedRowIndex(index) => MutabilityError::UnorderedRowIndex(index),
-            MutabilityError::UnorderedColumnIndex(index) => {
-                MutabilityError::UnorderedColumnIndex(index)
-            }
-            MutabilityError::DuplicatedEntry(coordinates) => {
-                MutabilityError::DuplicatedEntry(coordinates)
-            }
-            MutabilityError::OutOfBounds(coordinates) => MutabilityError::OutOfBounds(coordinates),
-            MutabilityError::MaxedOutRowIndex => MutabilityError::MaxedOutRowIndex,
-            MutabilityError::MaxedOutColumnIndex => MutabilityError::MaxedOutColumnIndex,
-            MutabilityError::MaxedOutSparseIndex => MutabilityError::MaxedOutSparseIndex,
-        }
-    }
-}
