@@ -28,8 +28,9 @@ members = [
     "data-structures/algebra",
     "data-migrations/directus-migration/directus-migration-builder",
     "data-migrations/directus-migration",
-    "data-structures/rosetta-uuid",
-    "data-structures/sorted-vec", "data-structures/mass-spectrometry", "utils/functional-properties",
+    "data-structures/sorted-vec",
+    "data-structures/mass-spectrometry",
+    "utils/functional-properties",
     "data-structures/rosetta-uuid",
 ]
 
@@ -49,7 +50,7 @@ infer = "0.16.0"
 csv = "1.3.1"
 bytes = "1.10.0"
 bincode = "1.3.3"
-sqlparser = { version = "0.55" }
+sqlparser = {git = "https://github.com/apache/datafusion-sqlparser-rs.git", branch = "main"}
 arbitrary = { version = "1", features = ["derive"] }
 diesel = { version = "2.2", default-features = false, features = ["extras"] }
 diesel-async = { version = "0.5", default-features = false }

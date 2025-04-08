@@ -9,11 +9,21 @@ mod pgrx;
 
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature="diesel", derive(diesel::expression::AsExpression, diesel::deserialize::FromSqlRow))]
+#[cfg_attr(
+    feature = "diesel",
+    derive(diesel::expression::AsExpression, diesel::deserialize::FromSqlRow)
+)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature="diesel", diesel(sql_type = crate::diesel_impls::Uuid))]
 /// A wrapper around the `uuid` crate's `Uuid` type.
 pub struct Uuid(uuid::Uuid);
+
+impl Uuid {
+    /// Creates a new `Uuid` using the `uuid` crate's `new_v4` method.
+    pub fn new_v4() -> Self {
+        Self(uuid::Uuid::new_v4())
+    }
+}
 
 impl FromStr for Uuid {
     type Err = uuid::Error;
