@@ -1,5 +1,5 @@
 //! Submodule providing a definition of a CSR matrix.
-use core::{fmt::Debug, iter::repeat};
+use core::{fmt::Debug, iter::repeat_n};
 
 use crate::prelude::*;
 
@@ -14,6 +14,8 @@ pub struct CSR2D<SparseIndex, RowIndex, ColumnIndex> {
     pub(super) number_of_rows: RowIndex,
     /// The column indices.
     pub(super) column_indices: Vec<ColumnIndex>,
+    /// The number of non-empty rows.
+    pub(super) number_of_non_empty_rows: RowIndex,
 }
 
 impl<SparseIndex: Debug, RowIndex: Debug, ColumnIndex: Debug> Debug
@@ -25,6 +27,7 @@ impl<SparseIndex: Debug, RowIndex: Debug, ColumnIndex: Debug> Debug
             .field("number_of_columns", &self.number_of_columns)
             .field("number_of_rows", &self.number_of_rows)
             .field("column_indices", &self.column_indices)
+            .field("number_of_non_empty_rows", &self.number_of_non_empty_rows)
             .finish()
     }
 }
@@ -38,13 +41,14 @@ impl<SparseIndex: Zero, RowIndex: Zero, ColumnIndex: Zero> Default
             number_of_columns: ColumnIndex::ZERO,
             number_of_rows: RowIndex::ZERO,
             column_indices: Vec::new(),
+            number_of_non_empty_rows: RowIndex::ZERO,
         }
     }
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize,
-        RowIndex: PositiveInteger + IntoUsize,
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
         ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
     > SparseMatrixMut for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
@@ -60,14 +64,28 @@ where
         (number_of_rows, number_of_columns): Self::MinimalShape,
         number_of_values: Self::SparseIndex,
     ) -> Self {
-        let mut offsets = Vec::with_capacity((number_of_rows + RowIndex::ONE).into_usize());
+        let mut offsets = Vec::with_capacity(number_of_rows.into_usize() + 1);
         offsets.push(SparseIndex::ZERO);
         Self {
             offsets,
             number_of_columns,
             number_of_rows,
             column_indices: Vec::with_capacity(number_of_values.into_usize()),
+            number_of_non_empty_rows: RowIndex::ZERO,
         }
+    }
+}
+
+impl<
+        SparseIndex,
+        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        ColumnIndex: PositiveInteger + IntoUsize,
+    > Matrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+{
+    type Coordinates = (RowIndex, ColumnIndex);
+
+    fn shape(&self) -> Vec<usize> {
+        vec![self.number_of_rows.into_usize(), self.number_of_columns.into_usize()]
     }
 }
 
@@ -99,8 +117,23 @@ impl<
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize,
-        RowIndex: PositiveInteger + IntoUsize,
+        SparseIndex,
+        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        ColumnIndex: PositiveInteger + IntoUsize,
+    > Matrix2DRef for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+{
+    fn number_of_rows_ref(&self) -> &Self::RowIndex {
+        &self.number_of_rows
+    }
+
+    fn number_of_columns_ref(&self) -> &Self::ColumnIndex {
+        &self.number_of_columns
+    }
+}
+
+impl<
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
         ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
     > SparseMatrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
@@ -112,18 +145,61 @@ where
     where
         Self: 'a;
 
-    fn number_of_defined_values(&self) -> Self::SparseIndex {
-        self.offsets.last().copied().unwrap_or(SparseIndex::ZERO)
-    }
-
     fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_> {
         self.into()
+    }
+
+    fn is_empty(&self) -> bool {
+        self.number_of_defined_values() == SparseIndex::ZERO
     }
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize,
-        RowIndex: PositiveInteger + IntoUsize,
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    > SizedSparseMatrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+where
+    Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
+{
+    fn number_of_defined_values(&self) -> Self::SparseIndex {
+        self.offsets.last().copied().unwrap_or(SparseIndex::ZERO)
+    }
+}
+
+impl<
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    > RankSelectSparseMatrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+where
+    Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
+{
+    fn select(&self, sparse_index: Self::SparseIndex) -> Self::Coordinates {
+        (self.select_row(sparse_index), self.select_column(sparse_index))
+    }
+
+    fn rank(&self, &(row_index, column_index): &Self::Coordinates) -> Self::SparseIndex {
+        let start = self.rank_row(row_index);
+        let end = self.rank_row(row_index + RowIndex::ONE);
+        let Ok(relative_column_index) =
+            self.column_indices[start.into_usize()..end.into_usize()].binary_search(&column_index)
+        else {
+            panic!("The column index {column_index} is not present in the row {row_index}.");
+        };
+
+        start + Self::SparseIndex::try_from_usize(relative_column_index)
+            .unwrap_or_else(|_| {
+                unreachable!(
+                    "The Matrix is in an illegal state where a sparse index is greater than the number of defined values."
+                )
+            })
+    }
+}
+
+impl<
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
         ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
     > SparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
@@ -141,14 +217,19 @@ where
         = CSR2DRows<'a, Self>
     where
         Self: 'a;
-    type SparseRowSizes<'a>
-        = CSR2DRowSizes<'a, Self>
+
+    type EmptyRowIndices<'a>
+        = CSR2DEmptyRowIndices<'a, Self>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a>
+        = CSR2DNonEmptyRowIndices<'a, Self>
     where
         Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
-        let start = self.rank(row).into_usize();
-        let end = self.rank(row + RowIndex::ONE).into_usize();
+        let start = self.rank_row(row).into_usize();
+        let end = self.rank_row(row + RowIndex::ONE).into_usize();
         self.column_indices[start..end].iter().copied()
     }
 
@@ -160,39 +241,92 @@ where
         self.into()
     }
 
-    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
+    fn number_of_non_empty_rows(&self) -> Self::RowIndex {
+        self.number_of_non_empty_rows
+    }
+
+    fn number_of_empty_rows(&self) -> Self::RowIndex {
+        self.number_of_rows() - self.number_of_non_empty_rows()
+    }
+
+    fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
         self.into()
     }
 
-    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
-        if let Ok(out_degree) = (self.rank(row + RowIndex::ONE) - self.rank(row)).try_into() {
-            out_degree
-        } else {
-            unreachable!(
-                "The Matrix is in an illegal state where a sparse row has a number of defined columns greated than the data type of the columns allows for."
-            )
-        }
+    fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
+        self.into()
     }
+}
 
-    /// Returns the rank for the provided row.
-    fn rank(&self, row: RowIndex) -> SparseIndex {
+impl<
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    > SizedSparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+where
+    Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
+{
+    fn rank_row(&self, row: RowIndex) -> SparseIndex {
         if self.offsets.len() <= row.into_usize() && row <= self.number_of_rows() {
             return self.number_of_defined_values();
         }
         self.offsets[row.into_usize()]
     }
+
+    fn select_row(&self, sparse_index: Self::SparseIndex) -> Self::RowIndex {
+        Self::RowIndex::try_from_usize(
+            self.offsets.binary_search(&sparse_index).unwrap_or_else(|x| x),
+        ).unwrap_or_else(|_| {
+            unreachable!(
+                "The Matrix is in an illegal state where a sparse index is greater than the number of defined values."
+            )
+        })
+    }
+
+    fn select_column(&self, sparse_index: Self::SparseIndex) -> Self::ColumnIndex {
+        self.column_indices[sparse_index.into_usize()]
+    }
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize,
-        RowIndex: PositiveInteger + IntoUsize,
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    > SizedRowsSparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+where
+    Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
+{
+    type SparseRowSizes<'a>
+        = CSR2DRowSizes<'a, Self>
+    where
+        Self: 'a;
+
+    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
+        self.into()
+    }
+
+    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
+        if let Ok(out_degree) = (self.rank_row(row + RowIndex::ONE) - self.rank_row(row)).try_into()
+        {
+            out_degree
+        } else {
+            unreachable!(
+                "The Matrix is in an illegal state where a sparse row has a number of defined columns greater than the data type of the columns allows for."
+            )
+        }
+    }
+}
+
+impl<
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
         ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
     > MatrixMut for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
     type Entry = Self::Coordinates;
-    type Error = super::MutabilityError<Self>;
+    type Error = crate::error::MutabilityError<Self>;
 
     fn add(&mut self, (row, column): Self::Entry) -> Result<(), Self::Error> {
         if !self.is_empty() && row.into_usize() == self.offsets.len() - 2 {
@@ -204,28 +338,51 @@ where
             if self.sparse_row(row).last().is_some_and(|last| last > column) {
                 return Err(MutabilityError::UnorderedColumnIndex(column));
             }
-            // If the row is the last row, we can add the entry at the end of the column
-            // indices.
-            self.column_indices.push(column);
-            self.number_of_columns = self.number_of_columns.max(column + ColumnIndex::ONE);
+
+            if column == ColumnIndex::MAX {
+                return Err(MutabilityError::MaxedOutColumnIndex);
+            }
+
             if let Some(offset) = self.offsets.last_mut() {
+                if *offset == SparseIndex::MAX {
+                    return Err(MutabilityError::MaxedOutSparseIndex);
+                }
                 *offset += SparseIndex::ONE;
             } else {
                 unreachable!()
             }
+
+            // If the row is the last row, we can add the entry at the end of the column
+            // indices.
+            self.column_indices.push(column);
+            self.number_of_columns = self.number_of_columns.max(column + ColumnIndex::ONE);
+
             Ok(())
         } else if row.into_usize() >= self.offsets.len() - 1 {
+            if self.number_of_non_empty_rows == RowIndex::MAX {
+                return Err(MutabilityError::MaxedOutRowIndex);
+            }
+            if column == ColumnIndex::MAX {
+                return Err(MutabilityError::MaxedOutColumnIndex);
+            }
+            if row == RowIndex::MAX {
+                return Err(MutabilityError::MaxedOutSparseIndex);
+            }
+            let last_offset = self.offsets.last().copied().unwrap_or(SparseIndex::ZERO);
+            if last_offset == SparseIndex::MAX {
+                return Err(MutabilityError::MaxedOutSparseIndex);
+            }
             // If the row is the next row, we can add the entry at the end of the column
             // indices.
-            self.offsets.extend(
-                repeat(self.number_of_defined_values())
-                    .take((row.into_usize() + 1) - self.offsets.len()),
-            );
+            self.offsets.extend(repeat_n(
+                self.number_of_defined_values(),
+                (row.into_usize() + 1) - self.offsets.len(),
+            ));
+            self.number_of_non_empty_rows += RowIndex::ONE;
             self.column_indices.push(column);
             self.number_of_columns = self.number_of_columns.max(column + ColumnIndex::ONE);
             self.number_of_rows = self.number_of_rows.max(row + RowIndex::ONE);
-            self.offsets
-                .push(self.offsets.last().copied().unwrap_or(SparseIndex::ZERO) + SparseIndex::ONE);
+            self.offsets.push(last_offset + SparseIndex::ONE);
             Ok(())
         } else {
             Err(MutabilityError::UnorderedRowIndex(row))
@@ -234,24 +391,24 @@ where
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize,
-        RowIndex: PositiveInteger + IntoUsize,
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
         ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
-    > TransposableMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    > TransposableMatrix2D<CSR2D<SparseIndex, ColumnIndex, RowIndex>>
+    for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
     CSR2D<SparseIndex, ColumnIndex, RowIndex>:
         Matrix2D<RowIndex = ColumnIndex, ColumnIndex = RowIndex>,
 {
-    type Transposed = CSR2D<SparseIndex, ColumnIndex, RowIndex>;
-
-    fn transpose(&self) -> Self::Transposed {
+    fn transpose(&self) -> CSR2D<SparseIndex, ColumnIndex, RowIndex> {
         // We initialize the transposed matrix.
-        let mut transposed: Self::Transposed = Self::Transposed {
+        let mut transposed: CSR2D<SparseIndex, ColumnIndex, RowIndex> = CSR2D {
             offsets: vec![SparseIndex::ZERO; self.number_of_columns().into_usize() + 1],
             number_of_columns: self.number_of_rows(),
             number_of_rows: self.number_of_columns(),
             column_indices: vec![RowIndex::ZERO; self.number_of_defined_values().into_usize()],
+            number_of_non_empty_rows: self.number_of_columns(),
         };
 
         // First, we proceed to compute the number of elements in each column.
@@ -263,6 +420,8 @@ where
         let mut prefix_sum = SparseIndex::ZERO;
         for offset in &mut transposed.offsets {
             prefix_sum += *offset;
+            transposed.number_of_non_empty_rows +=
+                if *offset > SparseIndex::ZERO { ColumnIndex::ONE } else { ColumnIndex::ZERO };
             *offset = prefix_sum;
         }
 

@@ -23,16 +23,3 @@ pub trait Symmetrize<M: SymmetricMatrix2D>: SquareMatrix {
     /// Returns the symmetrized version of the matrix.
     fn symmetrize(&self) -> M;
 }
-
-impl<M: SquareMatrix> Matrix2D for M {
-    type RowIndex = M::Index;
-    type ColumnIndex = M::Index;
-
-    fn number_of_rows(&self) -> Self::RowIndex {
-        self.order()
-    }
-
-    fn number_of_columns(&self) -> Self::ColumnIndex {
-        self.order()
-    }
-}

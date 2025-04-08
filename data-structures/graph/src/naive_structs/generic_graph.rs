@@ -1,55 +1,87 @@
-//! Simple generic graph implementation.
+//! Submodule providing a naively implemented generic Monoparted Graph.
 
-use crate::{
-    errors::builder::graph::GraphBuilderError,
-    traits::{BidirectionalVocabulary, Edges, Graph, Vocabulary, VocabularyRef},
-};
+use algebra::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
-/// A generic graph.
-pub struct GenericGraph<Sources, Destinations, Edges> {
-    /// The sources of the graph.
-    sources: Sources,
-    /// The destinations of the graph.
-    destinations: Destinations,
+use super::generic_monoplex_monopartite_graph_builder::MonoplexMonopartiteGraphBuilderError;
+use crate::traits::{BidirectionalVocabulary, Edges, Graph, MonopartiteGraph, MonoplexGraph};
+
+/// Struct representing a generic graph.
+pub struct GenericGraph<Nodes, Edges> {
+    /// The nodes of the graph.
+    nodes: Nodes,
     /// The edges of the graph.
     edges: Edges,
 }
 
-impl<S, D, E> TryFrom<(S, D, E)> for GenericGraph<S, D, E>
+impl<Nodes, Edges> Default for GenericGraph<Nodes, Edges>
 where
-    Self: Graph,
+    Nodes: Default,
+    Edges: Default,
 {
-    type Error = GraphBuilderError<GenericGraph<S, D, E>>;
-
-    fn try_from((sources, destinations, edges): (S, D, E)) -> Result<Self, Self::Error> {
-        // TODO! CHECK COMPATIBILITY!
-        Ok(Self { sources, destinations, edges })
+    fn default() -> Self {
+        Self { nodes: Nodes::default(), edges: Edges::default() }
     }
 }
 
-impl<S, D, E> Graph for GenericGraph<S, D, E>
+impl<Nodes, Edges> core::fmt::Debug for GenericGraph<Nodes, Edges>
 where
-    S: BidirectionalVocabulary + VocabularyRef + Vocabulary<SourceSymbol = E::SourceNodeId>,
-    D: BidirectionalVocabulary + VocabularyRef + Vocabulary<SourceSymbol = E::DestinationNodeId>,
-    E: Edges,
+    Nodes: core::fmt::Debug,
+    Edges: core::fmt::Debug,
 {
-    type SourceNodeId = E::SourceNodeId;
-    type DestinationNodeId = E::DestinationNodeId;
-    type SourceNodeSymbol = S::DestinationSymbol;
-    type DestinationNodeSymbol = D::DestinationSymbol;
-    type Sources = S;
-    type Destinations = D;
-    type Edges = E;
-    type EdgeId = E::EdgeId;
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("GenericGraph")
+            .field("nodes", &self.nodes)
+            .field("edges", &self.edges)
+            .finish()
+    }
+}
+
+impl<Nodes, Edges> TryFrom<(Nodes, Edges)> for GenericGraph<Nodes, Edges> {
+    type Error = MonoplexMonopartiteGraphBuilderError;
+
+    fn try_from((nodes, edges): (Nodes, Edges)) -> Result<Self, Self::Error> {
+        Ok(Self { nodes, edges })
+    }
+}
+
+impl<Nodes, E> Graph for GenericGraph<Nodes, E>
+where
+    Nodes: BidirectionalVocabulary,
+    Nodes::SourceSymbol: PositiveInteger + IntoUsize + TryFromUsize,
+    E: Edges<SourceNodeId = Nodes::SourceSymbol, DestinationNodeId = Nodes::SourceSymbol>,
+{
+    fn has_edges(&self) -> bool {
+        self.edges.has_edges()
+    }
+
+    fn has_nodes(&self) -> bool {
+        !self.nodes.is_empty()
+    }
+}
+
+impl<Nodes, E> MonopartiteGraph for GenericGraph<Nodes, E>
+where
+    Nodes: BidirectionalVocabulary,
+    Nodes::SourceSymbol: PositiveInteger + IntoUsize + TryFromUsize,
+    E: Edges<SourceNodeId = Nodes::SourceSymbol, DestinationNodeId = Nodes::SourceSymbol>,
+{
+    type NodeId = Nodes::SourceSymbol;
+    type NodeSymbol = Nodes::DestinationSymbol;
+    type Nodes = Nodes;
+
+    fn nodes_vocabulary(&self) -> &Self::Nodes {
+        &self.nodes
+    }
+}
+
+impl<Nodes, E> MonoplexGraph for GenericGraph<Nodes, E>
+where
+    Nodes: BidirectionalVocabulary,
+    Nodes::SourceSymbol: PositiveInteger + IntoUsize + TryFromUsize,
+    E: Edges<SourceNodeId = Nodes::SourceSymbol, DestinationNodeId = Nodes::SourceSymbol>,
+{
     type Edge = E::Edge;
-
-    fn source_vocabulary(&self) -> &Self::Sources {
-        &self.sources
-    }
-
-    fn destination_vocabulary(&self) -> &Self::Destinations {
-        &self.destinations
-    }
+    type Edges = E;
 
     fn edges(&self) -> &Self::Edges {
         &self.edges

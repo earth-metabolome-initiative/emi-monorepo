@@ -9,5 +9,7 @@ pub mod traits;
 
 /// Prelude module for the graph crate.
 pub mod prelude {
+    pub use common_traits::builder::Builder;
+
     pub use crate::{naive_structs::*, traits::*};
 }

@@ -25,7 +25,7 @@ members = [
     "utils/time-requirements",
     "data-structures/graph",
     "data-structures/algebra",
-    "data-structures/sorted-vec",
+    "data-structures/sorted-vec", "data-structures/mass-spectrometry", "utils/functional-properties",
 ]
 
 [workspace.dependencies]
@@ -44,6 +44,7 @@ infer = "0.16.0"
 csv = "1.3.1"
 bytes = "1.10.0"
 bincode = "1.3.3"
+arbitrary = { version = "1", features = ["derive"] }
 sqlparser = { git = "https://github.com/LucaCappelletti94/sqlparser-rs.git", branch = "gin_trgm_ops" }
 diesel = { version = "2.2", default-features = false, features = ["extras"] }
 diesel-async = { version = "0.5", default-features = false }
@@ -67,6 +68,7 @@ web_common_traits = { path = "web/web_common/web_common_traits" }
 webcodegen = { path = "web/web_common/webcodegen", features = ["postgres_17"] }
 diesel_migrations_utils = { path = "utils/diesel_migrations_utils" }
 common-traits = { path = "utils/common-traits" }
+functional-properties = { path = "utils/functional-properties" }
 inflector = { path = "utils/inflector" }
 core-structures = { path = "web/core-structures" }
 core-structures-builder = { path = "web/core-structures/core-structures-builder" }

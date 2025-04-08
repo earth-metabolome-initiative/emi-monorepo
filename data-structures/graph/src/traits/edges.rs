@@ -2,8 +2,8 @@
 //! or a ragged list or a compressed sparse row matrix.
 
 use algebra::prelude::{
-    IntoUsize, MatrixMut, PositiveInteger, SparseMatrix, SparseMatrix2D, SparseMatrixMut,
-    TryFromUsize,
+    IntoUsize, MatrixMut, PositiveInteger, SizedRowsSparseMatrix2D, SizedSparseMatrix,
+    SparseMatrix, SparseMatrix2D, SparseMatrixMut, TryFromUsize,
 };
 
 use super::Edge;
@@ -20,7 +20,7 @@ pub trait Edges {
     /// The type of the edge identifier.
     type EdgeId: PositiveInteger + IntoUsize + TryFromUsize;
     /// The underlying matrix type.
-    type Matrix: SparseMatrix2D<
+    type Matrix: SizedRowsSparseMatrix2D<
         RowIndex = Self::SourceNodeId,
         ColumnIndex = Self::DestinationNodeId,
         SparseIndex = Self::EdgeId,
@@ -32,6 +32,11 @@ pub trait Edges {
     /// Returns the number of edges.
     fn number_of_edges(&self) -> Self::EdgeId {
         self.matrix().number_of_defined_values()
+    }
+
+    /// Returns whether the graph has any edges.
+    fn has_edges(&self) -> bool {
+        !self.matrix().is_empty()
     }
 
     /// Returns the successors of the node with the given identifier.
@@ -56,12 +61,12 @@ pub trait Edges {
     }
 
     /// Returns an iterator over the out degrees of the nodes.
-    fn out_degrees(&self) -> <Self::Matrix as SparseMatrix2D>::SparseRowSizes<'_> {
+    fn out_degrees(&self) -> <Self::Matrix as SizedRowsSparseMatrix2D>::SparseRowSizes<'_> {
         self.matrix().sparse_row_sizes()
     }
 
     /// Returns the iterator of the edges.
-    fn edges(&self) -> <Self::Matrix as SparseMatrix>::SparseCoordinates<'_> {
+    fn sparse_coordinates(&self) -> <Self::Matrix as SparseMatrix>::SparseCoordinates<'_> {
         self.matrix().sparse_coordinates()
     }
 }

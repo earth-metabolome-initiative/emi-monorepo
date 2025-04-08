@@ -2,7 +2,7 @@
 
 use common_traits::prelude::Serde;
 
-use super::{Bounded, One, Zero};
+use super::{Bounded, Finite, One, Ten, TotalOrd, Zero};
 
 /// Trait defining a number.
 pub trait Number:
@@ -12,10 +12,14 @@ pub trait Number:
     + core::fmt::Debug
     + PartialEq
     + PartialOrd
+    + TotalOrd
+    + Ten
     + One
     + Zero
+    + Finite
     + Bounded
     + Serde
+    + core::iter::Sum
     + core::ops::Add<Output = Self>
     + core::ops::Sub<Output = Self>
     + core::ops::Mul<Output = Self>
@@ -28,6 +32,9 @@ pub trait Number:
     + core::ops::RemAssign
 {
 }
+
+/// Trait defining a positive number.
+pub trait PositiveNumber: Number {}
 
 impl Number for i8 {}
 impl Number for i16 {}

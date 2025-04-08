@@ -6,40 +6,44 @@ use std::marker::PhantomData;
 use algebra::prelude::{SparseMatrixMut, Symmetrize};
 use common_traits::prelude::Builder;
 
-use super::GenericDirectedEdgesBuilder;
+use super::GenericEdgesBuilder;
 use crate::{
     errors::builder::edges::EdgesBuilderError,
     traits::{
-        DirectedEdges, Edges, EdgesBuilder, EdgesBuilderOptions, FromDirectedEdges, GrowableEdges,
-        UndirectedEdges,
+        DirectedEdges, Edges, EdgesBuilder, EdgesBuilderOptions, FromDirectedMonopartiteEdges,
+        GrowableEdges, MonopartiteEdges, UndirectedMonopartiteEdges,
     },
 };
 
 /// A generic edges builder that can be used to build a edges for any type of
 /// graph.
-pub struct GenericUndirectedEdgesBuilder<EdgeIterator, GE: GrowableEdges, UE> {
+pub struct GenericUndirectedMonopartiteEdgesBuilder<EdgeIterator, GE: GrowableEdges, UE> {
     /// The inner builder for the edges.
-    builder: GenericDirectedEdgesBuilder<EdgeIterator, GE>,
+    builder: GenericEdgesBuilder<EdgeIterator, GE>,
     /// The actual undirected graph that will be built.
     _undirected_edges: core::marker::PhantomData<UE>,
 }
 
 impl<EdgeIterator, GE: GrowableEdges, UE> Default
-    for GenericUndirectedEdgesBuilder<EdgeIterator, GE, UE>
+    for GenericUndirectedMonopartiteEdgesBuilder<EdgeIterator, GE, UE>
 {
     fn default() -> Self {
-        Self { builder: GenericDirectedEdgesBuilder::default(), _undirected_edges: PhantomData }
+        Self { builder: GenericEdgesBuilder::default(), _undirected_edges: PhantomData }
     }
 }
 
-impl<EdgeIterator, GE, UE> EdgesBuilder for GenericUndirectedEdgesBuilder<EdgeIterator, GE, UE>
+impl<EdgeIterator, GE, UE> EdgesBuilder
+    for GenericUndirectedMonopartiteEdgesBuilder<EdgeIterator, GE, UE>
 where
-    UE: UndirectedEdges<Edge = GE::Edge, EdgeId = GE::EdgeId> + FromDirectedEdges<GE>,
+    UE: UndirectedMonopartiteEdges<Edge = GE::Edge, EdgeId = GE::EdgeId>
+        + FromDirectedMonopartiteEdges<GE>,
     GE: GrowableEdges<Error = EdgesBuilderError<GE>>
-        + DirectedEdges<DirectedMatrix = GE::GrowableMatrix>,
+        + MonopartiteEdges<MonopartiteMatrix = GE::GrowableMatrix>
+        + DirectedEdges<Matrix = GE::GrowableMatrix>,
     EdgeIterator: IntoIterator<Item = GE::Edge>,
     EdgesBuilderError<UE>: From<EdgesBuilderError<GE>>,
-    <GE as GrowableEdges>::GrowableMatrix: Symmetrize<<UE as UndirectedEdges>::SymmetricMatrix>,
+    <GE as GrowableEdges>::GrowableMatrix:
+        Symmetrize<<UE as UndirectedMonopartiteEdges>::SymmetricSquaredMatrix>,
 {
     type EdgeIterator = EdgeIterator;
     type IntermediateEdges = GE;
@@ -81,15 +85,19 @@ where
     }
 }
 
-impl<EdgeIterator, GE, UE> Builder for GenericUndirectedEdgesBuilder<EdgeIterator, GE, UE>
+impl<EdgeIterator, GE, UE> Builder
+    for GenericUndirectedMonopartiteEdgesBuilder<EdgeIterator, GE, UE>
 where
-    UE: UndirectedEdges<Edge = GE::Edge, EdgeId = GE::EdgeId> + FromDirectedEdges<GE>,
+    UE: UndirectedMonopartiteEdges<Edge = GE::Edge, EdgeId = GE::EdgeId>
+        + FromDirectedMonopartiteEdges<GE>,
     GE: GrowableEdges<Error = EdgesBuilderError<GE>>
-        + DirectedEdges<DirectedMatrix = GE::GrowableMatrix>,
+        + MonopartiteEdges<MonopartiteMatrix = GE::GrowableMatrix>
+        + DirectedEdges<Matrix = GE::GrowableMatrix>,
     Self: EdgesBuilder<EdgeIterator = EdgeIterator, Edges = UE, IntermediateEdges = GE>,
     EdgeIterator: IntoIterator<Item = <<Self as EdgesBuilder>::Edges as Edges>::Edge>,
     EdgesBuilderError<UE>: From<EdgesBuilderError<GE>>,
-    <GE as GrowableEdges>::GrowableMatrix: Symmetrize<<UE as UndirectedEdges>::SymmetricMatrix>,
+    <GE as GrowableEdges>::GrowableMatrix:
+        Symmetrize<<UE as UndirectedMonopartiteEdges>::SymmetricSquaredMatrix>,
 {
     type Object = UE;
     type Error = EdgesBuilderError<UE>;

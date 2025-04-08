@@ -1,23 +1,40 @@
 //! Submodule defining commonly used named types for the generic graph data
 //! structures.
 
-use algebra::impls::{SquareCSR2D, SymmetricCSR2D, UpperTriangularCSR2D};
+use algebra::impls::{SquareCSR2D, SymmetricCSR2D, UpperTriangularCSR2D, ValuedCSR2D, CSR2D};
 use sorted_vec::prelude::SortedVec;
 
-use super::{GenericDirectedEdgesBuilder, GenericDirectionalGraph, GenericUndirectedEdgesBuilder};
+use super::{
+    GenericBiGraph, GenericEdgesBuilder, GenericGraph, GenericUndirectedMonopartiteEdgesBuilder,
+};
 
 /// Type alias for a generic directed graph.
-pub type DiGraph<NodeSymbol> =
-    GenericDirectionalGraph<SortedVec<NodeSymbol>, SquareCSR2D<usize, usize>>;
+pub type DiGraph<NodeSymbol> = GenericGraph<SortedVec<NodeSymbol>, SquareCSR2D<usize, usize>>;
 /// Type alias for a generic directed edges list builder.
 pub type DiEdgesBuilder<EdgeIterator> =
-    GenericDirectedEdgesBuilder<EdgeIterator, SquareCSR2D<usize, usize>>;
+    GenericEdgesBuilder<EdgeIterator, SquareCSR2D<usize, usize>>;
+
+/// Type alias for a generic directed bipartite graph.
+pub type BiGraph<LeftNodeSymbol, RightNodeSymbol> = GenericBiGraph<
+    SortedVec<LeftNodeSymbol>,
+    SortedVec<RightNodeSymbol>,
+    CSR2D<usize, usize, usize>,
+>;
+/// Type alias for a generic directed bipartite edges list builder.
+pub type BiEdgesBuilder<EdgeIterator> =
+    GenericEdgesBuilder<EdgeIterator, UpperTriangularCSR2D<usize, usize>>;
+
+/// Type alias for a generic weighted directed bipartite graph.
+pub type WeightedBiGraph<LeftNodeSymbol, RightNodeSymbol> = GenericBiGraph<
+    SortedVec<LeftNodeSymbol>,
+    SortedVec<RightNodeSymbol>,
+    ValuedCSR2D<usize, usize, usize, f64>,
+>;
 
 /// Type alias for a generic undirected graph.
-pub type UndiGraph<NodeSymbol> =
-    GenericDirectionalGraph<SortedVec<NodeSymbol>, SymmetricCSR2D<usize, usize>>;
+pub type UndiGraph<NodeSymbol> = GenericGraph<SortedVec<NodeSymbol>, SymmetricCSR2D<usize, usize>>;
 /// Type alias for a generic undirected edges list builder.
-pub type UndiEdgesBuilder<EdgeIterator> = GenericUndirectedEdgesBuilder<
+pub type UndiEdgesBuilder<EdgeIterator> = GenericUndirectedMonopartiteEdgesBuilder<
     EdgeIterator,
     UpperTriangularCSR2D<usize, usize>,
     SymmetricCSR2D<usize, usize>,

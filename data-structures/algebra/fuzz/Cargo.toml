@@ -1,0 +1,57 @@
+[package]
+name = "algebra-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+honggfuzz = "0.5"
+algebra = { path = "../", features = ["arbitrary"] }
+arbitrary = { version = "1", features = ["derive"] }
+common-traits = { path = "../../../utils/common-traits" }
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[profile.release]
+debug = 1
+
+[[bin]]
+name = "lapjv"
+path = "fuzz_targets/lapjv.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "csr2d"
+path = "fuzz_targets/csr2d.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "valued_csr2d"
+path = "fuzz_targets/valued_csr2d.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "padded_matrix2d"
+path = "fuzz_targets/padded_matrix2d.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "hopcroft_karp"
+path = "fuzz_targets/hopcroft_karp.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "generic_matrix2d_with_padded_diagonal"
+path = "fuzz_targets/generic_matrix2d_with_padded_diagonal.rs"
+test = false
+doc = false

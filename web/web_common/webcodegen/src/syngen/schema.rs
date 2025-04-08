@@ -64,11 +64,12 @@ impl Table {
             }
         };
 
-        let columns_feature_flag = if let Some(columns_feature_flag_name) = self.diesel_feature_flag_name(conn)? {
-            quote! {#[cfg(feature = #columns_feature_flag_name)]}
-        } else {
-            TokenStream::new()
-        };
+        let columns_feature_flag =
+            if let Some(columns_feature_flag_name) = self.diesel_feature_flag_name(conn)? {
+                quote! {#[cfg(feature = #columns_feature_flag_name)]}
+            } else {
+                TokenStream::new()
+            };
 
         let sql_name = if self.has_snake_case_name()? {
             TokenStream::new()
