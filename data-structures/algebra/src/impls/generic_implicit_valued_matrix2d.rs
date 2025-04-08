@@ -226,13 +226,19 @@ where
     fn number_of_defined_values(&self) -> Self::SparseIndex {
         self.matrix.number_of_defined_values()
     }
+}
+
+impl<M, Map, Value> RankSelectSparseMatrix for GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: SizedSparseMatrix2D + RankSelectSparseMatrix,
+    Map: Fn(M::Coordinates) -> Value,
+{
+    fn rank(&self, coordinates: &Self::Coordinates) -> Self::SparseIndex {
+        self.matrix.rank(coordinates)
+    }
 
     fn select(&self, sparse_index: Self::SparseIndex) -> Self::Coordinates {
         self.matrix.select(sparse_index)
-    }
-
-    fn rank(&self, coordinates: &Self::Coordinates) -> Self::SparseIndex {
-        self.matrix.rank(coordinates)
     }
 }
 

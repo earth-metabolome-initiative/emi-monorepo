@@ -171,7 +171,14 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex, Value> SizedRowsSparseMatrix2D
     for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 where
-    CSR2D<SparseIndex, RowIndex, ColumnIndex>: SizedRowsSparseMatrix2D,
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    CSR2D<SparseIndex, RowIndex, ColumnIndex>: SizedRowsSparseMatrix2D<
+        RowIndex = RowIndex,
+        ColumnIndex = ColumnIndex,
+        SparseIndex = SparseIndex,
+    >
 {
     type SparseRowSizes<'a>
         = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SizedRowsSparseMatrix2D>::SparseRowSizes<'a>
@@ -190,7 +197,14 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex, Value> SizedSparseMatrix2D
     for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 where
-    CSR2D<SparseIndex, RowIndex, ColumnIndex>: SizedSparseMatrix2D,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    CSR2D<SparseIndex, RowIndex, ColumnIndex>: SizedSparseMatrix2D<
+        RowIndex = RowIndex,
+        ColumnIndex = ColumnIndex,
+        SparseIndex = SparseIndex,
+    >,
 {
     fn rank_row(&self, row: Self::RowIndex) -> Self::SparseIndex {
         self.csr.rank_row(row)
