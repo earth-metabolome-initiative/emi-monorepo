@@ -76,6 +76,7 @@ mod tests {
     fn test_singularize() {
         assert_eq!(Inflector::default().singularize("countries"), "country");
         assert_eq!(Inflector::default().singularize("Taxa"), "Taxon");
+        assert_eq!(Inflector::default().singularize("taxa"), "taxon");
         assert_eq!(Inflector::default().singularize("elephants"), "elephant");
         assert_eq!(Inflector::default().singularize("taxal"), "taxal");
         assert_eq!(Inflector::default().singularize("matrices"), "matrix");
