@@ -9,9 +9,9 @@ pub struct SiriusBuilder<V: Version> {
 }
 
 /// The functions in this block are used to set the parameters of the
-/// `SiriusBuilder`. Most of the functions come from the `sirius config` command.
-/// The comments in the functions are usually a copy-paste from the `sirius
-/// config --help` command.
+/// `SiriusBuilder`. Most of the functions come from the `sirius config`
+/// command. The comments in the functions are usually a copy-paste from the
+/// `sirius config --help` command.
 impl SiriusBuilder<Version5> {
     /// Set the maximal value of m/z ratio on which Sirius calculation will be
     /// carried.
@@ -39,10 +39,7 @@ impl SiriusBuilder<Version5> {
     /// configuration.
     pub fn maximal_mz(mut self, maximal_mz: f64) -> Result<Self, String> {
         if maximal_mz < 0.0 {
-            return Err(format!(
-                "Maximal m/z ratio must be positive. You provided {maximal_mz}.",
-                
-            ));
+            return Err(format!("Maximal m/z ratio must be positive. You provided {maximal_mz}.",));
         }
         if maximal_mz == 0.0 {
             return Err("Maximal m/z ratio cannot be 0".to_string());
@@ -332,7 +329,6 @@ impl SiriusBuilder<Version5> {
         if median_noise_intensity < 0.0 {
             return Err(format!(
                 "Median noise intensity must be positive. You provided {median_noise_intensity}.",
-                
             ));
         }
         self.config.add_config_parameter(ConfigV5::MedianNoiseIntensity(median_noise_intensity))?;
@@ -359,7 +355,6 @@ impl SiriusBuilder<Version5> {
         if ms1_absolute_intensity_error < 0.0 {
             return Err(format!(
                 "MS1 absolute intensity error must be positive. You provided {ms1_absolute_intensity_error}.",
-                
             ));
         }
         self.config.add_config_parameter(ConfigV5::MS1AbsoluteIntensityError(
@@ -440,7 +435,6 @@ impl SiriusBuilder<Version5> {
         if noise_threshold_settings_intensity_threshold < 0.0 {
             return Err(format!(
                 "Noise threshold settings intensity threshold must be positive. You provided {noise_threshold_settings_intensity_threshold}.",
-                
             ));
         }
         self.config.add_config_parameter(ConfigV5::NoiseThresholdSettingsIntensityThreshold(
@@ -581,7 +575,6 @@ impl SiriusBuilder<Version5> {
         if zodiac_edge_filter_thresholds_threshold_filter < 0.0 {
             return Err(format!(
                 "Zodiac edge filter thresholds threshold filter must be positive. You provided {zodiac_edge_filter_thresholds_threshold_filter}.",
-                
             ));
         }
         self.config.add_config_parameter(ConfigV5::ZodiacEdgeFilterThresholdsThresholdFilter(

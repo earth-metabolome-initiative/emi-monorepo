@@ -32,7 +32,7 @@ impl<V: Version> Sirius<V> {
     /// # Arguments
     /// * `input_file_path` - The path to the input file
     /// * `output_file_path` - The path to the output file
-    /// 
+    ///
     /// # Errors
     /// Returns an error if:
     /// - The `SIRIUS_PATH` environment variable is not set
@@ -80,11 +80,14 @@ impl<V: Version> Sirius<V> {
         // different depending on the operating system. Fortunately, the
         // complexity of this is hidden behind the is_executable crate.
         if !sirius_path.is_executable() {
-            return Err(format!("The sirius executable at {} is not executable", sirius_path.display()));
+            return Err(format!(
+                "The sirius executable at {} is not executable",
+                sirius_path.display()
+            ));
         }
 
-        // Fetch the `SIRIUS_USERNAME` and the `SIRIUS_PASSWORD` from environment variables
-        // in order to login before launching the sirius command
+        // Fetch the `SIRIUS_USERNAME` and the `SIRIUS_PASSWORD` from environment
+        // variables in order to login before launching the sirius command
 
         let sirius_username = env::var("SIRIUS_USERNAME").map_err(|_| {
             concat!(
