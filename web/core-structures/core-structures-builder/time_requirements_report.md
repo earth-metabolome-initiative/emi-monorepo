@@ -1,14 +1,14 @@
 # Time Report for Building Core Structures
 
 The total time spent on all tasks was 35 seconds.
-The slowest task was `Building Schema from CSVs` which took 19 seconds (54.29% of all time).
+The slowest task was `Building Schema from CSVs` which took 18 seconds (51.43% of all time).
 
 | name                            | time       | percentage | comment    |
 |---------------------------------|------------|------------|------------|
 | Checking Migrations Directory   | now        | 0.00%      | Unchanged. |
 | Creating Font Awesome Icons CSV | now        | 0.00%      | Unchanged. |
 | Creating Taxonomical Ranks CSV  | now        | 0.00%      | Unchanged. |
-| Building Schema from CSVs       | 19 seconds | 54.29%     | Unchanged. |
+| Building Schema from CSVs       | 18 seconds | 51.43%     | Unchanged. |
 | Executing Migrations            | now        | 0.00%      | Unchanged. |
 | Executing Meta-SQL              | now        | 0.00%      | Unchanged. |
 | Checking Constraints            | now        | 8.57%      | Unchanged. |
@@ -24,7 +24,7 @@ The slowest task was `Generate Structs` which took now (50.00% of all time).
 | Retrieving tables          | now  | 0.00%      | Unchanged. |
 | Generating Diesel code     | now  | 8.33%      | Unchanged. |
 | Generate Structs           | now  | 50.00%     | Unchanged. |
-| Generate Web Common Traits | now  | 33.33%     | Unchanged. |
+| Generate Web Common Traits | now  | 41.67%     | Unchanged. |
 
 ### Time Report for Generating Diesel code
 
@@ -60,14 +60,14 @@ The slowest task was `Generate Table Traits` which took now (100.00% of all time
 #### Time Report for Generate Table Traits
 
 The total time spent on all tasks was now.
-The slowest task was `Generate Foreign Traits` which took now (25.00% of all time).
+The slowest task was `Generate Updatable Traits` which took now (20.00% of all time).
 
 | name                       | time | percentage | comment    |
 |----------------------------|------|------------|------------|
 | Generate Deletable Traits  | now  | 0.00%      | Unchanged. |
 | Generate Loadable Traits   | now  | 0.00%      | Unchanged. |
-| Generate Foreign Traits    | now  | 25.00%     | Unchanged. |
+| Generate Foreign Traits    | now  | 20.00%     | Unchanged. |
 | Generate Insertable Traits | now  | 0.00%      | Unchanged. |
-| Generate Updatable Traits  | now  | 25.00%     | Unchanged. |
+| Generate Updatable Traits  | now  | 20.00%     | Unchanged. |
 
 ![Plot](time_requirements_report.png)
