@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
 /// The possible canopus settings
@@ -13,12 +15,12 @@ pub enum CanopusV5 {
     Help,
 }
 
-impl ToString for CanopusV5 {
-    fn to_string(&self) -> String {
+impl Display for CanopusV5 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CanopusV5::Enabled => Self::parameter_set_name().to_string(),
-            CanopusV5::Help => "--help".to_string(),
-            CanopusV5::Version => "--version".to_string(),
+            CanopusV5::Enabled => write!(f, "{}", Self::parameter_set_name()),
+            CanopusV5::Help => write!(f, "--help"),
+            CanopusV5::Version => write!(f, "--version"),
         }
     }
 }

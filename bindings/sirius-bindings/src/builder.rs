@@ -34,10 +34,7 @@ impl SiriusBuilder<Version5> {
     /// ```
     pub fn maximal_mz(mut self, maximal_mz: f64) -> Result<Self, String> {
         if maximal_mz < 0.0 {
-            return Err(format!(
-                concat!("Maximal m/z ratio must be positive. ", "You provided {}."),
-                maximal_mz
-            ));
+            return Err(format!("Maximal m/z ratio must be positive. You provided {}.", maximal_mz));
         }
         if maximal_mz == 0.0 {
             return Err("Maximal m/z ratio cannot be 0".to_string());
@@ -74,8 +71,7 @@ impl SiriusBuilder<Version5> {
     /// # Arguments
     /// * `recompute` - Whether to recompute the whole task or not
     pub fn recompute_all(mut self, recompute: bool) -> Result<Self, String> {
-        self.config
-            .add_core_parameter(CoreV5::Recompute(recompute))?;
+        self.config.add_core_parameter(CoreV5::Recompute(recompute))?;
         Ok(self)
     }
     /// Activate the use of the isotope settings filter.
@@ -263,7 +259,7 @@ impl SiriusBuilder<Version5> {
     pub fn median_noise_intensity(mut self, median_noise_intensity: f32) -> Result<Self, String> {
         if median_noise_intensity < 0.0 {
             return Err(format!(
-                concat!("Median noise intensity must be positive. ", "You provided {}."),
+                "Median noise intensity must be positive. You provided {}.",
                 median_noise_intensity
             ));
         }
@@ -286,7 +282,7 @@ impl SiriusBuilder<Version5> {
     ) -> Result<Self, String> {
         if ms1_absolute_intensity_error < 0.0 {
             return Err(format!(
-                concat!("MS1 absolute intensity error must be positive. ", "You provided {}."),
+                "MS1 absolute intensity error must be positive. You provided {}.",
                 ms1_absolute_intensity_error
             ));
         }
@@ -310,7 +306,7 @@ impl SiriusBuilder<Version5> {
     ) -> Result<Self, String> {
         if ms1_minimal_intensity_to_consider < 0.0 {
             return Err(format!(
-                concat!("MS1 minimal intensity to consider must be positive. ", "You provided {}."),
+                "MS1 minimal intensity to consider must be positive. You provided {}.",
                 ms1_minimal_intensity_to_consider
             ));
         }
@@ -335,7 +331,7 @@ impl SiriusBuilder<Version5> {
     ) -> Result<Self, String> {
         if ms1_relative_intensity_error < 0.0 {
             return Err(format!(
-                concat!("MS1 relative intensity error must be positive. ", "You provided {}."),
+                "MS1 relative intensity error must be positive. You provided {}.",
                 ms1_relative_intensity_error
             ));
         }
@@ -355,10 +351,7 @@ impl SiriusBuilder<Version5> {
     ) -> Result<Self, String> {
         if noise_threshold_settings_intensity_threshold < 0.0 {
             return Err(format!(
-                concat!(
-                    "Noise threshold settings intensity threshold must be positive. ",
-                    "You provided {}."
-                ),
+                "Noise threshold settings intensity threshold must be positive. You provided {}.",
                 noise_threshold_settings_intensity_threshold
             ));
         }
@@ -441,10 +434,7 @@ impl SiriusBuilder<Version5> {
     ) -> Result<Self, String> {
         if zodiac_edge_filter_thresholds_threshold_filter < 0.0 {
             return Err(format!(
-                concat!(
-                    "Zodiac edge filter thresholds threshold filter must be positive. ",
-                    "You provided {}."
-                ),
+                "Zodiac edge filter thresholds threshold filter must be positive. You provided {}.",
                 zodiac_edge_filter_thresholds_threshold_filter
             ));
         }
@@ -538,7 +528,7 @@ impl SiriusBuilder<Version5> {
             // fast and easy way to check interval of values in Rust. Then add the "!" to
             // negate the condition.
             return Err(format!(
-                concat!("Zodiac library scoring min cosine must be in [0,1]. ", "You provided {}."),
+                "Zodiac library scoring min cosine must be in [0,1]. You provided {}.",
                 zodiac_library_scoring_min_cosine
             ));
         }
@@ -598,10 +588,7 @@ impl SiriusBuilder<Version5> {
     ) -> Result<Self, String> {
         if !(0.0..=1.0).contains(&zodiac_ratio_of_considered_candidates_per_ionization) {
             return Err(format!(
-                concat!(
-                    "Zodiac ratio of considered candidates per ionization must be in [0,1]. ",
-                    "You provided {}."
-                ),
+                "Zodiac ratio of considered candidates per ionization must be in [0,1]. You provided {}.",
                 zodiac_ratio_of_considered_candidates_per_ionization
             ));
         }
@@ -946,8 +933,6 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
-    /// End `sirius config` command parameters.
-
     /// Wether to enable the Formula module.
     pub fn enable_formula(mut self) -> Result<Self, String> {
         self.config.add_formula_parameter(FormulaV5::Enabled)?;
@@ -1092,15 +1077,13 @@ impl SiriusBuilder<Version5> {
     /// Set to default the number of CPUs to use. By default, all available CPUs
     /// are used.
     pub fn max_cpus_default(mut self) -> Result<Self, String> {
-        self.config
-            .add_core_parameter(CoreV5::NCPUs(usize::default()).into_default())?;
+        self.config.add_core_parameter(CoreV5::NCPUs(usize::default()).into_default())?;
         Ok(self)
     }
 
     /// Whether to recompute all tools. By default, it is set to `false`.
     pub fn recompute_all_default(mut self) -> Result<Self, String> {
-        self.config
-            .add_core_parameter(CoreV5::Recompute(bool::default()).into_default())?;
+        self.config.add_core_parameter(CoreV5::Recompute(bool::default()).into_default())?;
         Ok(self)
     }
 

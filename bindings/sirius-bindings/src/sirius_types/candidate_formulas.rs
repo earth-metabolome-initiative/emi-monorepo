@@ -23,7 +23,7 @@ impl<'a> TryFrom<&'a str> for CandidateFormulas {
     fn try_from(s: &'a str) -> Result<Self, Self::Error> {
         match s {
             "," => Ok(CandidateFormulas::Comma),
-            _ => Err(format!("Unknown adduct settings enforced: {}", s)),
+            _ => Err(format!("Unknown adduct settings enforced: {s}")),
         }
     }
 }

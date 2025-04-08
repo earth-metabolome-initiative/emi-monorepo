@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
 /// The possible fingerprint settings
@@ -13,12 +15,12 @@ pub enum FingerprintV5 {
     Help,
 }
 
-impl ToString for FingerprintV5 {
-    fn to_string(&self) -> String {
+impl Display for FingerprintV5 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            FingerprintV5::Enabled => Self::parameter_set_name().to_string(),
-            FingerprintV5::Help => "--help".to_string(),
-            FingerprintV5::Version => "--version".to_string(),
+            FingerprintV5::Enabled => write!(f, "{}", Self::parameter_set_name()),
+            FingerprintV5::Help => write!(f, "--help"),
+            FingerprintV5::Version => write!(f, "--version"),
         }
     }
 }

@@ -28,7 +28,7 @@ impl<'a> TryFrom<&'a str> for ForbidRecalibration {
         match s {
             "ALLOWED" => Ok(ForbidRecalibration::Allowed),
             "FORBIDDEN" => Ok(ForbidRecalibration::Forbidden),
-            _ => Err(format!("Unknown value: {}", s)),
+            _ => Err(format!("Unknown value: {s}")),
         }
     }
 }

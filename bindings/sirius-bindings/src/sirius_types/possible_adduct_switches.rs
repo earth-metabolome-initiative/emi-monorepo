@@ -28,7 +28,7 @@ impl<'a> TryFrom<&'a str> for PossibleAdductSwitches {
             "[M+Na]+:[M+H]+,[M+K]+:[M+H]+,[M+Cl]-:[M-H]-" => {
                 Ok(PossibleAdductSwitches::DefaultAdductsSwitches)
             }
-            _ => Err(format!("Unknown adduct settings enforced: {}", s)),
+            _ => Err(format!("Unknown adduct settings enforced: {s}")),
         }
     }
 }

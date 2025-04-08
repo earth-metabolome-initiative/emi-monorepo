@@ -1,3 +1,5 @@
+use std::fmt;
+
 use crate::{
     prelude::*,
     traits::{Enablable, IntoDefault, NamedParametersSet},
@@ -254,250 +256,250 @@ pub enum ConfigV5 {
     PossibleAdductSwitches(PossibleAdductSwitches),
 }
 
-impl ToString for ConfigV5 {
-    fn to_string(&self) -> String {
+impl fmt::Display for ConfigV5 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ConfigV5::Enabled => Self::parameter_set_name().to_string(),
+            ConfigV5::Enabled => write!(f, "{}", Self::parameter_set_name()),
             ConfigV5::IsotopeSettingsFilter(isotope_settings_filter) => {
-                format!("--IsotopeSettings.filter={}", isotope_settings_filter)
+                write!(f, "--IsotopeSettings.filter={isotope_settings_filter}")
             }
             ConfigV5::FormulaSearchDB(formula_search_db) => {
-                format!("--FormulaSearchDB={}", formula_search_db)
+                write!(f, "--FormulaSearchDB={formula_search_db}")
             }
             ConfigV5::StructureSearchDB(structure_search_db) => {
-                format!("--StructureSearchDB={}", structure_search_db)
+                write!(f, "--StructureSearchDB={structure_search_db}")
             }
             ConfigV5::TimeoutSecondsPerTree(timeout_seconds_per_tree) => {
-                format!("--Timeout.secondsPerTree={}", timeout_seconds_per_tree)
+                write!(f, "--Timeout.secondsPerTree={timeout_seconds_per_tree}")
             }
             ConfigV5::NumberOfCandidatesPerIon(number_of_candidates_per_ion) => {
-                format!("--NumberOfCandidatesPerIon={}", number_of_candidates_per_ion)
+                write!(f, "--NumberOfCandidatesPerIon={number_of_candidates_per_ion}")
             }
             ConfigV5::NumberOfStructureCandidates(number_of_structure_candidates) => {
-                format!("--NumberOfStructureCandidates={}", number_of_structure_candidates)
+                write!(f, "--NumberOfStructureCandidates={number_of_structure_candidates}")
             }
             ConfigV5::RecomputeResults(recompute_results) => {
-                format!("--RecomputeResults={}", recompute_results)
+                write!(f, "--RecomputeResults={recompute_results}")
             }
             ConfigV5::PrintCitations(print_citations) => {
-                format!("--PrintCitations={}", print_citations)
+                write!(f, "--PrintCitations={print_citations}")
             }
             ConfigV5::TimeoutSecondsPerInstance(timeout_seconds_per_instance) => {
-                format!("--Timeout.secondsPerInstance={}", timeout_seconds_per_instance)
+                write!(f, "--Timeout.secondsPerInstance={timeout_seconds_per_instance}")
             }
             ConfigV5::FormulaResultThreshold(formula_result_threshold) => {
-                format!("--FormulaResultThreshold={}", formula_result_threshold)
+                write!(f, "--FormulaResultThreshold={formula_result_threshold}")
             }
             ConfigV5::InjectElGordoCompounds(inject_el_gordo_compounds) => {
-                format!("--InjectElGordoCompounds={}", inject_el_gordo_compounds)
+                write!(f, "--InjectElGordoCompounds={inject_el_gordo_compounds}")
             }
             ConfigV5::MedianNoiseIntensity(median_noise_intensity) => {
-                format!("--MedianNoiseIntensity={}", median_noise_intensity)
+                write!(f, "--MedianNoiseIntensity={median_noise_intensity}")
             }
             ConfigV5::MS1AbsoluteIntensityError(ms1_absolute_intensity_error) => {
-                format!("--ms1.absoluteIntensityError={}", ms1_absolute_intensity_error)
+                write!(f, "--ms1.absoluteIntensityError={ms1_absolute_intensity_error}")
             }
             ConfigV5::MS1MinimalIntensityToConsider(ms1_minimal_intensity_to_consider) => {
-                format!("--ms1.minimalIntensityToConsider={}", ms1_minimal_intensity_to_consider)
+                write!(f, "--ms1.minimalIntensityToConsider={ms1_minimal_intensity_to_consider}")
             }
             ConfigV5::MS1RelativeIntensityError(ms1_relative_intensity_error) => {
-                format!("--ms1.relativeIntensityError={}", ms1_relative_intensity_error)
+                write!(f, "--ms1.relativeIntensityError={ms1_relative_intensity_error}")
             }
             ConfigV5::NoiseThresholdSettingsIntensityThreshold(
                 noise_threshold_settings_intensity_threshold,
             ) => {
-                format!(
-                    "--NoiseThresholdSettings.intensityThreshold={}",
-                    noise_threshold_settings_intensity_threshold
+                write!(
+                    f,
+                    "--NoiseThresholdSettings.intensityThreshold={noise_threshold_settings_intensity_threshold}"
                 )
             }
             ConfigV5::NoiseThresholdSettingsMaximalNumberOfPeaks(
                 noise_threshold_settings_maximal_number_of_peaks,
             ) => {
-                format!(
-                    "--NoiseThresholdSettings.maximalNumberOfPeaks={}",
-                    noise_threshold_settings_maximal_number_of_peaks
+                write!(
+                    f,
+                    "--NoiseThresholdSettings.maximalNumberOfPeaks={noise_threshold_settings_maximal_number_of_peaks}"
                 )
             }
             ConfigV5::NumberOfCandidates(number_of_candidates) => {
-                format!("--NumberOfCandidates={}", number_of_candidates)
+                write!(f, "--NumberOfCandidates={number_of_candidates}")
             }
             ConfigV5::ZodiacClusterCompounds(zodiac_cluster_compounds) => {
-                format!("--ZodiacClusterCompounds={}", zodiac_cluster_compounds)
+                write!(f, "--ZodiacClusterCompounds={zodiac_cluster_compounds}")
             }
             ConfigV5::ZodiacEdgeFilterThresholdsMinLocalCandidates(
                 zodiac_edge_filter_thresholds_min_local_candidates,
             ) => {
-                format!(
-                    "--ZodiacEdgeFilterThresholds.minLocalCandidates={}",
-                    zodiac_edge_filter_thresholds_min_local_candidates
+                write!(
+                    f,
+                    "--ZodiacEdgeFilterThresholds.minLocalCandidates={zodiac_edge_filter_thresholds_min_local_candidates}"
                 )
             }
             ConfigV5::ZodiacEdgeFilterThresholdsMinLocalConnections(
                 zodiac_edge_filter_thresholds_min_local_connections,
             ) => {
-                format!(
-                    "--ZodiacEdgeFilterThresholds.minLocalConnections={}",
-                    zodiac_edge_filter_thresholds_min_local_connections
+                write!(
+                    f,
+                    "--ZodiacEdgeFilterThresholds.minLocalConnections={zodiac_edge_filter_thresholds_min_local_connections}"
                 )
             }
             ConfigV5::ZodiacEdgeFilterThresholdsThresholdFilter(
                 zodiac_edge_filter_thresholds_threshold_filter,
             ) => {
-                format!(
-                    "--ZodiacEdgeFilterThresholds.thresholdFilter={}",
-                    zodiac_edge_filter_thresholds_threshold_filter
+                write!(
+                    f,
+                    "--ZodiacEdgeFilterThresholds.thresholdFilter={zodiac_edge_filter_thresholds_threshold_filter}"
                 )
             }
             ConfigV5::ZodiacEpochsBurnInPeriod(zodiac_epochs_burn_in_period) => {
-                format!("--ZodiacEpochs.burnInPeriod={}", zodiac_epochs_burn_in_period)
+                write!(f, "--ZodiacEpochs.burnInPeriod={zodiac_epochs_burn_in_period}")
             }
             ConfigV5::ZodiacEpochsIterations(zodiac_epochs_iterations) => {
-                format!("--ZodiacEpochs.iterations={}", zodiac_epochs_iterations)
+                write!(f, "--ZodiacEpochs.iterations={zodiac_epochs_iterations}")
             }
             ConfigV5::ZodiacEpochsNumberOfMarkovChains(zodiac_epochs_number_of_markov_chains) => {
-                format!(
-                    "--ZodiacEpochs.numberOfMarkovChains={}",
-                    zodiac_epochs_number_of_markov_chains
+                write!(
+                    f,
+                    "--ZodiacEpochs.numberOfMarkovChains={zodiac_epochs_number_of_markov_chains}"
                 )
             }
             ConfigV5::ZodiacLibraryScoringLambda(zodiac_library_scoring_lambda) => {
-                format!("--ZodiacLibraryScoring.lambda={}", zodiac_library_scoring_lambda)
+                write!(f, "--ZodiacLibraryScoring.lambda={zodiac_library_scoring_lambda}")
             }
             ConfigV5::ZodiacLibraryScoringMinCosine(zodiac_library_scoring_min_cosine) => {
-                format!("--ZodiacLibraryScoring.minCosine={}", zodiac_library_scoring_min_cosine)
+                write!(f, "--ZodiacLibraryScoring.minCosine={zodiac_library_scoring_min_cosine}")
             }
             ConfigV5::ZodiacNumberOfConsideredCandidatesAt300Mz(
                 zodiac_number_of_considered_candidates_at_300_mz,
             ) => {
-                format!(
-                    "--ZodiacNumberOfConsideredCandidatesAt300Mz={}",
-                    zodiac_number_of_considered_candidates_at_300_mz
+                write!(
+                    f,
+                    "--ZodiacNumberOfConsideredCandidatesAt300Mz={zodiac_number_of_considered_candidates_at_300_mz}"
                 )
             }
             ConfigV5::ZodiacNumberOfConsideredCandidatesAt800Mz(
                 zodiac_number_of_considered_candidates_at_800_mz,
             ) => {
-                format!(
-                    "--ZodiacNumberOfConsideredCandidatesAt800Mz={}",
-                    zodiac_number_of_considered_candidates_at_800_mz
+                write!(
+                    f,
+                    "--ZodiacNumberOfConsideredCandidatesAt800Mz={zodiac_number_of_considered_candidates_at_800_mz}"
                 )
             }
             ConfigV5::ZodiacRatioOfConsideredCandidatesPerIonization(
                 zodiac_ratio_of_considered_candidates_per_ionization,
             ) => {
-                format!(
-                    "--ZodiacRatioOfConsideredCandidatesPerIonization={}",
-                    zodiac_ratio_of_considered_candidates_per_ionization
+                write!(
+                    f,
+                    "--ZodiacRatioOfConsideredCandidatesPerIonization={zodiac_ratio_of_considered_candidates_per_ionization}"
                 )
             }
             ConfigV5::ZodiacRunInTwoSteps(zodiac_run_in_two_steps) => {
-                format!("--ZodiacRunInTwoSteps={}", zodiac_run_in_two_steps)
+                write!(f, "--ZodiacRunInTwoSteps={zodiac_run_in_two_steps}")
             }
             ConfigV5::MS1MassDeviationAllowedMassDeviation(
                 ms1_mass_deviation_allowed_mass_deviation,
             ) => {
-                format!(
-                    "--MS1MassDeviation.allowedMassDeviation={}",
-                    ms1_mass_deviation_allowed_mass_deviation
+                write!(
+                    f,
+                    "--MS1MassDeviation.allowedMassDeviation={ms1_mass_deviation_allowed_mass_deviation}"
                 )
             }
             ConfigV5::MS1MassDeviationMassDifferenceDeviation(
                 ms1_mass_deviation_mass_difference_deviation,
             ) => {
-                format!(
-                    "--MS1MassDeviation.massDifferenceDeviation={}",
-                    ms1_mass_deviation_mass_difference_deviation
+                write!(
+                    f,
+                    "--MS1MassDeviation.massDifferenceDeviation={ms1_mass_deviation_mass_difference_deviation}"
                 )
             }
             ConfigV5::MS1MassDeviationStandardMassDeviation(
                 ms1_mass_deviation_standard_mass_deviation,
             ) => {
-                format!(
-                    "--MS1MassDeviation.standardMassDeviation={}",
-                    ms1_mass_deviation_standard_mass_deviation
+                write!(
+                    f,
+                    "--MS1MassDeviation.standardMassDeviation={ms1_mass_deviation_standard_mass_deviation}"
                 )
             }
             ConfigV5::MS2MassDeviationAllowedMassDeviation(
                 ms2_mass_deviation_allowed_mass_deviation,
             ) => {
-                format!(
-                    "--MS2MassDeviation.allowedMassDeviation={}",
-                    ms2_mass_deviation_allowed_mass_deviation
+                write!(
+                    f,
+                    "--MS2MassDeviation.allowedMassDeviation={ms2_mass_deviation_allowed_mass_deviation}"
                 )
             }
             ConfigV5::MS2MassDeviationStandardMassDeviation(
                 ms2_mass_deviation_standard_mass_deviation,
             ) => {
-                format!(
-                    "--MS2MassDeviation.standardMassDeviation={}",
-                    ms2_mass_deviation_standard_mass_deviation
+                write!(
+                    f,
+                    "--MS2MassDeviation.standardMassDeviation={ms2_mass_deviation_standard_mass_deviation}"
                 )
             }
             ConfigV5::FormulaSettingsDetectable(formula_settings_detectable) => {
-                format!("--FormulaSettings.detectable={}", formula_settings_detectable)
+                write!(f, "--FormulaSettings.detectable={formula_settings_detectable}")
             }
             ConfigV5::FormulaSettingsEnforced(formula_settings_enforced) => {
-                format!("--FormulaSettings.enforced={}", formula_settings_enforced)
+                write!(f, "--FormulaSettings.enforced={formula_settings_enforced}")
             }
             ConfigV5::FormulaSettingsFallback(formula_settings_fallback) => {
-                format!("--FormulaSettings.fallback={}", formula_settings_fallback)
+                write!(f, "--FormulaSettings.fallback={formula_settings_fallback}")
             }
             ConfigV5::ForbidRecalibration(forbid_recalibration) => {
-                format!("--ForbidRecalibration={}", forbid_recalibration)
+                write!(f, "--ForbidRecalibration={forbid_recalibration}")
             }
             ConfigV5::UseHeuristicMZToUseHeuristic(use_heuristic_mz_to_use_heuristic) => {
-                format!("--UseHeuristic.mzToUseHeuristic={}", use_heuristic_mz_to_use_heuristic)
+                write!(f, "--UseHeuristic.mzToUseHeuristic={use_heuristic_mz_to_use_heuristic}")
             }
             ConfigV5::UseHeuristicMZToUseHeuristicOnly(use_heuristic_mz_to_use_heuristic_only) => {
-                format!(
-                    "--UseHeuristic.mzToUseHeuristicOnly={}",
-                    use_heuristic_mz_to_use_heuristic_only
+                write!(
+                    f,
+                    "--UseHeuristic.mzToUseHeuristicOnly={use_heuristic_mz_to_use_heuristic_only}"
                 )
             }
             ConfigV5::AdductSettingsDetectable(adduct_settings_detectable) => {
-                format!("--AdductSettings.detectable={}", adduct_settings_detectable)
+                write!(f, "--AdductSettings.detectable={adduct_settings_detectable}")
             }
             ConfigV5::AdductSettingsFallback(adduct_settings_fallback) => {
-                format!("--AdductSettings.fallback={}", adduct_settings_fallback)
+                write!(f, "--AdductSettings.fallback={adduct_settings_fallback}")
             }
             ConfigV5::AlgorithmProfile(algorithm_profile) => {
-                format!("--AlgorithmProfile={}", algorithm_profile)
+                write!(f, "--AlgorithmProfile={algorithm_profile}")
             }
             ConfigV5::CompoundQuality(compound_quality) => {
-                format!("--CompoundQuality={}", compound_quality)
+                write!(f, "--CompoundQuality={compound_quality}")
             }
             ConfigV5::AdductSettingsEnforced(adduct_settings_enforced) => {
-                format!("--AdductSettings.enforced={}", adduct_settings_enforced)
+                write!(f, "--AdductSettings.enforced={adduct_settings_enforced}")
             }
             ConfigV5::CandidateFormulas(candidate_formulas) => {
-                format!("--CandidateFormulas={}", candidate_formulas)
+                write!(f, "--CandidateFormulas={candidate_formulas}")
             }
             ConfigV5::FormulaResultRankingScore(formula_result_ranking_score) => {
-                format!("--FormulaResultRankingScore={}", formula_result_ranking_score)
+                write!(f, "--FormulaResultRankingScore={formula_result_ranking_score}")
             }
             ConfigV5::IsotopeMS2Settings(isotope_ms2_settings) => {
-                format!("--IsotopeMs2Settings={}", isotope_ms2_settings)
+                write!(f, "--IsotopeMs2Settings={isotope_ms2_settings}")
             }
             ConfigV5::IsotopeSettingsMultiplier(isotope_settings_multiplier) => {
-                format!("--IsotopeSettings.multiplier={}", isotope_settings_multiplier)
+                write!(f, "--IsotopeSettings.multiplier={isotope_settings_multiplier}")
             }
             ConfigV5::NoiseThresholdSettingsAbsoluteThreshold(
                 noise_threshold_settings_absolute_threshold,
             ) => {
-                format!(
-                    "--NoiseThresholdSettings.absoluteThreshold={}",
-                    noise_threshold_settings_absolute_threshold
+                write!(
+                    f,
+                    "--NoiseThresholdSettings.absoluteThreshold={noise_threshold_settings_absolute_threshold}"
                 )
             }
             ConfigV5::NoiseThresholdSettingsBasePeak(noise_threshold_settings_base_peak) => {
-                format!("--NoiseThresholdSettings.basePeak={}", noise_threshold_settings_base_peak)
+                write!(f, "--NoiseThresholdSettings.basePeak={noise_threshold_settings_base_peak}")
             }
             ConfigV5::StructurePredictors(structure_predictors) => {
-                format!("--StructurePredictors={}", structure_predictors)
+                write!(f, "--StructurePredictors={structure_predictors}")
             }
             ConfigV5::PossibleAdductSwitches(possible_adduct_switches) => {
-                format!("--PossibleAdductSwitches={}", possible_adduct_switches)
+                write!(f, "--PossibleAdductSwitches={possible_adduct_switches}")
             }
         }
     }

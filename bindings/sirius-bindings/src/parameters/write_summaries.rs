@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
 /// The possible write summaries settings
@@ -13,12 +15,12 @@ pub enum WriteSummariesV5 {
     Help,
 }
 
-impl ToString for WriteSummariesV5 {
-    fn to_string(&self) -> String {
+impl Display for WriteSummariesV5 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            WriteSummariesV5::Enabled => Self::parameter_set_name().to_string(),
-            WriteSummariesV5::Help => "--help".to_string(),
-            WriteSummariesV5::Version => "--version".to_string(),
+            WriteSummariesV5::Enabled => write!(f, "{}", Self::parameter_set_name()),
+            WriteSummariesV5::Help => write!(f, "--help"),
+            WriteSummariesV5::Version => write!(f, "--version"),
         }
     }
 }

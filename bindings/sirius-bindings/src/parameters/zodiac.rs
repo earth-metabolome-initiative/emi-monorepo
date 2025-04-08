@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
 /// The possible zodiac settings
@@ -13,12 +15,12 @@ pub enum ZodiacV5 {
     Help,
 }
 
-impl ToString for ZodiacV5 {
-    fn to_string(&self) -> String {
+impl Display for ZodiacV5 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ZodiacV5::Enabled => Self::parameter_set_name().to_string(),
-            ZodiacV5::Help => "--help".to_string(),
-            ZodiacV5::Version => "--version".to_string(),
+            ZodiacV5::Enabled => write!(f, "{}", Self::parameter_set_name()),
+            ZodiacV5::Help => write!(f, "--help"),
+            ZodiacV5::Version => write!(f, "--version"),
         }
     }
 }

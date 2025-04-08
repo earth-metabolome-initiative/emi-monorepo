@@ -22,3 +22,6 @@ num_cpus = "1.16.0"
 # we only require the arbitrary derivable crate when fuzz is enabled
 [features]
 fuzz = ["dep:arbitrary"]
+
+[lints]
+workspace = true

@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::{prelude::*, traits::Enablable};
 
 /// Struct providing the configuration for Sirius.
@@ -51,11 +53,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                concat!(
-                    "The core parameter {:?} cannot be added to the configuration. ",
-                    "There is already an existing parameter which is {:?}. ",
-                    "You cannot add it twice."
-                ),
+                "The core parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
                 parameter, existing_parameter
             ))
         } else {
@@ -78,11 +76,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                concat!(
-                    "The config parameter {:?} cannot be added to the configuration. ",
-                    "There is already an existing parameter which is {:?}. ",
-                    "You cannot add it twice."
-                ),
+                "The config parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
                 parameter, existing_parameter
             ))
         } else {
@@ -111,11 +105,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                concat!(
-                    "The formula parameter {:?} cannot be added to the configuration. ",
-                    "There is already an existing parameter which is {:?}. ",
-                    "You cannot add it twice."
-                ),
+                "The formula parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
                 parameter, existing_parameter
             ))
         } else {
@@ -144,11 +134,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                concat!(
-                    "The zodiac parameter {:?} cannot be added to the configuration. ",
-                    "There is already an existing parameter which is {:?}. ",
-                    "You cannot add it twice."
-                ),
+                "The zodiac parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
                 parameter, existing_parameter
             ))
         } else {
@@ -177,11 +163,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                concat!(
-                    "The fingerprint parameter {:?} cannot be added to the configuration. ",
-                    "There is already an existing parameter which is {:?}. ",
-                    "You cannot add it twice."
-                ),
+                "The fingerprint parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
                 parameter, existing_parameter
             ))
         } else {
@@ -210,11 +192,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                concat!(
-                    "The structure parameter {:?} cannot be added to the configuration. ",
-                    "There is already an existing parameter which is {:?}. ",
-                    "You cannot add it twice."
-                ),
+                "The structure parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
                 parameter, existing_parameter
             ))
         } else {
@@ -243,11 +221,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                concat!(
-                    "The canopus parameter {:?} cannot be added to the configuration. ",
-                    "There is already an existing parameter which is {:?}. ",
-                    "You cannot add it twice."
-                ),
+                "The canopus parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
                 parameter, existing_parameter
             ))
         } else {
@@ -279,11 +253,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                concat!(
-                    "The write_summaries parameter {:?} cannot be added to the configuration. ",
-                    "There is already an existing parameter which is {:?}. ",
-                    "You cannot add it twice."
-                ),
+                "The write_summaries parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
                 parameter, existing_parameter
             ))
         } else {
@@ -301,21 +271,21 @@ impl<V: Version> SiriusConfig<V> {
     pub fn args(&self) -> Vec<String> {
         self.core_parameters
             .iter()
-            .map(|p| p.to_string())
-            .chain(self.config_parameters.iter().map(|p| p.to_string()))
-            .chain(self.formula_parameters.iter().map(|p| p.to_string()))
-            .chain(self.zodiac_parameters.iter().map(|p| p.to_string()))
-            .chain(self.fingerprint_parameters.iter().map(|p| p.to_string()))
-            .chain(self.structure_parameters.iter().map(|p| p.to_string()))
-            .chain(self.canopus_parameters.iter().map(|p| p.to_string()))
-            .chain(self.write_summaries_parameters.iter().map(|p| p.to_string()))
+            .map(ToString::to_string)
+            .chain(self.config_parameters.iter().map(ToString::to_string))
+            .chain(self.formula_parameters.iter().map(ToString::to_string))
+            .chain(self.zodiac_parameters.iter().map(ToString::to_string))
+            .chain(self.fingerprint_parameters.iter().map(ToString::to_string))
+            .chain(self.structure_parameters.iter().map(ToString::to_string))
+            .chain(self.canopus_parameters.iter().map(ToString::to_string))
+            .chain(self.write_summaries_parameters.iter().map(ToString::to_string))
             .collect::<Vec<String>>()
     }
 }
 
-impl<V: Version> ToString for SiriusConfig<V> {
-    fn to_string(&self) -> String {
-        self.args().join(" ")
+impl<V: Version> Display for SiriusConfig<V> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.args().iter().try_for_each(|arg| Display::fmt(arg, f))
     }
 }
 

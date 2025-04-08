@@ -38,7 +38,7 @@ impl<'a> TryFrom<&'a str> for Instruments {
             "qtof" => Ok(Instruments::Qtof),
             "orbitrap" => Ok(Instruments::Orbitrap),
             "fticr" => Ok(Instruments::Fticr),
-            _ => Err(format!("Unknown instrument: {}", s)),
+            _ => Err(format!("Unknown instrument: {s}")),
         }
     }
 }

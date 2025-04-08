@@ -23,7 +23,7 @@ impl<'a> TryFrom<&'a str> for IsotopeMS2Settings {
     fn try_from(s: &'a str) -> Result<Self, Self::Error> {
         match s {
             "IGNORE" => Ok(IsotopeMS2Settings::Ignore),
-            _ => Err(format!("Unknown adduct settings enforced: {}", s)),
+            _ => Err(format!("Unknown adduct settings enforced: {s}")),
         }
     }
 }

@@ -54,18 +54,18 @@ impl<V: Version> Sirius<V> {
         let sirius_path = Path::new(&sirius_path);
 
         if !sirius_path.exists() {
-            return Err(format!("The sirius path {:?} does not exist", sirius_path));
+            return Err(format!("The sirius path {sirius_path:?} does not exist"));
         }
 
         if !sirius_path.is_file() {
-            return Err(format!("The sirius path {:?} is not a file", sirius_path));
+            return Err(format!("The sirius path {sirius_path:?} is not a file"));
         }
 
         // We also need to check whether the file is executable, but this will be
         // different depending on the operating system. Fortunately, the
         // complexity of this is hidden behind the is_executable crate.
         if !sirius_path.is_executable() {
-            return Err(format!("The sirius executable at {:?} is not executable", sirius_path));
+            return Err(format!("The sirius executable at {sirius_path:?} is not executable"));
         }
 
         // Fetch the SIRIUS_USERNAME and the SIRIUS_PASSWORD from environment variables
@@ -123,7 +123,7 @@ impl<V: Version> Sirius<V> {
         let login_command_status = binding
             .args(["login", "--user-env", "SIRIUS_USERNAME", "--password-env", "SIRIUS_PASSWORD"])
             .status()
-            .map_err(|e| format!("Failed to execute Sirius login command: {}", e))?;
+            .map_err(|e| format!("Failed to execute Sirius login command: {e}"))?;
 
         // We make sure to print the login command status for debugging
 
@@ -133,29 +133,24 @@ impl<V: Version> Sirius<V> {
 
         // We now check that the input file exists and is a file and not a directory
         if !input_file_path.exists() {
-            return Err(format!("The input file {:?} does not exist", input_file_path));
+            return Err(format!("The input file {input_file_path:?} does not exist"));
         }
 
         if !input_file_path.is_file() {
-            return Err(format!("The input file {:?} is not a file", input_file_path));
+            return Err(format!("The input file {input_file_path:?} is not a file"));
         }
 
         // We check that the extension of the input file is MGF, in either upper or
         // lower case
         let input_file_extension = input_file_path.extension().ok_or_else(|| {
             format!(
-                concat!(
-                    "The input file {:?} does not have an extension. ",
-                    "We expected the input file to have the extension .mgf"
-                ),
-                input_file_path
+                "The input file {input_file_path:?} does not have an extension. We expected the input file to have the extension .mgf"
             )
         })?;
 
         if input_file_extension.to_string_lossy().to_lowercase() != "mgf" {
             return Err(format!(
-                "The input file {:?} does not have the extension .mgf",
-                input_file_path
+                "The input file {input_file_path:?} does not have the extension .mgf",
             ));
         }
 

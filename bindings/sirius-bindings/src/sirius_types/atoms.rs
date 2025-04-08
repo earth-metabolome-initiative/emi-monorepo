@@ -490,7 +490,7 @@ impl<'a> TryFrom<&'a str> for Atoms {
             "Lv" => Ok(Atoms::Lv),
             "Ts" => Ok(Atoms::Ts),
             "Og" => Ok(Atoms::Og),
-            _ => Err(format!("Unknown atom: {}", s)),
+            _ => Err(format!("Unknown atom: {s}")),
         }
     }
 }
@@ -512,18 +512,18 @@ impl Display for AtomVector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut atoms = self.0.iter();
         if let Some(atom) = atoms.next() {
-            write!(f, "{}", atom)?;
+            write!(f, "{atom}",)?;
             for atom in atoms {
-                write!(f, ",{}", atom)?;
+                write!(f, ",{atom}",)?;
             }
         }
         Ok(())
     }
 }
 
-/// Implement the `new` method for AtomVector
+/// Implement the `new` method for `AtomVector`
 impl From<Vec<Atoms>> for AtomVector {
-    /// Create a new AtomVector from a vector of Atoms
+    /// Create a new `AtomVector` from a vector of Atoms
     fn from(atoms: Vec<Atoms>) -> Self {
         AtomVector(atoms)
     }
@@ -538,8 +538,7 @@ impl<'a> TryFrom<&'a str> for AtomVector {
             .map(|atom| {
                 Atoms::try_from(atom).map_err(|e| {
                     format!(
-                        "Cannot parse atom: {} ({}). Maybe forgot to put a comma between atoms ?",
-                        atom, e
+                        "Cannot parse atom: {atom} ({e}). Maybe forgot to put a comma between atoms ?"
                     )
                 })
             })

@@ -58,7 +58,7 @@ impl<'a> TryFrom<&'a str> for CompoundQuality {
             "Chimeric" => Ok(CompoundQuality::Chimeric),
             "NotMonoisotopicPeak" => Ok(CompoundQuality::NotMonoisotopicPeak),
             "PoorlyExplained" => Ok(CompoundQuality::PoorlyExplained),
-            _ => Err(format!("Unknown compound quality: {}", s)),
+            _ => Err(format!("Unknown compound quality: {s}")),
         }
     }
 }

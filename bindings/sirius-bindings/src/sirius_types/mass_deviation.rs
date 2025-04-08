@@ -95,8 +95,8 @@ impl MassDeviation {
 impl Display for MassDeviation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            MassDeviation::Ppm(value) => write!(f, "{} ppm", value),
-            MassDeviation::Da(value) => write!(f, "{} Da", value),
+            MassDeviation::Ppm(value) => write!(f, "{value} ppm"),
+            MassDeviation::Da(value) => write!(f, "{value} Da"),
         }
     }
 }
@@ -112,15 +112,15 @@ impl<'a> TryFrom<&'a str> for MassDeviation {
         match unit {
             "ppm" => {
                 Ok(MassDeviation::Ppm(
-                    value.parse().map_err(|e| format!("Cannot parse value: {}", e))?,
+                    value.parse().map_err(|e| format!("Cannot parse value: {e}"))?,
                 ))
             }
             "Da" => {
                 Ok(MassDeviation::Da(
-                    value.parse().map_err(|e| format!("Cannot parse value: {}", e))?,
+                    value.parse().map_err(|e| format!("Cannot parse value: {e}"))?,
                 ))
             }
-            _ => Err(format!("Unknown unit: {}", unit)),
+            _ => Err(format!("Unknown unit: {unit}")),
         }
     }
 }

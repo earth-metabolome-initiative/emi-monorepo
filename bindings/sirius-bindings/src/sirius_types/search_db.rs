@@ -128,7 +128,7 @@ impl<'a> TryFrom<&'a str> for SearchDB {
             "YMDB" => Ok(SearchDB::Ymdb),
             "YMDBMINE" => Ok(SearchDB::Ymdbmine),
             "ZINCBIO" => Ok(SearchDB::Zincbio),
-            _ => Err(format!("Unknown formula search db: {}", s)),
+            _ => Err(format!("Unknown formula search db: {s}")),
         }
     }
 }
@@ -150,9 +150,9 @@ impl Display for DBVector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut atoms = self.0.iter();
         if let Some(atom) = atoms.next() {
-            write!(f, "{}", atom)?;
+            write!(f, "{atom}")?;
             for atom in atoms {
-                write!(f, ",{}", atom)?;
+                write!(f, ",{atom}")?;
             }
         }
         Ok(())
@@ -174,8 +174,7 @@ impl<'a> TryFrom<&'a str> for DBVector {
             .map(|db| {
                 SearchDB::try_from(db).map_err(|e| {
                     format!(
-                        "Cannot parse database: {} ({}). Maybe forgot to put a comma between databases ?",
-                        db, e
+                        "Cannot parse database: {db} ({e}). Maybe forgot to put a comma between databases?",
                     )
                 })
             })

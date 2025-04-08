@@ -23,7 +23,7 @@ impl<'a> TryFrom<&'a str> for BasePeak {
     fn try_from(s: &'a str) -> Result<Self, Self::Error> {
         match s {
             "NOT_PRECURSOR" => Ok(BasePeak::NotPrecursor),
-            _ => Err(format!("Unknown base peak: {}", s)),
+            _ => Err(format!("Unknown base peak: {s}")),
         }
     }
 }

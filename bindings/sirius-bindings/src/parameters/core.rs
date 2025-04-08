@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::traits::IntoDefault;
 
 /// The possible core settings
@@ -16,17 +18,17 @@ pub enum CoreV5 {
     Recompute(bool),
 }
 
-impl ToString for CoreV5 {
-    fn to_string(&self) -> String {
+impl Display for CoreV5 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             CoreV5::MaximalMz(maximal_mz) => {
-                format!("--maxmz={}", maximal_mz)
+                write!(f, "--maxmz={maximal_mz}",)
             }
             CoreV5::NCPUs(n_cores) => {
-                format!("--cores={}", n_cores)
+                write!(f, "--cores={n_cores}",)
             }
             CoreV5::Recompute(recompute) => {
-                format!("--recompute={}", recompute)
+                write!(f, "--recompute={recompute}",)
             }
         }
     }
