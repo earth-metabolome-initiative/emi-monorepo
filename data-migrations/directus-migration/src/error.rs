@@ -15,11 +15,11 @@ use web_common_traits::database::InsertError;
 /// Enumeration of errors that may occur during directus migration
 pub enum Error {
     /// Error when user doesn't have an email
-    MissingEmail(uuid::Uuid),
+    MissingEmail(rosetta_uuid::Uuid),
     /// Missing first name
-    MissingFirstName(uuid::Uuid),
+    MissingFirstName(rosetta_uuid::Uuid),
     /// Missing last name
-    MissingLastName(uuid::Uuid),
+    MissingLastName(rosetta_uuid::Uuid),
     /// Missing instrument name
     MissingInstrumentTypeName(Box<DirectusInstrumentType>),
     /// A brand is missing a user
