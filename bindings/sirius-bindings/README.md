@@ -3,7 +3,7 @@
 [![Crates.io](https://img.shields.io/crates/v/sirius-bindings.svg)](https://crates.io/crates/sirius-bindings)
 [![Documentation](https://docs.rs/sirius-bindings/badge.svg)](https://docs.rs/sirius-bindings)
 
-SIRIUS is a java-based software framework for the analysis of LC-MS/MS data of metabolites and other "small molecules of biological interest". SIRIUS integrates a collection of tools, including CSI:FingerID (with [COSMIC](https://bio.informatik.uni-jena.de/software/cosmic/), [ZODIAC](https://bio.informatik.uni-jena.de/software/zodiac/) and [CANOPUS](https://bio.informatik.uni-jena.de/software/canopus/). In particular, both the graphical user interface and the command line version of SIRIUS seamlessly integrate the CSI:FingerID and CANOPUS web services.
+SIRIUS is a computational mass spectrometry Java-based software framework for the analysis of LC-MS/MS metabolomics data sets and the annotation of metabolites and other small molecules of biological interest. SIRIUS integrates a collection of tools, including CSI:FingerID (with [COSMIC](https://bio.informatik.uni-jena.de/software/cosmic/), [ZODIAC](https://bio.informatik.uni-jena.de/software/zodiac/) and [CANOPUS](https://bio.informatik.uni-jena.de/software/canopus/).
 
 For further reading we recommend you to refer to the official [Sirius website](https://bio.informatik.uni-jena.de/software/sirius/). 
 
@@ -55,7 +55,7 @@ let sirius = SiriusBuilder::<Version5>::default()
     .build();
 let input_file_path = Path::new("tests/data/input_sirius.mgf");
 let output_file_path = Path::new("tests/data/output_sirius_default");
-// Check if the path exists before attempting to remove it
+// In case you need to remove the output directory, uncomment the lines below
 if output_file_path.exists() {
     let _ = std::fs::remove_dir_all(output_file_path);
 }
@@ -149,7 +149,7 @@ let sirius = SiriusBuilder::default()
 
 let input_file_path = Path::new("tests/data/input_sirius.mgf");
 let output_file_path = Path::new("tests/data/output_sirius");
-// Check if the path exists before attempting to remove it
+// In case you need to remove the output directory, uncomment the lines below
 if output_file_path.exists() {
     let _ = std::fs::remove_dir_all(output_file_path);
 }
@@ -175,9 +175,9 @@ let sirius = SiriusBuilder::<Version5>::default()
     .build();
 let input_file_path = Path::new("tests/data/input_sirius.mgf");
 let output_file_path = Path::new("tests/data/output_sirius_default");
-// Check if the path exists before attempting to remove it
+// In case you need to remove the output directory, uncomment the lines below
 if output_file_path.exists() {
-    let _ = std::fs::remove_dir_all(output_file_path);
+   let _ = std::fs::remove_dir_all(output_file_path);
 }
 sirius.run(input_file_path, output_file_path).unwrap();
 ```
