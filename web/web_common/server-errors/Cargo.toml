@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-diesel = {workspace = true, optional = true}
+diesel.workspace = true
 
 [lints]
 workspace = true
 
 [features]
 frontend = []
-backend = ["dep:diesel"]
+backend = []

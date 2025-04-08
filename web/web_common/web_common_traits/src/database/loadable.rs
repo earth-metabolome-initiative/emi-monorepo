@@ -6,7 +6,7 @@ pub trait Loadable: Sized + diesel::associations::HasTable {
     type PrimaryKey;
 
     /// The connection type of the table.
-    type Conn: diesel_async::AsyncConnection;
+    type Conn;
 
     /// Loads the row in a table.
     ///

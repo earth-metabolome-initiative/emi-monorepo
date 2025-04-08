@@ -106,13 +106,28 @@ pub async fn main() {
 
     // Generate the code associated with the database
     let task = Task::new("Generating Code");
+    let users =
+        Table::load(&mut conn, "users", None, DATABASE_NAME).expect("Failed to load `users` table");
+    let projects = Table::load(&mut conn, "projects", None, DATABASE_NAME)
+        .expect("Failed to load `projects` table");
+    let teams =
+        Table::load(&mut conn, "teams", None, DATABASE_NAME).expect("Failed to load `teams` table");
+    let team_members = Table::load(&mut conn, "team_members", None, DATABASE_NAME)
+        .expect("Failed to load `team_members` table");
+    let team_projects = Table::load(&mut conn, "team_projects", None, DATABASE_NAME)
+        .expect("Failed to load `team_projects` table");
     Codegen::default()
-        .users(&users_table)
+        .users(&users)
+        .projects(&projects)
+        .teams(&teams)
+        .team_members(&team_members)
+        .team_projects(&team_projects)
         .set_output_directory(out_dir.as_ref())
         .enable_loadable_trait()
         .enable_deletable_trait()
         .enable_insertable_trait()
         .enable_foreign_trait()
+        .enable_updatable_trait()
         .beautify()
         .generate(&mut conn, DATABASE_NAME, None)
         .unwrap();

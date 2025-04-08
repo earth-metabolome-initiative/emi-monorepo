@@ -551,11 +551,12 @@ table! {
 }
 
 allow_tables_to_appear_in_same_query!(
-    columns,
-    constraint_column_usage,
-    key_column_usage,
     table_constraints,
-    tables
+    key_column_usage,
+    tables,
+    constraint_column_usage,
+    columns,
+    referential_constraints
 );
 allow_tables_to_appear_in_same_query!(check_constraints, table_constraints);
 allow_tables_to_appear_in_same_query!(pg_trigger, pg_class, pg_namespace);
@@ -566,6 +567,5 @@ allow_tables_to_appear_in_same_query!(pg_attribute, pg_type);
 allow_tables_to_appear_in_same_query!(pg_depend, pg_extension);
 allow_tables_to_appear_in_same_query!(columns, pg_attribute, pg_class, pg_index);
 allow_tables_to_appear_in_same_query!(pg_extension, pg_namespace);
-allow_tables_to_appear_in_same_query!(key_column_usage, referential_constraints);
 allow_tables_to_appear_in_same_query!(check_constraints, constraint_column_usage);
 allow_tables_to_appear_in_same_query!(pg_constraint, pg_namespace);

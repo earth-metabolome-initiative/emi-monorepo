@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS sample_taxa (
     sample_id UUID NOT NULL,
     taxon_id INTEGER NOT NULL,
     PRIMARY KEY (sample_id, taxon_id),
-    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(id),
     FOREIGN KEY (sample_id) REFERENCES samples(id) ON DELETE CASCADE,
-    FOREIGN KEY (taxon_id) REFERENCES taxa(id) ON DELETE CASCADE
+    FOREIGN KEY (taxon_id) REFERENCES taxa(id)
 );

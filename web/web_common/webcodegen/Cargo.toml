@@ -20,6 +20,7 @@ snake-case-sanitizer = { path = "../snake-case-sanitizer" }
 common-traits.workspace = true
 inflector.workspace = true
 futures.workspace = true
+server-errors.workspace = true
 
 [dev-dependencies]
 diesel_migrations = "2.2.0"

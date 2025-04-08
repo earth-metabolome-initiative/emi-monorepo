@@ -44,7 +44,11 @@ impl Codegen<'_> {
 
         for table in tables {
             let mut submodule_token_stream = TokenStream::new();
-            for foreign_table in table.foreign_tables(conn)? {
+            for foreign_table in table
+                .foreign_tables(conn)?
+                .into_iter()
+                .chain(table.sibling_tables(conn)?)
+            {
                 // if the foreign table is the same as table we continue
                 if &foreign_table == table {
                     continue;

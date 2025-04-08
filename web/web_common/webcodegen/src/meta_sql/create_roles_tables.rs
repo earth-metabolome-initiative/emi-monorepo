@@ -145,7 +145,7 @@ impl Table {
 
         create_table.push_str("FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,\n");
 
-        create_table.push_str("FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE\n");
+        create_table.push_str("FOREIGN KEY (created_by) REFERENCES users(id)\n");
 
         create_table.push_str(");\n");
 

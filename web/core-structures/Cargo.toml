@@ -12,6 +12,7 @@ diesel-async = {workspace = true, default-features = false}
 web_common_traits.workspace = true
 serde = {workspace = true, optional = true}
 common-traits.workspace = true
+server-errors.workspace = true
 
 [features]
 default = ["serde"]

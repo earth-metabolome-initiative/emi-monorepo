@@ -395,6 +395,70 @@ impl Table {
             .collect::<Vec<Column>>())
     }
 
+    /// Returns the parent keys of the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Returns
+    ///
+    /// The set of foreign key columns that have `ON DELETE CASCADE` constraint.
+    ///
+    /// # Errors
+    ///
+    /// * If the foreign keys cannot be loaded from the database.
+    pub fn parent_keys(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
+        Ok(self
+            .columns(conn)?
+            .into_iter()
+            .filter(|column| column.is_foreign_key_on_delete_cascade(conn))
+            .collect::<Vec<Column>>())
+    }
+
+    /// Returns the parent tables of the table.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - The database connection.
+    /// 
+    /// # Returns
+    /// 
+    /// A vector of tables that are parents to the current table.
+    /// 
+    /// # Errors
+    /// 
+    /// * If the parent tables cannot be loaded from the database.
+    /// 
+    pub fn parent_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
+        let mut tables = Vec::new();
+        for column in self.parent_keys(conn)? {
+            if let Some((foreign_table, _)) = column.foreign_table(conn)? {
+                if !tables.contains(&foreign_table) {
+                    tables.push(foreign_table);
+                }
+            }
+        }
+        Ok(tables)
+    }
+
+    /// Returns whether the table has parent tables.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Returns
+    ///
+    /// A boolean indicating whether the table has parent tables.
+    ///
+    /// # Errors
+    ///
+    /// * If the foreign keys cannot be loaded from the database.
+    pub fn has_parents(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(!self.parent_keys(conn)?.is_empty())
+    }
+
     /// Returns the set of foreign tables of the table.
     ///
     /// # Arguments
@@ -415,6 +479,93 @@ impl Table {
             if let Some((foreign_table, _)) = column.foreign_table(conn)? {
                 if !tables.contains(&foreign_table) {
                     tables.push(foreign_table);
+                }
+            }
+        }
+        Ok(tables)
+    }
+
+    /// Returns the set of children tables of the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Returns
+    ///
+    /// A set of tables that are children to the current table.
+    ///
+    /// # Errors
+    ///
+    /// * If the children tables cannot be loaded from the database.
+    pub fn children_tables(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Table>, diesel::result::Error> {
+        use crate::schema::{key_column_usage, referential_constraints, table_constraints, tables};
+        tables::table
+            .inner_join(
+                table_constraints::table.on(tables::table_catalog
+                    .eq(table_constraints::table_catalog)
+                    .and(tables::table_schema.eq(table_constraints::table_schema))
+                    .and(tables::table_name.eq(table_constraints::table_name))),
+            )
+            .inner_join(
+                referential_constraints::table.on(table_constraints::constraint_catalog
+                    .eq(referential_constraints::constraint_catalog)
+                    .and(
+                        table_constraints::constraint_schema
+                            .eq(referential_constraints::constraint_schema),
+                    )
+                    .and(
+                        table_constraints::constraint_name
+                            .eq(referential_constraints::constraint_name),
+                    )),
+            )
+            .inner_join(
+                key_column_usage::table.on(referential_constraints::unique_constraint_catalog
+                    .eq(key_column_usage::constraint_catalog.nullable())
+                    .and(
+                        referential_constraints::unique_constraint_schema
+                            .eq(key_column_usage::constraint_schema.nullable()),
+                    )
+                    .and(
+                        referential_constraints::unique_constraint_name
+                            .eq(key_column_usage::constraint_name.nullable()),
+                    )),
+            )
+            .filter(
+                key_column_usage::table_catalog
+                    .eq(&self.table_catalog)
+                    .and(key_column_usage::table_schema.eq(&self.table_schema))
+                    .and(key_column_usage::table_name.eq(&self.table_name)),
+            )
+            .select(tables::all_columns)
+            .distinct()
+            .load(conn)
+    }
+
+    /// Returns the set of sibling tables of the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Returns
+    ///
+    /// A set of tables that are siblings to the current table.
+    ///
+    /// # Errors
+    ///
+    /// * If the sibling tables cannot be loaded from the database.
+    pub fn sibling_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
+        let mut tables = Vec::new();
+        for parent_table in self.parent_keys(conn)? {
+            if let Some((foreign_table, _)) = parent_table.foreign_table(conn)? {
+                for child_table in foreign_table.children_tables(conn)? {
+                    if child_table != *self && !tables.contains(&child_table) {
+                        tables.push(child_table);
+                    }
                 }
             }
         }

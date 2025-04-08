@@ -735,8 +735,45 @@ impl Column {
             .filter(key_column_usage::column_name.eq(&self.column_name))
             .select((Table::as_select(), Column::as_select()))
             .first::<(Table, Column)>(conn)
-            .map(Some)
-            .or_else(|e| if e == DieselError::NotFound { Ok(None) } else { Err(e) })
+            .optional()
+    }
+
+    /// Returns whether the column is a foreign key with `ON DELETE CASCADE` constraint.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Errors
+    /// 
+    /// * If an error occurs while querying the database
+    /// 
+    /// # Returns
+    /// 
+    /// A `bool` indicating whether the column is a foreign key with `ON DELETE CASCADE` constraint
+    pub fn is_foreign_key_on_delete_cascade(&self, conn: &mut PgConnection) -> bool {
+        use crate::schema::{key_column_usage, referential_constraints};
+        key_column_usage::table
+            .inner_join(
+                referential_constraints::table.on(key_column_usage::constraint_name
+                    .eq(referential_constraints::constraint_name)
+                    .and(
+                        key_column_usage::constraint_schema
+                            .eq(referential_constraints::constraint_schema),
+                    )
+                    .and(
+                        key_column_usage::constraint_catalog
+                            .eq(referential_constraints::constraint_catalog),
+                    )),
+            )
+            .filter(key_column_usage::column_name.eq(&self.column_name))
+            .filter(key_column_usage::table_name.eq(&self.table_name))
+            .filter(key_column_usage::table_schema.eq(&self.table_schema))
+            .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
+            .filter(referential_constraints::delete_rule.eq("CASCADE"))
+            .select(KeyColumnUsage::as_select())
+            .first::<KeyColumnUsage>(conn)
+            .is_ok()
     }
 
     #[must_use]
@@ -750,5 +787,44 @@ impl Column {
         // together.
         parts.push(Inflector.pluralize(&last_element));
         parts.join("_")
+    }
+
+    #[must_use]
+    /// Returns the getter method name for the column.
+    /// 
+    /// # Errors
+    /// 
+    /// * If an error occurs while sanitizing the column name
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing the getter method name if the operation was successful,
+    /// 
+    pub fn getter_name(&self) -> Result<String, WebCodeGenError> {
+        let mut snake_case_name = self.snake_case_name()?;
+        if let Some(stripped_snake_case_name) = snake_case_name.strip_suffix("_id") {
+            snake_case_name = stripped_snake_case_name.to_owned();
+        };
+        Ok(snake_case_name)
+    }
+
+    #[must_use]
+    /// Returns the getter method ident for the column.
+    /// 
+    /// # Errors
+    /// 
+    /// * If an error occurs while sanitizing the column name
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing the getter method ident if the operation was successful,
+    /// 
+    pub fn getter_ident(&self) -> Result<Ident, WebCodeGenError> {
+        let getter_name = self.getter_name()?;
+        if RESERVED_RUST_WORDS.contains(&getter_name.as_str()) {
+            Ok(Ident::new_raw(&getter_name, proc_macro2::Span::call_site()))
+        } else {
+            Ok(Ident::new(&getter_name, proc_macro2::Span::call_site()))
+        }
     }
 }

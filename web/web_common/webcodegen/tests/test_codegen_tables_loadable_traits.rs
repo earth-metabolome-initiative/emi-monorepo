@@ -23,5 +23,5 @@ async fn test_codegen_tables_loadable_traits() {
 
     codegen_test("codegen_tables_loadable_traits");
 
-    // std::fs::remove_dir_all("tests/codegen_tables_loadable_traits").unwrap();
+    std::fs::remove_dir_all("tests/codegen_tables_loadable_traits").unwrap();
 }
