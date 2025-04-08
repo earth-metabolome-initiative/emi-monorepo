@@ -1,15 +1,15 @@
 //! A builder is a type of struct that will collect configurations and once
-//! build, prodiuces a complete struct.
+//! build, produces a complete struct.
 use crate::{prelude::*, sirius_config::SiriusConfig, traits::IntoDefault};
 
-/// The SiriusBuilder is used to set the parameters of the SiriusConfig.
+/// The `SiriusBuilder` is used to set the parameters of the `SiriusConfig`.
 #[derive(Default)]
 pub struct SiriusBuilder<V: Version> {
     config: SiriusConfig<V>,
 }
 
 /// The functions in this block are used to set the parameters of the
-/// SiriusBuilder. Most of the functions come from the `sirius config` command.
+/// `SiriusBuilder`. Most of the functions come from the `sirius config` command.
 /// The comments in the functions are usually a copy-paste from the `sirius
 /// config --help` command.
 impl SiriusBuilder<Version5> {
@@ -32,9 +32,17 @@ impl SiriusBuilder<Version5> {
     /// assert!(SiriusBuilder::default().maximal_mz(std::f64::NAN).is_err());
     /// assert!(SiriusBuilder::default().maximal_mz(std::f64::INFINITY).is_err());
     /// ```
+    ///
+    /// # Errors
+    /// Returns an error if the maximal m/z ratio is negative, zero, NaN, or
+    /// infinite, or if the parameter has already been set in the
+    /// configuration.
     pub fn maximal_mz(mut self, maximal_mz: f64) -> Result<Self, String> {
         if maximal_mz < 0.0 {
-            return Err(format!("Maximal m/z ratio must be positive. You provided {}.", maximal_mz));
+            return Err(format!(
+                "Maximal m/z ratio must be positive. You provided {maximal_mz}.",
+                
+            ));
         }
         if maximal_mz == 0.0 {
             return Err("Maximal m/z ratio cannot be 0".to_string());
@@ -58,6 +66,10 @@ impl SiriusBuilder<Version5> {
     /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::default().max_cpus(4).unwrap().build();
     /// ```
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn max_cpus(mut self, n_cores: usize) -> Result<Self, String> {
         self.config.add_core_parameter(CoreV5::NCPUs(n_cores))?;
         Ok(self)
@@ -70,10 +82,15 @@ impl SiriusBuilder<Version5> {
     ///
     /// # Arguments
     /// * `recompute` - Whether to recompute the whole task or not
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn recompute_all(mut self, recompute: bool) -> Result<Self, String> {
         self.config.add_core_parameter(CoreV5::Recompute(recompute))?;
         Ok(self)
     }
+
     /// Activate the use of the isotope settings filter.
     /// # Arguments
     /// * `isotope_settings_filter` - Whether to enable the isotope settings
@@ -84,6 +101,10 @@ impl SiriusBuilder<Version5> {
     /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::default().isotope_settings_filter(true).unwrap().build();
     /// ```
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn isotope_settings_filter(
         mut self,
         isotope_settings_filter: bool,
@@ -108,6 +129,10 @@ impl SiriusBuilder<Version5> {
     ///     .formula_search_db(DBVector::from(vec![SearchDB::Hmdb]))
     ///     .is_ok());
     /// ```
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn formula_search_db(
         mut self,
         formula_search_db: crate::sirius_types::DBVector,
@@ -128,6 +153,10 @@ impl SiriusBuilder<Version5> {
     ///     .unwrap()
     ///     .build();
     /// ```
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn structure_search_db(
         mut self,
         structure_search_db: crate::sirius_types::DBVector,
@@ -144,6 +173,10 @@ impl SiriusBuilder<Version5> {
     /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::default().timeout_seconds_per_tree(100).unwrap().build();
     /// ```
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn timeout_seconds_per_tree(
         mut self,
         timeout_seconds_per_tree: u32,
@@ -156,6 +189,10 @@ impl SiriusBuilder<Version5> {
     /// Set the number of candidates.
     /// # Arguments
     /// * `number_of_candidates` - The number of candidates.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn number_of_candidates(mut self, number_of_candidates: u32) -> Result<Self, String> {
         self.config.add_config_parameter(ConfigV5::NumberOfCandidates(number_of_candidates))?;
         Ok(self)
@@ -164,6 +201,10 @@ impl SiriusBuilder<Version5> {
     /// Set the number of candidates per ion.
     /// # Arguments
     /// * `number_of_candidates_per_ion` - The number of candidates per ion.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn number_of_candidates_per_ion(
         mut self,
         number_of_candidates_per_ion: u32,
@@ -177,6 +218,10 @@ impl SiriusBuilder<Version5> {
     /// Sets the number of structure candidates.
     /// # Arguments
     /// * `number_of_structure_candidates` - The number of structure candidates.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn number_of_structure_candidates(
         mut self,
         number_of_structure_candidates: u32,
@@ -190,6 +235,10 @@ impl SiriusBuilder<Version5> {
     /// Specify if the results should be recomputed.
     /// # Arguments
     /// * `recompute_results` - Whether to recompute the results.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn recompute_results(mut self, recompute_results: bool) -> Result<Self, String> {
         self.config.add_config_parameter(ConfigV5::RecomputeResults(recompute_results))?;
         Ok(self)
@@ -198,6 +247,10 @@ impl SiriusBuilder<Version5> {
     /// Whether to print citations we Sirius has finished running.
     /// # Arguments
     /// * `print_citations` - Whether to print citations.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn print_citations(mut self, print_citations: bool) -> Result<Self, String> {
         self.config.add_config_parameter(ConfigV5::PrintCitations(print_citations))?;
         Ok(self)
@@ -210,9 +263,14 @@ impl SiriusBuilder<Version5> {
     /// instances and just skip the challenging ones. Note that, due to
     /// multithreading, this time constraints are not absolutely accurate.
     /// Set the maximum number of seconds for computing a single compound. Set
-    /// to 0 to disable the time constraint. # Arguments
+    /// to 0 to disable the time constraint.
+    /// # Arguments
     /// * `timeout_seconds_per_instance` - The maximum number of seconds for
     ///   computing a single compound.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn timeout_seconds_per_instance(
         mut self,
         timeout_seconds_per_instance: u32,
@@ -225,9 +283,14 @@ impl SiriusBuilder<Version5> {
 
     /// Specifies if the list of Molecular Formula Identifications is filtered
     /// by a soft threshold (calculateThreshold) before CSI:FingerID
-    /// predictions are calculated. # Arguments
-    /// * `formula_settings_filter` - Whether to filter the list of Molecular
+    /// predictions are calculated.
+    /// # Arguments
+    /// * `formula_result_threshold` - Whether to filter the list of Molecular
     ///   Formula Identifications.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn formula_result_threshold(
         mut self,
         formula_result_threshold: bool,
@@ -242,8 +305,13 @@ impl SiriusBuilder<Version5> {
     /// that the MS/MS is a lipid spectrum. If this parameter is set to
     /// 'false' El Gordo will still be executed and e.g. improve the
     /// fragmentation tree, but the matching candidates will not be tagged
-    /// as lipid class. # Arguments
+    /// as lipid class.
+    /// # Arguments
     /// * `inject_el_gordo_compounds` - Whether to inject El Gordo compounds.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn inject_el_gordo_compounds(
         mut self,
         inject_el_gordo_compounds: bool,
@@ -256,11 +324,15 @@ impl SiriusBuilder<Version5> {
     /// Sets the median noise intensity.
     /// # Arguments
     /// * `median_noise_intensity` - The median noise intensity.
+    ///
+    /// # Errors
+    /// Returns an error if the median noise intensity is negative or if the
+    /// parameter has already been set in the configuration.
     pub fn median_noise_intensity(mut self, median_noise_intensity: f32) -> Result<Self, String> {
         if median_noise_intensity < 0.0 {
             return Err(format!(
-                "Median noise intensity must be positive. You provided {}.",
-                median_noise_intensity
+                "Median noise intensity must be positive. You provided {median_noise_intensity}.",
+                
             ));
         }
         self.config.add_config_parameter(ConfigV5::MedianNoiseIntensity(median_noise_intensity))?;
@@ -276,14 +348,18 @@ impl SiriusBuilder<Version5> {
     /// # Arguments
     /// * `ms1_absolute_intensity_error` - The average absolute deviation
     ///   between theoretical and measured intensity of isotope peaks.
+    ///
+    /// # Errors
+    /// Returns an error if the MS1 absolute intensity error is negative or if
+    /// the parameter has already been set in the configuration.
     pub fn ms1_absolute_intensity_error(
         mut self,
         ms1_absolute_intensity_error: f32,
     ) -> Result<Self, String> {
         if ms1_absolute_intensity_error < 0.0 {
             return Err(format!(
-                "MS1 absolute intensity error must be positive. You provided {}.",
-                ms1_absolute_intensity_error
+                "MS1 absolute intensity error must be positive. You provided {ms1_absolute_intensity_error}.",
+                
             ));
         }
         self.config.add_config_parameter(ConfigV5::MS1AbsoluteIntensityError(
@@ -297,17 +373,21 @@ impl SiriusBuilder<Version5> {
     /// above noise level. Obviously, this is hard to judge without having
     /// absolute values. Keeping this value around 1 percent is fine for
     /// most settings. Set it to smaller values if you trust your small
-    /// intensities. # Arguments
+    /// intensities.
+    /// # Arguments
     /// * `ms1_minimal_intensity_to_consider` - The minimal intensity to
     ///   consider.
+    ///
+    /// # Errors
+    /// Returns an error if the MS1 minimal intensity to consider is negative or
+    /// if the parameter has already been set in the configuration.
     pub fn ms1_minimal_intensity_to_consider(
         mut self,
         ms1_minimal_intensity_to_consider: f32,
     ) -> Result<Self, String> {
         if ms1_minimal_intensity_to_consider < 0.0 {
             return Err(format!(
-                "MS1 minimal intensity to consider must be positive. You provided {}.",
-                ms1_minimal_intensity_to_consider
+                "MS1 minimal intensity to consider must be positive. You provided {ms1_minimal_intensity_to_consider}.", 
             ));
         }
         self.config.add_config_parameter(ConfigV5::MS1MinimalIntensityToConsider(
@@ -325,14 +405,17 @@ impl SiriusBuilder<Version5> {
     /// # Arguments
     /// * `ms1_relative_intensity_error` - The average relative deviation
     ///   between theoretical and measured intensity of isotope peaks.
+    ///
+    /// # Errors
+    /// Returns an error if the MS1 relative intensity error is negative or if
+    /// the parameter has already been set in the configuration.
     pub fn ms1_relative_intensity_error(
         mut self,
         ms1_relative_intensity_error: f32,
     ) -> Result<Self, String> {
         if ms1_relative_intensity_error < 0.0 {
             return Err(format!(
-                "MS1 relative intensity error must be positive. You provided {}.",
-                ms1_relative_intensity_error
+                "MS1 relative intensity error must be positive. You provided {ms1_relative_intensity_error}.",
             ));
         }
         self.config.add_config_parameter(ConfigV5::MS1RelativeIntensityError(
@@ -342,17 +425,22 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Sets the noise threshold settings absolute threshold.
+    ///
     /// # Arguments
-    /// * `noise_threshold_settings_absolute_threshold` - The noise threshold
+    /// * `noise_threshold_settings_intensity_threshold` - The noise threshold
     ///   settings absolute threshold.
+    ///
+    /// # Errors
+    /// Returns an error if the configuration parameter cannot be added to the
+    /// `SiriusConfig`, or if the threshold is negative.
     pub fn noise_threshold_settings_intensity_threshold(
         mut self,
         noise_threshold_settings_intensity_threshold: f32,
     ) -> Result<Self, String> {
         if noise_threshold_settings_intensity_threshold < 0.0 {
             return Err(format!(
-                "Noise threshold settings intensity threshold must be positive. You provided {}.",
-                noise_threshold_settings_intensity_threshold
+                "Noise threshold settings intensity threshold must be positive. You provided {noise_threshold_settings_intensity_threshold}.",
+                
             ));
         }
         self.config.add_config_parameter(ConfigV5::NoiseThresholdSettingsIntensityThreshold(
@@ -365,6 +453,9 @@ impl SiriusBuilder<Version5> {
     /// # Arguments
     /// * `noise_threshold_settings_maximal_number_of_peaks` - The noise
     ///   threshold settings maximal number of peaks.
+    /// # Errors
+    /// Returns an error if the configuration parameter cannot be added to the
+    /// `SiriusConfig`.
     pub fn noise_threshold_settings_maximal_number_of_peaks(
         mut self,
         noise_threshold_settings_maximal_number_of_peaks: u32,
@@ -375,10 +466,49 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Sets the noise threshold settings absolute threshold.
+    ///
+    /// # Arguments
+    /// * `noise_threshold_settings_absolute_threshold` - The noise threshold
+    ///   settings absolute threshold.
+    ///
+    /// # Errors
+    /// Returns an error if the configuration parameter cannot be added to the
+    /// `SiriusConfig`.
+    pub fn noise_threshold_settings_absolute_threshold(
+        mut self,
+        noise_threshold_settings_absolute_threshold: u32,
+    ) -> Result<Self, String> {
+        self.config.add_config_parameter(ConfigV5::NoiseThresholdSettingsAbsoluteThreshold(
+            noise_threshold_settings_absolute_threshold,
+        ))?;
+        Ok(self)
+    }
+
+    /// The base peak for the noise.
+    /// # Arguments
+    /// * `noise_threshold_settings_base_peak` - The base peak for the noise.
+    /// # Errors
+    /// Returns an error if the configuration parameter cannot be added to the
+    /// `SiriusConfig`.
+    pub fn noise_threshold_settings_base_peak(
+        mut self,
+        noise_threshold_settings_base_peak: BasePeak,
+    ) -> Result<Self, String> {
+        self.config.add_config_parameter(ConfigV5::NoiseThresholdSettingsBasePeak(
+            noise_threshold_settings_base_peak,
+        ))?;
+        Ok(self)
+    }
+
     /// Sets if you want to cluster compounds before running ZODIAC.
     /// # Arguments
     /// * `zodiac_cluster_compounds` - Whether to cluster compounds before
     ///   running ZODIAC.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_cluster_compounds(
         mut self,
         zodiac_cluster_compounds: bool,
@@ -391,9 +521,14 @@ impl SiriusBuilder<Version5> {
     /// Minimum number of candidates per compound which are forced to have at
     /// least \[minLocalConnections\] connections to other compounds. E.g. 2
     /// candidates per compound must have at least 10 connections to other
-    /// compounds. # Arguments
+    /// compounds.
+    /// # Arguments
     /// * `zodiac_edge_filter_thresholds_min_local_candidates` - The minimum
     ///   number of candidates per compound.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_edge_filter_thresholds_min_local_candidates(
         mut self,
         zodiac_edge_filter_thresholds_min_local_candidates: u32,
@@ -409,9 +544,14 @@ impl SiriusBuilder<Version5> {
     ///  Minimum number of connections per candidate which are forced for at
     /// least \[minLocalCandidates\] candidates to other compounds.
     /// E.g. 2 candidates per compound must have at least 10 connections to
-    /// other compounds. # Arguments
+    /// other compounds.
+    /// # Arguments
     /// * `zodiac_edge_filter_thresholds_min_local_connections` - The minimum
     ///   number of connections per candidate.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_edge_filter_thresholds_min_local_connections(
         mut self,
         zodiac_edge_filter_thresholds_min_local_connections: u32,
@@ -425,17 +565,23 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Defines the proportion of edges of the complete network which will be
-    /// ignored. # Arguments
+    /// ignored.
+    /// # Arguments
     /// * `zodiac_edge_filter_thresholds_threshold_filter` - The proportion of
     ///   edges of the complete network which will be ignored.
+    ///
+    /// # Errors
+    /// Returns an error if the zodiac edge filter thresholds threshold filter
+    /// is negative or if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_edge_filter_thresholds_threshold_filter(
         mut self,
         zodiac_edge_filter_thresholds_threshold_filter: f32,
     ) -> Result<Self, String> {
         if zodiac_edge_filter_thresholds_threshold_filter < 0.0 {
             return Err(format!(
-                "Zodiac edge filter thresholds threshold filter must be positive. You provided {}.",
-                zodiac_edge_filter_thresholds_threshold_filter
+                "Zodiac edge filter thresholds threshold filter must be positive. You provided {zodiac_edge_filter_thresholds_threshold_filter}.",
+                
             ));
         }
         self.config.add_config_parameter(ConfigV5::ZodiacEdgeFilterThresholdsThresholdFilter(
@@ -447,9 +593,14 @@ impl SiriusBuilder<Version5> {
     /// Number of epochs considered as 'burn-in period'.
     /// Samples from the beginning of a Markov chain do not accurately represent
     /// the desired distribution of candidates and are not used to estimate the
-    /// ZODIAC score. # Arguments
+    /// ZODIAC score.
+    /// # Arguments
     /// * `zodiac_epochs_burn_in_period` - The number of epochs considered as
     ///   'burn-in period'.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_epochs_burn_in_period(
         mut self,
         zodiac_epochs_burn_in_period: u32,
@@ -461,9 +612,14 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Number of epochs to run the Gibbs sampling. When multiple Markov chains
-    /// are computed, all chains' iterations sum up to this value. # Arguments
+    /// are computed, all chains' iterations sum up to this value.
+    /// # Arguments
     /// * `zodiac_epochs_iterations` - The number of epochs to run the Gibbs
     ///   sampling.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_epochs_iterations(
         mut self,
         zodiac_epochs_number_of_epochs: u32,
@@ -478,6 +634,10 @@ impl SiriusBuilder<Version5> {
     /// # Arguments
     /// * `zodiac_epochs_number_of_markov_chains` - The number of separate Gibbs
     ///   sampling runs.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_epochs_number_of_markov_chains(
         mut self,
         zodiac_epochs_number_of_markov_chains: u32,
@@ -489,10 +649,14 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Lambda used in the scoring function of spectral library hits. The higher
-    /// this value the higher are librar hits weighted in ZODIAC scoring. #
-    /// Arguments
+    /// this value the higher are librar hits weighted in ZODIAC scoring.
+    /// # Arguments
     /// * `zodiac_library_scoring_lambda` - The lambda used in the scoring
     ///   function of spectral library hits.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_library_scoring_lambda(
         mut self,
         zodiac_library_scoring_lambda: u32,
@@ -512,8 +676,9 @@ impl SiriusBuilder<Version5> {
     /// let sirius = SiriusBuilder::default().zodiac_library_scoring_min_cosine(0.5).unwrap().build();
     /// ```
     /// # Errors
-    /// If the value is not in the range 0 and 1.
-    /// # Example
+    /// Returns an error if the zodiac library scoring min cosine is not in the
+    /// range 0 and 1 or if the parameter has already been set in the
+    /// configuration. # Example
     /// ```
     /// use sirius_bindings::prelude::*;
     /// assert!(SiriusBuilder::default().zodiac_library_scoring_min_cosine(1.1).is_err());
@@ -528,8 +693,7 @@ impl SiriusBuilder<Version5> {
             // fast and easy way to check interval of values in Rust. Then add the "!" to
             // negate the condition.
             return Err(format!(
-                "Zodiac library scoring min cosine must be in [0,1]. You provided {}.",
-                zodiac_library_scoring_min_cosine
+                "Zodiac library scoring min cosine must be in [0,1]. You provided {zodiac_library_scoring_min_cosine}.",
             ));
         }
         self.config.add_config_parameter(ConfigV5::ZodiacLibraryScoringMinCosine(
@@ -546,6 +710,10 @@ impl SiriusBuilder<Version5> {
     /// # Arguments
     /// * `zodiac_number_of_considered_candidates_at_300_mz` - The maximum
     ///   number of candidate molecular formulas.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_number_of_considered_candidates_at_300_mz(
         mut self,
         zodiac_number_of_considered_candidates_at_300_mz: i32,
@@ -564,6 +732,10 @@ impl SiriusBuilder<Version5> {
     /// # Arguments
     /// * `zodiac_number_of_considered_candidates_at_800_mz` - The maximum
     ///   number of candidate molecular formulas.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_number_of_considered_candidates_at_800_mz(
         mut self,
         zodiac_number_of_considered_candidates_at_800_mz: i32,
@@ -579,17 +751,22 @@ impl SiriusBuilder<Version5> {
     /// considered by ZODIAC. This depends on the number of candidates ZODIAC
     /// considers. E.g. if 50 candidates are considered and a ratio of 0.2
     /// is set, at least 10 candidates per ionization will be considered,
-    /// which might increase the number of candidates above 50. # Arguments
+    /// which might increase the number of candidates above 50.
+    /// # Arguments
     /// * `zodiac_ratio_of_considered_candidates_per_ionization` - The ratio of
     ///   candidate molecular formulas.
+    ///
+    /// # Errors
+    /// Returns an error if the zodiac ratio of considered candidates per
+    /// ionization is not in the range 0 and 1 or if the parameter
+    /// has already been set in the configuration.
     pub fn zodiac_ratio_of_considered_candidates_per_ionization(
         mut self,
         zodiac_ratio_of_considered_candidates_per_ionization: f32,
     ) -> Result<Self, String> {
         if !(0.0..=1.0).contains(&zodiac_ratio_of_considered_candidates_per_ionization) {
             return Err(format!(
-                "Zodiac ratio of considered candidates per ionization must be in [0,1]. You provided {}.",
-                zodiac_ratio_of_considered_candidates_per_ionization
+                "Zodiac ratio of considered candidates per ionization must be in [0,1]. You provided {zodiac_ratio_of_considered_candidates_per_ionization}.",
             ));
         }
         self.config.add_config_parameter(
@@ -601,8 +778,13 @@ impl SiriusBuilder<Version5> {
     }
 
     /// As default ZODIAC runs a 2-step approach. First running 'good quality
-    /// compounds' only, and afterwards including the remaining. # Arguments
+    /// compounds' only, and afterwards including the remaining.
+    /// # Arguments
     /// * `zodiac_run_in_two_steps` - Whether to run ZODIAC in two steps.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_run_in_two_steps(
         mut self,
         zodiac_run_in_two_steps: bool,
@@ -615,9 +797,14 @@ impl SiriusBuilder<Version5> {
     /// written as "X ppm (Y Da)" with X and Y are numerical values. The ppm
     /// is a relative measure (parts per million), Da is an absolute
     /// measure. For each mass, the maximum of relative and absolute is
-    /// used. # Arguments
+    /// used.
+    /// # Arguments
     /// * `ms1_mass_deviation_allowed_mass_deviation` - The mass accuracy
     ///   setting for MS1 spectra.
+    ///
+    /// # Errors
+    /// Returns an error if the mass deviation is negative or if the parameter
+    /// has already been set in the configuration.
     pub fn ms1_mass_deviation_allowed_mass_deviation(
         mut self,
         ms1_mass_deviation_allowed_mass_deviation: MassDeviation,
@@ -632,6 +819,10 @@ impl SiriusBuilder<Version5> {
     /// # Arguments
     /// * `ms1_mass_deviation_mass_difference_deviation` - The mass deviation
     ///   between two masses.
+    ///
+    /// # Errors
+    /// Returns an error if the mass deviation is negative or if the parameter
+    /// has already been set in the configuration.
     pub fn ms1_mass_deviation_mass_difference_deviation(
         mut self,
         ms1_mass_deviation_mass_difference_deviation: MassDeviation,
@@ -646,6 +837,10 @@ impl SiriusBuilder<Version5> {
     /// # Arguments
     /// * `ms1_mass_deviation_standard_mass_deviation` - The standard mass
     ///   deviation for MS1 spectra.
+    ///
+    /// # Errors
+    /// Returns an error if the mass deviation is negative or if the parameter
+    /// has already been set in the configuration.
     pub fn ms1_mass_deviation_standard_mass_deviation(
         mut self,
         ms1_mass_deviation_standard_mass_deviation: MassDeviation,
@@ -660,6 +855,10 @@ impl SiriusBuilder<Version5> {
     /// # Arguments
     /// * `ms2_mass_deviation_mass_difference_deviation` - The standard mass
     ///   deviation for MS2 spectra.
+    ///
+    /// # Errors
+    /// Returns an error if the mass deviation is negative or if the parameter
+    /// has already been set in the configuration.
     pub fn ms2_mass_deviation_standard_mass_deviation(
         mut self,
         ms2_mass_deviation_standard_mass_deviation: MassDeviation,
@@ -674,9 +873,14 @@ impl SiriusBuilder<Version5> {
     /// written as "X ppm (Y Da)" with X and Y are numerical values. The ppm
     /// is a relative measure (parts per million), Da is an absolute
     /// measure. For each mass, the maximum of relative and absolute is
-    /// used. # Arguments
+    /// used.
+    /// # Arguments
     /// * `ms2_mass_deviation_allowed_mass_deviation` - The mass accuracy
     ///   setting for MS2 spectra.
+    ///
+    /// # Errors
+    /// Returns an error if the mass deviation is negative or if the parameter
+    /// has already been set in the configuration.
     pub fn ms2_mass_deviation_allowed_mass_deviation(
         mut self,
         ms2_mass_deviation_allowed_mass_deviation: MassDeviation,
@@ -688,8 +892,13 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Detectable elements are added to the chemical alphabet, if there are
-    /// indications for them (e.g. in isotope pattern) # Arguments
+    /// indications for them (e.g. in isotope pattern)
+    /// # Arguments
     /// * `formula_settings_detectable` - The detectable elements.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn formula_settings_detectable(
         mut self,
         formula_settings_detectable: AtomVector,
@@ -707,6 +916,10 @@ impl SiriusBuilder<Version5> {
     /// ignored. Enforced elements are always considered.
     /// # Arguments
     /// * `formula_settings_enforced` - The enforced elements.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn formula_settings_enforced(
         mut self,
         formula_settings_enforced: AtomVector,
@@ -717,8 +930,13 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Fallback elements are used, if the auto-detection fails (e.g. no isotope
-    /// pattern available) # Arguments
+    /// pattern available)
+    /// # Arguments
     /// * `formula_settings_fallback` - The fallback elements.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn formula_settings_fallback(
         mut self,
         formula_settings_fallback: AtomVector,
@@ -732,6 +950,10 @@ impl SiriusBuilder<Version5> {
     /// Must be either 'ALLOWED' or FORBIDDEN'.
     /// # Arguments
     /// * `forbid_recalibration` - Whether to forbid recalibration.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn forbid_recalibration(
         mut self,
         forbid_recalibration: ForbidRecalibration,
@@ -742,10 +964,16 @@ impl SiriusBuilder<Version5> {
 
     /// Set minimum m/z to enable heuristic preprocessing. The heuristic will be
     /// used to initially rank the formula candidates.
-    /// The Top (NumberOfCandidates) candidates will then be computed exactly by
-    /// solving the ILP. # Arguments
+    /// The Top (`NumberOfCandidates`) candidates will then be computed exactly
+    /// by solving the ILP.
+    ///
+    /// # Arguments
     /// * `use_heuristic_mz_to_use_heuristic` - The minimum m/z to enable
     ///   heuristic preprocessing.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn use_heuristic_mz_to_use_heuristic(
         mut self,
         use_heuristic_mz_to_use_heuristic: u32,
@@ -757,9 +985,14 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set minimum m/z to only use heuristic tree computation. No exact tree
-    /// computation (ILP) will be performed for this compounds. # Arguments
+    /// computation (ILP) will be performed for this compounds.
+    /// # Arguments
     /// * `use_heuristic_mz_to_use_heuristic_only` - The minimum m/z to only use
     ///   heuristic tree computation.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn use_heuristic_mz_to_use_heuristic_only(
         mut self,
         use_heuristic_mz_to_use_heuristic: u32,
@@ -772,6 +1005,10 @@ impl SiriusBuilder<Version5> {
 
     ///  Detectable ion modes which are only considered if there is an
     /// indication in the MS1 scan (e.g. correct mass delta).
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn adduct_settings_detectable(
         mut self,
         adduct_settings_detectable: AdductsVector,
@@ -782,8 +1019,13 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Fallback ion modes which are considered if the auto detection did not
-    /// find any indication for an ion mode. # Arguments
+    /// find any indication for an ion mode.
+    /// # Arguments
     /// * `adduct_settings_fallback` - The fallback ion modes.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn adduct_settings_fallback(
         mut self,
         adduct_settings_fallback: AdductsVector,
@@ -794,18 +1036,28 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Configuration profile to store instrument specific algorithm properties.
-    /// Some of the default profiles are: 'qtof', 'orbitrap', 'fticr'. #
-    /// Arguments
+    /// Some of the default profiles are: 'qtof', 'orbitrap', 'fticr'.
+    /// # Arguments
     /// * `algorithm_profile` - The algorithm profile.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn algorithm_profile(mut self, algorithm_profile: Instruments) -> Result<Self, String> {
         self.config.add_config_parameter(ConfigV5::AlgorithmProfile(algorithm_profile))?;
         Ok(self)
     }
 
     /// Keywords that can be assigned to a input spectrum to judge its quality.
-    /// Available keywords are: Good, LowIntensity, NoMS1Peak, FewPeaks,
-    /// Chimeric, NotMonoisotopicPeak, PoorlyExplained # Arguments
+    /// Available keywords are: `Good`, `LowIntensity`, `NoMS1Peak`, `FewPeaks`,
+    /// `Chimeric`, `NotMonoisotopicPeak`, `PoorlyExplained`
+    ///
+    /// # Arguments
     /// * `compound_quality` - The compound quality.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn compound_quality(mut self, compound_quality: CompoundQuality) -> Result<Self, String> {
         self.config.add_config_parameter(ConfigV5::CompoundQuality(compound_quality))?;
         Ok(self)
@@ -814,6 +1066,10 @@ impl SiriusBuilder<Version5> {
     /// Enforced ion modes that are always considered.
     /// # Arguments
     /// * `adduct_settings_enforced` - The enforced ion modes.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn adduct_settings_enforced(
         mut self,
         adduct_settings_enforced: AdductSettingsEnforced,
@@ -826,9 +1082,13 @@ impl SiriusBuilder<Version5> {
     /// This configuration holds a set of user given formulas to be used as
     /// candidates for SIRIUS Note: This set might be merged with other
     /// sources like formulas from databases Set of Molecular Formulas to be
-    /// used as candidates for molecular formula estimation with SIRIUS #
-    /// Arguments
+    /// used as candidates for molecular formula estimation with SIRIUS
+    /// # Arguments
     /// * `candidate_formulas` - The candidate formulas.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn candidate_formulas(
         mut self,
         candidate_formulas: CandidateFormulas,
@@ -837,12 +1097,18 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
-    /// Allows the USER to Specify the ScoreType that is used to rank the list
+    /// Allows the USER to Specify the `ScoreType` that is used to rank the list
     /// of Molecular Formula Identifications before CSI:FingerID predictions
-    /// are calculated. Auto means that this ScoreType is automatically set
-    /// depending on the executed workflow. # Arguments
+    /// are calculated. Auto means that this `ScoreType` is automatically set
+    /// depending on the executed workflow.
+    ///
+    /// # Arguments
     /// * `formula_result_ranking_score` - The score type that is used to rank
     ///   the list of Molecular Formula Identifications.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn formula_result_ranking_score(
         mut self,
         formula_result_ranking_score: FormulaResultRankingScore,
@@ -853,7 +1119,11 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
-    /// Wheter to use the isotopes for the MS2 spectra.
+    /// whether to use the isotopes for the MS2 spectra.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn isotope_ms2_settings(
         mut self,
         isotope_ms2_settings: IsotopeMS2Settings,
@@ -865,8 +1135,13 @@ impl SiriusBuilder<Version5> {
     /// multiplier for the isotope score. Set to 0 to disable isotope scoring.
     /// Otherwise, the score from isotope pattern analysis is multiplied with
     /// this coefficient. Set to a value larger than one if your isotope
-    /// pattern data is of much better quality than your MS/MS data. # Arguments
+    /// pattern data is of much better quality than your MS/MS data.
+    /// # Arguments
     /// * `isotope_settings_multiplier` - The multiplier for the isotope score.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn isotope_settings_multiplier(
         mut self,
         isotope_settings_multiplier: u32,
@@ -877,36 +1152,14 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
-    /// The absolute threshold for the noise
-    /// # Arguments
-    /// * `noise_threshold_settings_absolute_threshold` - The absolute threshold
-    ///   for the noise.
-    pub fn noise_threshold_settings_absolute_threshold(
-        mut self,
-        noise_threshold_settings_absolute_threshold: u32,
-    ) -> Result<Self, String> {
-        self.config.add_config_parameter(ConfigV5::NoiseThresholdSettingsAbsoluteThreshold(
-            noise_threshold_settings_absolute_threshold,
-        ))?;
-        Ok(self)
-    }
-
-    /// The base peak for the noise.
-    /// # Arguments
-    /// * `noise_threshold_settings_base_peak` - The base peak for the noise.
-    pub fn noise_threshold_settings_base_peak(
-        mut self,
-        noise_threshold_settings_base_peak: BasePeak,
-    ) -> Result<Self, String> {
-        self.config.add_config_parameter(ConfigV5::NoiseThresholdSettingsBasePeak(
-            noise_threshold_settings_base_peak,
-        ))?;
-        Ok(self)
-    }
-
     /// Setups the algorithm for the structure predictors. This should be
-    /// CSI:FingerID # Arguments
+    /// CSI:FingerID
+    /// # Arguments
     /// * `structure_predictors` - The algorithm for the structure predictors.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn structure_predictors(
         mut self,
         structure_predictors: StructurePredictors,
@@ -921,9 +1174,13 @@ impl SiriusBuilder<Version5> {
     /// of the analysis, but for certain adducts they might happen
     /// regularly. Adduct switches are written in the form  {@literal a -> b, a
     /// -> c, d -> c} where a, b, c, and d are adducts and  {@literal a ->
-    /// b} denotes an allowed switch from a to b within the MS/MS spectrum. #
-    /// Arguments
+    /// b} denotes an allowed switch from a to b within the MS/MS spectrum.
+    /// # Arguments
     /// * `possible_adduct_switches` - The possible adduct switches.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn possible_adduct_switches(
         mut self,
         possible_adduct_switches: PossibleAdductSwitches,
@@ -934,108 +1191,180 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Wether to enable the Formula module.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn enable_formula(mut self) -> Result<Self, String> {
         self.config.add_formula_parameter(FormulaV5::Enabled)?;
         Ok(self)
     }
 
     /// Set whether to display the help of Formula.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn formula_help(mut self) -> Result<Self, String> {
         self.config.add_formula_parameter(FormulaV5::Help)?;
         Ok(self)
     }
 
     /// Set whether to display the version of Formula.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn formula_version(mut self) -> Result<Self, String> {
         self.config.add_formula_parameter(FormulaV5::Version)?;
         Ok(self)
     }
 
     /// Wether to enable the Zodiac module.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn enable_zodiac(mut self) -> Result<Self, String> {
         self.config.add_zodiac_parameter(ZodiacV5::Enabled)?;
         Ok(self)
     }
 
     /// Set whether to display the help of Zodiac.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_help(mut self) -> Result<Self, String> {
         self.config.add_zodiac_parameter(ZodiacV5::Help)?;
         Ok(self)
     }
 
     /// Set whether to display the version of Zodiac.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_version(mut self) -> Result<Self, String> {
         self.config.add_zodiac_parameter(ZodiacV5::Version)?;
         Ok(self)
     }
 
     /// Wether to enable the Fingerprint module.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn enable_fingerprint(mut self) -> Result<Self, String> {
         self.config.add_fingerprint_parameter(FingerprintV5::Enabled)?;
         Ok(self)
     }
 
     /// Set whether to display the help of Fingerprint.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn fingerprint_help(mut self) -> Result<Self, String> {
         self.config.add_fingerprint_parameter(FingerprintV5::Help)?;
         Ok(self)
     }
 
     /// Set whether to display the version of Fingerprint.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn fingerprint_version(mut self) -> Result<Self, String> {
         self.config.add_fingerprint_parameter(FingerprintV5::Version)?;
         Ok(self)
     }
 
     /// Wether to enable the Structure module.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn enable_structure(mut self) -> Result<Self, String> {
         self.config.add_structure_parameter(StructureV5::Enabled)?;
         Ok(self)
     }
 
     /// Set whether to display the help of Structure.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn structure_help(mut self) -> Result<Self, String> {
         self.config.add_structure_parameter(StructureV5::Help)?;
         Ok(self)
     }
 
     /// Set whether to display the version of Structure.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn structure_version(mut self) -> Result<Self, String> {
         self.config.add_structure_parameter(StructureV5::Version)?;
         Ok(self)
     }
 
     /// Whether to enable the Canopus module.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn enable_canopus(mut self) -> Result<Self, String> {
         self.config.add_canopus_parameter(CanopusV5::Enabled)?;
         Ok(self)
     }
 
     /// Set whether to display the help of Canopus.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn canopus_help(mut self) -> Result<Self, String> {
         self.config.add_canopus_parameter(CanopusV5::Help)?;
         Ok(self)
     }
 
     /// Set whether to display the version of Canopus.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn canopus_version(mut self) -> Result<Self, String> {
         self.config.add_canopus_parameter(CanopusV5::Version)?;
         Ok(self)
     }
 
-    /// Whether to enable the WriteSummaries module.
+    /// Whether to enable the `WriteSummaries` module.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn enable_write_summaries(mut self) -> Result<Self, String> {
         self.config.add_write_summaries_parameter(WriteSummariesV5::Enabled)?;
         Ok(self)
     }
 
-    /// Set whether to display the help of WriteSummaries.
+    /// Set whether to display the help of `WriteSummaries`.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn write_summaries_help(mut self) -> Result<Self, String> {
         self.config.add_write_summaries_parameter(WriteSummariesV5::Help)?;
         Ok(self)
     }
 
-    /// Set whether to display the version of WriteSummaries.
+    /// Set whether to display the version of `WriteSummaries`.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn write_summaries_version(mut self) -> Result<Self, String> {
         self.config.add_write_summaries_parameter(WriteSummariesV5::Version)?;
         Ok(self)
@@ -1070,6 +1399,10 @@ impl SiriusBuilder<Version5> {
     ///
     /// assert!(SiriusBuilder::default().maximal_mz_default().unwrap().maximal_mz_default().is_err());
     /// ```
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn maximal_mz_default(mut self) -> Result<Self, String> {
         self.config.add_core_parameter(CoreV5::MaximalMz(f64::default()).into_default())?;
         Ok(self)
@@ -1077,18 +1410,30 @@ impl SiriusBuilder<Version5> {
 
     /// Set to default the number of CPUs to use. By default, all available CPUs
     /// are used.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn max_cpus_default(mut self) -> Result<Self, String> {
         self.config.add_core_parameter(CoreV5::NCPUs(usize::default()).into_default())?;
         Ok(self)
     }
 
     /// Whether to recompute all tools. By default, it is set to `false`.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn recompute_all_default(mut self) -> Result<Self, String> {
         self.config.add_core_parameter(CoreV5::Recompute(bool::default()).into_default())?;
         Ok(self)
     }
 
     /// Set to default isotope settings filter.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn isotope_settings_filter_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::IsotopeSettingsFilter(bool::default()).into_default(),
@@ -1097,6 +1442,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default isotope settings intensity threshold.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn formula_search_db_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::FormulaSearchDB(crate::sirius_types::DBVector::default()).into_default(),
@@ -1105,6 +1454,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default structure search db.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn structure_search_db_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::StructureSearchDB(crate::sirius_types::DBVector::default()).into_default(),
@@ -1113,6 +1466,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default timeout seconds per tree.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn timeout_seconds_per_tree_default(mut self) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::TimeoutSecondsPerTree(u32::default()).into_default())?;
@@ -1120,6 +1477,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default number of candidates.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn number_of_candidates_default(mut self) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::NumberOfCandidates(u32::default()).into_default())?;
@@ -1127,6 +1488,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default number of candidates per ion.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn number_of_candidates_per_ion_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::NumberOfCandidatesPerIon(u32::default()).into_default(),
@@ -1135,6 +1500,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default number of structure candidates.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn number_of_structure_candidates_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::NumberOfStructureCandidates(u32::default()).into_default(),
@@ -1142,14 +1511,22 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
-    /// Set to default wheter to recompute results.
+    /// Set to default whether to recompute results.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn recompute_results_default(mut self) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::RecomputeResults(bool::default()).into_default())?;
         Ok(self)
     }
 
-    /// Set to default wheter to print citations.
+    /// Set to default whether to print citations.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn print_citations_default(mut self) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::PrintCitations(bool::default()).into_default())?;
@@ -1157,6 +1534,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default timeout seconds per instance.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn timeout_seconds_per_instance_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::TimeoutSecondsPerInstance(u32::default()).into_default(),
@@ -1164,7 +1545,11 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
-    /// Set to default wheter to use the formula result threshold.
+    /// Set to default whether to use the formula result threshold.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn formula_result_threshold_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::FormulaResultThreshold(bool::default()).into_default(),
@@ -1173,6 +1558,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Whether to use the default El Gordo compounds setting.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn inject_el_gordo_compounds_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::InjectElGordoCompounds(bool::default()).into_default(),
@@ -1181,6 +1570,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the median noise intensity.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn median_noise_intensity_default(mut self) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::MedianNoiseIntensity(f32::default()).into_default())?;
@@ -1188,6 +1581,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the MS1 absolute intensity error.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn ms1_absolute_intensity_error_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::MS1AbsoluteIntensityError(f32::default()).into_default(),
@@ -1196,6 +1593,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the MS1 minimal intensity to consider.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn ms1_minimal_intensity_to_consider_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::MS1MinimalIntensityToConsider(f32::default()).into_default(),
@@ -1204,6 +1605,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the MS1 relative intensity error.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn ms1_relative_intensity_error_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::MS1RelativeIntensityError(f32::default()).into_default(),
@@ -1212,6 +1617,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the noise threshold settings intensity threshold.
+    ///
+    /// # Errors
+    /// Returns an error if the configuration parameter cannot be added to the
+    /// `SiriusConfig`.
     pub fn noise_threshold_settings_intensity_threshold_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::NoiseThresholdSettingsIntensityThreshold(f32::default()).into_default(),
@@ -1220,6 +1629,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the noise threshold settings maximal number of peaks.
+    ///
+    /// # Errors
+    /// Returns an error if the configuration parameter cannot be added to the
+    /// `SiriusConfig`.
     pub fn noise_threshold_settings_maximal_number_of_peaks_default(
         mut self,
     ) -> Result<Self, String> {
@@ -1229,8 +1642,12 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
-    /// Wheter to set to default the clustering of compounds before running
+    /// whether to set to default the clustering of compounds before running
     /// zodiac.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_cluster_compounds_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::ZodiacClusterCompounds(bool::default()).into_default(),
@@ -1239,6 +1656,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the zodiac edge filter thresholds min local candidates.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_edge_filter_thresholds_min_local_candidates_default(
         mut self,
     ) -> Result<Self, String> {
@@ -1249,6 +1670,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the zodiac edge filter thresholds min local connections.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_edge_filter_thresholds_min_local_connections_default(
         mut self,
     ) -> Result<Self, String> {
@@ -1258,7 +1683,11 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
-    /// Set to default the zodiac edge filter thresholds theshold filter.
+    /// Set to default the zodiac edge filter thresholds threshold filter.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_edge_filter_thresholds_threshold_filter_default(
         mut self,
     ) -> Result<Self, String> {
@@ -1269,6 +1698,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the zodiac epochs burn in period.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_epochs_burn_in_period_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::ZodiacEpochsBurnInPeriod(u32::default()).into_default(),
@@ -1277,6 +1710,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the zodiac epochs iterations.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_epochs_iterations_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::ZodiacEpochsIterations(u32::default()).into_default(),
@@ -1285,6 +1722,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the zodiac epochs number of markov chains.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_epochs_number_of_markov_chains_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::ZodiacEpochsNumberOfMarkovChains(u32::default()).into_default(),
@@ -1293,6 +1734,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Sdet to default the zodiac library scoring lambda.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_library_scoring_lambda_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::ZodiacLibraryScoringLambda(u32::default()).into_default(),
@@ -1301,6 +1746,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the zodiac library scoring min cosine.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_library_scoring_min_cosine_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::ZodiacLibraryScoringMinCosine(f32::default()).into_default(),
@@ -1309,6 +1758,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the number of considered candidates at 300 mz.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_number_of_considered_candidates_at_300_mz_default(
         mut self,
     ) -> Result<Self, String> {
@@ -1319,6 +1772,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the number of considered candidates at 800 mz.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_number_of_considered_candidates_at_800_mz_default(
         mut self,
     ) -> Result<Self, String> {
@@ -1329,6 +1786,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the ratio of considered candidates per ionization.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_ratio_of_considered_candidates_per_ionization_default(
         mut self,
     ) -> Result<Self, String> {
@@ -1339,6 +1800,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Whether to set to default the run in two steps.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn zodiac_run_in_two_steps_default(mut self) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::ZodiacRunInTwoSteps(bool::default()).into_default())?;
@@ -1346,6 +1811,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the allowed mass deviation for MS1 spectra.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn ms1_mass_deviation_allowed_mass_deviation_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::MS1MassDeviationAllowedMassDeviation(
@@ -1357,6 +1826,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the mass difference deviation for MS1 spectra.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn ms1_mass_deviation_mass_difference_deviation_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::MS1MassDeviationMassDifferenceDeviation(
@@ -1368,6 +1841,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the standard mass deviation for MS1 spectra.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn ms1_mass_deviation_standard_mass_deviation_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::MS1MassDeviationStandardMassDeviation(
@@ -1379,6 +1856,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the standard mass deviation for MS2 spectra.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn ms2_mass_deviation_standard_mass_deviation_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::MS2MassDeviationStandardMassDeviation(
@@ -1390,6 +1871,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the mass accuracy setting for MS2 spectra.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn ms2_mass_deviation_allowed_mass_deviation_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::MS2MassDeviationAllowedMassDeviation(
@@ -1401,6 +1886,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the detectable elements.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn formula_settings_detectable_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::FormulaSettingsDetectable(AtomVector::default()).into_default(),
@@ -1409,6 +1898,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the enforced elements.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn formula_settings_enforced_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::FormulaSettingsEnforced(AtomVector::default()).into_default(),
@@ -1417,6 +1910,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the fallback elements.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn formula_settings_fallback_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::FormulaSettingsFallback(AtomVector::default()).into_default(),
@@ -1425,6 +1922,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the forbid recalibration.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn forbid_recalibration_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::ForbidRecalibration(ForbidRecalibration::default()).into_default(),
@@ -1433,6 +1934,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the minimum m/z to enable heuristic preprocessing.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn use_heuristic_mz_to_use_heuristic_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::UseHeuristicMZToUseHeuristic(u32::default()).into_default(),
@@ -1441,6 +1946,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the minimum m/z to only use heuristic tree computation.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn use_heuristic_mz_to_use_heuristic_only_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::UseHeuristicMZToUseHeuristicOnly(u32::default()).into_default(),
@@ -1449,6 +1958,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the detectable adducts.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn adduct_settings_detectable_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::AdductSettingsDetectable(AdductsVector::default()).into_default(),
@@ -1457,6 +1970,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the fallback adducts.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn adduct_settings_fallback_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::AdductSettingsFallback(AdductsVector::default()).into_default(),
@@ -1465,6 +1982,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the algorithm profile.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn algorithm_profile_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::AlgorithmProfile(Instruments::default()).into_default(),
@@ -1473,6 +1994,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the compound quality.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn compound_quality_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::CompoundQuality(CompoundQuality::default()).into_default(),
@@ -1481,6 +2006,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the enforced adducts.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn adduct_settings_enforced_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::AdductSettingsEnforced(AdductSettingsEnforced::default()).into_default(),
@@ -1489,6 +2018,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the candidate formulas.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn candidate_formulas_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::CandidateFormulas(CandidateFormulas::default()).into_default(),
@@ -1497,6 +2030,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the formula result ranking score.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn formula_result_ranking_score_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::FormulaResultRankingScore(FormulaResultRankingScore::default())
@@ -1506,6 +2043,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the isotope ms2 settings.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn isotope_ms2_settings_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::IsotopeMS2Settings(IsotopeMS2Settings::default()).into_default(),
@@ -1514,6 +2055,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the isotope settings multiplier.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn isotope_settings_multiplier_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::IsotopeSettingsMultiplier(u32::default()).into_default(),
@@ -1522,6 +2067,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the noise threshold settings absolute threshold.
+    ///
+    /// # Errors
+    /// Returns an error if the configuration parameter cannot be added to the
+    /// `SiriusConfig`.
     pub fn noise_threshold_settings_absolute_threshold_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::NoiseThresholdSettingsAbsoluteThreshold(u32::default()).into_default(),
@@ -1530,6 +2079,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the noise threshold settings base peak.
+    ///
+    /// # Errors
+    /// Returns an error if the configuration parameter cannot be added to the
+    /// `SiriusConfig`.
     pub fn noise_threshold_settings_base_peak_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::NoiseThresholdSettingsBasePeak(BasePeak::default()).into_default(),
@@ -1538,6 +2091,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the structure predictors algorithm.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn structure_predictors_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::StructurePredictors(StructurePredictors::default()).into_default(),
@@ -1546,6 +2103,10 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Set to default the possible adduct switches.
+    ///
+    /// # Errors
+    /// Returns an error if the parameter has already been set in the
+    /// configuration.
     pub fn possible_adduct_switches_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
             ConfigV5::PossibleAdductSwitches(PossibleAdductSwitches::default()).into_default(),

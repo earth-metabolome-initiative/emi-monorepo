@@ -256,6 +256,7 @@ pub enum ConfigV5 {
     PossibleAdductSwitches(PossibleAdductSwitches),
 }
 
+#[allow(clippy::too_many_lines)]
 impl fmt::Display for ConfigV5 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -505,6 +506,7 @@ impl fmt::Display for ConfigV5 {
     }
 }
 
+#[allow(clippy::too_many_lines)]
 impl IntoDefault for ConfigV5 {
     fn into_default(self) -> Self {
         match self {
