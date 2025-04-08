@@ -175,7 +175,7 @@ impl Codegen<'_> {
 
             let insertable_variant_methods = table.foreign_key_methods(conn, &self.syntax)?;
 
-            let insertable_builder_attributes = columns
+            let insertable_builder_attributes = nullable_insertable_columns
                 .iter()
                 .map(|column| {
                     let column_name = column.snake_case_ident()?;

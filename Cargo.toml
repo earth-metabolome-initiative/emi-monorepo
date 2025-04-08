@@ -30,6 +30,7 @@ members = [
     "data-migrations/directus-migration",
     "data-structures/rosetta-uuid",
     "data-structures/sorted-vec", "data-structures/mass-spectrometry", "utils/functional-properties",
+    "data-structures/rosetta-uuid",
 ]
 
 [workspace.dependencies]
