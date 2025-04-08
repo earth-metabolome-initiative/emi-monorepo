@@ -5,7 +5,9 @@
 use std::fmt::Debug;
 
 use super::MutabilityError;
-use crate::traits::{Bounded, IntoUsize, Matrix2D, SparseMatrix2D, SparseValuedMatrix2D, ValuedMatrix};
+use crate::traits::{
+    Bounded, IntoUsize, Matrix2D, SparseMatrix2D, SparseValuedMatrix2D, ValuedMatrix,
+};
 
 mod imputed_row_values;
 mod matrix;

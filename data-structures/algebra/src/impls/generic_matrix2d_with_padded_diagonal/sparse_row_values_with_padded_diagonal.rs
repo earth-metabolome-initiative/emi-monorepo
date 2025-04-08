@@ -6,7 +6,7 @@
 
 use crate::{
     impls::MutabilityError,
-    traits::{IntoUsize, TryFromUsize, SparseValuedMatrix2D},
+    traits::{IntoUsize, SparseValuedMatrix2D, TryFromUsize},
 };
 
 /// A wrapper iterator over the sparse row values which includes the diagonal
@@ -40,7 +40,7 @@ where
     M::RowIndex: IntoUsize,
     M::ColumnIndex: TryFromUsize,
     M::Value: Clone,
-    Map: Clone
+    Map: Clone,
 {
     fn clone(&self) -> Self {
         Self {

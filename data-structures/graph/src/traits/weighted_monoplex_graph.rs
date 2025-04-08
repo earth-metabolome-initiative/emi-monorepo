@@ -226,16 +226,15 @@ pub trait WeightedMonoplexGraph:
 
     /// Returns the smallest weight of the successors of a node and the
     /// corresponding successor node identifier.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `source_node_id`: The node identifier.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// The smallest weight of the successors of the node and the corresponding
     /// successor node identifier, if any.
-    /// 
     fn min_successor_weight_and_id(
         &self,
         source_node_id: <Self::WeightedEdges as Edges>::SourceNodeId,

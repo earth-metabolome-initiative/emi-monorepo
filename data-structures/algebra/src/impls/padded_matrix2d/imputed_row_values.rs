@@ -95,10 +95,8 @@ where
                 self.next_column_index = None;
                 return self.sparse_values.as_mut().and_then(Iterator::next);
             }
-        } else if let Some(sparse_column_index) = self
-            .sparse_column_indices
-            .as_mut()
-            .and_then(Iterator::next)
+        } else if let Some(sparse_column_index) =
+            self.sparse_column_indices.as_mut().and_then(Iterator::next)
         {
             debug_assert!(
                 sparse_column_index >= dense_column_index,
@@ -131,16 +129,11 @@ where
                     .as_mut()
                     .and_then(|sparse_values| sparse_values.next_back());
             }
-        } else if let Some(sparse_column_index) = self
-            .sparse_column_indices
-            .as_mut()
-            .and_then(DoubleEndedIterator::next_back)
+        } else if let Some(sparse_column_index) =
+            self.sparse_column_indices.as_mut().and_then(DoubleEndedIterator::next_back)
         {
             if dense_column_index == sparse_column_index {
-                return self
-                    .sparse_values
-                    .as_mut()
-                    .and_then(DoubleEndedIterator::next_back);
+                return self.sparse_values.as_mut().and_then(DoubleEndedIterator::next_back);
             } else {
                 self.next_back_column_index = Some(sparse_column_index);
             }

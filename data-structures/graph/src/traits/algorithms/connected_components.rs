@@ -99,9 +99,7 @@ impl From<ConnectedComponentsError>
     }
 }
 
-impl<G: MonopartiteGraph> From<ConnectedComponentsError>
-    for crate::errors::MonopartiteError<G>
-{
+impl<G: MonopartiteGraph> From<ConnectedComponentsError> for crate::errors::MonopartiteError<G> {
     fn from(error: ConnectedComponentsError) -> Self {
         Self::AlgorithmError(error.into())
     }

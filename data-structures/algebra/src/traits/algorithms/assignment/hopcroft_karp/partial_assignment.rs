@@ -1,19 +1,22 @@
 //! Partial assignment for Hopcroft-Karp algorithm.
 
-use crate::{prelude::{IntoUsize, Number}, traits::SparseMatrix2D};
 use super::HopcroftKarpError;
+use crate::{
+    prelude::{IntoUsize, Number},
+    traits::SparseMatrix2D,
+};
 
 /// Struct representing a partial assignment.
 pub struct PartialAssignment<'a, M: SparseMatrix2D + ?Sized, Distance = u16> {
     predecessors: Vec<Option<M::RowIndex>>,
     successors: Vec<Option<M::ColumnIndex>>,
     left_distances: Vec<Distance>,
-	null_distance: Distance,
+    null_distance: Distance,
     matrix: &'a M,
 }
 
-impl<'a, M: SparseMatrix2D + ?Sized, Distance: Number>
-    From<PartialAssignment<'a, M, Distance>> for Vec<(M::RowIndex, M::ColumnIndex)>
+impl<'a, M: SparseMatrix2D + ?Sized, Distance: Number> From<PartialAssignment<'a, M, Distance>>
+    for Vec<(M::RowIndex, M::ColumnIndex)>
 {
     fn from(assignment: PartialAssignment<'a, M, Distance>) -> Self {
         assignment
@@ -36,7 +39,13 @@ impl<'a, M: SparseMatrix2D + ?Sized, Distance: Number> From<&'a M>
         let predecessors = vec![None; matrix.number_of_columns().into_usize()];
         let successors = vec![None; matrix.number_of_rows().into_usize()];
         let left_distances = vec![Distance::MAX; matrix.number_of_rows().into_usize()];
-        PartialAssignment { predecessors, successors, left_distances, matrix, null_distance: Distance::MAX }
+        PartialAssignment {
+            predecessors,
+            successors,
+            left_distances,
+            matrix,
+            null_distance: Distance::MAX,
+        }
     }
 }
 
@@ -50,11 +59,11 @@ impl<M: SparseMatrix2D + ?Sized, Distance: Number> PartialAssignment<'_, M, Dist
         let mut frontier = Vec::new();
         for row_index in self.matrix.row_indices() {
             if self.has_successor(row_index) {
-				self.left_distances[row_index.into_usize()] = Distance::MAX;
+                self.left_distances[row_index.into_usize()] = Distance::MAX;
             } else {
                 self.left_distances[row_index.into_usize()] = Distance::ZERO;
                 frontier.push(row_index);
-			}
+            }
         }
 
         self.null_distance = Distance::MAX;
@@ -83,42 +92,39 @@ impl<M: SparseMatrix2D + ?Sized, Distance: Number> PartialAssignment<'_, M, Dist
         Ok(self.null_distance != Distance::MAX)
     }
 
-	/// Returns the distance of the provided left node id.
-	/// 
-	/// # Arguments
-	/// 
-	/// * `row_index`: The identifier of the left node.
-	/// 
-	fn left_distance(&self, row_index: Option<M::RowIndex>) -> Distance {
-		let Some(row_index) = row_index else {
-			return self.null_distance;
-		};
-		self.left_distances[row_index.into_usize()]
-	}
+    /// Returns the distance of the provided left node id.
+    ///
+    /// # Arguments
+    ///
+    /// * `row_index`: The identifier of the left node.
+    fn left_distance(&self, row_index: Option<M::RowIndex>) -> Distance {
+        let Some(row_index) = row_index else {
+            return self.null_distance;
+        };
+        self.left_distances[row_index.into_usize()]
+    }
 
-	/// Returns a mutable reference to the distance of the provided left node id.
-	///
-	/// # Arguments
-	/// 
-	/// * `row_index`: The identifier of the left node.
-	/// 
-	fn left_distance_mut(&mut self, row_index: Option<M::RowIndex>) -> &mut Distance {
-		let Some(row_index) = row_index else {
-			return &mut self.null_distance;
-		};
-		&mut self.left_distances[row_index.into_usize()]
-	}
+    /// Returns a mutable reference to the distance of the provided left node
+    /// id.
+    ///
+    /// # Arguments
+    ///
+    /// * `row_index`: The identifier of the left node.
+    fn left_distance_mut(&mut self, row_index: Option<M::RowIndex>) -> &mut Distance {
+        let Some(row_index) = row_index else {
+            return &mut self.null_distance;
+        };
+        &mut self.left_distances[row_index.into_usize()]
+    }
 
     pub(super) fn dfs(&mut self, row_index: Option<M::RowIndex>) -> bool {
-		let Some(row_index) = row_index else {
-			return true;
-		};
+        let Some(row_index) = row_index else {
+            return true;
+        };
         let left_distance = self.left_distances[row_index.into_usize()];
         for successor_id in self.matrix.sparse_row(row_index) {
             let maybe_predecessor_id = self.predecessors[successor_id.into_usize()];
-            if self.left_distance(maybe_predecessor_id)
-                == left_distance + Distance::ONE
-            {
+            if self.left_distance(maybe_predecessor_id) == left_distance + Distance::ONE {
                 if self.dfs(maybe_predecessor_id) {
                     self.successors[row_index.into_usize()] = Some(successor_id);
                     self.predecessors[successor_id.into_usize()] = Some(row_index);

@@ -4,14 +4,15 @@
 use algebra::{
     impls::{Ranged, RangedCSR2D},
     prelude::{
-        IntoUsize, Matrix2D, Matrix2DRef, PositiveInteger, SparseMatrix, SparseMatrixMut,
-        TryFromUsize, Zero, SizedSparseMatrix
+        IntoUsize, Matrix2D, Matrix2DRef, PositiveInteger, SizedSparseMatrix, SparseMatrix,
+        SparseMatrixMut, TryFromUsize, Zero,
     },
 };
 
-use crate::{errors::builder::edges::EdgesBuilderError, traits::{
-    BidirectionalVocabulary, BipartiteGraph, Edges, Graph, GrowableEdges, MonoplexGraph,
-}};
+use crate::{
+    errors::builder::edges::EdgesBuilderError,
+    traits::{BidirectionalVocabulary, BipartiteGraph, Edges, Graph, GrowableEdges, MonoplexGraph},
+};
 
 impl<SparseIndex, RowIndex, R> Edges for RangedCSR2D<SparseIndex, RowIndex, R>
 where

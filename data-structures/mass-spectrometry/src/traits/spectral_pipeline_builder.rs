@@ -1,8 +1,7 @@
 //! Submodule defining a builder for a [`SpectralPipeline`].
 
-use crate::prelude::{SpectralFilter, SpectralPipeline, Spectrum};
-
 use super::SpectralProcessor;
+use crate::prelude::{SpectralFilter, SpectralPipeline, Spectrum};
 
 /// A builder for a [`SpectralPipeline`].
 pub trait SpectralPipelineBuilder {
@@ -14,9 +13,9 @@ pub trait SpectralPipelineBuilder {
     /// Adds a filter to the pipeline.
     fn filter(self, filter: Box<dyn SpectralFilter<Spectrum = Self::Spectrum>>) -> Self;
 
-	/// Adds a processor to the pipeline.
-	fn processor(self, processor: Box<dyn SpectralProcessor<Spectrum = Self::Spectrum>>) -> Self;
+    /// Adds a processor to the pipeline.
+    fn processor(self, processor: Box<dyn SpectralProcessor<Spectrum = Self::Spectrum>>) -> Self;
 
-	/// Builds the pipeline.
-	fn build(self) -> Self::Pipeline;
+    /// Builds the pipeline.
+    fn build(self) -> Self::Pipeline;
 }

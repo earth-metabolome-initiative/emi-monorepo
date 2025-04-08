@@ -42,7 +42,8 @@ pub trait TransposedEdges: super::Edges<Matrix = <Self as TransposedEdges>::BiMa
 
 impl<E: Edges> TransposedEdges for E
 where
-    E::Matrix: SizedSparseBiMatrix2D<RowIndex = E::SourceNodeId, ColumnIndex = E::DestinationNodeId>,
+    E::Matrix:
+        SizedSparseBiMatrix2D<RowIndex = E::SourceNodeId, ColumnIndex = E::DestinationNodeId>,
 {
     type BiMatrix = E::Matrix;
 }

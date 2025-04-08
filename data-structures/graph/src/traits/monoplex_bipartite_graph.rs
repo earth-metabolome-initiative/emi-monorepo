@@ -5,7 +5,7 @@
 //! * They are bipartite, i.e., they have two types of nodes.
 //! * They are monoplex, i.e., they have only one type of edges.
 
-use algebra::prelude::{SparseMatrix2D, Zero, IntoUsize};
+use algebra::prelude::{IntoUsize, SparseMatrix2D, Zero};
 
 use super::{BipartiteGraph, Edges, MonoplexGraph};
 
@@ -64,11 +64,7 @@ pub trait MonoplexBipartiteGraph:
         }
 
         for (src, dst) in self.edges().sparse_coordinates() {
-            dot.push_str(&format!(
-                "  L{} -> R{};\n",
-                src.into_usize(),
-                dst.into_usize()
-            ));
+            dot.push_str(&format!("  L{} -> R{};\n", src.into_usize(), dst.into_usize()));
         }
 
         dot.push_str("}\n");
