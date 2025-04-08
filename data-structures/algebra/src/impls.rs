@@ -26,5 +26,4 @@ pub use generic_iterators::*;
 pub use generic_matrix2d_with_padded_diagonal::GenericMatrix2DWithPaddedDiagonal;
 pub use ranged_csr::*;
 pub use valued_matrix::*;
-pub use padded_matrix2d::*;
 pub use vec::VecMatrix2D;

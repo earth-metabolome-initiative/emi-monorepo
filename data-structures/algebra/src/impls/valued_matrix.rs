@@ -178,7 +178,7 @@ where
         RowIndex = RowIndex,
         ColumnIndex = ColumnIndex,
         SparseIndex = SparseIndex,
-    >
+    >,
 {
     type SparseRowSizes<'a>
         = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SizedRowsSparseMatrix2D>::SparseRowSizes<'a>

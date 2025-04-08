@@ -349,14 +349,12 @@ pub trait DenseValuedMatrix: DenseMatrix + ValuedMatrix {
 }
 
 impl<M: DenseValuedMatrix> DenseValuedMatrix for &M {
-    type Values<'a> = M::Values<'a>
+    type Values<'a>
+        = M::Values<'a>
     where
         Self: 'a;
 
-    fn value(
-        &self,
-        coordinates: Self::Coordinates,
-    ) -> Self::Value {
+    fn value(&self, coordinates: Self::Coordinates) -> Self::Value {
         (*self).value(coordinates)
     }
 

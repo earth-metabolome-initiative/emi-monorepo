@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 
-pub mod traits;
 pub mod structs;
+pub mod traits;
 
 /// Prelude module for the mass-spectrometry crate.
 pub mod prelude {
