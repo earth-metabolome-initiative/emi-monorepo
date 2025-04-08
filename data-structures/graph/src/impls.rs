@@ -18,9 +18,6 @@ mod tuple;
 mod ranged_csr;
 
 #[cfg(any(feature = "std", feature = "alloc"))]
-mod ranged_csr;
-
-#[cfg(any(feature = "std", feature = "alloc"))]
 mod csr2d;
 #[cfg(any(feature = "std", feature = "alloc"))]
 mod generic_implicit_valued_matrix2d;
