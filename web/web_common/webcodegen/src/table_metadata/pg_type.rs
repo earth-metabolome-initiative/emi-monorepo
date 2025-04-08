@@ -114,7 +114,7 @@ pub struct PgType {
 pub fn rust_type_str<S: AsRef<str>>(type_name: S, conn: &mut PgConnection) -> Result<&'static str, WebCodeGenError> {
     Ok(match type_name.as_ref() {
         // Numeric types
-        "integer" => "i32",
+        "integer" | "int4" => "i32",
         "smallint" => "i16",
         "bigint" => "i64",
         "real" | "float4" => "f32",
@@ -868,87 +868,54 @@ impl PgType {
         Ok(pg_type::table.filter(pg_type::typname.eq(type_name)).first::<PgType>(conn)?)
     }
 
-    #[must_use]
     /// Returns whether the [`PgType`] is a boolean.
     pub fn is_boolean(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(rust_type_str(&self.typname, conn)? == "bool")
     }
 
-    #[must_use]
     /// Returns whether the [`PgType`] is a text type.
     pub fn is_text(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(rust_type_str(&self.typname, conn)? == "String")
     }
 
-    #[must_use]
-    /// Returns whether the [`PgType`] is a numeric type.
-    pub fn is_numeric(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        let rust_type = rust_type_str(&self.typname, conn)?;
-        Ok(rust_type == "i32"
-            || rust_type == "i16"
-            || rust_type == "i64"
-            || rust_type == "f32"
-            || rust_type == "f64")
+    /// Returns whether the [`PgType`] is a i16 type.
+    pub fn is_i16(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "i16")
     }
 
-    #[must_use]
-    /// Returns the tokenstream of the provided string casted to the required
-    /// type.
-    ///
-    /// # Arguments
-    ///
-    /// * `value` - The value to cast.
-    /// * `conn` - The Postgres connection.
-    ///
-    /// # Returns
-    ///
-    /// A Result containing the tokenstream of the provided string casted to the
-    /// required type, or an error if the type is not supported.
-    pub fn cast(&self, value: &str, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
-        match rust_type_str(&self.typname, conn)? {
-            "i16" => {
-                let value = value.parse::<i16>()?;
-                Ok(quote! {
-                    #value
-                })
-            }
-            "i32" => {
-                let value = value.parse::<i32>()?;
-                Ok(quote! {
-                    #value
-                })
-            }
-            "i64" => {
-                let value = value.parse::<i64>()?;
-                Ok(quote! {
-                    #value
-                })
-            }
-            "f32" => {
-                let value = value.parse::<f32>()?;
-                Ok(quote! {
-                    #value
-                })
-            }
-            "f64" => {
-                let value = value.parse::<f64>()?;
-                Ok(quote! {
-                    #value
-                })
-            }
-            "bool" => {
-                let value = value.parse::<bool>()?;
-                Ok(quote! {
-                    #value
-                })
-            }
-            _ => {
-                Err(WebCodeGenError::UnsupportedTypeCasting(
-                    value.to_owned(),
-                    Box::new(self.clone()),
-                ))
-            }
-        }
+    /// Returns whether the [`PgType`] is a i32 type.
+    pub fn is_i32(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "i32")
+    }
+
+    /// Returns whether the [`PgType`] is a i64 type.
+    pub fn is_i64(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "i64")
+    }
+
+    /// Returns whether the [`PgType`] is a u16 type.
+    pub fn is_u16(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "u16")
+    }
+
+    /// Returns whether the [`PgType`] is a u32 type.
+    pub fn is_u32(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "u32")
+    }
+
+    /// Returns whether the [`PgType`] is a u64 type.
+    pub fn is_u64(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "u64")
+    }
+
+    /// Returns whether the [`PgType`] is a f32 type.
+    pub fn is_f32(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "f32")
+    }
+
+    /// Returns whether the [`PgType`] is a f64 type.
+    pub fn is_f64(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "f64")
     }
 
     /// Returns the [`PgType`] struct from the given OID.

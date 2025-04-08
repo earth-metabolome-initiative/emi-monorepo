@@ -204,6 +204,10 @@ impl Codegen<'_> {
                         let column_type = column.rust_data_type(conn)?;
 
                         let check_constraints = column.check_constraints(conn)?.into_iter().map(|constraint| {
+                            if constraint.is_postgis_constraint() {
+                                return Ok(TokenStream::new());
+                            }
+
                             let outcome = constraint.to_syn(&[column], &nullable_insertable_columns, self.check_constraints_extensions.as_slice(), &insertable_enum, conn);
                             if let Err(WebCodeGenError::CodeGenerationError(CodeGenerationError::CheckConstraintError(CheckConstraintError::NoInvolvedColumns(unknown_column, _)))) = &outcome {
                                 if all_columns.contains(unknown_column.as_ref()) && !insertable_columns.contains(&unknown_column.as_ref()) {
