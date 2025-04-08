@@ -39,5 +39,5 @@ async fn test_codegen_tables_insertable_traits() {
 
     codegen_test("codegen_tables_insertable_traits");
 
-    std::fs::remove_dir_all("tests/codegen_tables_insertable_traits").unwrap();
+    // std::fs::remove_dir_all("tests/codegen_tables_insertable_traits").unwrap();
 }
