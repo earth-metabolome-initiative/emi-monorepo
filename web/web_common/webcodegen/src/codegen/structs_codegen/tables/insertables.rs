@@ -131,10 +131,6 @@ impl Codegen<'_> {
         let mut insertables_main_module = TokenStream::new();
 
         for table in tables {
-            if !self.is_table_insertable(table, conn)? {
-                continue;
-            }
-
             let all_columns = table.columns(conn)?;
             let insertable_columns = all_columns
                 .iter()
