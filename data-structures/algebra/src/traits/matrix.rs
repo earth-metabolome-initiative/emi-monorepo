@@ -130,7 +130,16 @@ pub trait SizedSparseMatrix: SparseMatrix {
 
     /// Returns the number of defined elements in the matrix.
     fn number_of_defined_values(&self) -> Self::SparseIndex;
+}
 
+impl<M: SizedSparseMatrix> SizedSparseMatrix for &M {
+    fn number_of_defined_values(&self) -> Self::SparseIndex {
+        (*self).number_of_defined_values()
+    }
+}
+
+/// Trait defining a sized sparse matrix.
+pub trait RankSelectSparseMatrix: SizedSparseMatrix {
     /// Returns the rank of the provided coordinates.
     ///
     /// # Arguments
@@ -152,6 +161,16 @@ pub trait SizedSparseMatrix: SparseMatrix {
     ///
     /// Panics if the sparse index is out of bounds.
     fn select(&self, sparse_index: Self::SparseIndex) -> Self::Coordinates;
+}
+
+impl<M: RankSelectSparseMatrix> RankSelectSparseMatrix for &M {
+    fn rank(&self, coordinates: &Self::Coordinates) -> Self::SparseIndex {
+        (*self).rank(coordinates)
+    }
+
+    fn select(&self, sparse_index: Self::SparseIndex) -> Self::Coordinates {
+        (*self).select(sparse_index)
+    }
 }
 
 /// Trait defining a dense valued matrix.

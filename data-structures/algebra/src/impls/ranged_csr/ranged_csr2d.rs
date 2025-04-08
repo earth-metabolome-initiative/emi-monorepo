@@ -141,6 +141,19 @@ impl<
         SparseIndex: PositiveInteger + IntoUsize,
         RowIndex: PositiveInteger + IntoUsize,
         R: Ranged,
+    > SizedSparseMatrix for RangedCSR2D<SparseIndex, RowIndex, R>
+where
+    Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = R::Step>,
+{
+    fn number_of_defined_values(&self) -> Self::SparseIndex {
+        self.number_of_defined_values
+    }
+}
+
+impl<
+        SparseIndex: PositiveInteger + IntoUsize,
+        RowIndex: PositiveInteger + IntoUsize,
+        R: Ranged,
     > SparseMatrix2D for RangedCSR2D<SparseIndex, RowIndex, R>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = R::Step>,
