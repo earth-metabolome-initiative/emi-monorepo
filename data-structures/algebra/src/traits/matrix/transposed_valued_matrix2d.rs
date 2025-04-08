@@ -1,8 +1,8 @@
 //! Submodule providing the [`TransposedValuedMatrix2D`] trait.
 
 use super::{
-    BiMatrix2D, SparseBiMatrix2D, SparseMatrix2D, SymmetricMatrix2D, ValuedMatrix, ValuedMatrix2D,
-    SparseValuedMatrix2D,
+    BiMatrix2D, SizedSparseBiMatrix2D, SparseMatrix2D, SparseValuedMatrix2D,
+    SymmetricMatrix2D, ValuedMatrix, ValuedMatrix2D,
 };
 use crate::traits::TotalOrd;
 
@@ -30,13 +30,13 @@ pub trait ValuedBiMatrix2D:
 
 /// Trait defining a sparse matrix which supports efficient operations on
 /// columns.
-pub trait ValuedSparseBiMatrix2D:
+pub trait ValuedSizedSparseBiMatrix2D:
     ValuedBiMatrix2D<
-        ValuedMatrix = <Self as ValuedSparseBiMatrix2D>::ValuedSparseMatrix,
-        ValuedTransposedMatrix = <Self as ValuedSparseBiMatrix2D>::ValuedSparseTransposedMatrix,
-    > + SparseBiMatrix2D<
-        SparseMatrix = <Self as ValuedSparseBiMatrix2D>::ValuedSparseMatrix,
-        SparseTransposedMatrix = <Self as ValuedSparseBiMatrix2D>::ValuedSparseTransposedMatrix,
+        ValuedMatrix = <Self as ValuedSizedSparseBiMatrix2D>::ValuedSparseMatrix,
+        ValuedTransposedMatrix = <Self as ValuedSizedSparseBiMatrix2D>::ValuedSparseTransposedMatrix,
+    > + SizedSparseBiMatrix2D<
+        SizedSparseMatrix = <Self as ValuedSizedSparseBiMatrix2D>::ValuedSparseMatrix,
+        SizedSparseTransposedMatrix = <Self as ValuedSizedSparseBiMatrix2D>::ValuedSparseTransposedMatrix,
     >
 {
     /// The type of the underlying valued sparse matrix.
@@ -100,17 +100,22 @@ pub trait ValuedSparseBiMatrix2D:
     }
 }
 
-impl<M> ValuedSparseBiMatrix2D for M
+impl<M> ValuedSizedSparseBiMatrix2D for M
 where
-    M: ValuedBiMatrix2D + SparseMatrix2D,
+    M: ValuedBiMatrix2D + SizedSparseBiMatrix2D<
+        SizedSparseMatrix = <M as ValuedBiMatrix2D>::ValuedMatrix,
+        SizedSparseTransposedMatrix = <M as ValuedBiMatrix2D>::ValuedTransposedMatrix,
+    >,
     M::ValuedMatrix: SparseValuedMatrix2D<
         RowIndex = Self::RowIndex,
         ColumnIndex = Self::ColumnIndex,
+        SparseIndex = Self::SparseIndex,
         Value = Self::Value,
     >,
     M::ValuedTransposedMatrix: SparseValuedMatrix2D<
         RowIndex = Self::ColumnIndex,
         ColumnIndex = Self::RowIndex,
+        SparseIndex = Self::SparseIndex,
         Value = Self::Value,
     >,
 {

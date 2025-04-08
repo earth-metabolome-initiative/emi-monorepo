@@ -87,13 +87,20 @@ where
     fn number_of_defined_values(&self) -> Self::SparseIndex {
         self.matrix.number_of_defined_values()
     }
+}
+
+impl<M, T> RankSelectSparseMatrix for GenericBiMatrix2D<M, T>
+where
+    T: Matrix2D,
+    M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
+    M: RankSelectSparseMatrix,
+{
+    fn rank(&self, coordinates: &Self::Coordinates) -> Self::SparseIndex {
+        self.matrix.rank(coordinates)
+    }
 
     fn select(&self, sparse_index: Self::SparseIndex) -> Self::Coordinates {
         self.matrix.select(sparse_index)
-    }
-
-    fn rank(&self, coordinates: &Self::Coordinates) -> Self::SparseIndex {
-        self.matrix.rank(coordinates)
     }
 }
 

@@ -126,13 +126,21 @@ where
     fn number_of_defined_values(&self) -> Self::SparseIndex {
         self.csr.number_of_defined_values()
     }
+}
+
+impl<SparseIndex: PositiveInteger + IntoUsize, Idx: PositiveInteger + IntoUsize> RankSelectSparseMatrix
+    for UpperTriangularCSR2D<SparseIndex, Idx>
+where
+    Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
+    SquareCSR2D<SparseIndex, Idx>:
+        RankSelectSparseMatrix<Coordinates = Self::Coordinates, SparseIndex = SparseIndex>,
+{
+    fn rank(&self, coordinates: &Self::Coordinates) -> Self::SparseIndex {
+        self.csr.rank(coordinates)
+    }
 
     fn select(&self, sparse_index: Self::SparseIndex) -> Self::Coordinates {
         self.csr.select(sparse_index)
-    }
-
-    fn rank(&self, coordinates: &Self::Coordinates) -> Self::SparseIndex {
-        self.csr.rank(coordinates)
     }
 }
 

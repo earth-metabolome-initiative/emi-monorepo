@@ -21,6 +21,22 @@ fn main() {
                     "The row {row_index} has duplicates"
                 );
             }
+
+            // We collect the sparse coordinates, and check that they are sorted
+            // and non-duplicated.
+            let sparse_coordinates = csr.sparse_coordinates().collect::<Vec<_>>();
+            let mut clone_sparse_coordinates = sparse_coordinates.clone();
+            clone_sparse_coordinates.sort_unstable();
+            assert_eq!(
+                sparse_coordinates, clone_sparse_coordinates,
+                "The sparse coordinates are not sorted"
+            );
+            clone_sparse_coordinates.dedup();
+            assert_eq!(
+                sparse_coordinates, clone_sparse_coordinates,
+                "The sparse coordinates have duplicates: {:?}",
+                csr
+            );
         });
     }
 }

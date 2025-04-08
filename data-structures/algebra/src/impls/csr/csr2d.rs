@@ -165,7 +165,16 @@ where
     fn number_of_defined_values(&self) -> Self::SparseIndex {
         self.offsets.last().copied().unwrap_or(SparseIndex::ZERO)
     }
+}
 
+impl<
+        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    > RankSelectSparseMatrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+where
+    Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
+{
     fn select(&self, sparse_index: Self::SparseIndex) -> Self::Coordinates {
         (self.select_row(sparse_index), self.select_column(sparse_index))
     }

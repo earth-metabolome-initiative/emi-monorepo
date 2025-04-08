@@ -6,9 +6,9 @@ use core::fmt::Debug;
 use super::{MutabilityError, CSR2D};
 use crate::traits::{
     IntoUsize, Matrix, Matrix2D, Matrix2DRef, MatrixMut, One, PositiveInteger,
-    SizedRowsSparseMatrix2D, SizedSparseMatrix, SizedSparseMatrix2D, SizedSparseValuedMatrix,
-    SparseMatrix, SparseMatrix2D, SparseMatrixMut, SparseValuedMatrix, TryFromUsize, ValuedMatrix,
-    ValuedMatrix2D, SparseValuedMatrix2D, Zero,
+    RankSelectSparseMatrix, SizedRowsSparseMatrix2D, SizedSparseMatrix, SizedSparseMatrix2D,
+    SizedSparseValuedMatrix, SparseMatrix, SparseMatrix2D, SparseMatrixMut, SparseValuedMatrix,
+    SparseValuedMatrix2D, TryFromUsize, ValuedMatrix, ValuedMatrix2D, Zero,
 };
 
 #[cfg(feature = "arbitrary")]
@@ -78,10 +78,7 @@ where
     type Coordinates = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as Matrix>::Coordinates;
 
     fn shape(&self) -> Vec<usize> {
-        vec![
-            self.number_of_rows().into_usize(),
-            self.number_of_columns().into_usize(),
-        ]
+        vec![self.number_of_rows().into_usize(), self.number_of_columns().into_usize()]
     }
 }
 
@@ -174,7 +171,14 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex, Value> SizedRowsSparseMatrix2D
     for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 where
-    CSR2D<SparseIndex, RowIndex, ColumnIndex>: SizedRowsSparseMatrix2D,
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    CSR2D<SparseIndex, RowIndex, ColumnIndex>: SizedRowsSparseMatrix2D<
+        RowIndex = RowIndex,
+        ColumnIndex = ColumnIndex,
+        SparseIndex = SparseIndex,
+    >
 {
     type SparseRowSizes<'a>
         = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SizedRowsSparseMatrix2D>::SparseRowSizes<'a>
@@ -193,7 +197,14 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex, Value> SizedSparseMatrix2D
     for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 where
-    CSR2D<SparseIndex, RowIndex, ColumnIndex>: SizedSparseMatrix2D,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    CSR2D<SparseIndex, RowIndex, ColumnIndex>: SizedSparseMatrix2D<
+        RowIndex = RowIndex,
+        ColumnIndex = ColumnIndex,
+        SparseIndex = SparseIndex,
+    >,
 {
     fn rank_row(&self, row: Self::RowIndex) -> Self::SparseIndex {
         self.csr.rank_row(row)
@@ -236,13 +247,22 @@ where
     fn number_of_defined_values(&self) -> Self::SparseIndex {
         self.csr.number_of_defined_values()
     }
+}
+
+impl<SparseIndex, RowIndex, ColumnIndex, Value> RankSelectSparseMatrix
+    for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
+where
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    CSR2D<SparseIndex, RowIndex, ColumnIndex>: RankSelectSparseMatrix<SparseIndex = SparseIndex>,
+{
+    fn rank(&self, coordinates: &Self::Coordinates) -> Self::SparseIndex {
+        self.csr.rank(coordinates)
+    }
 
     fn select(&self, sparse_index: Self::SparseIndex) -> Self::Coordinates {
         self.csr.select(sparse_index)
-    }
-
-    fn rank(&self, coordinates: &Self::Coordinates) -> Self::SparseIndex {
-        self.csr.rank(coordinates)
     }
 }
 

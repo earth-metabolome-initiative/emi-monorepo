@@ -26,6 +26,12 @@ The CSR2D struct is one of the most commonly used sparse matrix representations.
 cargo hfuzz run csr2d
 ```
 
+and to run the crash cases:
+
+```bash
+cargo hfuzz run-debug csr2d hfuzz_workspace/*/*.fuzz
+```
+
 ### Valued CSR2D
 
 The Valued CSR2D struct is a variant of the CSR2D struct that allows for storing values in the sparse matrix. This is useful for applications where the values of the non-zero elements are important.
@@ -34,6 +40,11 @@ The Valued CSR2D struct is a variant of the CSR2D struct that allows for storing
 cargo hfuzz run valued_csr2d
 ```
 
+and to run the crash cases:
+
+```bash
+cargo hfuzz run-debug valued_csr2d hfuzz_workspace/*/*.fuzz
+```
 
 ### Padded Matrix2d
 

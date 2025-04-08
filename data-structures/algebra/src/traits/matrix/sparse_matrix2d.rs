@@ -1,6 +1,9 @@
 //! Submodule defining traits characterizing a sparse matrix.
 
-use super::{BiMatrix2D, Matrix2D, SizedSparseMatrix, SparseMatrix, SymmetricMatrix2D};
+use super::{
+    BiMatrix2D, Matrix2D, RankSelectSparseMatrix, SizedSparseMatrix, SparseMatrix,
+    SymmetricMatrix2D,
+};
 
 /// Trait defining a sparse bi-dimensional matrix.
 pub trait SparseMatrix2D: Matrix2D + SparseMatrix {
@@ -111,7 +114,23 @@ impl<M: SparseMatrix2D> SparseMatrix2D for &M {
 
 /// Trait defining a sized sparse matrix which efficiently provides the sizes of
 /// all rows.
-pub trait SizedSparseMatrix2D: SizedRowsSparseMatrix2D + SizedSparseMatrix {
+pub trait SizedRowsSparseMatrix2D: SparseMatrix2D + SizedSparseMatrix {
+    /// Iterator over the sizes of all of the rows.
+    type SparseRowSizes<'a>: Iterator<Item = Self::ColumnIndex>
+        + DoubleEndedIterator<Item = Self::ColumnIndex>
+    where
+        Self: 'a;
+
+    /// Returns an iterator over the sizes of all of the rows.
+    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_>;
+
+    /// Returns the number of defined values in a row.
+    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex;
+}
+
+/// Trait defining a sized sparse matrix which efficiently provides the sizes of
+/// all rows.
+pub trait SizedSparseMatrix2D: SizedRowsSparseMatrix2D + RankSelectSparseMatrix {
     /// Returns the rank of a row.
     fn rank_row(&self, row: Self::RowIndex) -> Self::SparseIndex;
 
@@ -128,22 +147,6 @@ pub trait SizedSparseMatrix2D: SizedRowsSparseMatrix2D + SizedSparseMatrix {
     ///
     /// * `sparse_index`: The sparse index of the column to get.
     fn select_column(&self, sparse_index: Self::SparseIndex) -> Self::ColumnIndex;
-}
-
-/// Trait defining a sized sparse matrix which efficiently provides the sizes of
-/// all rows.
-pub trait SizedRowsSparseMatrix2D: SparseMatrix2D {
-    /// Iterator over the sizes of all of the rows.
-    type SparseRowSizes<'a>: Iterator<Item = Self::ColumnIndex>
-        + DoubleEndedIterator<Item = Self::ColumnIndex>
-    where
-        Self: 'a;
-
-    /// Returns an iterator over the sizes of all of the rows.
-    fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_>;
-
-    /// Returns the number of defined values in a row.
-    fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex;
 }
 
 /// Trait defining a sparse matrix which supports efficient operations on
@@ -175,13 +178,23 @@ pub trait SparseBiMatrix2D:
     }
 }
 
+impl<M> SparseBiMatrix2D for M
+where
+    M: BiMatrix2D + SparseMatrix2D,
+    M::Matrix: SparseMatrix2D<RowIndex = Self::RowIndex, ColumnIndex = Self::ColumnIndex>,
+    M::TransposedMatrix: SparseMatrix2D<RowIndex = Self::ColumnIndex, ColumnIndex = Self::RowIndex>,
+{
+    type SparseMatrix = M::Matrix;
+    type SparseTransposedMatrix = M::TransposedMatrix;
+}
+
 /// Trait defining a sized sparse bimatrix which efficiently provides the sizes
 /// of all rows.
 pub trait SizedSparseBiMatrix2D:
     SparseBiMatrix2D<
-    SparseMatrix = <Self as SizedSparseBiMatrix2D>::SizedSparseMatrix,
-    SparseTransposedMatrix = <Self as SizedSparseBiMatrix2D>::SizedSparseTransposedMatrix,
->
+        SparseMatrix = <Self as SizedSparseBiMatrix2D>::SizedSparseMatrix,
+        SparseTransposedMatrix = <Self as SizedSparseBiMatrix2D>::SizedSparseTransposedMatrix,
+    > + SizedSparseMatrix2D
 {
     /// The type of the underlying sparse matrix.
     type SizedSparseMatrix: SizedSparseMatrix2D<
@@ -215,23 +228,21 @@ pub trait SizedSparseBiMatrix2D:
     }
 }
 
-impl<M> SparseBiMatrix2D for M
+impl<M> SizedSparseBiMatrix2D for M
 where
-    M: BiMatrix2D + SparseMatrix2D,
-    M::Matrix: SparseMatrix2D<RowIndex = Self::RowIndex, ColumnIndex = Self::ColumnIndex>,
-    M::TransposedMatrix: SparseMatrix2D<RowIndex = Self::ColumnIndex, ColumnIndex = Self::RowIndex>,
+    M: SparseBiMatrix2D + SizedSparseMatrix2D,
+    M::Matrix: SizedSparseMatrix2D<RowIndex = Self::RowIndex, ColumnIndex = Self::ColumnIndex>,
+    M::TransposedMatrix:
+        SizedSparseMatrix2D<RowIndex = Self::ColumnIndex, ColumnIndex = Self::RowIndex>,
 {
-    type SparseMatrix = M::Matrix;
-    type SparseTransposedMatrix = M::TransposedMatrix;
+    type SizedSparseMatrix = M::Matrix;
+    type SizedSparseTransposedMatrix = M::TransposedMatrix;
 }
 
 /// Trait defining a sparse symmetric matrix.
 pub trait SparseSymmetricMatrix2D:
     SymmetricMatrix2D<SymmetricMatrix = <Self as SparseSymmetricMatrix2D>::SymmetricSparseMatrix>
-    + SparseBiMatrix2D<
-        SparseMatrix = <Self as SparseSymmetricMatrix2D>::SymmetricSparseMatrix,
-        SparseTransposedMatrix = <Self as SparseSymmetricMatrix2D>::SymmetricSparseMatrix,
-    >
+    + SparseMatrix2D
 {
     /// The underlying symmetric sparse matrix type.
     type SymmetricSparseMatrix: SparseMatrix2D<
