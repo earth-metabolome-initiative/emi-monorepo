@@ -1,30 +1,30 @@
 # Time Report for Building Core Structures
 
 The total time spent on all tasks was 35 seconds.
-The slowest task was `Building Schema from CSVs` which took 18 seconds (51.43% of all time).
+The slowest task was `Building Schema from CSVs` which took 19 seconds (54.29% of all time).
 
 | name                            | time       | percentage | comment    |
 |---------------------------------|------------|------------|------------|
 | Checking Migrations Directory   | now        | 0.00%      | Unchanged. |
 | Creating Font Awesome Icons CSV | now        | 0.00%      | Unchanged. |
 | Creating Taxonomical Ranks CSV  | now        | 0.00%      | Unchanged. |
-| Building Schema from CSVs       | 18 seconds | 51.43%     | Unchanged. |
+| Building Schema from CSVs       | 19 seconds | 54.29%     | Unchanged. |
 | Executing Migrations            | now        | 0.00%      | Unchanged. |
 | Executing Meta-SQL              | now        | 0.00%      | Unchanged. |
 | Checking Constraints            | now        | 8.57%      | Unchanged. |
-| Code generation                 | 12 seconds | 34.29%     | Unchanged. |
+| Code generation                 | 13 seconds | 37.14%     | Unchanged. |
 
 ## Time Report for Code generation
 
-The total time spent on all tasks was 12 seconds.
-The slowest task was `Generate Structs` which took now (50.00% of all time).
+The total time spent on all tasks was 13 seconds.
+The slowest task was `Generate Structs` which took now (46.15% of all time).
 
 | name                       | time | percentage | comment    |
 |----------------------------|------|------------|------------|
 | Retrieving tables          | now  | 0.00%      | Unchanged. |
-| Generating Diesel code     | now  | 8.33%      | Unchanged. |
-| Generate Structs           | now  | 50.00%     | Unchanged. |
-| Generate Web Common Traits | now  | 41.67%     | Unchanged. |
+| Generating Diesel code     | now  | 7.69%      | Unchanged. |
+| Generate Structs           | now  | 46.15%     | Unchanged. |
+| Generate Web Common Traits | now  | 38.46%     | Unchanged. |
 
 ### Time Report for Generating Diesel code
 

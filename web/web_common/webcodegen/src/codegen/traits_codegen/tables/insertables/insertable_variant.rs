@@ -86,7 +86,35 @@ impl Codegen<'_> {
                 })
             };
 
+            // We implement the [`BackendInsertableVariant`] only when the table
+            // has no parent tables or when the parent tables are not updatable.
+            let backend_insertable_impl = if parent_check.is_empty(){
+                quote::quote! {
+                    #[cfg(feature="backend")]
+                    impl web_common_traits::database::BackendInsertableVariant for #insertable_frontend_variant {
+                        async fn backend_insert(
+                            self,
+                            conn: &mut Self::Conn,
+                        ) -> Result<
+                            Self::Row,
+                            web_common_traits::database::InsertError<<Self::InsertableBuilder as common_traits::prelude::Builder>::Attribute>,
+                        > {
+                            use diesel_async::RunQueryDsl;
+                            use diesel::associations::HasTable;
+    
+                            Ok(diesel::insert_into(Self::Row::table())
+                                .values(self)
+                                .get_result(conn).await?)
+                        }
+                    }
+                }
+            } else {
+                TokenStream::new()
+            };
+
             std::fs::write(&table_file, self.beautify_code(&quote::quote!{
+                #backend_insertable_impl
+
                 #syntax_flag
 				impl web_common_traits::database::InsertableVariant for #insertable_frontend_variant {
 					type Row = #table_path;

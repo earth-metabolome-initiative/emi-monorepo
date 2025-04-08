@@ -3,7 +3,7 @@
 use crate::codegen::Address as DirectusAddress;
 use core_structures::{Address as PortalAddress, City as PortalCity, Country as PortalCountry};
 use diesel_async::AsyncPgConnection;
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{Insertable, BackendInsertableVariant};
 use web_common_traits::prelude::Builder;
 
 /// Returns (potentially newly created) address for a Directus address.
@@ -26,7 +26,7 @@ pub async fn get_address(
             .code(directus_address.city_code.clone())?
             .iso(country.iso.clone())?
             .build()?
-            .insert(portal_conn)
+            .backend_insert(portal_conn)
             .await?
     };
 
@@ -57,7 +57,7 @@ pub async fn get_address(
                 }
             })?
             .build()?
-            .insert(portal_conn)
+            .backend_insert(portal_conn)
             .await?)
     }
 }

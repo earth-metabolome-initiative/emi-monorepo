@@ -1,11 +1,14 @@
 //! Submodule providing an utility to retrieve or insert a room.
 
-use super::{get_address, get_user};
-use crate::codegen::Room as DirectusRoom;
 use core_structures::Room as PortalRoom;
 use diesel_async::AsyncPgConnection;
-use web_common_traits::database::{Insertable, InsertableVariant};
-use web_common_traits::prelude::Builder;
+use web_common_traits::{
+    database::{Insertable, InsertableVariant},
+    prelude::Builder,
+};
+
+use super::{get_address, get_user};
+use crate::codegen::Room as DirectusRoom;
 
 pub async fn get_room(
     directus_room: &DirectusRoom,
@@ -51,7 +54,7 @@ pub async fn get_room(
             .created_at(created_at)?
             .updated_at(updated_at)?
             .build()?
-            .insert(portal_conn)
+            .insert(&portal_created_by.id, portal_conn)
             .await?)
     }
 }

@@ -14,7 +14,7 @@ postgis_diesel.workspace = true
 web_common_traits.workspace = true
 tokio.workspace = true
 const_format.workspace = true
-core-structures.workspace = true
+core-structures = { workspace = true, features = ["backend"] }
 
 [features]
 default = ["serde", "64-column-tables"]

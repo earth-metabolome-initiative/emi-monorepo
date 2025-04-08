@@ -58,6 +58,35 @@ pub trait InsertableVariant {
     >;
 }
 
+#[cfg(feature="backend")]
+/// A trait for types that can be constructed in the backend only to
+/// execute the insert operation without a user ID.
+pub trait BackendInsertableVariant: InsertableVariant {
+    /// Inserts the row into the database.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The connection to the database.
+    ///
+    /// # Returns
+    ///
+    /// The inserted row, if the operation was successful.
+    /// 
+    /// # Errors
+    /// 
+    /// * If the row cannot be inserted.
+    /// 
+    fn backend_insert(
+        self,
+        conn: &mut Self::Conn,
+    ) -> impl core::future::Future<
+        Output = Result<
+            Self::Row,
+            InsertError<<Self::InsertableBuilder as common_traits::prelude::Builder>::Attribute>,
+        >,
+    >;
+}
+
 /// A trait for types that can be constructed in the frontend or backend to
 /// create the insertable variant.
 pub trait InsertableBuilder:

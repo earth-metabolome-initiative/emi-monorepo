@@ -1,13 +1,15 @@
-//! Submodule providing a method to migrate the brands from the Directus database
-//! to the new database.
+//! Submodule providing a method to migrate the brands from the Directus
+//! database to the new database.
 
+use core_structures::{Brand as PortalBrand, BrandState as PortalBrandState};
 use diesel_async::AsyncPgConnection;
+use web_common_traits::{
+    database::{Insertable, InsertableVariant, Loadable},
+    prelude::Builder,
+};
 
 use super::get_user;
 use crate::codegen::Brand as DirectusBrand;
-use core_structures::{Brand as PortalBrand, BrandState as PortalBrandState};
-use web_common_traits::database::{Insertable, InsertableVariant, Loadable};
-use web_common_traits::prelude::Builder;
 
 /// Inserts missing brands into the portal database.
 ///
@@ -19,7 +21,6 @@ use web_common_traits::prelude::Builder;
 /// # Errors
 ///
 /// * If the insertion fails, an error of type `error::Error` is returned.
-///
 pub async fn insert_missing_brands(
     directus_conn: &mut AsyncPgConnection,
     portal_conn: &mut AsyncPgConnection,
@@ -79,7 +80,7 @@ pub async fn insert_missing_brands(
             .updated_by(portal_updated_by.id)?
             .name(directus_brand.brand.clone())?
             .build()?
-            .insert(portal_conn)
+            .insert(&portal_created_by.id, portal_conn)
             .await?;
     }
 

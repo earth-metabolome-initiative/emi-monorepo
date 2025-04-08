@@ -86,7 +86,7 @@ pub(crate) async fn insert_missing_instrument_models(
             .updated_at(updated_at)?
             .created_at(created_at)?
             .build()?
-            .insert(portal_conn).await?;
+            .insert(&portal_created_by.id, portal_conn).await?;
     }
     Ok(())
 }

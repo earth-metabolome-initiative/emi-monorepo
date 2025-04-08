@@ -1,16 +1,18 @@
 //! Submodule to insert missing instruments present in the Directus database
 //! but not in the Portal database.
 
+use core_structures::{
+    Instrument as PortalInstrument, InstrumentModel as PortalInstrumentModel,
+    InstrumentState as PortalInstrumentState,
+};
 use diesel_async::AsyncPgConnection;
+use web_common_traits::{
+    database::{Insertable, InsertableVariant, Loadable},
+    prelude::Builder,
+};
 
 use super::get_user;
 use crate::codegen::Instrument as DirectusInstrument;
-use core_structures::{
-    Instrument as PortalInstrument, InstrumentLocation as PortalInstrumentLocation,
-    InstrumentModel as PortalInstrumentModel, InstrumentState as PortalInstrumentState,
-};
-use web_common_traits::database::{Insertable, InsertableVariant, Loadable};
-use web_common_traits::prelude::Builder;
 
 /// Inserts missing instruments into the Portal database
 /// that are present in the Directus database.
@@ -23,7 +25,6 @@ use web_common_traits::prelude::Builder;
 /// # Errors
 ///
 /// * If the database operations fail, an error is returned.
-///
 pub(crate) async fn insert_missing_instruments(
     directus_conn: &mut AsyncPgConnection,
     portal_conn: &mut AsyncPgConnection,
@@ -75,7 +76,7 @@ pub(crate) async fn insert_missing_instruments(
             .instrument_model_id(portal_instrument_model.id)?
             .qrcode(directus_instrument.uuid_instrument)?
             .build()?
-            .insert(portal_conn)
+            .insert(&created_by.id, portal_conn)
             .await?;
 
         // TODO! Add the geolocation and room information!

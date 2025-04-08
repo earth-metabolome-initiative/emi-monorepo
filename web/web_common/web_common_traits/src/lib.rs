@@ -28,4 +28,7 @@ pub mod prelude {
         session::Session,
         session_operation::SessionOperation,
     };
+
+    #[cfg(feature = "backend")]
+    pub use crate::database::BackendInsertableVariant;
 }
