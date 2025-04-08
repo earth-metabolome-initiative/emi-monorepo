@@ -6,14 +6,14 @@ use crate::api::ws::{operation_errors::InfallibleOperationError, outcomes::NoOpO
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NoOp {
-    id: uuid::Uuid,
+    id: rosetta_uuid::Uuid,
 }
 
 impl Operation for NoOp {
     type Outcome = NoOpOutcome;
     type Error = InfallibleOperationError<Self>;
 
-    fn id(&self) -> uuid::Uuid {
+    fn id(&self) -> rosetta_uuid::Uuid {
         self.id
     }
 }
