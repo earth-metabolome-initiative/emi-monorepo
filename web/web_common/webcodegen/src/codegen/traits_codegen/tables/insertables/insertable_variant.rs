@@ -38,9 +38,6 @@ impl Codegen<'_> {
         let user_id_type = user_table.primary_key_type(conn)?;
 
         for table in tables {
-            if !table.allows_insertable(conn)? {
-                continue;
-            }
             // We create a file for each table
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let table_path = table.import_struct_path()?;
@@ -55,6 +52,11 @@ impl Codegen<'_> {
                 .iter()
                 .map(|parent_key| {
                     let parent_key_method = parent_key.getter_ident()?;
+                    let (parent_table, _) = parent_key.foreign_table(conn)?.expect("Parent table not found");
+                    if !parent_table.allows_updatable(conn)? {
+                        return Ok(TokenStream::new());
+                    }
+
                     Ok(if parent_key.is_nullable() {
                         quote::quote! {
                             if let Some(parent) = self.#parent_key_method(conn).await? {
@@ -76,12 +78,43 @@ impl Codegen<'_> {
             let (user_id, additional_imports) = if parent_check.is_empty() {
                 (quote::quote! { _user_id }, TokenStream::new())
             } else {
-                (quote::quote! { user_id }, quote::quote! {
-                    use web_common_traits::database::Updatable;
-                })
+                (
+                    quote::quote! { user_id },
+                    quote::quote! {
+                        use web_common_traits::database::Updatable;
+                    },
+                )
+            };
+
+            // We implement the [`BackendInsertableVariant`] only when the table
+            // has no parent tables or when the parent tables are not updatable.
+            let backend_insertable_impl = if parent_check.is_empty() {
+                quote::quote! {
+                    #[cfg(feature="backend")]
+                    impl web_common_traits::database::BackendInsertableVariant for #insertable_frontend_variant {
+                        async fn backend_insert(
+                            self,
+                            conn: &mut Self::Conn,
+                        ) -> Result<
+                            Self::Row,
+                            web_common_traits::database::InsertError<<Self::InsertableBuilder as common_traits::prelude::Builder>::Attribute>,
+                        > {
+                            use diesel_async::RunQueryDsl;
+                            use diesel::associations::HasTable;
+
+                            Ok(diesel::insert_into(Self::Row::table())
+                                .values(self)
+                                .get_result(conn).await?)
+                        }
+                    }
+                }
+            } else {
+                TokenStream::new()
             };
 
             std::fs::write(&table_file, self.beautify_code(&quote::quote!{
+                #backend_insertable_impl
+
                 #syntax_flag
 				impl web_common_traits::database::InsertableVariant for #insertable_frontend_variant {
 					type Row = #table_path;

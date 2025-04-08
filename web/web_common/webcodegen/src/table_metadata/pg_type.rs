@@ -9,7 +9,7 @@ use quote::quote;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{parse_str, Ident, Type};
 
-use super::{table::RESERVED_RUST_WORDS, PgAttribute, PgEnum};
+use super::{table::RESERVED_RUST_WORDS, PgAttribute, PgEnum, PgSetting};
 use crate::{
     codegen::{
         CODEGEN_DIESEL_MODULE, CODEGEN_DIRECTORY, CODEGEN_STRUCTS_MODULE, CODEGEN_TYPES_PATH,
@@ -18,7 +18,8 @@ use crate::{
 };
 
 /// Constant listing types supporting `Copy`.
-pub(crate) const COPY_TYPES: [&str; 7] = ["i32", "i16", "i64", "f32", "f64", "bool", "rosetta_uuid::Uuid"];
+pub(crate) const COPY_TYPES: [&str; 7] =
+    ["i32", "i16", "i64", "f32", "f64", "bool", "rosetta_uuid::Uuid"];
 
 /// Constant listing types supporting `Eq`.
 pub(crate) const EQ_TYPES: [&str; 5] = ["i32", "i16", "i64", "bool", "rosetta_uuid::Uuid"];
@@ -111,10 +112,13 @@ pub struct PgType {
 /// # Panics
 ///
 /// Panics if the type is not supported.
-pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> Result<&'static str, WebCodeGenError> {
+pub fn rust_type_str<S: AsRef<str>>(
+    type_name: S,
+    conn: &mut PgConnection,
+) -> Result<&'static str, WebCodeGenError> {
     Ok(match type_name.as_ref() {
         // Numeric types
-        "integer" => "i32",
+        "integer" | "int4" => "i32",
         "smallint" => "i16",
         "bigint" => "i64",
         "real" | "float4" => "f32",
@@ -129,7 +133,16 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> Result<&'static str, WebCod
         "boolean" | "bool" => "bool",
 
         // Temporal types
-        "timestamp with time zone" | "timestamp without time zone" => "chrono::NaiveDateTime",
+        "timestamp without time zone" => "chrono::NaiveDateTime",
+        "timestamp with time zone" => {
+            let time_zone = PgSetting::time_zone(conn)?;
+            match time_zone.setting.as_str() {
+                "UTC" => "chrono::DateTime<chrono::Utc>",
+                unknown_time_zone => {
+                    unimplemented!("Time zone `{unknown_time_zone}` not supported")
+                }
+            }
+        }
         "date" => "chrono::NaiveDate",
         "time without time zone" | "time with time zone" => "chrono::NaiveTime",
         "interval" => "chrono::Duration",
@@ -220,9 +233,10 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<String, WebCod
         "tsquery" => "diesel_full_text_search::TsQuery",
 
         // GIS types
-        "geometry" | "geography" | "point" | "polygon" | "geometry(Point,4326)" | "line" => {
+        "geometry" | "point" | "polygon" | "geometry(Point,4326)" | "line" => {
             "postgis_diesel::sql_types::Geometry"
         }
+        "geography" => "postgis_diesel::sql_types::Geography",
 
         // Other
         "uuid" => "rosetta_uuid::diesel_impls::Uuid",
@@ -284,7 +298,7 @@ impl PgType {
         optional: bool,
         conn: &mut PgConnection,
     ) -> Result<Type, WebCodeGenError> {
-        match rust_type_str(&self.typname) {
+        match rust_type_str(&self.typname, conn) {
             Ok(rust_type) => Ok(parse_str::<Type>(rust_type)?),
             Err(error) => {
                 if self.is_composite() || self.is_enum() {
@@ -496,7 +510,7 @@ impl PgType {
                 .ok_or(WebCodeGenError::MissingBaseType(Box::new(self.clone())))
                 .and_then(|base_type| base_type.supports_copy(conn))
         } else {
-            Ok(COPY_TYPES.contains(&rust_type_str(&self.typname)?))
+            Ok(COPY_TYPES.contains(&rust_type_str(&self.typname, conn)?))
         }
     }
 
@@ -520,7 +534,7 @@ impl PgType {
                 .into_iter()
                 .try_fold(true, |acc, attribute| attribute.supports_hash(conn).map(|b| acc && b))
         } else {
-            Ok(HASH_TYPES.contains(&rust_type_str(&self.typname)?))
+            Ok(HASH_TYPES.contains(&rust_type_str(&self.typname, conn)?))
         }
     }
 
@@ -544,7 +558,7 @@ impl PgType {
                 .into_iter()
                 .try_fold(true, |acc, attribute| attribute.supports_eq(conn).map(|b| acc && b))
         } else {
-            Ok(EQ_TYPES.contains(&rust_type_str(&self.typname)?))
+            Ok(EQ_TYPES.contains(&rust_type_str(&self.typname, conn)?))
         }
     }
 
@@ -860,86 +874,54 @@ impl PgType {
         Ok(pg_type::table.filter(pg_type::typname.eq(type_name)).first::<PgType>(conn)?)
     }
 
-    #[must_use]
     /// Returns whether the [`PgType`] is a boolean.
-    pub fn is_boolean(&self) -> Result<bool, WebCodeGenError> {
-        Ok(rust_type_str(&self.typname)? == "bool")
+    pub fn is_boolean(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "bool")
     }
 
-    #[must_use]
     /// Returns whether the [`PgType`] is a text type.
-    pub fn is_text(&self) -> Result<bool, WebCodeGenError> {
-        Ok(rust_type_str(&self.typname)? == "String")
+    pub fn is_text(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "String")
     }
 
-    #[must_use]
-    /// Returns whether the [`PgType`] is a numeric type.
-    pub fn is_numeric(&self) -> Result<bool, WebCodeGenError> {
-        let rust_type = rust_type_str(&self.typname)?;
-        Ok(rust_type == "i32"
-            || rust_type == "i16"
-            || rust_type == "i64"
-            || rust_type == "f32"
-            || rust_type == "f64")
+    /// Returns whether the [`PgType`] is a i16 type.
+    pub fn is_i16(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "i16")
     }
 
-    #[must_use]
-    /// Returns the tokenstream of the provided string casted to the required
-    /// type.
-    ///
-    /// # Arguments
-    ///
-    /// * `value` - The value to cast.
-    ///
-    /// # Returns
-    ///
-    /// A Result containing the tokenstream of the provided string casted to the
-    /// required type, or an error if the type is not supported.
-    pub fn cast(&self, value: &str) -> Result<TokenStream, WebCodeGenError> {
-        match rust_type_str(&self.typname)? {
-            "i16" => {
-                let value = value.parse::<i16>()?;
-                Ok(quote! {
-                    #value
-                })
-            }
-            "i32" => {
-                let value = value.parse::<i32>()?;
-                Ok(quote! {
-                    #value
-                })
-            }
-            "i64" => {
-                let value = value.parse::<i64>()?;
-                Ok(quote! {
-                    #value
-                })
-            }
-            "f32" => {
-                let value = value.parse::<f32>()?;
-                Ok(quote! {
-                    #value
-                })
-            }
-            "f64" => {
-                let value = value.parse::<f64>()?;
-                Ok(quote! {
-                    #value
-                })
-            }
-            "bool" => {
-                let value = value.parse::<bool>()?;
-                Ok(quote! {
-                    #value
-                })
-            }
-            _ => {
-                Err(WebCodeGenError::UnsupportedTypeCasting(
-                    value.to_owned(),
-                    Box::new(self.clone()),
-                ))
-            }
-        }
+    /// Returns whether the [`PgType`] is a i32 type.
+    pub fn is_i32(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "i32")
+    }
+
+    /// Returns whether the [`PgType`] is a i64 type.
+    pub fn is_i64(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "i64")
+    }
+
+    /// Returns whether the [`PgType`] is a u16 type.
+    pub fn is_u16(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "u16")
+    }
+
+    /// Returns whether the [`PgType`] is a u32 type.
+    pub fn is_u32(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "u32")
+    }
+
+    /// Returns whether the [`PgType`] is a u64 type.
+    pub fn is_u64(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "u64")
+    }
+
+    /// Returns whether the [`PgType`] is a f32 type.
+    pub fn is_f32(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "f32")
+    }
+
+    /// Returns whether the [`PgType`] is a f64 type.
+    pub fn is_f64(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "f64")
     }
 
     /// Returns the [`PgType`] struct from the given OID.

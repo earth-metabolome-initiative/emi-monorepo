@@ -246,6 +246,29 @@ impl Column {
             .first::<crate::GeometryColumn>(conn)?)
     }
 
+    /// Returns the associated geography column if the column is a geography
+    /// column.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn geography(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<crate::GeographyColumn, WebCodeGenError> {
+        use crate::schema::geography_columns;
+
+        Ok(geography_columns::table
+            .filter(geography_columns::f_table_name.eq(&self.table_name))
+            .filter(geography_columns::f_table_schema.eq(&self.table_schema))
+            .filter(geography_columns::f_geography_column.eq(&self.column_name))
+            .first::<crate::GeographyColumn>(conn)?)
+    }
+
     /// Returns the data type associated with the column as repo
     ///
     /// # Arguments
@@ -313,7 +336,10 @@ impl Column {
         if let Ok(geometry) = self.geometry(conn) {
             return Ok(geometry.str_rust_type().to_owned());
         }
-        match rust_type_str(self.data_type_str(conn)?) {
+        if let Ok(geography) = self.geography(conn) {
+            return Ok(geography.str_rust_type().to_owned());
+        }
+        match rust_type_str(self.data_type_str(conn)?, conn) {
             Ok(s) => Ok(s.to_string()),
             Err(error) => {
                 if self.has_custom_type() {
@@ -361,7 +387,10 @@ impl Column {
         if let Ok(geometry) = self.geometry(conn) {
             return geometry.rust_type(self.is_nullable());
         }
-        match rust_type_str(self.data_type_str(conn)?) {
+        if let Ok(geography) = self.geography(conn) {
+            return geography.rust_type(self.is_nullable());
+        }
+        match rust_type_str(self.data_type_str(conn)?, conn) {
             Ok(s) => {
                 if self.is_nullable() {
                     Ok(syn::parse_str(&format!("Option<{s}>"))?)
@@ -493,6 +522,30 @@ impl Column {
         self.__is_nullable == "YES"
     }
 
+    /// Returns whether the column type implements copy.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        if let Ok(geometry) = self.geometry(conn) {
+            return Ok(geometry.supports_copy());
+        }
+        if let Ok(geography) = self.geography(conn) {
+            return Ok(geography.supports_copy());
+        }
+        match rust_type_str(self.data_type_str(conn)?, conn) {
+            Ok(s) => Ok(COPY_TYPES.contains(&s)),
+            Err(error) => {
+                if self.has_custom_type() {
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.supports_copy(conn)?)
+                } else {
+                    Err(error)
+                }
+            }
+        }
+    }
+
     /// Returns the diesel type of the column
     ///
     /// # Arguments
@@ -540,12 +593,15 @@ impl Column {
     /// # Returns
     ///
     /// A `bool` indicating whether the column is automatically generated
-    pub fn is_automatically_generated(&self) -> bool {
+    pub fn is_always_automatically_generated(&self) -> bool {
         self.is_generated == "ALWAYS"
             || self.column_default.as_ref().is_some_and(|d| d.starts_with("nextval"))
-            || self.column_default.as_ref().is_some_and(|d| d.starts_with("CURRENT_TIMESTAMP"))
-            || self.column_default.as_ref().is_some_and(|d| d.starts_with("NOW()"))
             || self.is_identity.as_ref().is_some_and(|i| i == "YES")
+    }
+
+    /// Returns whether the current column has a DEFAULT value
+    pub fn has_default(&self) -> bool {
+        self.column_default.is_some()
     }
 
     /// Returns whether the column contains the update user and is defined by
@@ -574,14 +630,14 @@ impl Column {
     /// Returns whether the column is a timestamp which has to be updated at
     /// each update operation
     pub fn is_updated_at(&self) -> bool {
-        self.column_name == "updated_at" && self.data_type == "timestamp without time zone"
+        self.column_name == "updated_at" && self.data_type == "timestamp with time zone"
     }
 
     #[must_use]
     /// Returns whether the column is a timestamp which has to be set at the
     /// insert operation
     pub fn is_created_at(&self) -> bool {
-        self.column_name == "created_at" && self.data_type == "timestamp without time zone"
+        self.column_name == "created_at" && self.data_type == "timestamp with time zone"
     }
 
     /// Returns whether the column is a session user generated column
@@ -791,7 +847,7 @@ impl Column {
         let last_element = parts.pop().unwrap();
         // We convert to singular form the last element and join the parts back
         // together.
-        parts.push(Inflector.pluralize(&last_element));
+        parts.push(Inflector::default().pluralize(&last_element));
         parts.join("_")
     }
 

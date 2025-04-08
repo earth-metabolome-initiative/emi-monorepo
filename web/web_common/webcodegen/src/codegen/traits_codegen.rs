@@ -11,6 +11,7 @@ use crate::Table;
 mod tables;
 mod types;
 use syn::Ident;
+use time_requirements::prelude::{Task, TimeTracker};
 
 use time_requirements::prelude::{Task, TimeTracker};
 

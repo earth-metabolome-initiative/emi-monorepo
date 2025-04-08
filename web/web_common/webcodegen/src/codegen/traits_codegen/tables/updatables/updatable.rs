@@ -80,7 +80,7 @@ impl Codegen<'_> {
         let team_project_table = team_projects.import_diesel_path()?;
 
         for table in tables {
-            if !table.allows_updatable(conn)? {
+            if !table.allows_updatable(conn)? && table != user {
                 continue;
             }
 
@@ -120,6 +120,11 @@ impl Codegen<'_> {
                     let Some((parent_table, _)) = parent_key.foreign_table(conn)? else {
                         return Ok(TokenStream::new());
                     };
+
+                    if !parent_table.allows_updatable(conn)? {
+                        return Ok(TokenStream::new());
+                    }
+
                     let method_ident = parent_key.getter_ident()?;
                     let parent_table_ident = parent_table.snake_case_ident()?;
 
@@ -171,6 +176,17 @@ impl Codegen<'_> {
                 quote::quote! { conn }
             };
 
+            let user_check = if user == table {
+                quote::quote! {
+                    // If the user is the owner of the record, they can update it
+                    if *user_id == self.id {
+                        return Ok(true)
+                    }
+                }
+            } else {
+                TokenStream::new()
+            };
+
             let created_by_check = if table.has_created_by_column(conn)? {
                 quote::quote! {
                     // If the user is the creator of the record, they can update it
@@ -210,6 +226,7 @@ impl Codegen<'_> {
 
                             #created_by_check
                             #updated_by_check
+                            #user_check
 
                             #team_check
 

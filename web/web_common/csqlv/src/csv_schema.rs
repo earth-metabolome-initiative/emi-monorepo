@@ -79,7 +79,8 @@ impl CSVSchema {
     /// * If the provided table name does not exist in the schema.
     pub fn table_from_name(&self, table_name: &str) -> Result<CSVTable<'_>, CSVSchemaError> {
         let table_metadata = self
-            .table_metadatas.binary_search_by_key(&table_name, |table| &table.name)
+            .table_metadatas
+            .binary_search_by_key(&table_name, |table| &table.name)
             .ok()
             .map(|index| &self.table_metadatas[index])
             .ok_or(CSVSchemaError::InvalidTableName(table_name.to_owned()))?;
@@ -313,9 +314,7 @@ impl CSVSchemaBuilder {
                             .binary_search_by_key(&foreign_table_name, |table| &table.name)
                             .ok()
                             .map(|index| &table_metadatas[index])
-                            .ok_or(CSVSchemaError::InvalidTableName(
-                                foreign_table_name.clone(),
-                            ))?;
+                            .ok_or(CSVSchemaError::InvalidTableName(foreign_table_name.clone()))?;
 
                         if original_table == foreign_table {
                             return Err(CSVSchemaError::Loop(original_table.name.clone()));

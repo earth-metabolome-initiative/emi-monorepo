@@ -38,13 +38,11 @@ impl<'a> CSVTable<'a> {
 
     /// Returns the dependant tables of the table.
     pub fn dependant_tables(&self) -> impl Iterator<Item = CSVTable<'_>> {
-        self.schema
-            .tables()
-            .filter(|table| {
-                table
-                    .columns()
-                    .any(|column| column.foreign_table().is_some_and(|t| t.name() == self.name()))
-            })
+        self.schema.tables().filter(|table| {
+            table
+                .columns()
+                .any(|column| column.foreign_table().is_some_and(|t| t.name() == self.name()))
+        })
     }
 
     #[must_use]

@@ -131,15 +131,10 @@ impl Codegen<'_> {
         let mut insertables_main_module = TokenStream::new();
 
         for table in tables {
-            if !table.allows_insertable(conn)? {
-                continue;
-            }
-
             let all_columns = table.columns(conn)?;
-
             let insertable_columns = all_columns
                 .iter()
-                .filter(|column| !column.is_automatically_generated())
+                .filter(|column| !column.is_always_automatically_generated())
                 .collect::<Vec<_>>();
             let nullable_insertable_columns: Vec<Column> =
                 insertable_columns.iter().map(|column| column.to_nullable()).collect();
@@ -205,6 +200,10 @@ impl Codegen<'_> {
                         let column_type = column.rust_data_type(conn)?;
 
                         let check_constraints = column.check_constraints(conn)?.into_iter().map(|constraint| {
+                            if constraint.is_postgis_constraint() {
+                                return Ok(TokenStream::new());
+                            }
+
                             let outcome = constraint.to_syn(&[column], &nullable_insertable_columns, self.check_constraints_extensions.as_slice(), &insertable_enum, conn);
                             if let Err(WebCodeGenError::CodeGenerationError(CodeGenerationError::CheckConstraintError(CheckConstraintError::NoInvolvedColumns(unknown_column, _)))) = &outcome {
                                 if all_columns.contains(unknown_column.as_ref()) && !insertable_columns.contains(&unknown_column.as_ref()) {
@@ -310,7 +309,7 @@ impl Codegen<'_> {
             let table_identifier = table.snake_case_ident()?;
             insertables_main_module.extend(quote::quote! {
                 mod #table_identifier;
-                pub use #table_identifier::{#insertable_variant_ident, #insertable_builder_ident};
+                pub use #table_identifier::{#insertable_variant_ident, #insertable_builder_ident, #insertable_enum};
             });
         }
 

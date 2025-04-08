@@ -184,7 +184,7 @@ impl Table {
             parts.pop().ok_or(WebCodeGenError::EmptyTableName(Box::new(self.clone())))?;
         // We convert to singular form the last element and join the parts back
         // together.
-        parts.push(Inflector.singularize(&last_element));
+        parts.push(Inflector::default().singularize(&last_element));
         Ok(parts.join("_"))
     }
 
@@ -514,12 +514,6 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<bool, WebCodeGenError> {
         Ok(self.columns(conn)?.iter().any(|column| column.is_session_user_generated(conn)))
-    }
-
-    #[must_use]
-    /// Returns whether the table IS the `users` table.
-    pub fn is_users_table(&self) -> bool {
-        self.table_name == "users"
     }
 
     /// Returns whether the table has an `created_by` column.

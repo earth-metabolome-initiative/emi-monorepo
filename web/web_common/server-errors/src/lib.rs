@@ -17,11 +17,12 @@ impl From<diesel::result::Error> for Error {
     }
 }
 
-
 impl core::fmt::Display for Error {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Error::DatabaseError => write!(f, "An error occured while trying to access the database."),
+            Error::DatabaseError => {
+                write!(f, "An error occured while trying to access the database.")
+            }
             Error::Unauthorized => write!(f, "The user attempted an unauthorized action."),
         }
     }

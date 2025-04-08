@@ -9,17 +9,12 @@ use taxonomy_fetcher::{
     impls::ncbi::{NCBIRank, NCBITaxonomy, NCBITaxonomyBuilder},
 };
 use time_requirements::prelude::*;
-use webcodegen::{
-    Codegen, CompatibleForeignTypeConstraint, CustomColumnConstraint, CustomTableConstraint, LowercaseColumnConstraint, LowercaseTableConstraint, PgExtension, Table
-};
+use webcodegen::{Codegen, PgExtension, Table};
 
-const DATABASE_NAME: &str = "development.db";
-const DATABASE_PASSWORD: &str = "password";
-const DATABASE_USER: &str = "user";
-const DATABASE_PORT: u16 = 15032;
-const DATABASE_URL: &str = const_format::formatcp!(
-    "postgres://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:{DATABASE_PORT}/{DATABASE_NAME}",
-);
+mod consistency_constraints;
+use consistency_constraints::execute_consistency_constraint_checks;
+mod constants;
+use constants::{DATABASE_NAME, DATABASE_URL};
 
 #[tokio::main]
 pub async fn main() {
@@ -51,12 +46,14 @@ pub async fn main() {
     time_tracker.add_completed_task(task);
 
     // We retrieve and build the latest version of the NCBI taxonomy
-    let task = Task::new("Fetching NCBI Taxonomy");
-    let taxonomy: NCBITaxonomy = NCBITaxonomyBuilder::latest().build().await.unwrap();
-    time_tracker.add_completed_task(task);
-    let task = Task::new("Creating Taxonomy CSV");
-    taxonomy.to_csv("../csvs/taxa.csv").unwrap();
-    time_tracker.add_completed_task(task);
+    if !Path::new("../csvs/taxa.csv").exists() {
+        let task = Task::new("Fetching NCBI Taxonomy");
+        let taxonomy: NCBITaxonomy = NCBITaxonomyBuilder::latest().build().await.unwrap();
+        time_tracker.add_completed_task(task);
+        let task = Task::new("Creating Taxonomy CSV");
+        taxonomy.to_csv("../csvs/taxa.csv").unwrap();
+        time_tracker.add_completed_task(task);
+    }
 
     // Next, we build the SQL associated with the CSVs present in the 'csvs'
     // directory
@@ -100,9 +97,9 @@ pub async fn main() {
 
     // We check that the database follows the expected constraints.
     let task = Task::new("Checking Constraints");
-    CompatibleForeignTypeConstraint::default().check_all(DATABASE_NAME, None, &mut conn).unwrap();
-    LowercaseColumnConstraint::default().check_all(DATABASE_NAME, None, &mut conn).unwrap();
-    LowercaseTableConstraint::default().check_all(DATABASE_NAME, None, &mut conn).unwrap();
+
+    execute_consistency_constraint_checks(&mut conn).unwrap();
+
     time_tracker.add_completed_task(task);
 
     // We write to the target directory the generated structs

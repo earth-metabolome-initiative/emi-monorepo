@@ -1,12 +1,11 @@
 -- SQL query creating a mockup of the users table.
 CREATE TABLE teams (
     id SERIAL PRIMARY KEY,
-    teamsname VARCHAR(255) NOT NULL CHECK (must_not_be_empty(teamsname)),
-    email VARCHAR(255) NOT NULL,
+    name TEXT NOT NULL CHECK (must_not_be_empty(name)),
     created_by INTEGER NOT NULL REFERENCES users(id),
     updated_by INTEGER NOT NULL REFERENCES users(id),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS team_members (

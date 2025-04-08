@@ -56,7 +56,9 @@ unsafe impl<'fcx> pgrx::callconv::ArgAbi<'fcx> for crate::Uuid {
         unsafe { <pgrx::Uuid as pgrx::callconv::ArgAbi<'fcx>>::unbox_arg_unchecked(arg).into() }
     }
 
-    unsafe fn unbox_nullable_arg(arg: pgrx::callconv::Arg<'_, 'fcx>) -> pgrx::nullable::Nullable<Self> {
+    unsafe fn unbox_nullable_arg(
+        arg: pgrx::callconv::Arg<'_, 'fcx>,
+    ) -> pgrx::nullable::Nullable<Self> {
         unsafe {
             <pgrx::Uuid as pgrx::callconv::ArgAbi<'fcx>>::unbox_nullable_arg(arg).map(Into::into)
         }

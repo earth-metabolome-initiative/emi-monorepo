@@ -1,45 +1,21 @@
 //! Submodule providing the code to generate the implementation of the
-//! [`Insertable`](web_common_traits::database::Insertable) trait for all required tables.
+//! [`Insertable`](web_common_traits::database::Insertable) trait for all
+//! required tables.
 
 use std::path::Path;
 
-use diesel::PgConnection;
 use proc_macro2::TokenStream;
 
 use crate::{Codegen, Table};
 
-impl Table {
-    /// Returns whether the table allows for the implementation of the
-    /// [`Insertable`](web_common_traits::database::Insertable) trait.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`.
-    ///
-    /// # Returns
-    ///
-    /// A boolean indicating whether the table allows for the implementation of
-    /// the [`Insertable`](web_common_traits::database::Insertable) trait.
-    ///
-    /// # Errors
-    ///
-    /// * If the database connection fails.
-    pub fn allows_insertable(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<bool, crate::errors::WebCodeGenError> {
-        self.has_created_by_column(conn)
-    }
-}
-
 impl Codegen<'_> {
-    /// Generates the [`Insertable`](web_common_traits::database::Insertable) trait implementation for the tables
+    /// Generates the [`Insertable`](web_common_traits::database::Insertable)
+    /// trait implementation for the tables
     ///
     /// # Arguments
     ///
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
-    /// * `conn` - A mutable reference to a `PgConnection`.
     ///
     /// # Errors
     ///
@@ -49,7 +25,6 @@ impl Codegen<'_> {
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
 
@@ -57,10 +32,6 @@ impl Codegen<'_> {
         let syntax_flag = self.syntax.as_feature_flag();
 
         for table in tables {
-            if !table.allows_insertable(conn)? {
-                continue;
-            }
-
             // We create a file for each table
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let table_path = table.import_struct_path()?;

@@ -121,6 +121,16 @@ async fn setup_docker(
     database_port: u16,
     database_name: &str,
 ) -> Result<ContainerAsync<GenericImage>, TestcontainersError> {
+    let extension_directory = format!("../pgrx_validation/{EXTENSION_NAME}");
+
+    // We check whether the extension directory exists, or we raise an adequate
+    // error warning the reader that they most likely need to build the
+    // extension.
+
+    if !std::path::Path::new(&extension_directory).exists() {
+        panic!("The extension directory does not exist. Most likely you forgot to build the extension. Refer to the `pgrx_validation` README for more informations.");
+    }
+
     GenericImage::new("postgres", "17-bookworm")
         .with_wait_for(WaitFor::message_on_stderr("database system is ready to accept connections"))
         .with_network("bridge")
@@ -132,16 +142,16 @@ async fn setup_docker(
         .with_copy_to(
             "/usr/share/postgresql/17/extension/pgrx_validation.control",
             Path::new(
-                &find_file(&format!("../pgrx_validation/{EXTENSION_NAME}"), "control").expect("Failed to find extension `.control` file - Most likely you forgot to build the extension"),
+                &find_file(&extension_directory, "control").expect("Failed to find extension `.control` file - Most likely you forgot to build the extension"),
             ),
         )
         .with_copy_to(
             "/usr/share/postgresql/17/extension/pgrx_validation--0.0.0.sql",
-            Path::new(&find_file(&format!("../pgrx_validation/{EXTENSION_NAME}"), "sql").expect("Failed to find extension `.sql` file - Most likely you forgot to build the extension"))
+            Path::new(&find_file(&extension_directory, "sql").expect("Failed to find extension `.sql` file - Most likely you forgot to build the extension"))
         )
         .with_copy_to(
             "/usr/lib/postgresql/17/lib/pgrx_validation.so",
-            Path::new(&find_file(&format!("../pgrx_validation/{EXTENSION_NAME}"), "so").expect("Failed to find extension `.so` file - Most likely you forgot to build the extension"))
+            Path::new(&find_file(&extension_directory, "so").expect("Failed to find extension `.so` file - Most likely you forgot to build the extension"))
         )
         .start()
         .await

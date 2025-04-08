@@ -29,6 +29,8 @@ pub struct CheckConstraint {
     pub check_clause: String,
 }
 
+const POSTGIS_CONSTRAINTS: [&str; 1] = ["spatial_ref_sys_srid_check"];
+
 struct TranslateExpression<'a, C1, C2> {
     check_constraint: &'a CheckConstraint,
     contextual_columns: &'a [C1],
@@ -38,26 +40,104 @@ struct TranslateExpression<'a, C1, C2> {
     attributes_enumeration: &'a syn::Ident,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 enum ReturningType {
     Result,
     Boolean,
     Textual,
-    Numeric,
+    U16,
+    U32,
+    U64,
+    I16,
+    I32,
+    I64,
+    F32,
+    F64,
     Custom(PgType),
 }
 
-impl TryFrom<PgType> for ReturningType {
-    type Error = WebCodeGenError;
+impl ReturningType {
+    fn is_numeric(&self) -> bool {
+        matches!(
+            self,
+            ReturningType::U16
+                | ReturningType::U32
+                | ReturningType::U64
+                | ReturningType::I16
+                | ReturningType::I32
+                | ReturningType::I64
+                | ReturningType::F32
+                | ReturningType::F64
+        )
+    }
 
-    fn try_from(ty: PgType) -> Result<Self, Self::Error> {
-        if ty.is_boolean()? {
+    fn cast(&self, value: &str) -> Result<TokenStream, WebCodeGenError> {
+        match self {
+            ReturningType::I16 => {
+                let value = value.parse::<i16>()?;
+                Ok(quote::quote! {
+                    #value
+                })
+            }
+            ReturningType::I32 => {
+                let value = value.parse::<i32>()?;
+                Ok(quote::quote! {
+                    #value
+                })
+            }
+            ReturningType::I64 => {
+                let value = value.parse::<i64>()?;
+                Ok(quote::quote! {
+                    #value
+                })
+            }
+            ReturningType::F32 => {
+                let value = value.parse::<f32>()?;
+                Ok(quote::quote! {
+                    #value
+                })
+            }
+            ReturningType::F64 => {
+                let value = value.parse::<f64>()?;
+                Ok(quote::quote! {
+                    #value
+                })
+            }
+            ReturningType::Boolean => {
+                let value = value.parse::<bool>()?;
+                Ok(quote::quote! {
+                    #value
+                })
+            }
+            unsupported => {
+                unimplemented!("Unsupported cast from string `{value}` to {unsupported:?}.",);
+            }
+        }
+    }
+
+    fn try_from_pg_type(ty: PgType, conn: &mut PgConnection) -> Result<Self, WebCodeGenError> {
+        if ty.is_boolean(conn)? {
             Ok(ReturningType::Boolean)
-        } else if ty.is_numeric()? {
-            Ok(ReturningType::Numeric)
-        } else if ty.is_text()? {
+        } else if ty.is_i16(conn)? {
+            Ok(ReturningType::I16)
+        } else if ty.is_i32(conn)? {
+            Ok(ReturningType::I32)
+        } else if ty.is_i64(conn)? {
+            Ok(ReturningType::I64)
+        } else if ty.is_u16(conn)? {
+            Ok(ReturningType::U16)
+        } else if ty.is_u32(conn)? {
+            Ok(ReturningType::U32)
+        } else if ty.is_u64(conn)? {
+            Ok(ReturningType::U64)
+        } else if ty.is_f32(conn)? {
+            Ok(ReturningType::F32)
+        } else if ty.is_f64(conn)? {
+            Ok(ReturningType::F64)
+        } else if ty.is_text(conn)? {
             Ok(ReturningType::Textual)
         } else {
+            assert_ne!(ty.typname, "int4");
             Ok(ReturningType::Custom(ty))
         }
     }
@@ -124,7 +204,7 @@ where
     ) -> Result<proc_macro2::TokenStream, WebCodeGenError> {
         let (argument_column, is_contextual) = self.get_column(column)?;
         let column_ident = argument_column.snake_case_ident()?;
-        let mut column_ident = if is_contextual || !unpacking{
+        let mut column_ident = if is_contextual || !unpacking {
             quote::quote! { #column_ident }
         } else {
             quote::quote! { self.#column_ident }
@@ -187,7 +267,7 @@ where
     fn parse_function_argument_expr(
         &self,
         arg: &FunctionArgExpr,
-        arg_type: &PgType,
+        arg_type: &ReturningType,
         conn: &mut PgConnection,
     ) -> Result<(proc_macro2::TokenStream, Option<&'_ Column>), WebCodeGenError> {
         match arg {
@@ -219,7 +299,7 @@ where
     fn parse_function_argument(
         &self,
         arg: &FunctionArg,
-        arg_type: &PgType,
+        arg_type: &ReturningType,
         conn: &mut PgConnection,
     ) -> Result<(proc_macro2::TokenStream, Option<&'_ Column>), WebCodeGenError> {
         match arg {
@@ -238,7 +318,7 @@ where
     fn parse_function_argument_list(
         &self,
         args: &FunctionArgumentList,
-        argument_types: &[PgType],
+        argument_types: &[ReturningType],
         conn: &mut PgConnection,
     ) -> Result<(Vec<proc_macro2::TokenStream>, Vec<&'_ Column>), WebCodeGenError> {
         let mut token_stream = Vec::with_capacity(args.args.len());
@@ -262,7 +342,7 @@ where
     fn parse_function_arguments(
         &self,
         args: &FunctionArguments,
-        argument_types: &[PgType],
+        argument_types: &[ReturningType],
         conn: &mut PgConnection,
     ) -> Result<(Vec<proc_macro2::TokenStream>, Vec<&'_ Column>), WebCodeGenError> {
         match args {
@@ -311,7 +391,11 @@ where
             unimplemented!("ODBC syntax not supported");
         }
         let function = self.get_function_by_name(&name.to_string())?;
-        let argument_types = function.argument_types(conn)?;
+        let argument_types = function
+            .argument_types(conn)?
+            .into_iter()
+            .map(|pg_type| ReturningType::try_from_pg_type(pg_type, conn))
+            .collect::<Result<Vec<_>, WebCodeGenError>>()?;
         let (args, scoped_columns) = self.parse_function_arguments(&args, &argument_types, conn)?;
         let function_path = function.path(conn)?;
 
@@ -363,7 +447,7 @@ where
             if function.returns_result(conn)? {
                 ReturningType::Result
             } else {
-                ReturningType::try_from(function.return_type(conn)?)?
+                ReturningType::try_from_pg_type(function.return_type(conn)?, conn)?
             },
         ))
     }
@@ -402,7 +486,7 @@ where
     fn parse_value(
         &self,
         value: &sqlparser::ast::Value,
-        type_hint: Option<&PgType>,
+        type_hint: Option<&ReturningType>,
     ) -> Result<(proc_macro2::TokenStream, ReturningType), WebCodeGenError> {
         match value {
             sqlparser::ast::Value::Boolean(value) => {
@@ -410,9 +494,12 @@ where
             }
             sqlparser::ast::Value::Number(value, _) => {
                 match type_hint {
-                    Some(type_hint) => Ok((type_hint.cast(value)?, ReturningType::Numeric)),
+                    Some(type_hint) => Ok((type_hint.cast(value)?, type_hint.clone())),
                     None => {
-                        unimplemented!("Number without type hint not supported");
+                        unimplemented!(
+                            "Number without type hint not supported: {:?}",
+                            self.check_constraint
+                        );
                     }
                 }
             }
@@ -434,6 +521,7 @@ where
     ///   parse
     /// * `type_hint` - The [`PgType`](crate::table_metadata::PgType) of the
     ///  value
+    /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
     ///
@@ -442,7 +530,7 @@ where
     fn parse_value_with_span(
         &self,
         value: &sqlparser::ast::ValueWithSpan,
-        type_hint: Option<&PgType>,
+        type_hint: Option<&ReturningType>,
     ) -> Result<(proc_macro2::TokenStream, ReturningType), WebCodeGenError> {
         self.parse_value(&value.value, type_hint)
     }
@@ -452,7 +540,7 @@ where
     fn parse(
         &self,
         expr: &Expr,
-        type_hint: Option<&PgType>,
+        type_hint: Option<&ReturningType>,
         conn: &mut PgConnection,
     ) -> Result<(proc_macro2::TokenStream, Vec<&'_ Column>, ReturningType), WebCodeGenError> {
         match expr {
@@ -473,7 +561,7 @@ where
                 Ok((
                     self.formatted_column(&involved_column, false, conn)?,
                     vec![involved_column],
-                    ReturningType::Custom(involved_column.pg_type(conn)?),
+                    ReturningType::try_from_pg_type(involved_column.pg_type(conn)?, conn)?,
                 ))
             }
             Expr::BinaryOp { left, op, right } => {
@@ -542,15 +630,25 @@ where
                             unimplemented!("Unsupported binary operation");
                         }
                     }
-                    BinaryOperator::NotEq | BinaryOperator::Eq => {
+                    BinaryOperator::NotEq
+                    | BinaryOperator::Eq
+                    | BinaryOperator::Gt
+                    | BinaryOperator::Lt
+                    | BinaryOperator::GtEq
+                    | BinaryOperator::LtEq => {
                         let (left, _, left_returning_type) = self.parse(left, None, conn)?;
-                        let (right, _, right_returning_type) = self.parse(right, None, conn)?;
+                        let (right, _, right_returning_type) =
+                            self.parse(right, Some(&left_returning_type), conn)?;
                         if left_returning_type != right_returning_type {
-                            unimplemented!("Equality between different types not supported");
+                            unimplemented!("Equality between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}", self.check_constraint);
                         }
                         let operator_symbol: syn::BinOp = match op {
                             BinaryOperator::Eq => syn::BinOp::Eq(syn::token::EqEq::default()),
                             BinaryOperator::NotEq => syn::BinOp::Ne(syn::token::Ne::default()),
+                            BinaryOperator::Gt => syn::BinOp::Gt(syn::token::Gt::default()),
+                            BinaryOperator::Lt => syn::BinOp::Lt(syn::token::Lt::default()),
+                            BinaryOperator::GtEq => syn::BinOp::Ge(syn::token::Ge::default()),
+                            BinaryOperator::LtEq => syn::BinOp::Le(syn::token::Le::default()),
                             _ => unreachable!(),
                         };
                         Ok((
@@ -569,9 +667,10 @@ where
                         let (left, _, left_returning_type) = self.parse(left, type_hint, conn)?;
                         let (right, _, right_returning_type) =
                             self.parse(right, type_hint, conn)?;
-                        if matches!(left_returning_type, ReturningType::Numeric)
-                            && matches!(right_returning_type, ReturningType::Numeric)
-                        {
+                        if left_returning_type != right_returning_type {
+                            unimplemented!("Binary operation between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}", self.check_constraint);
+                        }
+                        if left_returning_type.is_numeric() && right_returning_type.is_numeric() {
                             let operator_symbol: syn::BinOp = match op {
                                 BinaryOperator::Plus => {
                                     syn::BinOp::Add(syn::token::Plus::default())
@@ -595,7 +694,7 @@ where
                                     #left #operator_symbol #right
                                 },
                                 Vec::new(),
-                                ReturningType::Numeric,
+                                left_returning_type,
                             ))
                         } else {
                             unimplemented!(
@@ -616,12 +715,24 @@ where
                     self.parse_value_with_span(value, type_hint)?;
                 Ok((token_stream, Vec::new(), returning_type))
             }
-            _ => unimplemented!("Unsupported expression: {:?}", expr),
+            _ => {
+                unimplemented!(
+                    "Unsupported expression: {:?}, from check constraint: {:?}",
+                    expr,
+                    self.check_constraint
+                )
+            }
         }
     }
 }
 
 impl CheckConstraint {
+    /// Returns whether the current [`CheckConstraint`] is known to come
+    /// from Postgis and therefore should most likely be ignored
+    pub fn is_postgis_constraint(&self) -> bool {
+        POSTGIS_CONSTRAINTS.contains(&self.constraint_name.as_str())
+    }
+
     /// Returns the [`TokenStream`](proc_macro2::TokenStream) of the check
     /// clause, including all functions specified from the provided
     /// extensions.

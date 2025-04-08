@@ -40,7 +40,7 @@ impl Codegen<'_> {
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
 
-        self.generate_insertable_impls(&root.join(CODEGEN_INSERTABLE_PATH), tables, conn)?;
+        self.generate_insertable_impls(&root.join(CODEGEN_INSERTABLE_PATH), tables)?;
         self.generate_insertable_variant_impls(
             &root.join(CODEGEN_INSERTABLE_VARIANT_PATH),
             tables,
@@ -49,7 +49,6 @@ impl Codegen<'_> {
         self.generate_insertable_builder_impls(
             &root.join(CODEGEN_INSERTABLE_BUILDER_PATH),
             tables,
-            conn,
         )?;
 
         let insertable_module = Ident::new(CODEGEN_INSERTABLE_PATH, proc_macro2::Span::call_site());

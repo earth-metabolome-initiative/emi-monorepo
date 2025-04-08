@@ -28,10 +28,8 @@ pub enum ConstraintError {
     },
     /// The column is not of the expected type.
     NotOfCorrectType {
-        /// The name of the column
-        column_name: String,
-        /// The type of the column
-        column_type: String,
+        /// The column which failed the check constraint
+        column: Box<Column>,
         /// The expected type of the column
         expected_column_type: String,
     },
@@ -71,14 +69,13 @@ impl Display for ConstraintError {
             ConstraintError::NotForeignKeyColumn { table_name, column_name } => {
                 write!(f, "Column {column_name} in table {table_name} is not a foreign key column",)
             }
-            ConstraintError::NotOfCorrectType {
-                column_name,
-                column_type,
-                expected_column_type,
-            } => {
+            ConstraintError::NotOfCorrectType { column, expected_column_type } => {
                 write!(
                     f,
-                    "Column {column_name} is of type {column_type}, expected {expected_column_type}",
+                    "Column {}.{} is of type {}, expected {expected_column_type}",
+                    column.table_name,
+                    column.column_name,
+                    column.raw_data_type(),
                 )
             }
             ConstraintError::DoesNotHaveSiblingColumn {

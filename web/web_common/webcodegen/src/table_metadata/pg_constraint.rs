@@ -6,7 +6,7 @@ use diesel::{
     SelectableHelper,
 };
 
-use super::{PgProc, PgOperator};
+use super::{PgOperator, PgProc};
 
 /// Represents the `pg_constraint` system catalog table in `PostgreSQL`.
 /// This table stores information about constraints on tables and columns.
@@ -109,15 +109,14 @@ impl PgConstraint {
 
     /// Returns the vector of [`PgOperator`] functions that are used in the
     /// constraint.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If an error occurs while querying the database
-    /// 
     pub fn operators(
         &self,
         conn: &mut diesel::PgConnection,

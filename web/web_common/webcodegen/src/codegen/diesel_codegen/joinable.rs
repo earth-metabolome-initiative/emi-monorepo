@@ -45,8 +45,8 @@ impl Codegen<'_> {
                     continue;
                 };
 
-                // There is no need to implement this macro for the case of a foreign table that curresponds
-                // with the table itself.
+                // There is no need to implement this macro for the case of a foreign table that
+                // curresponds with the table itself.
                 if &foreign_table == table {
                     continue;
                 }

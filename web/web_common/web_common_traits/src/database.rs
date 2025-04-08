@@ -8,6 +8,8 @@ mod updatable;
 
 pub use deletable::{Deletable, DeleteError};
 pub use foreign::Foreign;
+#[cfg(feature = "backend")]
+pub use insertable::BackendInsertableVariant;
 pub use insertable::{InsertError, Insertable, InsertableBuilder, InsertableVariant};
 pub use loadable::Loadable;
 pub use updatable::Updatable;

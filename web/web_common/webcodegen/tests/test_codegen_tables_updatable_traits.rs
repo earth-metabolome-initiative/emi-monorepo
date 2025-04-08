@@ -1,4 +1,5 @@
-//! Submodule to test the generation of the [`Updatable`](web_common_traits::database::Updatable) traits for tables.
+//! Submodule to test the generation of the
+//! [`Updatable`](web_common_traits::database::Updatable) traits for tables.
 
 mod utils;
 
@@ -6,17 +7,22 @@ use utils::*;
 use webcodegen::*;
 
 #[tokio::test]
-/// Test generation of [`Updatable`](web_common_traits::database::Updatable) traits for tables.
+/// Test generation of [`Updatable`](web_common_traits::database::Updatable)
+/// traits for tables.
 async fn test_codegen_tables_updatable_traits() {
     let (docker, mut conn, database_name) =
         setup_database_with_default_migrations("test_codegen_tables_updatable_traits")
             .await
             .unwrap();
 
-    let users = Table::load(&mut conn, "users", None, &database_name).expect("Failed to load `users` table");
-    let projects = Table::load(&mut conn, "projects", None, &database_name).expect("Failed to load `projects` table");
-    let team_members = Table::load(&mut conn, "team_members", None, &database_name).expect("Failed to load `team_members` table");
-    let team_projects = Table::load(&mut conn, "team_projects", None, &database_name).expect("Failed to load `team_projects` table");
+    let users = Table::load(&mut conn, "users", None, &database_name)
+        .expect("Failed to load `users` table");
+    let projects = Table::load(&mut conn, "projects", None, &database_name)
+        .expect("Failed to load `projects` table");
+    let team_members = Table::load(&mut conn, "team_members", None, &database_name)
+        .expect("Failed to load `team_members` table");
+    let team_projects = Table::load(&mut conn, "team_projects", None, &database_name)
+        .expect("Failed to load `team_projects` table");
 
     let outcome = Codegen::default()
         .users(&users)

@@ -1,13 +1,12 @@
 -- SQL query creating a mockup of the users table.
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL CHECK (username <> ''),
+    username TEXT NOT NULL CHECK (must_not_be_empty(username)),
     email CITEXT NOT NULL CHECK (must_be_mail(email)),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (username),
     UNIQUE (email),
-    UNIQUE (username, email),
-    CHECK (username <> email)
+    UNIQUE (username, email)
 );
 
 CREATE OR REPLACE FUNCTION js_jpeg(bytea_data BYTEA) RETURNS BOOLEAN AS $$
