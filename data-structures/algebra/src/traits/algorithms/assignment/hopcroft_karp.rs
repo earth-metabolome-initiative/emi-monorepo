@@ -18,6 +18,13 @@ pub enum HopcroftKarpError {
 /// Trait providing the Hopcroft-Karp algorithm for the assignment problem.
 pub trait HopcroftKarp: SparseMatrix2D {
     /// Return the assignment as assigned by the Hopcroft-Karp algorithm.
+    /// 
+    /// # Errors
+    /// 
+    /// Returns `HopcroftKarpError::InsufficientDistanceType` if the distance type
+    /// used in the algorithm is not large enough to represent all the distances
+    /// in the bipartite graph. This can occur when the graph is too large or
+    /// complex for the selected distance type.
     fn hopcroft_karp(&self) -> Result<Vec<(Self::RowIndex, Self::ColumnIndex)>, HopcroftKarpError> {
         let mut partial_assignment: PartialAssignment<'_, Self, u32> =
             PartialAssignment::from(self);

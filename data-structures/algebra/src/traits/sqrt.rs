@@ -2,6 +2,7 @@
 
 /// Trait providing the square root operation.
 pub trait Sqrt {
+	#[must_use]
 	/// Returns the square root of the provided value.
 	fn sqrt(self) -> Self;
 }

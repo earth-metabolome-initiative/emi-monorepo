@@ -42,14 +42,12 @@ where
         let next_row_rank = self.csr2d.rank_row(self.next_row).into_usize();
         let already_observed_in_next_row =
             self.csr2d.number_of_defined_values_in_row(self.next_row).into_usize()
-                - self.next.as_ref().map_or(0, |sparse_row| sparse_row.len());
+                - self.next.as_ref().map_or(0, ExactSizeIterator::len);
         let back_row_rank = self.csr2d.rank_row(self.back_row).into_usize();
-        let still_to_be_observed_in_back_row =
-            self.back.as_ref().map_or(0, |sparse_row| sparse_row.len());
-        let remaining = back_row_rank + still_to_be_observed_in_back_row
+        let still_to_be_observed_in_back_row = self.back.as_ref().map_or(0, ExactSizeIterator::len);
+        back_row_rank + still_to_be_observed_in_back_row
             - next_row_rank
-            - already_observed_in_next_row;
-        remaining
+            - already_observed_in_next_row
     }
 }
 

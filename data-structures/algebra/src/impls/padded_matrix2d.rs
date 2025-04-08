@@ -37,9 +37,9 @@ where
                     .zip(self.sparse_row_values(row_index))
                     .map(|(column_index, value)| {
                         if self.is_imputed((row_index, column_index)) {
-                            format!("I({:?})", value)
+                            format!("I({value:?})")
                         } else {
-                            format!("{:?}", value)
+                            format!("{value:?}")
                         }
                     })
                     .collect()
@@ -63,7 +63,7 @@ where
     ///
     /// * `matrix` - The underlying sparse matrix.
     /// * `map` - The function to map the values not defined in the underlying
-    /// sparse matrix.
+    ///   sparse matrix.
     pub fn new(matrix: M, map: Map) -> Result<Self, MutabilityError<M>> {
         let number_of_columns: usize = matrix.number_of_columns().into_usize();
         let number_of_rows: usize = matrix.number_of_rows().into_usize();
