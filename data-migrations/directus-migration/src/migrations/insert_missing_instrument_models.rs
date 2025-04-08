@@ -1,16 +1,18 @@
 //! Submodule for inserting the missing instrument models which
 //! are present in the Directus database but not in the Portal database.
 
-use diesel_async::AsyncPgConnection;
-
-use super::get_user;
-use crate::codegen::InstrumentModel as DirectusInstrumentModel;
 use core_structures::{
     Brand as PortalBrand, InstrumentModel as PortalInstrumentModel,
     InstrumentType as PortalInstrumentType,
 };
-use web_common_traits::database::{Insertable, InsertableVariant, Loadable};
-use web_common_traits::prelude::Builder;
+use diesel_async::AsyncPgConnection;
+use web_common_traits::{
+    database::{Insertable, InsertableVariant, Loadable},
+    prelude::Builder,
+};
+
+use super::get_user;
+use crate::codegen::InstrumentModel as DirectusInstrumentModel;
 
 /// Inserts missing instrument models into the portal database.
 ///
@@ -22,7 +24,6 @@ use web_common_traits::prelude::Builder;
 /// # Errors
 ///
 /// * If the insertion fails, an error of type `error::Error` is returned.
-///
 pub(crate) async fn insert_missing_instrument_models(
     directus_conn: &mut AsyncPgConnection,
     portal_conn: &mut AsyncPgConnection,
@@ -86,7 +87,8 @@ pub(crate) async fn insert_missing_instrument_models(
             .updated_at(updated_at)?
             .created_at(created_at)?
             .build()?
-            .insert(&portal_created_by.id, portal_conn).await?;
+            .insert(&portal_created_by.id, portal_conn)
+            .await?;
     }
     Ok(())
 }

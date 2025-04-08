@@ -77,8 +77,10 @@ impl Codegen<'_> {
 
             // If the user has specified a `team_members` table, we additional
             // generate the join with the `team_projects` table. These tables
-            // are siblings, but if we were to 
-            if let (Some(team_members), Some(team_projects)) = (self.team_members_table, self.team_projects_table) {
+            // are siblings, but if we were to
+            if let (Some(team_members), Some(team_projects)) =
+                (self.team_members_table, self.team_projects_table)
+            {
                 if table == team_members {
                     let foreign_table_path = team_projects.import_diesel_path()?;
                     submodule_token_stream.extend(quote::quote! {

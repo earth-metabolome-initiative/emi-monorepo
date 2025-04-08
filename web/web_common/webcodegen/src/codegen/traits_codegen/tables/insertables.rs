@@ -23,12 +23,12 @@ impl Codegen<'_> {
     /// Returns wether the table should be insertable or not
     ///
     ///  # Arguments
-    /// 
+    ///
     ///  * `table` - The passed table
     ///  * `conn` - A mutable reference to a `PgConnection`.
-    /// 
+    ///
     ///  # Errors
-    /// 
+    ///
     /// * If the database connection fails.
     pub(crate) fn is_table_insertable(
         &self,

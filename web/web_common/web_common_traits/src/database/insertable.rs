@@ -40,12 +40,11 @@ pub trait InsertableVariant {
     /// # Returns
     ///
     /// The inserted row, if the operation was successful.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the row cannot be inserted.
     /// * If the user is not authorized to insert the row.
-    /// 
     fn insert(
         self,
         user_id: &Self::UserId,
@@ -58,7 +57,7 @@ pub trait InsertableVariant {
     >;
 }
 
-#[cfg(feature="backend")]
+#[cfg(feature = "backend")]
 /// A trait for types that can be constructed in the backend only to
 /// execute the insert operation without a user ID.
 pub trait BackendInsertableVariant: InsertableVariant {
@@ -71,11 +70,10 @@ pub trait BackendInsertableVariant: InsertableVariant {
     /// # Returns
     ///
     /// The inserted row, if the operation was successful.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the row cannot be inserted.
-    /// 
     fn backend_insert(
         self,
         conn: &mut Self::Conn,
@@ -120,10 +118,18 @@ impl<FieldName: core::fmt::Display> core::error::Error for InsertError<FieldName
 impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertError::BuilderError(error) => <BuilderError<FieldName> as core::fmt::Display>::fmt(error, f),
-            InsertError::ValidationError(error) => <validation_errors::Error<FieldName> as core::fmt::Display>::fmt(error, f),
-            InsertError::DieselError(error) => <diesel::result::Error as core::fmt::Display>::fmt(error, f),
-            InsertError::ServerError(error) => <server_errors::Error as core::fmt::Display>::fmt(error, f),
+            InsertError::BuilderError(error) => {
+                <BuilderError<FieldName> as core::fmt::Display>::fmt(error, f)
+            }
+            InsertError::ValidationError(error) => {
+                <validation_errors::Error<FieldName> as core::fmt::Display>::fmt(error, f)
+            }
+            InsertError::DieselError(error) => {
+                <diesel::result::Error as core::fmt::Display>::fmt(error, f)
+            }
+            InsertError::ServerError(error) => {
+                <server_errors::Error as core::fmt::Display>::fmt(error, f)
+            }
         }
     }
 }

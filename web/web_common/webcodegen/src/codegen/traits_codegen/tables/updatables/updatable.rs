@@ -80,7 +80,7 @@ impl Codegen<'_> {
         let team_project_table = team_projects.import_diesel_path()?;
 
         for table in tables {
-            if !table.allows_updatable(conn)? && table != user{
+            if !table.allows_updatable(conn)? && table != user {
                 continue;
             }
 

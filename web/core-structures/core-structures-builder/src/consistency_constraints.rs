@@ -1,12 +1,13 @@
 //! Submodule defining rules that all tables in the database must satisfy.
 
-use crate::constants::DATABASE_NAME;
 use diesel::pg::PgConnection;
 use webcodegen::{
     CompatibleForeignTypeConstraint, CustomColumnConstraint, CustomTableConstraint,
     HasSpecificTypeConstraint, LowercaseColumnConstraint, LowercaseTableConstraint,
-    NotNullColumnConstraint, errors::WebCodeGenError
+    NotNullColumnConstraint, errors::WebCodeGenError,
 };
+
+use crate::constants::DATABASE_NAME;
 
 pub(crate) fn execute_consistency_constraint_checks(
     conn: &mut PgConnection,
@@ -37,8 +38,9 @@ pub(crate) fn execute_consistency_constraint_checks(
     NotNullColumnConstraint::new("created_at").check_all(DATABASE_NAME, None, conn)?;
     NotNullColumnConstraint::new("updated_at").check_all(DATABASE_NAME, None, conn)?;
 
-    // TODO!: All textual fields in all tables that are not CSVs should have a check constraint
-    // to validate that the field is correct within their own context (e.g. not empty!)
+    // TODO!: All textual fields in all tables that are not CSVs should have a check
+    // constraint to validate that the field is correct within their own context
+    // (e.g. not empty!)
 
     Ok(())
 }

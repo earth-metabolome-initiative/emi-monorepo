@@ -1,5 +1,6 @@
-use crate::codegen::diesel_codegen::tables::container_models::container_models;
-use crate::codegen::diesel_codegen::tables::si_units::si_units;
+use crate::codegen::diesel_codegen::tables::{
+    container_models::container_models, si_units::si_units,
+};
 diesel::allow_tables_to_appear_in_same_query!(container_models, si_units);
 use crate::codegen::diesel_codegen::tables::brands::brands;
 diesel::allow_tables_to_appear_in_same_query!(container_models, brands);

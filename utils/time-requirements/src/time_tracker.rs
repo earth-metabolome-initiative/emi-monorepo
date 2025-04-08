@@ -32,11 +32,10 @@ impl TimeTracker {
     }
 
     /// Returns a reference to the requested sub-tracker, if it exists.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `name` - The name of the sub-tracker to retrieve.
-    /// 
     pub(crate) fn sub_tracker_by_name(&self, name: &str) -> Option<&TimeTracker> {
         self.sub_trackers.iter().find(|tracker| tracker.name() == name)
     }

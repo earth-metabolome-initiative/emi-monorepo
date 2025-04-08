@@ -1,5 +1,5 @@
-//! Submodule providing the `PGSetting` struct representing a row of the `pg_settings`
-//! table in PostgreSQL.
+//! Submodule providing the `PGSetting` struct representing a row of the
+//! `pg_settings` table in PostgreSQL.
 
 use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
@@ -34,15 +34,23 @@ pub struct PgSetting {
     pub max_val: Option<String>,
     /// Allowed values of an enum parameter (null for non-enum values)
     pub enumvals: Option<Vec<String>>,
-    /// Parameter value assumed at server startup if the parameter is not otherwise set
+    /// Parameter value assumed at server startup if the parameter is not
+    /// otherwise set
     pub boot_val: Option<String>,
     /// Value that RESET would reset the parameter to in the current session
     pub reset_val: Option<String>,
-    /// Configuration file the current value was set in (null for values set from sources other than configuration files, or when examined by a user who neither is a superuser nor has privileges of pg_read_all_settings); helpful when using include directives in configuration files
+    /// Configuration file the current value was set in (null for values set
+    /// from sources other than configuration files, or when examined by a user
+    /// who neither is a superuser nor has privileges of pg_read_all_settings);
+    /// helpful when using include directives in configuration files
     pub sourcefile: Option<String>,
-    /// Line number within the configuration file the current value was set at (null for values set from sources other than configuration files, or when examined by a user who neither is a superuser nor has privileges of pg_read_all_settings).
+    /// Line number within the configuration file the current value was set at
+    /// (null for values set from sources other than configuration files, or
+    /// when examined by a user who neither is a superuser nor has privileges of
+    /// pg_read_all_settings).
     pub sourceline: Option<i32>,
-    /// true if the value has been changed in the configuration file but needs a restart; or false otherwise.
+    /// true if the value has been changed in the configuration file but needs a
+    /// restart; or false otherwise.
     pub pending_restart: Option<bool>,
 }
 
@@ -55,12 +63,12 @@ impl PgSetting {
     ///
     /// # Errors
     ///
-    /// This function will return an error if the query to fetch the TIME ZONE setting fails.
-    ///
+    /// This function will return an error if the query to fetch the TIME ZONE
+    /// setting fails.
     pub fn time_zone(conn: &mut PgConnection) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
+
         use crate::schema::pg_settings;
-        use diesel::ExpressionMethods;
-		use diesel::{RunQueryDsl, QueryDsl};
 
         pg_settings::table.filter(pg_settings::dsl::name.eq("TimeZone")).first::<PgSetting>(conn)
     }

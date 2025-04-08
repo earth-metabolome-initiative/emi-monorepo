@@ -15,9 +15,9 @@ use core_structures::User;
 use futures::Future;
 use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use redis::AsyncCommands;
+use rosetta_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use rosetta_uuid::Uuid;
 use web_common::api::{oauth::jwt_cookies::*, ApiError};
 use web_common_traits::database::Loadable;
 

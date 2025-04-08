@@ -25,9 +25,8 @@ impl Project {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
@@ -36,9 +35,7 @@ impl Project {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_created),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
             .await
             .map(Some)
     }
@@ -50,9 +47,8 @@ impl Project {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
@@ -61,9 +57,7 @@ impl Project {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_updated),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
             .await
             .map(Some)
     }
@@ -75,9 +69,8 @@ impl Project {
         Option<crate::codegen::structs_codegen::tables::projects::Project>,
         diesel::result::Error,
     > {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(parent_project) = self.parent_project.as_ref() else {
             return Ok(None);
         };
@@ -94,17 +87,13 @@ impl Project {
     pub async fn batch(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::batches::Batch,
-        diesel::result::Error,
-    > {
+    ) -> Result<crate::codegen::structs_codegen::tables::batches::Batch, diesel::result::Error>
+    {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::batches::Batch::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::batches::batches::dsl::id
-                    .eq(&self.batch),
+                crate::codegen::diesel_codegen::tables::batches::batches::dsl::id.eq(&self.batch),
             )
             .first::<crate::codegen::structs_codegen::tables::batches::Batch>(conn)
             .await
@@ -114,9 +103,8 @@ impl Project {
         conn: &mut diesel_async::AsyncPgConnection,
         user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::projects::projects::dsl::user_created
@@ -130,9 +118,8 @@ impl Project {
         conn: &mut diesel_async::AsyncPgConnection,
         user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::projects::projects::dsl::user_updated
@@ -146,9 +133,8 @@ impl Project {
         conn: &mut diesel_async::AsyncPgConnection,
         parent_project: &crate::codegen::structs_codegen::tables::projects::Project,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::projects::projects::dsl::parent_project
@@ -162,13 +148,11 @@ impl Project {
         conn: &mut diesel_async::AsyncPgConnection,
         batch: &crate::codegen::structs_codegen::tables::batches::Batch,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::projects::projects::dsl::batch
-                    .eq(batch.id),
+                crate::codegen::diesel_codegen::tables::projects::projects::dsl::batch.eq(batch.id),
             )
             .load::<Self>(conn)
             .await
@@ -178,16 +162,13 @@ impl Project {
         project_id: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, OptionalExtension, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, OptionalExtension};
         Self::table()
-            .filter(
-                diesel::ExpressionMethods::eq(
-                    crate::codegen::diesel_codegen::tables::projects::projects::project_id,
-                    project_id,
-                ),
-            )
+            .filter(diesel::ExpressionMethods::eq(
+                crate::codegen::diesel_codegen::tables::projects::projects::project_id,
+                project_id,
+            ))
             .first::<Self>(conn)
             .await
             .optional()

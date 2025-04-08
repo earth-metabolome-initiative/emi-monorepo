@@ -1,4 +1,4 @@
-//! Migration utilities used across 
+//! Migration utilities used across
 
 mod get_user;
 pub(crate) use get_user::get_user;

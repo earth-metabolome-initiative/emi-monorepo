@@ -27,9 +27,8 @@ impl Batch {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
@@ -38,9 +37,7 @@ impl Batch {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_created),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
             .await
             .map(Some)
     }
@@ -52,9 +49,8 @@ impl Batch {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
@@ -63,9 +59,7 @@ impl Batch {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_updated),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
             .await
             .map(Some)
     }
@@ -77,9 +71,8 @@ impl Batch {
         Option<crate::codegen::structs_codegen::tables::batch_types::BatchType>,
         diesel::result::Error,
     > {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(batch_type) = self.batch_type.as_ref() else {
             return Ok(None);
         };
@@ -88,9 +81,7 @@ impl Batch {
                 crate::codegen::diesel_codegen::tables::batch_types::batch_types::dsl::id
                     .eq(batch_type),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::batch_types::BatchType,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::batch_types::BatchType>(conn)
             .await
             .map(Some)
     }
@@ -99,9 +90,8 @@ impl Batch {
         conn: &mut diesel_async::AsyncPgConnection,
         user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::batches::batches::dsl::user_created
@@ -115,9 +105,8 @@ impl Batch {
         conn: &mut diesel_async::AsyncPgConnection,
         user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::batches::batches::dsl::user_updated
@@ -131,9 +120,8 @@ impl Batch {
         conn: &mut diesel_async::AsyncPgConnection,
         batch_type: &crate::codegen::structs_codegen::tables::batch_types::BatchType,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::batches::batches::dsl::batch_type
@@ -147,16 +135,13 @@ impl Batch {
         batch_id: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, OptionalExtension, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, OptionalExtension};
         Self::table()
-            .filter(
-                diesel::ExpressionMethods::eq(
-                    crate::codegen::diesel_codegen::tables::batches::batches::batch_id,
-                    batch_id,
-                ),
-            )
+            .filter(diesel::ExpressionMethods::eq(
+                crate::codegen::diesel_codegen::tables::batches::batches::batch_id,
+                batch_id,
+            ))
             .first::<Self>(conn)
             .await
             .optional()
@@ -166,16 +151,13 @@ impl Batch {
         old_id: Option<&str>,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, OptionalExtension, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, OptionalExtension};
         Self::table()
-            .filter(
-                diesel::ExpressionMethods::eq(
-                    crate::codegen::diesel_codegen::tables::batches::batches::old_id,
-                    old_id,
-                ),
-            )
+            .filter(diesel::ExpressionMethods::eq(
+                crate::codegen::diesel_codegen::tables::batches::batches::old_id,
+                old_id,
+            ))
             .first::<Self>(conn)
             .await
             .optional()

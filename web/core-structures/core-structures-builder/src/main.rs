@@ -2,11 +2,11 @@
 use std::path::Path;
 
 use csqlv::CSVSchemaBuilder;
-use diesel::{pg::PgConnection, Connection};
+use diesel::{Connection, pg::PgConnection};
 use diesel_migrations_utils::prelude::*;
 use taxonomy_fetcher::{
-    impls::ncbi::{NCBIRank, NCBITaxonomy, NCBITaxonomyBuilder},
     Rank, Taxonomy, TaxonomyBuilder,
+    impls::ncbi::{NCBIRank, NCBITaxonomy, NCBITaxonomyBuilder},
 };
 use time_requirements::prelude::*;
 use webcodegen::{Codegen, PgExtension, Table};
@@ -46,12 +46,14 @@ pub async fn main() {
     time_tracker.add_completed_task(task);
 
     // We retrieve and build the latest version of the NCBI taxonomy
-    // let task = Task::new("Fetching NCBI Taxonomy");
-    // let taxonomy: NCBITaxonomy =
-    // NCBITaxonomyBuilder::latest().build().await.unwrap(); time_tracker.
-    // add_completed_task(task); let task = Task::new("Creating Taxonomy CSV");
-    // taxonomy.to_csv("../csvs/taxa.csv").unwrap();
-    // time_tracker.add_completed_task(task);
+    if !Path::new("../csvs/taxa.csv").exists() {
+        let task = Task::new("Fetching NCBI Taxonomy");
+        let taxonomy: NCBITaxonomy = NCBITaxonomyBuilder::latest().build().await.unwrap();
+        time_tracker.add_completed_task(task);
+        let task = Task::new("Creating Taxonomy CSV");
+        taxonomy.to_csv("../csvs/taxa.csv").unwrap();
+        time_tracker.add_completed_task(task);
+    }
 
     // Next, we build the SQL associated with the CSVs present in the 'csvs'
     // directory

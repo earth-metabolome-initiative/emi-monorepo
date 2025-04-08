@@ -1,5 +1,6 @@
-use crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data;
-use crate::codegen::diesel_codegen::tables::field_data::field_data;
+use crate::codegen::diesel_codegen::tables::{
+    dried_samples_data::dried_samples_data, field_data::field_data,
+};
 diesel::allow_tables_to_appear_in_same_query!(dried_samples_data, field_data);
 use crate::codegen::diesel_codegen::tables::batches::batches;
 diesel::allow_tables_to_appear_in_same_query!(dried_samples_data, batches);

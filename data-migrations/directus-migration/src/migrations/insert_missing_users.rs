@@ -2,9 +2,9 @@
 //! to the new database.
 
 use diesel_async::AsyncPgConnection;
+use web_common_traits::database::Loadable;
 
 use super::get_user;
-use web_common_traits::database::Loadable;
 use crate::codegen::DirectusUser;
 
 pub async fn insert_missing_users(

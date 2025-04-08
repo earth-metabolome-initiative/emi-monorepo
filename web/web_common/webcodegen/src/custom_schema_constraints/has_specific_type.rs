@@ -14,10 +14,7 @@ pub struct HasSpecificTypeConstraint<'column> {
 impl<'column> HasSpecificTypeConstraint<'column> {
     /// Create a new `HasSpecificTypeConstraint`
     pub fn new(column_name: &'column str, column_type: &'column str) -> Self {
-        Self {
-            column_name,
-            column_type,
-        }
+        Self { column_name, column_type }
     }
 }
 

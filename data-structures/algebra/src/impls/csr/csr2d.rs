@@ -226,7 +226,7 @@ where
         = CSR2DNonEmptyRowIndices<'a, Self>
     where
         Self: 'a;
-        
+
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         let start = self.rank_row(row).into_usize();
         let end = self.rank_row(row + RowIndex::ONE).into_usize();

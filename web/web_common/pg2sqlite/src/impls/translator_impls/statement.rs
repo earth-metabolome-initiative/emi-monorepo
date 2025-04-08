@@ -11,10 +11,15 @@ impl Translator for Statement {
 
     fn translate(&self, schema: &Self::Schema) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         Ok(match self {
-            Self::CreateTable(create_table) => vec![Self::CreateTable(create_table.translate(schema)?)],
+            Self::CreateTable(create_table) => {
+                vec![Self::CreateTable(create_table.translate(schema)?)]
+            }
             Self::CreateIndex(create_index) => create_index.translate(schema)?,
             unsupported_statement => {
-                unimplemented!("Unsupported PostgreSQL statement: `{}` - Parsed as: {unsupported_statement:?}", unsupported_statement.to_string())
+                unimplemented!(
+                    "Unsupported PostgreSQL statement: `{}` - Parsed as: {unsupported_statement:?}",
+                    unsupported_statement.to_string()
+                )
             }
         })
     }

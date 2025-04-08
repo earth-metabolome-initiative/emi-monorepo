@@ -9,7 +9,7 @@ use quote::quote;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{parse_str, Ident, Type};
 
-use super::{table::RESERVED_RUST_WORDS, PgAttribute, PgSetting, PgEnum};
+use super::{table::RESERVED_RUST_WORDS, PgAttribute, PgEnum, PgSetting};
 use crate::{
     codegen::{
         CODEGEN_DIESEL_MODULE, CODEGEN_DIRECTORY, CODEGEN_STRUCTS_MODULE, CODEGEN_TYPES_PATH,
@@ -18,7 +18,8 @@ use crate::{
 };
 
 /// Constant listing types supporting `Copy`.
-pub(crate) const COPY_TYPES: [&str; 7] = ["i32", "i16", "i64", "f32", "f64", "bool", "rosetta_uuid::Uuid"];
+pub(crate) const COPY_TYPES: [&str; 7] =
+    ["i32", "i16", "i64", "f32", "f64", "bool", "rosetta_uuid::Uuid"];
 
 /// Constant listing types supporting `Eq`.
 pub(crate) const EQ_TYPES: [&str; 5] = ["i32", "i16", "i64", "bool", "rosetta_uuid::Uuid"];
@@ -111,7 +112,10 @@ pub struct PgType {
 /// # Panics
 ///
 /// Panics if the type is not supported.
-pub fn rust_type_str<S: AsRef<str>>(type_name: S, conn: &mut PgConnection) -> Result<&'static str, WebCodeGenError> {
+pub fn rust_type_str<S: AsRef<str>>(
+    type_name: S,
+    conn: &mut PgConnection,
+) -> Result<&'static str, WebCodeGenError> {
     Ok(match type_name.as_ref() {
         // Numeric types
         "integer" | "int4" => "i32",
@@ -134,9 +138,11 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S, conn: &mut PgConnection) -> Re
             let time_zone = PgSetting::time_zone(conn)?;
             match time_zone.setting.as_str() {
                 "UTC" => "chrono::DateTime<chrono::Utc>",
-                unknown_time_zone => unimplemented!("Time zone `{unknown_time_zone}` not supported"),
+                unknown_time_zone => {
+                    unimplemented!("Time zone `{unknown_time_zone}` not supported")
+                }
             }
-        },
+        }
         "date" => "chrono::NaiveDate",
         "time without time zone" | "time with time zone" => "chrono::NaiveTime",
         "interval" => "chrono::Duration",

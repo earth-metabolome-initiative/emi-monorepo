@@ -1,5 +1,6 @@
-use crate::codegen::diesel_codegen::tables::extraction_data::extraction_data;
-use crate::codegen::diesel_codegen::tables::containers::containers;
+use crate::codegen::diesel_codegen::tables::{
+    containers::containers, extraction_data::extraction_data,
+};
 diesel::allow_tables_to_appear_in_same_query!(extraction_data, containers);
 use crate::codegen::diesel_codegen::tables::directus_users::directus_users;
 diesel::allow_tables_to_appear_in_same_query!(extraction_data, directus_users);

@@ -21,9 +21,8 @@ impl DirectusRole {
         Option<crate::codegen::structs_codegen::tables::directus_roles::DirectusRole>,
         diesel::result::Error,
     > {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(parent) = self.parent.as_ref() else {
             return Ok(None);
         };
@@ -32,9 +31,7 @@ impl DirectusRole {
                 crate::codegen::diesel_codegen::tables::directus_roles::directus_roles::dsl::id
                     .eq(parent),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_roles::DirectusRole>(conn)
             .await
             .map(Some)
     }
@@ -43,9 +40,8 @@ impl DirectusRole {
         conn: &mut diesel_async::AsyncPgConnection,
         parent: &crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_roles::directus_roles::dsl::parent

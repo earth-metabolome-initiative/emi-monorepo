@@ -1,5 +1,6 @@
 //! Submodule providing the code to generate the implementation of the
-//! [`Insertable`](web_common_traits::database::Insertable) trait for all required tables.
+//! [`Insertable`](web_common_traits::database::Insertable) trait for all
+//! required tables.
 
 use std::path::Path;
 
@@ -9,7 +10,8 @@ use proc_macro2::TokenStream;
 use crate::{Codegen, Table};
 
 impl Codegen<'_> {
-    /// Generates the [`Insertable`](web_common_traits::database::Insertable) trait implementation for the tables
+    /// Generates the [`Insertable`](web_common_traits::database::Insertable)
+    /// trait implementation for the tables
     ///
     /// # Arguments
     ///

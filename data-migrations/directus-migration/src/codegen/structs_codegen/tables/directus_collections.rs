@@ -33,14 +33,11 @@ impl DirectusCollection {
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<
-        Option<
-            crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection,
-        >,
+        Option<crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection>,
         diesel::result::Error,
     > {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(group) = self.group.as_ref() else {
             return Ok(None);
         };
@@ -60,9 +57,8 @@ impl DirectusCollection {
         conn: &mut diesel_async::AsyncPgConnection,
         group: &crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::dsl::group

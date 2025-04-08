@@ -1,15 +1,20 @@
 //! Enumeration of errors that may occur during directus migration
 
-use crate::codegen::{
-    Brand as DirectusBrand, DirectusUser, InstrumentModel as DirectusInstrumentModel,
-    InstrumentType as DirectusInstrumentType, Instrument as DirectusInstrument,
-    Room as DirectusRoom
-};
 use core_structures::{
     codegen::structs_codegen::tables::insertables::InsertableUserAttributes,
-    tables::insertables::{InsertableAddressAttributes, InsertableBrandAttributes, InsertableCityAttributes, InsertableInstrumentAttributes, InsertableInstrumentModelAttributes, InsertableRoomAttributes, InsertableUserEmailAttributes},
+    tables::insertables::{
+        InsertableAddressAttributes, InsertableBrandAttributes, InsertableCityAttributes,
+        InsertableInstrumentAttributes, InsertableInstrumentModelAttributes,
+        InsertableRoomAttributes, InsertableUserEmailAttributes,
+    },
 };
 use web_common_traits::database::InsertError;
+
+use crate::codegen::{
+    Brand as DirectusBrand, DirectusUser, Instrument as DirectusInstrument,
+    InstrumentModel as DirectusInstrumentModel, InstrumentType as DirectusInstrumentType,
+    Room as DirectusRoom,
+};
 
 #[derive(Debug)]
 /// Enumeration of errors that may occur during directus migration

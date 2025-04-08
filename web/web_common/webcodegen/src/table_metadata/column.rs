@@ -9,7 +9,7 @@ use syn::{Ident, Type};
 
 use super::{
     check_constraint::CheckConstraint,
-    pg_type::{rust_type_str, COPY_TYPES, PgType},
+    pg_type::{rust_type_str, PgType, COPY_TYPES},
     table::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS},
 };
 use crate::{
@@ -229,16 +229,16 @@ impl Column {
             .first::<crate::GeometryColumn>(conn)?)
     }
 
-    /// Returns the associated geography column if the column is a geography column.
-    /// 
+    /// Returns the associated geography column if the column is a geography
+    /// column.
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If an error occurs while querying the database
-    /// 
     pub fn geography(
         &self,
         conn: &mut PgConnection,
@@ -510,7 +510,6 @@ impl Column {
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    ///
     pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         if let Ok(geometry) = self.geometry(conn) {
             return Ok(geometry.supports_copy());

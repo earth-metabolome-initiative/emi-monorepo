@@ -44,14 +44,13 @@ pub struct PgOperator {
 }
 
 impl PgOperator {
-
-    /// Returns the rust [`BinOp`](syn::BinOp) corresponding to this operator, if any.
-    /// 
+    /// Returns the rust [`BinOp`](syn::BinOp) corresponding to this operator,
+    /// if any.
+    ///
     /// # Returns
-    /// 
+    ///
     /// * `Some(BinOp)` if the operator is a binary operator
     /// * `None` if the operator is not a binary operator
-    /// 
     pub fn rust_binary_operator(&self) -> Result<syn::BinOp, syn::Error> {
         syn::parse_str(&self.oprname)
     }
@@ -67,19 +66,15 @@ impl PgOperator {
     }
 
     /// Returns the [`PgProc`] associated with this operator.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If an error occurs while querying the database
-    /// 
-    pub fn function(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<PgProc, diesel::result::Error> {
+    pub fn function(&self, conn: &mut PgConnection) -> Result<PgProc, diesel::result::Error> {
         use crate::schema::pg_proc;
         pg_proc::table
             .filter(pg_proc::oid.eq(self.oprcode))
@@ -111,15 +106,14 @@ impl PgOperator {
     }
 
     /// Returns the left operand type [`PgType`] of the operator.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If an error occurs while querying the database
-    /// 
     pub fn left_operand_type(
         &self,
         conn: &mut PgConnection,
@@ -132,15 +126,14 @@ impl PgOperator {
     }
 
     /// Returns the right operand type [`PgType`] of the operator.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If an error occurs while querying the database
-    /// 
     pub fn right_operand_type(
         &self,
         conn: &mut PgConnection,
@@ -153,19 +146,15 @@ impl PgOperator {
     }
 
     /// Returns the result type [`PgType`] of the operator.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If an error occurs while querying the database
-    /// 
-    pub fn result_type(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<PgType, diesel::result::Error> {
+    pub fn result_type(&self, conn: &mut PgConnection) -> Result<PgType, diesel::result::Error> {
         use crate::schema::pg_type;
         pg_type::table
             .filter(pg_type::oid.eq(self.oprresult))

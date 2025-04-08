@@ -25,17 +25,14 @@ impl DirectusNotification {
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
         diesel::result::Error,
     > {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(&self.recipient),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -46,9 +43,8 @@ impl DirectusNotification {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(sender) = self.sender.as_ref() else {
             return Ok(None);
         };
@@ -57,9 +53,7 @@ impl DirectusNotification {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(sender),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
             .await
             .map(Some)
     }
@@ -68,9 +62,8 @@ impl DirectusNotification {
         conn: &mut diesel_async::AsyncPgConnection,
         recipient: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_notifications::directus_notifications::dsl::recipient
@@ -84,9 +77,8 @@ impl DirectusNotification {
         conn: &mut diesel_async::AsyncPgConnection,
         sender: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_notifications::directus_notifications::dsl::sender

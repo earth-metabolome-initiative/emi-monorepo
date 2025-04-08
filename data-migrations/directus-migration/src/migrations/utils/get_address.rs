@@ -1,10 +1,13 @@
 //! Submodule providing an utility to retrieve or insert an address.
 
-use crate::codegen::Address as DirectusAddress;
 use core_structures::{Address as PortalAddress, City as PortalCity, Country as PortalCountry};
 use diesel_async::AsyncPgConnection;
-use web_common_traits::database::{Insertable, BackendInsertableVariant};
-use web_common_traits::prelude::Builder;
+use web_common_traits::{
+    database::{BackendInsertableVariant, Insertable},
+    prelude::Builder,
+};
+
+use crate::codegen::Address as DirectusAddress;
 
 /// Returns (potentially newly created) address for a Directus address.
 pub async fn get_address(

@@ -2,7 +2,9 @@
 use diesel::result::Error as DieselError;
 use snake_case_sanitizer::SanitizationErrors;
 
-use crate::{custom_schema_constraints::ConstraintError, CheckConstraint, Column, PgProc, PgType, Table};
+use crate::{
+    custom_schema_constraints::ConstraintError, CheckConstraint, Column, PgProc, PgType, Table,
+};
 
 #[derive(Debug)]
 /// Enumeration for the errors that may happen within the webcodegen crate.
@@ -93,7 +95,8 @@ pub enum CheckConstraintError {
     OperatorsNotSupported,
     /// When none of the provided columns are involved in the check clause.
     NoInvolvedColumns(Box<Column>, Box<CheckConstraint>),
-    /// When the top-level expression cannot be reduced to a Result-returning expression.
+    /// When the top-level expression cannot be reduced to a Result-returning
+    /// expression.
     TopLevelExpressionNotResult(Box<CheckConstraint>),
 }
 

@@ -6,9 +6,8 @@ use diesel::{
 };
 use syn::punctuated::Punctuated;
 
-use crate::{errors::WebCodeGenError, PgExtension};
-
 use super::PgType;
+use crate::{errors::WebCodeGenError, PgExtension};
 
 /// Represents the `pg_proc` system catalog table in `PostgreSQL`.
 /// This table stores information about functions and procedures.
@@ -78,15 +77,14 @@ pub struct PgProc {
 
 impl PgProc {
     /// Returns whether the current function may be return a `Result`.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the return type does not exist.
-    /// 
     pub fn returns_result(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         if self.proname.starts_with("must_be_") || self.proname.starts_with("must_not_be_") {
             Ok(self.return_type(conn)?.is_boolean(conn)?)
@@ -97,16 +95,18 @@ impl PgProc {
 
     /// Returns the `Vec` of [`PgType`] representing the types of the arguments
     /// of the function.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the provided connection is invalid.
-    /// 
-    pub fn argument_types(&self, conn: &mut PgConnection) -> Result<Vec<PgType>, diesel::result::Error> {
+    pub fn argument_types(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<PgType>, diesel::result::Error> {
         self.proargtypes.iter().map(|oid| PgType::from_oid(*oid, conn)).collect()
     }
 

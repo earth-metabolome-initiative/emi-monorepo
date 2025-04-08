@@ -10,13 +10,12 @@ mod updatables;
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use syn::Ident;
+use time_requirements::prelude::{Task, TimeTracker};
 
 use crate::{
     codegen::{CODEGEN_INSERTABLES_PATH, CODEGEN_UPDATABLES_PATH},
     Codegen, Table,
 };
-
-use time_requirements::prelude::{Task, TimeTracker};
 
 impl Codegen<'_> {
     /// Code relative to generating all of the diesel code.

@@ -4,7 +4,7 @@ mod migrations;
 use diesel_async::{AsyncConnection, AsyncPgConnection};
 use migrations::{
     ensure_instrument_types_compatibility, insert_missing_brands, insert_missing_instrument_models,
-    insert_missing_users, insert_missing_instruments
+    insert_missing_instruments, insert_missing_users,
 };
 
 const DIRECTUS_DATABASE_NAME: &str = "directus";
@@ -24,7 +24,8 @@ const PORTAL_DATABASE_URL: &str = const_format::formatcp!(
     "postgres://{PORTAL_DATABASE_USER}:{PORTAL_DATABASE_PASSWORD}@localhost:{PORTAL_DATABASE_PORT}/{PORTAL_DATABASE_NAME}",
 );
 
-/// Executes the data migration from the Directus database to the portal database.
+/// Executes the data migration from the Directus database to the portal
+/// database.
 async fn transact_migration(
     directus_conn: &mut AsyncPgConnection,
     portal_conn: &mut AsyncPgConnection,

@@ -69,10 +69,7 @@ impl Display for ConstraintError {
             ConstraintError::NotForeignKeyColumn { table_name, column_name } => {
                 write!(f, "Column {column_name} in table {table_name} is not a foreign key column",)
             }
-            ConstraintError::NotOfCorrectType {
-                column,
-                expected_column_type,
-            } => {
+            ConstraintError::NotOfCorrectType { column, expected_column_type } => {
                 write!(
                     f,
                     "Column {}.{} is of type {}, expected {expected_column_type}",

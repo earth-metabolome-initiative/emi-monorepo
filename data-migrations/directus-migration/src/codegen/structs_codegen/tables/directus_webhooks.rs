@@ -27,9 +27,8 @@ impl DirectusWebhook {
         Option<crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow>,
         diesel::result::Error,
     > {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(migrated_flow) = self.migrated_flow.as_ref() else {
             return Ok(None);
         };
@@ -38,9 +37,7 @@ impl DirectusWebhook {
                 crate::codegen::diesel_codegen::tables::directus_flows::directus_flows::dsl::id
                     .eq(migrated_flow),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow>(conn)
             .await
             .map(Some)
     }
@@ -49,9 +46,8 @@ impl DirectusWebhook {
         conn: &mut diesel_async::AsyncPgConnection,
         migrated_flow: &crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks::dsl::migrated_flow

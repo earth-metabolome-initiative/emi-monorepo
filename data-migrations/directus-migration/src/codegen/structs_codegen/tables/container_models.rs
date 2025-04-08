@@ -31,9 +31,8 @@ impl ContainerModel {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
@@ -42,9 +41,7 @@ impl ContainerModel {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_created),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
             .await
             .map(Some)
     }
@@ -56,9 +53,8 @@ impl ContainerModel {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
@@ -67,9 +63,7 @@ impl ContainerModel {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_updated),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
             .await
             .map(Some)
     }
@@ -81,30 +75,24 @@ impl ContainerModel {
         crate::codegen::structs_codegen::tables::container_types::ContainerType,
         diesel::result::Error,
     > {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::container_types::ContainerType::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::container_types::container_types::dsl::id
                     .eq(&self.container_type),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::container_types::ContainerType,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::container_types::ContainerType>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
     pub async fn volume_unit(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::si_units::SiUnit,
-        diesel::result::Error,
-    > {
+    ) -> Result<crate::codegen::structs_codegen::tables::si_units::SiUnit, diesel::result::Error>
+    {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::si_units::SiUnit::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::si_units::si_units::dsl::id
@@ -117,18 +105,11 @@ impl ContainerModel {
     pub async fn brand(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::brands::Brand,
-        diesel::result::Error,
-    > {
+    ) -> Result<crate::codegen::structs_codegen::tables::brands::Brand, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::brands::Brand::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::brands::brands::dsl::id
-                    .eq(&self.brand),
-            )
+            .filter(crate::codegen::diesel_codegen::tables::brands::brands::dsl::id.eq(&self.brand))
             .first::<crate::codegen::structs_codegen::tables::brands::Brand>(conn)
             .await
     }
@@ -137,9 +118,8 @@ impl ContainerModel {
         conn: &mut diesel_async::AsyncPgConnection,
         user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::user_created
@@ -153,9 +133,8 @@ impl ContainerModel {
         conn: &mut diesel_async::AsyncPgConnection,
         user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::user_updated
@@ -169,9 +148,8 @@ impl ContainerModel {
         conn: &mut diesel_async::AsyncPgConnection,
         container_type: &crate::codegen::structs_codegen::tables::container_types::ContainerType,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::container_type
@@ -185,9 +163,8 @@ impl ContainerModel {
         conn: &mut diesel_async::AsyncPgConnection,
         volume_unit: &crate::codegen::structs_codegen::tables::si_units::SiUnit,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::volume_unit
@@ -201,9 +178,8 @@ impl ContainerModel {
         conn: &mut diesel_async::AsyncPgConnection,
         brand: &crate::codegen::structs_codegen::tables::brands::Brand,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::brand

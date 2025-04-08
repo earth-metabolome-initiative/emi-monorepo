@@ -81,14 +81,17 @@ impl Codegen<'_> {
             let (user_id, additional_imports) = if parent_check.is_empty() {
                 (quote::quote! { _user_id }, TokenStream::new())
             } else {
-                (quote::quote! { user_id }, quote::quote! {
-                    use web_common_traits::database::Updatable;
-                })
+                (
+                    quote::quote! { user_id },
+                    quote::quote! {
+                        use web_common_traits::database::Updatable;
+                    },
+                )
             };
 
             // We implement the [`BackendInsertableVariant`] only when the table
             // has no parent tables or when the parent tables are not updatable.
-            let backend_insertable_impl = if parent_check.is_empty(){
+            let backend_insertable_impl = if parent_check.is_empty() {
                 quote::quote! {
                     #[cfg(feature="backend")]
                     impl web_common_traits::database::BackendInsertableVariant for #insertable_frontend_variant {
@@ -101,7 +104,7 @@ impl Codegen<'_> {
                         > {
                             use diesel_async::RunQueryDsl;
                             use diesel::associations::HasTable;
-    
+
                             Ok(diesel::insert_into(Self::Row::table())
                                 .values(self)
                                 .get_result(conn).await?)

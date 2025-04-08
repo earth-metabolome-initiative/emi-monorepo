@@ -1,5 +1,4 @@
-use crate::codegen::diesel_codegen::tables::ms_data::ms_data;
-use crate::codegen::diesel_codegen::tables::directus_users::directus_users;
+use crate::codegen::diesel_codegen::tables::{directus_users::directus_users, ms_data::ms_data};
 diesel::allow_tables_to_appear_in_same_query!(ms_data, directus_users);
 use crate::codegen::diesel_codegen::tables::si_units::si_units;
 diesel::allow_tables_to_appear_in_same_query!(ms_data, si_units);
