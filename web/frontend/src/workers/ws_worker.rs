@@ -8,7 +8,7 @@ use futures::{SinkExt, StreamExt};
 use gloo::timers::callback::Timeout;
 use gloo_net::websocket::futures::WebSocket;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
+use rosetta_uuid::Uuid;
 use web_common::api::{
     ws::messages::{BackendMessage, CloseReason, FrontendMessage},
     ApiError,
