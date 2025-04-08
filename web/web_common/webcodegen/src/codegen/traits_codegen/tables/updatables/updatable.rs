@@ -120,6 +120,11 @@ impl Codegen<'_> {
                     let Some((parent_table, _)) = parent_key.foreign_table(conn)? else {
                         return Ok(TokenStream::new());
                     };
+
+                    if !parent_table.allows_updatable(conn)? {
+                        return Ok(TokenStream::new());
+                    }
+
                     let method_ident = parent_key.getter_ident()?;
                     let parent_table_ident = parent_table.snake_case_ident()?;
 

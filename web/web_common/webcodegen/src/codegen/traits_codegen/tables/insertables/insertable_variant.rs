@@ -55,6 +55,11 @@ impl Codegen<'_> {
                 .iter()
                 .map(|parent_key| {
                     let parent_key_method = parent_key.getter_ident()?;
+                    let (parent_table, _) = parent_key.foreign_table(conn)?.expect("Parent table not found");
+                    if !parent_table.allows_updatable(conn)? {
+                        return Ok(TokenStream::new());
+                    }
+
                     Ok(if parent_key.is_nullable() {
                         quote::quote! {
                             if let Some(parent) = self.#parent_key_method(conn).await? {
