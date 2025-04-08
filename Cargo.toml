@@ -48,7 +48,8 @@ infer = "0.16.0"
 csv = "1.3.1"
 bytes = "1.10.0"
 bincode = "1.3.3"
-sqlparser = { git = "https://github.com/apache/datafusion-sqlparser-rs.git" }
+sqlparser = { version = "0.55" }
+arbitrary = { version = "1", features = ["derive"] }
 diesel = { version = "2.2", default-features = false, features = ["extras"] }
 diesel-async = { version = "0.5", default-features = false }
 diesel_full_text_search = "2.2"
