@@ -22,14 +22,12 @@ impl<'a> CSVTable<'a> {
         self.table_metadata.foreign_table_name()
     }
 
-    #[must_use]
     /// Returns representations of the columns in the table.
-    pub fn columns(&self) -> Vec<CSVColumn<'_>> {
+    pub fn columns(&self) -> impl Iterator<Item = CSVColumn<'_>> {
         self.table_metadata
             .columns
             .iter()
             .map(|column_metadata| CSVColumn { table: self, column_metadata })
-            .collect()
     }
 
     #[must_use]
@@ -38,19 +36,15 @@ impl<'a> CSVTable<'a> {
         self.column_from_name(column_name).is_ok()
     }
 
-    #[must_use]
     /// Returns the dependant tables of the table.
-    pub fn dependant_tables(&self) -> Vec<CSVTable<'_>> {
+    pub fn dependant_tables(&self) -> impl Iterator<Item = CSVTable<'_>> {
         self.schema
             .tables()
-            .into_iter()
             .filter(|table| {
                 table
                     .columns()
-                    .iter()
                     .any(|column| column.foreign_table().is_some_and(|t| t.name() == self.name()))
             })
-            .collect()
     }
 
     #[must_use]
@@ -76,16 +70,15 @@ impl<'a> CSVTable<'a> {
             .table_metadata
             .columns
             .iter()
-            .find(|column| &column.name(self.schema).unwrap() == column_name)
+            .find(|column| column.name(self.schema).unwrap() == column_name)
             .ok_or(CSVSchemaError::InvalidColumnName(column_name.to_string()))?;
         Ok(CSVColumn { table: self, column_metadata })
     }
 
-    #[must_use]
     /// Returns the name of the table.
     pub fn to_sql(&self) -> Result<String, CSVSchemaError> {
         let mut sql = format!("CREATE TABLE IF NOT EXISTS {} (\n", self.table_metadata.name);
-        for column in &self.columns() {
+        for column in self.columns() {
             sql.push_str(&format!(
                 "    {} {}{}{}{}{},\n",
                 column.name()?,
@@ -99,7 +92,7 @@ impl<'a> CSVTable<'a> {
                 if column.is_nullable() || column.is_primary_key() { "" } else { " NOT NULL" },
                 if let Some(foreign_table) = &column.foreign_table() {
                     format!(
-                        " REFERENCES {}({}) ON DELETE CASCADE",
+                        " REFERENCES {}({})",
                         foreign_table.name(),
                         foreign_table.primary_key().name()?
                     )
@@ -125,7 +118,7 @@ impl<'a> CSVTable<'a> {
         let temporary_table_name = self.table_metadata.temporary_table_name();
 
         let mut sql = format!("CREATE TEMPORARY TABLE {temporary_table_name} (\n");
-        for column in &self.columns() {
+        for column in self.columns() {
             if column.is_artificial() {
                 continue;
             }
@@ -170,7 +163,6 @@ impl<'a> CSVTable<'a> {
         Ok(sql)
     }
 
-    #[must_use]
     /// Returns the SQL to populate the table.
     ///
     /// # Panics
@@ -197,7 +189,7 @@ impl<'a> CSVTable<'a> {
         sql.push_str("\n) SELECT\n");
         let temporary_table_name = self.table_metadata.temporary_table_name();
 
-        for column in &self.columns() {
+        for column in self.columns() {
             if column.is_artificial() {
                 continue;
             }
@@ -216,7 +208,7 @@ impl<'a> CSVTable<'a> {
 
         sql.push_str("\nFROM\n");
         sql.push_str(&format!("    {temporary_table_name}"));
-        for column in &self.columns() {
+        for column in self.columns() {
             if let Some(foreign_table) = column.foreign_table() {
                 sql.push_str(&format!(
                     "\n    JOIN {} ON {}.{}_{} = {}.{}",

@@ -45,6 +45,12 @@ impl Codegen<'_> {
                     continue;
                 };
 
+                // There is no need to implement this macro for the case of a foreign table that curresponds
+                // with the table itself.
+                if &foreign_table == table {
+                    continue;
+                }
+
                 // We check wether for the current table we havce already created a given token
                 // stream.
                 if let Some(maybe_token_stream) = table_hashmap.get_mut(&foreign_table) {

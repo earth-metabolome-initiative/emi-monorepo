@@ -1,31 +1,75 @@
 # Time Report for Building Core Structures
 
 The total time spent on all tasks was 38 seconds.
+The slowest task was `Building Schema from CSVs` which took 20 seconds (52.63% of all time).
 
-The slowest task was `Building Schema from CSVs` which took 19 seconds (50.00% of all time).
+| name                            | time       | percentage | comment    |
+|---------------------------------|------------|------------|------------|
+| Checking Migrations Directory   | now        | 0.00%      | Unchanged. |
+| Creating Font Awesome Icons CSV | now        | 0.00%      | Unchanged. |
+| Creating Taxonomical Ranks CSV  | now        | 0.00%      | Unchanged. |
+| Fetching NCBI Taxonomy          | now        | 15.79%     | Unchanged. |
+| Creating Taxonomy CSV           | now        | 0.00%      | Unchanged. |
+| Building Schema from CSVs       | 20 seconds | 52.63%     | Unchanged. |
+| Executing Migrations            | now        | 0.00%      | Unchanged. |
+| Executing Meta-SQL              | now        | 0.00%      | Unchanged. |
+| Checking Constraints            | now        | 5.26%      | Unchanged. |
+| Code generation                 | now        | 18.42%     | Unchanged. |
+
+## Time Report for Code generation
+
+The total time spent on all tasks was now.
+The slowest task was `Generate Web Common Traits` which took now (42.86% of all time).
+
+| name                       | time | percentage | comment    |
+|----------------------------|------|------------|------------|
+| Retrieving tables          | now  | 0.00%      | Unchanged. |
+| Generating Diesel code     | now  | 14.29%     | Unchanged. |
+| Generate Structs           | now  | 42.86%     | Unchanged. |
+| Generate Web Common Traits | now  | 42.86%     | Unchanged. |
+
+### Time Report for Generating Diesel code
+
+The total time spent on all tasks was now.
+The slowest task was `Generating allow tables to appear in same query schema` which took now (100.00% of all time).
+
+| name                                                   | time | percentage | comment    |
+|--------------------------------------------------------|------|------------|------------|
+| Generating tables schema                               | now  | 0.00%      | Unchanged. |
+| Generating types schema                                | now  | 0.00%      | Unchanged. |
+| Generating allow tables to appear in same query schema | now  | 100.00%    | Unchanged. |
+
+### Time Report for Generate Structs
+
+The total time spent on all tasks was now.
+The slowest task was `Generate Table Structs` which took now (100.00% of all time).
+
+| name                   | time | percentage | comment    |
+|------------------------|------|------------|------------|
+| Generate Types Structs | now  | 0.00%      | Unchanged. |
+| Generate Table Structs | now  | 100.00%    | Unchanged. |
+
+### Time Report for Generate Web Common Traits
+
+The total time spent on all tasks was now.
+The slowest task was `Generate Table Traits` which took now (100.00% of all time).
+
+| name                  | time | percentage | comment    |
+|-----------------------|------|------------|------------|
+| Generate Types Traits | now  | 0.00%      | Unchanged. |
+| Generate Table Traits | now  | 100.00%    | Unchanged. |
+
+#### Time Report for Generate Table Traits
+
+The total time spent on all tasks was now.
+The slowest task was `Generate Foreign Traits` which took now (33.33% of all time).
+
+| name                       | time | percentage | comment    |
+|----------------------------|------|------------|------------|
+| Generate Deletable Traits  | now  | 0.00%      | Unchanged. |
+| Generate Loadable Traits   | now  | 0.00%      | Unchanged. |
+| Generate Foreign Traits    | now  | 33.33%     | Unchanged. |
+| Generate Insertable Traits | now  | 0.00%      | Unchanged. |
+| Generate Updatable Traits  | now  | 33.33%     | Unchanged. |
 
 ![Plot](time_requirements_report.png)
-
-+---------------------------------+------------+------------+------------+
-| name                            | time       | percentage | comment    |
-+---------------------------------+------------+------------+------------+
-| Checking Migrations Directory   | now        | 0.00%      | Unchanged. |
-+---------------------------------+------------+------------+------------+
-| Creating Font Awesome Icons CSV | now        | 0.00%      | Unchanged. |
-+---------------------------------+------------+------------+------------+
-| Creating Taxonomical Ranks CSV  | now        | 0.00%      | Unchanged. |
-+---------------------------------+------------+------------+------------+
-| Fetching NCBI Taxonomy          | now        | 15.79%     | Unchanged. |
-+---------------------------------+------------+------------+------------+
-| Creating Taxonomy CSV           | now        | 0.00%      | Unchanged. |
-+---------------------------------+------------+------------+------------+
-| Building Schema from CSVs       | 19 seconds | 50.00%     | Unchanged. |
-+---------------------------------+------------+------------+------------+
-| Executing Migrations            | now        | 0.00%      | Unchanged. |
-+---------------------------------+------------+------------+------------+
-| Executing Meta-SQL              | now        | 0.00%      | Unchanged. |
-+---------------------------------+------------+------------+------------+
-| Checking Constraints            | now        | 5.26%      | Unchanged. |
-+---------------------------------+------------+------------+------------+
-| Generating Code                 | now        | 21.05%     | Unchanged. |
-+---------------------------------+------------+------------+------------+

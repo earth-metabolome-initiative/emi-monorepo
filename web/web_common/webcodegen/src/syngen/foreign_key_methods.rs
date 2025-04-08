@@ -52,13 +52,7 @@ impl Table {
             .into_iter()
             .map(|(foreign_key_table, column)| {
                 let foreign_key_struct_path = foreign_key_table.import_struct_path()?;
-
-                let column_name = column.snake_case_name()?;
-                let method_name: Ident = if column_name.ends_with("_id") {
-                    Ident::new(&column_name[..column_name.len() - 3], proc_macro2::Span::call_site())
-                } else {
-                    Ident::new(&column_name, proc_macro2::Span::call_site())
-                };
+                let method_ident: Ident = column.getter_ident()?;
 
                 Ok(quote! {
                     #syntax_feature_flag
@@ -66,7 +60,7 @@ impl Table {
                         type Conn = #connection;
 
                         async fn foreign(&self, conn: &mut Self::Conn) -> Result<#foreign_key_struct_path, diesel::result::Error> {
-                            self.#method_name(conn).await
+                            self.#method_ident(conn).await
                         }
                     }
                 })
@@ -87,11 +81,7 @@ impl Table {
             .into_iter()
             .map(|column| {
                 let (foreign_key_table, _) = column.foreign_table(conn).unwrap().unwrap();
-                let method_name: Ident = if column.column_name.ends_with("_id") {
-                    Ident::new(&column.column_name[..column.column_name.len() - 3], proc_macro2::Span::call_site())
-                } else {
-                    Ident::new(&column.column_name, proc_macro2::Span::call_site())
-                };
+                let method_ident: Ident = column.getter_ident()?;
                 let current_column_ident: Ident = column.snake_case_ident()?;
                 let foreign_key_struct_path = foreign_key_table.import_struct_path()?;
 
@@ -122,7 +112,7 @@ impl Table {
 
                 Ok(quote! {
                     #feature_flag
-                    pub async fn #method_name(&self, conn: &mut #connection) -> Result<#return_statement, diesel::result::Error> {
+                    pub async fn #method_ident(&self, conn: &mut #connection) -> Result<#return_statement, diesel::result::Error> {
                         use diesel_async::RunQueryDsl;
                         use diesel::associations::HasTable;
                         use diesel::QueryDsl;

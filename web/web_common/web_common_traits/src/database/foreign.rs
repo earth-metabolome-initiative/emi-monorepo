@@ -3,7 +3,7 @@
 /// Trait for a struct that has a foreign key.
 pub trait Foreign<T> {
     /// The connection type of the table.
-    type Conn: diesel_async::AsyncConnection;
+    type Conn;
 
     /// Returns the foreign key.
     fn foreign(

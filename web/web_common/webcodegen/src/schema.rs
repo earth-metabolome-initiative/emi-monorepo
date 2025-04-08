@@ -36,15 +36,15 @@ table! {
         datetime_precision -> Nullable<Integer>,
         interval_type -> Nullable<Text>,
         interval_precision -> Nullable<Integer>,
-        character_set_catalog -> Nullable<Text>,
-        character_set_schema -> Nullable<Text>,
-        character_set_name -> Nullable<Text>,
-        collation_catalog -> Nullable<Text>,
-        collation_schema -> Nullable<Text>,
-        collation_name -> Nullable<Text>,
-        domain_catalog -> Nullable<Text>,
-        domain_schema -> Nullable<Text>,
-        domain_name -> Nullable<Text>,
+        // character_set_catalog -> Nullable<Text>,
+        // character_set_schema -> Nullable<Text>,
+        // character_set_name -> Nullable<Text>,
+        // collation_catalog -> Nullable<Text>,
+        // collation_schema -> Nullable<Text>,
+        // collation_name -> Nullable<Text>,
+        // domain_catalog -> Nullable<Text>,
+        // domain_schema -> Nullable<Text>,
+        // domain_name -> Nullable<Text>,
         udt_catalog -> Nullable<Text>,
         udt_schema -> Nullable<Text>,
         udt_name -> Nullable<Text>,
@@ -55,12 +55,12 @@ table! {
         dtd_identifier -> Nullable<Text>,
         is_self_referencing -> Nullable<Text>,
         is_identity -> Nullable<Text>,
-        identity_generation -> Nullable<Text>,
-        identity_start -> Nullable<Text>,
-        identity_increment -> Nullable<Text>,
-        identity_maximum -> Nullable<Text>,
-        identity_minimum -> Nullable<Text>,
-        identity_cycle -> Nullable<Text>,
+        // identity_generation -> Nullable<Text>,
+        // identity_start -> Nullable<Text>,
+        // identity_increment -> Nullable<Text>,
+        // identity_maximum -> Nullable<Text>,
+        // identity_minimum -> Nullable<Text>,
+        // identity_cycle -> Nullable<Text>,
         is_generated -> Text,
         generation_expression -> Nullable<Text>,
         is_updatable -> Text,
@@ -257,7 +257,6 @@ table! {
     }
 }
 
-#[cfg(not(feature = "postgres_17"))]
 table! {
     pg_type (oid, typname, typnamespace) {
         oid -> Oid,
@@ -272,43 +271,6 @@ table! {
         typisdefined -> Bool,
         typdelim -> Char,
         typrelid -> Oid,
-        typelem -> Oid,
-        typarray -> Oid,
-        typinput -> Oid,
-        typoutput -> Oid,
-        typreceive -> Oid,
-        typsend -> Oid,
-        typmodin -> Oid,
-        typmodout -> Oid,
-        typanalyze -> Oid,
-        typalign -> Char,
-        typstorage -> Char,
-        typnotnull -> Bool,
-        typbasetype -> Oid,
-        typtypmod -> Integer,
-        typndims -> Integer,
-        typcollation -> Oid,
-        typdefaultbin -> Nullable<Bytea>,
-        typdefault -> Nullable<Text>,
-    }
-}
-
-#[cfg(feature = "postgres_17")]
-table! {
-    pg_type (oid, typname, typnamespace) {
-        oid -> Oid,
-        typname -> Text,
-        typnamespace -> Oid,
-        typowner -> Oid,
-        typlen -> SmallInt,
-        typbyval -> Bool,
-        typtype -> Char,
-        typcategory -> Char,
-        typispreferred -> Bool,
-        typisdefined -> Bool,
-        typdelim -> Char,
-        typrelid -> Oid,
-        typsubscript -> Oid,
         typelem -> Oid,
         typarray -> Oid,
         typinput -> Oid,
@@ -413,38 +375,6 @@ table! {
     }
 }
 
-#[cfg(feature = "postgres_17")]
-table! {
-    pg_attribute (attrelid, attname, atttypid) {
-        attrelid -> Oid,
-        attname -> Text,
-        atttypid -> Oid,
-        attlen -> SmallInt,
-        attnum -> SmallInt,
-        attcacheoff -> Integer,
-        atttypmod -> Integer,
-        attndims -> SmallInt,
-        attbyval -> Bool,
-        attalign -> Char,
-        attstorage -> Char,
-        attcompression -> Char,
-        attnotnull -> Bool,
-        atthasdef -> Bool,
-        atthasmissing -> Bool,
-        attidentity -> Char,
-        attgenerated -> Char,
-        attisdropped -> Bool,
-        attislocal -> Bool,
-        attinhcount -> SmallInt,
-        attcollation -> Oid,
-        attstattarget -> Nullable<SmallInt>,
-        attacl -> Nullable<Array<Oid>>,
-        attoptions -> Nullable<Array<Text>>,
-        attfdwoptions -> Nullable<Array<Text>>,
-    }
-}
-
-#[cfg(not(feature = "postgres_17"))]
 table! {
     pg_attribute (attrelid, attname, atttypid) {
         attrelid -> Oid,
@@ -531,21 +461,20 @@ table! {
 }
 
 allow_tables_to_appear_in_same_query!(
-    columns,
-    constraint_column_usage,
-    key_column_usage,
     table_constraints,
-    tables
+    key_column_usage,
+    tables,
+    constraint_column_usage,
+    columns,
+    referential_constraints
 );
+allow_tables_to_appear_in_same_query!(columns, pg_type, pg_attribute, pg_class, pg_namespace, pg_index);
 allow_tables_to_appear_in_same_query!(check_constraints, table_constraints);
-allow_tables_to_appear_in_same_query!(pg_trigger, pg_class, pg_namespace);
-allow_tables_to_appear_in_same_query!(pg_operator, pg_proc, pg_type);
+allow_tables_to_appear_in_same_query!(pg_trigger, pg_namespace);
+allow_tables_to_appear_in_same_query!(pg_trigger, pg_class);
+allow_tables_to_appear_in_same_query!(pg_operator, pg_constraint, pg_depend, pg_proc, pg_type, tables);
 allow_tables_to_appear_in_same_query!(pg_namespace, pg_proc);
-allow_tables_to_appear_in_same_query!(pg_constraint, pg_depend, pg_proc);
-allow_tables_to_appear_in_same_query!(pg_attribute, pg_type);
 allow_tables_to_appear_in_same_query!(pg_depend, pg_extension);
-allow_tables_to_appear_in_same_query!(columns, pg_attribute, pg_class, pg_index);
 allow_tables_to_appear_in_same_query!(pg_extension, pg_namespace);
-allow_tables_to_appear_in_same_query!(key_column_usage, referential_constraints);
 allow_tables_to_appear_in_same_query!(check_constraints, constraint_column_usage);
 allow_tables_to_appear_in_same_query!(pg_constraint, pg_namespace);

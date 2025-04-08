@@ -132,16 +132,16 @@ async fn setup_docker(
         .with_copy_to(
             "/usr/share/postgresql/17/extension/pgrx_validation.control",
             Path::new(
-                &find_file(&format!("../pgrx_validation/{EXTENSION_NAME}"), "control").unwrap(),
+                &find_file(&format!("../pgrx_validation/{EXTENSION_NAME}"), "control").expect("Failed to find extension `.control` file - Most likely you forgot to build the extension"),
             ),
         )
         .with_copy_to(
             "/usr/share/postgresql/17/extension/pgrx_validation--0.0.0.sql",
-            Path::new(&find_file(&format!("../pgrx_validation/{EXTENSION_NAME}"), "sql").unwrap()),
+            Path::new(&find_file(&format!("../pgrx_validation/{EXTENSION_NAME}"), "sql").expect("Failed to find extension `.sql` file - Most likely you forgot to build the extension"))
         )
         .with_copy_to(
             "/usr/lib/postgresql/17/lib/pgrx_validation.so",
-            Path::new(&find_file(&format!("../pgrx_validation/{EXTENSION_NAME}"), "so").unwrap()),
+            Path::new(&find_file(&format!("../pgrx_validation/{EXTENSION_NAME}"), "so").expect("Failed to find extension `.so` file - Most likely you forgot to build the extension"))
         )
         .start()
         .await

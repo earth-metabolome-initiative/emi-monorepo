@@ -52,6 +52,15 @@ impl GeometryColumn {
         }
     }
 
+    #[must_use]
+    /// Returns whether the current type supports `Copy`.
+    pub fn supports_copy(&self) -> bool {
+        match self.r#type.as_str() {
+            "POINT" | "LINESTRING" | "POLYGON" => true,
+            _ => false,
+        }
+    }
+
     /// Returns the rust type of the geometry column.
     ///
     /// # Arguments

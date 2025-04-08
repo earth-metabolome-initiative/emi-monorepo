@@ -5,7 +5,7 @@ use std::{collections::HashMap, io::Write, path::Path};
 use chrono::{NaiveDateTime, TimeDelta};
 use chrono_humanize::{Accuracy, HumanTime, Tense};
 use plotters::prelude::*;
-use tabled::{Table, Tabled};
+use tabled::{settings::Style, Table, Tabled};
 
 use crate::{prelude::TimeTracker, task::CompletedTask};
 
@@ -51,8 +51,8 @@ impl Report {
         Ok(())
     }
 
-    fn title(&self) -> String {
-        format!("# Time Report for {}\n", self.time_tracker.name())
+    fn title(&self, depth: usize) -> String {
+        format!("{} Time Report for {}\n\n", "#".repeat(depth + 1), self.time_tracker.name())
     }
 
     fn description(&self) -> String {
@@ -184,8 +184,22 @@ impl Report {
         Ok(())
     }
 
-    /// Writes out the markdown report to a given file.
-    pub fn write(&self, report_path: &Path, plot_path: &Path) -> std::io::Result<()> {
+    /// Returns an iterator over the sub-reports.
+    fn sub_reports(&self) -> impl Iterator<Item = Report> + '_ {
+        self.time_tracker.sub_trackers().into_iter().cloned().map(|time_tracker| {
+            Self {
+                previous_reports: self
+                    .previous_reports
+                    .iter()
+                    .filter_map(|report| report.sub_tracker_by_name(time_tracker.name()).cloned())
+                    .collect(),
+                time_tracker,
+            }
+        })
+    }
+
+    /// Returns the text of the report.
+    fn text(&self, depth: usize) -> String {
         let total_time = self.time_tracker.total_time().num_seconds() as f64;
         let rows = self.time_tracker.tasks().map(|task| {
             TableRow {
@@ -198,21 +212,36 @@ impl Report {
                 comment: self.task_comment(task).unwrap_or_default(),
             }
         });
-        let table = Table::new(rows);
+        let mut table = Table::new(rows);
+        table.with(Style::markdown());
 
-        let mut file = std::fs::File::create(report_path)?;
-        writeln!(file, "{}", self.title())?;
-        writeln!(file, "{}", self.description())?;
+        let mut report = String::new();
+
+        report.push_str(&self.title(depth));
+        report.push_str(&self.description());
 
         if let Some(description) = self.slowest_task_description() {
-            writeln!(file, "{}", description)?;
+            report.push_str(&description);
         }
 
+        report.push_str("\n\n");
+        report.push_str(&table.to_string());
+
+        for sub_report in self.sub_reports() {
+            report.push_str("\n\n");
+            report.push_str(&sub_report.text((depth + 1).min(6)));
+        }
+
+        report
+    }
+
+    /// Writes out the markdown report to a given file.
+    pub fn write(&self, report_path: &Path, plot_path: &Path) -> std::io::Result<()> {
+        let mut file = std::fs::File::create(report_path)?;
         self.plot(plot_path)?;
 
-        writeln!(file, "\n![Plot]({})\n", plot_path.to_string_lossy())?;
-
-        writeln!(file, "{}", table)?;
+        writeln!(file, "{}", self.text(0))?;
+        writeln!(file, "\n![Plot]({})", plot_path.to_string_lossy())?;
 
         Ok(())
     }

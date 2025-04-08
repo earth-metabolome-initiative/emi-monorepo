@@ -19,6 +19,6 @@ CREATE TABLE IF NOT EXISTS organisms (
   FOREIGN KEY (nameplate_id) REFERENCES nameplates(id),
   FOREIGN KEY (project_id) REFERENCES projects(id),
   FOREIGN KEY (created_by) REFERENCES users(id),
-  FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE CASCADE,
-  CONSTRAINT host_organism CHECK (id  != host_organism_id)
+  FOREIGN KEY (updated_by) REFERENCES users(id),
+  CONSTRAINT host_organism CHECK (must_be_distinct_uuid(host_organism_id, id))
 );

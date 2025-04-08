@@ -2,7 +2,7 @@
 use diesel::result::Error as DieselError;
 use snake_case_sanitizer::SanitizationErrors;
 
-use crate::{custom_schema_constraints::ConstraintError, Column, PgType, Table};
+use crate::{custom_schema_constraints::ConstraintError, CheckConstraint, Column, PgProc, PgType, Table};
 
 #[derive(Debug)]
 /// Enumeration for the errors that may happen within the webcodegen crate.
@@ -21,10 +21,14 @@ pub enum WebCodeGenError {
     SynError(syn::Error),
     /// A column is of an unknown type.
     UnknownColumnType(Box<Column>),
+    /// A column requested by name could not be found.
+    ColumnNotFound(String),
     /// Unknown `PostgreSQL` Diesel type.
     UnknownDieselPostgresType(String),
     /// Unknown `PostgreSQL` Rust type.
     UnknownPostgresRustType(String),
+    /// Unknown `PostgreSQL` [`PgProc`].
+    UnknownPostgresProc(String),
     /// A type is not user-defined.
     NotUserDefinedType(String),
     /// A base type is missing.
@@ -49,6 +53,14 @@ pub enum WebCodeGenError {
     IoError(std::io::Error),
     /// Empty table name.
     EmptyTableName(Box<Table>),
+    /// Error attempting to convert a string to an integer.
+    ParseIntError(core::num::ParseIntError),
+    /// Error attempting to convert a string to a float.
+    ParseFloatError(core::num::ParseFloatError),
+    /// Error attempting to convert a string to a boolean.
+    ParseBoolError(core::str::ParseBoolError),
+    /// An unsupported type casting operation.
+    UnsupportedTypeCasting(String, Box<PgType>),
 }
 
 #[derive(Debug)]
@@ -58,6 +70,42 @@ pub enum CodeGenerationError {
     GenerationDirectoryNotProvided,
     /// When the user table has not been specified.
     UserTableNotProvided,
+    /// When the project table has not been specified.
+    ProjectTableNotProvided,
+    /// When the teams table has not been specified.
+    TeamsTableNotProvided,
+    /// When the team members table has not been specified.
+    TeamMembersTableNotProvided,
+    /// When the team projects table has not been specified.
+    TeamProjectsTableNotProvided,
+    /// When the check constraints failed to generate.
+    CheckConstraintError(CheckConstraintError),
+}
+
+#[derive(Debug)]
+/// Error type for code generation.
+pub enum CheckConstraintError {
+    /// When one of the functions is not from the provided extensions.
+    FunctionNotFromProvidedExtensions(Box<PgProc>, Box<CheckConstraint>),
+    /// When some of the syntax of the [`CheckConstraint`] is not supported.
+    UnsupportedSyntax(Box<CheckConstraint>, UnsupportedCheckConstraintErrorSyntax),
+    /// When one of the operators is not a plain Rust operator.
+    OperatorsNotSupported,
+    /// When none of the provided columns are involved in the check clause.
+    NoInvolvedColumns(Box<Column>, Box<CheckConstraint>),
+    /// When the top-level expression cannot be reduced to a Result-returning expression.
+    TopLevelExpressionNotResult(Box<CheckConstraint>),
+}
+
+#[derive(Debug)]
+/// Error type for unsupported syntax in a check constraint.
+pub enum UnsupportedCheckConstraintErrorSyntax {
+    /// When no scoped columns are expected but are found.
+    ExpectedNoScopedColumn(usize),
+    /// When a column is expected to be a single scoped column but is not.
+    ExpectedSingleScopedColumn(usize),
+    /// When a column is expected to be a scoped column but is not.
+    ExpectedScopedColumn,
 }
 
 impl From<DieselError> for WebCodeGenError {
@@ -93,5 +141,36 @@ impl From<syn::Error> for WebCodeGenError {
 impl From<std::io::Error> for WebCodeGenError {
     fn from(value: std::io::Error) -> Self {
         WebCodeGenError::IoError(value)
+    }
+}
+
+impl From<CheckConstraintError> for CodeGenerationError {
+    fn from(value: CheckConstraintError) -> Self {
+        CodeGenerationError::CheckConstraintError(value)
+    }
+}
+
+impl From<CheckConstraintError> for WebCodeGenError {
+    fn from(value: CheckConstraintError) -> Self {
+        let codegen_error: CodeGenerationError = value.into();
+        codegen_error.into()
+    }
+}
+
+impl From<core::num::ParseIntError> for WebCodeGenError {
+    fn from(value: core::num::ParseIntError) -> Self {
+        WebCodeGenError::ParseIntError(value)
+    }
+}
+
+impl From<core::num::ParseFloatError> for WebCodeGenError {
+    fn from(value: core::num::ParseFloatError) -> Self {
+        WebCodeGenError::ParseFloatError(value)
+    }
+}
+
+impl From<core::str::ParseBoolError> for WebCodeGenError {
+    fn from(value: core::str::ParseBoolError) -> Self {
+        WebCodeGenError::ParseBoolError(value)
     }
 }

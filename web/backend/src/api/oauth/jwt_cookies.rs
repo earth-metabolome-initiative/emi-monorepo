@@ -17,7 +17,7 @@ use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, 
 use redis::AsyncCommands;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use uuid::Uuid;
+use rosetta_uuid::Uuid;
 use web_common::api::{oauth::jwt_cookies::*, ApiError};
 use web_common_traits::database::Loadable;
 

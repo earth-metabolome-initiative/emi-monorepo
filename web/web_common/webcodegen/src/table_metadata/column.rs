@@ -9,7 +9,7 @@ use syn::{Ident, Type};
 
 use super::{
     check_constraint::CheckConstraint,
-    pg_type::{rust_type_str, PgType},
+    pg_type::{rust_type_str, PgType, COPY_TYPES},
     table::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS},
 };
 use crate::{
@@ -54,23 +54,23 @@ pub struct Column {
     /// Precision of the interval data type
     pub interval_precision: Option<i32>,
     /// Catalog name of the character set
-    pub character_set_catalog: Option<String>,
+    /// pub character_set_catalog: Option<String>,
     /// Schema name of the character set
-    pub character_set_schema: Option<String>,
+    /// pub character_set_schema: Option<String>,
     /// Name of the character set
-    pub character_set_name: Option<String>,
+    /// pub character_set_name: Option<String>,
     /// Catalog name of the collation
-    pub collation_catalog: Option<String>,
+    /// pub collation_catalog: Option<String>,
     /// Schema name of the collation
-    pub collation_schema: Option<String>,
+    /// pub collation_schema: Option<String>,
     /// Name of the collation
-    pub collation_name: Option<String>,
+    /// pub collation_name: Option<String>,
     /// Catalog name of the domain
-    pub domain_catalog: Option<String>,
+    /// pub domain_catalog: Option<String>,
     /// Schema name of the domain
-    pub domain_schema: Option<String>,
+    /// pub domain_schema: Option<String>,
     /// Name of the domain
-    pub domain_name: Option<String>,
+    /// pub domain_name: Option<String>,
     /// Catalog name of the underlying type of the column
     pub udt_catalog: Option<String>,
     /// Schema name of the underlying type of the column
@@ -92,17 +92,17 @@ pub struct Column {
     /// Indicates if the column is an identity column
     pub is_identity: Option<String>,
     /// Generation expression of the identity column
-    pub identity_generation: Option<String>,
+    /// pub identity_generation: Option<String>,
     /// Start value of the identity column
-    pub identity_start: Option<String>,
+    /// pub identity_start: Option<String>,
     /// Increment value of the identity column
-    pub identity_increment: Option<String>,
+    /// pub identity_increment: Option<String>,
     /// Maximum value of the identity column
-    pub identity_maximum: Option<String>,
+    /// pub identity_maximum: Option<String>,
     /// Minimum value of the identity column
-    pub identity_minimum: Option<String>,
+    /// pub identity_minimum: Option<String>,
     /// Indicates if the identity column cycles
-    pub identity_cycle: Option<String>,
+    /// pub identity_cycle: Option<String>,
     /// Indicates if the column is generated ("ALWAYS" or "NEVER")
     pub is_generated: String,
     /// Generation expression of the column
@@ -111,11 +111,44 @@ pub struct Column {
     pub is_updatable: String,
 }
 
+impl AsRef<Column> for Column {
+    fn as_ref(&self) -> &Column {
+        self
+    }
+}
+
 impl Column {
+    /// Returns the column as a nullable column
+    pub fn into_nullable(self) -> Self {
+        Self { __is_nullable: "YES".to_string(), ..self }
+    }
+
+    /// Returns the column as a nullable column
+    pub fn to_nullable(&self) -> Self {
+        self.clone().into_nullable()
+    }
+
     #[must_use]
     /// Returns the raw data type of the column
     pub fn raw_data_type(&self) -> &str {
         &self.data_type
+    }
+
+    /// Returns whether the data type associated to the column is copiable.
+    pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        if let Ok(geometry) = self.geometry(conn) {
+            return Ok(geometry.supports_copy());
+        }
+        match rust_type_str(self.data_type_str(conn)?) {
+            Ok(s) => Ok(COPY_TYPES.contains(&s)),
+            Err(error) => {
+                if self.has_custom_type() {
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.supports_copy(conn)?)
+                } else {
+                    Err(error)
+                }
+            }
+        }
     }
 
     /// Returns whether the column contains `PostGIS` geometry data
@@ -237,6 +270,34 @@ impl Column {
         } else {
             &self.data_type
         })
+    }
+
+    /// Returns the [`PgType`] associated with the column
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the [`PgType`] of the column if the operation was
+    /// successful, or a `WebCodeGenError` if an error occurred
+    ///
+    /// # Errors
+    ///
+    /// If an error occurs while querying the database
+    pub fn pg_type(&self, conn: &mut PgConnection) -> Result<PgType, diesel::result::Error> {
+        use crate::schema::{pg_attribute, pg_class, pg_namespace, pg_type};
+
+        pg_type::table
+            .inner_join(pg_attribute::table.on(pg_attribute::atttypid.eq(pg_type::oid)))
+            .inner_join(pg_class::table.on(pg_attribute::attrelid.eq(pg_class::oid)))
+            .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
+            .filter(pg_class::relname.eq(&self.table_name))
+            .filter(pg_namespace::nspname.eq(&self.table_schema))
+            .filter(pg_attribute::attname.eq(&self.column_name))
+            .select(PgType::as_select())
+            .first::<PgType>(conn)
     }
 
     /// Returns the string data type
@@ -678,8 +739,47 @@ impl Column {
             .filter(key_column_usage::column_name.eq(&self.column_name))
             .select((Table::as_select(), Column::as_select()))
             .first::<(Table, Column)>(conn)
-            .map(Some)
-            .or_else(|e| if e == DieselError::NotFound { Ok(None) } else { Err(e) })
+            .optional()
+    }
+
+    /// Returns whether the column is a foreign key with `ON DELETE CASCADE`
+    /// constraint.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    ///
+    /// # Returns
+    ///
+    /// A `bool` indicating whether the column is a foreign key with `ON DELETE
+    /// CASCADE` constraint
+    pub fn is_foreign_key_on_delete_cascade(&self, conn: &mut PgConnection) -> bool {
+        use crate::schema::{key_column_usage, referential_constraints};
+        key_column_usage::table
+            .inner_join(
+                referential_constraints::table.on(key_column_usage::constraint_name
+                    .eq(referential_constraints::constraint_name)
+                    .and(
+                        key_column_usage::constraint_schema
+                            .eq(referential_constraints::constraint_schema),
+                    )
+                    .and(
+                        key_column_usage::constraint_catalog
+                            .eq(referential_constraints::constraint_catalog),
+                    )),
+            )
+            .filter(key_column_usage::column_name.eq(&self.column_name))
+            .filter(key_column_usage::table_name.eq(&self.table_name))
+            .filter(key_column_usage::table_schema.eq(&self.table_schema))
+            .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
+            .filter(referential_constraints::delete_rule.eq("CASCADE"))
+            .select(KeyColumnUsage::as_select())
+            .first::<KeyColumnUsage>(conn)
+            .is_ok()
     }
 
     #[must_use]
@@ -693,5 +793,44 @@ impl Column {
         // together.
         parts.push(Inflector.pluralize(&last_element));
         parts.join("_")
+    }
+
+    #[must_use]
+    /// Returns the getter method name for the column.
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while sanitizing the column name
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the getter method name if the operation was
+    /// successful,
+    pub fn getter_name(&self) -> Result<String, WebCodeGenError> {
+        let mut snake_case_name = self.snake_case_name()?;
+        if let Some(stripped_snake_case_name) = snake_case_name.strip_suffix("_id") {
+            snake_case_name = stripped_snake_case_name.to_owned();
+        };
+        Ok(snake_case_name)
+    }
+
+    #[must_use]
+    /// Returns the getter method ident for the column.
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while sanitizing the column name
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the getter method ident if the operation was
+    /// successful,
+    pub fn getter_ident(&self) -> Result<Ident, WebCodeGenError> {
+        let getter_name = self.getter_name()?;
+        if RESERVED_RUST_WORDS.contains(&getter_name.as_str()) {
+            Ok(Ident::new_raw(&getter_name, proc_macro2::Span::call_site()))
+        } else {
+            Ok(Ident::new(&getter_name, proc_macro2::Span::call_site()))
+        }
     }
 }
