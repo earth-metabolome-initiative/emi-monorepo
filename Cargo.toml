@@ -44,6 +44,7 @@ infer = "0.16.0"
 csv = "1.3.1"
 bytes = "1.10.0"
 bincode = "1.3.3"
+arbitrary = { version = "1", features = ["derive"] }
 sqlparser = { git = "https://github.com/LucaCappelletti94/sqlparser-rs.git", branch = "gin_trgm_ops" }
 diesel = { version = "2.2", default-features = false, features = ["extras"] }
 diesel-async = { version = "0.5", default-features = false }

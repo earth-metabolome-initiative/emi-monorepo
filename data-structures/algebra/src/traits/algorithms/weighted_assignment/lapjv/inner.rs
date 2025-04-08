@@ -1,7 +1,5 @@
 //! Submodule providing the concrete implementation of the LAPJV algorithm.
 
-use std::fmt::Debug;
-
 use super::LAPJVError;
 use crate::traits::{
     AssignmentState, Bounded, DenseValuedMatrix2D, Finite, IntoUsize, Number, TotalOrd,
@@ -76,7 +74,6 @@ where
 impl<'matrix, M: DenseValuedMatrix2D + ?Sized> Inner<'matrix, M>
 where
     M::Value: Number,
-    M: Debug,
 {
     pub(super) fn column_reduction(&mut self) -> Result<(), LAPJVError> {
         debug_assert!(
@@ -295,8 +292,7 @@ where
             self.unassigned_rows.iter().all(|row_index| {
                 !self.assigned_rows.contains(&AssignmentState::Assigned(*row_index))
             }),
-            "We expected all unassigned rows to be unassigned: {:?}",
-            self.matrix
+            "We expected all unassigned rows to be unassigned",
         );
     }
 
@@ -347,9 +343,8 @@ where
             assert!(
                 number_of_iterations
                     < self.matrix.number_of_columns().into_usize(),
-                "We expected the number of iterations to be less than the number of columns ({}): {:?}, with max cost {}",
+                "We expected the number of iterations to be less than the number of columns ({}), with max cost {}",
                 self.matrix.number_of_columns(),
-                self.matrix,
                 self.max_cost
             );
 
@@ -424,9 +419,8 @@ where
             assert!(
                 number_of_iterations
                     < self.matrix.number_of_columns().into_usize(),
-                "We expected the number of iterations to be less than the number of columns ({}): {:?}, with max cost {}",
+                "We expected the number of iterations to be less than the number of columns ({}): with max cost {}",
                 self.matrix.number_of_columns(),
-                self.matrix,
                 self.max_cost
             );
 
@@ -478,8 +472,7 @@ where
             loop {
                 assert!(
                     number_of_iterations < self.matrix.number_of_columns().into_usize() * self.matrix.number_of_columns().into_usize(),
-                    "We expected the number of iterations to be less than the number of columns: {:?}",
-                    self.matrix
+                    "We expected the number of iterations to be less than the number of columns",
                 );
 
                 let row_index = predecessors[column_index.into_usize()];

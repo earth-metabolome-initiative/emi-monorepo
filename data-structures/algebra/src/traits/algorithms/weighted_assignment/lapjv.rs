@@ -2,7 +2,6 @@
 
 mod errors;
 mod inner;
-use std::fmt::Debug;
 
 pub use errors::LAPJVError;
 use inner::Inner;
@@ -14,7 +13,7 @@ use crate::{
 
 /// Trait defining the LAPJV algorithm for solving the Weighted Assignment
 /// Problem.
-pub trait LAPJV: DenseValuedMatrix2D + Sized + Debug
+pub trait LAPJV: DenseValuedMatrix2D + Sized
 where
     Self::Value: Number,
     Self::ColumnIndex: TryFromUsize,
@@ -55,7 +54,7 @@ where
     }
 }
 
-impl<M: DenseValuedMatrix2D + Debug> LAPJV for M
+impl<M: DenseValuedMatrix2D> LAPJV for M
 where
     M::Value: Number,
     M::ColumnIndex: TryFromUsize,
@@ -64,7 +63,7 @@ where
 
 /// Trait defining the LAPJV algorithm for solving the Weighted Assignment
 /// Problem, adapted for the Sparse Matrix type.
-pub trait SparseLAPJV: SparseValuedMatrix2D + Sized + Debug
+pub trait SparseLAPJV: SparseValuedMatrix2D + Sized
 where
     Self::Value: Number,
     Self::RowIndex: TryFromUsize,
@@ -118,7 +117,7 @@ where
     }
 }
 
-impl<M: SparseValuedMatrix2D + Debug> SparseLAPJV for M
+impl<M: SparseValuedMatrix2D> SparseLAPJV for M
 where
     M::Value: Number,
     M::RowIndex: TryFromUsize,
