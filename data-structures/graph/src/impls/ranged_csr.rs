@@ -5,7 +5,7 @@ use algebra::{
     impls::{Ranged, RangedCSR2D},
     prelude::{
         IntoUsize, Matrix2D, Matrix2DRef, PositiveInteger, SparseMatrix, SparseMatrixMut,
-        TryFromUsize, Zero,
+        TryFromUsize, Zero, SizedSparseMatrix
     },
 };
 

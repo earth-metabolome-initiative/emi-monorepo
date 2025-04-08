@@ -26,7 +26,7 @@ impl<
         DE: MonopartiteEdges,
     > FromDirectedMonopartiteEdges<DE> for SymmetricCSR2D<SparseIndex, Idx>
 where
-    DE::MonopartitedMatrix: Symmetrize<Self>,
+    DE::MonopartiteMatrix: Symmetrize<Self>,
 {
     fn from_directed_edges(edges: DE) -> Self {
         edges.matrix().symmetrize()

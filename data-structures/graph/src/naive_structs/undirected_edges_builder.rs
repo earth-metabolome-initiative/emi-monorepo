@@ -38,7 +38,7 @@ where
     UE: UndirectedMonopartiteEdges<Edge = GE::Edge, EdgeId = GE::EdgeId>
         + FromDirectedMonopartiteEdges<GE>,
     GE: GrowableEdges<Error = EdgesBuilderError<GE>>
-        + MonopartiteEdges<MonopartitedMatrix = GE::GrowableMatrix>
+        + MonopartiteEdges<MonopartiteMatrix = GE::GrowableMatrix>
         + DirectedEdges<Matrix = GE::GrowableMatrix>,
     EdgeIterator: IntoIterator<Item = GE::Edge>,
     EdgesBuilderError<UE>: From<EdgesBuilderError<GE>>,
@@ -91,7 +91,7 @@ where
     UE: UndirectedMonopartiteEdges<Edge = GE::Edge, EdgeId = GE::EdgeId>
         + FromDirectedMonopartiteEdges<GE>,
     GE: GrowableEdges<Error = EdgesBuilderError<GE>>
-        + MonopartiteEdges<MonopartitedMatrix = GE::GrowableMatrix>
+        + MonopartiteEdges<MonopartiteMatrix = GE::GrowableMatrix>
         + DirectedEdges<Matrix = GE::GrowableMatrix>,
     Self: EdgesBuilder<EdgeIterator = EdgeIterator, Edges = UE, IntermediateEdges = GE>,
     EdgeIterator: IntoIterator<Item = <<Self as EdgesBuilder>::Edges as Edges>::Edge>,

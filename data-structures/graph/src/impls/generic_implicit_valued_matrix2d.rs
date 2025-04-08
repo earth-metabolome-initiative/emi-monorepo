@@ -2,8 +2,8 @@
 //! [`GenericImplicitValuedMatrix2D`](algebra::prelude::GenericImplicitValuedMatrix2D).
 
 use algebra::prelude::{
-    GenericImplicitValuedMatrix2D, Matrix2D, Matrix2DRef, Number, SparseMatrix, SparseMatrix2D,
-    TryFromUsize, Zero,
+    GenericImplicitValuedMatrix2D, Matrix2D, Matrix2DRef, Number, SizedSparseMatrix,
+    SizedSparseMatrix2D, TryFromUsize, Zero,
 };
 
 use crate::traits::{BidirectionalVocabulary, BipartiteGraph, Edges, Graph, MonoplexGraph};
@@ -11,7 +11,7 @@ use crate::traits::{BidirectionalVocabulary, BipartiteGraph, Edges, Graph, Monop
 impl<M, Map, Value> Edges for GenericImplicitValuedMatrix2D<M, Map, Value>
 where
     Value: Number,
-    M: SparseMatrix2D,
+    M: SizedSparseMatrix2D,
     M::RowIndex: TryFromUsize,
     M::ColumnIndex: TryFromUsize,
     M::SparseIndex: TryFromUsize,
@@ -30,7 +30,7 @@ where
 
 impl<M, Map, Value> Graph for GenericImplicitValuedMatrix2D<M, Map, Value>
 where
-    M: SparseMatrix2D,
+    M: SizedSparseMatrix2D,
     M::RowIndex: TryFromUsize,
     M::ColumnIndex: TryFromUsize,
     M::SparseIndex: TryFromUsize,
@@ -48,7 +48,7 @@ where
 
 impl<M, Map, Value> MonoplexGraph for GenericImplicitValuedMatrix2D<M, Map, Value>
 where
-    M: SparseMatrix2D,
+    M: SizedSparseMatrix2D,
     M::RowIndex: TryFromUsize,
     M::ColumnIndex: TryFromUsize,
     M::SparseIndex: TryFromUsize,
@@ -65,7 +65,7 @@ where
 
 impl<M, Map, Value> BipartiteGraph for GenericImplicitValuedMatrix2D<M, Map, Value>
 where
-    M: SparseMatrix2D + Matrix2DRef,
+    M: SizedSparseMatrix2D + Matrix2DRef,
     M::SparseIndex: TryFromUsize,
     M::RowIndex: TryFromUsize
         + BidirectionalVocabulary<SourceSymbol = M::RowIndex, DestinationSymbol = M::RowIndex>,

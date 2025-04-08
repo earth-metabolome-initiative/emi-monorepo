@@ -7,7 +7,7 @@ use super::Edges;
 /// Trait defining the properties of a transposed graph.
 pub trait TransposedEdges: super::Edges<Matrix = <Self as TransposedEdges>::BiMatrix> {
     /// The type of matrix required to store the transposed edges.
-    type BiMatrix: SparseBiMatrix2D<
+    type BiMatrix: SizedSparseBiMatrix2D<
         RowIndex = Self::SourceNodeId,
         ColumnIndex = Self::DestinationNodeId,
     >;
@@ -35,14 +35,14 @@ pub trait TransposedEdges: super::Edges<Matrix = <Self as TransposedEdges>::BiMa
     }
 
     /// Returns an iterator over the in-boynd degrees of the nodes.
-    fn in_degrees(&self) -> <<Self::BiMatrix as SparseBiMatrix2D>::SparseTransposedMatrix as SparseMatrix2D>::SparseRowSizes<'_>{
+    fn in_degrees(&self) -> <<Self::BiMatrix as SparseBiMatrix2D>::SparseTransposedMatrix as SizedRowsSparseMatrix2D>::SparseRowSizes<'_>{
         self.matrix().sparse_column_sizes()
     }
 }
 
 impl<E: Edges> TransposedEdges for E
 where
-    E::Matrix: SparseBiMatrix2D<RowIndex = E::SourceNodeId, ColumnIndex = E::DestinationNodeId>,
+    E::Matrix: SizedSparseBiMatrix2D<RowIndex = E::SourceNodeId, ColumnIndex = E::DestinationNodeId>,
 {
     type BiMatrix = E::Matrix;
 }
