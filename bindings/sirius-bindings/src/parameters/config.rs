@@ -179,7 +179,7 @@ pub enum ConfigV5 {
     /// Fallback ion modes which are considered if the auto
     /// detection did not find any indication for an ion mode.
     /// ATTENTION: Expanding adducts from ionizations (e.g. `[M+H]+` to
-    /// `[M+H-H2O]+``) does not respect databases that were selected in the
+    /// `[M+H-H2O]+`) does not respect databases that were selected in the
     /// formulas annotation step.
     AdductSettingsFallback(AdductsVector),
 
@@ -189,8 +189,8 @@ pub enum ConfigV5 {
     AlgorithmProfile(Instruments),
 
     /// Keywords that can be assigned to a input spectrum to judge its quality.
-    /// Available keywords are: Good, LowIntensity, NoMS1Peak, FewPeaks,
-    /// Chimeric, NotMonoisotopicPeak, PoorlyExplained
+    /// Available keywords are: `Good`, `LowIntensity`, `NoMS1Peak`, `FewPeaks`,
+    /// `Chimeric`, `NotMonoisotopicPeak`, `PoorlyExplained`
     ///
     /// Default: `UNKNOWN`
     CompoundQuality(CompoundQuality),
@@ -221,9 +221,9 @@ pub enum ConfigV5 {
     /// Default: `,`
     CandidateFormulas(CandidateFormulas),
 
-    /// Allows the USER to Specify the ScoreType that is used to rank the list
+    /// Allows the USER to Specify the `ScoreType` that is used to rank the list
     /// of Molecular Formula Identifications before CSI:FingerID predictions
-    /// are calculated. Auto means that this ScoreType is automatically set
+    /// are calculated. Auto means that this `ScoreType` is automatically set
     /// depending on the executed workflow.
     ///
     /// Currently only the default value is supported.

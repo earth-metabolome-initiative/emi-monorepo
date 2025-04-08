@@ -26,11 +26,10 @@ impl MassDeviation {
     /// use sirius_bindings::prelude::*;
     /// let ppm = MassDeviation::ppm(-10.0);
     /// ```
+    #[must_use]
     pub fn ppm(value: f32) -> Self {
         // ppm can't be negative
-        if value < 0.0 {
-            panic!("ppm value can't be negative");
-        }
+        assert!(value > 0.0, "ppm value can't be negative");
         MassDeviation::Ppm(value)
     }
 
@@ -48,11 +47,10 @@ impl MassDeviation {
     /// use sirius_bindings::prelude::*;
     /// let x = MassDeviation::da(-0.1);
     /// ```
+    #[must_use]
     pub fn da(value: f32) -> Self {
         // Da can't be negative
-        if value < 0.0 {
-            panic!("Da value can't be negative");
-        }
+        assert!(value > 0.0, "Da value can't be negative");
         MassDeviation::Da(value)
     }
 

@@ -53,8 +53,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                "The core parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
-                parameter, existing_parameter
+                "The core parameter {parameter:?} cannot be added to the configuration. There is already an existing parameter which is {existing_parameter:?}. You cannot add it twice.",
             ))
         } else {
             self.core_parameters.push(parameter);
@@ -76,8 +75,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                "The config parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
-                parameter, existing_parameter
+                "The config parameter {parameter:?} cannot be added to the configuration. There is already an existing parameter which is {existing_parameter:?}. You cannot add it twice.",
             ))
         } else {
             if !parameter.is_enabler() {
@@ -105,8 +103,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                "The formula parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
-                parameter, existing_parameter
+                "The formula parameter {parameter:?} cannot be added to the configuration. There is already an existing parameter which is {existing_parameter:?}. You cannot add it twice.",
             ))
         } else {
             if !parameter.is_enabler() {
@@ -134,8 +131,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                "The zodiac parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
-                parameter, existing_parameter
+                "The zodiac parameter {parameter:?} cannot be added to the configuration. There is already an existing parameter which is {existing_parameter:?}. You cannot add it twice.",
             ))
         } else {
             if !parameter.is_enabler() {
@@ -163,8 +159,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                "The fingerprint parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
-                parameter, existing_parameter
+                "The fingerprint parameter {parameter:?} cannot be added to the configuration. There is already an existing parameter which is {existing_parameter:?}. You cannot add it twice.",
             ))
         } else {
             if !parameter.is_enabler() {
@@ -192,8 +187,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                "The structure parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
-                parameter, existing_parameter
+                "The structure parameter {parameter:?} cannot be added to the configuration. There is already an existing parameter which is {existing_parameter:?}. You cannot add it twice.",
             ))
         } else {
             if !parameter.is_enabler() {
@@ -221,8 +215,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                "The canopus parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
-                parameter, existing_parameter
+                "The canopus parameter {parameter:?} cannot be added to the configuration. There is already an existing parameter which is {existing_parameter:?}. You cannot add it twice.",
             ))
         } else {
             if !parameter.is_enabler() {
@@ -236,7 +229,7 @@ impl<V: Version> SiriusConfig<V> {
         }
     }
 
-    /// Add a parameter to the write_summaries configuration.
+    /// Add a parameter to the `write_summaries` configuration.
     ///
     /// # Arguments
     ///
@@ -253,8 +246,7 @@ impl<V: Version> SiriusConfig<V> {
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
             Err(format!(
-                "The write_summaries parameter {:?} cannot be added to the configuration. There is already an existing parameter which is {:?}. You cannot add it twice.",
-                parameter, existing_parameter
+                "The write_summaries parameter {parameter:?} cannot be added to the configuration. There is already an existing parameter which is {existing_parameter:?}. You cannot add it twice.",
             ))
         } else {
             if !parameter.is_enabler() {
@@ -268,6 +260,7 @@ impl<V: Version> SiriusConfig<V> {
         }
     }
 
+    #[must_use]
     pub fn args(&self) -> Vec<String> {
         self.core_parameters
             .iter()

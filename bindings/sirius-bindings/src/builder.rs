@@ -1049,6 +1049,7 @@ impl<V: Version> SiriusBuilder<V> {
     /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::<Version5>::default().build();
     /// ```
+    #[must_use]
     pub fn build(self) -> Sirius<V> {
         Sirius::from(self.config)
     }

@@ -243,6 +243,7 @@ pub enum Atoms {
 }
 
 impl Display for Atoms {
+    #[allow(clippy::too_many_lines)]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Atoms::H => write!(f, "H"),
@@ -370,6 +371,7 @@ impl Display for Atoms {
 impl<'a> TryFrom<&'a str> for Atoms {
     type Error = String;
 
+    #[allow(clippy::too_many_lines)]
     fn try_from(s: &'a str) -> Result<Self, Self::Error> {
         match s {
             "H" => Ok(Atoms::H),

@@ -8,10 +8,10 @@ pub enum StructureV5 {
     /// If the structure is enabled
     Enabled,
 
-    /// The version for `structure``
+    /// The version for `structure`
     Version,
 
-    /// The help  for `structure``
+    /// The help  for `structure`
     Help,
 }
 

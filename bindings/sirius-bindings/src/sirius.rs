@@ -12,6 +12,7 @@ pub struct Sirius<V: Version> {
 }
 
 impl<V: Version> From<SiriusConfig<V>> for Sirius<V> {
+    #[must_use]
     fn from(config: SiriusConfig<V>) -> Self {
         Sirius { config }
     }
@@ -21,11 +22,11 @@ impl<V: Version> Sirius<V> {
     /// Run the sirius command with the given input and output file paths.
     ///
     /// The sirius executable is expected to be available in the environment
-    /// variable SIRIUS_PATH. The username and password for the sirius
+    /// variable `SIRIUS_PATH`. The username and password for the sirius
     /// account are expected to be available in the environment variables
-    /// SIRIUS_USERNAME and SIRIUS_PASSWORD.
+    /// `SIRIUS_USERNAME` and `SIRIUS_PASSWORD`.
     ///
-    /// This function gets the parameters that where set in the SiriusBuilder
+    /// This function gets the parameters that where set in the `SiriusBuilder`
     /// struct and runs the sirius command with the given input and output file
     /// paths.
     ///
@@ -144,13 +145,15 @@ impl<V: Version> Sirius<V> {
         // lower case
         let input_file_extension = input_file_path.extension().ok_or_else(|| {
             format!(
-                "The input file {input_file_path:?} does not have an extension. We expected the input file to have the extension .mgf"
+                "The input file {} does not have an extension. We expected the input file to have the extension .mgf",
+                input_file_path.display()
             )
         })?;
 
         if input_file_extension.to_string_lossy().to_lowercase() != "mgf" {
             return Err(format!(
-                "The input file {input_file_path:?} does not have the extension .mgf",
+                "The input file {} does not have the extension .mgf",
+                input_file_path.display()
             ));
         }
 
