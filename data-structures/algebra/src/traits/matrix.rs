@@ -121,6 +121,7 @@ impl<M: SparseMatrix> SparseMatrix for &M {
 
 /// Trait defining a sized sparse matrix.
 pub trait SizedSparseMatrix: SparseMatrix {
+    #[allow(clippy::cast_precision_loss)]
     /// Returns the density of the matrix.
     fn density(&self) -> f64 {
         let defined_values = self.number_of_defined_values().into_usize();

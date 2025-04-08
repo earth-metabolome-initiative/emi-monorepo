@@ -142,7 +142,7 @@ pub struct ImplicitValuedSparseRowIterator<'matrix, M: SparseMatrix2D> {
     matrix: &'matrix M,
 }
 
-impl<'matrix, M: SparseMatrix2D> Clone for ImplicitValuedSparseRowIterator<'matrix, M> {
+impl<M: SparseMatrix2D> Clone for ImplicitValuedSparseRowIterator<'_, M> {
     fn clone(&self) -> Self {
         Self { iter: self.iter.clone(), row: self.row, matrix: self.matrix }
     }

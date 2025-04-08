@@ -18,6 +18,7 @@ where
     Self::Value: Number,
     Self::ColumnIndex: TryFromUsize,
 {
+    #[allow(clippy::type_complexity)]
     /// Computes the weighted assignment using the LAPJV algorithm.
     ///
     /// # Arguments
@@ -28,6 +29,18 @@ where
     ///
     /// A vector of tuples containing the row and column indices of the
     /// assignment.
+    /// 
+    /// # Errors
+    /// 
+    /// Returns an error if:
+    /// - `max_cost` is not a finite number (`LAPJVError::MaximalCostNotFinite`)
+    /// - `max_cost` is not positive (`LAPJVError::MaximalCostNotPositive`)
+    /// - The matrix is not square (`LAPJVError::NonSquareMatrix`)
+    /// - The matrix is empty (`LAPJVError::EmptyMatrix`)
+    /// - The matrix contains zero values (`LAPJVError::ZeroValues`)
+    /// - The matrix contains negative values (`LAPJVError::NegativeValues`)
+    /// - The matrix contains non-finite values (`LAPJVError::NonFiniteValues`)
+    /// - The matrix contains a value larger than the maximum cost (`LAPJVError::ValueTooLarge`)
     fn lapjv(
         &self,
         max_cost: Self::Value,
@@ -69,6 +82,7 @@ where
     Self::RowIndex: TryFromUsize,
     Self::ColumnIndex: TryFromUsize,
 {
+    #[allow(clippy::type_complexity)]
     /// Computes the weighted assignment using the LAPJV algorithm.
     ///
     /// # Arguments
@@ -80,6 +94,18 @@ where
     ///
     /// A vector of tuples containing the row and column indices of the
     /// assignment.
+    /// 
+    /// # Errors
+    /// 
+    /// Returns an error if:
+    /// - `padding_cost` is not a finite number (`LAPJVError::PaddingValueNotFinite`)
+    /// - `padding_cost` is not positive (`LAPJVError::PaddingValueNotPositive`)
+    /// - `padding_cost` is greater than or equal to `max_cost` (`LAPJVError::ValueTooLarge`)
+    /// - `max_cost` is not a finite number (`LAPJVError::MaximalCostNotFinite`)
+    /// - `max_cost` is not positive (`LAPJVError::MaximalCostNotPositive`)
+    /// - The matrix is not square after padding (`LAPJVError::NonSquareMatrix`)
+    /// - The matrix contains values that are greater than the padding cost
+    /// - The matrix contains zero, negative or non-finite values
     fn sparse_lapjv(
         &self,
         padding_cost: Self::Value,
