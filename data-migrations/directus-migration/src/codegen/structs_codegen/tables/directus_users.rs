@@ -1,18 +1,12 @@
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(
-    feature = "32-column-tables",
-    derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)
-)]
-#[cfg_attr(feature = "32-column-tables", diesel(primary_key(id)))]
-#[cfg_attr(
-    feature = "32-column-tables",
-    diesel(
-        table_name = crate::codegen::diesel_codegen::tables::directus_users::directus_users
-    )
+#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[diesel(primary_key(id))]
+#[diesel(
+    table_name = crate::codegen::diesel_codegen::tables::directus_users::directus_users
 )]
 pub struct DirectusUser {
-    pub id: uuid::Uuid,
+    pub id: rosetta_uuid::Uuid,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub email: Option<String>,
@@ -21,11 +15,11 @@ pub struct DirectusUser {
     pub title: Option<String>,
     pub description: Option<String>,
     pub tags: Option<serde_json::Value>,
-    pub avatar: Option<uuid::Uuid>,
+    pub avatar: Option<rosetta_uuid::Uuid>,
     pub language: Option<String>,
     pub tfa_secret: Option<String>,
     pub status: String,
-    pub role: Option<uuid::Uuid>,
+    pub role: Option<rosetta_uuid::Uuid>,
     pub token: Option<String>,
     pub last_access: Option<chrono::DateTime<chrono::Utc>>,
     pub last_page: Option<String>,
@@ -76,7 +70,7 @@ impl DirectusUser {
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::role
-                    .eq(&role.id),
+                    .eq(role.id),
             )
             .load::<Self>(conn)
             .await

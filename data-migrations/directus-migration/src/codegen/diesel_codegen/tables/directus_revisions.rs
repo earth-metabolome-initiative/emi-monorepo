@@ -5,5 +5,5 @@ diesel::table! {
     diesel::sql_types::Json >, delta -> diesel::sql_types::Nullable <
     diesel::sql_types::Json >, parent -> diesel::sql_types::Nullable <
     diesel::sql_types::Integer >, version -> diesel::sql_types::Nullable <
-    diesel::sql_types::Uuid > }
+    rosetta_uuid::diesel_impls::Uuid > }
 }

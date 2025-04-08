@@ -13,7 +13,7 @@ pub struct DirectusPermission {
     pub validation: Option<serde_json::Value>,
     pub presets: Option<serde_json::Value>,
     pub fields: Option<String>,
-    pub policy: uuid::Uuid,
+    pub policy: rosetta_uuid::Uuid,
 }
 impl DirectusPermission {
     #[cfg(feature = "postgres")]
@@ -48,7 +48,7 @@ impl DirectusPermission {
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_permissions::directus_permissions::dsl::policy
-                    .eq(&policy.id),
+                    .eq(policy.id),
             )
             .load::<Self>(conn)
             .await

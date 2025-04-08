@@ -9,8 +9,8 @@ pub struct DirectusNotification {
     pub id: i32,
     pub timestamp: Option<chrono::DateTime<chrono::Utc>>,
     pub status: Option<String>,
-    pub recipient: uuid::Uuid,
-    pub sender: Option<uuid::Uuid>,
+    pub recipient: rosetta_uuid::Uuid,
+    pub sender: Option<rosetta_uuid::Uuid>,
     pub subject: String,
     pub message: Option<String>,
     pub collection: Option<String>,
@@ -39,22 +39,6 @@ impl DirectusNotification {
             .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_recipient(
-        conn: &mut diesel_async::AsyncPgConnection,
-        recipient: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_notifications::directus_notifications::dsl::recipient
-                    .eq(&recipient.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn sender(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -80,6 +64,22 @@ impl DirectusNotification {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_recipient(
+        conn: &mut diesel_async::AsyncPgConnection,
+        recipient: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_notifications::directus_notifications::dsl::recipient
+                    .eq(recipient.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn from_sender(
         conn: &mut diesel_async::AsyncPgConnection,
         sender: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
@@ -90,7 +90,7 @@ impl DirectusNotification {
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_notifications::directus_notifications::dsl::sender
-                    .eq(&sender.id),
+                    .eq(sender.id),
             )
             .load::<Self>(conn)
             .await

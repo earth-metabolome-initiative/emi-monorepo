@@ -6,12 +6,12 @@
     table_name = crate::codegen::diesel_codegen::tables::directus_dashboards::directus_dashboards
 )]
 pub struct DirectusDashboard {
-    pub id: uuid::Uuid,
+    pub id: rosetta_uuid::Uuid,
     pub name: String,
     pub icon: String,
     pub note: Option<String>,
     pub date_created: Option<chrono::DateTime<chrono::Utc>>,
-    pub user_created: Option<uuid::Uuid>,
+    pub user_created: Option<rosetta_uuid::Uuid>,
     pub color: Option<String>,
 }
 impl DirectusDashboard {
@@ -51,7 +51,7 @@ impl DirectusDashboard {
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_dashboards::directus_dashboards::dsl::user_created
-                    .eq(&user_created.id),
+                    .eq(user_created.id),
             )
             .load::<Self>(conn)
             .await

@@ -1,15 +1,9 @@
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(
-    feature = "32-column-tables",
-    derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)
-)]
-#[cfg_attr(feature = "32-column-tables", diesel(primary_key(id)))]
-#[cfg_attr(
-    feature = "32-column-tables",
-    diesel(
-        table_name = crate::codegen::diesel_codegen::tables::directus_fields::directus_fields
-    )
+#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[diesel(primary_key(id))]
+#[diesel(
+    table_name = crate::codegen::diesel_codegen::tables::directus_fields::directus_fields
 )]
 pub struct DirectusField {
     pub id: i32,

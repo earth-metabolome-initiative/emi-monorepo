@@ -6,7 +6,7 @@
     table_name = crate::codegen::diesel_codegen::tables::directus_flows::directus_flows
 )]
 pub struct DirectusFlow {
-    pub id: uuid::Uuid,
+    pub id: rosetta_uuid::Uuid,
     pub name: String,
     pub icon: Option<String>,
     pub color: Option<String>,
@@ -15,9 +15,9 @@ pub struct DirectusFlow {
     pub trigger: Option<String>,
     pub accountability: Option<String>,
     pub options: Option<serde_json::Value>,
-    pub operation: Option<uuid::Uuid>,
+    pub operation: Option<rosetta_uuid::Uuid>,
     pub date_created: Option<chrono::DateTime<chrono::Utc>>,
-    pub user_created: Option<uuid::Uuid>,
+    pub user_created: Option<rosetta_uuid::Uuid>,
 }
 impl DirectusFlow {
     #[cfg(feature = "postgres")]
@@ -56,14 +56,14 @@ impl DirectusFlow {
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_flows::directus_flows::dsl::user_created
-                    .eq(&user_created.id),
+                    .eq(user_created.id),
             )
             .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
     pub async fn from_operation(
-        operation: Option<&uuid::Uuid>,
+        operation: Option<&rosetta_uuid::Uuid>,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
         use diesel_async::RunQueryDsl;

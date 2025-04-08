@@ -6,9 +6,9 @@
     table_name = crate::codegen::diesel_codegen::tables::directus_folders::directus_folders
 )]
 pub struct DirectusFolder {
-    pub id: uuid::Uuid,
+    pub id: rosetta_uuid::Uuid,
     pub name: String,
-    pub parent: Option<uuid::Uuid>,
+    pub parent: Option<rosetta_uuid::Uuid>,
 }
 impl DirectusFolder {
     #[cfg(feature = "postgres")]
@@ -49,7 +49,7 @@ impl DirectusFolder {
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_folders::directus_folders::dsl::parent
-                    .eq(&parent.id),
+                    .eq(parent.id),
             )
             .load::<Self>(conn)
             .await

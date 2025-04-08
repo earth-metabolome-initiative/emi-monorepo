@@ -1,27 +1,21 @@
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(
-    feature = "32-column-tables",
-    derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)
-)]
-#[cfg_attr(feature = "32-column-tables", diesel(primary_key(id)))]
-#[cfg_attr(
-    feature = "32-column-tables",
-    diesel(
-        table_name = crate::codegen::diesel_codegen::tables::directus_files::directus_files
-    )
+#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[diesel(primary_key(id))]
+#[diesel(
+    table_name = crate::codegen::diesel_codegen::tables::directus_files::directus_files
 )]
 pub struct DirectusFile {
-    pub id: uuid::Uuid,
+    pub id: rosetta_uuid::Uuid,
     pub storage: String,
     pub filename_disk: Option<String>,
     pub filename_download: String,
     pub title: Option<String>,
     pub r#type: Option<String>,
-    pub folder: Option<uuid::Uuid>,
-    pub uploaded_by: Option<uuid::Uuid>,
+    pub folder: Option<rosetta_uuid::Uuid>,
+    pub uploaded_by: Option<rosetta_uuid::Uuid>,
     pub created_on: chrono::DateTime<chrono::Utc>,
-    pub modified_by: Option<uuid::Uuid>,
+    pub modified_by: Option<rosetta_uuid::Uuid>,
     pub modified_on: chrono::DateTime<chrono::Utc>,
     pub charset: Option<String>,
     pub filesize: Option<i64>,
@@ -68,22 +62,6 @@ impl DirectusFile {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_folder(
-        conn: &mut diesel_async::AsyncPgConnection,
-        folder: &crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_files::directus_files::dsl::folder
-                    .eq(&folder.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn uploaded_by(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -107,22 +85,6 @@ impl DirectusFile {
             >(conn)
             .await
             .map(Some)
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_uploaded_by(
-        conn: &mut diesel_async::AsyncPgConnection,
-        uploaded_by: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_files::directus_files::dsl::uploaded_by
-                    .eq(&uploaded_by.id),
-            )
-            .load::<Self>(conn)
-            .await
     }
     #[cfg(feature = "postgres")]
     pub async fn modified_by(
@@ -150,6 +112,38 @@ impl DirectusFile {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_folder(
+        conn: &mut diesel_async::AsyncPgConnection,
+        folder: &crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_files::directus_files::dsl::folder
+                    .eq(folder.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_uploaded_by(
+        conn: &mut diesel_async::AsyncPgConnection,
+        uploaded_by: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_files::directus_files::dsl::uploaded_by
+                    .eq(uploaded_by.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn from_modified_by(
         conn: &mut diesel_async::AsyncPgConnection,
         modified_by: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
@@ -160,7 +154,7 @@ impl DirectusFile {
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_files::directus_files::dsl::modified_by
-                    .eq(&modified_by.id),
+                    .eq(modified_by.id),
             )
             .load::<Self>(conn)
             .await

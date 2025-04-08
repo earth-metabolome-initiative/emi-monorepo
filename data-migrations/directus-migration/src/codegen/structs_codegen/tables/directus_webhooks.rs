@@ -16,7 +16,7 @@ pub struct DirectusWebhook {
     pub collections: String,
     pub headers: Option<serde_json::Value>,
     pub was_active_before_deprecation: bool,
-    pub migrated_flow: Option<uuid::Uuid>,
+    pub migrated_flow: Option<rosetta_uuid::Uuid>,
 }
 impl DirectusWebhook {
     #[cfg(feature = "postgres")]
@@ -55,7 +55,7 @@ impl DirectusWebhook {
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks::dsl::migrated_flow
-                    .eq(&migrated_flow.id),
+                    .eq(migrated_flow.id),
             )
             .load::<Self>(conn)
             .await

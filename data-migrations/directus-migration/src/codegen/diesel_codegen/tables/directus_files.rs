@@ -1,15 +1,14 @@
-#[cfg(feature = "32-column-tables")]
 diesel::table! {
-    public.directus_files(id) { id -> diesel::sql_types::Uuid, storage ->
+    public.directus_files(id) { id -> rosetta_uuid::diesel_impls::Uuid, storage ->
     diesel::sql_types::Text, filename_disk -> diesel::sql_types::Nullable <
     diesel::sql_types::Text >, filename_download -> diesel::sql_types::Text, title ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, #[sql_name = "type"] r#type
     -> diesel::sql_types::Nullable < diesel::sql_types::Text >, folder ->
-    diesel::sql_types::Nullable < diesel::sql_types::Uuid >, uploaded_by ->
-    diesel::sql_types::Nullable < diesel::sql_types::Uuid >, created_on ->
+    diesel::sql_types::Nullable < rosetta_uuid::diesel_impls::Uuid >, uploaded_by ->
+    diesel::sql_types::Nullable < rosetta_uuid::diesel_impls::Uuid >, created_on ->
     diesel::sql_types::Timestamptz, modified_by -> diesel::sql_types::Nullable <
-    diesel::sql_types::Uuid >, modified_on -> diesel::sql_types::Timestamptz, charset ->
-    diesel::sql_types::Nullable < diesel::sql_types::Text >, filesize ->
+    rosetta_uuid::diesel_impls::Uuid >, modified_on -> diesel::sql_types::Timestamptz,
+    charset -> diesel::sql_types::Nullable < diesel::sql_types::Text >, filesize ->
     diesel::sql_types::Nullable < diesel::sql_types::BigInt >, width ->
     diesel::sql_types::Nullable < diesel::sql_types::Integer >, height ->
     diesel::sql_types::Nullable < diesel::sql_types::Integer >, duration ->

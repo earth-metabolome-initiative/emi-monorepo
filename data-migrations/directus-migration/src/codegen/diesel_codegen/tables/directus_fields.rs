@@ -1,4 +1,3 @@
-#[cfg(feature = "32-column-tables")]
 diesel::table! {
     public.directus_fields(id) { id -> diesel::sql_types::Integer, collection ->
     diesel::sql_types::Text, field -> diesel::sql_types::Text, special ->

@@ -6,11 +6,11 @@
     table_name = crate::codegen::diesel_codegen::tables::directus_roles::directus_roles
 )]
 pub struct DirectusRole {
-    pub id: uuid::Uuid,
+    pub id: rosetta_uuid::Uuid,
     pub name: String,
     pub icon: String,
     pub description: Option<String>,
-    pub parent: Option<uuid::Uuid>,
+    pub parent: Option<rosetta_uuid::Uuid>,
 }
 impl DirectusRole {
     #[cfg(feature = "postgres")]
@@ -49,7 +49,7 @@ impl DirectusRole {
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_roles::directus_roles::dsl::parent
-                    .eq(&parent.id),
+                    .eq(parent.id),
             )
             .load::<Self>(conn)
             .await

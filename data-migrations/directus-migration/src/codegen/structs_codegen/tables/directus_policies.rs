@@ -6,7 +6,7 @@
     table_name = crate::codegen::diesel_codegen::tables::directus_policies::directus_policies
 )]
 pub struct DirectusPolicy {
-    pub id: uuid::Uuid,
+    pub id: rosetta_uuid::Uuid,
     pub name: String,
     pub icon: String,
     pub description: Option<String>,

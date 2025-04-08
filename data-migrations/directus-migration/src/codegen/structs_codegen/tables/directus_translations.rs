@@ -6,7 +6,7 @@
     table_name = crate::codegen::diesel_codegen::tables::directus_translations::directus_translations
 )]
 pub struct DirectusTranslation {
-    pub id: uuid::Uuid,
+    pub id: rosetta_uuid::Uuid,
     pub language: String,
     pub key: String,
     pub value: String,

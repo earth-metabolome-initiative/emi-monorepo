@@ -1,15 +1,9 @@
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(
-    feature = "32-column-tables",
-    derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)
-)]
-#[cfg_attr(feature = "32-column-tables", diesel(primary_key(collection)))]
-#[cfg_attr(
-    feature = "32-column-tables",
-    diesel(
-        table_name = crate::codegen::diesel_codegen::tables::directus_collections::directus_collections
-    )
+#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[diesel(primary_key(collection))]
+#[diesel(
+    table_name = crate::codegen::diesel_codegen::tables::directus_collections::directus_collections
 )]
 pub struct DirectusCollection {
     pub collection: String,

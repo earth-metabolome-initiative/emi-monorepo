@@ -2,9 +2,9 @@
 impl web_common_traits::prelude::Loadable
 for crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder {
     type Conn = diesel_async::AsyncPgConnection;
-    type PrimaryKey = uuid::Uuid;
+    type PrimaryKey = rosetta_uuid::Uuid;
     async fn load(
-        id: &uuid::Uuid,
+        id: &rosetta_uuid::Uuid,
         conn: &mut Self::Conn,
     ) -> Result<Option<Self>, diesel::result::Error> {
         use diesel_async::RunQueryDsl;

@@ -1,19 +1,13 @@
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(
-    feature = "64-column-tables",
-    derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)
-)]
-#[cfg_attr(feature = "64-column-tables", diesel(primary_key(id)))]
-#[cfg_attr(
-    feature = "64-column-tables",
-    diesel(table_name = crate::codegen::diesel_codegen::tables::field_data::field_data)
-)]
+#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[diesel(primary_key(id))]
+#[diesel(table_name = crate::codegen::diesel_codegen::tables::field_data::field_data)]
 pub struct FieldDatum {
     pub id: i32,
-    pub user_created: Option<uuid::Uuid>,
+    pub user_created: Option<rosetta_uuid::Uuid>,
     pub date_created: Option<chrono::DateTime<chrono::Utc>>,
-    pub user_updated: Option<uuid::Uuid>,
+    pub user_updated: Option<rosetta_uuid::Uuid>,
     pub date_updated: Option<chrono::DateTime<chrono::Utc>>,
     pub collector_fullname: Option<String>,
     pub observation_subject: Option<String>,
@@ -78,22 +72,6 @@ impl FieldDatum {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_user_created(
-        conn: &mut diesel_async::AsyncPgConnection,
-        user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::field_data::field_data::dsl::user_created
-                    .eq(&user_created.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn user_updated(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -119,6 +97,22 @@ impl FieldDatum {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_user_created(
+        conn: &mut diesel_async::AsyncPgConnection,
+        user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::field_data::field_data::dsl::user_created
+                    .eq(user_created.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn from_user_updated(
         conn: &mut diesel_async::AsyncPgConnection,
         user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
@@ -129,7 +123,7 @@ impl FieldDatum {
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::field_data::field_data::dsl::user_updated
-                    .eq(&user_updated.id),
+                    .eq(user_updated.id),
             )
             .load::<Self>(conn)
             .await

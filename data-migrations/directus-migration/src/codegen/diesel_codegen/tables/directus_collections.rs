@@ -1,4 +1,3 @@
-#[cfg(feature = "32-column-tables")]
 diesel::table! {
     public.directus_collections(collection) { collection -> diesel::sql_types::Text, icon
     -> diesel::sql_types::Nullable < diesel::sql_types::Text >, note ->

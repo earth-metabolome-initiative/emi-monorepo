@@ -8,9 +8,9 @@
 pub struct ContainerType {
     pub id: i32,
     pub status: Option<String>,
-    pub user_created: Option<uuid::Uuid>,
+    pub user_created: Option<rosetta_uuid::Uuid>,
     pub date_created: Option<chrono::DateTime<chrono::Utc>>,
-    pub user_updated: Option<uuid::Uuid>,
+    pub user_updated: Option<rosetta_uuid::Uuid>,
     pub date_updated: Option<chrono::DateTime<chrono::Utc>>,
     pub container_type: String,
 }
@@ -41,22 +41,6 @@ impl ContainerType {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_user_created(
-        conn: &mut diesel_async::AsyncPgConnection,
-        user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::container_types::container_types::dsl::user_created
-                    .eq(&user_created.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn user_updated(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -82,6 +66,22 @@ impl ContainerType {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_user_created(
+        conn: &mut diesel_async::AsyncPgConnection,
+        user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::container_types::container_types::dsl::user_created
+                    .eq(user_created.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn from_user_updated(
         conn: &mut diesel_async::AsyncPgConnection,
         user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
@@ -92,7 +92,7 @@ impl ContainerType {
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::container_types::container_types::dsl::user_updated
-                    .eq(&user_updated.id),
+                    .eq(user_updated.id),
             )
             .load::<Self>(conn)
             .await

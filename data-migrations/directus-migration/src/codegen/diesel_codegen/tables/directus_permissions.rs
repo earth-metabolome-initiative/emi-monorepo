@@ -5,5 +5,5 @@ diesel::table! {
     diesel::sql_types::Nullable < diesel::sql_types::Json >, presets ->
     diesel::sql_types::Nullable < diesel::sql_types::Json >, fields ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, policy ->
-    diesel::sql_types::Uuid }
+    rosetta_uuid::diesel_impls::Uuid }
 }

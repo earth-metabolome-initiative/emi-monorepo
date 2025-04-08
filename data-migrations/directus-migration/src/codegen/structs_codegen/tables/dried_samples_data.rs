@@ -8,11 +8,11 @@
 pub struct DriedSamplesDatum {
     pub id: i32,
     pub status: String,
-    pub user_created: Option<uuid::Uuid>,
+    pub user_created: Option<rosetta_uuid::Uuid>,
     pub date_created: Option<chrono::DateTime<chrono::Utc>>,
-    pub user_updated: Option<uuid::Uuid>,
+    pub user_updated: Option<rosetta_uuid::Uuid>,
     pub date_updated: Option<chrono::DateTime<chrono::Utc>>,
-    pub uuid_dried_sample: Option<uuid::Uuid>,
+    pub uuid_dried_sample: Option<rosetta_uuid::Uuid>,
     pub sample_container: i32,
     pub parent_container: Option<i32>,
     pub batch: Option<i32>,
@@ -45,22 +45,6 @@ impl DriedSamplesDatum {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_user_created(
-        conn: &mut diesel_async::AsyncPgConnection,
-        user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data::dsl::user_created
-                    .eq(&user_created.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn user_updated(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -86,22 +70,6 @@ impl DriedSamplesDatum {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_user_updated(
-        conn: &mut diesel_async::AsyncPgConnection,
-        user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data::dsl::user_updated
-                    .eq(&user_updated.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn sample_container(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -120,22 +88,6 @@ impl DriedSamplesDatum {
             .first::<
                 crate::codegen::structs_codegen::tables::containers::Container,
             >(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_sample_container(
-        conn: &mut diesel_async::AsyncPgConnection,
-        sample_container: &crate::codegen::structs_codegen::tables::containers::Container,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data::dsl::sample_container
-                    .eq(sample_container.id),
-            )
-            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -164,22 +116,6 @@ impl DriedSamplesDatum {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_parent_container(
-        conn: &mut diesel_async::AsyncPgConnection,
-        parent_container: &crate::codegen::structs_codegen::tables::containers::Container,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data::dsl::parent_container
-                    .eq(parent_container.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn batch(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -201,22 +137,6 @@ impl DriedSamplesDatum {
             .first::<crate::codegen::structs_codegen::tables::batches::Batch>(conn)
             .await
             .map(Some)
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_batch(
-        conn: &mut diesel_async::AsyncPgConnection,
-        batch: &crate::codegen::structs_codegen::tables::batches::Batch,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data::dsl::batch
-                    .eq(batch.id),
-            )
-            .load::<Self>(conn)
-            .await
     }
     #[cfg(feature = "postgres")]
     pub async fn field_data(
@@ -242,6 +162,86 @@ impl DriedSamplesDatum {
             >(conn)
             .await
             .map(Some)
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_user_created(
+        conn: &mut diesel_async::AsyncPgConnection,
+        user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data::dsl::user_created
+                    .eq(user_created.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_user_updated(
+        conn: &mut diesel_async::AsyncPgConnection,
+        user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data::dsl::user_updated
+                    .eq(user_updated.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_sample_container(
+        conn: &mut diesel_async::AsyncPgConnection,
+        sample_container: &crate::codegen::structs_codegen::tables::containers::Container,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data::dsl::sample_container
+                    .eq(sample_container.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_parent_container(
+        conn: &mut diesel_async::AsyncPgConnection,
+        parent_container: &crate::codegen::structs_codegen::tables::containers::Container,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data::dsl::parent_container
+                    .eq(parent_container.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_batch(
+        conn: &mut diesel_async::AsyncPgConnection,
+        batch: &crate::codegen::structs_codegen::tables::batches::Batch,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data::dsl::batch
+                    .eq(batch.id),
+            )
+            .load::<Self>(conn)
+            .await
     }
     #[cfg(feature = "postgres")]
     pub async fn from_field_data(

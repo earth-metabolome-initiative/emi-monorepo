@@ -13,7 +13,7 @@ pub struct DirectusRevision {
     pub data: Option<serde_json::Value>,
     pub delta: Option<serde_json::Value>,
     pub parent: Option<i32>,
-    pub version: Option<uuid::Uuid>,
+    pub version: Option<rosetta_uuid::Uuid>,
 }
 impl DirectusRevision {
     #[cfg(feature = "postgres")]
@@ -35,22 +35,6 @@ impl DirectusRevision {
             .first::<
                 crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity,
             >(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_activity(
-        conn: &mut diesel_async::AsyncPgConnection,
-        activity: &crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions::dsl::activity
-                    .eq(activity.id),
-            )
-            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -81,22 +65,6 @@ impl DirectusRevision {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_parent(
-        conn: &mut diesel_async::AsyncPgConnection,
-        parent: &crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions::dsl::parent
-                    .eq(parent.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn version(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -124,6 +92,38 @@ impl DirectusRevision {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_activity(
+        conn: &mut diesel_async::AsyncPgConnection,
+        activity: &crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions::dsl::activity
+                    .eq(activity.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_parent(
+        conn: &mut diesel_async::AsyncPgConnection,
+        parent: &crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions::dsl::parent
+                    .eq(parent.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn from_version(
         conn: &mut diesel_async::AsyncPgConnection,
         version: &crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion,
@@ -134,7 +134,7 @@ impl DirectusRevision {
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions::dsl::version
-                    .eq(&version.id),
+                    .eq(version.id),
             )
             .load::<Self>(conn)
             .await

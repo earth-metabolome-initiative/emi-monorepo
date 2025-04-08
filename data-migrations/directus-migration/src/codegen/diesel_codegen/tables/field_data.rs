@@ -1,13 +1,12 @@
-#[cfg(feature = "64-column-tables")]
 diesel::table! {
     #[sql_name = "Field_Data"] public.field_data(id) { id -> diesel::sql_types::Integer,
-    user_created -> diesel::sql_types::Nullable < diesel::sql_types::Uuid >, date_created
-    -> diesel::sql_types::Nullable < diesel::sql_types::Timestamptz >, user_updated ->
-    diesel::sql_types::Nullable < diesel::sql_types::Uuid >, date_updated ->
-    diesel::sql_types::Nullable < diesel::sql_types::Timestamptz >, collector_fullname ->
-    diesel::sql_types::Nullable < diesel::sql_types::Text >, observation_subject ->
-    diesel::sql_types::Nullable < diesel::sql_types::Text >, inat_upload ->
-    diesel::sql_types::Nullable < diesel::sql_types::Integer >, is_wild ->
+    user_created -> diesel::sql_types::Nullable < rosetta_uuid::diesel_impls::Uuid >,
+    date_created -> diesel::sql_types::Nullable < diesel::sql_types::Timestamptz >,
+    user_updated -> diesel::sql_types::Nullable < rosetta_uuid::diesel_impls::Uuid >,
+    date_updated -> diesel::sql_types::Nullable < diesel::sql_types::Timestamptz >,
+    collector_fullname -> diesel::sql_types::Nullable < diesel::sql_types::Text >,
+    observation_subject -> diesel::sql_types::Nullable < diesel::sql_types::Text >,
+    inat_upload -> diesel::sql_types::Nullable < diesel::sql_types::Integer >, is_wild ->
     diesel::sql_types::Nullable < diesel::sql_types::Integer >, taxon_name ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, no_name_on_list ->
     diesel::sql_types::Nullable < diesel::sql_types::Integer >, sample_id ->

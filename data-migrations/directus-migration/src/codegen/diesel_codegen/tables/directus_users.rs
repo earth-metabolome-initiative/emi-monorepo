@@ -1,6 +1,5 @@
-#[cfg(feature = "32-column-tables")]
 diesel::table! {
-    public.directus_users(id) { id -> diesel::sql_types::Uuid, first_name ->
+    public.directus_users(id) { id -> rosetta_uuid::diesel_impls::Uuid, first_name ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, last_name ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, email ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, password ->
@@ -9,11 +8,11 @@ diesel::table! {
     diesel::sql_types::Nullable < diesel::sql_types::Text >, description ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, tags ->
     diesel::sql_types::Nullable < diesel::sql_types::Json >, avatar ->
-    diesel::sql_types::Nullable < diesel::sql_types::Uuid >, language ->
+    diesel::sql_types::Nullable < rosetta_uuid::diesel_impls::Uuid >, language ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, tfa_secret ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, status ->
     diesel::sql_types::Text, role -> diesel::sql_types::Nullable <
-    diesel::sql_types::Uuid >, token -> diesel::sql_types::Nullable <
+    rosetta_uuid::diesel_impls::Uuid >, token -> diesel::sql_types::Nullable <
     diesel::sql_types::Text >, last_access -> diesel::sql_types::Nullable <
     diesel::sql_types::Timestamptz >, last_page -> diesel::sql_types::Nullable <
     diesel::sql_types::Text >, provider -> diesel::sql_types::Text, external_identifier

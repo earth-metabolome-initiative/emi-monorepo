@@ -6,8 +6,8 @@
     table_name = crate::codegen::diesel_codegen::tables::directus_panels::directus_panels
 )]
 pub struct DirectusPanel {
-    pub id: uuid::Uuid,
-    pub dashboard: uuid::Uuid,
+    pub id: rosetta_uuid::Uuid,
+    pub dashboard: rosetta_uuid::Uuid,
     pub name: Option<String>,
     pub icon: Option<String>,
     pub color: Option<String>,
@@ -20,7 +20,7 @@ pub struct DirectusPanel {
     pub height: i32,
     pub options: Option<serde_json::Value>,
     pub date_created: Option<chrono::DateTime<chrono::Utc>>,
-    pub user_created: Option<uuid::Uuid>,
+    pub user_created: Option<rosetta_uuid::Uuid>,
 }
 impl DirectusPanel {
     #[cfg(feature = "postgres")]
@@ -42,22 +42,6 @@ impl DirectusPanel {
             .first::<
                 crate::codegen::structs_codegen::tables::directus_dashboards::DirectusDashboard,
             >(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_dashboard(
-        conn: &mut diesel_async::AsyncPgConnection,
-        dashboard: &crate::codegen::structs_codegen::tables::directus_dashboards::DirectusDashboard,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_panels::directus_panels::dsl::dashboard
-                    .eq(&dashboard.id),
-            )
-            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -86,6 +70,22 @@ impl DirectusPanel {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_dashboard(
+        conn: &mut diesel_async::AsyncPgConnection,
+        dashboard: &crate::codegen::structs_codegen::tables::directus_dashboards::DirectusDashboard,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_panels::directus_panels::dsl::dashboard
+                    .eq(dashboard.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn from_user_created(
         conn: &mut diesel_async::AsyncPgConnection,
         user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
@@ -96,7 +96,7 @@ impl DirectusPanel {
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_panels::directus_panels::dsl::user_created
-                    .eq(&user_created.id),
+                    .eq(user_created.id),
             )
             .load::<Self>(conn)
             .await

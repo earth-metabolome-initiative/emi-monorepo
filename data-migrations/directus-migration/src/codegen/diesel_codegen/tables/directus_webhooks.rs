@@ -5,5 +5,5 @@ diesel::table! {
     diesel::sql_types::Bool, actions -> diesel::sql_types::Text, collections ->
     diesel::sql_types::Text, headers -> diesel::sql_types::Nullable <
     diesel::sql_types::Json >, was_active_before_deprecation -> diesel::sql_types::Bool,
-    migrated_flow -> diesel::sql_types::Nullable < diesel::sql_types::Uuid > }
+    migrated_flow -> diesel::sql_types::Nullable < rosetta_uuid::diesel_impls::Uuid > }
 }

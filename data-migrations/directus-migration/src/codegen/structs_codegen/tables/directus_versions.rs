@@ -6,7 +6,7 @@
     table_name = crate::codegen::diesel_codegen::tables::directus_versions::directus_versions
 )]
 pub struct DirectusVersion {
-    pub id: uuid::Uuid,
+    pub id: rosetta_uuid::Uuid,
     pub key: String,
     pub name: Option<String>,
     pub collection: String,
@@ -14,8 +14,8 @@ pub struct DirectusVersion {
     pub hash: Option<String>,
     pub date_created: Option<chrono::DateTime<chrono::Utc>>,
     pub date_updated: Option<chrono::DateTime<chrono::Utc>>,
-    pub user_created: Option<uuid::Uuid>,
-    pub user_updated: Option<uuid::Uuid>,
+    pub user_created: Option<rosetta_uuid::Uuid>,
+    pub user_updated: Option<rosetta_uuid::Uuid>,
     pub delta: Option<serde_json::Value>,
 }
 impl DirectusVersion {
@@ -38,22 +38,6 @@ impl DirectusVersion {
             .first::<
                 crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection,
             >(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_collection(
-        conn: &mut diesel_async::AsyncPgConnection,
-        collection: &crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_versions::directus_versions::dsl::collection
-                    .eq(&collection.collection),
-            )
-            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -82,22 +66,6 @@ impl DirectusVersion {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_user_created(
-        conn: &mut diesel_async::AsyncPgConnection,
-        user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_versions::directus_versions::dsl::user_created
-                    .eq(&user_created.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn user_updated(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -123,6 +91,38 @@ impl DirectusVersion {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_collection(
+        conn: &mut diesel_async::AsyncPgConnection,
+        collection: &crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_versions::directus_versions::dsl::collection
+                    .eq(&collection.collection),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_user_created(
+        conn: &mut diesel_async::AsyncPgConnection,
+        user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::directus_versions::directus_versions::dsl::user_created
+                    .eq(user_created.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn from_user_updated(
         conn: &mut diesel_async::AsyncPgConnection,
         user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
@@ -133,7 +133,7 @@ impl DirectusVersion {
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_versions::directus_versions::dsl::user_updated
-                    .eq(&user_updated.id),
+                    .eq(user_updated.id),
             )
             .load::<Self>(conn)
             .await

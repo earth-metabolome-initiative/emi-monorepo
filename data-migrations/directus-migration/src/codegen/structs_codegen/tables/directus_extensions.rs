@@ -7,9 +7,9 @@
 )]
 pub struct DirectusExtension {
     pub enabled: bool,
-    pub id: uuid::Uuid,
+    pub id: rosetta_uuid::Uuid,
     pub folder: String,
     pub source: String,
-    pub bundle: Option<uuid::Uuid>,
+    pub bundle: Option<rosetta_uuid::Uuid>,
 }
 impl DirectusExtension {}
