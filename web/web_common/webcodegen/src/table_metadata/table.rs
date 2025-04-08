@@ -570,17 +570,15 @@ impl Table {
     ///
     /// * If the sibling tables cannot be loaded from the database.
     pub fn sibling_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
-        let mut tables = Vec::new();
-        for parent_table in self.parent_keys(conn)? {
-            if let Some((foreign_table, _)) = parent_table.foreign_table(conn)? {
-                for child_table in foreign_table.children_tables(conn)? {
-                    if child_table != *self && !tables.contains(&child_table) {
-                        tables.push(child_table);
-                    }
+        let mut tables = HashSet::new();
+        for parent_table in self.parent_tables(conn)? {
+            for child_table in parent_table.children_tables(conn)? {
+                if child_table != *self {
+                    tables.insert(child_table);
                 }
             }
         }
-        Ok(tables)
+        Ok(tables.into_iter().collect())
     }
 
     /// Returns whether the table has user-associated columns.
