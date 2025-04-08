@@ -2,9 +2,9 @@
 
 use crate::traits::{
     ImplicitValuedMatrix, ImplicitValuedSparseMatrix, ImplicitValuedSparseRowIterator, IntoUsize,
-    Matrix, Matrix2D, Matrix2DRef, SizedRowsSparseMatrix2D, SizedSparseMatrix, SizedSparseMatrix2D,
-    SizedSparseValuedMatrix, SparseMatrix, SparseMatrix2D, SparseValuedMatrix, ValuedMatrix,
-    ValuedMatrix2D, SparseValuedMatrix2D,
+    Matrix, Matrix2D, Matrix2DRef, RankSelectSparseMatrix, SizedRowsSparseMatrix2D,
+    SizedSparseMatrix, SizedSparseMatrix2D, SizedSparseValuedMatrix, SparseMatrix, SparseMatrix2D,
+    SparseValuedMatrix, SparseValuedMatrix2D, ValuedMatrix, ValuedMatrix2D,
 };
 
 /// A 2D matrix with implicit values.
@@ -97,19 +97,25 @@ where
 
 impl<M, Map, Value> SizedSparseMatrix for GenericImplicitValuedMatrix2D<M, Map, Value>
 where
-    M: SizedSparseMatrix2D,
+    M: SizedSparseMatrix + SparseMatrix2D,
     Map: Fn(M::Coordinates) -> Value,
 {
     fn number_of_defined_values(&self) -> Self::SparseIndex {
         self.matrix.number_of_defined_values()
     }
+}
+
+impl<M, Map, Value> RankSelectSparseMatrix for GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: SizedSparseMatrix2D + RankSelectSparseMatrix,
+    Map: Fn(M::Coordinates) -> Value,
+{
+    fn rank(&self, coordinates: &Self::Coordinates) -> Self::SparseIndex {
+        self.matrix.rank(coordinates)
+    }
 
     fn select(&self, sparse_index: Self::SparseIndex) -> Self::Coordinates {
         self.matrix.select(sparse_index)
-    }
-
-    fn rank(&self, coordinates: &Self::Coordinates) -> Self::SparseIndex {
-        self.matrix.rank(coordinates)
     }
 }
 

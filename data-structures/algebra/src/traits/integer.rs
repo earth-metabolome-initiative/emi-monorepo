@@ -1,7 +1,12 @@
 //! Submodule defining the Integer number trait.
 
+use super::SaturatingSub;
+
 /// Trait defining an integer number.
-pub trait Integer: super::Number + Ord + Eq + core::hash::Hash + From<bool> {}
+pub trait Integer:
+    super::Number + Ord + Eq + core::hash::Hash + From<bool> + SaturatingSub<Output = Self>
+{
+}
 
 impl Integer for i8 {}
 impl Integer for i16 {}
