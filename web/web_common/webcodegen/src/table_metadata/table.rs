@@ -184,7 +184,7 @@ impl Table {
             parts.pop().ok_or(WebCodeGenError::EmptyTableName(Box::new(self.clone())))?;
         // We convert to singular form the last element and join the parts back
         // together.
-        parts.push(Inflector.singularize(&last_element));
+        parts.push(Inflector::default().singularize(&last_element));
         Ok(parts.join("_"))
     }
 

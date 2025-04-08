@@ -831,7 +831,7 @@ impl Column {
         let last_element = parts.pop().unwrap();
         // We convert to singular form the last element and join the parts back
         // together.
-        parts.push(Inflector.pluralize(&last_element));
+        parts.push(Inflector::default().pluralize(&last_element));
         parts.join("_")
     }
 
