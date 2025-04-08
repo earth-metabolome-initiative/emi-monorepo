@@ -1,0 +1,906 @@
+@import "./button.scss";
+@import "./scanner.scss";
+
+.input-group {
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    padding-bottom: 0.5em;
+
+    label.input-label {
+        display: block;
+        font-size: 0.9em;
+
+        color: $near_black;
+        font-weight: 100;
+        padding-right: 0.5em;
+        display: inline-block;
+        min-width: 100px;
+
+        &.input-label-mandatory::after {
+            content: "*";
+            color: $red;
+        }
+    }
+
+    &.textarea {
+        padding-top: 0.25em;
+    }
+
+    input {
+        background-color: white;
+        color: $near_black;
+        transition: background-color 0.2s;
+        font-size: 0.9em;
+        &:disabled {
+            background-color: $light_grey;
+            cursor: not-allowed;
+        }
+    }
+
+    input[type="number"],
+    input[type="search"],
+    input[type="datetime-local"],
+    input[type="text"] {
+        width: 100%;
+    }
+
+    &.text,
+    &.scanner,
+    &.number,
+    &.datalist,
+    &.datetime-local {
+        .input-container {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            transition: width 0.2s;
+        }
+    }
+
+    .input-wrapper {
+        width: 100%;
+        position: relative;
+        // We show by default a search icon
+        // on the right side of the search input
+        &::after {
+            display: block;
+            font-family: "Font Awesome 5 Free";
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            font-weight: 900;
+            font-size: 1.2em;
+            color: $grey;
+            position: absolute;
+            right: 0.5em;
+            top: 50%;
+            margin-top: -0.5em;
+            transition: color 0.2s;
+        }
+    }
+
+    &.datalist {
+        input[type="search"] {
+            animation: pop-in 0.2s;
+        }
+
+        /* clears the ‘X’ from Internet Explorer */
+        input[type=search]::-ms-clear { display: none; width : 0; height: 0; }
+        input[type=search]::-ms-reveal { display: none; width : 0; height: 0; }
+        /* clears the ‘X’ from Chrome */
+        input[type="search"]::-webkit-search-decoration,
+        input[type="search"]::-webkit-search-cancel-button,
+        input[type="search"]::-webkit-search-results-button,
+        input[type="search"]::-webkit-search-results-decoration { display: none; }
+
+        .input-container {
+            grid-template-columns: auto 1fr auto;
+            // We show by default a search icon
+            // on the right side of the search input
+            .input-wrapper {
+                &::after {
+                    content: "\f002";
+                }
+            }
+        }
+        &:focus-within {
+            .input-wrapper {
+                &::after {
+                    color: $primary;
+                }
+            }
+        }
+        &.loading {
+            .input-wrapper {
+                &::after {
+                    content: "\f110";
+                    animation: fa-spin 1s infinite linear;
+                }
+            }
+        }
+        &.disabled {
+            .input-wrapper {
+                &::after {
+                    // We apply a disable symbol for the content
+                    // to illustrate this form is disabled
+                    content: "\f05e";
+                }
+            }
+        }
+
+        &.has-selections {
+            .input-wrapper {
+                &::after {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    &.no-label {
+        .input-container {
+            grid-template-columns: auto;
+        }
+    }
+
+    input[type="text"],
+    input[type="search"],
+    input[type="datetime-local"],
+    textarea,
+    input[type="number"] {
+        padding: 0.4em;
+        box-sizing: border-box;
+        max-width: 100%;
+        transition: border-color 0.2s, border-radius 0.2s;
+        border: 1px solid $light_grey;
+        border-radius: 0.5em;
+
+        &:focus {
+            outline: none;
+            border-color: $primary;
+        }
+    }
+
+    textarea {
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+        font-family: inherit;
+        display: block;
+        min-height: 50px;
+        max-height: 200px;
+        margin-top: 0.5em;
+    }
+
+    &.scanner {
+        .input-container {
+            grid-template-columns: auto 1fr auto;
+            .input-wrapper {
+                &::after {
+                    content: "\f029";
+                }
+
+                &:focus-within {
+                    &::after {
+                        color: $primary;
+                    }
+                }
+            }
+        }
+
+        .start-scanner {
+            animation: fade-in-right 0.2s;
+            padding: 0.25em 0.35em;
+
+            i {
+                font-size: 1.75em;
+                color: inherit;
+                transition: color 0.2s;
+            }
+
+            &:hover {
+                i {
+                   color: white; 
+                }
+            }
+        }
+    }
+
+    &.input-group-invalid {
+
+        input[type="text"],
+        input[type="search"],
+        input[type="datetime-local"],
+        textarea,
+        input[type="number"] {
+            border-color: $error;
+            border-style: dashed;
+            animation: small-shake 0.2s;
+        }
+    }
+
+    &.datalist {
+        ul.selected-datalist-badges {
+            display: inline-block;
+            flex-wrap: wrap;
+            margin-top: 0.5em;
+            border: none;
+
+            li.datalist-add {
+                display: inline-block;
+                margin-left: 0.5em;
+                box-sizing: border-box;
+                border-radius: 2em;
+                cursor: pointer;
+                transition: border-color 0.2s;
+                animation: pop-in 0.2s;
+
+                &.deleting {
+                    animation: pop-out 0.2s;
+                }
+
+                button {
+                    padding: 0;
+                    height: 2em;
+                    width: 2em;
+                    background-color: transparent;
+                    cursor: pointer;
+                    border-radius: 100%;
+                    transition: border-color 0.2s;
+                    line-height: 1em;
+                    text-align: center;
+                    border: 1px solid $light_grey;
+                    box-sizing: border-box;
+
+                    i {
+                        font-size: 1.2em;
+                        color: $light_grey;
+                        transition: color 0.2s;
+                    }
+
+                    &:hover {
+                        border-color: $blue;
+
+                        i {
+                            color: $blue;
+                        }
+                    }
+                }
+            }
+
+            li.selected-datalist-badge {
+                display: inline-block;
+                padding: 0.5em 2em 0.5em 0.5em;
+                box-sizing: border-box;
+                border-radius: 2em;
+                margin-right: 0.5em;
+                margin-bottom: 0.5em;
+                font-size: 0.8em;
+                cursor: pointer;
+                position: relative;
+                border: 1px solid $light_grey;
+                transition: border-color 0.2s;
+                animation: pop-in 0.2s;
+
+                &.deleting {
+                    animation: pop-out 0.2s;
+                }
+
+                button {
+                    padding: 0;
+                    position: absolute;
+                    right: 0.4em;
+                    top: 50%;
+                    margin-top: -0.6em;
+                    height: 1.2em;
+                    width: 1.2em;
+                    background-color: transparent;
+                    cursor: pointer;
+                    border-radius: 100%;
+                    transition: border-color 0.2s;
+                    text-align: center;
+                    border: 1px solid $light_grey;
+                    box-sizing: border-box;
+
+                    i {
+                        font-size: 1em;
+                        color: $light_grey;
+                        transition: color 0.2s, font-size 0.2s;
+                    }
+
+                    &:hover {
+                        border-color: $red;
+
+                        i {
+                            color: $red;
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    &.file {
+        min-height: 100px;
+
+        &.processing {
+            position: relative;
+            &:before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                border-radius: 0.5em;
+                z-index: 1;
+                animation: fade-in 0.3s;
+            
+            }
+            &:after {
+                content: "\f110";
+                animation: fa-spin 1s infinite linear;
+                font-family: "Font Awesome 5 Free";
+                font-style: normal;
+                font-variant: normal;
+                text-rendering: auto;
+                -webkit-font-smoothing: antialiased;
+                font-weight: 900;
+                font-size: 3em;
+                color: white;
+                position: absolute;
+                z-index: 2;
+                width: 100%;
+                text-align: center;
+                top: 50%;
+                left: 0;
+                margin-top: -0.5em;
+            }
+        }
+
+        .droparea {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            margin-top: 0.5em;
+            min-height: 100px;
+            border-radius: 0.5em;
+            transition: background-color 0.3s;
+            cursor: pointer;
+            animation: pop-in 0.2s;
+            background: linear-gradient(90deg, rgba($grey, 0.8) 50%, transparent 50%), linear-gradient(90deg, rgba($grey, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($grey, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($grey, 0.8) 50%, transparent 50%);
+            background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+            background-size: 15px 1px, 15px 1px, 1px 15px, 1px 15px;
+            background-position: top left, bottom left, top left, top right;
+
+            &.hiding {
+                animation: pop-out 0.2s;
+            }
+
+            p,
+            i {
+                font-size: 1.25em;
+                color: $grey;
+                transition: font-size 0.3s ease-in-out, color 0.3s ease-in-out;
+                animation: fade-in-up 0.3s;
+            }
+
+            &:hover,
+            &.dragging {
+                border-color: $primary;
+                background: linear-gradient(90deg, rgba($primary, 0.8) 50%, transparent 50%), linear-gradient(90deg, rgba($primary, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($primary, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($primary, 0.8) 50%, transparent 50%);
+                background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+                background-size: 15px 1px, 15px 1px, 1px 15px, 1px 15px;
+                background-position: top left, bottom left, top left, top right;
+                animation: pop-in 0.2s, border-dance 10s infinite linear;
+
+                i,
+                p {
+                    color: $primary;
+                }
+
+                i {
+                    font-size: 2em;
+                    // When the user hovers the drop area, we make the icon
+                    // make small jumps in loop, with delay between each jump
+                    animation: fade-in-up 0.3s, small-jump 1.5s infinite;
+                }
+            }
+        }
+
+        ul.file-preview-list {
+            list-style: none;
+        }
+
+        /* File Preview Container */
+        .file-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            animation: pop-in 0.2s;
+
+            &.hiding {
+                animation: pop-out 0.2s;
+            }
+        }
+
+        div.file-preview-item,
+        ul.file-preview-list {
+            margin-top: 0.5em;
+            width: 100%;
+        }
+
+        ul.file-preview-list {
+            >li {
+                width: 150px;
+            }
+
+            &.two-files {
+                >li {
+                    width: calc(50% - 0.5em);
+                }
+            }
+
+            &.three-files {
+                >li {
+                    width: calc(33.3333% - 1em / 3);
+                }
+            }
+        }
+
+        /* File Preview Item */
+        .file-preview-item {
+            border-radius: 0.5em;
+            animation: pop-in 0.2s;
+            max-width: 100%;
+            min-width: 150px;
+            height: 150px;
+            overflow: hidden;
+            position: relative;
+            display: inline-block;
+
+            &:only-child {
+                width: 100%;
+            }
+
+            &:not(:last-child) {
+                margin-right: 0.5em;
+            }
+
+            .metadata {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                color: white;
+                padding: 0.5em;
+                background-color: rgba(0, 0, 0, 0.5);
+                animation: slide-in-from-bottom 0.3s;
+            }
+
+            .delete {
+                position: absolute;
+                top: 0.25em;
+                right: 0.25em;
+                font-size: 1em;
+                text-shadow: 0 0 1px rgba(0, 0, 0, 0.9);
+                cursor: pointer;
+                border: none;
+                border-radius: 100%;
+                background-color: transparent;
+                color: transparentize($color: white, $amount: 0.1);
+                animation: slide-in-from-right 0.3s;
+
+                i {
+                    transition: color 0.2s ease-in-out;
+                }
+
+                &:hover {
+                    color: white;
+                }
+            }
+
+            .preview {
+                width: 100%;
+                height: 150px;
+                object-fit: cover;
+                border: none;
+                padding: 0;
+                margin: 0;
+            }
+        }
+    }
+
+    // We style inputs of type checkbox in such
+    // a way that they look like switches.
+    input[type="checkbox"] {
+        display: none;
+    }
+
+    label.checkbox {
+        display: inline-block;
+        vertical-align: middle;
+        width: 30px;
+        height: 16px;
+        background-color: $light_grey;
+        border-radius: 1em;
+        position: relative;
+        cursor: pointer;
+        transition: background-color 0.3s;
+
+        &::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 0;
+            left: 8px;
+            margin-left: -8px;
+            background-color: #fff;
+            border-radius: 100%;
+            border: 1px solid $light_grey;
+            box-sizing: border-box;
+            transition: left 0.3s, border-color 0.3s;
+        }
+    }
+
+    input[type="checkbox"]:checked+label.checkbox::after {
+        left: 22px;
+    }
+
+    input[type="file"] {
+        display: none;
+    }
+}
+
+.gps-input {
+    .map {
+        position: relative;
+        height: 300px;
+        width: 100%;
+        margin-bottom: 0.5em;
+        border-radius: 0.5em;
+        z-index: 2 !important;
+    }
+
+    div.input-container {
+        position: relative;
+        &:after {
+            content: "\f041";
+            display: block;
+            font-family: "Font Awesome 5 Free";
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            font-weight: 900;
+            font-size: 1.2em;
+            color: $grey;
+            position: absolute;
+            right: 0.5em;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: color 0.2s;
+        }
+        &:focus-within {
+            &:after {
+                color: $primary;
+            }
+        }
+    }
+}
+
+ul.input-errors {
+    padding-top: 0.5em;
+    margin: 0;
+    list-style: none;
+    font-size: inherit;
+    font-weight: 100;
+    width: 100%;
+
+    li.input-error {
+        background-color: $error;
+    }
+    li.input-warning {
+        background-color: $warning;
+    }
+    
+    li.input-error, li.input-warning {
+        color: white;
+        padding: 0.5em;
+        box-sizing: border-box;
+        border-radius: 0.5em;
+        position: relative;
+        padding-right: 1.5em;
+        animation: pop-in 0.2s;
+        transition: margin 0.2s;
+
+        &:not(:first-child) {
+            margin-top: 0.5em;
+        }
+
+        &.hiding {
+            animation: pop-out 0.2s;
+        }
+
+        button {
+            background-color: transparent;
+            border: none;
+            box-sizing: border-box;
+            color: white;
+            cursor: pointer;
+            float: right;
+            font-size: inherit;
+            padding: 0.5em;
+            position: absolute;
+            right: 0;
+            top: 0;
+
+            i {
+                transition: color 0.2s;
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            &:hover {
+                i {
+                    color: white;
+                }
+            }
+        }
+    }
+}
+
+form.standard-form {
+    width: 800px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding-top: 1em;
+    animation: slide-in-from-bottom 0.3s;
+
+    h4 {
+        padding-bottom: 0.25em;
+        margin: 0;
+        border-bottom: 1px solid $near_black;
+        color: $near_black;
+        font-weight: 600;
+        font-size: 1.2em;
+        border-top-left-radius: 0.5em;
+        border-top-right-radius: 0.5em;
+    }
+
+    p.instructions {
+        color: $near_black;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        text-align: justify;
+    }
+
+    ul.input-group {
+        display: flex;
+
+        &:before {
+            display: flex;
+            align-items: center;
+            color: $grey;
+            margin-right: 0.5em;
+        }
+
+        >li {
+            flex: 1;
+            padding: 0;
+        }
+
+        @media screen and (max-width: $small-screen-width) {
+            flex-direction: column;
+        }
+    }
+
+    ul.name-wrapper {
+        &:before {
+            content: "Name:";
+        }
+
+        >li {
+            width: calc(100% / 3 - 0.5em);
+
+            &:not(:last-child) {
+                margin-right: 0.5em;
+            }
+        }
+    }
+
+    ul.coords-wrapper {
+        &:before {
+            content: "Coords:";
+            min-width: 100px;
+            padding-right: 0.5em;
+            color: $near_black;
+        }
+
+        >li {
+            width: calc(100% / 3 - 0.5em);
+
+            &:not(:last-child) {
+                margin-right: 0.5em;
+            }
+
+            .input-group {
+                padding: 0;
+            }
+        }
+
+        @media screen and (max-width: $small-screen-width) {
+            >li {
+                width: 100%;
+                margin-right: 0;
+                &:not(:last-child) {
+                    margin-bottom: 0.5em;
+                }
+            }
+        }
+    }
+
+    button.clear-button {
+        border-color: $red;
+        color: $red;
+
+        &:hover {
+            background-color: $red;
+            color: white;
+        }
+
+        &.enabled::before {
+            background-color: $red;
+            background: linear-gradient(120deg,
+                    transparent,
+                    rgba($red, 0.2),
+                    transparent);
+        }
+    }
+
+    &[method="DELETE"] {
+        border: 1px solid $red;
+
+        h4 {
+            color: $red;
+        }
+
+        input[type="checkbox"]:checked+label.checkbox {
+            background-color: $red;
+        }
+
+        input[type="checkbox"]:checked+label.checkbox::after {
+            border-color: $red;
+        }
+
+        &.input-group-valid {
+
+            input[type="text"],
+            input[type="search"] {
+                border-color: $red;
+            }
+        }
+
+        .input-group.scanner {
+            .start-scanner {
+                color: $red;
+                &:hover {
+                    color: white;
+                    background-color: $red;
+                }
+            }
+        }
+
+        button[type="submit"] {
+            border-color: $red;
+            color: $red;
+
+            &:hover {
+                background-color: $red;
+                color: white;
+            }
+
+            &.enabled::before {
+                background: linear-gradient(120deg,
+                        transparent,
+                        rgba($red, 0.2),
+                        transparent);
+            }
+        }
+    }
+
+    &[method="PUT"] {
+        input[type="checkbox"]:checked+label.checkbox {
+            background-color: $green;
+        }
+
+        input[type="checkbox"]:checked+label.checkbox::after {
+            border-color: $green;
+        }
+
+        &.input-group-valid {
+
+            input[type="text"],
+            input[type="search"] {
+                border-color: $green;
+            }
+        }
+
+        .input-group.scanner {
+            .start-scanner {
+                color: $green;
+                &:hover {
+                    color: white;
+                    background-color: $green;
+                }
+            }
+        }
+
+        button[type="submit"] {
+            border-color: $green;
+            color: $green;
+
+            &:hover {
+                background-color: $green;
+                color: white;
+            }
+
+            &.enabled::before {
+                background: linear-gradient(120deg,
+                        transparent,
+                        rgba($green, 0.2),
+                        transparent);
+            }
+        }
+    }
+
+    &[method="POST"] {
+        input[type="checkbox"]:checked+label.checkbox {
+            background-color: $blue;
+        }
+
+        input[type="checkbox"]:checked+label.checkbox::after {
+            border-color: $blue;
+        }
+
+        &.input-group-valid {
+
+            input[type="text"],
+            input[type="search"] {
+                border-color: $blue;
+            }
+        }
+
+        .input-group.scanner {
+            .start-scanner {
+                color: $blue;
+                &:hover {
+                    color: white;
+                    background-color: $blue;
+                }
+            }
+        }
+
+        button[type="submit"] {
+            border-color: $blue;
+            color: $blue;
+
+            &:hover {
+                background-color: $blue;
+                color: white;
+            }
+
+            &.enabled::before {
+                background: linear-gradient(120deg,
+                        transparent,
+                        rgba($blue, 0.2),
+                        transparent);
+            }
+        }
+    }
+}

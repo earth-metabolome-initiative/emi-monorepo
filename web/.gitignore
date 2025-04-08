@@ -1,0 +1,7 @@
+.env
+.env_deploy
+.env_develop
+database_tmp
+redis
+documents_tmp
+.domain

@@ -1,0 +1,51 @@
+.page {
+    width: 1200px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    animation: slide-in-from-bottom 0.3s;
+
+    h2 {
+        padding-bottom: 0.5em;
+        /* Increase distance between border bottom and badge */
+        margin: 0;
+        margin-bottom: 0.5em;
+        border-bottom: 1px solid $near_black;
+        color: $near_black;
+        font-weight: 600;
+        font-size: 1.2em;
+        border-top-left-radius: 0.5em;
+        border-top-right-radius: 0.5em;
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+    }
+
+    h3 {
+        margin: 0;
+        margin-bottom: 0.5em;
+        padding-bottom: 0.25em;
+        color: $near_black;
+        font-weight: 600;
+        font-size: 1em;
+        border-bottom: 1px dashed $near_black;
+        border-top-left-radius: 0.5em;
+        border-top-right-radius: 0.5em;
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .fas.fa-paragraph {
+            color: $grey;
+            transition: color 0.3s;
+            &:hover {
+                color: $near_black;
+            }
+        }
+    }
+}

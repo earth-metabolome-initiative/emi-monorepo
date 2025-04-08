@@ -1,0 +1,3 @@
+name,description,colors.name,icons.name
+active,used brand,green,check
+inactive,no longer used brand,red,cross

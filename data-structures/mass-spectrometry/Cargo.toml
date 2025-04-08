@@ -1,0 +1,14 @@
+[package]
+name = "mass-spectrometry"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+algebra.workspace = true
+functional-properties.workspace = true
+common-traits.workspace = true
+sorted-vec.workspace = true
+graph.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,19 @@
+[package]
+name = "pgrx_validation_derive"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+syn.workspace = true
+quote.workspace = true
+proc-macro2.workspace = true
+
+[dev-dependencies]
+trybuild.workspace = true
+validation-errors.workspace = true
+
+[lib]
+proc-macro = true
+
+[features]
+pgrx = []

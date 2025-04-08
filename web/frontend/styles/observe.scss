@@ -1,0 +1,32 @@
+.fullscreen_center_app {
+    div.observe {
+        width: 800px;
+        max-width: 100%;
+        h2 {
+            font-weight: 400;
+            font-size: 1.2em;
+        }
+        p {
+            color: $near_black;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+        }
+        button.next-button {
+            border-color: $blue;
+            color: $blue;
+    
+            &:hover {
+                background-color: $blue;
+                color: white;
+            }
+    
+            &.enabled::before {
+                background-color: $blue;
+                background: linear-gradient(120deg,
+                        transparent,
+                        rgba($blue, 0.2),
+                        transparent);
+            }
+        }
+    }
+}

@@ -1,0 +1,11 @@
+[package]
+name = "inflector"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+pluralizer = "0.4"
+regex.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,7 @@
+error: Function `is_not_empty` must return a `Result<(), validation_errors::SingleFieldError>` or `Result<(), validation_errors::DoubleFieldError>` to be decorated with `validation`, but returns `()`.
+ --> tests/ui/test_empty_return_type_validation.rs:5:1
+  |
+5 | #[validation]
+  | ^^^^^^^^^^^^^
+  |
+  = note: this error originates in the attribute macro `validation` (in Nightly builds, run with -Z macro-backtrace for more info)

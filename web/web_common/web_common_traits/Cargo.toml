@@ -1,0 +1,21 @@
+[package]
+name = "web_common_traits"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rosetta-uuid.workspace = true
+serde = { workspace = true, optional = true }
+diesel.workspace = true
+diesel-async.workspace = true
+common-traits.workspace = true
+validation-errors.workspace = true
+server-errors.workspace = true
+
+[features]
+frontend = ["server-errors/frontend"]
+backend = ["server-errors/backend"]
+serde = ["dep:serde", "common-traits/serde"]
+
+[lints]
+workspace = true

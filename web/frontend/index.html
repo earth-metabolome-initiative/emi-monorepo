@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link data-trunk rel="copy-dir" href="images"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-180x180.png">
+  <link rel="icon" sizes="192x192" href="/images/android-chrome-192x192.png">
+  <link rel="icon" sizes="512x512" href="/images/android-chrome-512x512.png">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+  <meta name="theme-color" content="#aa9639">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link data-trunk rel="copy-file" href="manifest.json" />
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    integrity="sha512-mD70nAW2ThLsWH0zif8JPbfraZ8hbCtjQ+5RU1m4+ztZq6/MymyZeB55pWsi4YAX+73yvcaJyk61mzfYMvtm9w=="
+    crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha512-Dqm3h1Y4qiHUjbhxTuBGQsza0Tfppn53SHlu/uj1f+RT+xfShfe7r6czRf5r2NmllO2aKx+tYJgoxboOkn1Scg=="
+    crossorigin=""></script>
+  <link data-trunk rel="rust" href="Cargo.toml" data-bin="app" data-type="main" data-weak-refs data-wasm-opt="z" />
+  <link data-trunk rel="rust" href="Cargo.toml" data-bin="web_socket_worker" data-type="worker" data-weak-refs
+    data-wasm-opt="z" />
+  <link data-trunk rel="rust" href="Cargo.toml" data-bin="jpeg_file_processor" data-type="worker" data-weak-refs
+    data-wasm-opt="z" />
+  <link data-trunk rel="scss" href="styles/index.scss" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <title>Earth Metabolome Initiative</title>
+</head>
+
+<body></body>
+
+</html>

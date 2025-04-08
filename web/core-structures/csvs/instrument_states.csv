@@ -1,0 +1,4 @@
+name,description,icons.name,colors.name
+"active","The instrument is active and ready to use.","check","green"
+"maintenance","The instrument is under maintenance and not available for use.","maintenance","yellow"
+"decommissioned","The instrument has been decommissioned and is no longer in use.","circle-exclamation","red"

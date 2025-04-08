@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS instrument_locations (
+	id SERIAL PRIMARY KEY,
+	instrument_id INTEGER NOT NULL REFERENCES instruments(id),
+	room_id INTEGER NOT NULL REFERENCES rooms(id),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	created_by INTEGER NOT NULL REFERENCES users(id)
+);

@@ -1,9 +1,7 @@
 //! Trait and structs to define the different versions of Sirius
-use std::fmt::Debug;
+use core::fmt::Debug;
 
-use crate::traits::Enablable;
-use crate::traits::IntoDefault;
-use crate::traits::NamedParametersSet;
+use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
 /// Trait for the different versions of Sirius
 pub trait Version: Default {

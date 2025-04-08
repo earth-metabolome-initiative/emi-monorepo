@@ -1,0 +1,26 @@
+# Use a lightweight image as a base
+FROM rust:1.79
+
+ARG ACTIX_PORT
+
+# Expose the port that the Actix server will run on
+EXPOSE $ACTIX_PORT
+
+# We need to install postgresql-dev to build the diesel-cli
+RUN apt-get update && apt-get install -y libpq-dev tmux
+
+# We need to add the wasm compilation target to the image
+RUN rustup target add wasm32-unknown-unknown
+
+# Install the trunk package manager
+RUN cargo install --locked trunk
+
+# We need to compile diesel-cli to run the migrations
+RUN cargo install diesel_cli --no-default-features --features postgres
+
+# Set the working directory inside the container
+WORKDIR /app/backend
+
+# We run the Actix server by executing inside a TMUX session
+# the bash script called `start_deploy.sh`
+CMD tmux new-session -s actix-deployment 'bash /app/backend/start_deploy.sh'

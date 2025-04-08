@@ -1,0 +1,105 @@
+name: ${DOCKER_PROJECT_NAME}
+services:
+  postgres:
+    container_name: ${POSTGRES_DOCKER_NAME}
+    build:
+      context: ../
+      dockerfile: ./core-structures/Dockerfile
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ${POSTGRES_DATABASE_DIRECTORY}:/var/lib/postgresql/data
+      - ./backend/db_data:/app
+    ports:
+      - "${PGPORT}:5432"
+    networks:
+      - deploy_backend
+    restart: on-failure
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - ./pgadmin/servers.json:/pgadmin4/servers.json
+    ports:
+      - "${PGADMIN_PORT}:80"
+    networks:
+      - deploy_backend
+    depends_on:
+      - postgres
+    restart: on-failure
+
+  redis:
+    image: redis:latest
+    volumes:
+      - ${REDIS_DATABASE_DIRECTORY}:/data
+    command: --port ${REDIS_PORT}
+    networks:
+      - deploy_backend
+    restart: on-failure
+
+  actix-server:
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    build:
+      context: ./backend
+      dockerfile: DockerfileDeploy
+      args:
+        ACTIX_PORT: ${ACTIX_PORT}
+    environment:
+      DOCKER_DATABASE_URL: ${DOCKER_DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      RUST_BACKTRACE: ${RUST_BACKTRACE}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      GITHUB_REDIRECT_URI: ${GITHUB_REDIRECT_URI}
+      ORCID_CLIENT_ID: ${ORCID_CLIENT_ID}
+      ORCID_CLIENT_SECRET: ${ORCID_CLIENT_SECRET}
+      SIRIUS_USERNAME: ${SIRIUS_USERNAME}
+      SIRIUS_PASSWORD: ${SIRIUS_PASSWORD}
+      ACCESS_TOKEN_PUBLIC_KEY: ${ACCESS_TOKEN_PUBLIC_KEY}
+      ACCESS_TOKEN_PRIVATE_KEY: ${ACCESS_TOKEN_PRIVATE_KEY}
+      ACCESS_TOKEN_MINUTES: ${ACCESS_TOKEN_MINUTES}
+      REFRESH_TOKEN_PUBLIC_KEY: ${REFRESH_TOKEN_PUBLIC_KEY}
+      REFRESH_TOKEN_PRIVATE_KEY: ${REFRESH_TOKEN_PRIVATE_KEY}
+      REFRESH_TOKEN_MINUTES: ${REFRESH_TOKEN_MINUTES}
+      ACTIX_PORT: ${ACTIX_PORT}
+      ACTIX_WORKER_THREADS: ${ACTIX_WORKER_THREADS}
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./:/app
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - deploy_backend
+
+  nginx:
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    build:
+      context: ./nginx
+      dockerfile: DockerfileDeploy
+    volumes:
+      - ./nginx:/app
+    environment:
+      ACTIX_PORT: ${ACTIX_PORT}
+      NGINX_HTTPS_PORT: ${NGINX_HTTPS_PORT}
+      DOMAIN: ${DOMAIN}
+      NGINX_WORKER_PROCESSES: ${NGINX_WORKER_PROCESSES}
+    ports:
+      - "${NGINX_HTTPS_PORT}:${NGINX_HTTPS_PORT}"
+    restart: on-failure
+    depends_on:
+      - actix-server
+    networks:
+      - deploy_backend
+
+networks:
+  deploy_backend:
+    driver: bridge
+

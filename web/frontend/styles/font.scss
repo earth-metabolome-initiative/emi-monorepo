@@ -1,0 +1,16 @@
+//! Set the font family for the entire site
+
+$sans-serif: "Source Sans Pro", Helvetica, Verdana, sans-serif;
+$serif: Merriweather, Georgia, "Times New Roman", serif;
+$mono: "Source Code Pro", Courier, mono;
+
+$light: 300;
+$normal: 400;
+$semibold: 500;
+$bold: 700;
+
+body {
+    font-family: $sans-serif;
+    font-weight: $light;
+    -webkit-text-size-adjust: 100%; //fix for iOS
+}

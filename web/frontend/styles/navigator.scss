@@ -1,0 +1,139 @@
+@import "navigator/hamburger";
+
+nav {
+  border-bottom: 1px solid $primary;
+  box-sizing: border-box;
+  background-color: white;
+  position: fixed;
+  width: 100%;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  height: $navigator-height;
+  padding: 1em 0.5em;
+
+  h1 {
+    display: inline-block;
+    color: $primary;
+    font-size: 1.5em;
+
+    a {
+      color: inherit;
+    }
+  }
+
+  .badge {
+    width: auto;
+    height: auto;
+  }
+
+  .hamburger {
+    display: none;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  a.right_nav_button {
+    color: $primary;
+    font-size: 1.25rem;
+    border: 1px solid $primary;
+    padding: 0.3em 0.5em;
+    box-sizing: border-box;
+    border-radius: 0.3em;
+    white-space:nowrap;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+      
+    &:hover {
+      background-color: $primary;
+      color: white;
+    }
+  }
+
+  .search {
+    margin-left: auto;
+    margin-right: auto;
+    width: 20%;
+    min-width: 100px;
+    max-width: 1200px;
+    padding: 0 1em;
+    transition: width 0.5s;
+    position: relative;
+
+    input {
+      width: 100%;
+    }
+
+    .badges-container,
+    .input-errors {
+      display: none;
+    }
+
+    &.focus {
+      width: 90%;
+
+      .badges-container {
+        display: grid;
+      }
+
+      .input-errors {
+        display: block;
+      }
+
+      .input-group.datalist.has-candidates {
+        .input-container input {
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+        }
+      }
+    }
+
+    .input-group.datalist {
+      padding: 0;
+
+      ul.input-errors,
+      ul.badges-container {
+        position: absolute;
+
+        &:empty {
+          display: none;
+        }
+      }
+
+      ul.badges-container {
+        backdrop-filter: blur(5px);
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 0.25em;
+        margin: 0;
+        max-height: 80vh;
+        overflow-y: scroll;
+        border: 1px solid $primary;
+        border-top: none;
+        box-sizing: border-box;
+        border-bottom-left-radius: 0.5em;
+        border-bottom-right-radius: 0.5em;
+      }
+    }
+  }
+}
+
+@media (max-width: $small-screen-width) {
+  nav {
+    h1 {
+      display: none;
+    }
+
+    .search {
+      padding: 0 0.5em;
+    }
+
+    .hamburger {
+      display: inline-block;
+    }
+  }
+}

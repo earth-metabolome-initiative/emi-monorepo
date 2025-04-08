@@ -1,0 +1,216 @@
+.active-scanner-ui {
+    position: fixed;
+    z-index: 100;
+    transform: translate3d(0px, 0px, 0px);
+    background-color: rgba(0, 0, 0, 0.5);
+    // We blur the background to make the scanner more visible
+    backdrop-filter: blur(5px);
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s;
+    opacity: 0;
+
+    video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        object-position: center;
+        object-fit: cover;
+    }
+
+    .scanner-focus-container {
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    &.opening {
+        opacity: 1;
+        .scanner-focus-container {
+            opacity: 1;
+            &::after {
+                animation: fade-in-up 0.3s;
+            }
+
+            .scanner-focus {
+                &::before {
+                    animation: pop-in 0.3s;
+                }
+
+                &::after {
+                    animation: fade-in-up 0.3s;
+                }
+            }
+        }
+    }
+
+    &.closing {
+        opacity: 0;
+        .scanner-focus-container {
+            opacity: 0;
+            &::after {
+                animation: fade-out-up 0.3s;
+            }
+
+            .scanner-focus {
+                &::before {
+                    animation: pop-out 0.3s;
+                }
+
+                &::after {
+                    animation: fade-out-up 0.3s;
+                }
+            }
+        }
+    }
+
+    &.mirrored {
+        video {
+            transform: rotateY(180deg);
+            -webkit-transform:rotateY(180deg); /* Safari and Chrome */
+            -moz-transform:rotateY(180deg); /* Firefox */
+        }
+    }
+
+    .scanner-focus-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-left: 50vw;
+        border-right: 50vw;
+        border-top: 50vh;
+        border-bottom: 50vh;
+        border-style: solid;
+        border-color: rgba(0, 0, 0, 0.5);
+        width: min(50vw, 50vh);
+        height: min(50vw, 50vh);
+
+        .scanner-focus {
+            position: relative;
+            width: min(50vw, 50vh);
+            height: min(50vw, 50vh);
+            border-radius: min(8vh, 8vw);
+            border: min(3vh, 3vw) solid white;
+            top: max(-2.9vh, -2.9vw);
+            left: max(-2.9vh, -2.9vw);
+            &::before {
+                content: "\f110";
+                font-family: "Font Awesome 5 Free";
+                position: absolute;
+                font-weight: 900;
+                font-size: min(25vw, 25vh);
+                width: 100%;
+                color: white;
+                text-align: center;
+                top: 50%;
+                margin-top: max(-12.5vw, -12.5vh);
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            &::after {
+                content: "SCAN QR CODE";
+                position: absolute;
+                font-size: min(2.75vh, 2.75vw);
+                width: 100%;
+                font-size: 100;
+                color: white;
+                text-align: center;
+                bottom: min(1vh, 1vw);
+                left: 0;
+                opacity: 1;
+                transition: opacity 0.3s;
+            }
+        }
+
+        ul.operations {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            li {
+                position: relative;
+                border: 1px solid white;
+                cursor: pointer;
+                border-radius: 100%;
+                width: min(10vh, 10vw);
+                height: min(10vh, 10vw);
+                background-color: transparent;
+                color: white;
+                font-size: min(3vh, 3vw);
+                padding: 0;
+                margin: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                transition: background-color 0.3s;
+                animation: pop-in 0.3s;
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.5);
+                }
+                &.switch-camera {
+                    &::after {
+                        content: attr(camera-number) '/' attr(camera-total);
+                        position: absolute;
+                        bottom: 0;
+                        left: 50%;
+                        border-radius: 3px;
+                        color: black;
+                        background-color: white;
+                        font-size: min(1.5vh, 1.5vw);
+                        padding: 0.1em;
+                    }
+                }
+            }
+        }
+    }
+
+    &.loading {
+        .scanner-focus-container {
+            .scanner-focus {
+                &::before {
+                    animation: fa-spin 1s linear infinite;
+                    opacity: 1;
+                }
+                &::after {
+                    opacity: 0;
+                }
+            }
+        }
+    }
+
+    .scan-per-second {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        text-align: right;
+        color: white;
+        font-size: min(2.5vh, 2.5vw);
+        padding: 0.5em;
+    }
+
+    .ongoing-operation {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        color: white;
+        font-size: min(2.5vh, 2.5vw);
+        padding: 0.5em;
+        text-align: left;
+    }
+}
+

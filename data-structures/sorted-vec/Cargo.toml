@@ -1,0 +1,15 @@
+[package]
+name = "sorted-vec"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common-traits.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = ["std"]
+std = ["alloc"]
+alloc = []

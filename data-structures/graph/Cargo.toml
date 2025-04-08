@@ -1,0 +1,19 @@
+[package]
+name = "graph"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+algebra.workspace = true
+sorted-vec.workspace = true
+common-traits.workspace = true
+serde = { workspace = true, optional = true }
+
+[lints]
+workspace = true
+
+[features]
+default = ["std"]
+std = ["alloc", "sorted-vec/std"]
+alloc = ["sorted-vec/alloc"]
+serde = ["algebra/serde", "dep:serde"]

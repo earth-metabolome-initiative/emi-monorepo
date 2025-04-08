@@ -1,0 +1,75 @@
+$blue: #5778a4;
+$orange: #e49444;
+$red: #d1615d;
+$error: #FF5733;
+$warning: #FFC300;
+$teal: #85b6b2;
+$green: #6a9f58;
+$yellow: #e7ca60;
+$purple: #a87c9f;
+$pink: #f1a2a9;
+$brown: #967662;
+$grey: #b8b0ac;
+$black: #000000;
+$near_black: #444;
+$light_grey: #eee;
+$primary: #aa9639;
+
+
+i {
+    &.blue {
+        color: $blue;
+    }
+
+    &.orange {
+        color: $orange;
+    }
+
+    &.red {
+        color: $red;
+    }
+
+    &.teal {
+        color: $teal;
+    }
+
+    &.green {
+        color: $green;
+    }
+
+    &.yellow {
+        color: $yellow;
+    }
+
+    &.purple {
+        color: $purple;
+    }
+
+    &.pink {
+        color: $pink;
+    }
+
+    &.brown {
+        color: $brown;
+    }
+
+    &.grey {
+        color: $grey;
+    }
+
+    &.black {
+        color: $black;
+    }
+
+    &.near-black {
+        color: $near_black;
+    }
+
+    &.grey {
+        color: $grey;
+    }
+
+    &.primary {
+        color: $primary;
+    }
+}

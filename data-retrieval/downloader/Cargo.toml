@@ -1,0 +1,16 @@
+[package]
+name = "downloader"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ctrlc = "3.4.5"
+url.workspace = true
+indicatif.workspace = true
+reqwest.workspace = true
+futures-util.workspace = true
+tokio.workspace = true
+flate2.workspace = true
+tar.workspace = true
+infer.workspace = true
+zip.workspace = true

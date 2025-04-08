@@ -1,0 +1,73 @@
+// Define variables for easy customization
+$sidebar-width: 16rem;
+$sidebar-hover-color: #f76a00;
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: $navigator-height;
+    height: 100%;
+    max-width: 80%;
+    width: $sidebar-width;
+    color: $near_black;
+    transition: transform 0.3s ease;
+    background-color: white;
+    z-index: 10;
+    box-sizing: border-box;
+    border-right: 1px solid $primary;
+    padding-bottom: $navigator-height;
+    overflow-y: scroll;
+
+    .sidebar-content {
+        padding: 20px;
+
+        ul {
+            list-style: none;
+            padding: 0;
+
+            li {
+                margin-bottom: 15px;
+
+                i {
+                    display: inline-block;
+                    width: 1.25em;
+                    text-align: right;
+                }
+                a, button {
+                    text-decoration: none;
+                    font-size: 1.1rem;
+                    font-weight: 300;
+                    color: inherit;
+                    transition: color 0.3s ease;
+                    background-color: transparent;
+                    border: none;
+                    cursor: pointer;
+                    padding: 0;
+
+                    &:hover {
+                        color: $sidebar-hover-color;
+                    }
+                }
+
+                &.active {
+                    a, button {
+                        color: $sidebar-hover-color;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Media query for smaller screens
+@media screen and (max-width: $small-screen-width) {
+    .sidebar {
+        &.hidden {
+            transform: translateX(-$sidebar-width);
+        }
+
+        .sidebar-content {
+            padding: 15px;
+        }
+    }
+}

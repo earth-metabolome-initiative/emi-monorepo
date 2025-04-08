@@ -1,0 +1,58 @@
+DOCKER_PROJECT_NAME='emi' # This name should be customized if several docker networks are deployed on the same system
+# Domain of the website
+DOMAIN='emi.local'
+ACTIX_PORT=8080
+TRUNK_PORT=3000
+NGINX_WORKER_PROCESSES=4
+NGINX_HTTPS_PORT=443
+ACTIX_WORKER_THREADS=4
+# We set the RUST_LOG environment variable to debug
+# so that we can see the logs of the application
+RUST_LOG=debug
+RUST_BACKTRACE=1
+# This is a default version of the '.env' file
+# You should copy this file into a new file called '.env'
+# and then change the values to match your environment
+POSTGRES_DB='development.db'
+POSTGRES_USER='user'
+POSTGRES_PASSWORD='password'
+PGPORT=15032
+PGADMIN_PORT=15050
+POSTGRES_DOCKER_NAME='postgres'
+# The database url is composed from the previous
+# variables. It is important to not change this
+# variable, as it is used by the application
+DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_DOCKER_NAME}:${PGPORT}/${POSTGRES_DB}
+DOCKER_DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_DOCKER_NAME}:5432/${POSTGRES_DB}
+# This is the directory where the database will be stored
+# It is recommended to use a large disk for this
+# as the database can grow to be very large
+POSTGRES_DATABASE_DIRECTORY='path/to/large/disk'
+# In order to provide Oauth authentication for the API
+# you need to provide the client id and client secret
+# for the application that you have created in ORCID
+ORCID_CLIENT_ID='orcid_client_id'
+ORCID_CLIENT_SECRET='orcid_client_secret'
+# We also need to set the login variables for the
+# sirius executable. These are the mail and password,
+# with the email being an academic email address.
+SIRIUS_USERNAME='email@email.com'
+SIRIUS_PASSWORD='password'
+# The GitHub Client ID credentials.
+GITHUB_CLIENT_ID='github_client_id'
+GITHUB_CLIENT_SECRET='github_client_secret'
+GITHUB_REDIRECT_URI=https://${DOMAIN}/api/oauth/github
+# Generate the public & secret key using https://travistidwell.com/jsencrypt/demo/
+# then, convert both to base64 using https://www.base64encode.org/
+# Generate keys with 4096 bits!
+ACCESS_TOKEN_PUBLIC_KEY=my_public_key_for_access_token
+ACCESS_TOKEN_PRIVATE_KEY=my_ultra_secure_secret_access_token_key
+ACCESS_TOKEN_MINUTES=15 # in minutes
+# Do the same thing for the refresh token
+REFRESH_TOKEN_PUBLIC_KEY=my_public_key_for_refresh_token
+REFRESH_TOKEN_PRIVATE_KEY=my_ultra_secure_secret_refresh_token_key
+REFRESH_TOKEN_MINUTES=480 # in minutes, equals to 8 hours
+# Next up, we have the Redis configuration
+REDIS_PORT=6379
+REDIS_URL=redis://redis:${REDIS_PORT}/
+REDIS_DATABASE_DIRECTORY='path/to/redis/database'

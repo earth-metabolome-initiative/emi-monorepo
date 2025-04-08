@@ -1,0 +1,46 @@
+name,description
+BioType,"A biological type, often representing a specific characteristic or group."
+Class,A taxonomic rank grouping orders of organisms.
+Clade,A group of organisms believed to have evolved from a common ancestor.
+Cohort,A taxonomic rank grouping related orders or families.
+Family,A taxonomic rank grouping genera.
+Forma,A minor taxonomic rank for variations within a species.
+Forma Specialis,A forma distinguished by specific pathogenic characteristics.
+Genotype,A group of organisms with the same genetic makeup.
+Genus,A taxonomic rank grouping species with shared traits.
+InfraClass,A rank below subclass for finer classifications.
+InfraOrder,"A rank below order, for smaller groupings."
+Isolate,A population of microorganisms obtained from a single source.
+Kingdom,A major rank grouping organisms with similar characteristics.
+Morph,A rank representing a morphological variant.
+No rank,No specific rank assigned.
+Order,A taxonomic rank grouping families of organisms.
+ParvOrder,A minor division below infraorder.
+PathoGroup,A grouping based on shared pathogenic traits.
+Phylum,A major taxonomic rank grouping classes of organisms.
+Section,A rank grouping species within a genus.
+SeroGroup,A group based on shared serological properties.
+Serotype,A classification based on antigenic properties.
+Series,A taxonomic rank grouping related species or varieties.
+Species,"The basic rank, representing individual organisms capable of interbreeding."
+Species Group,A grouping of related species.
+Species Subgroup,A subdivision within a species group.
+Strain,A genetic variant or subtype within a species.
+SubClass,A rank below class for finer divisions.
+SubCohort,A rank below cohort for additional classification.
+SubFamily,A rank below family for finer distinctions.
+SubGenus,"A rank below genus, grouping closely related species."
+SubKingdom,"A rank below kingdom, dividing kingdoms into smaller groups."
+SubOrder,"A rank below order, dividing orders into smaller groups."
+SubPhylum,"A rank below phylum, dividing it further."
+SubSection,A rank below section for finer groupings.
+Subspecies,"A rank below species, denoting geographic or morphological variation."
+SubTribe,A rank below tribe for finer distinctions.
+SubVariety,A rank below variety for additional specificity.
+SuperClass,"A rank above class, for larger groupings."
+SuperFamily,"A rank above family, grouping related families."
+SuperKingdom,"A rank above kingdom, used for large clades."
+SuperOrder,"A rank above order, grouping related orders."
+SuperPhylum,A rank above phylum for large clades.
+Tribe,A rank grouping related genera within a family.
+Varietas,A rank for botanical varieties within a species.

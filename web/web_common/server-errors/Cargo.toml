@@ -1,0 +1,14 @@
+[package]
+name = "server-errors"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+diesel.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+frontend = []
+backend = []

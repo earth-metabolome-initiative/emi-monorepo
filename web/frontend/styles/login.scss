@@ -1,0 +1,52 @@
+//! Styles for the login page
+///
+/// The login page solely contains Oauth2 login buttons, represented as anchors with class login-provider.
+/// The login box is a container for the h2 Login title and, below it, an ul with class login-providers.
+/// Inside the ul, we find a list of li elements, each containing an anchor with class login-provider.
+/// Within the anchor we find yet again two elements: a i element with the font-awesome icon and
+/// a span element with the provider name.
+
+.login_box {
+  width: 200px;
+  max-width: 100%;
+  padding: 20px;
+  border: 1px solid $primary;
+  border-radius: 5px;
+  text-align: center;
+  animation: fade-in-up 0.5s;
+  margin-top: -$navigator-height;
+
+  h2 {
+    margin-bottom: 20px;
+    color: $primary;
+    font-size: 1.5em;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+
+    li {
+      margin-bottom: 10px;
+
+      a {
+        display: block;
+        padding: 10px;
+        border: 1px solid $primary;
+        border-radius: 5px;
+        color: $primary;
+        text-decoration: none;
+        transition: background-color 0.3s, color 0.3s;
+
+        i {
+          margin-right: 10px;
+        }
+
+        &:hover {
+          background-color: $primary;
+          color: white;
+        }
+      }
+    }
+  }
+}

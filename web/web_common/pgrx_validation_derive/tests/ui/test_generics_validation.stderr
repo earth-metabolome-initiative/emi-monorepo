@@ -1,0 +1,5 @@
+error: Function `is_not_empty` must not have any generic parameters to be decorated with `validation`.
+ --> tests/ui/test_generics_validation.rs:6:20
+  |
+6 | pub fn is_not_empty<S: ToString>(string: S) -> Result<(), String> {
+  |                    ^^^^^^^^^^^^^

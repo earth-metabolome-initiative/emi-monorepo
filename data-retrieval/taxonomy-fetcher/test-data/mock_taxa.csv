@@ -1,0 +1,3 @@
+id,taxonID,identifier,parentNameUsageID,scientificName
+1,https://example.com/taxa/1,https://example.com/taxa/1,https://example.com/taxa/48460,Animalia
+2,https://example.com/taxa/2,https://example.com/taxa/2,https://example.com/taxa/1,Chordata
