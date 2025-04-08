@@ -1,17 +1,15 @@
 //! Implementation of the cosine distance for mass spectra.
 
-use ::graph::prelude::{WeightedAssignment, HungarianAlgorithm};
 use algebra::{
     impls::{GenericImplicitValuedMatrix2D, RangedCSR2D, ranged::SimpleRanged},
-    prelude::{Number, One, Pow, SparseMatrix2D, Sqrt, Zero},
+    prelude::{ImplicitValuedMatrix, Number, One, Pow, SparseLAPJV, SparseMatrix, Sqrt, Ten, Zero},
 };
 use functional_properties::prelude::ScalarSimilarity;
-use graph::traits::Edges;
 
 use crate::traits::{ScalarSpectralSimilarity, Spectrum};
 
 /// Implementation of the cosine distance for mass spectra.
-pub struct HungarianCosine<EXP, MZ> {
+pub struct ExactCosine<EXP, MZ> {
     /// The power to which the mass/charge ratio is raised.
     mz_power: EXP,
     /// The power to which the intensity is raised.
@@ -20,7 +18,7 @@ pub struct HungarianCosine<EXP, MZ> {
     mz_tolerance: MZ,
 }
 
-impl<EXP: Number, MZ: Number> HungarianCosine<EXP, MZ> {
+impl<EXP: Number, MZ: Number> ExactCosine<EXP, MZ> {
     /// Creates a new instance of the Hungarian cosine distance.
     ///
     /// # Arguments
@@ -53,7 +51,7 @@ impl<EXP: Number, MZ: Number> HungarianCosine<EXP, MZ> {
     }
 }
 
-impl<EXP, S1, S2> ScalarSimilarity<S1, S2> for HungarianCosine<EXP, S1::Mz>
+impl<EXP, S1, S2> ScalarSimilarity<S1, S2> for ExactCosine<EXP, S1::Mz>
 where
     EXP: Number,
     S1::Mz: Pow<EXP> + Sqrt + Number,
@@ -91,19 +89,17 @@ where
             |(i, j)| left_peak_products[i as usize] * right_peak_products[j as usize],
         );
 
-        if !map.has_edges() {
+        if map.is_empty() {
             return (S1::Mz::ZERO, 0);
         }
 
-        println!(
-            "left node: {}, right nodes: {}",
-            map.number_of_non_empty_rows(),
-            map.number_of_non_empty_columns()
-        );
-        let matching: Vec<(u16, u16, S1::Mz)> =
-            map.hungarian().expect("Failed to compute the Hungarian algorithm");
+        let matching: Vec<(u16, u16)> = map
+            .sparse_lapjv(S1::Mz::ONE, S1::Mz::TEN)
+            .expect("Failed to compute the Hungarian algorithm");
 
-        let similarity = matching.cost() / (left_peak_norm * right_peak_norm);
+        let cost = matching.iter().map(|&(i, j)| map.implicit_value(&(i, j))).sum::<S1::Mz>();
+
+        let similarity = cost / (left_peak_norm * right_peak_norm);
 
         if similarity > S1::Mz::ONE {
             (S1::Mz::ONE, matching.len() as u16)
@@ -113,7 +109,7 @@ where
     }
 }
 
-impl<S1, S2, EXP> ScalarSpectralSimilarity<S1, S2> for HungarianCosine<EXP, S1::Mz>
+impl<S1, S2, EXP> ScalarSpectralSimilarity<S1, S2> for ExactCosine<EXP, S1::Mz>
 where
     EXP: Number,
     S1::Mz: Pow<EXP> + Sqrt,
