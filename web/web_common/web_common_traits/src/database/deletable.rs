@@ -53,32 +53,3 @@ impl core::fmt::Display for DeleteError {
         }
     }
 }
-
-/// The error type for deletions.
-pub enum DeleteError {
-    /// A diesel error occurred.
-    DieselError(diesel::result::Error),
-    /// A server error occurred.
-    ServerError(server_errors::Error),
-}
-
-impl From<diesel::result::Error> for DeleteError {
-    fn from(e: diesel::result::Error) -> Self {
-        DeleteError::DieselError(e)
-    }
-}
-
-impl From<server_errors::Error> for DeleteError {
-    fn from(e: server_errors::Error) -> Self {
-        DeleteError::ServerError(e)
-    }
-}
-
-impl core::fmt::Display for DeleteError {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            DeleteError::DieselError(e) => <diesel::result::Error as core::fmt::Display>::fmt(e, f),
-            DeleteError::ServerError(e) => <server_errors::Error as core::fmt::Display>::fmt(e, f),
-        }
-    }
-}

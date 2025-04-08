@@ -182,6 +182,7 @@ where
         }
     }
 
+    #[allow(clippy::type_complexity)]
     /// Returns the first and second minimum reduced costs of the row.
     ///
     /// # Arguments

@@ -186,39 +186,36 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// validation_errors::SingleFieldError>` or `Result<(),
 /// validation_errors::DoubleFieldError>`.
 fn is_result_unit_pgrx_error(output: &syn::ReturnType) -> bool {
-    match output {
-        syn::ReturnType::Type(_, ty) => {
-            if let syn::Type::Path(type_path) = &**ty {
-                // Ensure it's a `Result<T, E>`
-                if let Some(last_segment) = type_path.path.segments.last() {
-                    if last_segment.ident == "Result" {
-                        if let syn::PathArguments::AngleBracketed(args) = &last_segment.arguments {
-                            let mut iter = args.args.iter();
-                            // First generic argument: Must be `()`
-                            if let Some(syn::GenericArgument::Type(syn::Type::Tuple(tuple))) =
-                                iter.next()
-                            {
-                                if !tuple.elems.is_empty() {
-                                    return false;
-                                }
-                            } else {
+    if let syn::ReturnType::Type(_, ty) = output {
+        if let syn::Type::Path(type_path) = &**ty {
+            // Ensure it's a `Result<T, E>`
+            if let Some(last_segment) = type_path.path.segments.last() {
+                if last_segment.ident == "Result" {
+                    if let syn::PathArguments::AngleBracketed(args) = &last_segment.arguments {
+                        let mut iter = args.args.iter();
+                        // First generic argument: Must be `()`
+                        if let Some(syn::GenericArgument::Type(syn::Type::Tuple(tuple))) =
+                            iter.next()
+                        {
+                            if !tuple.elems.is_empty() {
                                 return false;
                             }
+                        } else {
+                            return false;
+                        }
 
-                            // Second generic argument: Must be
-                            // `validation_errors::SingleFieldError`
-                            // or `validation_errors::DoubleFieldError`
-                            if let Some(syn::GenericArgument::Type(syn::Type::Path(error_path))) =
-                                iter.next()
-                            {
-                                return is_pgrx_validation_error(error_path);
-                            }
+                        // Second generic argument: Must be
+                        // `validation_errors::SingleFieldError`
+                        // or `validation_errors::DoubleFieldError`
+                        if let Some(syn::GenericArgument::Type(syn::Type::Path(error_path))) =
+                            iter.next()
+                        {
+                            return is_pgrx_validation_error(error_path);
                         }
                     }
                 }
             }
         }
-        _ => {}
     }
     false
 }

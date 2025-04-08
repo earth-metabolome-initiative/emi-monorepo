@@ -76,7 +76,6 @@ pub trait BackendInsertableVariant: InsertableVariant {
     /// * If the row cannot be inserted.
     fn backend_insert(
         self,
-        user_id: &Self::UserId,
         conn: &mut Self::Conn,
     ) -> impl core::future::Future<
         Output = Result<
