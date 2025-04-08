@@ -21,12 +21,8 @@ impl<'a, M: SparseMatrix2D + ?Sized, Distance: Number>
             .iter()
             .copied()
             .filter_map(|right_node_id: Option<M::ColumnIndex>| {
-                let Some(right_node_id) = right_node_id else {
-                    return None;
-                };
-                let Some(row_index) = assignment.predecessors[right_node_id.into_usize()] else {
-                    return None;
-                };
+                let right_node_id = right_node_id?;
+                let row_index = assignment.predecessors[right_node_id.into_usize()]?;
                 Some((row_index, right_node_id))
             })
             .collect()
@@ -44,7 +40,7 @@ impl<'a, M: SparseMatrix2D + ?Sized, Distance: Number> From<&'a M>
     }
 }
 
-impl<'a, M: SparseMatrix2D + ?Sized, Distance: Number> PartialAssignment<'a, M, Distance> {
+impl<M: SparseMatrix2D + ?Sized, Distance: Number> PartialAssignment<'_, M, Distance> {
     /// Returns whether the provided left node id has a successor.
     pub(super) fn has_successor(&self, row_index: M::RowIndex) -> bool {
         self.successors[row_index.into_usize()].is_some()
@@ -53,11 +49,11 @@ impl<'a, M: SparseMatrix2D + ?Sized, Distance: Number> PartialAssignment<'a, M, 
     pub(super) fn bfs(&mut self) -> Result<bool, HopcroftKarpError> {
         let mut frontier = Vec::new();
         for row_index in self.matrix.row_indices() {
-            if !self.has_successor(row_index) {
+            if self.has_successor(row_index) {
+				self.left_distances[row_index.into_usize()] = Distance::MAX;
+            } else {
                 self.left_distances[row_index.into_usize()] = Distance::ZERO;
                 frontier.push(row_index);
-            } else {
-				self.left_distances[row_index.into_usize()] = Distance::MAX;
 			}
         }
 

@@ -71,7 +71,7 @@ where
     }
 }
 
-impl<'matrix, M: DenseValuedMatrix2D + ?Sized> Inner<'matrix, M>
+impl<M: DenseValuedMatrix2D + ?Sized> Inner<'_, M>
 where
     M::Value: Number,
 {
@@ -81,11 +81,11 @@ where
             "We expected the column costs to be initialized to the maximum cost",
         );
         debug_assert!(
-            self.assigned_rows.iter().all(|state| state.is_unassigned()),
+            self.assigned_rows.iter().all(AssignmentState::is_unassigned),
             "We expected all rows to be unassigned",
         );
         debug_assert!(
-            self.assigned_columns.iter().all(|state| state.is_unassigned()),
+            self.assigned_columns.iter().all(AssignmentState::is_unassigned),
             "We expected all columns to be unassigned",
         );
 
@@ -119,7 +119,7 @@ where
         }
 
         debug_assert!(
-            self.assigned_rows.iter().all(|state| state.is_assigned()),
+            self.assigned_rows.iter().all(AssignmentState::is_assigned),
             "We expected all rows to be assigned",
         );
 
@@ -297,7 +297,6 @@ where
     }
 
     fn find_minimum_distance(
-        &self,
         lower_bound: usize,
         distances: &[M::Value],
         to_scan: &mut [M::ColumnIndex],
@@ -426,7 +425,7 @@ where
 
             if lower_bound == upper_bound {
                 n_ready = lower_bound;
-                upper_bound = self.find_minimum_distance(lower_bound, distances, to_scan);
+                upper_bound = Self::find_minimum_distance(lower_bound, distances, to_scan);
 
                 for column_index in to_scan[lower_bound..upper_bound].iter().copied() {
                     if self.assigned_rows[column_index.into_usize()].is_unassigned() {

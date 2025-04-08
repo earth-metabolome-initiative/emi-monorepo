@@ -29,7 +29,7 @@ pub struct ImputedRowValues<'a, M: SparseValuedMatrix2D, Map> {
     next_back_column_index: Option<M::ColumnIndex>,
 }
 
-impl<'a, M, Map> Clone for ImputedRowValues<'a, M, Map>
+impl<M, Map> Clone for ImputedRowValues<'_, M, Map>
 where
     M: SparseValuedMatrix2D,
     M::RowIndex: IntoUsize + TryFromUsize,
@@ -75,7 +75,7 @@ where
     }
 }
 
-impl<'a, M, Map> Iterator for ImputedRowValues<'a, M, Map>
+impl<M, Map> Iterator for ImputedRowValues<'_, M, Map>
 where
     M: SparseValuedMatrix2D,
     M::RowIndex: IntoUsize + TryFromUsize,
@@ -93,19 +93,19 @@ where
             );
             if dense_column_index == backup_sparse_column_index {
                 self.next_column_index = None;
-                return self.sparse_values.as_mut().and_then(|sparse_values| sparse_values.next());
+                return self.sparse_values.as_mut().and_then(Iterator::next);
             }
         } else if let Some(sparse_column_index) = self
             .sparse_column_indices
             .as_mut()
-            .and_then(|sparse_column_indices| sparse_column_indices.next())
+            .and_then(Iterator::next)
         {
             debug_assert!(
                 sparse_column_index >= dense_column_index,
                 "The column indices are not sorted in ascending order."
             );
             if dense_column_index == sparse_column_index {
-                return self.sparse_values.as_mut().and_then(|sparse_values| sparse_values.next());
+                return self.sparse_values.as_mut().and_then(Iterator::next);
             } else {
                 self.next_column_index = Some(sparse_column_index);
             }
@@ -114,7 +114,7 @@ where
     }
 }
 
-impl<'a, M, Map> DoubleEndedIterator for ImputedRowValues<'a, M, Map>
+impl<M, Map> DoubleEndedIterator for ImputedRowValues<'_, M, Map>
 where
     M: SparseValuedMatrix2D,
     M::RowIndex: IntoUsize + TryFromUsize,
@@ -134,13 +134,13 @@ where
         } else if let Some(sparse_column_index) = self
             .sparse_column_indices
             .as_mut()
-            .and_then(|sparse_column_indices| sparse_column_indices.next_back())
+            .and_then(DoubleEndedIterator::next_back)
         {
             if dense_column_index == sparse_column_index {
                 return self
                     .sparse_values
                     .as_mut()
-                    .and_then(|sparse_values| sparse_values.next_back());
+                    .and_then(DoubleEndedIterator::next_back);
             } else {
                 self.next_back_column_index = Some(sparse_column_index);
             }
@@ -149,7 +149,7 @@ where
     }
 }
 
-impl<'a, M, Map> ExactSizeIterator for ImputedRowValues<'a, M, Map>
+impl<M, Map> ExactSizeIterator for ImputedRowValues<'_, M, Map>
 where
     M: SparseValuedMatrix2D,
     M::RowIndex: IntoUsize + TryFromUsize,

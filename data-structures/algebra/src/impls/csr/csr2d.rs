@@ -185,7 +185,7 @@ where
         let Ok(relative_column_index) =
             self.column_indices[start.into_usize()..end.into_usize()].binary_search(&column_index)
         else {
-            panic!("The column index {} is not present in the row {}.", column_index, row_index);
+            panic!("The column index {column_index} is not present in the row {row_index}.");
         };
 
         start + Self::SparseIndex::try_from_usize(relative_column_index)

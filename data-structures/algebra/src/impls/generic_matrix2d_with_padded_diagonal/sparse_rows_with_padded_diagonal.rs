@@ -27,7 +27,7 @@ impl<'matrix, M: SparseMatrix2D> From<&'matrix M> for SparseRowsWithPaddedDiagon
     }
 }
 
-impl<'matrix, M: SparseMatrix2D> Iterator for SparseRowsWithPaddedDiagonal<'matrix, M>
+impl<M: SparseMatrix2D> Iterator for SparseRowsWithPaddedDiagonal<'_, M>
 where
     M::RowIndex: IntoUsize,
     M::ColumnIndex: TryFromUsize,
@@ -58,7 +58,7 @@ where
     }
 }
 
-impl<'matrix, M: SparseMatrix2D> DoubleEndedIterator for SparseRowsWithPaddedDiagonal<'matrix, M>
+impl<M: SparseMatrix2D> DoubleEndedIterator for SparseRowsWithPaddedDiagonal<'_, M>
 where
     M::RowIndex: IntoUsize,
     M::ColumnIndex: TryFromUsize,

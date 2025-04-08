@@ -2,6 +2,7 @@
 
 /// Trait for exponentiation.
 pub trait Pow<Exponent> {
+    #[must_use]
     /// Compute the exponentiation.
     fn pow(self, exponent: Exponent) -> Self;
 }

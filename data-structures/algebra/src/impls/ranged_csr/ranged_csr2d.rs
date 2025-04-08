@@ -24,10 +24,11 @@ impl<SparseIndex: Debug, RowIndex: Debug, R: Ranged> Debug
 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("RangedCSR2D")
-            .field("number_of_elements", &self.number_of_defined_values)
+            .field("number_of_defined_values", &self.number_of_defined_values)
             .field("number_of_columns", &self.number_of_columns)
             .field("number_of_rows", &self.number_of_rows)
             .field("column_indices", &self.ranges)
+            .field("number_of_non_empty_rows", &self.number_of_non_empty_rows)
             .finish()
     }
 }

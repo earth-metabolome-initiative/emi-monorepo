@@ -36,6 +36,17 @@ where
 {
     /// Creates a new `GenericMatrix2DWithPaddedDiagonal` with the given matrix
     /// and map function.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `matrix` - The underlying matrix.
+    /// * `map` - The map function defining the values of the new elements.
+    /// 
+    /// # Errors
+    /// 
+    /// * Returns an error if the number of rows or columns exceeds the maximum
+    ///   allowed size for the given row and column index types.
+    /// 
     pub fn new(matrix: M, map: Map) -> Result<Self, MutabilityError<M>> {
         let number_of_columns: usize = matrix.number_of_columns().into_usize();
         let number_of_rows: usize = matrix.number_of_rows().into_usize();
@@ -59,6 +70,11 @@ where
     /// # Arguments
     ///
     /// * `row` - The row index of the sparse row.
+    /// 
+    /// # Panics
+    /// 
+    /// * If the row index is out of bounds.
+    /// 
     pub fn is_diagonal_imputed(&self, row: M::RowIndex) -> bool {
         if row >= self.matrix.number_of_rows() {
             return true;
@@ -68,7 +84,7 @@ where
             .map_err(|_| MutabilityError::<M>::MaxedOutColumnIndex)
             .unwrap();
 
-        self.matrix.sparse_row(row).find(|&column_index| column_index == row_as_column).is_none()
+        self.matrix.sparse_row(row).all(|column| column != row_as_column)
     }
 }
 

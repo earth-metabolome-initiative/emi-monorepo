@@ -17,7 +17,7 @@ pub struct CSR2DEmptyRowIndices<'a, CSR: SizedRowsSparseMatrix2D> {
     returned_empty_rows: CSR::RowIndex,
 }
 
-impl<'a, CSR: SizedRowsSparseMatrix2D> Iterator for CSR2DEmptyRowIndices<'a, CSR> {
+impl<CSR: SizedRowsSparseMatrix2D> Iterator for CSR2DEmptyRowIndices<'_, CSR> {
     type Item = CSR::RowIndex;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -33,13 +33,13 @@ impl<'a, CSR: SizedRowsSparseMatrix2D> Iterator for CSR2DEmptyRowIndices<'a, CSR
     }
 }
 
-impl<'a, CSR: SizedRowsSparseMatrix2D> ExactSizeIterator for CSR2DEmptyRowIndices<'a, CSR> {
+impl<CSR: SizedRowsSparseMatrix2D> ExactSizeIterator for CSR2DEmptyRowIndices<'_, CSR> {
     fn len(&self) -> usize {
         (self.csr2d.number_of_rows() - self.returned_empty_rows).into_usize()
     }
 }
 
-impl<'a, CSR: SizedRowsSparseMatrix2D> DoubleEndedIterator for CSR2DEmptyRowIndices<'a, CSR> {
+impl<CSR: SizedRowsSparseMatrix2D> DoubleEndedIterator for CSR2DEmptyRowIndices<'_, CSR> {
     fn next_back(&mut self) -> Option<Self::Item> {
         while let (Some(row_index), Some(row_size)) =
             (self.row_sizes.0.next_back(), self.row_sizes.1.next_back())
