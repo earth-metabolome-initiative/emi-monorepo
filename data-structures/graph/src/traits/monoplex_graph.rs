@@ -3,7 +3,7 @@
 //! A monoplex graph is a graph where all edges are of the same type,
 //! i.e., there is no distinction between different types of edges.
 
-use algebra::prelude::{SparseMatrix, SparseMatrix2D};
+use algebra::prelude::{SizedRowsSparseMatrix2D, SparseMatrix, SparseMatrix2D};
 
 use super::Edges;
 
@@ -44,7 +44,7 @@ pub trait MonoplexGraph: super::Graph {
     /// Iterates across all out degrees of the graph.
     fn out_degrees(
         &self,
-    ) -> <<Self::Edges as Edges>::Matrix as SparseMatrix2D>::SparseRowSizes<'_> {
+    ) -> <<Self::Edges as Edges>::Matrix as SizedRowsSparseMatrix2D>::SparseRowSizes<'_> {
         self.edges().out_degrees()
     }
 
