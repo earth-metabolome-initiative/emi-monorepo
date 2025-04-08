@@ -1,8 +1,8 @@
 //! Submodule providing the [`TransposedValuedMatrix2D`] trait.
 
 use super::{
-    BiMatrix2D, SizedSparseBiMatrix2D, SparseMatrix2D, SparseValuedMatrix2D,
-    SymmetricMatrix2D, ValuedMatrix, ValuedMatrix2D,
+    BiMatrix2D, SizedSparseBiMatrix2D, SparseMatrix2D, SparseValuedMatrix2D, SymmetricMatrix2D,
+    ValuedMatrix, ValuedMatrix2D,
 };
 use crate::traits::TotalOrd;
 
@@ -102,10 +102,11 @@ pub trait ValuedSizedSparseBiMatrix2D:
 
 impl<M> ValuedSizedSparseBiMatrix2D for M
 where
-    M: ValuedBiMatrix2D + SizedSparseBiMatrix2D<
-        SizedSparseMatrix = <M as ValuedBiMatrix2D>::ValuedMatrix,
-        SizedSparseTransposedMatrix = <M as ValuedBiMatrix2D>::ValuedTransposedMatrix,
-    >,
+    M: ValuedBiMatrix2D
+        + SizedSparseBiMatrix2D<
+            SizedSparseMatrix = <M as ValuedBiMatrix2D>::ValuedMatrix,
+            SizedSparseTransposedMatrix = <M as ValuedBiMatrix2D>::ValuedTransposedMatrix,
+        >,
     M::ValuedMatrix: SparseValuedMatrix2D<
         RowIndex = Self::RowIndex,
         ColumnIndex = Self::ColumnIndex,

@@ -18,11 +18,10 @@ pub trait SpectrumMut: Spectrum {
 /// Trait for an allocable Spectrum.
 pub trait SpectrumAlloc: SpectrumMut {
     /// Create a new Spectrum with a given capacity.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `precursor_mz`: The precursor mass over charge.
     /// * `capacity`: The capacity of the Spectrum.
-    /// 
     fn with_capacity(precursor_mz: Self::Mz, capacity: usize) -> Self;
 }

@@ -89,7 +89,8 @@ where
     right_shift: LeftSpectrum::Mz,
 }
 
-impl<LeftSpectrum, RightSpectrum> Default for GreedySharedPeaksBuilder<'_, LeftSpectrum, RightSpectrum>
+impl<LeftSpectrum, RightSpectrum> Default
+    for GreedySharedPeaksBuilder<'_, LeftSpectrum, RightSpectrum>
 where
     LeftSpectrum: Spectrum,
     RightSpectrum: Spectrum<Mz = LeftSpectrum::Mz>,

@@ -81,10 +81,7 @@ impl<SparseIndex, RowIndex: PositiveInteger + IntoUsize + TryFromUsize, R: Range
     type Coordinates = (RowIndex, R::Step);
 
     fn shape(&self) -> Vec<usize> {
-        vec![
-            self.number_of_rows.into_usize(),
-            self.number_of_columns.into_usize(),
-        ]
+        vec![self.number_of_rows.into_usize(), self.number_of_columns.into_usize()]
     }
 }
 

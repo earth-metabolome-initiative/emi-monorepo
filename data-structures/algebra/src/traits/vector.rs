@@ -14,16 +14,16 @@ pub trait Vector: Index<<Self as Vector>::Index, Output = <Self as Vector>::Valu
         Self: 'a;
     /// The index of the vector.
     type Index: PositiveInteger + IntoUsize;
-	/// Iterator over the indices of the vector.
-	type Indices<'a>: Iterator<Item = Self::Index>
-	where
-		Self: 'a;
+    /// Iterator over the indices of the vector.
+    type Indices<'a>: Iterator<Item = Self::Index>
+    where
+        Self: 'a;
 
-	/// Returns an iterator over the values in the vector.
-	fn iter(&self) -> Self::Iter<'_>;
+    /// Returns an iterator over the values in the vector.
+    fn iter(&self) -> Self::Iter<'_>;
 
-	/// Returns an iterator over the indices of the vector.
-	fn indices(&self) -> Self::Indices<'_>;
+    /// Returns an iterator over the indices of the vector.
+    fn indices(&self) -> Self::Indices<'_>;
 
     /// Returns the number of elements in the vector.
     fn len(&self) -> Self::Index;

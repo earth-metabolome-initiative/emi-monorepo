@@ -5,7 +5,7 @@
 
 use crate::traits::{
     Bounded, IntoUsize, Matrix, Matrix2D, SparseMatrix, SparseMatrix2D, SparseValuedMatrix,
-    TryFromUsize, ValuedMatrix, ValuedMatrix2D, SparseValuedMatrix2D, Zero,
+    SparseValuedMatrix2D, TryFromUsize, ValuedMatrix, ValuedMatrix2D, Zero,
 };
 
 mod sparse_row_with_padded_diagonal;
@@ -36,17 +36,16 @@ where
 {
     /// Creates a new `GenericMatrix2DWithPaddedDiagonal` with the given matrix
     /// and map function.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `matrix` - The underlying matrix.
     /// * `map` - The map function defining the values of the new elements.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * Returns an error if the number of rows or columns exceeds the maximum
     ///   allowed size for the given row and column index types.
-    /// 
     pub fn new(matrix: M, map: Map) -> Result<Self, MutabilityError<M>> {
         let number_of_columns: usize = matrix.number_of_columns().into_usize();
         let number_of_rows: usize = matrix.number_of_rows().into_usize();
@@ -70,11 +69,10 @@ where
     /// # Arguments
     ///
     /// * `row` - The row index of the sparse row.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// * If the row index is out of bounds.
-    /// 
     pub fn is_diagonal_imputed(&self, row: M::RowIndex) -> bool {
         if row >= self.matrix.number_of_rows() {
             return true;
@@ -239,7 +237,7 @@ where
     M::RowIndex: IntoUsize + TryFromUsize,
     M::ColumnIndex: IntoUsize + TryFromUsize,
     Map: Fn(M::RowIndex) -> M::Value,
-    M::Value: Clone
+    M::Value: Clone,
 {
     type SparseValues<'a>
         = M2DValues<'a, Self>
@@ -257,7 +255,7 @@ where
     M::RowIndex: IntoUsize + TryFromUsize,
     M::ColumnIndex: IntoUsize + TryFromUsize,
     Map: Fn(M::RowIndex) -> M::Value,
-    M::Value: Clone
+    M::Value: Clone,
 {
     type SparseRowValues<'a>
         = SparseRowValuesWithPaddedDiagonal<'a, M, &'a Map>

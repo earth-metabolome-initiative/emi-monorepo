@@ -470,7 +470,9 @@ where
             let mut number_of_iterations = 0;
             loop {
                 assert!(
-                    number_of_iterations < self.matrix.number_of_columns().into_usize() * self.matrix.number_of_columns().into_usize(),
+                    number_of_iterations
+                        < self.matrix.number_of_columns().into_usize()
+                            * self.matrix.number_of_columns().into_usize(),
                     "We expected the number of iterations to be less than the number of columns",
                 );
 

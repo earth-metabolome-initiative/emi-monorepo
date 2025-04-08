@@ -29,9 +29,9 @@ where
     ///
     /// A vector of tuples containing the row and column indices of the
     /// assignment.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns an error if:
     /// - `max_cost` is not a finite number (`LAPJVError::MaximalCostNotFinite`)
     /// - `max_cost` is not positive (`LAPJVError::MaximalCostNotPositive`)
@@ -40,7 +40,8 @@ where
     /// - The matrix contains zero values (`LAPJVError::ZeroValues`)
     /// - The matrix contains negative values (`LAPJVError::NegativeValues`)
     /// - The matrix contains non-finite values (`LAPJVError::NonFiniteValues`)
-    /// - The matrix contains a value larger than the maximum cost (`LAPJVError::ValueTooLarge`)
+    /// - The matrix contains a value larger than the maximum cost
+    ///   (`LAPJVError::ValueTooLarge`)
     fn lapjv(
         &self,
         max_cost: Self::Value,
@@ -94,13 +95,15 @@ where
     ///
     /// A vector of tuples containing the row and column indices of the
     /// assignment.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns an error if:
-    /// - `padding_cost` is not a finite number (`LAPJVError::PaddingValueNotFinite`)
+    /// - `padding_cost` is not a finite number
+    ///   (`LAPJVError::PaddingValueNotFinite`)
     /// - `padding_cost` is not positive (`LAPJVError::PaddingValueNotPositive`)
-    /// - `padding_cost` is greater than or equal to `max_cost` (`LAPJVError::ValueTooLarge`)
+    /// - `padding_cost` is greater than or equal to `max_cost`
+    ///   (`LAPJVError::ValueTooLarge`)
     /// - `max_cost` is not a finite number (`LAPJVError::MaximalCostNotFinite`)
     /// - `max_cost` is not positive (`LAPJVError::MaximalCostNotPositive`)
     /// - The matrix is not square after padding (`LAPJVError::NonSquareMatrix`)

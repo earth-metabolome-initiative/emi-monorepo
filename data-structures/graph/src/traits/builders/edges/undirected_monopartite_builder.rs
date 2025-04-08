@@ -5,7 +5,9 @@ use crate::traits::UndirectedMonopartiteEdges;
 
 /// Trait for Options for building edges.
 pub trait UndirectedMonopartiteEdgesBuilder:
-    DirectedMonopartiteEdgesBuilder<DirectedEdges = <Self as UndirectedMonopartiteEdgesBuilder>::UndirectedMonopartiteEdges>
+    DirectedMonopartiteEdgesBuilder<
+    DirectedEdges = <Self as UndirectedMonopartiteEdgesBuilder>::UndirectedMonopartiteEdges,
+>
 {
     /// The type of the edges being built.
     type UndirectedMonopartiteEdges: UndirectedMonopartiteEdges;

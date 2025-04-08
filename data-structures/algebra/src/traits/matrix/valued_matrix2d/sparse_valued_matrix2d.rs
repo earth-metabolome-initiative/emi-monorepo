@@ -2,15 +2,17 @@
 //!
 //! A sparse valued matrix is a matrix where not all the values are defined.
 
-use crate::traits::{ImplicitValuedMatrix, SparseMatrix2D, SparseValuedMatrix, TotalOrd, ValuedMatrix};
-
 use super::ValuedMatrix2D;
+use crate::traits::{
+    ImplicitValuedMatrix, SparseMatrix2D, SparseValuedMatrix, TotalOrd, ValuedMatrix,
+};
 
 /// Trait defining a bi-dimensional matrix.
 pub trait SparseValuedMatrix2D: SparseMatrix2D + ValuedMatrix2D + SparseValuedMatrix {
     /// Iterator over the values of a row.
     type SparseRowValues<'a>: Iterator<Item = <Self as ValuedMatrix>::Value>
-        + DoubleEndedIterator<Item = <Self as ValuedMatrix>::Value> + Clone
+        + DoubleEndedIterator<Item = <Self as ValuedMatrix>::Value>
+        + Clone
     where
         Self: 'a;
 

@@ -32,15 +32,14 @@ pub trait Spectrum {
     fn intensities(&self) -> Self::SortedIntensitiesIter<'_>;
 
     /// Returns the nth-intensity value.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `n`: The index of the intensity value.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// Panics if the index is out of bounds.
-    /// 
     fn intensity_nth(&self, n: usize) -> Self::Intensity;
 
     /// Returns an iterator over the SORTED mass over charge values in the
@@ -52,15 +51,14 @@ pub trait Spectrum {
     fn mz_from(&self, index: usize) -> Self::SortedMzIter<'_>;
 
     /// Returns the nth-mz value.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `n`: The index of the mz value.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// Panics if the index is out of bounds.
-    /// 
     fn mz_nth(&self, n: usize) -> Self::Mz;
 
     /// Returns an iterator over the peaks in the Spectrum, SORTED by mass over
@@ -68,15 +66,14 @@ pub trait Spectrum {
     fn peaks(&self) -> Self::SortedPeaksIter<'_>;
 
     /// Returns the nth-peak.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `n`: The index of the peak.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// Panics if the index is out of bounds.
-    /// 
     fn peak_nth(&self, n: usize) -> (Self::Mz, Self::Intensity);
 
     /// Returns the precursor mass over charge.
@@ -111,9 +108,9 @@ pub trait Spectrum {
                 if other_mz < mz - mz_tolerance {
                     continue;
                 }
-                matching_peaks.add((i as u16, j as u16)).expect(
-                    "The peak matching graph should not contain duplicate edges.",
-                );
+                matching_peaks
+                    .add((i as u16, j as u16))
+                    .expect("The peak matching graph should not contain duplicate edges.");
                 lowest_other_index_tmp = j;
             }
             lowest_other_index = lowest_other_index_tmp;
