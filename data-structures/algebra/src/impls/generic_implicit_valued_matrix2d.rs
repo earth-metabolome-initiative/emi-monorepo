@@ -7,6 +7,7 @@ use crate::traits::{
     SparseValuedMatrix, SparseValuedMatrix2D, ValuedMatrix, ValuedMatrix2D,
 };
 
+#[derive(Clone, Debug)]
 /// A 2D matrix with implicit values.
 pub struct GenericImplicitValuedMatrix2D<M, Map, Value>
 where
