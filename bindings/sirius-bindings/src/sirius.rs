@@ -18,6 +18,7 @@ impl<V: Version> From<SiriusConfig<V>> for Sirius<V> {
 }
 
 impl<V: Version> Sirius<V> {
+    #[allow(clippy::too_many_lines)]
     /// Run the sirius command with the given input and output file paths.
     ///
     /// The sirius executable is expected to be available in the environment
@@ -181,18 +182,18 @@ impl<V: Version> Sirius<V> {
         // Add input and output file paths with their respective flags
         let mut args = vec![
             "-i".to_string(),
-            input_file_path.to_str().unwrap().to_string(),
+            input_file_path.to_string_lossy().to_string(),
             "--output".to_string(),
-            output_file_path.to_str().unwrap().to_string(),
+            output_file_path.to_string_lossy().to_string(),
         ];
 
         // Add arguments from config directly
         args.extend(self.config.args().iter().cloned());
 
         // Add arguments and spawn the command
-        // let mut child = command.args(&args).spawn().expect("Sirius failed to start");
-        // let status = child.wait().expect("Failed to wait on child");
-        let status = command.args(&args).status().expect("Sirius failed to start");
+        let Ok(status) = command.args(&args).status() else {
+            return Err("Sirius failed to start".to_string());
+        };
 
         if !status.success() {
             return Err("Sirius failed".to_string());

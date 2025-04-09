@@ -13,27 +13,27 @@ use crate::{prelude::*, traits::Enablable};
 /// [`Sirius`](crate::sirius::Sirius) struct with invalid parameters. DO NOT
 /// MAKE THIS STRUCT PUBLIC.
 pub(crate) struct SiriusConfig<V: Version> {
-    core_parameters: Vec<V::Core>,
-    config_parameters: Vec<V::Config>,
-    formula_parameters: Vec<V::Formula>,
-    zodiac_parameters: Vec<V::Zodiac>,
-    fingerprint_parameters: Vec<V::Fingerprint>,
-    structure_parameters: Vec<V::Structure>,
-    canopus_parameters: Vec<V::Canopus>,
-    write_summaries_parameters: Vec<V::WriteSummaries>,
+    core: Vec<V::Core>,
+    config: Vec<V::Config>,
+    formula: Vec<V::Formula>,
+    zodiac: Vec<V::Zodiac>,
+    fingerprint: Vec<V::Fingerprint>,
+    structure: Vec<V::Structure>,
+    canopus: Vec<V::Canopus>,
+    write_summaries: Vec<V::WriteSummaries>,
 }
 
 impl<V: Version> Default for SiriusConfig<V> {
     fn default() -> Self {
         SiriusConfig {
-            core_parameters: Vec::new(),
-            config_parameters: Vec::new(),
-            formula_parameters: Vec::new(),
-            zodiac_parameters: Vec::new(),
-            fingerprint_parameters: Vec::new(),
-            structure_parameters: Vec::new(),
-            canopus_parameters: Vec::new(),
-            write_summaries_parameters: Vec::new(),
+            core: Vec::new(),
+            config: Vec::new(),
+            formula: Vec::new(),
+            zodiac: Vec::new(),
+            fingerprint: Vec::new(),
+            structure: Vec::new(),
+            canopus: Vec::new(),
+            write_summaries: Vec::new(),
         }
     }
 }
@@ -52,7 +52,7 @@ impl<V: Version> SiriusConfig<V> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
         if let Some(existing_parameter) = self
-            .core_parameters
+            .core
             .iter()
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
@@ -60,7 +60,7 @@ impl<V: Version> SiriusConfig<V> {
                 "The core parameter {parameter:?} cannot be added to the configuration. There is already an existing parameter which is {existing_parameter:?}. You cannot add it twice.",
             ))
         } else {
-            self.core_parameters.push(parameter);
+            self.core.push(parameter);
             Ok(())
         }
     }
@@ -79,7 +79,7 @@ impl<V: Version> SiriusConfig<V> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
         if let Some(existing_parameter) = self
-            .config_parameters
+            .config
             .iter()
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
@@ -93,7 +93,7 @@ impl<V: Version> SiriusConfig<V> {
                 // without checking if it is already present.
                 let _ = self.add_config_parameter(V::Config::enabler());
             }
-            self.config_parameters.push(parameter);
+            self.config.push(parameter);
             Ok(())
         }
     }
@@ -112,7 +112,7 @@ impl<V: Version> SiriusConfig<V> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
         if let Some(existing_parameter) = self
-            .formula_parameters
+            .formula
             .iter()
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
@@ -126,7 +126,7 @@ impl<V: Version> SiriusConfig<V> {
                 // without checking if it is already present.
                 let _ = self.add_formula_parameter(V::Formula::enabler());
             }
-            self.formula_parameters.push(parameter);
+            self.formula.push(parameter);
             Ok(())
         }
     }
@@ -145,7 +145,7 @@ impl<V: Version> SiriusConfig<V> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
         if let Some(existing_parameter) = self
-            .zodiac_parameters
+            .zodiac
             .iter()
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
@@ -159,7 +159,7 @@ impl<V: Version> SiriusConfig<V> {
                 // without checking if it is already present.
                 let _ = self.add_zodiac_parameter(V::Zodiac::enabler());
             }
-            self.zodiac_parameters.push(parameter);
+            self.zodiac.push(parameter);
             Ok(())
         }
     }
@@ -178,7 +178,7 @@ impl<V: Version> SiriusConfig<V> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
         if let Some(existing_parameter) = self
-            .fingerprint_parameters
+            .fingerprint
             .iter()
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
@@ -192,7 +192,7 @@ impl<V: Version> SiriusConfig<V> {
                 // without checking if it is already present.
                 let _ = self.add_fingerprint_parameter(V::Fingerprint::enabler());
             }
-            self.fingerprint_parameters.push(parameter);
+            self.fingerprint.push(parameter);
             Ok(())
         }
     }
@@ -211,7 +211,7 @@ impl<V: Version> SiriusConfig<V> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
         if let Some(existing_parameter) = self
-            .structure_parameters
+            .structure
             .iter()
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
@@ -225,7 +225,7 @@ impl<V: Version> SiriusConfig<V> {
                 // without checking if it is already present.
                 let _ = self.add_structure_parameter(V::Structure::enabler());
             }
-            self.structure_parameters.push(parameter);
+            self.structure.push(parameter);
             Ok(())
         }
     }
@@ -244,7 +244,7 @@ impl<V: Version> SiriusConfig<V> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
         if let Some(existing_parameter) = self
-            .canopus_parameters
+            .canopus
             .iter()
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
@@ -258,7 +258,7 @@ impl<V: Version> SiriusConfig<V> {
                 // without checking if it is already present.
                 let _ = self.add_canopus_parameter(V::Canopus::enabler());
             }
-            self.canopus_parameters.push(parameter);
+            self.canopus.push(parameter);
             Ok(())
         }
     }
@@ -280,7 +280,7 @@ impl<V: Version> SiriusConfig<V> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
         if let Some(existing_parameter) = self
-            .write_summaries_parameters
+            .write_summaries
             .iter()
             .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
         {
@@ -294,23 +294,23 @@ impl<V: Version> SiriusConfig<V> {
                 // without checking if it is already present.
                 let _ = self.add_write_summaries_parameter(V::WriteSummaries::enabler());
             }
-            self.write_summaries_parameters.push(parameter);
+            self.write_summaries.push(parameter);
             Ok(())
         }
     }
 
     #[must_use]
     pub fn args(&self) -> Vec<String> {
-        self.core_parameters
+        self.core
             .iter()
             .map(ToString::to_string)
-            .chain(self.config_parameters.iter().map(ToString::to_string))
-            .chain(self.formula_parameters.iter().map(ToString::to_string))
-            .chain(self.zodiac_parameters.iter().map(ToString::to_string))
-            .chain(self.fingerprint_parameters.iter().map(ToString::to_string))
-            .chain(self.structure_parameters.iter().map(ToString::to_string))
-            .chain(self.canopus_parameters.iter().map(ToString::to_string))
-            .chain(self.write_summaries_parameters.iter().map(ToString::to_string))
+            .chain(self.config.iter().map(ToString::to_string))
+            .chain(self.formula.iter().map(ToString::to_string))
+            .chain(self.zodiac.iter().map(ToString::to_string))
+            .chain(self.fingerprint.iter().map(ToString::to_string))
+            .chain(self.structure.iter().map(ToString::to_string))
+            .chain(self.canopus.iter().map(ToString::to_string))
+            .chain(self.write_summaries.iter().map(ToString::to_string))
             .collect::<Vec<String>>()
     }
 }
