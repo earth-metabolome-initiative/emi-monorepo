@@ -88,7 +88,7 @@ pub async fn main() {
             if error.message() == "extension \"pgrx_validation\" is not available" {
                 panic!(concat!(
                     "You have forgotten to build the pgrx_validation extension. ",
-                    "Please navigate to the `pgrx_validation` crate and read the ",
+                    "Please navigate to the `/web/web_common/pgrx_validation` crate and read the ",
                     "README.md file to build the extension. Do remember to copy the ",
                     "extension to the `core-structures` directory as at this time the ",
                     "Docker is not able to load the extension from the `pgrx_validation` ",

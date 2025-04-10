@@ -40,17 +40,6 @@ To then create a new extension, in a context where you DO NOT already have a cra
 cargo pgrx new my_extension
 ```
 
-## Building the extension
-
-To build the extension into the local folder `./pgrx_validation`, you can run:
-
-```bash
-docker compose build
-docker compose up
-```
-
-DO NOT just run `cargo build` or `cargo pgrx package` as you may not have the correct version of PostgreSQL installed on your system or several other dynamically linked libraries, such as `GLIBC`. Instead, always use the `docker compose` command.
-
 ## Testing the extension
 
 After having built the extension in a directory such as `pgrx_validation` as described above, you can run the test suite which will create a temporary docker container with PostgreSQL by using [`testcontainers`](https://testcontainers.com/). It will then copy the `lib` and `extension` directories in the container by using `docker cp` and run the test migration using `cargo test`:
