@@ -3,13 +3,14 @@
 
 use core_structures::{
     Instrument as PortalInstrument, InstrumentModel as PortalInstrumentModel,
-    InstrumentState as PortalInstrumentState,
+    InstrumentState as PortalInstrumentState, InstrumentLocation as PortalInstrumentLocation,
 };
 use diesel_async::AsyncPgConnection;
 use web_common_traits::{
     database::{Insertable, InsertableVariant, Loadable},
     prelude::Builder,
 };
+use super::get_room;
 
 use super::get_user;
 use crate::codegen::Instrument as DirectusInstrument;
@@ -67,7 +68,7 @@ pub(crate) async fn insert_missing_instruments(
             ))
         })?;
 
-        let _portal_instrument = PortalInstrument::new()
+        let portal_instrument = PortalInstrument::new()
             .created_by(created_by.id)?
             .updated_by(updated_by.id)?
             .created_at(created_at)?
@@ -79,7 +80,17 @@ pub(crate) async fn insert_missing_instruments(
             .insert(&created_by.id, portal_conn)
             .await?;
 
-        // TODO! Add the geolocation and room information!
+        let directus_room = directus_instrument.instrument_location(directus_conn).await?;
+        let portal_room = get_room(&directus_room, directus_conn, portal_conn).await?;
+
+        let _instrument_location = PortalInstrumentLocation::new()
+            .instrument_id(portal_instrument.id)?
+            .room_id(portal_room.id)?
+            .created_by(created_by.id)?
+            .created_at(created_at)?
+            .build()?
+            .insert(&created_by.id, portal_conn)
+            .await?;
     }
     Ok(())
 }
