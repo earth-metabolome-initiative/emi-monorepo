@@ -21,7 +21,7 @@ pub enum Error {
 impl core::fmt::Display for Error {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Error::RedisError => {
+            Error::RedisError(_) => {
                 write!(f, "An error occurred while trying to access the redis database.")
             }
             Error::DieselError => {

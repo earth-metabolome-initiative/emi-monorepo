@@ -34,7 +34,7 @@ impl From<reqwest::Error> for Error {
 }
 
 impl From<redis::RedisError> for Error {
-    fn from(_: redis::RedisError) -> Self {
-        Error::RedisError
+    fn from(error: redis::RedisError) -> Self {
+        Error::RedisError(error)
     }
 }
