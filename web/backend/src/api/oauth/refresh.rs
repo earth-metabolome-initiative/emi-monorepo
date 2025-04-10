@@ -1,12 +1,12 @@
 //! API endpoint to refresh the access token.
-use actix_web::{get, web, HttpRequest, HttpResponse};
-use backend_request_errors::BackendRequestError;
+use actix_web::{HttpRequest, HttpResponse, get, web};
+use api_path::api::oauth::jwt_cookies::AccessToken;
 use core_structures::User;
-use web_common::api::{oauth::jwt_cookies::AccessToken, ApiError};
 use web_common_traits::database::Loadable;
 
-use crate::api::oauth::jwt_cookies::{
-    eliminate_cookies, JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME,
+use crate::{
+    api::oauth::jwt_cookies::{JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME},
+    errors::BackendError,
 };
 
 #[get("/refresh")]
@@ -30,59 +30,40 @@ pub async fn refresh_access_token_handler(
     redis_client: web::Data<redis::Client>,
 ) -> HttpResponse {
     match refresh_access_token(&req, &pool, &redis_client).await {
-        Ok(response) => response.1.into(),
-        Err(error) => error,
+        Ok((_, token)) => actix_web::HttpResponse::Ok().json(token),
+        Err(error) => error.into(),
     }
 }
 
-pub async fn refresh_access_token(
+pub(crate) async fn refresh_access_token(
     req: &HttpRequest,
     pool: &web::Data<crate::DBPool>,
     redis_client: &web::Data<redis::Client>,
-) -> Result<(User, AccessToken), HttpResponse> {
-    let Some(refresh_cookie) = req.cookie(REFRESH_COOKIE_NAME) else {
-        log::debug!("Refresh token not present in request");
-        return Err(eliminate_cookies(HttpResponse::Unauthorized()).json(Error::Unauthorized));
-    };
-
-    let Ok(refresh_token) = JsonRefreshToken::decode(refresh_cookie.value()) else {
-        log::debug!("Unable to decode refresh token");
-        return Err(eliminate_cookies(HttpResponse::Unauthorized()).json(Error::Unauthorized));
-    };
+) -> Result<(User, AccessToken), BackendError> {
+    let refresh_cookie = req.cookie(REFRESH_COOKIE_NAME).ok_or(BackendError::Unauthorized)?;
+    let refresh_token = JsonRefreshToken::decode(refresh_cookie.value())?;
 
     // If the token is expired, we return an error.
-    if refresh_token.is_expired() {
-        return Err(eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::Unauthorized));
-    }
-
-    // Next up, we check whether the token is still present in the redis database.
-    let is_still_present = refresh_token.is_still_present_in_redis(&redis_client).await;
-
-    if is_still_present.map_or(true, |present| !present) {
-        log::debug!("Refresh token not present in redis");
-        return Err(eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::Unauthorized));
+    if refresh_token.is_expired() || !refresh_token.is_still_present_in_redis(&redis_client).await?
+    {
+        return Err(BackendError::Unauthorized);
     }
 
     // Finally, we get the user from the database, as while the user indeed seems
     // to be authenticated and it still exists in the redis database, we still need
     // to check whether the user exists in the database, as it may have been deleted
     // in the meantime.
-    let mut connection = pool.get().await.map_err(ApiError::from)?;
+    let mut connection = pool.get().await?;
 
     // If the user doesn't exist, we return an error, otherwise we return the user.
-    let Some(user) = User::load(&refresh_token.user_id(), &mut connection).await.ok().flatten()
-    else {
-        return Err(eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::Unauthorized));
-    };
+    let user = User::load(&refresh_token.user_id(), &mut connection)
+        .await?
+        .ok_or(BackendError::Unauthorized)?;
 
     // If the user exists, we create a new access token and return it.
-    let Ok(access_token) = JsonAccessToken::new(refresh_token.user_id()) else {
-        return Err(HttpResponse::InternalServerError().json(ApiError::internal_server_error()));
-    };
+    let access_token = JsonAccessToken::new(refresh_token.user_id())?;
 
-    if let Err(_err) = access_token.insert_into_redis(&redis_client).await {
-        return Err(HttpResponse::InternalServerError().json(ApiError::internal_server_error()));
-    }
+    access_token.insert_into_redis(&redis_client).await?;
 
     // We return the access token as part of the JSON response, and we
     // expect the frontend to store it in a variable and use it for
@@ -91,8 +72,5 @@ pub async fn refresh_access_token(
     // new access token, but this is a security measure to prevent
     // unauthorized access to the API.
 
-    match access_token.encode() {
-        Ok(encoded_token) => Ok((user, AccessToken::new(encoded_token))),
-        Err(_) => Err(HttpResponse::InternalServerError().json(ApiError::internal_server_error())),
-    }
+    Ok((user, AccessToken::new(access_token.encode()?)))
 }

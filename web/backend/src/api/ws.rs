@@ -3,8 +3,6 @@ use actix_web::{get, rt, web, Error, HttpRequest, HttpResponse};
 use actix_ws::AggregatedMessage;
 use futures::StreamExt;
 
-use crate::api::oauth::refresh::refresh_access_token;
-
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(start_websocket);
 }
@@ -21,8 +19,8 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 async fn start_websocket(
     req: HttpRequest,
     stream: web::Payload,
-    redis_client: web::Data<redis::Client>,
-    diesel_pool: web::Data<crate::DBPool>,
+    _redis_client: web::Data<redis::Client>,
+    _diesel_pool: web::Data<crate::DBPool>,
 ) -> Result<HttpResponse, Error> {
     let (res, mut session, stream) = actix_ws::handle(&req, stream)?;
 

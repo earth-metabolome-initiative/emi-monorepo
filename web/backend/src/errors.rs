@@ -3,6 +3,7 @@
 mod from_impls;
 
 #[derive(Debug)]
+#[allow(dead_code)]
 /// High-level errors that may occur in the Server.
 pub(crate) enum BackendError {
     /// An error that occurred while trying to access the redis database.
@@ -19,4 +20,14 @@ pub(crate) enum BackendError {
     Unauthorized,
     /// A third-party service returned an error.
     RequestError(reqwest::Error),
+    /// An error happened while parsing a value to an integer.
+    ParseIntError(std::num::ParseIntError),
+    /// An error happened while trying to decode a base64 value.
+    Base64DecodeError(base64::DecodeError),
+    /// An error happened while trying to decode a JSON value.
+    FromUtf8Error(std::string::FromUtf8Error),
+    /// An error occurred while encoding or decoding a JSONWebToken.
+    JWTError(jsonwebtoken::errors::Error),
+    /// When a login provider is not found in the database.
+    UnknownLoginProvider(String),
 }

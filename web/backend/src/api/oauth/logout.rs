@@ -1,11 +1,14 @@
 //! API endpoint to logout the user.
-use std::future::{ready, Ready};
+use std::future::{Ready, ready};
 
-use actix_web::{dev::Payload, error::Error, get, web, FromRequest, HttpRequest, HttpResponse};
+use actix_web::{FromRequest, HttpRequest, HttpResponse, dev::Payload, error::Error, get, web};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 
-use crate::api::oauth::jwt_cookies::{
-    eliminate_cookies, JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME,
+use crate::{
+    api::oauth::jwt_cookies::{
+        eliminate_cookies, JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME
+    },
+    errors::BackendError,
 };
 
 struct MaybeBearer {
@@ -47,57 +50,44 @@ pub async fn logout(
     if let Some(bearer) = maybe_bearer.bearer {
         let access_token = match JsonAccessToken::decode(bearer.token()) {
             Ok(token) => token,
-            Err(_) => {
-                log::debug!("Unable to decode access token");
-                return eliminate_cookies(HttpResponse::Unauthorized()).json(Error::Unauthorized);
+            Err(error) => {
+                return error.into();
             }
         };
 
         let is_still_present = access_token.is_still_present_in_redis(&redis_client).await;
 
         if is_still_present.map_or(true, |present| !present) {
-            log::debug!("Access token not present in redis");
-            return eliminate_cookies(HttpResponse::Unauthorized()).json(Error::Unauthorized);
+            return BackendError::Unauthorized.into();
         }
 
-        match access_token.delete_from_redis(&redis_client).await {
-            Ok(_) => (),
-            Err(_) => {
-                log::error!("Unable to delete access token from redis");
-                return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
-            }
+        if let Err(error) = access_token.delete_from_redis(&redis_client).await {
+            return error.into();
         }
     }
 
     let refresh_cookie = match req.cookie(REFRESH_COOKIE_NAME) {
         Some(cookie) => cookie,
         None => {
-            log::debug!("Refresh token not present in request");
-            return eliminate_cookies(HttpResponse::Unauthorized()).json(Error::Unauthorized);
+            return BackendError::Unauthorized.into();
         }
     };
 
     let refresh_token = match JsonRefreshToken::decode(refresh_cookie.value()) {
         Ok(token) => token,
         Err(_) => {
-            log::debug!("Unable to decode refresh token");
-            return eliminate_cookies(HttpResponse::Unauthorized()).json(Error::Unauthorized);
+            return BackendError::Unauthorized.into();
         }
     };
 
     if refresh_token.is_still_present_in_redis(&redis_client).await.map_or(true, |present| !present)
     {
-        log::debug!("Refresh token not present in redis");
-        return eliminate_cookies(HttpResponse::Unauthorized()).json(Error::Unauthorized);
+        return BackendError::Unauthorized.into();
     }
 
-    if refresh_token.delete_from_redis(&redis_client).await.is_err() {
-        log::error!("Unable to delete refresh token from redis");
-        return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
+    if let Err(error) = refresh_token.delete_from_redis(&redis_client).await {
+        return error.into();
     }
 
-    log::debug!("Logging out user");
-    // We delete the refresh token cookie and the user online cookie from the user's
-    // browser.
-    eliminate_cookies(HttpResponse::Ok()).finish()
+    eliminate_cookies(HttpResponse::Ok())
 }

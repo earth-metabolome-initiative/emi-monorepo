@@ -2,7 +2,7 @@ use actix_web::web;
 
 mod auth;
 mod healthchecker;
-mod oauth;
+pub(crate) mod oauth;
 mod ws;
 
 use healthchecker::health_checker_handler;
