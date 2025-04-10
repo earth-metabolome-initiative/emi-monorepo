@@ -1,2 +1,1 @@
-mod foreign;
-mod loadable;
+mod loadable ; mod foreign ;

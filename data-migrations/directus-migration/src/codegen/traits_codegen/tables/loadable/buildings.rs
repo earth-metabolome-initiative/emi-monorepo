@@ -1,21 +1,26 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Loadable
-    for crate::codegen::structs_codegen::tables::buildings::Building
-{
+for crate::codegen::structs_codegen::tables::buildings::Building {
     type Conn = diesel_async::AsyncPgConnection;
     type PrimaryKey = i32;
-    async fn load(id: &i32, conn: &mut Self::Conn) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, OptionalExtension, QueryDsl};
+    async fn load(
+        id: &i32,
+        conn: &mut Self::Conn,
+    ) -> Result<Option<Self>, diesel::result::Error> {
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, OptionalExtension};
         crate::codegen::structs_codegen::tables::buildings::Building::table()
             .find(id)
             .first::<Self>(conn)
             .await
             .optional()
     }
-    async fn load_all(conn: &mut Self::Conn) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::associations::HasTable;
+    async fn load_all(
+        conn: &mut Self::Conn,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
         crate::codegen::structs_codegen::tables::buildings::Building::table()
             .load::<Self>(conn)
             .await

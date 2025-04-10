@@ -14,7 +14,9 @@ pub struct Room {
     pub room_name: String,
     pub comment: String,
     pub address: i32,
-    pub geolocation: postgis_diesel::types::GeometryContainer<postgis_diesel::types::Point>,
+    pub geolocation: postgis_diesel::types::GeometryContainer<
+        postgis_diesel::types::Point,
+    >,
     pub qr_code: rosetta_uuid::Uuid,
 }
 impl Room {
@@ -26,8 +28,9 @@ impl Room {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
@@ -36,7 +39,9 @@ impl Room {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_created),
             )
-            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+            >(conn)
             .await
             .map(Some)
     }
@@ -48,8 +53,9 @@ impl Room {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
@@ -58,7 +64,9 @@ impl Room {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_updated),
             )
-            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+            >(conn)
             .await
             .map(Some)
     }
@@ -66,10 +74,13 @@ impl Room {
     pub async fn building(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::buildings::Building, diesel::result::Error>
-    {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::buildings::Building,
+        diesel::result::Error,
+    > {
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::buildings::Building::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::buildings::buildings::dsl::id
@@ -82,10 +93,13 @@ impl Room {
     pub async fn address(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::addresses::Address, diesel::result::Error>
-    {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::addresses::Address,
+        diesel::result::Error,
+    > {
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::addresses::Address::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::addresses::addresses::dsl::id
@@ -99,8 +113,9 @@ impl Room {
         conn: &mut diesel_async::AsyncPgConnection,
         user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::rooms::rooms::dsl::user_created
@@ -114,8 +129,9 @@ impl Room {
         conn: &mut diesel_async::AsyncPgConnection,
         user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::rooms::rooms::dsl::user_updated
@@ -129,11 +145,13 @@ impl Room {
         conn: &mut diesel_async::AsyncPgConnection,
         building: &crate::codegen::structs_codegen::tables::buildings::Building,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::rooms::rooms::dsl::building.eq(building.id),
+                crate::codegen::diesel_codegen::tables::rooms::rooms::dsl::building
+                    .eq(building.id),
             )
             .load::<Self>(conn)
             .await
@@ -143,11 +161,13 @@ impl Room {
         conn: &mut diesel_async::AsyncPgConnection,
         address: &crate::codegen::structs_codegen::tables::addresses::Address,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::rooms::rooms::dsl::address.eq(address.id),
+                crate::codegen::diesel_codegen::tables::rooms::rooms::dsl::address
+                    .eq(address.id),
             )
             .load::<Self>(conn)
             .await

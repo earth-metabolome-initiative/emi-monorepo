@@ -25,11 +25,14 @@ impl DirectusOperation {
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation>,
+        Option<
+            crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation,
+        >,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(resolve) = self.resolve.as_ref() else {
             return Ok(None);
         };
@@ -49,11 +52,14 @@ impl DirectusOperation {
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation>,
+        Option<
+            crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation,
+        >,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(reject) = self.reject.as_ref() else {
             return Ok(None);
         };
@@ -76,14 +82,17 @@ impl DirectusOperation {
         crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_flows::directus_flows::dsl::id
                     .eq(&self.flow),
             )
-            .first::<crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow,
+            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -94,8 +103,9 @@ impl DirectusOperation {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
@@ -104,7 +114,9 @@ impl DirectusOperation {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_created),
             )
-            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+            >(conn)
             .await
             .map(Some)
     }
@@ -113,8 +125,9 @@ impl DirectusOperation {
         conn: &mut diesel_async::AsyncPgConnection,
         resolve: &crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_operations::directus_operations::dsl::resolve
@@ -128,8 +141,9 @@ impl DirectusOperation {
         conn: &mut diesel_async::AsyncPgConnection,
         reject: &crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_operations::directus_operations::dsl::reject
@@ -143,8 +157,9 @@ impl DirectusOperation {
         conn: &mut diesel_async::AsyncPgConnection,
         flow: &crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_operations::directus_operations::dsl::flow
@@ -158,8 +173,9 @@ impl DirectusOperation {
         conn: &mut diesel_async::AsyncPgConnection,
         user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_operations::directus_operations::dsl::user_created

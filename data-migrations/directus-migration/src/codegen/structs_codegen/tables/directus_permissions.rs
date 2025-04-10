@@ -24,8 +24,9 @@ impl DirectusPermission {
         crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_policies::directus_policies::dsl::id
@@ -41,8 +42,9 @@ impl DirectusPermission {
         conn: &mut diesel_async::AsyncPgConnection,
         policy: &crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_permissions::directus_permissions::dsl::policy

@@ -7,5 +7,5 @@ diesel::table! {
     diesel::sql_types::Nullable < diesel::sql_types::Timestamptz >, uuid_instrument ->
     rosetta_uuid::diesel_impls::Uuid, instrument_id -> diesel::sql_types::Text,
     instrument_model -> diesel::sql_types::Integer, instrument_location ->
-    diesel::sql_types::Nullable < diesel::sql_types::Integer > }
+    diesel::sql_types::Integer }
 }

@@ -42,8 +42,9 @@ impl DirectusUser {
         Option<crate::codegen::structs_codegen::tables::directus_roles::DirectusRole>,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(role) = self.role.as_ref() else {
             return Ok(None);
         };
@@ -52,7 +53,9 @@ impl DirectusUser {
                 crate::codegen::diesel_codegen::tables::directus_roles::directus_roles::dsl::id
                     .eq(role),
             )
-            .first::<crate::codegen::structs_codegen::tables::directus_roles::DirectusRole>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
+            >(conn)
             .await
             .map(Some)
     }
@@ -61,8 +64,9 @@ impl DirectusUser {
         conn: &mut diesel_async::AsyncPgConnection,
         role: &crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::role
@@ -76,13 +80,16 @@ impl DirectusUser {
         email: Option<&str>,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, OptionalExtension, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, OptionalExtension};
         Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::directus_users::directus_users::email,
-                email,
-            ))
+            .filter(
+                diesel::ExpressionMethods::eq(
+                    crate::codegen::diesel_codegen::tables::directus_users::directus_users::email,
+                    email,
+                ),
+            )
             .first::<Self>(conn)
             .await
             .optional()
@@ -92,8 +99,9 @@ impl DirectusUser {
         external_identifier: Option<&str>,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, OptionalExtension, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, OptionalExtension};
         Self::table()
             .filter(
                 diesel::ExpressionMethods::eq(
@@ -110,13 +118,16 @@ impl DirectusUser {
         token: Option<&str>,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, OptionalExtension, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, OptionalExtension};
         Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::directus_users::directus_users::token,
-                token,
-            ))
+            .filter(
+                diesel::ExpressionMethods::eq(
+                    crate::codegen::diesel_codegen::tables::directus_users::directus_users::token,
+                    token,
+                ),
+            )
             .first::<Self>(conn)
             .await
             .optional()
