@@ -14,19 +14,19 @@ use crate::{
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a CSV schema.
 pub struct CSVSchema {
-    table_metadatas: Vec<CSVTableMetadata>,
+    table_metadata: Vec<CSVTableMetadata>,
 }
 
 impl CSVSchema {
     #[must_use]
     /// Returns the number of tables in the schema.
     pub fn number_of_tables(&self) -> usize {
-        self.table_metadatas.len()
+        self.table_metadata.len()
     }
 
     /// Returns the tables in the schema.
     pub fn tables(&self) -> impl Iterator<Item = CSVTable<'_>> {
-        self.table_metadatas.iter().map(|table_metadata| CSVTable { schema: self, table_metadata })
+        self.table_metadata.iter().map(|table_metadata| CSVTable { schema: self, table_metadata })
     }
 
     #[must_use]
@@ -79,10 +79,10 @@ impl CSVSchema {
     /// * If the provided table name does not exist in the schema.
     pub fn table_from_name(&self, table_name: &str) -> Result<CSVTable<'_>, CSVSchemaError> {
         let table_metadata = self
-            .table_metadatas
+            .table_metadata
             .binary_search_by_key(&table_name, |table| &table.name)
             .ok()
-            .map(|index| &self.table_metadatas[index])
+            .map(|index| &self.table_metadata[index])
             .ok_or(CSVSchemaError::InvalidTableName(table_name.to_owned()))?;
         Ok(CSVTable { schema: self, table_metadata })
     }
@@ -268,7 +268,7 @@ impl CSVSchemaBuilder {
         };
 
         // Next, we iterate over the list of files to process.
-        let mut table_metadatas = paths
+        let mut table_metadata = paths
             .iter()
             .progress_with(progress_bar)
             .filter(|path| {
@@ -286,17 +286,17 @@ impl CSVSchemaBuilder {
             })
             .collect::<Result<Vec<_>, CSVSchemaError>>()?;
 
-        table_metadatas.sort_unstable_by(|a, b| a.name.cmp(&b.name));
+        table_metadata.sort_unstable_by(|a, b| a.name.cmp(&b.name));
 
         // We check that the tables have unique names.
-        for window in table_metadatas.windows(2) {
+        for window in table_metadata.windows(2) {
             if window[0].name == window[1].name {
                 return Err(CSVSchemaError::DuplicateTable(window[0].name.clone()));
             }
         }
 
         // We check that there are no loops in the schema caused by foreign keys.
-        for original_table in &table_metadatas {
+        for original_table in &table_metadata {
             let mut visited: std::collections::HashSet<&CSVTableMetadata> =
                 std::collections::HashSet::new();
             let mut stack: Vec<&CSVTableMetadata> = vec![&original_table];
@@ -310,10 +310,10 @@ impl CSVSchemaBuilder {
 
                 for column in &table.columns {
                     if let Some(foreign_table_name) = &column.foreign_table_name {
-                        let foreign_table = table_metadatas
+                        let foreign_table = table_metadata
                             .binary_search_by_key(&foreign_table_name, |table| &table.name)
                             .ok()
-                            .map(|index| &table_metadatas[index])
+                            .map(|index| &table_metadata[index])
                             .ok_or(CSVSchemaError::InvalidTableName(foreign_table_name.clone()))?;
 
                         if original_table == foreign_table {
@@ -326,12 +326,12 @@ impl CSVSchemaBuilder {
             }
         }
 
-        let schema = CSVSchema { table_metadatas };
+        let schema = CSVSchema { table_metadata };
 
         // We check that all of the foreign tables are valid and that the foreign
         // columns actually exist in the foreign tables.
         schema
-            .table_metadatas
+            .table_metadata
             .iter()
             .try_for_each(|table| table.validate_schema_compatibility(&schema))?;
 
