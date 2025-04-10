@@ -21,8 +21,9 @@ impl DirectusAccess {
         Option<crate::codegen::structs_codegen::tables::directus_roles::DirectusRole>,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(role) = self.role.as_ref() else {
             return Ok(None);
         };
@@ -31,7 +32,9 @@ impl DirectusAccess {
                 crate::codegen::diesel_codegen::tables::directus_roles::directus_roles::dsl::id
                     .eq(role),
             )
-            .first::<crate::codegen::structs_codegen::tables::directus_roles::DirectusRole>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
+            >(conn)
             .await
             .map(Some)
     }
@@ -43,8 +46,9 @@ impl DirectusAccess {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user) = self.user.as_ref() else {
             return Ok(None);
         };
@@ -53,7 +57,9 @@ impl DirectusAccess {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user),
             )
-            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+            >(conn)
             .await
             .map(Some)
     }
@@ -65,8 +71,9 @@ impl DirectusAccess {
         crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_policies::directus_policies::dsl::id
@@ -82,8 +89,9 @@ impl DirectusAccess {
         conn: &mut diesel_async::AsyncPgConnection,
         role: &crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_access::directus_access::dsl::role
@@ -97,8 +105,9 @@ impl DirectusAccess {
         conn: &mut diesel_async::AsyncPgConnection,
         user: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_access::directus_access::dsl::user
@@ -112,8 +121,9 @@ impl DirectusAccess {
         conn: &mut diesel_async::AsyncPgConnection,
         policy: &crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_access::directus_access::dsl::policy

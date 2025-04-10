@@ -28,8 +28,9 @@ impl AliquotingDatum {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
@@ -38,7 +39,9 @@ impl AliquotingDatum {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_created),
             )
-            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+            >(conn)
             .await
             .map(Some)
     }
@@ -50,8 +53,9 @@ impl AliquotingDatum {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
@@ -60,7 +64,9 @@ impl AliquotingDatum {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_updated),
             )
-            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+            >(conn)
             .await
             .map(Some)
     }
@@ -68,26 +74,34 @@ impl AliquotingDatum {
     pub async fn sample_container(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::containers::Container, diesel::result::Error>
-    {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::containers::Container,
+        diesel::result::Error,
+    > {
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::containers::Container::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::containers::containers::dsl::id
                     .eq(&self.sample_container),
             )
-            .first::<crate::codegen::structs_codegen::tables::containers::Container>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::containers::Container,
+            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
     pub async fn aliquot_volume_unit(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::si_units::SiUnit, diesel::result::Error>
-    {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::si_units::SiUnit,
+        diesel::result::Error,
+    > {
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::si_units::SiUnit::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::si_units::si_units::dsl::id
@@ -100,32 +114,42 @@ impl AliquotingDatum {
     pub async fn parent_container(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::containers::Container, diesel::result::Error>
-    {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::containers::Container,
+        diesel::result::Error,
+    > {
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::containers::Container::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::containers::containers::dsl::id
                     .eq(&self.parent_container),
             )
-            .first::<crate::codegen::structs_codegen::tables::containers::Container>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::containers::Container,
+            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
     pub async fn parent_sample_container(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::containers::Container, diesel::result::Error>
-    {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::containers::Container,
+        diesel::result::Error,
+    > {
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::containers::Container::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::containers::containers::dsl::id
                     .eq(&self.parent_sample_container),
             )
-            .first::<crate::codegen::structs_codegen::tables::containers::Container>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::containers::Container,
+            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -133,8 +157,9 @@ impl AliquotingDatum {
         conn: &mut diesel_async::AsyncPgConnection,
         user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::aliquoting_data::aliquoting_data::dsl::user_created
@@ -148,8 +173,9 @@ impl AliquotingDatum {
         conn: &mut diesel_async::AsyncPgConnection,
         user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::aliquoting_data::aliquoting_data::dsl::user_updated
@@ -163,8 +189,9 @@ impl AliquotingDatum {
         conn: &mut diesel_async::AsyncPgConnection,
         sample_container: &crate::codegen::structs_codegen::tables::containers::Container,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::aliquoting_data::aliquoting_data::dsl::sample_container
@@ -178,8 +205,9 @@ impl AliquotingDatum {
         conn: &mut diesel_async::AsyncPgConnection,
         aliquot_volume_unit: &crate::codegen::structs_codegen::tables::si_units::SiUnit,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::aliquoting_data::aliquoting_data::dsl::aliquot_volume_unit
@@ -193,8 +221,9 @@ impl AliquotingDatum {
         conn: &mut diesel_async::AsyncPgConnection,
         parent_container: &crate::codegen::structs_codegen::tables::containers::Container,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::aliquoting_data::aliquoting_data::dsl::parent_container
@@ -208,8 +237,9 @@ impl AliquotingDatum {
         conn: &mut diesel_async::AsyncPgConnection,
         parent_sample_container: &crate::codegen::structs_codegen::tables::containers::Container,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::aliquoting_data::aliquoting_data::dsl::parent_sample_container

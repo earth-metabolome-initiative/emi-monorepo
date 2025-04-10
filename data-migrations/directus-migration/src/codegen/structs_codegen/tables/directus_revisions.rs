@@ -24,8 +24,9 @@ impl DirectusRevision {
         crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_activity::directus_activity::dsl::id
@@ -41,11 +42,14 @@ impl DirectusRevision {
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision>,
+        Option<
+            crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision,
+        >,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(parent) = self.parent.as_ref() else {
             return Ok(None);
         };
@@ -65,11 +69,14 @@ impl DirectusRevision {
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion>,
+        Option<
+            crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion,
+        >,
         diesel::result::Error,
     > {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         let Some(version) = self.version.as_ref() else {
             return Ok(None);
         };
@@ -89,8 +96,9 @@ impl DirectusRevision {
         conn: &mut diesel_async::AsyncPgConnection,
         activity: &crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions::dsl::activity
@@ -104,8 +112,9 @@ impl DirectusRevision {
         conn: &mut diesel_async::AsyncPgConnection,
         parent: &crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions::dsl::parent
@@ -119,8 +128,9 @@ impl DirectusRevision {
         conn: &mut diesel_async::AsyncPgConnection,
         version: &crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{associations::HasTable, ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions::dsl::version

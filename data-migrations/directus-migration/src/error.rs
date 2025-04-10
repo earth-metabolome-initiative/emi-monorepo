@@ -3,9 +3,7 @@
 use core_structures::{
     codegen::structs_codegen::tables::insertables::InsertableUserAttributes,
     tables::insertables::{
-        InsertableAddressAttributes, InsertableBrandAttributes, InsertableCityAttributes,
-        InsertableInstrumentAttributes, InsertableInstrumentModelAttributes,
-        InsertableRoomAttributes, InsertableUserEmailAttributes,
+        InsertableAddressAttributes, InsertableBrandAttributes, InsertableCityAttributes, InsertableInstrumentAttributes, InsertableInstrumentLocationAttributes, InsertableInstrumentModelAttributes, InsertableProductAttributes, InsertableRoomAttributes, InsertableUserEmailAttributes
     },
 };
 use web_common_traits::database::InsertError;
@@ -17,6 +15,7 @@ use crate::codegen::{
 };
 
 #[derive(Debug)]
+#[allow(dead_code)]
 /// Enumeration of errors that may occur during directus migration
 pub enum Error {
     /// Error when user doesn't have an email
@@ -61,6 +60,8 @@ pub enum Error {
     MailInsertError(InsertError<InsertableUserEmailAttributes>),
     /// Failed to insert brand
     BrandInsertError(InsertError<InsertableBrandAttributes>),
+    /// Failed to insert product.
+    ProductInsertError(InsertError<InsertableProductAttributes>),
     /// Failed to insert instrument model.
     InstrumentModelInsertError(InsertError<InsertableInstrumentModelAttributes>),
     /// Failed to insert instrument
@@ -71,6 +72,8 @@ pub enum Error {
     AddressInsertError(InsertError<InsertableAddressAttributes>),
     /// Failed to insert a new room
     RoomInsertError(InsertError<InsertableRoomAttributes>),
+    /// Failed to insert a new instrument location.
+    InstrumentLocationInsertError(InsertError<InsertableInstrumentLocationAttributes>),
     /// User never logged in
     UserNeverLoggedIn(Box<DirectusUser>),
 }
@@ -132,5 +135,17 @@ impl From<InsertError<InsertableAddressAttributes>> for Error {
 impl From<InsertError<InsertableRoomAttributes>> for Error {
     fn from(value: InsertError<InsertableRoomAttributes>) -> Self {
         Error::RoomInsertError(value)
+    }
+}
+
+impl From<InsertError<InsertableInstrumentLocationAttributes>> for Error {
+    fn from(value: InsertError<InsertableInstrumentLocationAttributes>) -> Self {
+        Error::InstrumentLocationInsertError(value)
+    }
+}
+
+impl From<InsertError<InsertableProductAttributes>> for Error {
+    fn from(value: InsertError<InsertableProductAttributes>) -> Self {
+        Error::ProductInsertError(value)
     }
 }

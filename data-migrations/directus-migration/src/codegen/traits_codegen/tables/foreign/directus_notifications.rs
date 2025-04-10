@@ -1,9 +1,8 @@
 #[cfg(feature = "postgres")]
-impl
-    web_common_traits::prelude::Foreign<
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-    > for crate::codegen::structs_codegen::tables::directus_notifications::DirectusNotification
-{
+impl web_common_traits::prelude::Foreign<
+    crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+>
+for crate::codegen::structs_codegen::tables::directus_notifications::DirectusNotification {
     type Conn = diesel_async::AsyncPgConnection;
     async fn foreign(
         &self,

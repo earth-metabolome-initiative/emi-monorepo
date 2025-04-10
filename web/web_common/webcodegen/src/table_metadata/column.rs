@@ -29,7 +29,7 @@ pub struct Column {
     pub table_name: String,
     /// Name of the column
     pub column_name: String,
-    /// Ordinal position of the column within the table (count starts at 1)
+    /// Ordinal position of the column within the table (co nt starts at 1)
     pub ordinal_position: i32,
     /// Default expression of the column
     pub column_default: Option<String>,
@@ -475,6 +475,46 @@ impl Column {
     /// Returns whether the column is nullable
     pub fn is_nullable(&self) -> bool {
         self.__is_nullable == "YES"
+    }
+
+    /// Returns the table which contains the current column.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    ///
+    pub fn table(&self, conn: &mut PgConnection) -> Result<Table, WebCodeGenError> {
+        use crate::schema::tables;
+        tables::table
+            .filter(tables::table_name.eq(&self.table_name))
+            .filter(tables::table_schema.eq(&self.table_schema))
+            .filter(tables::table_catalog.eq(&self.table_catalog))
+            .first::<Table>(conn)
+            .map_err(WebCodeGenError::from)
+    }
+
+    /// Returns whether the column is part of a single-column unique constraint.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn is_unique(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        let table = self.table(conn)?;
+        let pg_indices = table.unique_indices(conn)?;
+        Ok(pg_indices.iter().any(|index| {
+            let Ok(columns) = index.columns(conn) else {
+                return false;
+            };
+            columns.len() == 1 && columns[0].column_name == self.column_name
+        }))
     }
 
     /// Returns whether the column type implements copy.

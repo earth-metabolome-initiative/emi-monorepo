@@ -1,2 +1,1 @@
-mod tables;
-mod types;
+mod types ; mod tables ;

@@ -1,7 +1,7 @@
 //! Submodule providing the methods for all of the directus migrations.
 
 mod utils;
-pub(crate) use utils::get_user;
+pub(crate) use utils::{get_user, get_address, get_room};
 mod insert_missing_brands;
 pub use insert_missing_brands::insert_missing_brands;
 mod insert_missing_users;

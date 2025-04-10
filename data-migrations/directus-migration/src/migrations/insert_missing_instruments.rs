@@ -1,9 +1,11 @@
 //! Submodule to insert missing instruments present in the Directus database
 //! but not in the Portal database.
 
+use super::get_room;
 use core_structures::{
-    Instrument as PortalInstrument, InstrumentModel as PortalInstrumentModel,
-    InstrumentState as PortalInstrumentState,
+    Instrument as PortalInstrument, InstrumentLocation as PortalInstrumentLocation,
+    InstrumentModel as PortalInstrumentModel, InstrumentState as PortalInstrumentState,
+    Product as PortalProduct,
 };
 use diesel_async::AsyncPgConnection;
 use web_common_traits::{
@@ -56,18 +58,23 @@ pub(crate) async fn insert_missing_instruments(
                     crate::error::Error::UnknownInstrumentState(directus_instrument.status.clone())
                 })?;
         let directus_instrument_model = directus_instrument.instrument_model(directus_conn).await?;
-        let portal_instrument_model = PortalInstrumentModel::from_name(
-            &directus_instrument_model.instrument_model,
-            portal_conn,
-        )
-        .await?
-        .ok_or_else(|| {
-            crate::error::Error::UnknownInstrumentModel(Box::from(
-                directus_instrument_model.clone(),
-            ))
-        })?;
+        let portal_product =
+            PortalProduct::from_name(&directus_instrument_model.instrument_model, portal_conn)
+                .await?
+                .ok_or_else(|| {
+                    crate::error::Error::UnknownInstrumentModel(Box::from(
+                        directus_instrument_model.clone(),
+                    ))
+                })?;
 
-        let _portal_instrument = PortalInstrument::new()
+        let portal_instrument_model =
+            PortalInstrumentModel::from_id(portal_conn, &portal_product).await.map_err(|_| {
+                crate::error::Error::UnknownInstrumentModel(Box::from(
+                    directus_instrument_model.clone(),
+                ))
+            })?;
+
+        let portal_instrument = PortalInstrument::new()
             .created_by(created_by.id)?
             .updated_by(updated_by.id)?
             .created_at(created_at)?
@@ -79,7 +86,17 @@ pub(crate) async fn insert_missing_instruments(
             .insert(&created_by.id, portal_conn)
             .await?;
 
-        // TODO! Add the geolocation and room information!
+        let directus_room = directus_instrument.instrument_location(directus_conn).await?;
+        let portal_room = get_room(&directus_room, directus_conn, portal_conn).await?;
+
+        let _instrument_location = PortalInstrumentLocation::new()
+            .instrument_id(portal_instrument.id)?
+            .room_id(portal_room.id)?
+            .created_by(created_by.id)?
+            .created_at(created_at)?
+            .build()?
+            .insert(&created_by.id, portal_conn)
+            .await?;
     }
     Ok(())
 }

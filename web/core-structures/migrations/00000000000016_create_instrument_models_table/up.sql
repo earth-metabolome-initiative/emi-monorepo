@@ -1,9 +1,6 @@
 CREATE TABLE IF NOT EXISTS instrument_models (
-    id SERIAL PRIMARY KEY,
-	name TEXT NOT NULL UNIQUE,
-	deprecation_date TIMESTAMP WITH TIME ZONE,
+	id INTEGER PRIMARY KEY REFERENCES products(id),
 	instrument_type_id SMALLINT NOT NULL REFERENCES instrument_types(id),
-	brand_id INTEGER NOT NULL REFERENCES brands(id),
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INTEGER NOT NULL REFERENCES users(id),
