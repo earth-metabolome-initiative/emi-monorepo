@@ -4,7 +4,9 @@
 /// High-level errors that may occur in the Server.
 pub enum BackendRequestError {
     /// An error that occurred on the server.
-    ServerError,
+    InternalServerError,
+    /// When something was not found.
+    NotFound,
     /// The user attempted an unauthorized action.
     Unauthorized,
 }
@@ -12,7 +14,8 @@ pub enum BackendRequestError {
 impl core::fmt::Display for BackendRequestError {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            BackendRequestError::ServerError => write!(f, "Server error"),
+            BackendRequestError::InternalServerError => write!(f, "Internal Server error"),
+            BackendRequestError::NotFound => write!(f, "Not Found"),
             BackendRequestError::Unauthorized => write!(f, "Unauthorized"),
         }
     }
