@@ -1,3 +1,4 @@
+//! Submodule for testing CSV schema creation and deletion with Docker.
 use csqlv::{CSVSchemaBuilder, CSVSchemaError};
 use diesel::pg::PgConnection;
 use testcontainers::{
