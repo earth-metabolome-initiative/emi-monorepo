@@ -1,6 +1,6 @@
 //! API endpoint to refresh the access token.
 use actix_web::{get, web, HttpRequest, HttpResponse};
-use backend_errors::Error;
+use backend_request_errors::BackendRequestError;
 use core_structures::User;
 use web_common::api::{oauth::jwt_cookies::AccessToken, ApiError};
 use web_common_traits::database::Loadable;

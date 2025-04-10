@@ -1,21 +1,21 @@
 //! Login API for GitHub OAuth
 use std::env;
 
-use actix_web::{get, HttpResponse, Responder};
-use backend_errors::Error;
+use actix_web::{HttpResponse, Responder, get};
+use backend_request_errors::BackendRequestError;
 use core_structures::LoginProvider;
 use redis::Client as RedisClient;
 use reqwest::Client;
 use serde::Deserialize;
 
 use super::jwt_cookies::build_login_response;
-use crate::api::oauth::*;
+use crate::{api::oauth::*, errors::BackendError};
 
 /// Struct representing the GitHub OAuth2 configuration.
 struct GitHubConfig {
     client_id: String,
     client_secret: String,
-    provider_id: i16,
+    provider: LoginProvider,
 }
 
 impl GitHubConfig {
@@ -26,21 +26,12 @@ impl GitHubConfig {
     ///
     /// A `Result` containing the `GitHubConfig` if the environment variables
     /// are set, or an error message if they are not.
-    pub async fn from_env(connection: &mut crate::Conn) -> Result<GitHubConfig, Error> {
-        let Ok(client_secret) = env::var("GITHUB_CLIENT_SECRET") else {
-            panic!("GITHUB_CLIENT_SECRET not set");
-        };
-
-        let Ok(client_id) = env::var("GITHUB_CLIENT_ID") else {
-            panic!("GITHUB_CLIENT_ID not set");
-        };
-
-        // We retrieve the ID for the 'GitHub' provider from the database.
-        let Some(provider) = LoginProvider::from_name("GitHub", connection).await? else {
-            panic!("GitHub provider not found in the database");
-        };
-
-        Ok(GitHubConfig { client_id, client_secret, provider_id: provider.id })
+    pub async fn from_env(connection: &mut crate::Conn) -> Result<GitHubConfig, BackendError> {
+        Ok(GitHubConfig {
+            client_id: env::var("GITHUB_CLIENT_ID")?,
+            client_secret: env::var("GITHUB_CLIENT_SECRET")?,
+            provider: LoginProvider::from_name("GitHub", connection).await?,
+        })
     }
 }
 

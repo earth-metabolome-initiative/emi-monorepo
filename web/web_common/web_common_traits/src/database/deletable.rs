@@ -1,5 +1,7 @@
 //! A trait defining a Deletable table entry.
 
+use backend_request_errors::BackendRequestError;
+
 /// The Deletable trait
 pub trait Deletable {
     /// The backend to be used.
@@ -30,7 +32,7 @@ pub enum DeleteError {
     /// A diesel error occurred.
     DieselError(diesel::result::Error),
     /// A server error occurred.
-    ServerError(backend_errors::Error),
+    ServerError(BackendRequestError),
 }
 
 impl From<diesel::result::Error> for DeleteError {
@@ -39,8 +41,8 @@ impl From<diesel::result::Error> for DeleteError {
     }
 }
 
-impl From<backend_errors::Error> for DeleteError {
-    fn from(e: backend_errors::Error) -> Self {
+impl From<BackendRequestError> for DeleteError {
+    fn from(e: BackendRequestError) -> Self {
         DeleteError::ServerError(e)
     }
 }
@@ -49,7 +51,7 @@ impl core::fmt::Display for DeleteError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             DeleteError::DieselError(e) => <diesel::result::Error as core::fmt::Display>::fmt(e, f),
-            DeleteError::ServerError(e) => <backend_errors::Error as core::fmt::Display>::fmt(e, f),
+            DeleteError::ServerError(e) => <BackendRequestError as core::fmt::Display>::fmt(e, f),
         }
     }
 }

@@ -68,6 +68,7 @@ impl Codegen<'_> {
 
             submodule_file_content.extend(quote::quote! {
                 pub mod #tables_ident;
+                #[allow(unused_imports)]
                 pub use #tables_ident::{#(#table_structs),*};
             });
             time_tracker.add_completed_task(task);

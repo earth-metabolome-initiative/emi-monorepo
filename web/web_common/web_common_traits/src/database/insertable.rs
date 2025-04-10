@@ -1,6 +1,7 @@
 //! Submodule defining traits regarding tables that can be extended with new
 //! rows.
 use common_traits::prelude::BuilderError;
+use backend_request_errors::BackendRequestError;
 
 /// A trait for types that can be inserted into the database.
 pub trait Insertable {
@@ -111,7 +112,7 @@ pub enum InsertError<FieldName> {
     /// A diesel error occurred.
     DieselError(diesel::result::Error),
     /// A server error occurred.
-    ServerError(backend_errors::Error),
+    ServerError(BackendRequestError),
 }
 
 impl<FieldName: core::fmt::Display> core::error::Error for InsertError<FieldName> {}
@@ -129,7 +130,7 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName
                 <diesel::result::Error as core::fmt::Display>::fmt(error, f)
             }
             InsertError::ServerError(error) => {
-                <backend_errors::Error as core::fmt::Display>::fmt(error, f)
+                <BackendRequestError as core::fmt::Display>::fmt(error, f)
             }
         }
     }
@@ -173,8 +174,8 @@ impl<FieldName> From<diesel::result::Error> for InsertError<FieldName> {
     }
 }
 
-impl<FieldName> From<backend_errors::Error> for InsertError<FieldName> {
-    fn from(error: backend_errors::Error) -> Self {
+impl<FieldName> From<BackendRequestError> for InsertError<FieldName> {
+    fn from(error: BackendRequestError) -> Self {
         InsertError::ServerError(error)
     }
 }

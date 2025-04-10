@@ -10,7 +10,7 @@ use actix_web::{
 };
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use api_path::api::oauth::jwt_cookies::USER_ONLINE_COOKIE_NAME;
-use backend_errors::Error;
+use backend_request_errors::BackendRequestError;
 use base64::prelude::*;
 use chrono::{Duration, Utc};
 use core_structures::User;
@@ -23,6 +23,8 @@ use rosetta_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use web_common_traits::database::Loadable;
+
+use crate::errors::BackendError;
 
 /// Set a const with the expected cookie name.
 pub(crate) const REFRESH_COOKIE_NAME: &str = "refresh_token";
@@ -37,7 +39,7 @@ struct JWTConfig {
 }
 
 impl JWTConfig {
-    pub fn from_env() -> Result<JWTConfig, Error> {
+    pub fn from_env() -> Result<JWTConfig, BackendError> {
         Ok(JWTConfig {
             access_token_base_64_public_key: env::var("ACCESS_TOKEN_PUBLIC_KEY")?,
             access_token_base_64_private_key: env::var("ACCESS_TOKEN_PRIVATE_KEY")?,
@@ -324,7 +326,7 @@ impl JsonAccessToken {
         self.web_token.encode(config.access_token_private_key()?)
     }
 
-    pub fn decode(token: &str) -> Result<JsonAccessToken, String> {
+    pub fn decode(token: &str) -> Result<JsonAccessToken, BackendError> {
         let config = JWTConfig::from_env()?;
         Ok(JsonAccessToken {
             web_token: JsonWebToken::decode(token, config.access_token_public_key()?)?,

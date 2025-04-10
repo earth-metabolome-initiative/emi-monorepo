@@ -2,7 +2,7 @@
 use std::env;
 
 use actix_web::{get, web, HttpResponse, Responder};
-use backend_errors::Error;
+use backend_request_errors::BackendRequestError;
 use core_structures::LoginProvider;
 use web_common_traits::database::Loadable;
 
