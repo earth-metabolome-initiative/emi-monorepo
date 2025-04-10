@@ -1,16 +1,17 @@
 //! Submodule to insert missing instruments present in the Directus database
 //! but not in the Portal database.
 
+use super::get_room;
 use core_structures::{
-    Instrument as PortalInstrument, InstrumentModel as PortalInstrumentModel,
-    InstrumentState as PortalInstrumentState, InstrumentLocation as PortalInstrumentLocation,
+    Instrument as PortalInstrument, InstrumentLocation as PortalInstrumentLocation,
+    InstrumentModel as PortalInstrumentModel, InstrumentState as PortalInstrumentState,
+    Product as PortalProduct,
 };
 use diesel_async::AsyncPgConnection;
 use web_common_traits::{
     database::{Insertable, InsertableVariant, Loadable},
     prelude::Builder,
 };
-use super::get_room;
 
 use super::get_user;
 use crate::codegen::Instrument as DirectusInstrument;
@@ -57,16 +58,21 @@ pub(crate) async fn insert_missing_instruments(
                     crate::error::Error::UnknownInstrumentState(directus_instrument.status.clone())
                 })?;
         let directus_instrument_model = directus_instrument.instrument_model(directus_conn).await?;
-        let portal_instrument_model = PortalInstrumentModel::from_name(
-            &directus_instrument_model.instrument_model,
-            portal_conn,
-        )
-        .await?
-        .ok_or_else(|| {
-            crate::error::Error::UnknownInstrumentModel(Box::from(
-                directus_instrument_model.clone(),
-            ))
-        })?;
+        let portal_product =
+            PortalProduct::from_name(&directus_instrument_model.instrument_model, portal_conn)
+                .await?
+                .ok_or_else(|| {
+                    crate::error::Error::UnknownInstrumentModel(Box::from(
+                        directus_instrument_model.clone(),
+                    ))
+                })?;
+
+        let portal_instrument_model =
+            PortalInstrumentModel::from_id(portal_conn, &portal_product).await.map_err(|_| {
+                crate::error::Error::UnknownInstrumentModel(Box::from(
+                    directus_instrument_model.clone(),
+                ))
+            })?;
 
         let portal_instrument = PortalInstrument::new()
             .created_by(created_by.id)?
