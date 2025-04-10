@@ -14,7 +14,7 @@ impl crate::Table {
     ///
     /// * `conn` - The Diesel connection to the database.
     ///
-    /// # Implementative details
+    /// # Implementation details
     ///
     /// Since the foreign key methods from the [`Foreign`] trait and the `load`
     /// method from the [`Loadable`] trait cover all foreign keys and the

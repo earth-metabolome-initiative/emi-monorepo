@@ -2,7 +2,9 @@
 
 #[derive(Debug, Clone, Copy)]
 /// A struct that provides methods to pluralize and singularize words.
-pub struct Inflector;
+pub struct Inflector {
+    _private: (),
+}
 
 impl Default for Inflector {
     fn default() -> Self {
@@ -31,7 +33,7 @@ impl Default for Inflector {
             "$1on".to_string(),
         );
 
-        Self
+        Self { _private: () }
     }
 }
 

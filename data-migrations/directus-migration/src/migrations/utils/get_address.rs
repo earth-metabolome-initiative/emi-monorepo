@@ -10,7 +10,7 @@ use web_common_traits::{
 use crate::codegen::Address as DirectusAddress;
 
 /// Returns (potentially newly created) address for a Directus address.
-pub async fn get_address(
+pub(crate) async fn get_address(
     directus_address: &DirectusAddress,
     portal_conn: &mut AsyncPgConnection,
 ) -> Result<PortalAddress, crate::error::Error> {

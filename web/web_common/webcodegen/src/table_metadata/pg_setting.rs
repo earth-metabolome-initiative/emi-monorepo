@@ -1,11 +1,11 @@
 //! Submodule providing the `PGSetting` struct representing a row of the
-//! `pg_settings` table in PostgreSQL.
+//! `pg_settings` table in `PostgreSQL`.
 
 use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Clone)]
 #[diesel(table_name = crate::schema::pg_settings)]
-/// The view pg_settings provides access to run-time parameters of the server.
+/// The view `pg_settings` provides access to run-time parameters of the server.
 /// It is essentially an alternative interface to the SHOW and SET commands.
 /// It also provides access to some facts about each parameter that are not
 /// directly available from SHOW, such as minimum and maximum values.
@@ -41,13 +41,13 @@ pub struct PgSetting {
     pub reset_val: Option<String>,
     /// Configuration file the current value was set in (null for values set
     /// from sources other than configuration files, or when examined by a user
-    /// who neither is a superuser nor has privileges of pg_read_all_settings);
+    /// who neither is a superuser nor has privileges of `pg_read_all_settings`);
     /// helpful when using include directives in configuration files
     pub sourcefile: Option<String>,
     /// Line number within the configuration file the current value was set at
     /// (null for values set from sources other than configuration files, or
     /// when examined by a user who neither is a superuser nor has privileges of
-    /// pg_read_all_settings).
+    /// `pg_read_all_settings`).
     pub sourceline: Option<i32>,
     /// true if the value has been changed in the configuration file but needs a
     /// restart; or false otherwise.
@@ -55,11 +55,11 @@ pub struct PgSetting {
 }
 
 impl PgSetting {
-    /// Returns the TIME ZONE setting for the provided PostgreSQL connection.
+    /// Returns the TIME ZONE setting for the provided `PostgreSQL` connection.
     ///
     /// # Arguments
     ///
-    /// * `conn` - A reference to a PostgreSQL connection.
+    /// * `conn` - A reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///

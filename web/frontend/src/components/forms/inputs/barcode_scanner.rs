@@ -1,6 +1,5 @@
 use gloo::timers::callback::{Interval, Timeout};
 use wasm_bindgen::JsCast;
-use web_common::api::{ApiError, DeviceError};
 use web_sys::{
     CanvasRenderingContext2d, HtmlCanvasElement, HtmlVideoElement, MediaStream, MediaStreamTrack,
 };

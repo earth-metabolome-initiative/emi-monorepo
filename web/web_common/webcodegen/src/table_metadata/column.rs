@@ -53,24 +53,6 @@ pub struct Column {
     pub interval_type: Option<String>,
     /// Precision of the interval data type
     pub interval_precision: Option<i32>,
-    /// Catalog name of the character set
-    /// pub character_set_catalog: Option<String>,
-    /// Schema name of the character set
-    /// pub character_set_schema: Option<String>,
-    /// Name of the character set
-    /// pub character_set_name: Option<String>,
-    /// Catalog name of the collation
-    /// pub collation_catalog: Option<String>,
-    /// Schema name of the collation
-    /// pub collation_schema: Option<String>,
-    /// Name of the collation
-    /// pub collation_name: Option<String>,
-    /// Catalog name of the domain
-    /// pub domain_catalog: Option<String>,
-    /// Schema name of the domain
-    /// pub domain_schema: Option<String>,
-    /// Name of the domain
-    /// pub domain_name: Option<String>,
     /// Catalog name of the underlying type of the column
     pub udt_catalog: Option<String>,
     /// Schema name of the underlying type of the column
@@ -91,18 +73,6 @@ pub struct Column {
     pub is_self_referencing: Option<String>,
     /// Indicates if the column is an identity column
     pub is_identity: Option<String>,
-    /// Generation expression of the identity column
-    /// pub identity_generation: Option<String>,
-    /// Start value of the identity column
-    /// pub identity_start: Option<String>,
-    /// Increment value of the identity column
-    /// pub identity_increment: Option<String>,
-    /// Maximum value of the identity column
-    /// pub identity_maximum: Option<String>,
-    /// Minimum value of the identity column
-    /// pub identity_minimum: Option<String>,
-    /// Indicates if the identity column cycles
-    /// pub identity_cycle: Option<String>,
     /// Indicates if the column is generated ("ALWAYS" or "NEVER")
     pub is_generated: String,
     /// Generation expression of the column
@@ -118,11 +88,13 @@ impl AsRef<Column> for Column {
 }
 
 impl Column {
+    #[must_use]
     /// Returns the column as a nullable column
     pub fn into_nullable(self) -> Self {
         Self { __is_nullable: "YES".to_string(), ..self }
     }
 
+    #[must_use]
     /// Returns the column as a nullable column
     pub fn to_nullable(&self) -> Self {
         self.clone().into_nullable()
@@ -510,6 +482,10 @@ impl Column {
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
     pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         if let Ok(geometry) = self.geometry(conn) {
             return Ok(geometry.supports_copy());
@@ -582,6 +558,7 @@ impl Column {
             || self.is_identity.as_ref().is_some_and(|i| i == "YES")
     }
 
+    #[must_use]
     /// Returns whether the current column has a DEFAULT value
     pub fn has_default(&self) -> bool {
         self.column_default.is_some()
@@ -821,20 +798,23 @@ impl Column {
             .is_ok()
     }
 
-    #[must_use]
     /// Returns the plural name of the column.
-    pub fn plural_column_name(&self) -> String {
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while sanitizing the column name
+    pub fn plural_column_name(&self) -> Result<String, WebCodeGenError> {
         // We split the column name by underscores and remove the last element.
         let mut parts =
             self.column_name.split('_').map(ToString::to_string).collect::<Vec<String>>();
-        let last_element = parts.pop().unwrap();
+        let last_element =
+            parts.pop().ok_or_else(|| WebCodeGenError::EmptyColumnName(Box::from(self.clone())))?;
         // We convert to singular form the last element and join the parts back
         // together.
         parts.push(Inflector::default().pluralize(&last_element));
-        parts.join("_")
+        Ok(parts.join("_"))
     }
 
-    #[must_use]
     /// Returns the getter method name for the column.
     ///
     /// # Errors
@@ -849,11 +829,10 @@ impl Column {
         let mut snake_case_name = self.snake_case_name()?;
         if let Some(stripped_snake_case_name) = snake_case_name.strip_suffix("_id") {
             snake_case_name = stripped_snake_case_name.to_owned();
-        };
+        }
         Ok(snake_case_name)
     }
 
-    #[must_use]
     /// Returns the getter method ident for the column.
     ///
     /// # Errors

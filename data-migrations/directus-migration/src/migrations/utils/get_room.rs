@@ -10,7 +10,7 @@ use web_common_traits::{
 use super::{get_address, get_user};
 use crate::codegen::Room as DirectusRoom;
 
-pub async fn get_room(
+pub(crate) async fn get_room(
     directus_room: &DirectusRoom,
     directus_conn: &mut AsyncPgConnection,
     portal_conn: &mut AsyncPgConnection,

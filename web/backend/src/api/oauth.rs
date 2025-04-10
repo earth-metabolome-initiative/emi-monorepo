@@ -24,7 +24,7 @@ pub(crate) struct QueryCode {
 pub fn configure(cfg: &mut web::ServiceConfig) {
     // All these endpoints will show up under `/api/oauth/*`
     cfg.service(
-        web::scope(web_common::api::oauth::ENDPOINT)
+        web::scope(api_path::api::oauth::ENDPOINT)
             .service(github::github_oauth_handler)
             .service(providers::get_providers)
             .service(refresh::refresh_access_token_handler)

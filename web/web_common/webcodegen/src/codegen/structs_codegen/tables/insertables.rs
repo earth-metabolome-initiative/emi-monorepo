@@ -106,6 +106,7 @@ impl Table {
 }
 
 impl Codegen<'_> {
+    #[allow(clippy::too_many_lines)]
     /// Generate implementations of the structs able to implement the
     /// [`Insertable`] and [`Insertable`]-adjacent traits for the provided
     /// tables.

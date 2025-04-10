@@ -17,7 +17,7 @@ pub struct TimeTracker {
 
 impl TimeTracker {
     /// Creates a new time tracker for the given project name.
-    pub fn new<S: ToString>(name: S) -> Self {
+    pub fn new<S: ToString + ?Sized>(name: &S) -> Self {
         Self {
             name: name.to_string(),
             tasks: Vec::new(),
@@ -40,6 +40,7 @@ impl TimeTracker {
         self.sub_trackers.iter().find(|tracker| tracker.name() == name)
     }
 
+    #[must_use]
     /// Converts the tracker into a completed task.
     pub fn to_completed_task(&self) -> CompletedTask {
         CompletedTask {
@@ -60,11 +61,13 @@ impl TimeTracker {
         self.tasks.push(task.complete());
     }
 
+    #[must_use]
     /// Returns the name of the project.
     pub fn name(&self) -> &str {
         &self.name
     }
 
+    #[must_use]
     /// Returns the start time of the project.
     pub fn start(&self) -> chrono::NaiveDateTime {
         self.start
@@ -75,17 +78,28 @@ impl TimeTracker {
         self.tasks.iter()
     }
 
+    #[must_use]
     /// Returns a reference to the slowest task.
     pub fn slowest_task(&self) -> Option<&CompletedTask> {
         self.tasks.iter().max()
     }
 
+    #[must_use]
     /// Returns the total amount of time spent on all tasks.
     pub fn total_time(&self) -> chrono::TimeDelta {
-        self.tasks.iter().map(|task| task.time()).sum()
+        self.tasks.iter().map(CompletedTask::time).sum()
     }
 
     /// Saves the report as a JSON in the provided directory.
+    ///
+    /// # Arguments
+    ///
+    /// * `directory` - The directory to save the report in.
+    ///
+    /// # Errors
+    ///
+    /// If the directory does not exist or is not writable, an error will be
+    /// returned.
     pub fn save(&self, directory: &std::path::Path) -> std::io::Result<()> {
         let file = std::fs::File::create(directory.join(format!("{}.json", self.name)))?;
         serde_json::to_writer(file, self)?;

@@ -3,7 +3,6 @@ use std::future::{ready, Ready};
 
 use actix_web::{dev::Payload, error::Error, get, web, FromRequest, HttpRequest, HttpResponse};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
-use web_common::api::ApiError;
 
 use crate::api::oauth::jwt_cookies::{
     eliminate_cookies, JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME,
@@ -30,7 +29,7 @@ impl FromRequest for MaybeBearer {
 /// * `bearer` - The bearer token of the user to logout.
 /// * `redis_client` - The redis client to use for the login.
 ///
-/// # Implementative details
+/// # Implementation details
 /// The logout endpoint is expected to be called with a valid access token, and
 /// will remove the access token from the redis database, effectively logging
 /// the user out. It will also remove the refresh token from the redis database,
@@ -51,7 +50,7 @@ pub async fn logout(
             Err(_) => {
                 log::debug!("Unable to decode access token");
                 return eliminate_cookies(HttpResponse::Unauthorized())
-                    .json(ApiError::unauthorized());
+                    .json(Error::Unauthorized);
             }
         };
 
@@ -59,7 +58,7 @@ pub async fn logout(
 
         if is_still_present.map_or(true, |present| !present) {
             log::debug!("Access token not present in redis");
-            return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
+            return eliminate_cookies(HttpResponse::Unauthorized()).json(Error::Unauthorized);
         }
 
         match access_token.delete_from_redis(&redis_client).await {
@@ -75,7 +74,7 @@ pub async fn logout(
         Some(cookie) => cookie,
         None => {
             log::debug!("Refresh token not present in request");
-            return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
+            return eliminate_cookies(HttpResponse::Unauthorized()).json(Error::Unauthorized);
         }
     };
 
@@ -83,14 +82,14 @@ pub async fn logout(
         Ok(token) => token,
         Err(_) => {
             log::debug!("Unable to decode refresh token");
-            return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
+            return eliminate_cookies(HttpResponse::Unauthorized()).json(Error::Unauthorized);
         }
     };
 
     if refresh_token.is_still_present_in_redis(&redis_client).await.map_or(true, |present| !present)
     {
         log::debug!("Refresh token not present in redis");
-        return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
+        return eliminate_cookies(HttpResponse::Unauthorized()).json(Error::Unauthorized);
     }
 
     if refresh_token.delete_from_redis(&redis_client).await.is_err() {

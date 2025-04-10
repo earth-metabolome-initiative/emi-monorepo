@@ -11,6 +11,7 @@ pub trait Insertable {
     /// backend to create the insertable variant.
     type InsertableBuilder: InsertableBuilder<Row = Self, Product = Self::InsertableVariant>;
 
+    #[must_use]
     /// Returns a new insertable variant builder.
     fn new() -> Self::InsertableBuilder {
         Default::default()
@@ -110,7 +111,7 @@ pub enum InsertError<FieldName> {
     /// A diesel error occurred.
     DieselError(diesel::result::Error),
     /// A server error occurred.
-    ServerError(server_errors::Error),
+    ServerError(backend_errors::Error),
 }
 
 impl<FieldName: core::fmt::Display> core::error::Error for InsertError<FieldName> {}
@@ -128,7 +129,7 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName
                 <diesel::result::Error as core::fmt::Display>::fmt(error, f)
             }
             InsertError::ServerError(error) => {
-                <server_errors::Error as core::fmt::Display>::fmt(error, f)
+                <backend_errors::Error as core::fmt::Display>::fmt(error, f)
             }
         }
     }
@@ -172,8 +173,8 @@ impl<FieldName> From<diesel::result::Error> for InsertError<FieldName> {
     }
 }
 
-impl<FieldName> From<server_errors::Error> for InsertError<FieldName> {
-    fn from(error: server_errors::Error) -> Self {
+impl<FieldName> From<backend_errors::Error> for InsertError<FieldName> {
+    fn from(error: backend_errors::Error) -> Self {
         InsertError::ServerError(error)
     }
 }

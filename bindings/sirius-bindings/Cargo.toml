@@ -19,6 +19,9 @@ is_executable = "1.0.4"
 arbitrary = { version = "1", optional = true, features = ["derive"] }
 num_cpus = "1.16.0"
 
+[dev-dependencies]
+# cargo-husky.workspace = true
+
 # we only require the arbitrary derivable crate when fuzz is enabled
 [features]
 fuzz = ["dep:arbitrary"]

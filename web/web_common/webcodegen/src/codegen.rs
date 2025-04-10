@@ -396,8 +396,16 @@ impl<'a> Codegen<'a> {
     }
 
     /// Returns the list of required types.
+    ///
+    /// # Arguments
+    ///
+    /// * `tables` - A slice of tables to check for custom types.
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the connection to the database fails.
     pub(super) fn required_types(
-        &self,
         tables: &[Table],
         conn: &mut PgConnection,
     ) -> Result<Vec<PgType>, WebCodeGenError> {

@@ -73,15 +73,16 @@ impl GeographyColumn {
 
     #[must_use]
     /// Returns whether the underlying rust type supports the `Copy` trait.
+    /// 
+    /// # Panics
+    /// 
+    /// * If the geography type is unknown.
+    /// 
     pub fn supports_copy(&self) -> bool {
         match self.str_rust_type() {
-            "postgis_diesel::types::Point" => true,
-            "postgis_diesel::types::LineString" => false,
-            "postgis_diesel::types::Polygon" => false,
-            "postgis_diesel::types::MultiPoint" => false,
-            "postgis_diesel::types::MultiLineString" => false,
-            "postgis_diesel::types::MultiPolygon" => false,
-            "postgis_diesel::types::GeometryCollection" => false,
+            "POINT" => true,
+            "LINESTRING" | "POLYGON" | "MULTIPOINT" | "MULTILINESTRING" | "MULTIPOLYGON"
+            | "GEOMETRYCOLLECTION" | "GEOMETRY" => false,
             _ => panic!("Unknown geography type: {}", self.str_rust_type()),
         }
     }

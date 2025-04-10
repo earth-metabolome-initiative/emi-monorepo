@@ -53,7 +53,7 @@ enum ReturningType {
     I64,
     F32,
     F64,
-    Custom(PgType),
+    Custom(Box<PgType>),
 }
 
 impl ReturningType {
@@ -137,8 +137,7 @@ impl ReturningType {
         } else if ty.is_text(conn)? {
             Ok(ReturningType::Textual)
         } else {
-            assert_ne!(ty.typname, "int4");
-            Ok(ReturningType::Custom(ty))
+            Ok(ReturningType::Custom(Box::from(ty)))
         }
     }
 }
@@ -159,7 +158,7 @@ where
     /// # Returns
     ///
     /// * A tuple containing the column and a boolean indicating whether the
-    ///  column was found in the `contextual_columns` or not
+    ///   column was found in the `contextual_columns` or not
     ///
     /// # Errors
     ///
@@ -396,7 +395,7 @@ where
             .into_iter()
             .map(|pg_type| ReturningType::try_from_pg_type(pg_type, conn))
             .collect::<Result<Vec<_>, WebCodeGenError>>()?;
-        let (args, scoped_columns) = self.parse_function_arguments(&args, &argument_types, conn)?;
+        let (args, scoped_columns) = self.parse_function_arguments(args, &argument_types, conn)?;
         let function_path = function.path(conn)?;
 
         let map_err = if function.returns_result(conn)? {
@@ -457,16 +456,11 @@ where
     /// # Arguments
     ///
     /// * `kind` - The [`CastKind`](sqlparser::ast::CastKind) to verify
-    ///
-    /// # Errors
-    ///
-    /// * If the provided [`CastKind`](sqlparser::ast::CastKind) is not
-    ///   supported
-    fn verify_cast_kind(&self, kind: &sqlparser::ast::CastKind) -> Result<(), WebCodeGenError> {
+    fn verify_cast_kind(kind: &sqlparser::ast::CastKind) {
         match kind {
-            sqlparser::ast::CastKind::DoubleColon => Ok(()),
+            sqlparser::ast::CastKind::DoubleColon => {}
             _ => {
-                unimplemented!("Unsupported cast kind: {:?}", kind);
+                unimplemented!("Unsupported cast kind: {kind:?}");
             }
         }
     }
@@ -478,7 +472,7 @@ where
     ///
     /// * `value` - The [`Value`](sqlparser::ast::Value) to parse
     /// * `type_hint` - The [`PgType`](crate::table_metadata::PgType) of the
-    /// value
+    ///   value
     ///
     /// # Errors
     ///
@@ -520,7 +514,7 @@ where
     /// * `value` - The [`ValueWithSpan`](sqlparser::ast::ValueWithSpan) to
     ///   parse
     /// * `type_hint` - The [`PgType`](crate::table_metadata::PgType) of the
-    ///  value
+    ///   value
     /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
@@ -535,6 +529,7 @@ where
         self.parse_value(&value.value, type_hint)
     }
 
+    #[allow(clippy::too_many_lines)]
     /// Translates the provided expression to a
     /// [`TokenStream`](proc_macro2::TokenStream)
     fn parse(
@@ -545,11 +540,11 @@ where
     ) -> Result<(proc_macro2::TokenStream, Vec<&'_ Column>, ReturningType), WebCodeGenError> {
         match expr {
             Expr::Function(function) => {
-                let (token_stream, returning_type) = self.parse_function(&function, conn)?;
+                let (token_stream, returning_type) = self.parse_function(function, conn)?;
                 Ok((token_stream, Vec::new(), returning_type))
             }
             Expr::Cast { kind, expr, data_type: _, format } => {
-                self.verify_cast_kind(kind)?;
+                Self::verify_cast_kind(kind);
                 if format.is_some() {
                     unimplemented!("Format not supported");
                 }
@@ -559,7 +554,7 @@ where
             Expr::Identifier(ident) => {
                 let involved_column = self.get_involved_column_by_name(&ident.value)?;
                 Ok((
-                    self.formatted_column(&involved_column, false, conn)?,
+                    self.formatted_column(involved_column, false, conn)?,
                     vec![involved_column],
                     ReturningType::try_from_pg_type(involved_column.pg_type(conn)?, conn)?,
                 ))
@@ -705,8 +700,8 @@ where
                             );
                         }
                     }
-                    _operator => {
-                        unimplemented!("Unsupported binary operator: {:?}", _operator);
+                    operator => {
+                        unimplemented!("Unsupported binary operator: {operator:?}");
                     }
                 }
             }
@@ -727,6 +722,7 @@ where
 }
 
 impl CheckConstraint {
+    #[must_use]
     /// Returns whether the current [`CheckConstraint`] is known to come
     /// from Postgis and therefore should most likely be ignored
     pub fn is_postgis_constraint(&self) -> bool {
@@ -753,6 +749,10 @@ impl CheckConstraint {
     /// * `None` if the provided column is not involved in the check clause
     /// * `None` if the provided `extensions` are not involved in the check
     ///   clause
+    ///
+    /// # Panics
+    ///
+    /// * If the parser check clause cannot be parsed
     pub fn to_syn<E: AsRef<PgExtension>, C1: AsRef<Column>, C2: AsRef<Column>>(
         &self,
         contextual_columns: &[C1],

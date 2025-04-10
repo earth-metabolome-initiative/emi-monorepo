@@ -10,7 +10,7 @@ For further reading we recommend you to refer to the official [Sirius website](h
 ## Installation
 Since version 5.7.0 SIRIUS is officially available via conda ([conda-forge](https://conda-forge.org/)) under the package name [sirius-ms](https://anaconda.org/conda-forge/sirius-ms). Native MacOS arm64 (Apple Silicon) builds are solely available via conda.
 
-Additionally, you can install Sirius via their [GitHub repository](https://github.com/boecker-lab/sirius). 
+Additionally, you can install Sirius via their [GitHub repository](https://github.com/boecker-lab/sirius).
 
 # Sirius binding
 Here we present a binding for Sirius in [Rust](https://www.rust-lang.org/). This binding is a wrapper around the Sirius command line interface (CLI) and provides a more user-friendly interface for running Sirius. It also provides a safer way to run Sirius by using type safety and error handling before running Sirius executable.
@@ -59,7 +59,12 @@ let output_file_path = Path::new("tests/data/output_sirius_default");
 if output_file_path.exists() {
     let _ = std::fs::remove_dir_all(output_file_path);
 }
-sirius.run(input_file_path, output_file_path).unwrap();
+
+if std::env::var("SIRIUS_PATH").is_ok() {
+    sirius.run(input_file_path, output_file_path).unwrap();
+} else {
+    println!("`SIRIUS_PATH` is not set. Please set it to the path of the `SIRIUS` executable.");
+}
 ```
 
 You can also be more specific and add other parameters. The following example uses the parameters used for the [ENPKG pipeline](https://github.com/enpkg/enpkg_full/blob/c8e649290ee72f000c3385e7669b5da2215abad8/params/user.yml#L60):
@@ -153,11 +158,16 @@ let output_file_path = Path::new("tests/data/output_sirius");
 if output_file_path.exists() {
     let _ = std::fs::remove_dir_all(output_file_path);
 }
-sirius.run(input_file_path, output_file_path).unwrap();
+
+if std::env::var("SIRIUS_PATH").is_ok() {
+    sirius.run(input_file_path, output_file_path).unwrap();
+} else {
+    println!("`SIRIUS_PATH` is not set. Please set it to the path of the `SIRIUS` executable.");
+}
 ```
 
 ## Error cases
-This binding also provides error handling before running the Sirius CLI. 
+This binding also provides error handling before running the Sirius CLI.
 
 The following example will throw an error because the `maximal_mz` is added twice:
 ```should_panic

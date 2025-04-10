@@ -26,6 +26,7 @@ struct TableRow<'a> {
 }
 
 impl Report {
+    #[must_use]
     /// Creates a new report for the given time tracker.
     pub fn new(time_tracker: TimeTracker) -> Self {
         Self { time_tracker, previous_reports: Vec::new() }
@@ -37,10 +38,19 @@ impl Report {
 
         // We ensure that the previous reports are sorted by the start time, so
         // that they are all sorted by the time they were created.
-        self.previous_reports.sort_by_key(|report| report.start());
+        self.previous_reports.sort_by_key(TimeTracker::start);
     }
 
     /// Adds a directory from which to load previous reports in JSON format.
+    ///
+    /// # Arguments
+    ///
+    /// * `directory` - The path to the directory containing the JSON files.
+    ///
+    /// # Errors
+    ///
+    /// If the directory cannot be read or if any of the files cannot be
+    /// parsed, an error will be returned.
     pub fn add_directory(&mut self, directory: &std::path::Path) -> std::io::Result<()> {
         for entry in std::fs::read_dir(directory)? {
             let entry = entry?;
@@ -64,6 +74,7 @@ impl Report {
         )
     }
 
+    #[allow(clippy::cast_precision_loss)]
     fn slowest_task_description(&self) -> Option<String> {
         self.time_tracker.slowest_task().map(|task| {
             let total_time = self.time_tracker.total_time();
@@ -103,6 +114,7 @@ impl Report {
         self.previous_reports_task(task).last().copied()
     }
 
+    #[allow(clippy::cast_precision_loss)]
     /// Returns the comment for a given task based on the previous reports.
     fn task_comment(&self, task: &CompletedTask) -> Option<String> {
         self.previous_report_task(task).map(|previous_task| {
@@ -122,27 +134,45 @@ impl Report {
         })
     }
 
+    #[must_use]
     /// Returns a reference to the oldest report
     pub fn oldest_report(&self) -> &TimeTracker {
         self.previous_reports.first().unwrap_or(&self.time_tracker)
     }
 
+    #[must_use]
     /// Slowest task in the report
     pub fn slowest_task(&self) -> Option<&CompletedTask> {
         self.previous_reports
             .iter()
             .chain(std::iter::once(&self.time_tracker))
-            .max_by_key(|report| report.slowest_task().map(|task| task.time()).unwrap_or_default())?
+            .max_by_key(|report| report.slowest_task().map(CompletedTask::time).unwrap_or_default())?
             .slowest_task()
     }
 
+    #[must_use]
     /// Returns the total number of reports
     pub fn total_reports(&self) -> usize {
         self.previous_reports.len() + 1
     }
 
+    #[allow(clippy::cast_precision_loss)]
     /// Writes out a plot of the trends for all tasks in the report and saves it
     /// to the given file.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `path` - The path to the file to write the plot to.
+    /// 
+    /// # Errors
+    /// 
+    /// If the file cannot be created or written to, an error will be returned.
+    /// 
+    /// # Panics
+    /// 
+    /// If the plot cannot be created due to configurations or other
+    /// reasons, a panic will occur.
+    /// 
     pub fn plot(&self, path: &Path) -> std::io::Result<()> {
         let root = BitMapBackend::new(path, (800, 600)).into_drawing_area();
         root.fill(&WHITE).unwrap();
@@ -152,10 +182,7 @@ impl Report {
             .y_label_area_size(40)
             .build_cartesian_2d(
                 0.0..self.total_reports() as f64,
-                0.0..self
-                    .slowest_task()
-                    .map(|task| task.time().num_seconds() as f64)
-                    .unwrap_or(1.0),
+                0.0..self.slowest_task().map_or(1.0, |task| task.time().num_seconds() as f64),
             )
             .unwrap();
 
@@ -176,7 +203,7 @@ impl Report {
                         let y = y.num_seconds() as f64;
                         (x as f64, y)
                     }),
-                    styles.get(task).unwrap().clone(),
+                    *styles.get(task).unwrap(),
                 ))
                 .unwrap();
         }
@@ -186,7 +213,7 @@ impl Report {
 
     /// Returns an iterator over the sub-reports.
     fn sub_reports(&self) -> impl Iterator<Item = Report> + '_ {
-        self.time_tracker.sub_trackers().into_iter().cloned().map(|time_tracker| {
+        self.time_tracker.sub_trackers().iter().cloned().map(|time_tracker| {
             Self {
                 previous_reports: self
                     .previous_reports
@@ -198,6 +225,7 @@ impl Report {
         })
     }
 
+    #[allow(clippy::cast_precision_loss)]
     /// Returns the text of the report.
     fn text(&self, depth: usize) -> String {
         let total_time = self.time_tracker.total_time().num_seconds() as f64;
@@ -236,6 +264,15 @@ impl Report {
     }
 
     /// Writes out the markdown report to a given file.
+    ///
+    /// # Arguments
+    ///
+    /// * `report_path` - The path to the file to write the report to.
+    /// * `plot_path` - The path to the file to write the plot to.
+    ///
+    /// # Errors
+    ///
+    /// If the file cannot be created or written to, an error will be returned.
     pub fn write(&self, report_path: &Path, plot_path: &Path) -> std::io::Result<()> {
         let mut file = std::fs::File::create(report_path)?;
         self.plot(plot_path)?;

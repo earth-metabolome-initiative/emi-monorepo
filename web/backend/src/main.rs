@@ -1,4 +1,3 @@
-// main.rs
 extern crate diesel;
 
 use std::path::PathBuf;
@@ -19,7 +18,7 @@ async fn index() -> impl Responder {
 #[get("/{filename:.*}")]
 /// Entrypoint to load the *.wasm and the *.js files
 ///
-/// # Implementative details
+/// # Implementation details
 /// If the path happens to not exist, the server will return a 404 error.
 async fn frontend_static_files(req: HttpRequest) -> impl Responder {
     let path: PathBuf = req.match_info().query("filename").parse().unwrap();

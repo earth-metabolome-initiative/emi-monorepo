@@ -175,8 +175,17 @@ impl PgProc {
             .optional()
     }
 
-    #[must_use]
     /// Returns the path to the function.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a [`PgConnection`](diesel::PgConnection).
+    /// 
+    /// # Errors
+    /// 
+    /// * If the database connection is invalid.
+    /// * If the function is not contained in an extension.
+    /// 
     pub fn path(&self, conn: &mut PgConnection) -> Result<syn::Path, diesel::result::Error> {
         let extension = self.extension(conn)?;
         let extension = extension.map(|ext| ext.ident());

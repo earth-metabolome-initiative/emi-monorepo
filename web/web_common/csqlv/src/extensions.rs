@@ -13,7 +13,7 @@ pub const COMPRESSION_EXTENSIONS: [&str; 1] = ["gz"];
 /// # Arguments
 /// * `path` - A path to a file.
 ///
-/// # Implementative details
+/// # Implementation details
 /// The function checks whether the provided path has an extension that is
 /// supported by the CSV Schema struct. The supported extensions are defined
 /// in the `EXTENSIONS` constant, combined with the `COMPRESSION_EXTENSIONS`

@@ -4,7 +4,7 @@ use crate::{prelude::*, traits::Enablable};
 
 /// Struct providing the configuration for Sirius.
 ///
-/// # Implementative details
+/// # Implementation details
 /// This struct MUST be a private struct. It is only used by the
 /// [`SiriusBuilder`](crate::builder::SiriusBuilder) to
 /// build the [`Sirius`](crate::sirius::Sirius) struct, and through the builder

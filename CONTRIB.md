@@ -4,6 +4,14 @@
 
 I wrote a short [Rust setup tutorial](https://github.com/LucaCappelletti94/linux-setup/blob/main/RUST.md) that you can follow to set up your Rust environment. Please follow it before contributing to this project.
 
+## Setting up the Monorepo environment
+
+In the monorepo you will find 
+
+```bash
+pip install pre-commit
+```
+
 ## Comments on code styles and standards
 
 In this section I try to briefly summarize the code styles and standards that we follow in this project. If you are unsure about something, please refer to the existing codebase, or ask in the GitHub issues.

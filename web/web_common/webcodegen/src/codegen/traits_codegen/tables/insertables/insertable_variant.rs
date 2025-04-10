@@ -9,6 +9,7 @@ use proc_macro2::TokenStream;
 use crate::{Codegen, Table};
 
 impl Codegen<'_> {
+    #[allow(clippy::too_many_lines)]
     /// Generates the [`InsertableVariant`] trait implementation for the tables
     ///
     /// # Arguments
@@ -61,14 +62,14 @@ impl Codegen<'_> {
                         quote::quote! {
                             if let Some(parent) = self.#parent_key_method(conn).await? {
                                 if !parent.can_update(user_id, conn).await? {
-                                    return Err(server_errors::Error::Unauthorized.into());
+                                    return Err(backend_errors::Error::Unauthorized.into());
                                 }
                             }
                         }
                     } else {
                         quote::quote! {
                             if !self.#parent_key_method(conn).await?.can_update(user_id, conn).await? {
-                                return Err(server_errors::Error::Unauthorized.into());
+                                return Err(backend_errors::Error::Unauthorized.into());
                             }
                         }
                     })

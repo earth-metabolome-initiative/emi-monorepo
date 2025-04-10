@@ -3,6 +3,7 @@ use actix_web::{get, web, HttpRequest, HttpResponse};
 use core_structures::User;
 use web_common::api::{oauth::jwt_cookies::AccessToken, ApiError};
 use web_common_traits::database::Loadable;
+use backend_errors::Error;
 
 use crate::api::oauth::jwt_cookies::{
     eliminate_cookies, JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME,
@@ -16,7 +17,7 @@ use crate::api::oauth::jwt_cookies::{
 /// * `pool` - The database pool to use for the login.
 /// * `redis_client` - The redis client to use for the login.
 ///
-/// # Implementative details
+/// # Implementation details
 /// The refresh token is expected to be present in the request as a cookie, with
 /// the name defined by the constant REFRESH_COOKIE_NAME. The refresh token is
 /// then decoded, and checked whether it is still present in the redis database.
@@ -41,12 +42,12 @@ pub async fn refresh_access_token(
 ) -> Result<(User, AccessToken), HttpResponse> {
     let Some(refresh_cookie) = req.cookie(REFRESH_COOKIE_NAME) else {
         log::debug!("Refresh token not present in request");
-        return Err(eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized()));
+        return Err(eliminate_cookies(HttpResponse::Unauthorized()).json(Error::Unauthorized));
     };
 
     let Ok(refresh_token) = JsonRefreshToken::decode(refresh_cookie.value()) else {
         log::debug!("Unable to decode refresh token");
-        return Err(eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized()));
+        return Err(eliminate_cookies(HttpResponse::Unauthorized()).json(Error::Unauthorized));
     };
 
     // If the token is expired, we return an error.

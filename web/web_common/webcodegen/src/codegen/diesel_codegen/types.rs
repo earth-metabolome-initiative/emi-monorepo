@@ -24,7 +24,7 @@ impl Codegen<'_> {
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
 
-        let types = self.required_types(tables, conn)?;
+        let types = Self::required_types(tables, conn)?;
 
         // We generate each table in a separate document under the provided root, and we
         // collect all of the imported modules in a public one.
