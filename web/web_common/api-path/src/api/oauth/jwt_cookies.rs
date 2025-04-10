@@ -15,3 +15,27 @@ pub const FULL_LOGOUT_ENDPOINT: &str =
 
 /// Name of the cookie storing whether the user is online
 pub const USER_ONLINE_COOKIE_NAME: &str = "user_online";
+
+
+#[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq, Clone)]
+/// Struct representing the access token used to authenticate the user.
+pub struct AccessToken {
+    token: String,
+}
+
+impl AccessToken {
+    /// Creates a new access token.
+    pub fn new(token: String) -> Self {
+        Self { token }
+    }
+
+    /// Creates a new access token from a string slice.
+    pub fn token(&self) -> &str {
+        &self.token
+    }
+
+    /// Creates a new access token from a string slice.
+    pub fn header(&self) -> (&str, String) {
+        ("Authorization", format!("Bearer {}", self.token))
+    }
+}
