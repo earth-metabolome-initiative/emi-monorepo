@@ -12,7 +12,7 @@ members = [
     "web/web_common/pgrx_validation",
     "web/web_common/pgrx_validation_derive",
     "web/web_common/validation-errors",
-    "web/web_common/backend-errors",
+    "web/web_common/backend-request-errors",
     "web/web_common/frontend-errors",
     "web/web_common/pg2sqlite",
     "data-retrieval/taxonomy-fetcher",
@@ -99,7 +99,7 @@ sorted-vec = { path = "data-structures/sorted-vec" }
 pgrx_validation = { path = "web/web_common/pgrx_validation" }
 pgrx_validation_derive = { path = "web/web_common/pgrx_validation_derive" }
 validation-errors = { path = "web/web_common/validation-errors" }
-backend-errors = { path = "web/web_common/backend-errors" }
+backend-request-errors = { path = "web/web_common/backend-request-errors" }
 frontend-errors = { path = "web/web_common/frontend-errors" }
 validator = { version = "0.16", features = ["derive"] }
 cargo-husky = { version = "1", features = [
