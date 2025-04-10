@@ -39,7 +39,7 @@ impl CSVTableMetadata {
     /// Returns the name of the table to use as foreign key.
     pub fn foreign_table_name(&self) -> String {
         if self.singularize {
-            Inflector.singularize(&self.name)
+            Inflector::default().singularize(&self.name)
         } else {
             self.name.clone()
         }

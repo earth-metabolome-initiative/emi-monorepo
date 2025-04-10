@@ -33,7 +33,7 @@ impl CSVSchema {
     /// Returns the tables in the schema alongside their priority score, sorted
     /// by descending priority.
     ///
-    /// # Implementative details
+    /// # Implementation details
     /// The priority score is determined by the score of the dependant tables +
     /// 1.
     pub fn tables_with_priority(&self) -> Vec<(CSVTable<'_>, usize)> {
@@ -137,7 +137,7 @@ impl CSVSchema {
     #[must_use]
     /// Returns the SQL to delete all tables in the schema in `PostgreSQL`.
     ///
-    /// # Implementative details
+    /// # Implementation details
     /// The deletion happens following the reverse order of the foreign keys.
     pub fn to_sql_delete(&self) -> String {
         let mut sql = String::new();

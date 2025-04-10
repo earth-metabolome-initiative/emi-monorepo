@@ -39,6 +39,7 @@ impl Table {
 }
 
 impl Codegen<'_> {
+    #[allow(clippy::too_many_lines)]
     /// Generates the [`Updatable`](web_common_traits::database::Updatable)
     /// trait implementation for the tables
     ///

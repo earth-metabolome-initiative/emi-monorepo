@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
 /// The possible structure settings
@@ -6,19 +8,19 @@ pub enum StructureV5 {
     /// If the structure is enabled
     Enabled,
 
-    /// The version for `structure``
+    /// The version for `structure`
     Version,
 
-    /// The help  for `structure``
+    /// The help  for `structure`
     Help,
 }
 
-impl ToString for StructureV5 {
-    fn to_string(&self) -> String {
+impl Display for StructureV5 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            StructureV5::Enabled => Self::parameter_set_name().to_string(),
-            StructureV5::Help => "--help".to_string(),
-            StructureV5::Version => "--version".to_string(),
+            StructureV5::Enabled => write!(f, "{}", Self::parameter_set_name()),
+            StructureV5::Help => write!(f, "--help"),
+            StructureV5::Version => write!(f, "--version"),
         }
     }
 }

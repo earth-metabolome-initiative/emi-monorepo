@@ -12,13 +12,14 @@ pub struct HasSpecificTypeConstraint<'column> {
 }
 
 impl<'column> HasSpecificTypeConstraint<'column> {
+    #[must_use]
     /// Create a new `HasSpecificTypeConstraint`
     pub fn new(column_name: &'column str, column_type: &'column str) -> Self {
         Self { column_name, column_type }
     }
 }
 
-impl<'column> CustomColumnConstraint for HasSpecificTypeConstraint<'column> {
+impl CustomColumnConstraint for HasSpecificTypeConstraint<'_> {
     fn check_constraint(
         &self,
         conn: &mut PgConnection,

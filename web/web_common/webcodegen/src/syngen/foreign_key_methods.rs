@@ -15,6 +15,11 @@ impl Table {
     ///
     /// * `conn` - A mutable reference to a `PgConnection`.
     /// * `syntax` - The syntax to use for the code generation.
+    ///
+    /// # Errors
+    ///
+    /// * If the connection to the database fails.
+    /// * If the foreign key traits cannot be generated.
     pub fn foreign_key_traits(
         &self,
         conn: &mut PgConnection,
@@ -27,7 +32,10 @@ impl Table {
         // that appear ONCE, as otherwise the column of the trait would be ambiguous.
         let mut foreign_keys_and_tables = Vec::new();
         for foreign_key in foreign_keys {
-            let (foreign_key_table, _) = foreign_key.foreign_table(conn).unwrap().unwrap();
+            let Some((foreign_key_table, _)) = foreign_key.foreign_table(conn)? else {
+                continue;
+            };
+
             if &foreign_key_table == self {
                 continue;
             }
@@ -68,6 +76,16 @@ impl Table {
     }
 
     /// Returns the Syn `TokenStream` for the foreign key methods.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    /// * `syntax` - The syntax to use for the code generation.
+    ///
+    /// # Errors
+    ///
+    /// * If the connection to the database fails.
+    /// * If the foreign key methods cannot be generated.
     pub fn foreign_key_methods(
         &self,
         conn: &mut PgConnection,
@@ -80,7 +98,9 @@ impl Table {
             .foreign_keys(conn)?
             .into_iter()
             .map(|column| {
-                let (foreign_key_table, foreign_key_column) = column.foreign_table(conn).unwrap().unwrap();
+                let Some((foreign_key_table, foreign_key_column)) = column.foreign_table(conn)? else {
+                    return Ok(TokenStream::new());
+                };
                 let method_ident: Ident = column.getter_ident()?;
 
                 let current_column_ident: Ident = column.snake_case_ident()?;
@@ -136,6 +156,16 @@ impl Table {
     }
 
     /// Returns the Syn `TokenStream` for the from foreign key methods.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    /// * `syntax` - The syntax to use for the code generation.
+    ///
+    /// # Errors
+    ///
+    /// * If the connection to the database fails.
+    /// * If the foreign key methods cannot be generated.
     pub fn from_foreign_key_methods(
         &self,
         conn: &mut PgConnection,
@@ -149,7 +179,9 @@ impl Table {
             .foreign_keys(conn)?
             .into_iter()
             .map(|column| {
-                let (foreign_key_table, foreign_key_column) = column.foreign_table(conn).unwrap().unwrap();
+                let Some((foreign_key_table, foreign_key_column)) = column.foreign_table(conn)? else {
+                    return Ok(TokenStream::new());
+                };
                 let from_method_ident: Ident = Ident::new(&format!("from_{}", column.column_name), proc_macro2::Span::call_site());
 
                 let current_column_ident: Ident = column.snake_case_ident()?;

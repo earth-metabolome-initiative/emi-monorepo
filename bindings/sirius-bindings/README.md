@@ -3,14 +3,14 @@
 [![Crates.io](https://img.shields.io/crates/v/sirius-bindings.svg)](https://crates.io/crates/sirius-bindings)
 [![Documentation](https://docs.rs/sirius-bindings/badge.svg)](https://docs.rs/sirius-bindings)
 
-SIRIUS is a java-based software framework for the analysis of LC-MS/MS data of metabolites and other "small molecules of biological interest". SIRIUS integrates a collection of tools, including CSI:FingerID (with [COSMIC](https://bio.informatik.uni-jena.de/software/cosmic/), [ZODIAC](https://bio.informatik.uni-jena.de/software/zodiac/) and [CANOPUS](https://bio.informatik.uni-jena.de/software/canopus/). In particular, both the graphical user interface and the command line version of SIRIUS seamlessly integrate the CSI:FingerID and CANOPUS web services.
+SIRIUS is a computational mass spectrometry Java-based software framework for the analysis of LC-MS/MS metabolomics data sets and the annotation of metabolites and other small molecules of biological interest. SIRIUS integrates a collection of tools, including CSI:FingerID (with [COSMIC](https://bio.informatik.uni-jena.de/software/cosmic/), [ZODIAC](https://bio.informatik.uni-jena.de/software/zodiac/) and [CANOPUS](https://bio.informatik.uni-jena.de/software/canopus/).
 
 For further reading we recommend you to refer to the official [Sirius website](https://bio.informatik.uni-jena.de/software/sirius/). 
 
 ## Installation
 Since version 5.7.0 SIRIUS is officially available via conda ([conda-forge](https://conda-forge.org/)) under the package name [sirius-ms](https://anaconda.org/conda-forge/sirius-ms). Native MacOS arm64 (Apple Silicon) builds are solely available via conda.
 
-Additionally, you can install Sirius via their [GitHub repository](https://github.com/boecker-lab/sirius). 
+Additionally, you can install Sirius via their [GitHub repository](https://github.com/boecker-lab/sirius).
 
 # Sirius binding
 Here we present a binding for Sirius in [Rust](https://www.rust-lang.org/). This binding is a wrapper around the Sirius command line interface (CLI) and provides a more user-friendly interface for running Sirius. It also provides a safer way to run Sirius by using type safety and error handling before running Sirius executable.
@@ -55,11 +55,16 @@ let sirius = SiriusBuilder::<Version5>::default()
     .build();
 let input_file_path = Path::new("tests/data/input_sirius.mgf");
 let output_file_path = Path::new("tests/data/output_sirius_default");
-// Check if the path exists before attempting to remove it
+// In case you need to remove the output directory, uncomment the lines below
 if output_file_path.exists() {
     let _ = std::fs::remove_dir_all(output_file_path);
 }
-sirius.run(input_file_path, output_file_path).unwrap();
+
+if std::env::var("SIRIUS_PATH").is_ok() {
+    sirius.run(input_file_path, output_file_path).unwrap();
+} else {
+    println!("`SIRIUS_PATH` is not set. Please set it to the path of the `SIRIUS` executable.");
+}
 ```
 
 You can also be more specific and add other parameters. The following example uses the parameters used for the [ENPKG pipeline](https://github.com/enpkg/enpkg_full/blob/c8e649290ee72f000c3385e7669b5da2215abad8/params/user.yml#L60):
@@ -149,15 +154,20 @@ let sirius = SiriusBuilder::default()
 
 let input_file_path = Path::new("tests/data/input_sirius.mgf");
 let output_file_path = Path::new("tests/data/output_sirius");
-// Check if the path exists before attempting to remove it
+// In case you need to remove the output directory, uncomment the lines below
 if output_file_path.exists() {
     let _ = std::fs::remove_dir_all(output_file_path);
 }
-sirius.run(input_file_path, output_file_path).unwrap();
+
+if std::env::var("SIRIUS_PATH").is_ok() {
+    sirius.run(input_file_path, output_file_path).unwrap();
+} else {
+    println!("`SIRIUS_PATH` is not set. Please set it to the path of the `SIRIUS` executable.");
+}
 ```
 
 ## Error cases
-This binding also provides error handling before running the Sirius CLI. 
+This binding also provides error handling before running the Sirius CLI.
 
 The following example will throw an error because the `maximal_mz` is added twice:
 ```should_panic
@@ -175,9 +185,9 @@ let sirius = SiriusBuilder::<Version5>::default()
     .build();
 let input_file_path = Path::new("tests/data/input_sirius.mgf");
 let output_file_path = Path::new("tests/data/output_sirius_default");
-// Check if the path exists before attempting to remove it
+// In case you need to remove the output directory, uncomment the lines below
 if output_file_path.exists() {
-    let _ = std::fs::remove_dir_all(output_file_path);
+   let _ = std::fs::remove_dir_all(output_file_path);
 }
 sirius.run(input_file_path, output_file_path).unwrap();
 ```

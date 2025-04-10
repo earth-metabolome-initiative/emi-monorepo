@@ -13,9 +13,6 @@ mod types;
 use syn::Ident;
 use time_requirements::prelude::{Task, TimeTracker};
 
-use time_requirements::prelude::{Task, TimeTracker};
-
-
 impl Codegen<'_> {
     /// Code relative to generating all of the web common traits code.
     ///

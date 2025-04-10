@@ -1,11 +1,11 @@
 use std::fmt::Display;
 
-/// The structure predictors. For now, only CSI_FINGERID is supported.
+/// The structure predictors. For now, only `CSI_FINGERID` is supported.
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default, Copy)]
 pub enum StructurePredictors {
     #[default]
-    /// The CSI_FINGERID structure predictor
+    /// The `CSI_FINGERID` structure predictor
     CsiFingerId,
 }
 
@@ -23,7 +23,7 @@ impl<'a> TryFrom<&'a str> for StructurePredictors {
     fn try_from(s: &'a str) -> Result<Self, Self::Error> {
         match s {
             "CSI_FINGERID" => Ok(StructurePredictors::CsiFingerId),
-            _ => Err(format!("Unknown structure predictor: {}", s)),
+            _ => Err(format!("Unknown structure predictor: {s}")),
         }
     }
 }

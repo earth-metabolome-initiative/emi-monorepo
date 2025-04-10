@@ -121,7 +121,7 @@ impl<'a> TryFrom<&'a str> for Adducts {
             "[M+H-H4O2]+" => Ok(Adducts::MplusHminusTwoH2Oplus),
             "[M-H2O-H]-" => Ok(Adducts::MminusH20minusHminus),
             "[M+Br]-" => Ok(Adducts::MplusBromideminus),
-            _ => Err(format!("Unknown adduct: {}", s)),
+            _ => Err(format!("Unknown adduct: {s}")),
         }
     }
 }
@@ -143,9 +143,9 @@ impl Display for AdductsVector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut adducts_string = self.0.iter();
         if let Some(adduct) = adducts_string.next() {
-            write!(f, "{}", adduct)?;
+            write!(f, "{adduct}")?;
             for adduct in adducts_string {
-                write!(f, ",{}", adduct)?;
+                write!(f, ",{adduct}")?;
             }
         }
         Ok(())
@@ -166,7 +166,7 @@ impl<'a> TryFrom<&'a str> for AdductsVector {
             .split(',')
             .map(|adduct| {
                 Adducts::try_from(adduct)
-                    .map_err(|e| format!("Cannot parse adduct: {} ({}). Maybe forgot to put a comma between adducts ?", adduct, e))
+                    .map_err(|e| format!("Cannot parse adduct: {adduct} ({e}). Maybe forgot to put a comma between adducts ?"))
             })
             .collect::<Result<Vec<_>, _>>()?;
         Ok(AdductsVector(adducts))

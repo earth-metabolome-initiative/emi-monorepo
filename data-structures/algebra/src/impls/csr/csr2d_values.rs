@@ -46,11 +46,7 @@ where
         let already_observed_in_back_row =
             self.matrix.number_of_defined_values_in_row(self.back_row).into_usize()
                 - self.back.len();
-        let remaining = back_row_rank
-            - next_row_rank
-            - already_observed_in_next_row
-            - already_observed_in_back_row;
-        remaining
+        back_row_rank - next_row_rank - already_observed_in_next_row - already_observed_in_back_row
     }
 }
 

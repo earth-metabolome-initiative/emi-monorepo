@@ -62,7 +62,7 @@ impl Codegen<'_> {
                         use web_common_traits::database::Updatable;
 
                         if !self.can_update(user_id, conn).await? {
-                            return Err(server_errors::Error::Unauthorized.into());
+                            return Err(backend_errors::Error::Unauthorized.into());
                         }
 
                         Ok(diesel::delete(Self::table().find(self.id())).execute(conn).await.map(|x| x > 0)?)

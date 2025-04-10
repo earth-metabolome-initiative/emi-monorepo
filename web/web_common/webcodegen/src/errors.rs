@@ -55,6 +55,8 @@ pub enum WebCodeGenError {
     IoError(std::io::Error),
     /// Empty table name.
     EmptyTableName(Box<Table>),
+    /// Empty column name.
+    EmptyColumnName(Box<Column>),
     /// Error attempting to convert a string to an integer.
     ParseIntError(core::num::ParseIntError),
     /// Error attempting to convert a string to a float.

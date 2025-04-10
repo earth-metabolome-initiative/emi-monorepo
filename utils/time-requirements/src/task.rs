@@ -11,10 +11,11 @@ pub struct Task {
 
 impl Task {
     /// Create a new task with the given name.
-    pub fn new<S: ToString>(name: S) -> Self {
+    pub fn new<S: ToString + ?Sized>(name: &S) -> Self {
         Self { name: name.to_string(), start: chrono::Local::now().naive_local() }
     }
 
+    #[must_use]
     /// Marks the task as completed.
     pub fn complete(self) -> CompletedTask {
         CompletedTask {
@@ -37,11 +38,13 @@ pub struct CompletedTask {
 }
 
 impl CompletedTask {
+    #[must_use]
     /// Returns the name of the task.
     pub fn name(&self) -> &str {
         &self.name
     }
 
+    #[must_use]
     /// Returns the time required to complete the task.
     pub fn time(&self) -> chrono::TimeDelta {
         self.end - self.start

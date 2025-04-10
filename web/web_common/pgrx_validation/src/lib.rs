@@ -333,8 +333,8 @@ mod tests {
 
     #[test]
     fn test_must_be_distinct_uuid() {
-        let uuid1 = uuid::Uuid::new_v4();
-        let uuid2 = uuid::Uuid::new_v4();
+        let uuid1 = rosetta_uuid::Uuid::new_v4();
+        let uuid2 = rosetta_uuid::Uuid::new_v4();
         assert!(must_be_distinct_uuid(uuid1, uuid2).is_ok());
         assert_eq!(
             must_be_distinct_uuid(uuid1, uuid1).unwrap_err(),

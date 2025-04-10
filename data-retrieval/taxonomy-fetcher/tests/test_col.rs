@@ -1,13 +1,11 @@
 //! Test whether the COL taxonomy fetcher works as expected.
 
-use strum::IntoEnumIterator;
-use taxonomy_fetcher::{
-    impls::catalog_of_life::{CatalogOfLifeTaxonomyBuilder, CatalogOfLifeVersion},
-    TaxonomyBuilder, TaxonomyBuilderError,
-};
+use taxonomy_fetcher::{impls::catalog_of_life::CatalogOfLifeTaxonomyBuilder, TaxonomyBuilder};
 
 #[tokio::test]
 async fn test_all_col() {
+    // use taxonomy_fetcher::{impls::catalog_of_life::CatalogOfLifeVersion,
+    // TaxonomyBuilderError}; use strum::IntoEnumIterator;
     // for version in CatalogOfLifeVersion::iter() {
     //     // We create a new COL taxonomy fetcher.
     //     let fetcher = CatalogOfLifeTaxonomyBuilder::default().version(version);

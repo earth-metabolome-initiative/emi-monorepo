@@ -1,3 +1,4 @@
+//! Test for the CSV schema
 use csqlv::{CSVSchema, CSVSchemaBuilder};
 
 #[test]

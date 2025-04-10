@@ -1,6 +1,6 @@
 //! Utilities regarding cookies that can be used in the frontend.
 //!
-//! # Implementative details
+//! # Implementation details
 //! There exist a type of cookie called `HttpOnly` cookies, which are not
 //! accessible from JavaScript. This is a security feature, and is used for
 //! cookies that are not meant to be accessed from JavaScript. As such, we will

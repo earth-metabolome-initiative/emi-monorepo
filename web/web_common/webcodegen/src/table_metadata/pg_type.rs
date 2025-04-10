@@ -707,6 +707,7 @@ impl PgType {
         }
     }
 
+    #[allow(clippy::too_many_lines)]
     /// Returns the syn of the traits necessary for diesel to support the
     /// conversion between the Postgres type and the Rust type.
     ///
@@ -875,51 +876,177 @@ impl PgType {
     }
 
     /// Returns whether the [`PgType`] is a boolean.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing a boolean indicating whether the type is a boolean.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
     pub fn is_boolean(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(rust_type_str(&self.typname, conn)? == "bool")
     }
 
     /// Returns whether the [`PgType`] is a text type.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing a boolean indicating whether the type is a text
+    /// type.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
     pub fn is_text(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(rust_type_str(&self.typname, conn)? == "String")
     }
 
-    /// Returns whether the [`PgType`] is a i16 type.
+    /// Returns whether the [`PgType`] is an i16 type.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing a boolean indicating whether the type is an i16
+    /// type.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
     pub fn is_i16(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(rust_type_str(&self.typname, conn)? == "i16")
     }
 
-    /// Returns whether the [`PgType`] is a i32 type.
+    /// Returns whether the [`PgType`] is an i32 type.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing a boolean indicating whether the type is an i32
+    /// type.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
     pub fn is_i32(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(rust_type_str(&self.typname, conn)? == "i32")
     }
 
-    /// Returns whether the [`PgType`] is a i64 type.
+    /// Returns whether the [`PgType`] is an i64 type.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing a boolean indicating whether the type is an i64
+    /// type.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
     pub fn is_i64(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(rust_type_str(&self.typname, conn)? == "i64")
     }
 
     /// Returns whether the [`PgType`] is a u16 type.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing a boolean indicating whether the type is a u16 type.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
     pub fn is_u16(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(rust_type_str(&self.typname, conn)? == "u16")
     }
 
     /// Returns whether the [`PgType`] is a u32 type.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing a boolean indicating whether the type is a u32 type.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
     pub fn is_u32(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(rust_type_str(&self.typname, conn)? == "u32")
     }
 
     /// Returns whether the [`PgType`] is a u64 type.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing a boolean indicating whether the type is a u64 type.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
     pub fn is_u64(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(rust_type_str(&self.typname, conn)? == "u64")
     }
 
-    /// Returns whether the [`PgType`] is a f32 type.
+    /// Returns whether the [`PgType`] is an f32 type.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing a boolean indicating whether the type is an f32
+    /// type.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
     pub fn is_f32(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(rust_type_str(&self.typname, conn)? == "f32")
     }
 
-    /// Returns whether the [`PgType`] is a f64 type.
+    /// Returns whether the [`PgType`] is an f64 type.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing a boolean indicating whether the type is an f64
+    /// type.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
     pub fn is_f64(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(rust_type_str(&self.typname, conn)? == "f64")
     }
@@ -941,7 +1068,7 @@ impl PgType {
     /// * Returns an error if the provided database connection fails.
     pub fn from_oid(oid: u32, conn: &mut PgConnection) -> Result<Self, diesel::result::Error> {
         use crate::schema::pg_type;
-        Ok(pg_type::table.filter(pg_type::oid.eq(oid)).first::<PgType>(conn)?)
+        pg_type::table.filter(pg_type::oid.eq(oid)).first::<PgType>(conn)
     }
 
     /// Returns the attributes of the type, if it is a composite type.

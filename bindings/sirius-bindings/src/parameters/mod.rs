@@ -16,7 +16,7 @@ pub mod formula;
 /// Get the settings for structure
 pub mod structure;
 
-/// Get the settings for write_summaries
+/// Get the settings for `write_summaries`
 pub mod write_summaries;
 
 /// Get the settings for zodiac

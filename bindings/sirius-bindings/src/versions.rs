@@ -9,27 +9,51 @@ pub trait Version: Default {
     const VERSION: usize;
 
     /// The core parameters
+    ///
+    /// # Errors
+    /// This method does not return a `Result`, so no errors are expected.
     type Core: ToString + Debug + IntoDefault;
 
     /// The config parameters
+    ///
+    /// # Errors
+    /// This method does not return a `Result`, so no errors are expected.
     type Config: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
 
     /// The Canopus parameters
+    ///
+    /// # Errors
+    /// This method does not return a `Result`, so no errors are expected.
     type Canopus: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
 
     /// The Formula parameters
+    ///
+    /// # Errors
+    /// This method does not return a `Result`, so no errors are expected.
     type Formula: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
 
     /// The Zodiac parameters
+    ///
+    /// # Errors
+    /// This method does not return a `Result`, so no errors are expected.
     type Zodiac: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
 
     /// The Fingerprint parameters
+    ///
+    /// # Errors
+    /// This method does not return a `Result`, so no errors are expected.
     type Fingerprint: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
 
     /// The Structure parameters
+    ///
+    /// # Errors
+    /// This method does not return a `Result`, so no errors are expected.
     type Structure: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
 
     /// Whether to write summaries
+    ///
+    /// # Errors
+    /// This method does not return a `Result`, so no errors are expected.
     type WriteSummaries: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
 }
 

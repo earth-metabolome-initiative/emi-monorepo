@@ -5,11 +5,9 @@ on:
   push:
     paths:
       - "bindings/sirius-bindings/**"
-    branches: ["main"]
   pull_request:
     paths:
       - "bindings/sirius-bindings/**"
-    branches: ["main"]
 
 env:
   CARGO_TERM_COLOR: always

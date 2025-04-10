@@ -2,11 +2,11 @@
 use std::env;
 
 use actix_web::{get, HttpResponse, Responder};
+use backend_errors::Error;
 use core_structures::LoginProvider;
 use redis::Client as RedisClient;
 use reqwest::Client;
 use serde::Deserialize;
-use web_common::api::ApiError;
 
 use super::jwt_cookies::build_login_response;
 use crate::api::oauth::*;
@@ -26,7 +26,7 @@ impl GitHubConfig {
     ///
     /// A `Result` containing the `GitHubConfig` if the environment variables
     /// are set, or an error message if they are not.
-    pub async fn from_env(connection: &mut crate::Conn) -> Result<GitHubConfig, ApiError> {
+    pub async fn from_env(connection: &mut crate::Conn) -> Result<GitHubConfig, Error> {
         let Ok(client_secret) = env::var("GITHUB_CLIENT_SECRET") else {
             panic!("GITHUB_CLIENT_SECRET not set");
         };
@@ -68,23 +68,23 @@ async fn github_oauth_handler(
     let state = &query.state;
 
     if code.is_empty() {
-        return HttpResponse::Unauthorized().json(ApiError::unauthorized());
+        return HttpResponse::Unauthorized().json(Error::Unauthorized);
     }
 
     let Ok(token_response) = get_github_oauth_token(code.as_str(), &pool).await else {
-        return HttpResponse::BadRequest().json(ApiError::internal_server_error());
+        return HttpResponse::BadRequest().json(Error::DieselError);
     };
 
     // We retrieve the GitHub user emails
     let Ok(emails) = get_github_user_emails(token_response.access_token.as_str()).await else {
-        return HttpResponse::BadRequest().json(ApiError::internal_server_error());
+        return HttpResponse::BadRequest().json(Error::DieselError);
     };
 
     let Ok(mut connection) = pool.get().await else {
-        return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
+        return HttpResponse::InternalServerError().json(Error::DieselError);
     };
     let Ok(github_config) = GitHubConfig::from_env(&mut connection).await else {
-        return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
+        return HttpResponse::InternalServerError().json(Error::DieselError);
     };
 
     todo!("Build the user from the emails and the GitHubConfig");
@@ -95,7 +95,7 @@ async fn github_oauth_handler(
 pub async fn get_github_oauth_token(
     authorization_code: &str,
     pool: &web::Data<crate::DBPool>,
-) -> Result<GitHubOauthToken, ApiError> {
+) -> Result<GitHubOauthToken, Error> {
     let mut connection = pool.get().await?;
     let github_config = GitHubConfig::from_env(&mut connection).await?;
 
@@ -118,7 +118,7 @@ pub async fn get_github_oauth_token(
 /// Returns the emails associated with the GitHub user.
 pub async fn get_github_user_emails(
     authorization_code: &str,
-) -> Result<Vec<GithubEmailMetadata>, ApiError> {
+) -> Result<Vec<GithubEmailMetadata>, Error> {
     let root_url = "https://api.github.com/user/emails";
 
     let client = Client::new();

@@ -1,6 +1,5 @@
 use base64::{engine::general_purpose, Engine};
 use image::GenericImageView;
-use web_common::{api::JPEGError, traits::*, types::JPEG};
 
 use super::*;
 
@@ -27,11 +26,6 @@ impl FileLike for JPEG {
             return Err(JPEGError::ImageTooSmall.into());
         }
 
-        // If the image has transparency, we reject it as we expect JPEGs
-        if image.is_transparent() {
-            return Err(JPEGError::ImageHasTransparency.into());
-        }
-
         // If the image is larger than 1024 in either width or height, we resize it
         let image = if width > 1024 || height > 1024 {
             image.resize(1024, 1024, image::imageops::FilterType::Lanczos3)
@@ -40,26 +34,6 @@ impl FileLike for JPEG {
         };
 
         let grayscale = image.to_luma8();
-
-        // If the image is too dark, we reject it
-        if grayscale.is_dark(None) {
-            return Err(JPEGError::ImageTooDark.into());
-        }
-
-        // If the image is too light, we reject it
-        if grayscale.is_light(None) {
-            return Err(JPEGError::ImageTooLight.into());
-        }
-
-        // If the image is blurry, we reject it
-        if grayscale.is_blurry(None) {
-            return Err(JPEGError::ImageIsBlurry.into());
-        }
-
-        // If the image has only a few colors that are repeated a lot, we reject it
-        if image.get_repeated_colors_rate(10) > 0.3 {
-            return Err(JPEGError::ImageHasFewColors.into());
-        }
 
         // We convert the image to a JPEG
         let mut jpeg = Vec::new();

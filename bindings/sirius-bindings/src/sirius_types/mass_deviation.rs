@@ -26,11 +26,10 @@ impl MassDeviation {
     /// use sirius_bindings::prelude::*;
     /// let ppm = MassDeviation::ppm(-10.0);
     /// ```
+    #[must_use]
     pub fn ppm(value: f32) -> Self {
         // ppm can't be negative
-        if value < 0.0 {
-            panic!("ppm value can't be negative");
-        }
+        assert!(value > 0.0, "ppm value can't be negative");
         MassDeviation::Ppm(value)
     }
 
@@ -48,11 +47,10 @@ impl MassDeviation {
     /// use sirius_bindings::prelude::*;
     /// let x = MassDeviation::da(-0.1);
     /// ```
+    #[must_use]
     pub fn da(value: f32) -> Self {
         // Da can't be negative
-        if value < 0.0 {
-            panic!("Da value can't be negative");
-        }
+        assert!(value > 0.0, "Da value can't be negative");
         MassDeviation::Da(value)
     }
 
@@ -95,8 +93,8 @@ impl MassDeviation {
 impl Display for MassDeviation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            MassDeviation::Ppm(value) => write!(f, "{} ppm", value),
-            MassDeviation::Da(value) => write!(f, "{} Da", value),
+            MassDeviation::Ppm(value) => write!(f, "{value} ppm"),
+            MassDeviation::Da(value) => write!(f, "{value} Da"),
         }
     }
 }
@@ -112,15 +110,15 @@ impl<'a> TryFrom<&'a str> for MassDeviation {
         match unit {
             "ppm" => {
                 Ok(MassDeviation::Ppm(
-                    value.parse().map_err(|e| format!("Cannot parse value: {}", e))?,
+                    value.parse().map_err(|e| format!("Cannot parse value: {e}"))?,
                 ))
             }
             "Da" => {
                 Ok(MassDeviation::Da(
-                    value.parse().map_err(|e| format!("Cannot parse value: {}", e))?,
+                    value.parse().map_err(|e| format!("Cannot parse value: {e}"))?,
                 ))
             }
-            _ => Err(format!("Unknown unit: {}", unit)),
+            _ => Err(format!("Unknown unit: {unit}")),
         }
     }
 }

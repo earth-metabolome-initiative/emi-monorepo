@@ -19,6 +19,7 @@ mod pgrx;
 pub struct Uuid(uuid::Uuid);
 
 impl Uuid {
+    #[must_use]
     /// Creates a new `Uuid` using the `uuid` crate's `new_v4` method.
     pub fn new_v4() -> Self {
         Self(uuid::Uuid::new_v4())
@@ -53,7 +54,7 @@ impl From<[u8; 16]> for Uuid {
 
 impl From<Uuid> for [u8; 16] {
     fn from(uuid: Uuid) -> Self {
-        uuid.0.as_bytes().clone()
+        *uuid.0.as_bytes()
     }
 }
 

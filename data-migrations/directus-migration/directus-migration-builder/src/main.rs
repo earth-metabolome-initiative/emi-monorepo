@@ -15,6 +15,7 @@ const DATABASE_URL: &str = const_format::formatcp!(
 );
 
 #[tokio::main]
+/// Executable to generate the code for the Directus database.
 pub async fn main() {
     // Get the output directory
     let out_dir = Path::new("../src");

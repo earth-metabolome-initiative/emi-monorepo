@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
 /// The possible formula settings
@@ -13,12 +15,12 @@ pub enum FormulaV5 {
     Help,
 }
 
-impl ToString for FormulaV5 {
-    fn to_string(&self) -> String {
+impl Display for FormulaV5 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            FormulaV5::Enabled => Self::parameter_set_name().to_string(),
-            FormulaV5::Help => "--help".to_string(),
-            FormulaV5::Version => "--version".to_string(),
+            FormulaV5::Enabled => write!(f, "{}", Self::parameter_set_name()),
+            FormulaV5::Help => write!(f, "--help"),
+            FormulaV5::Version => write!(f, "--version"),
         }
     }
 }
