@@ -85,7 +85,7 @@ pub async fn main() {
         )) => {
             // This error is expected when the database is empty and the
             // migration is not the first one.
-            if error.message() != "extension \"pgrx_validation\" is not available" {
+            if error.message() == "extension \"pgrx_validation\" is not available" {
                 panic!(concat!(
                     "You have forgotten to build the pgrx_validation extension. ",
                     "Please navigate to the `pgrx_validation` crate and read the ",
@@ -94,6 +94,8 @@ pub async fn main() {
                     "Docker is not able to load the extension from the `pgrx_validation` ",
                     "directory."
                 ));
+            } else {
+                panic!("{:?}", error);
             }
         }
         error => error.unwrap(),
