@@ -2,7 +2,7 @@
 use std::path::Path;
 
 use csqlv::CSVSchemaBuilder;
-use diesel::{Connection, pg::PgConnection};
+use diesel::{Connection, pg::PgConnection, result::DatabaseErrorKind};
 use diesel_migrations_utils::prelude::*;
 use taxonomy_fetcher::{
     Rank, Taxonomy, TaxonomyBuilder,
@@ -76,7 +76,28 @@ pub async fn main() {
 
     // We execute the migrations
     let task = Task::new("Executing Migrations");
-    extension_migrations.connect_and_execute_ups::<diesel::PgConnection>(DATABASE_URL).unwrap();
+    match extension_migrations.connect_and_execute_ups::<diesel::PgConnection>(DATABASE_URL) {
+        Ok(_) => {}
+        Err(MigrationError::ExecutingMigrationFailed(
+            _,
+            MigrationKind::Up,
+            diesel::result::Error::DatabaseError(DatabaseErrorKind::Unknown, error),
+        )) => {
+            // This error is expected when the database is empty and the
+            // migration is not the first one.
+            if error.message() != "extension \"pgrx_validation\" is not available" {
+                panic!(concat!(
+                    "You have forgotten to build the pgrx_validation extension. ",
+                    "Please navigate to the `pgrx_validation` crate and read the ",
+                    "README.md file to build the extension. Do remember to copy the ",
+                    "extension to the `core-structures` directory as at this time the ",
+                    "Docker is not able to load the extension from the `pgrx_validation` ",
+                    "directory."
+                ));
+            }
+        }
+        error => error.unwrap(),
+    }
     migrations.connect_and_execute_ups::<diesel::PgConnection>(DATABASE_URL).unwrap();
     time_tracker.add_completed_task(task);
 
