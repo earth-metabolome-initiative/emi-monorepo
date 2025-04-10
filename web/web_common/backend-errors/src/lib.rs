@@ -7,7 +7,8 @@ mod from_impls;
 pub enum Error {
     /// An error that occurred while trying to access the redis database.
     RedisError(redis::RedisError),
-    /// An error that occurred while trying to access the postgres database with diesel.
+    /// An error that occurred while trying to access the postgres database with
+    /// diesel.
     DieselError,
     /// An error that occurred due to some error mis-configuration.
     EnvironmentError,

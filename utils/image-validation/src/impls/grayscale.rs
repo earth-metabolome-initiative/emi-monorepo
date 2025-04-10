@@ -40,7 +40,6 @@ fn analyze_high_freq(data: &Vec<Complex<f32>>) -> f32 {
     window.iter().sum::<f32>() / window.len() as f32
 }
 
-
 impl IsDark for image::GrayImage {
     fn is_dark(&self, threshold: Option<f32>) -> bool {
         let threshold = threshold.unwrap_or(0.1);

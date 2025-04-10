@@ -1,7 +1,6 @@
 //! Submodule providing the `IsLight` trait which determines whether an image is
 //! too underexposed.
 
-
 /// Trait providing the `is_Light` method to determine whether an image is too
 /// underexposed.
 pub trait IsLight {

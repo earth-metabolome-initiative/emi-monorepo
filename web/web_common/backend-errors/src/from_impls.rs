@@ -28,13 +28,13 @@ impl From<std::env::VarError> for Error {
 }
 
 impl From<reqwest::Error> for Error {
-	fn from(_: reqwest::Error) -> Self {
-		Error::ThirdPartyError
-	}
+    fn from(_: reqwest::Error) -> Self {
+        Error::ThirdPartyError
+    }
 }
 
 impl From<redis::RedisError> for Error {
-	fn from(_: redis::RedisError) -> Self {
-		Error::RedisError
-	}
+    fn from(_: redis::RedisError) -> Self {
+        Error::RedisError
+    }
 }

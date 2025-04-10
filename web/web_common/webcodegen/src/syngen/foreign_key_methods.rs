@@ -35,7 +35,7 @@ impl Table {
             let Some((foreign_key_table, _)) = foreign_key.foreign_table(conn)? else {
                 continue;
             };
-            
+
             if &foreign_key_table == self {
                 continue;
             }

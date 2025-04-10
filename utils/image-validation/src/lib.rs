@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 
-pub mod traits;
 mod impls;
+pub mod traits;
 
 /// Prelude module to re-export commonly used items.
 pub mod prelude {

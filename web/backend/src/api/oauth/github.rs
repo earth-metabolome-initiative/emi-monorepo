@@ -2,11 +2,11 @@
 use std::env;
 
 use actix_web::{get, HttpResponse, Responder};
+use backend_errors::Error;
 use core_structures::LoginProvider;
 use redis::Client as RedisClient;
 use reqwest::Client;
 use serde::Deserialize;
-use backend_errors::Error;
 
 use super::jwt_cookies::build_login_response;
 use crate::api::oauth::*;

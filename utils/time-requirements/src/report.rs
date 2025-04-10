@@ -146,7 +146,9 @@ impl Report {
         self.previous_reports
             .iter()
             .chain(std::iter::once(&self.time_tracker))
-            .max_by_key(|report| report.slowest_task().map(CompletedTask::time).unwrap_or_default())?
+            .max_by_key(|report| {
+                report.slowest_task().map(CompletedTask::time).unwrap_or_default()
+            })?
             .slowest_task()
     }
 
@@ -159,20 +161,19 @@ impl Report {
     #[allow(clippy::cast_precision_loss)]
     /// Writes out a plot of the trends for all tasks in the report and saves it
     /// to the given file.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `path` - The path to the file to write the plot to.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// If the file cannot be created or written to, an error will be returned.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// If the plot cannot be created due to configurations or other
     /// reasons, a panic will occur.
-    /// 
     pub fn plot(&self, path: &Path) -> std::io::Result<()> {
         let root = BitMapBackend::new(path, (800, 600)).into_drawing_area();
         root.fill(&WHITE).unwrap();

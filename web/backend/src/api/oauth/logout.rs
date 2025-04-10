@@ -49,8 +49,7 @@ pub async fn logout(
             Ok(token) => token,
             Err(_) => {
                 log::debug!("Unable to decode access token");
-                return eliminate_cookies(HttpResponse::Unauthorized())
-                    .json(Error::Unauthorized);
+                return eliminate_cookies(HttpResponse::Unauthorized()).json(Error::Unauthorized);
             }
         };
 

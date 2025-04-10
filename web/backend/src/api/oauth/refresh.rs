@@ -1,9 +1,9 @@
 //! API endpoint to refresh the access token.
 use actix_web::{get, web, HttpRequest, HttpResponse};
+use backend_errors::Error;
 use core_structures::User;
 use web_common::api::{oauth::jwt_cookies::AccessToken, ApiError};
 use web_common_traits::database::Loadable;
-use backend_errors::Error;
 
 use crate::api::oauth::jwt_cookies::{
     eliminate_cookies, JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME,

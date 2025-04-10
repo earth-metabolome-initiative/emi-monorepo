@@ -1,7 +1,10 @@
-//! This module defines the `GeolocationError` enum, which represents various errors that can occur
-//! when interacting with geolocation services in a web application.
+//! This module defines the `GeolocationError` enum, which represents various
+//! errors that can occur when interacting with geolocation services in a web
+//! application.
 
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone, PartialEq, Hash, PartialOrd, Eq, Ord)]
+#[derive(
+    Debug, serde::Deserialize, serde::Serialize, Clone, PartialEq, Hash, PartialOrd, Eq, Ord,
+)]
 /// An enum representing various geolocation errors.
 pub enum GeolocationError {
     /// Indicates that geolocation is not supported by the device or browser.

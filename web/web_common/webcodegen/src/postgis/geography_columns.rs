@@ -73,11 +73,10 @@ impl GeographyColumn {
 
     #[must_use]
     /// Returns whether the underlying rust type supports the `Copy` trait.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// * If the geography type is unknown.
-    /// 
     pub fn supports_copy(&self) -> bool {
         match self.str_rust_type() {
             "POINT" => true,

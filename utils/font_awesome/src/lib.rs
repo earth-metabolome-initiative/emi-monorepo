@@ -5965,15 +5965,14 @@ impl Icon {
     }
 
     /// Writes the Font Awesome icons set to a csv.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `path` - The path to the csv file.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the file cannot be created or written to, an error is returned.
-    /// 
     pub fn to_csv(path: &str) -> Result<(), std::io::Error> {
         let mut writer = csv::Writer::from_path(path)?;
 

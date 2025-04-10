@@ -55,11 +55,10 @@ impl GeometryColumn {
 
     #[must_use]
     /// Returns whether the underlying rust type supports the `Copy` trait.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// * If the geometry type is unknown.
-    /// 
     pub fn supports_copy(&self) -> bool {
         match self.r#type.as_str() {
             "POINT" => true,

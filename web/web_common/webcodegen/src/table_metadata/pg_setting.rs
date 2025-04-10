@@ -41,8 +41,9 @@ pub struct PgSetting {
     pub reset_val: Option<String>,
     /// Configuration file the current value was set in (null for values set
     /// from sources other than configuration files, or when examined by a user
-    /// who neither is a superuser nor has privileges of `pg_read_all_settings`);
-    /// helpful when using include directives in configuration files
+    /// who neither is a superuser nor has privileges of
+    /// `pg_read_all_settings`); helpful when using include directives in
+    /// configuration files
     pub sourcefile: Option<String>,
     /// Line number within the configuration file the current value was set at
     /// (null for values set from sources other than configuration files, or

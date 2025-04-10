@@ -1,4 +1,5 @@
-//! This module defines a trait for calculating the rate of repeated colors in an image.
+//! This module defines a trait for calculating the rate of repeated colors in
+//! an image.
 
 /// Trait for calculating the rate of repeated colors in an image.
 pub trait RepeatedColors {

@@ -1,7 +1,9 @@
-//! This module defines the `DeviceError` enum, which represents various errors that can occur
-//! when interacting with devices in a web application.
+//! This module defines the `DeviceError` enum, which represents various errors
+//! that can occur when interacting with devices in a web application.
 
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone, PartialEq, Hash, PartialOrd, Eq, Ord)]
+#[derive(
+    Debug, serde::Deserialize, serde::Serialize, Clone, PartialEq, Hash, PartialOrd, Eq, Ord,
+)]
 /// An enum representing various device errors.
 pub enum DeviceError {
     /// Indicates that no cameras were found on the device.

@@ -900,7 +900,8 @@ impl PgType {
     ///
     /// # Returns
     ///
-    /// A Result containing a boolean indicating whether the type is a text type.
+    /// A Result containing a boolean indicating whether the type is a text
+    /// type.
     ///
     /// # Errors
     ///
@@ -917,7 +918,8 @@ impl PgType {
     ///
     /// # Returns
     ///
-    /// A Result containing a boolean indicating whether the type is an i16 type.
+    /// A Result containing a boolean indicating whether the type is an i16
+    /// type.
     ///
     /// # Errors
     ///
@@ -934,7 +936,8 @@ impl PgType {
     ///
     /// # Returns
     ///
-    /// A Result containing a boolean indicating whether the type is an i32 type.
+    /// A Result containing a boolean indicating whether the type is an i32
+    /// type.
     ///
     /// # Errors
     ///
@@ -951,7 +954,8 @@ impl PgType {
     ///
     /// # Returns
     ///
-    /// A Result containing a boolean indicating whether the type is an i64 type.
+    /// A Result containing a boolean indicating whether the type is an i64
+    /// type.
     ///
     /// # Errors
     ///
@@ -1019,7 +1023,8 @@ impl PgType {
     ///
     /// # Returns
     ///
-    /// A Result containing a boolean indicating whether the type is an f32 type.
+    /// A Result containing a boolean indicating whether the type is an f32
+    /// type.
     ///
     /// # Errors
     ///
@@ -1036,7 +1041,8 @@ impl PgType {
     ///
     /// # Returns
     ///
-    /// A Result containing a boolean indicating whether the type is an f64 type.
+    /// A Result containing a boolean indicating whether the type is an f64
+    /// type.
     ///
     /// # Errors
     ///
