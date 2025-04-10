@@ -8,7 +8,7 @@ postgis_diesel.workspace = true
 rosetta-uuid.workspace = true
 chrono.workspace = true
 diesel = {workspace = true, default-features = false, features = ["extras"]}
-diesel-async = {workspace = true, default-features = false}
+diesel-async.workspace = true
 web_common_traits.workspace = true
 serde = {workspace = true, optional = true}
 common-traits.workspace = true

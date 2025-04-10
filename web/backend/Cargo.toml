@@ -14,11 +14,11 @@ description = "Backend for the Earth Metabolome Initiative"
 
 [dependencies]
 chrono.workspace = true
-diesel = { workspace = true, default-features = false, features = [
+diesel = { workspace = true, features = [
 	"postgres",
 	"extras",
 ] }
-diesel-async = { workspace = true, default-features = false, features = [
+diesel-async = { workspace = true, features = [
 	"postgres",
 	"bb8",
 ] }
