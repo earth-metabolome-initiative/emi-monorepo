@@ -199,16 +199,43 @@ impl Table {
                     }
                 };
 
+                // Depending on whether the column represents a unique constraint (or a primary key)
+                // or something which does not have a 1-1 relationship, we need to return either a
+                // `Self` (when it is not optional and it is unique) or an `Option<Self>` (when it is
+                // optional and unique) or yet again a `Vec<Self>` (when it is not unique).
+
+                let (use_statement, return_type, loading_statement) = match (column.is_nullable(), column.is_unique(conn)?) {
+                    (true, true) => {
+                        (
+                            quote! { use diesel::{QueryDsl, ExpressionMethods, OptionalExtension};},
+                            quote! { Option<Self> },
+                            quote! { .first::<Self>(conn).await.optional() }
+                        )
+                    }
+                    (false, true) => {
+                        (
+                            quote! { use diesel::{QueryDsl, ExpressionMethods};},
+                            quote! { Self }, quote! { .first::<Self>(conn).await }
+                        )
+                    }
+                    (_, false) => {
+                        (
+                            quote! { use diesel::{QueryDsl, ExpressionMethods};},
+                            quote! { Vec<Self> },
+                            quote! { .load::<Self>(conn).await }
+                        )
+                    }
+                };
+
                 Ok(quote! {
                     #feature_flag
-                    pub async fn #from_method_ident(conn: &mut #connection, #current_column_ident: &#foreign_key_struct_path) -> Result<Vec<Self>, diesel::result::Error> {
+                    pub async fn #from_method_ident(conn: &mut #connection, #current_column_ident: &#foreign_key_struct_path) -> Result<#return_type, diesel::result::Error> {
                         use diesel_async::RunQueryDsl;
                         use diesel::associations::HasTable;
-                        use diesel::{QueryDsl, ExpressionMethods};
+                        #use_statement
                         Self::table()
                             .filter(#where_statement)
-                            .load::<Self>(conn)
-                            .await
+                            #loading_statement
                     }
                 })
             }).collect::<Result<TokenStream, WebCodeGenError>>()

@@ -65,7 +65,7 @@ impl Codegen<'_> {
                             return Err(backend_errors::Error::Unauthorized.into());
                         }
 
-                        Ok(diesel::delete(Self::table().find(self.id())).execute(conn).await.map(|x| x > 0)?)
+                        Ok(diesel::delete(Self::table().find(<&Self as Identifiable>::id(self))).execute(conn).await.map(|x| x > 0)?)
                     }
                 }
             })?)?;
