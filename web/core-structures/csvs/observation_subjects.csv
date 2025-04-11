@@ -1,8 +1,10 @@
-name,description,icon,color
+name,description,icon.name,color.name
 Root,"Roots function in the absorption of water and inorganic nutrients, anchoring the plant body to the substrate and supporting it, storage of food and nutrients, and vegetative reproduction.",carrot,grey
 Leaf,"Leaves are the main photosynthetic organs of the plant. They are the primary sites of photosynthesis, the process by which plants synthesize food.",leaf,green
 Stems,"Stems are the main structural axes of the plant body. They are the primary organs of the shoot system, and they provide structural support, conduct water, minerals, and food, and store food.",plant-wilt,yellow
 Flower,"The flower is the reproductive unit of the plant. It is the site where the reproductive organs are located.",fan,pink
 Fruit,"The fruit is the mature ovary of a flowering plant. It usually contains seeds, which are the plant's means of reproduction.",lemon,red
 Seed,"A seed is a plant embryo and food reserve enclosed in a protective outer covering called a seed coat.",seedling,brown
+Bud,"A bud is an undeveloped shoot or flower. It is a small, undeveloped structure that can develop into a new shoot or flower.",flower-bud,green
+Bark,"Bark is the outer protective layer of the stem and branches of a tree or shrub. It protects the plant from physical damage and disease.",tree,grey
 Whole organism,"The whole organism is the complete individual plant, including all of its parts.",person,grey
