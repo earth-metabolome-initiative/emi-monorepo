@@ -3,7 +3,7 @@
 use crate::prelude::MigrationKind;
 
 #[derive(Debug, PartialEq)]
-/// Enumeration of errors that may occour with the migrations utility.
+/// Enumeration of errors that may occur with the migrations utility.
 pub enum Error {
     /// Error raised when the directory is not a valid migration.
     InvalidMigration(String),

@@ -1,7 +1,7 @@
-//! Enumeration of errors that may occour when handling sorted vectors.
+//! Enumeration of errors that may occur when handling sorted vectors.
 
 #[derive(Clone, PartialEq, Eq)]
-/// Enumeration of errors that may occour when handling sorted vectors.
+/// Enumeration of errors that may occur when handling sorted vectors.
 pub enum Error<V> {
     /// Error indicating that the vector is not sorted, providing
     /// proof of the offending entry.
