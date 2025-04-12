@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 postgis_diesel.workspace = true
 rosetta-uuid.workspace = true
+rosetta-timestamp.workspace = true
 chrono.workspace = true
 diesel = {workspace = true, default-features = false, features = ["extras"]}
 diesel-async.workspace = true
@@ -18,8 +19,8 @@ validation-errors.workspace = true
 
 [features]
 default = ["serde"]
-serde = ["postgis_diesel/serde", "dep:serde", "rosetta-uuid/serde"]
-postgres = ["diesel-async/postgres", "diesel/postgres", "postgis_diesel/diesel", "rosetta-uuid/postgres"]
-sqlite = ["diesel-async/sqlite", "diesel/sqlite", "diesel/returning_clauses_for_sqlite_3_35", "rosetta-uuid/sqlite"]
+serde = ["postgis_diesel/serde", "dep:serde", "rosetta-uuid/serde", "rosetta-timestamp/serde"]
+postgres = ["diesel-async/postgres", "diesel/postgres", "postgis_diesel/diesel", "rosetta-uuid/postgres", "rosetta-timestamp/postgres"]
+sqlite = ["diesel-async/sqlite", "diesel/sqlite", "diesel/returning_clauses_for_sqlite_3_35", "rosetta-uuid/sqlite", "rosetta-timestamp/sqlite"]
 backend = ["postgres", "web_common_traits/backend"]
 frontend = ["sqlite", "web_common_traits/frontend"]

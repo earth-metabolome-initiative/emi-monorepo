@@ -3,7 +3,7 @@
 use chrono::NaiveDateTime;
 
 #[cfg(feature = "diesel")]
-mod diesel_impls;
+pub mod diesel_impls;
 #[cfg(feature = "pgrx")]
 mod pgrx_impls;
 

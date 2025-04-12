@@ -7,9 +7,9 @@ use diesel::{
 use proc_macro2::TokenStream;
 use quote::quote;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
-use syn::{parse_str, Ident, Type};
+use syn::{Ident, Type, parse_str};
 
-use super::{table::RESERVED_RUST_WORDS, PgAttribute, PgEnum, PgSetting};
+use super::{PgAttribute, PgEnum, PgSetting, table::RESERVED_RUST_WORDS};
 use crate::{
     codegen::{
         CODEGEN_DIESEL_MODULE, CODEGEN_DIRECTORY, CODEGEN_STRUCTS_MODULE, CODEGEN_TYPES_PATH,
@@ -18,14 +18,24 @@ use crate::{
 };
 
 /// Constant listing types supporting `Copy`.
-pub(crate) const COPY_TYPES: [&str; 7] =
-    ["i32", "i16", "i64", "f32", "f64", "bool", "rosetta_uuid::Uuid"];
+pub(crate) const COPY_TYPES: [&str; 8] = [
+    "i32",
+    "i16",
+    "i64",
+    "f32",
+    "f64",
+    "bool",
+    "rosetta_uuid::Uuid",
+    "rosetta_timestamp::TimestampUTC",
+];
 
 /// Constant listing types supporting `Eq`.
-pub(crate) const EQ_TYPES: [&str; 5] = ["i32", "i16", "i64", "bool", "rosetta_uuid::Uuid"];
+pub(crate) const EQ_TYPES: [&str; 6] =
+    ["i32", "i16", "i64", "bool", "rosetta_uuid::Uuid", "rosetta_timestamp::TimestampUTC"];
 
 /// Constant listing types supporting `Hash`.
-pub(crate) const HASH_TYPES: [&str; 5] = ["i32", "i16", "i64", "bool", "rosetta_uuid::Uuid"];
+pub(crate) const HASH_TYPES: [&str; 6] =
+    ["i32", "i16", "i64", "bool", "rosetta_uuid::Uuid", "rosetta_timestamp::TimestampUTC"];
 
 /// Represents a `PostgreSQL` type.
 ///
@@ -137,14 +147,13 @@ pub fn rust_type_str<S: AsRef<str>>(
         "timestamp with time zone" => {
             let time_zone = PgSetting::time_zone(conn)?;
             match time_zone.setting.as_str() {
-                "UTC" => "chrono::DateTime<chrono::Utc>",
+                "UTC" => "rosetta_timestamp::TimestampUTC",
                 unknown_time_zone => {
                     unimplemented!("Time zone `{unknown_time_zone}` not supported")
                 }
             }
         }
         "date" => "chrono::NaiveDate",
-        "time without time zone" | "time with time zone" => "chrono::NaiveTime",
         "interval" => "chrono::Duration",
 
         // Binary types
@@ -209,7 +218,7 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<String, WebCod
 
         // Temporal types
         "timestamp without time zone" | "timestamp" => "diesel::sql_types::Timestamp",
-        "timestamp with time zone" | "timestamptz" => "diesel::sql_types::Timestamptz",
+        "timestamp with time zone" | "timestamptz" => "rosetta_timestamp::diesel_impls::TimestampUTC",
         "time" => "diesel::sql_types::Time",
         "date" => "diesel::sql_types::Date",
         "interval" => "diesel::sql_types::Interval",

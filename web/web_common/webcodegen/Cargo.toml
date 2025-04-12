@@ -32,6 +32,7 @@ serde_json.workspace = true
 chrono.workspace = true
 ipnetwork = "0.20.0"
 rosetta-uuid = {workspace = true, features = ["diesel", "serde", "postgres"]}
+rosetta-timestamp = {workspace = true, features = ["diesel", "serde", "postgres"]}
 web_common_traits.workspace = true
 macaddr = "1.0.1"
 postgis_diesel.workspace = true

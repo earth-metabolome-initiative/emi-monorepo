@@ -32,8 +32,11 @@ members = [
     "utils/functional-properties",
     "data-structures/rosetta-uuid",
     "data-structures/sorted-vec",
-    "utils/functional-properties", "utils/image-validation", "utils/mime-types", "web/web_common/ws-messages",
-    
+    "utils/functional-properties",
+    "utils/image-validation",
+    "utils/mime-types",
+    "web/web_common/ws-messages", "utils/rosetta-timestamp",
+
 ]
 
 [workspace.dependencies]
@@ -58,9 +61,9 @@ diesel = { version = "2.2", default-features = false, features = ["extras"] }
 diesel-async = { version = "0.5", features = ["pool", "bb8"] }
 diesel_full_text_search = "2.2"
 redis = { version = "0.29", features = ["tokio-comp"] }
-postgis_diesel = { version = "2.5.0", features = [
+postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel.git", features = [
     "serde",
-], default-features = false }
+], default-features = false, branch = "sqlite" }
 chrono = { version = "0.4.39", features = ["serde"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
@@ -71,6 +74,7 @@ pgrx = "0.13"
 image = "0.25.5"
 pgrx-sql-entity-graph = "0.13"
 rosetta-uuid = { path = "data-structures/rosetta-uuid" }
+rosetta-timestamp = { path = "utils/rosetta-timestamp" }
 taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
 csqlv = { path = "web/web_common/csqlv" }
 font_awesome = { path = "utils/font_awesome" }
@@ -101,6 +105,7 @@ pgrx_validation_derive = { path = "web/web_common/pgrx_validation_derive" }
 validation-errors = { path = "web/web_common/validation-errors" }
 backend-request-errors = { path = "web/web_common/backend-request-errors" }
 frontend-errors = { path = "web/web_common/frontend-errors" }
+
 validator = { version = "0.16", features = ["derive"] }
 cargo-husky = { version = "1", features = [
     "precommit-hook",
@@ -109,7 +114,7 @@ cargo-husky = { version = "1", features = [
     "run-cargo-clippy",
     "run-cargo-test",
 ] }
-web-sys = {version = "0.3.77"}
+web-sys = { version = "0.3.77" }
 
 [workspace.lints.rust]
 missing_docs = "forbid"
