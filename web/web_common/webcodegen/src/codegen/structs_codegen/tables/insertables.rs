@@ -266,8 +266,8 @@ impl Codegen<'_> {
                             }
                         }
 
-                        #[derive(diesel::Insertable)]
-                        #[diesel(table_name = #table_diesel_ident)]
+                        #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
+                        #[cfg_attr(any(feature = "postgres", feature = "sqlite"), diesel(table_name = #table_diesel_ident))]
                         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
                         pub struct #insertable_variant_ident {
                             #(#insertable_attributes),*

@@ -4,14 +4,14 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-postgis_diesel.workspace = true
-rosetta-uuid.workspace = true
-rosetta-timestamp.workspace = true
+postgis_diesel = { workspace = true, features = ["diesel"] }
+rosetta-uuid = { workspace = true, features = ["diesel"] }
+rosetta-timestamp = { workspace = true, features = ["diesel"] }
 chrono.workspace = true
-diesel = {workspace = true, default-features = false, features = ["extras"]}
+diesel = { workspace = true, default-features = false, features = ["extras"] }
 diesel-async.workspace = true
 web_common_traits.workspace = true
-serde = {workspace = true, optional = true}
+serde = { workspace = true, optional = true }
 common-traits.workspace = true
 backend-request-errors.workspace = true
 pgrx_validation.workspace = true
@@ -19,8 +19,26 @@ validation-errors.workspace = true
 
 [features]
 default = ["serde"]
-serde = ["postgis_diesel/serde", "dep:serde", "rosetta-uuid/serde", "rosetta-timestamp/serde"]
-postgres = ["diesel-async/postgres", "diesel/postgres", "postgis_diesel/diesel", "rosetta-uuid/postgres", "rosetta-timestamp/postgres"]
-sqlite = ["diesel-async/sqlite", "diesel/sqlite", "diesel/returning_clauses_for_sqlite_3_35", "rosetta-uuid/sqlite", "rosetta-timestamp/sqlite"]
+serde = [
+	"postgis_diesel/serde",
+	"dep:serde",
+	"rosetta-uuid/serde",
+	"rosetta-timestamp/serde",
+]
+postgres = [
+	"diesel-async/postgres",
+	"diesel/postgres",
+	"postgis_diesel/postgres",
+	"rosetta-uuid/postgres",
+	"rosetta-timestamp/postgres",
+]
+sqlite = [
+	"diesel-async/sqlite",
+	"diesel/sqlite",
+	"postgis_diesel/sqlite",
+	"diesel/returning_clauses_for_sqlite_3_35",
+	"rosetta-uuid/sqlite",
+	"rosetta-timestamp/sqlite",
+]
 backend = ["postgres", "web_common_traits/backend"]
 frontend = ["sqlite", "web_common_traits/frontend"]
