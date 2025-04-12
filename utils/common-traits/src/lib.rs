@@ -5,6 +5,7 @@ pub mod builder;
 pub mod camel_case;
 pub mod serde_trait;
 pub mod transmute;
+pub mod try_from_async;
 
 /// Re-export of the core traits.
 pub mod prelude {
@@ -13,5 +14,6 @@ pub mod prelude {
         builder::{Builder, BuilderError},
         camel_case::ToCamelCase,
         serde_trait::Serde,
+        try_from_async::TryFromAsync,
     };
 }

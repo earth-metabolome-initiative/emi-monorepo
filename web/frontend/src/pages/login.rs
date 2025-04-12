@@ -1,13 +1,12 @@
 //! Login page of the application.
 
-use web_common::api::oauth::providers::OAuth2LoginProvider;
+use api_path::api::oauth::providers::LoginProviderCredentials;
 use yew::prelude::*;
 use yew_router::prelude::*;
 use yewdux::prelude::*;
 
 use crate::{
-    api::oauth::providers::retrieve_login_providers, components::login_provider::LoginProvider,
-    router::AppRoute, stores::user_state::UserState,
+    components::login_provider::LoginProvider, router::AppRoute, stores::user_state::UserState,
 };
 
 #[function_component(Login)]
@@ -19,7 +18,7 @@ pub fn login() -> Html {
         navigator.push(&AppRoute::Home);
     }
 
-    let login_providers = use_state(|| Vec::<OAuth2LoginProvider>::new());
+    let login_providers = use_state(|| Vec::<LoginProviderCredentials>::new());
 
     {
         let login_providers = login_providers.clone();

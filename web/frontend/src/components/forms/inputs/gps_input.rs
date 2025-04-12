@@ -9,19 +9,18 @@
 use std::{collections::HashSet, rc::Rc};
 
 use wasm_bindgen::{closure::Closure, JsCast};
-use web_common::api::{ApiError, GeolocationError};
 use web_sys::{PositionError, PositionOptions};
 use yew::prelude::*;
 
 use super::{BasicInput, MapInput};
-use crate::components::forms::InputErrors;
+use crate::{components::forms::InputErrors, errors::GeolocationError};
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct GPSInputProps {
     pub label: String,
     pub builder: Callback<Option<postgis_diesel::types::Point>>,
     #[prop_or_default]
-    pub errors: Vec<ApiError>,
+    pub errors: Vec<GeolocationError>,
     #[prop_or_default]
     pub coordinates: Option<postgis_diesel::types::Point>,
     #[prop_or(false)]
@@ -29,7 +28,7 @@ pub struct GPSInputProps {
 }
 
 pub struct GPSInput {
-    errors: HashSet<ApiError>,
+    errors: HashSet<GeolocationError>,
     latitude: Option<f64>,
     longitude: Option<f64>,
     watch_id: Option<i32>,
@@ -38,7 +37,7 @@ pub struct GPSInput {
 pub enum GPSInputMessage {
     RequireAuthorization,
     Authorized(i32),
-    Error(ApiError),
+    Error(GeolocationError),
     Coordinates(Option<f64>, Option<f64>),
     Latitude(Option<f64>),
     Longitude(Option<f64>),

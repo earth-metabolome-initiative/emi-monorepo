@@ -7,7 +7,7 @@
 //! not be able to access the `HttpOnly` cookies from Yew, and these utilities
 //! solely exist to access cookies that are not `HttpOnly`.
 use wasm_bindgen::JsCast;
-use web_common::api::oauth::jwt_cookies::USER_ONLINE_COOKIE_NAME;
+use api_path::api::oauth::jwt_cookies::USER_ONLINE_COOKIE_NAME;
 use web_sys::window;
 
 /// Returns whether a cookie with the given name exists.

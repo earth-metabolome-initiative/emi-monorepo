@@ -6,16 +6,15 @@ use std::{fmt::Debug, rc::Rc};
 use gloo::timers::callback::Timeout;
 use serde::de::DeserializeOwned;
 use wasm_bindgen::JsCast;
-use web_common::api::ApiError;
 use yew::prelude::*;
 use yew_agent::{prelude::WorkerBridgeHandle, scope_ext::AgentScopeExt};
 
-use super::{barcode_scanner::Scanner, InputErrors};
+use super::{InputErrors, barcode_scanner::Scanner};
 use crate::{
     components::{Badge, RowToBadge},
     workers::{
-        ws_worker::{ComponentMessage, WebsocketMessage},
         WebsocketWorker,
+        ws_worker::{ComponentMessage, WebsocketMessage},
     },
 };
 

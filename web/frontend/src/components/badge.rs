@@ -11,9 +11,7 @@ use yew_router::prelude::*;
 use crate::{router::AppRoute, traits::format_match::FormatMatch};
 
 /// Trait for types that can be converted to a badge.
-pub trait RowToBadge:
-    Foreign<Color> + Described + Sized + Clone + PartialEq + Debug + SimilarityScore
-{
+pub trait RowToBadge: Foreign<Color> + Described + Sized + Clone + PartialEq + Debug {
     /// Returns the title for the badge.
     fn badge_title(&self) -> String;
 

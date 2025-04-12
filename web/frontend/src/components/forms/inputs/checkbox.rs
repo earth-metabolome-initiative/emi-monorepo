@@ -2,7 +2,6 @@
 //! to be used in combination with BasicForm.
 
 use wasm_bindgen::JsCast;
-use web_common::api::ApiError;
 use yew::prelude::*;
 
 #[derive(Clone, PartialEq, Properties)]

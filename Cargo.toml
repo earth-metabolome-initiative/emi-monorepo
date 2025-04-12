@@ -13,7 +13,6 @@ members = [
     "web/web_common/pgrx_validation_derive",
     "web/web_common/validation-errors",
     "web/web_common/backend-request-errors",
-    "web/web_common/frontend-errors",
     "web/web_common/pg2sqlite",
     "data-retrieval/taxonomy-fetcher",
     "data-retrieval/downloader",
@@ -35,7 +34,8 @@ members = [
     "utils/functional-properties",
     "utils/image-validation",
     "utils/mime-types",
-    "web/web_common/ws-messages", "utils/rosetta-timestamp"
+    "web/web_common/ws-messages",
+    "utils/rosetta-timestamp", "utils/rosetta-image",
 
 ]
 
@@ -87,6 +87,7 @@ functional-properties = { path = "utils/functional-properties" }
 inflector = { path = "utils/inflector" }
 core-structures = { path = "web/core-structures" }
 core-structures-builder = { path = "web/core-structures/core-structures-builder" }
+ws-messages = { path = "web/web_common/ws-messages" }
 regex = "1.11"
 plotters = "0.3.7"
 futures = "0.3.31"
@@ -104,7 +105,6 @@ pgrx_validation = { path = "web/web_common/pgrx_validation" }
 pgrx_validation_derive = { path = "web/web_common/pgrx_validation_derive" }
 validation-errors = { path = "web/web_common/validation-errors" }
 backend-request-errors = { path = "web/web_common/backend-request-errors" }
-frontend-errors = { path = "web/web_common/frontend-errors" }
 
 validator = { version = "0.16", features = ["derive"] }
 cargo-husky = { version = "1", features = [

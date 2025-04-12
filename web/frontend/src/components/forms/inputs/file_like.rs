@@ -1,4 +1,3 @@
-use web_common::api::ApiError;
 use yew::prelude::*;
 mod jpeg_like;
 use std::{fmt::Debug, rc::Rc};

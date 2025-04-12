@@ -1,6 +1,7 @@
-use wasm_bindgen::{prelude::*, JsCast};
-use web_common::api::DeviceError;
-use web_sys::{window, MediaDeviceInfo, MediaStreamConstraints};
+use wasm_bindgen::{JsCast, prelude::*};
+use web_sys::{MediaDeviceInfo, MediaStreamConstraints, window};
+
+use crate::errors::DeviceError;
 
 /// Checks available cameras and their torch capabilities.
 ///
@@ -11,7 +12,7 @@ use web_sys::{window, MediaDeviceInfo, MediaStreamConstraints};
 /// # Returns
 /// A `Result` containing a vector of `CameraInfo` or a `ApiError` error if the
 /// process fails.
-pub async fn get_available_cameras() -> Result<Vec<MediaDeviceInfo>, web_common::api::ApiError> {
+pub async fn get_available_cameras() -> Result<Vec<MediaDeviceInfo>, DeviceError> {
     let devices = wasm_bindgen_futures::JsFuture::from(
         window()
             .unwrap()
@@ -52,9 +53,7 @@ pub async fn get_available_cameras() -> Result<Vec<MediaDeviceInfo>, web_common:
 }
 
 /// Attempts to get the media stream for a specific camera using its device ID.
-pub async fn get_camera_media_stream(
-    device_id: &str,
-) -> Result<web_sys::MediaStream, web_common::api::ApiError> {
+pub async fn get_camera_media_stream(device_id: &str) -> Result<web_sys::MediaStream, DeviceError> {
     let mut constraints = MediaStreamConstraints::new();
     let mut video = web_sys::MediaTrackConstraints::new();
     video.set_device_id(&device_id.into());

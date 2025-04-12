@@ -1,11 +1,11 @@
 //! HTML rendering of an OAuth login provider object.
-use web_common::api::oauth::providers::OAuth2LoginProvider;
+use api_path::api::oauth::providers::LoginProviderCredentials;
 use web_sys::wasm_bindgen::UnwrapThrowExt;
 use yew::prelude::*;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct OAuthLoginProviderProps {
-    pub provider: OAuth2LoginProvider,
+    pub provider: LoginProviderCredentials,
 }
 
 #[function_component(LoginProvider)]

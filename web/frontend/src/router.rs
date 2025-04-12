@@ -4,10 +4,12 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::{components::BasicList, pages::*};
+use crate::pages::*;
 
 #[derive(Debug, Clone, PartialEq, Routable, Eq)]
 pub enum AppRoute {
+    #[at("/")]
+    Home,
     #[at("/login")]
     Login,
     #[not_found]
@@ -21,6 +23,9 @@ pub enum AppRoute {
 /// * `route` - The route to map.
 pub fn switch(route: AppRoute) -> Html {
     match route {
+        AppRoute::Home => {
+            html! { <Home /> }
+        }
         AppRoute::Login => {
             html! { <Login /> }
         }

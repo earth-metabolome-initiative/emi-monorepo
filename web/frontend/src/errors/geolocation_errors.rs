@@ -2,6 +2,8 @@
 //! errors that can occur when interacting with geolocation services in a web
 //! application.
 
+use std::fmt::Display;
+
 #[derive(
     Debug, serde::Deserialize, serde::Serialize, Clone, PartialEq, Hash, PartialOrd, Eq, Ord,
 )]
@@ -19,14 +21,14 @@ pub enum GeolocationError {
     Unknown(String),
 }
 
-impl ToString for GeolocationError {
-    fn to_string(&self) -> String {
+impl Display for GeolocationError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            GeolocationError::NotSupported => "Geolocation is not supported.".to_string(),
-            GeolocationError::PermissionDenied => "Permission to geolocate was denied - You may need to authorize this in your device privacy settings.".to_string(),
-            GeolocationError::PositionUnavailable => "Position unavailable.".to_string(),
-            GeolocationError::Timeout => "Geolocation request timed out.".to_string(),
-            GeolocationError::Unknown(e) => format!("Geolocation error: {}", e),
+            GeolocationError::NotSupported => write!(f, "Geolocation is not supported."),
+            GeolocationError::PermissionDenied => write!(f, "Permission denied."),
+            GeolocationError::PositionUnavailable => write!(f, "Position unavailable."),
+            GeolocationError::Timeout => write!(f, "Request timed out."),
+            GeolocationError::Unknown(msg) => write!(f, "Unknown error: {}", msg),
         }
     }
 }

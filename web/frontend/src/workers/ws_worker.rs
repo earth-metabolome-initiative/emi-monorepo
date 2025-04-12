@@ -9,12 +9,10 @@ use gloo::timers::callback::Timeout;
 use gloo_net::websocket::futures::WebSocket;
 use rosetta_uuid::Uuid;
 use serde::{Deserialize, Serialize};
-use web_common::api::{
-    ws::messages::{BackendMessage, CloseReason, FrontendMessage},
-    ApiError,
-};
 use yew::platform::spawn_local;
 use yew_agent::worker::{HandlerId, Worker};
+use ws_messages::FrontendMessage;
+use api_path::api::ws::FULL_ENDPOINT;
 
 const NOMINAL_CLOSURE_CODE: u16 = 1000;
 
@@ -64,9 +62,7 @@ impl WebsocketWorker {
         hostname: &str,
         scope: &yew_agent::prelude::WorkerScope<Self>,
     ) -> Result<futures::channel::mpsc::Sender<FrontendMessage>, String> {
-        let endpoint = web_common::api::ws::FULL_ENDPOINT;
-
-        let websocket = WebSocket::open(&format!("wss://{}{}", hostname, endpoint))
+        let websocket = WebSocket::open(&format!("wss://{hostname}{FULL_ENDPOINT}"))
             .map_err(|err| format!("Error opening websocket connection: {:?}", err))?;
 
         match websocket.state() {
