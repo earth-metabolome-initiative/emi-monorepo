@@ -1,0 +1,12 @@
+-- UP MIGRATION
+CREATE TABLE IF NOT EXISTS field_samples (
+    id UUID PRIMARY KEY,
+    container_model_id INTEGER NOT NULL REFERENCES container_models(id),
+    project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    created_by INTEGER NOT NULL REFERENCES users(id),
+    sampled_by INTEGER NOT NULL REFERENCES users(id),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by INTEGER NOT NULL REFERENCES users(id),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    state_id SMALLINT NOT NULL DEFAULT 1 REFERENCES sample_states(id)
+);
