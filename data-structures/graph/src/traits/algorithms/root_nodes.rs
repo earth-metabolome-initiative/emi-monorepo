@@ -18,10 +18,6 @@ pub trait RootNodes: TopologicalSorting {
         // Iterate over all nodes and mark the predecessors of each node as
         // visited. A node is considered visited if it has a predecessor.
         for node in self.node_ids() {
-            // We skip the node if it has already been visited.
-            if visited[node.into_usize()] {
-                continue;
-            }
             // Mark the successors of the node as visited.
             for successor_node_id in self.successors(node) {
                 visited[successor_node_id.into_usize()] = true;
