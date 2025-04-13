@@ -1,7 +1,7 @@
 //! Submodule defining commonly used named types for the generic graph data
 //! structures.
 
-use algebra::impls::{SquareCSR2D, SymmetricCSR2D, UpperTriangularCSR2D, ValuedCSR2D, CSR2D};
+use algebra::impls::{CSR2D, SquareCSR2D, SymmetricCSR2D, UpperTriangularCSR2D, ValuedCSR2D};
 use sorted_vec::prelude::SortedVec;
 
 use super::{

@@ -5,10 +5,10 @@ use algebra::prelude::*;
 use crate::{errors::builder::edges::EdgesBuilderError, prelude::*};
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
-    > Edges for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
+> Edges for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     type Edge = <Self as Matrix>::Coordinates;
     type SourceNodeId = RowIndex;
@@ -22,10 +22,10 @@ impl<
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex> + TryFromUsize,
-    > GrowableEdges for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex> + TryFromUsize,
+> GrowableEdges for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     type GrowableMatrix = Self;
     type Error = EdgesBuilderError<Self>;
@@ -47,10 +47,10 @@ impl<
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex> + TryFromUsize,
-    > Graph for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex> + TryFromUsize,
+> Graph for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     fn has_nodes(&self) -> bool {
         self.number_of_rows() > RowIndex::ZERO && self.number_of_columns() > ColumnIndex::ZERO
@@ -62,10 +62,10 @@ impl<
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex> + TryFromUsize,
-    > MonoplexGraph for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex> + TryFromUsize,
+> MonoplexGraph for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     type Edge = <Self as Matrix>::Coordinates;
     type Edges = Self;
@@ -76,17 +76,17 @@ impl<
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger
-            + TryFromUsize
-            + IntoUsize
-            + BidirectionalVocabulary<SourceSymbol = RowIndex, DestinationSymbol = RowIndex>,
-        ColumnIndex: PositiveInteger
-            + IntoUsize
-            + TryFrom<SparseIndex>
-            + TryFromUsize
-            + BidirectionalVocabulary<SourceSymbol = ColumnIndex, DestinationSymbol = ColumnIndex>,
-    > BipartiteGraph for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger
+        + TryFromUsize
+        + IntoUsize
+        + BidirectionalVocabulary<SourceSymbol = RowIndex, DestinationSymbol = RowIndex>,
+    ColumnIndex: PositiveInteger
+        + IntoUsize
+        + TryFrom<SparseIndex>
+        + TryFromUsize
+        + BidirectionalVocabulary<SourceSymbol = ColumnIndex, DestinationSymbol = ColumnIndex>,
+> BipartiteGraph for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2DRef<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {

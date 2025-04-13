@@ -6,11 +6,11 @@ use algebra::prelude::*;
 use crate::{errors::builder::edges::EdgesBuilderError, prelude::*};
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
-        Value: Number,
-    > Edges for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
+    Value: Number,
+> Edges for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 {
     type Edge = (RowIndex, ColumnIndex, Value);
     type SourceNodeId = RowIndex;
@@ -24,11 +24,11 @@ impl<
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
-        Value: Number,
-    > GrowableEdges for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
+    Value: Number,
+> GrowableEdges for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 {
     type GrowableMatrix = Self;
     type Error = EdgesBuilderError<Self>;
@@ -50,11 +50,11 @@ impl<
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
-        Value: Number,
-    > Graph for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
+    Value: Number,
+> Graph for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 {
     fn has_nodes(&self) -> bool {
         self.number_of_rows() > RowIndex::ZERO && self.number_of_columns() > ColumnIndex::ZERO
@@ -66,11 +66,11 @@ impl<
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
-        Value: Number,
-    > MonoplexGraph for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + TryFromUsize + IntoUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
+    Value: Number,
+> MonoplexGraph for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 {
     type Edge = (RowIndex, ColumnIndex, Value);
     type Edges = Self;
@@ -81,18 +81,18 @@ impl<
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger
-            + TryFromUsize
-            + IntoUsize
-            + BidirectionalVocabulary<SourceSymbol = RowIndex, DestinationSymbol = RowIndex>,
-        ColumnIndex: PositiveInteger
-            + IntoUsize
-            + TryFrom<SparseIndex>
-            + TryFromUsize
-            + BidirectionalVocabulary<SourceSymbol = ColumnIndex, DestinationSymbol = ColumnIndex>,
-        Value: Number,
-    > BipartiteGraph for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger
+        + TryFromUsize
+        + IntoUsize
+        + BidirectionalVocabulary<SourceSymbol = RowIndex, DestinationSymbol = RowIndex>,
+    ColumnIndex: PositiveInteger
+        + IntoUsize
+        + TryFrom<SparseIndex>
+        + TryFromUsize
+        + BidirectionalVocabulary<SourceSymbol = ColumnIndex, DestinationSymbol = ColumnIndex>,
+    Value: Number,
+> BipartiteGraph for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
 where
     Self: Matrix2DRef<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {

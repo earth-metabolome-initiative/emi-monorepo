@@ -14,5 +14,5 @@ pub trait BipartiteGraphBuilder {
     #[must_use]
     /// Adds the right nodes partition to the graph.
     fn right_nodes(self, right_nodes: <Self::BipartiteGraph as BipartiteGraph>::RightNodes)
-        -> Self;
+    -> Self;
 }

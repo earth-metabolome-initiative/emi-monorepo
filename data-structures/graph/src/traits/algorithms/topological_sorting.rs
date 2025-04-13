@@ -12,6 +12,18 @@ pub enum TopologicalSortingError {
     UnreachableNodes,
 }
 
+impl std::fmt::Display for TopologicalSortingError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TopologicalSortingError::UnreachableNodes => {
+                write!(f, "Some nodes are not reachable from the starting nodes")
+            }
+        }
+    }
+}
+
+impl std::error::Error for TopologicalSortingError {}
+
 /// Trait defining the topological sorting algorithm.
 pub trait TopologicalSorting: MonoplexMonopartiteGraph {
     /// Returns the topological order of the graph from the provided node.
@@ -53,7 +65,7 @@ pub trait TopologicalSorting: MonoplexMonopartiteGraph {
         &self,
         nodes: &[Self::NodeId],
     ) -> Result<Vec<Self::NodeId>, TopologicalSortingError> {
-        if self.has_nodes() {
+        if !self.has_nodes() {
             return Ok(Vec::new());
         }
 
@@ -70,13 +82,13 @@ pub trait TopologicalSorting: MonoplexMonopartiteGraph {
 
         while !frontier.is_empty() {
             temporary_frontier.clear();
-            for node in frontier.iter() {
+            for node in frontier.drain(..) {
                 if topological_order[node.into_usize()].is_none() {
                     topological_order[node.into_usize()] = Some(number_of_visited_nodes);
                     number_of_visited_nodes += Self::NodeId::ONE;
                 }
 
-                temporary_frontier.extend(self.successors(*node).filter(|successor_node_id| {
+                temporary_frontier.extend(self.successors(node).filter(|successor_node_id| {
                     topological_order[successor_node_id.into_usize()].is_none()
                 }));
             }

@@ -19,14 +19,14 @@ pub trait BipartiteGraph: Graph {
     type RightNodeSymbol: Symbol;
     /// The vocabulary holding the symbols of the left nodes.
     type LeftNodes: BidirectionalVocabulary<
-        SourceSymbol = Self::LeftNodeId,
-        DestinationSymbol = Self::LeftNodeSymbol,
-    >;
+            SourceSymbol = Self::LeftNodeId,
+            DestinationSymbol = Self::LeftNodeSymbol,
+        >;
     /// The vocabulary holding the symbols of the right nodes.
     type RightNodes: BidirectionalVocabulary<
-        SourceSymbol = Self::RightNodeId,
-        DestinationSymbol = Self::RightNodeSymbol,
-    >;
+            SourceSymbol = Self::RightNodeId,
+            DestinationSymbol = Self::RightNodeSymbol,
+        >;
 
     /// Returns a reference to the vocabulary of the left nodes.
     fn left_nodes_vocabulary(&self) -> &Self::LeftNodes;

@@ -23,10 +23,10 @@ impl core::fmt::Display for EdgesBuilderOptions {
 /// Trait for Options for building edges.
 pub trait EdgesBuilder:
     Builder<
-    Object = <Self as EdgesBuilder>::Edges,
-    Error = crate::errors::builder::edges::EdgesBuilderError<<Self as EdgesBuilder>::Edges>,
-    Attribute = EdgesBuilderOptions,
->
+        Object = <Self as EdgesBuilder>::Edges,
+        Error = crate::errors::builder::edges::EdgesBuilderError<<Self as EdgesBuilder>::Edges>,
+        Attribute = EdgesBuilderOptions,
+    >
 {
     /// The type of the edges being built.
     type Edges: Edges;

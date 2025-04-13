@@ -1,6 +1,6 @@
 //! Errors raised in algorithms defined for [`MonopartiteGraph`]s.
 
-use crate::traits::{connected_components::ConnectedComponentsError, MonopartiteGraph};
+use crate::traits::{MonopartiteGraph, connected_components::ConnectedComponentsError};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// Errors that may occur when executing algorithms on a [`MonopartiteGraph`].

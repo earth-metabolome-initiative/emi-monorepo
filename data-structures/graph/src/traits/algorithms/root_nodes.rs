@@ -4,7 +4,7 @@
 
 use algebra::prelude::IntoUsize;
 
-use super::{topological_sorting::TopologicalSortingError, TopologicalSorting};
+use super::{TopologicalSorting, topological_sorting::TopologicalSortingError};
 
 /// Trait providing the `root_nodes` method, which returns the root nodes of the
 /// graph. A root node is a node with no predecessors.
@@ -37,7 +37,7 @@ pub trait RootNodes: TopologicalSorting {
     /// # Errors
     ///
     /// * `TopologicalSortingError::UnreachableNodes` - If some nodes are not
-	///   reachable from the root nodes.
+    ///   reachable from the root nodes.
     fn topological_sort_from_roots(&self) -> Result<Vec<Self::NodeId>, TopologicalSortingError> {
         // Get the root nodes of the graph.
         let root_nodes = self.root_nodes();

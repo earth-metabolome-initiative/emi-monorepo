@@ -35,21 +35,27 @@ impl<G: BipartiteGraph + ?Sized> core::fmt::Display for IllegalBipartiteGraphSta
                 write!(
                     f,
                     concat!(
-					"The maximal number of left nodes of the graph is larger than the number of left nodes that can be ",
-					"represented by the graph's node ID type ({}). This should be impossible to reach, and indicates ",
-					"some bug in the implementation of the graph traits. The number of left nodes that was reported ",
-					"was {}."
-				), G::LeftNodeId::MAX, number_of_left_nodes)
+                        "The maximal number of left nodes of the graph is larger than the number of left nodes that can be ",
+                        "represented by the graph's node ID type ({}). This should be impossible to reach, and indicates ",
+                        "some bug in the implementation of the graph traits. The number of left nodes that was reported ",
+                        "was {}."
+                    ),
+                    G::LeftNodeId::MAX,
+                    number_of_left_nodes
+                )
             }
             IllegalBipartiteGraphState::TooManyRightNodes { number_of_right_nodes } => {
                 write!(
                     f,
                     concat!(
-					"The maximal number of right nodes of the graph is larger than the number of right nodes that can be ",
-					"represented by the graph's node ID type ({}). This should be impossible to reach, and indicates ",
-					"some bug in the implementation of the graph traits. The number of right nodes that was reported ",
-					"was {}."
-				), G::RightNodeId::MAX, number_of_right_nodes)
+                        "The maximal number of right nodes of the graph is larger than the number of right nodes that can be ",
+                        "represented by the graph's node ID type ({}). This should be impossible to reach, and indicates ",
+                        "some bug in the implementation of the graph traits. The number of right nodes that was reported ",
+                        "was {}."
+                    ),
+                    G::RightNodeId::MAX,
+                    number_of_right_nodes
+                )
             }
             IllegalBipartiteGraphState::PhantomPlaceholder(_) => {
                 unreachable!()

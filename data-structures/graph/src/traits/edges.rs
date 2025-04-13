@@ -21,10 +21,10 @@ pub trait Edges {
     type EdgeId: PositiveInteger + IntoUsize + TryFromUsize;
     /// The underlying matrix type.
     type Matrix: SizedRowsSparseMatrix2D<
-        RowIndex = Self::SourceNodeId,
-        ColumnIndex = Self::DestinationNodeId,
-        SparseIndex = Self::EdgeId,
-    >;
+            RowIndex = Self::SourceNodeId,
+            ColumnIndex = Self::DestinationNodeId,
+            SparseIndex = Self::EdgeId,
+        >;
 
     /// Returns a reference to the underlying matrix.
     fn matrix(&self) -> &Self::Matrix;

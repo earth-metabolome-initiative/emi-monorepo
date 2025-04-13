@@ -1,15 +1,16 @@
 //! Test submodule for the `RootNodes` trait.
 
 use algebra::impls::SquareCSR2D;
-use graph::prelude::Builder;
-use graph::prelude::{
-    DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder, GenericVocabularyBuilder,
-    MonopartiteGraph, MonoplexGraph, RootNodes,
+use graph::{
+    prelude::{
+        Builder, DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder,
+        GenericVocabularyBuilder, MonopartiteGraph, MonoplexGraph, RootNodes,
+    },
+    traits::{
+        EdgesBuilder, MonopartiteGraphBuilder, MonoplexGraphBuilder, VocabularyBuilder,
+        topological_sorting::TopologicalSortingError,
+    },
 };
-use graph::traits::EdgesBuilder;
-use graph::traits::MonopartiteGraphBuilder;
-use graph::traits::MonoplexGraphBuilder;
-use graph::traits::VocabularyBuilder;
 use sorted_vec::prelude::SortedVec;
 
 #[test]
@@ -33,6 +34,10 @@ fn test_no_root_nodes() -> Result<(), Box<dyn std::error::Error>> {
     assert_eq!(graph.number_of_edges(), 9);
 
     assert_eq!(graph.root_nodes(), Vec::new(), "There should be no root nodes");
+    assert_eq!(
+        graph.topological_sort_from_roots().unwrap_err(),
+        TopologicalSortingError::UnreachableNodes
+    );
 
     Ok(())
 }
@@ -62,6 +67,7 @@ fn test_root_nodes() -> Result<(), Box<dyn std::error::Error>> {
     assert_eq!(graph.number_of_edges(), 5);
 
     assert_eq!(graph.root_nodes(), vec![0, 1]);
+    assert_eq!(graph.topological_sort_from_roots()?, vec![0, 1, 2, 3, 4, 5],);
 
     Ok(())
 }

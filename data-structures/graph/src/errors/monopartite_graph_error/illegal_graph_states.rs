@@ -27,11 +27,14 @@ impl<G: MonopartiteGraph + ?Sized> core::fmt::Display for IllegalMonopartiteGrap
                 write!(
                     f,
                     concat!(
-					"The maximal number of nodes of the graph is larger than the number of nodes that can be ",
-					"represented by the graph's node ID type ({}). This should be impossible to reach, and indicates ",
-					"some bug in the implementation of the graph traits. The number of nodes that was reported ",
-					"was {}."
-				), G::NodeId::MAX, number_of_nodes)
+                        "The maximal number of nodes of the graph is larger than the number of nodes that can be ",
+                        "represented by the graph's node ID type ({}). This should be impossible to reach, and indicates ",
+                        "some bug in the implementation of the graph traits. The number of nodes that was reported ",
+                        "was {}."
+                    ),
+                    G::NodeId::MAX,
+                    number_of_nodes
+                )
             }
             IllegalMonopartiteGraphState::PhantomPlaceholder(_) => {
                 unreachable!()

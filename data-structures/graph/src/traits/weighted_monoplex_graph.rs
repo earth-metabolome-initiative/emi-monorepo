@@ -28,25 +28,25 @@ where
 /// Trait defining an edge data structure that has weighted edges.
 pub trait WeightedEdges:
     Edges<
-    Edge = <Self as WeightedEdges>::WeightedEdge,
-    Matrix = <Self as WeightedEdges>::WeightedMatrix,
->
+        Edge = <Self as WeightedEdges>::WeightedEdge,
+        Matrix = <Self as WeightedEdges>::WeightedMatrix,
+    >
 {
     /// The type of the weight.
     type Weight: Number;
     /// The type of the weighted edge.
     type WeightedEdge: WeightedEdge<
-        Weight = Self::Weight,
-        SourceNodeId = Self::SourceNodeId,
-        DestinationNodeId = Self::DestinationNodeId,
-    >;
+            Weight = Self::Weight,
+            SourceNodeId = Self::SourceNodeId,
+            DestinationNodeId = Self::DestinationNodeId,
+        >;
     /// The type of the underlying matrix.
     type WeightedMatrix: SparseValuedMatrix2D<
-        Value = Self::Weight,
-        RowIndex = Self::SourceNodeId,
-        ColumnIndex = Self::DestinationNodeId,
-        SparseIndex = Self::EdgeId,
-    >;
+            Value = Self::Weight,
+            RowIndex = Self::SourceNodeId,
+            ColumnIndex = Self::DestinationNodeId,
+            SparseIndex = Self::EdgeId,
+        >;
 
     /// Returns the weights of the successors of a node.
     ///
@@ -146,9 +146,9 @@ where
 /// Trait defining a graph that has weighted edges.
 pub trait WeightedMonoplexGraph:
     MonoplexGraph<
-    Edges = <Self as WeightedMonoplexGraph>::WeightedEdges,
-    Edge = <Self as WeightedMonoplexGraph>::WeightedEdge,
->
+        Edges = <Self as WeightedMonoplexGraph>::WeightedEdges,
+        Edge = <Self as WeightedMonoplexGraph>::WeightedEdge,
+    >
 {
     /// The type of the weight.
     type Weight: Number;

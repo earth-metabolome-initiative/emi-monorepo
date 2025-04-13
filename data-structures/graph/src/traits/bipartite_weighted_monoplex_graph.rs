@@ -19,22 +19,22 @@ pub trait BipartiteWeightedMonoplexGraph:
 {
     /// The underlying type used to represent the edges of the graph.
     type BipartiteWeightedEdges: WeightedEdges<
-        SourceNodeId = Self::LeftNodeId,
-        DestinationNodeId = Self::RightNodeId,
-        Weight = Self::Weight,
-        WeightedEdge = Self::Edge,
-    >;
+            SourceNodeId = Self::LeftNodeId,
+            DestinationNodeId = Self::RightNodeId,
+            Weight = Self::Weight,
+            WeightedEdge = Self::Edge,
+        >;
 }
 
 impl<G> BipartiteWeightedMonoplexGraph for G
 where
     G: WeightedMonoplexGraph + MonoplexBipartiteGraph<MonoplexBipartiteEdges = G::WeightedEdges>,
     <G as WeightedMonoplexGraph>::WeightedEdges: WeightedEdges<
-        SourceNodeId = G::LeftNodeId,
-        DestinationNodeId = G::RightNodeId,
-        Weight = G::Weight,
-        WeightedEdge = G::Edge,
-    >,
+            SourceNodeId = G::LeftNodeId,
+            DestinationNodeId = G::RightNodeId,
+            Weight = G::Weight,
+            WeightedEdge = G::Edge,
+        >,
 {
     type BipartiteWeightedEdges = G::WeightedEdges;
 }

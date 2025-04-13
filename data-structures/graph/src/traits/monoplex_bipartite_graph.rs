@@ -15,9 +15,9 @@ pub trait MonoplexBipartiteGraph:
 {
     /// The edges of the graph.
     type MonoplexBipartiteEdges: Edges<
-        SourceNodeId = <Self as BipartiteGraph>::LeftNodeId,
-        DestinationNodeId = <Self as BipartiteGraph>::RightNodeId,
-    >;
+            SourceNodeId = <Self as BipartiteGraph>::LeftNodeId,
+            DestinationNodeId = <Self as BipartiteGraph>::RightNodeId,
+        >;
 
     /// Returns whether the left partition contains singletons.
     fn left_partition_has_singletons(&self) -> bool {
@@ -77,9 +77,9 @@ where
     G: MonoplexGraph,
     G: BipartiteGraph,
     G::Edges: Edges<
-        SourceNodeId = <G as BipartiteGraph>::LeftNodeId,
-        DestinationNodeId = <G as BipartiteGraph>::RightNodeId,
-    >,
+            SourceNodeId = <G as BipartiteGraph>::LeftNodeId,
+            DestinationNodeId = <G as BipartiteGraph>::RightNodeId,
+        >,
 {
     type MonoplexBipartiteEdges = G::Edges;
 }

@@ -13,11 +13,11 @@ pub trait TransposedWeightedEdges:
 {
     /// The type of the underlying matrix.
     type WeightedBiMatrix: ValuedSizedSparseBiMatrix2D<
-        Value = <Self as WeightedEdges>::Weight,
-        RowIndex = Self::SourceNodeId,
-        ColumnIndex = Self::DestinationNodeId,
-        SparseIndex = Self::EdgeId,
-    >;
+            Value = <Self as WeightedEdges>::Weight,
+            RowIndex = Self::SourceNodeId,
+            ColumnIndex = Self::DestinationNodeId,
+            SparseIndex = Self::EdgeId,
+        >;
 
     /// Returns the weights of the predecessors of a node.
     ///
@@ -72,11 +72,11 @@ impl<E> TransposedWeightedEdges for E
 where
     E: WeightedEdges,
     E::WeightedMatrix: ValuedSizedSparseBiMatrix2D<
-        RowIndex = E::SourceNodeId,
-        ColumnIndex = E::DestinationNodeId,
-        SparseIndex = E::EdgeId,
-        Value = E::Weight,
-    >,
+            RowIndex = E::SourceNodeId,
+            ColumnIndex = E::DestinationNodeId,
+            SparseIndex = E::EdgeId,
+            Value = E::Weight,
+        >,
 {
     type WeightedBiMatrix = E::WeightedMatrix;
 }

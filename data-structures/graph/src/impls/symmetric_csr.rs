@@ -5,9 +5,9 @@ use algebra::prelude::*;
 use crate::prelude::*;
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
-    > Edges for SymmetricCSR2D<SparseIndex, Idx>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
+> Edges for SymmetricCSR2D<SparseIndex, Idx>
 {
     type Edge = <Self as Matrix>::Coordinates;
     type SourceNodeId = Idx;
@@ -21,10 +21,10 @@ impl<
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
-        DE: MonopartiteEdges,
-    > FromDirectedMonopartiteEdges<DE> for SymmetricCSR2D<SparseIndex, Idx>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
+    DE: MonopartiteEdges,
+> FromDirectedMonopartiteEdges<DE> for SymmetricCSR2D<SparseIndex, Idx>
 where
     DE::MonopartiteMatrix: Symmetrize<Self>,
 {

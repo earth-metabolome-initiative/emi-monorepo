@@ -7,10 +7,7 @@ use super::Edges;
 /// Trait defining the properties of a transposed graph.
 pub trait TransposedEdges: super::Edges<Matrix = <Self as TransposedEdges>::BiMatrix> {
     /// The type of matrix required to store the transposed edges.
-    type BiMatrix: SizedSparseBiMatrix2D<
-        RowIndex = Self::SourceNodeId,
-        ColumnIndex = Self::DestinationNodeId,
-    >;
+    type BiMatrix: SizedSparseBiMatrix2D<RowIndex = Self::SourceNodeId, ColumnIndex = Self::DestinationNodeId>;
 
     /// Returns the predecessors of the node with the given identifier.
     ///

@@ -5,9 +5,9 @@ use algebra::prelude::*;
 use crate::{errors::builder::edges::EdgesBuilderError, prelude::*};
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
-    > Edges for SquareCSR2D<SparseIndex, Idx>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
+> Edges for SquareCSR2D<SparseIndex, Idx>
 {
     type Edge = <Self as Matrix>::Coordinates;
     type SourceNodeId = Idx;
@@ -21,9 +21,9 @@ impl<
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
-    > GrowableEdges for SquareCSR2D<SparseIndex, Idx>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
+> GrowableEdges for SquareCSR2D<SparseIndex, Idx>
 {
     type GrowableMatrix = Self;
     type Error = EdgesBuilderError<Self>;

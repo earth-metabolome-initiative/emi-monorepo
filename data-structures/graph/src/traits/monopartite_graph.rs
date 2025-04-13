@@ -10,10 +10,10 @@ use super::{BidirectionalVocabulary, Edges, Vocabulary};
 /// Trait defining the properties of the monopartited edges of a graph.
 pub trait MonopartiteEdges:
     Edges<
-    SourceNodeId = <Self as MonopartiteEdges>::NodeId,
-    DestinationNodeId = <Self as MonopartiteEdges>::NodeId,
-    Matrix = <Self as MonopartiteEdges>::MonopartiteMatrix,
->
+        SourceNodeId = <Self as MonopartiteEdges>::NodeId,
+        DestinationNodeId = <Self as MonopartiteEdges>::NodeId,
+        Matrix = <Self as MonopartiteEdges>::MonopartiteMatrix,
+    >
 {
     /// The monopartited matrix of the graph.
     type MonopartiteMatrix: SparseSquareMatrix<Index = Self::NodeId>;
@@ -50,10 +50,7 @@ pub trait MonopartiteGraph: super::Graph {
     /// The symbol of the node.
     type NodeSymbol: Symbol;
     /// The vocabulary holding the symbols of the nodes.
-    type Nodes: BidirectionalVocabulary<
-        SourceSymbol = Self::NodeId,
-        DestinationSymbol = Self::NodeSymbol,
-    >;
+    type Nodes: BidirectionalVocabulary<SourceSymbol = Self::NodeId, DestinationSymbol = Self::NodeSymbol>;
 
     /// Returns the nodes vocabulary.
     fn nodes_vocabulary(&self) -> &Self::Nodes;

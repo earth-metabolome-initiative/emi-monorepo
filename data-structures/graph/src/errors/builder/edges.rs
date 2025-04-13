@@ -60,9 +60,9 @@ impl<V: Edges> From<MutabilityError<V::Matrix>> for EdgesBuilderError<V> {
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        Idx: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
-    > From<EdgesBuilderError<UpperTriangularCSR2D<SparseIndex, Idx>>>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    Idx: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
+> From<EdgesBuilderError<UpperTriangularCSR2D<SparseIndex, Idx>>>
     for EdgesBuilderError<SymmetricCSR2D<SparseIndex, Idx>>
 {
     fn from(e: EdgesBuilderError<UpperTriangularCSR2D<SparseIndex, Idx>>) -> Self {

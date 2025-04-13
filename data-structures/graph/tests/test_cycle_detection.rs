@@ -1,15 +1,13 @@
 //! Test submodule for the `CycleDetection` trait.
 
 use algebra::impls::SquareCSR2D;
-use graph::prelude::Builder;
-use graph::prelude::{
-    CycleDetection, DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder,
-    GenericVocabularyBuilder, MonopartiteGraph, MonoplexGraph,
+use graph::{
+    prelude::{
+        Builder, CycleDetection, DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder,
+        GenericVocabularyBuilder, MonopartiteGraph, MonoplexGraph,
+    },
+    traits::{EdgesBuilder, MonopartiteGraphBuilder, MonoplexGraphBuilder, VocabularyBuilder},
 };
-use graph::traits::EdgesBuilder;
-use graph::traits::MonopartiteGraphBuilder;
-use graph::traits::MonoplexGraphBuilder;
-use graph::traits::VocabularyBuilder;
 use sorted_vec::prelude::SortedVec;
 
 #[test]

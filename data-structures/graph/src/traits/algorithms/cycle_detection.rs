@@ -33,9 +33,7 @@ impl<'graph, G: MonoplexMonopartiteGraph + ?Sized> CycleDetector<'graph, G> {
             self.stack.push(node);
 
             for successor_node_id in self.graph.successors(node) {
-                if !self.visited[successor_node_id.into_usize()]
-                    && self.dfs(successor_node_id)
-                {
+                if !self.visited[successor_node_id.into_usize()] && self.dfs(successor_node_id) {
                     return true;
                 } else if self.stack.contains(&successor_node_id) {
                     return true;

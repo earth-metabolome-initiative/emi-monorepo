@@ -9,10 +9,7 @@ pub trait TransposedDirectedEdges:
     TransposedEdges<BiMatrix = <Self as TransposedDirectedEdges>::DirectedBiMatrix> + DirectedEdges
 {
     /// The type of matrix required to store the transposed edges.
-    type DirectedBiMatrix: SparseBiMatrix2D<
-        RowIndex = Self::SourceNodeId,
-        ColumnIndex = Self::DestinationNodeId,
-    >;
+    type DirectedBiMatrix: SparseBiMatrix2D<RowIndex = Self::SourceNodeId, ColumnIndex = Self::DestinationNodeId>;
 }
 
 impl<E> TransposedDirectedEdges for E

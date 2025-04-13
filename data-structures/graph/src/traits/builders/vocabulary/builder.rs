@@ -23,12 +23,12 @@ impl core::fmt::Display for VocabularyBuilderOptions {
 /// Trait for Options for building a vocabulary.
 pub trait VocabularyBuilder:
     Builder<
-    Object = <Self as VocabularyBuilder>::Vocabulary,
-    Error = crate::errors::builder::vocabulary::VocabularyBuilderError<
-        <Self as VocabularyBuilder>::Vocabulary,
-    >,
-    Attribute = VocabularyBuilderOptions,
->
+        Object = <Self as VocabularyBuilder>::Vocabulary,
+        Error = crate::errors::builder::vocabulary::VocabularyBuilderError<
+            <Self as VocabularyBuilder>::Vocabulary,
+        >,
+        Attribute = VocabularyBuilderOptions,
+    >
 {
     /// The type of the vocabulary being built.
     type Vocabulary: GrowableVocabulary;
