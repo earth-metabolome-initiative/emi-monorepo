@@ -15,7 +15,7 @@ pub trait RootNodes: TopologicalSorting {
         // and initialize it to false for all nodes.
         let mut visited = vec![false; self.number_of_nodes().into_usize()];
 
-        // Iterate over all nodes and mark the predecessors of each node as
+        // Iterate over all nodes and mark the successors of each node as
         // visited. A node is considered visited if it has a predecessor.
         for node in self.node_ids() {
             // Mark the successors of the node as visited.
