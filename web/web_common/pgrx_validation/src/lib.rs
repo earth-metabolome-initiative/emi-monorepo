@@ -115,6 +115,27 @@ pub fn must_be_mail(value: &str) -> Result<(), validation_errors::SingleFieldErr
 }
 
 #[validation]
+/// Control that the i32 is strictly positive (0, ...].
+///
+/// # Arguments
+///
+/// * `value` a i32
+///
+/// # Errors
+///
+/// * `validation_errors::SingleFieldError::UnexpectedNegativeOrZeroValue(())`
+///   if the value is negative or zero.
+pub fn must_be_strictly_positive_i32(
+    value: i32,
+) -> Result<(), validation_errors::SingleFieldError> {
+    if value > 0 {
+        Ok(())
+    } else {
+        Err(validation_errors::SingleFieldError::UnexpectedNegativeOrZeroValue(()))
+    }
+}
+
+#[validation]
 /// Control that the f64 is strictly positive (0, ...].
 ///
 /// # Arguments
