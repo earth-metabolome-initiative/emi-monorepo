@@ -25,3 +25,9 @@ name = "root_nodes"
 path = "fuzz_targets/root_nodes.rs"
 test = false
 doc = false
+
+[[bin]]
+name = "sink_nodes"
+path = "fuzz_targets/sink_nodes.rs"
+test = false
+doc = false
