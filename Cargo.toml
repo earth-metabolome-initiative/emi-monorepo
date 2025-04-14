@@ -35,7 +35,7 @@ members = [
     "utils/image-validation",
     "utils/mime-types",
     "web/web_common/ws-messages",
-    "utils/rosetta-timestamp"
+    "utils/rosetta-timestamp",
 
 ]
 
@@ -73,6 +73,7 @@ zip = "2.2.2"
 pgrx = "0.13"
 image = "0.25.5"
 pgrx-sql-entity-graph = "0.13"
+criterion = { version = "0.5", features = ["html_reports"] }
 rosetta-uuid = { path = "data-structures/rosetta-uuid" }
 rosetta-timestamp = { path = "utils/rosetta-timestamp" }
 taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
@@ -125,3 +126,6 @@ unused_import_braces = "forbid"
 
 [workspace.lints.clippy]
 pedantic = "deny"
+
+[profile.bench]
+debug = true # Include debug info.
