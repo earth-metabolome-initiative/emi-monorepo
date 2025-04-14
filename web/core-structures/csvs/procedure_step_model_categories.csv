@@ -1,0 +1,7 @@
+name,description,icon.name
+sample packaging,"A step involving the packaging of samples for transport or storage.",sheet-plastic
+freeze drying,"A step involving the removal of moisture from samples by sublimation.",snowflake
+labelling,"A step involving the application of labels to organisms, samples or containers.",tag
+scan qrcode,"A step involving the scanning of a QR code for identification or tracking purposes.",qrcode
+photographing,"A step involving the capture of images of organisms, samples or containers.",camera
+geotagging,"A step involving the recording of geographical coordinates for samples or organisms.",map-location-dot

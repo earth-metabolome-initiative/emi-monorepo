@@ -1,17 +1,20 @@
-CREATE TABLE IF NOT EXISTS procedure_models (
+CREATE TABLE IF NOT EXISTS step_models (
 	id SERIAL PRIMARY KEY,
-	name TEXT NOT NULL CHECK (must_not_be_empty(name))
+	name TEXT NOT NULL CHECK (must_not_be_empty(name)),
 	description TEXT NOT NULL CHECK (must_not_be_empty(description)),
-	created_by INTEGER NOT NULL REFERENCES users(id),
+	-- Image illustrating what the step looks like
+	photograph_id INT NOT NULL REFERENCES photographs(id),
+	procedure_step_model_category_id SMALLINT NOT NULL REFERENCES procedure_step_model_categories(id),
+	created_by INT NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-	updated_by INTEGER NOT NULL REFERENCES users(id),
+	updated_by INT NOT NULL REFERENCES users(id),
 	updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Table providing the instrument types necessary for a given abstract procedure model
-CREATE TABLE IF NOT EXISTS procedure_model_instrument_categories (
+CREATE TABLE IF NOT EXISTS step_model_instrument_categories (
 	id SERIAL PRIMARY KEY,
-	procedure_model_id INT NOT NULL REFERENCES procedure_models(id),
+	step_model_id INT NOT NULL REFERENCES step_models(id),
 	instrument_category_id SMALLINT NOT NULL REFERENCES instrument_categories(id),
 	created_by INT NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -20,9 +23,9 @@ CREATE TABLE IF NOT EXISTS procedure_model_instrument_categories (
 );
 
 -- Table providing the nameplate categories used within a certain procedure model
-CREATE TABLE IF NOT EXISTS procedure_model_nameplate_categories (
+CREATE TABLE IF NOT EXISTS step_model_nameplate_categories (
 	id SERIAL PRIMARY KEY,
-	procedure_model_id INT NOT NULL REFERENCES procedure_models(id),
+	step_model_id INT NOT NULL REFERENCES step_models(id),
 	nameplate_category_id SMALLINT NOT NULL REFERENCES nameplate_categories(id),
 	created_by INT NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -30,9 +33,9 @@ CREATE TABLE IF NOT EXISTS procedure_model_nameplate_categories (
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS procedure_model_container_categories (
+CREATE TABLE IF NOT EXISTS step_model_container_categories (
 	id SERIAL PRIMARY KEY,
-	procedure_model_id INT NOT NULL REFERENCES procedure_models(id),
+	step_model_id INT NOT NULL REFERENCES step_models(id),
 	container_category_id SMALLINT NOT NULL REFERENCES container_categories(id),
 	created_by INT NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -40,10 +43,9 @@ CREATE TABLE IF NOT EXISTS procedure_model_container_categories (
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS procedure_model_tool_categories (
+CREATE TABLE IF NOT EXISTS step_model_tool_categories (
 	id SERIAL PRIMARY KEY,
-	quantity SMALLINT NOT NULL CHECK (must_be_strictly_positive_i32(quantity)),
-	procedure_model_id INT NOT NULL REFERENCES procedure_models(id),
+	step_model_id INT NOT NULL REFERENCES step_models(id),
 	tool_category_id SMALLINT NOT NULL REFERENCES tool_categories(id),
 	created_by INT NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
