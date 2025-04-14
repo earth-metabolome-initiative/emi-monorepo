@@ -32,6 +32,7 @@ impl<M: Matrix2D> From<M> for PaddedCoordinates<M> {
 impl<M: Matrix2D> Iterator for PaddedCoordinates<M> {
     type Item = (M::RowIndex, M::ColumnIndex);
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(column_index) = self.column_iter.next() {
             Some((self.current_row, column_index))
@@ -46,6 +47,7 @@ impl<M: Matrix2D> Iterator for PaddedCoordinates<M> {
 }
 
 impl<M: Matrix2D> DoubleEndedIterator for PaddedCoordinates<M> {
+    #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if let Some(column_index) = self.column_iter.next_back() {
             Some((self.current_row, column_index))

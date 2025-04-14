@@ -16,6 +16,7 @@ macro_rules! impl_saturating_sub_for_numerical {
 			impl SaturatingSub for $t {
 				type Output = Self;
 
+				#[inline]
 				fn saturating_sub(self, rhs: Self) -> Self::Output {
 					self.saturating_sub(rhs)
 				}

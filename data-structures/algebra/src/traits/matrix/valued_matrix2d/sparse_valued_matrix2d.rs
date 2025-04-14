@@ -16,6 +16,7 @@ pub trait SparseValuedMatrix2D: SparseMatrix2D + ValuedMatrix2D + SparseValuedMa
     where
         Self: 'a;
 
+    #[inline]
     /// Returns the maximal value on the row.
     ///
     /// # Arguments
@@ -32,6 +33,7 @@ pub trait SparseValuedMatrix2D: SparseMatrix2D + ValuedMatrix2D + SparseValuedMa
         self.sparse_row_values(row).max_by(TotalOrd::total_cmp)
     }
 
+    #[inline]
     /// Returns the maximal value and its column on the row.
     ///
     /// # Arguments
@@ -54,6 +56,7 @@ pub trait SparseValuedMatrix2D: SparseMatrix2D + ValuedMatrix2D + SparseValuedMa
             .max_by(|(_, value1), (_, value2)| value1.total_cmp(value2))
     }
 
+    #[inline]
     /// Returns the minimal value on the row.
     ///
     /// # Arguments
@@ -70,6 +73,7 @@ pub trait SparseValuedMatrix2D: SparseMatrix2D + ValuedMatrix2D + SparseValuedMa
         self.sparse_row_values(row).min_by(TotalOrd::total_cmp)
     }
 
+    #[inline]
     /// Returns the minimal value and its column on the row.
     ///
     /// # Arguments
@@ -99,6 +103,7 @@ pub trait SparseValuedMatrix2D: SparseMatrix2D + ValuedMatrix2D + SparseValuedMa
     /// * `row`: The row.
     fn sparse_row_values(&self, row: Self::RowIndex) -> Self::SparseRowValues<'_>;
 
+    #[inline]
     /// Returns an iterator over the maximum values of the rows.
     ///
     /// # Returns
@@ -112,6 +117,7 @@ pub trait SparseValuedMatrix2D: SparseMatrix2D + ValuedMatrix2D + SparseValuedMa
         self.row_indices().map(move |row| self.sparse_row_max_value(row))
     }
 
+    #[inline]
     /// Returns an iterator over the minimum values of the rows.
     ///
     /// # Returns
@@ -132,6 +138,7 @@ impl<M: SparseValuedMatrix2D> SparseValuedMatrix2D for &M {
     where
         Self: 'a;
 
+    #[inline]
     fn sparse_row_values(&self, row: Self::RowIndex) -> Self::SparseRowValues<'_> {
         (*self).sparse_row_values(row)
     }
@@ -168,6 +175,7 @@ where
 {
     type Item = M::Value;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|column| self.matrix.implicit_value(&(self.row, column)))
     }
@@ -178,6 +186,7 @@ where
     M: SparseMatrix2D + ImplicitValuedMatrix,
     M::SparseRow<'matrix>: ExactSizeIterator,
 {
+    #[inline]
     fn len(&self) -> usize {
         self.iter.len()
     }
@@ -187,6 +196,7 @@ impl<M> DoubleEndedIterator for ImplicitValuedSparseRowIterator<'_, M>
 where
     M: SparseMatrix2D + ImplicitValuedMatrix,
 {
+    #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         self.iter.next_back().map(|column| self.matrix.implicit_value(&(self.row, column)))
     }
@@ -217,6 +227,7 @@ where
     where
         Self: 'a;
 
+    #[inline]
     fn sparse_row_implicit_values(&self, row: Self::RowIndex) -> Self::SparseRowImplicitValues<'_> {
         ImplicitValuedSparseRowIterator { iter: self.sparse_row(row), row, matrix: self }
     }

@@ -124,12 +124,12 @@ impl<M: SparseMatrix2D + ?Sized, Distance: Number> PartialAssignment<'_, M, Dist
         let left_distance = self.left_distances[row_index.into_usize()];
         for successor_id in self.matrix.sparse_row(row_index) {
             let maybe_predecessor_id = self.predecessors[successor_id.into_usize()];
-            if self.left_distance(maybe_predecessor_id) == left_distance + Distance::ONE {
-                if self.dfs(maybe_predecessor_id) {
-                    self.successors[row_index.into_usize()] = Some(successor_id);
-                    self.predecessors[successor_id.into_usize()] = Some(row_index);
-                    return true;
-                }
+            if self.left_distance(maybe_predecessor_id) == left_distance + Distance::ONE
+                && self.dfs(maybe_predecessor_id)
+            {
+                self.successors[row_index.into_usize()] = Some(successor_id);
+                self.predecessors[successor_id.into_usize()] = Some(row_index);
+                return true;
             }
         }
 

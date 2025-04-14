@@ -2,7 +2,7 @@
 
 use algebra::{
     impls::{GenericImplicitValuedMatrix2D, RangedCSR2D, ranged::SimpleRanged},
-    prelude::{ImplicitValuedMatrix, Number, One, Pow, SparseLAPJV, SparseMatrix, Sqrt, Ten, Zero},
+    prelude::{Number, One, Pow, SparseLAPJV, SparseMatrix, Sqrt, Ten, Two, Zero},
 };
 use functional_properties::prelude::ScalarSimilarity;
 
@@ -86,7 +86,11 @@ where
             S1::Mz,
         > = GenericImplicitValuedMatrix2D::new(
             left.matching_peaks(right, self.mz_tolerance),
-            |(i, j)| left_peak_products[i as usize] * right_peak_products[j as usize],
+            |(i, j)| {
+                S1::Mz::ONE
+                    / (S1::Mz::ONE
+                        + left_peak_products[i as usize] * right_peak_products[j as usize])
+            },
         );
 
         if map.is_empty() {
@@ -94,10 +98,13 @@ where
         }
 
         let matching: Vec<(u16, u16)> = map
-            .sparse_lapjv(S1::Mz::ONE, S1::Mz::TEN)
+            .sparse_lapjv(S1::Mz::TWO, S1::Mz::TEN)
             .expect("Failed to compute the Hungarian algorithm");
 
-        let cost = matching.iter().map(|&(i, j)| map.implicit_value(&(i, j))).sum::<S1::Mz>();
+        let cost = matching
+            .iter()
+            .map(|&(i, j)| left_peak_products[i as usize] * right_peak_products[j as usize])
+            .sum::<S1::Mz>();
 
         let similarity = cost / (left_peak_norm * right_peak_norm);
 

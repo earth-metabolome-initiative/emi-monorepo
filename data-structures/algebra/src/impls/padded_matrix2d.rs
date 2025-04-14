@@ -66,6 +66,13 @@ where
     /// * `matrix` - The underlying sparse matrix.
     /// * `map` - The function to map the values not defined in the underlying
     ///   sparse matrix.
+    ///
+    /// # Errors
+    ///
+    /// * `MutabilityError::MaxedOutColumnIndex` - The number of columns in the
+    ///   matrix exceeds the maximum column index.
+    /// * `MutabilityError::MaxedOutRowIndex` - The number of rows in the matrix
+    ///   exceeds the maximum row index.
     pub fn new(matrix: M, map: Map) -> Result<Self, MutabilityError<M>> {
         let number_of_columns: usize = matrix.number_of_columns().into_usize();
         let number_of_rows: usize = matrix.number_of_rows().into_usize();
@@ -79,6 +86,7 @@ where
         Ok(Self { matrix, map })
     }
 
+    #[inline]
     /// Returns whether the value at the provided coordinates is imputed or
     /// not.
     ///

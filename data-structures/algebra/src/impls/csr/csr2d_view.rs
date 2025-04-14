@@ -1,5 +1,7 @@
 //! Iterator of the sparse coordinates of the CSR2D matrix.
 
+use std::cmp::Ordering;
+
 use crate::prelude::*;
 
 /// Iterator of the sparse coordinates of the CSR2D matrix.
@@ -21,14 +23,16 @@ impl<CSR: SparseMatrix2D> Iterator for CSR2DView<'_, CSR> {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.next.as_mut()?.next().map(|column_index| (self.next_row, column_index)).or_else(|| {
-            if self.next_row == self.back_row {
-                None
-            } else if self.next_row < self.back_row {
-                self.next_row += CSR::RowIndex::ONE;
-                self.next = Some(self.csr2d.sparse_row(self.next_row));
-                self.next()
-            } else {
-                self.back.as_mut()?.next().map(|column_index| (self.back_row, column_index))
+            match self.next_row.cmp(&self.back_row) {
+                Ordering::Equal => None,
+                Ordering::Less => {
+                    self.next_row += CSR::RowIndex::ONE;
+                    self.next = Some(self.csr2d.sparse_row(self.next_row));
+                    self.next()
+                }
+                Ordering::Greater => {
+                    self.back.as_mut()?.next().map(|column_index| (self.back_row, column_index))
+                }
             }
         })
     }
@@ -54,14 +58,16 @@ where
 impl<CSR: SparseMatrix2D> DoubleEndedIterator for CSR2DView<'_, CSR> {
     fn next_back(&mut self) -> Option<Self::Item> {
         self.back.as_mut()?.next().map(|column_index| (self.back_row, column_index)).or_else(|| {
-            if self.back_row == self.next_row {
-                None
-            } else if self.back_row > self.next_row {
-                self.back_row -= CSR::RowIndex::ONE;
-                self.back = Some(self.csr2d.sparse_row(self.back_row));
-                self.next_back()
-            } else {
-                self.next.as_mut()?.next().map(|column_index| (self.next_row, column_index))
+            match self.next_row.cmp(&self.back_row) {
+                Ordering::Equal => None,
+                Ordering::Less => {
+                    self.next.as_mut()?.next().map(|column_index| (self.next_row, column_index))
+                }
+                Ordering::Greater => {
+                    self.back_row += CSR::RowIndex::ONE;
+                    self.back =Some(self.csr2d.sparse_row(self.back_row));
+                    self.next_back()
+                }
             }
         })
     }

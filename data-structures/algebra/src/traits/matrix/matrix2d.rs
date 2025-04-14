@@ -21,11 +21,13 @@ pub trait Matrix2D:
     /// Returns the number of columns of the matrix.
     fn number_of_columns(&self) -> Self::ColumnIndex;
 
+    #[inline]
     /// Returns an iterator over the rows of the matrix.
     fn row_indices(&self) -> SimpleRanged<Self::RowIndex> {
         SimpleRanged::new(Self::RowIndex::ZERO, self.number_of_rows())
     }
 
+    #[inline]
     /// Returns an iterator over the columns of the matrix.
     fn column_indices(&self) -> SimpleRanged<Self::ColumnIndex> {
         SimpleRanged::new(Self::ColumnIndex::ZERO, self.number_of_columns())
@@ -36,10 +38,12 @@ impl<M: Matrix2D> Matrix2D for &M {
     type RowIndex = M::RowIndex;
     type ColumnIndex = M::ColumnIndex;
 
+    #[inline]
     fn number_of_rows(&self) -> Self::RowIndex {
         (*self).number_of_rows()
     }
 
+    #[inline]
     fn number_of_columns(&self) -> Self::ColumnIndex {
         (*self).number_of_columns()
     }

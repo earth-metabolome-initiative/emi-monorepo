@@ -50,6 +50,7 @@ where
     where
         Self: 'a;
 
+    #[inline]
     fn value(&self, (row_index, column_index): Self::Coordinates) -> Self::Value {
         if row_index >= self.matrix.number_of_rows()
             || column_index >= self.matrix.number_of_columns()
@@ -61,10 +62,10 @@ where
             .sparse_row(row_index)
             .zip(self.matrix.sparse_row_values(row_index))
             .find(|(sparse_column_index, _)| *sparse_column_index == column_index)
-            .map(|(_, value)| value)
-            .unwrap_or_else(|| (self.map)((row_index, column_index)))
+            .map_or_else(|| (self.map)((row_index, column_index)), |(_, value)| value)
     }
 
+    #[inline]
     fn values(&self) -> Self::Values<'_> {
         self.into()
     }
@@ -81,6 +82,7 @@ where
     where
         Self: 'a;
 
+    #[inline]
     fn sparse_values(&self) -> Self::SparseValues<'_> {
         self.into()
     }
@@ -97,6 +99,7 @@ where
     where
         Self: 'a;
 
+    #[inline]
     fn sparse_row_values(&self, row: Self::RowIndex) -> Self::SparseRowValues<'_> {
         ImputedRowValues::new(self, row)
     }
@@ -113,6 +116,7 @@ where
     where
         Self: 'a;
 
+    #[inline]
     fn row_values(&self, row: Self::RowIndex) -> Self::RowValues<'_> {
         ImputedRowValues::new(self, row)
     }

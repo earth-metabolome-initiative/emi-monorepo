@@ -11,6 +11,7 @@ pub struct ImplicitValuedSparseIterator<'matrix, M: ImplicitValuedSparseMatrix> 
 impl<'matrix, M: ImplicitValuedSparseMatrix> From<&'matrix M>
     for ImplicitValuedSparseIterator<'matrix, M>
 {
+    #[inline]
     fn from(matrix: &'matrix M) -> Self {
         let iter = matrix.sparse_coordinates();
         Self { iter, matrix }
@@ -20,6 +21,7 @@ impl<'matrix, M: ImplicitValuedSparseMatrix> From<&'matrix M>
 impl<M: ImplicitValuedSparseMatrix> Iterator for ImplicitValuedSparseIterator<'_, M> {
     type Item = M::Value;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|coordinates| self.matrix.implicit_value(&coordinates))
     }
@@ -30,12 +32,14 @@ impl<'matrix, M: ImplicitValuedSparseMatrix> ExactSizeIterator
 where
     M::SparseCoordinates<'matrix>: ExactSizeIterator,
 {
+    #[inline]
     fn len(&self) -> usize {
         self.iter.len()
     }
 }
 
 impl<M: ImplicitValuedSparseMatrix> DoubleEndedIterator for ImplicitValuedSparseIterator<'_, M> {
+    #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         self.iter.next_back().map(|coordinates| self.matrix.implicit_value(&coordinates))
     }

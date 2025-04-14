@@ -1,0 +1,27 @@
+[package]
+name = "graph-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+honggfuzz = "0.5"
+graph = { path = "../", features = ["arbitrary"] }
+algebra = { path = "../../algebra", features = ["arbitrary"] }
+arbitrary = { version = "1", features = ["derive"] }
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[profile.release]
+debug = 1
+
+[[bin]]
+name = "root_nodes"
+path = "fuzz_targets/root_nodes.rs"
+test = false
+doc = false

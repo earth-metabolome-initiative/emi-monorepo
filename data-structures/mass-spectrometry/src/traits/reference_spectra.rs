@@ -2,6 +2,7 @@
 
 pub mod aspirin;
 pub mod cocaine;
+pub mod epimeloscine;
 pub mod glucose;
 pub mod hydroxycholesterol;
 pub mod phenylalanine;
@@ -9,6 +10,7 @@ pub mod salicin;
 
 pub use aspirin::AspirinSpectrum;
 pub use cocaine::CocaineSpectrum;
+pub use epimeloscine::EpimeloscineSpectrum;
 pub use glucose::GlucoseSpectrum;
 pub use hydroxycholesterol::HydroxyCholesterolSpectrum;
 pub use phenylalanine::PhenylalanineSpectrum;

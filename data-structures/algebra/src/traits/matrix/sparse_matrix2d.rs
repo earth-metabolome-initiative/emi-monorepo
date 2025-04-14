@@ -83,30 +83,37 @@ impl<M: SparseMatrix2D> SparseMatrix2D for &M {
     where
         Self: 'a;
 
+    #[inline]
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         (*self).sparse_row(row)
     }
 
+    #[inline]
     fn sparse_columns(&self) -> Self::SparseColumns<'_> {
         (*self).sparse_columns()
     }
 
+    #[inline]
     fn sparse_rows(&self) -> Self::SparseRows<'_> {
         (*self).sparse_rows()
     }
 
+    #[inline]
     fn number_of_empty_rows(&self) -> Self::RowIndex {
         (*self).number_of_empty_rows()
     }
 
+    #[inline]
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         (*self).number_of_non_empty_rows()
     }
 
+    #[inline]
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
         (*self).empty_row_indices()
     }
 
+    #[inline]
     fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
         (*self).non_empty_row_indices()
     }
@@ -165,6 +172,7 @@ pub trait SparseBiMatrix2D:
         ColumnIndex = Self::RowIndex,
     >;
 
+    #[inline]
     /// Returns an iterator over the sparse rows of a column.
     ///
     /// # Arguments
@@ -207,6 +215,7 @@ pub trait SizedSparseBiMatrix2D:
         ColumnIndex = Self::RowIndex,
     >;
 
+    #[inline]
     /// Returns the number of defined values in a column.
     ///
     /// # Arguments
@@ -216,6 +225,7 @@ pub trait SizedSparseBiMatrix2D:
         self.transposed().number_of_defined_values_in_row(column)
     }
 
+    #[inline]
     /// Returns an iterator over the sparse sizes of all columns.
     ///
     /// # Arguments

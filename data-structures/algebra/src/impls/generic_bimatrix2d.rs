@@ -12,10 +12,8 @@ pub struct GenericBiMatrix2D<M, T> {
     transposed: T,
 }
 
-impl<
-        T: Matrix2D,
-        M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
-    > GenericBiMatrix2D<M, T>
+impl<T: Matrix2D, M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>>
+    GenericBiMatrix2D<M, T>
 {
     /// Creates a new instance of [`GenericBiMatrix2D`].
     ///
@@ -48,10 +46,12 @@ where
     type ColumnIndex = M::ColumnIndex;
     type RowIndex = M::RowIndex;
 
+    #[inline]
     fn number_of_columns(&self) -> Self::ColumnIndex {
         self.matrix.number_of_columns()
     }
 
+    #[inline]
     fn number_of_rows(&self) -> Self::RowIndex {
         self.matrix.number_of_rows()
     }
@@ -69,10 +69,11 @@ where
     where
         Self: 'a;
 
+    #[inline]
     fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_> {
         self.matrix.sparse_coordinates()
     }
-
+    #[inline]
     fn is_empty(&self) -> bool {
         self.matrix.is_empty()
     }
@@ -84,6 +85,7 @@ where
     M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
     M: SizedSparseMatrix,
 {
+    #[inline]
     fn number_of_defined_values(&self) -> Self::SparseIndex {
         self.matrix.number_of_defined_values()
     }
@@ -95,10 +97,12 @@ where
     M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
     M: RankSelectSparseMatrix,
 {
+    #[inline]
     fn rank(&self, coordinates: &Self::Coordinates) -> Self::SparseIndex {
         self.matrix.rank(coordinates)
     }
 
+    #[inline]
     fn select(&self, sparse_index: Self::SparseIndex) -> Self::Coordinates {
         self.matrix.select(sparse_index)
     }
@@ -132,30 +136,37 @@ where
     where
         Self: 'a;
 
+    #[inline]
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.matrix.sparse_row(row)
     }
 
+    #[inline]
     fn sparse_columns(&self) -> Self::SparseColumns<'_> {
         self.matrix.sparse_columns()
     }
 
+    #[inline]
     fn sparse_rows(&self) -> Self::SparseRows<'_> {
         self.matrix.sparse_rows()
     }
 
+    #[inline]
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
         self.matrix.empty_row_indices()
     }
 
+    #[inline]
     fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
         self.matrix.non_empty_row_indices()
     }
 
+    #[inline]
     fn number_of_empty_rows(&self) -> Self::RowIndex {
         self.matrix.number_of_empty_rows()
     }
 
+    #[inline]
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         self.matrix.number_of_non_empty_rows()
     }
@@ -172,10 +183,12 @@ where
     where
         Self: 'a;
 
+    #[inline]
     fn number_of_defined_values_in_row(&self, row: Self::RowIndex) -> Self::ColumnIndex {
         self.matrix.number_of_defined_values_in_row(row)
     }
 
+    #[inline]
     fn sparse_row_sizes(&self) -> Self::SparseRowSizes<'_> {
         self.matrix.sparse_row_sizes()
     }
@@ -187,14 +200,17 @@ where
     M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
     M: SizedSparseMatrix2D,
 {
+    #[inline]
     fn rank_row(&self, row: Self::RowIndex) -> Self::SparseIndex {
         self.matrix.rank_row(row)
     }
 
+    #[inline]
     fn select_row(&self, sparse_index: Self::SparseIndex) -> Self::RowIndex {
         self.matrix.select_row(sparse_index)
     }
 
+    #[inline]
     fn select_column(&self, sparse_index: Self::SparseIndex) -> Self::ColumnIndex {
         self.matrix.select_column(sparse_index)
     }
@@ -205,6 +221,7 @@ where
     T: Matrix2D + Clone,
     M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
 {
+    #[inline]
     fn transpose(&self) -> T {
         self.transposed.clone()
     }
@@ -219,10 +236,12 @@ where
     type Matrix = M;
     type TransposedMatrix = T;
 
+    #[inline]
     fn matrix(&self) -> &Self::Matrix {
         &self.matrix
     }
 
+    #[inline]
     fn transposed(&self) -> &T {
         &self.transposed
     }

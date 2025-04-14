@@ -11,6 +11,7 @@ pub mod ranged_csr;
 pub mod valued_matrix;
 pub mod vec;
 mod vector;
+pub mod ragged_vector;
 
 pub use csr::*;
 pub use error::{Error, MutabilityError};
@@ -22,3 +23,4 @@ pub use padded_matrix2d::*;
 pub use ranged_csr::*;
 pub use valued_matrix::*;
 pub use vec::VecMatrix2D;
+pub use ragged_vector::RaggedVector;

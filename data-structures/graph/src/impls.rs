@@ -16,6 +16,8 @@ mod tuple;
 
 #[cfg(any(feature = "std", feature = "alloc"))]
 mod ranged_csr;
+#[cfg(any(feature = "std", feature = "alloc"))]
+mod ragged_vec;
 
 #[cfg(any(feature = "std", feature = "alloc"))]
 mod csr2d;

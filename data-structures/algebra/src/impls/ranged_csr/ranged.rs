@@ -95,14 +95,17 @@ where
         }
     }
 
+    #[inline]
     fn number_of_elements(&self) -> Self::Step {
         self.end - self.start
     }
 
+    #[inline]
     fn start(&self) -> Self::Step {
         self.start
     }
 
+    #[inline]
     fn end(&self) -> Self::Step {
         self.end
     }
@@ -150,6 +153,7 @@ where
         }
     }
 
+    #[inline]
     fn number_of_elements(&self) -> Self::Step {
         match self {
             Self::Single(range) => range.number_of_elements(),
@@ -157,6 +161,7 @@ where
         }
     }
 
+    #[inline]
     fn start(&self) -> Self::Step {
         match self {
             Self::Single(range) => range.start,
@@ -164,6 +169,7 @@ where
         }
     }
 
+    #[inline]
     fn end(&self) -> Self::Step {
         match self {
             Self::Single(range) => range.end,
@@ -173,18 +179,21 @@ where
 }
 
 impl<N: PositiveInteger> Default for SimpleRanged<N> {
+    #[inline]
     fn default() -> Self {
         Self { start: N::ZERO, end: N::ZERO }
     }
 }
 
 impl<N: PositiveInteger> Default for DoubleRanged<N> {
+    #[inline]
     fn default() -> Self {
         Self::Single(SimpleRanged::default())
     }
 }
 
 impl<N: PositiveInteger> SimpleRanged<N> {
+    #[inline]
     /// Creates a new `SimpleRanged` struct.
     pub fn new(start: N, end: N) -> Self {
         debug_assert!(start <= end);
@@ -195,6 +204,7 @@ impl<N: PositiveInteger> SimpleRanged<N> {
 impl<N: PositiveInteger> Iterator for SimpleRanged<N> {
     type Item = N;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         if self.start < self.end {
             let current = self.start;
@@ -209,6 +219,7 @@ impl<N: PositiveInteger> Iterator for SimpleRanged<N> {
 impl<N: PositiveInteger> Iterator for DoubleRanged<N> {
     type Item = N;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         match self {
             Self::Single(range) => range.next(),
@@ -218,6 +229,7 @@ impl<N: PositiveInteger> Iterator for DoubleRanged<N> {
 }
 
 impl<N: PositiveInteger> DoubleEndedIterator for SimpleRanged<N> {
+    #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.start < self.end {
             self.end -= N::ONE;
@@ -229,6 +241,7 @@ impl<N: PositiveInteger> DoubleEndedIterator for SimpleRanged<N> {
 }
 
 impl<N: PositiveInteger> DoubleEndedIterator for DoubleRanged<N> {
+    #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         match self {
             Self::Single(range) => range.next_back(),
@@ -238,12 +251,14 @@ impl<N: PositiveInteger> DoubleEndedIterator for DoubleRanged<N> {
 }
 
 impl<N: PositiveInteger + IntoUsize> ExactSizeIterator for SimpleRanged<N> {
+    #[inline]
     fn len(&self) -> usize {
         (self.end - self.start).into_usize()
     }
 }
 
 impl<N: PositiveInteger + IntoUsize> ExactSizeIterator for DoubleRanged<N> {
+    #[inline]
     fn len(&self) -> usize {
         match self {
             Self::Single(range) => range.len(),
@@ -253,18 +268,21 @@ impl<N: PositiveInteger + IntoUsize> ExactSizeIterator for DoubleRanged<N> {
 }
 
 impl<N: PositiveInteger> From<(N, N)> for SimpleRanged<N> {
+    #[inline]
     fn from((start, end): (N, N)) -> Self {
         Self::new(start, end)
     }
 }
 
 impl<N: PositiveInteger> From<(N, N)> for DoubleRanged<N> {
+    #[inline]
     fn from((start, end): (N, N)) -> Self {
         Self::Single(SimpleRanged::new(start, end))
     }
 }
 
 impl<N: PositiveInteger> From<((N, N), (N, N))> for DoubleRanged<N> {
+    #[inline]
     fn from(((start1, end1), (start2, end2)): ((N, N), (N, N))) -> Self {
         Self::Double(SimpleRanged::new(start1, end1), SimpleRanged::new(start2, end2))
     }

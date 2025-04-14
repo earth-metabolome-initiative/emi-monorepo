@@ -52,6 +52,7 @@ pub trait ValuedSizedSparseBiMatrix2D:
         Value = Self::Value,
     >;
 
+    #[inline]
     /// Returns the maximal value on the column.
     ///
     /// # Arguments
@@ -71,6 +72,7 @@ pub trait ValuedSizedSparseBiMatrix2D:
         self.sparse_column_values(column).max_by(TotalOrd::total_cmp)
     }
 
+    #[inline]
     /// Returns the minimal value on the column.
     ///
     /// # Arguments
@@ -87,6 +89,7 @@ pub trait ValuedSizedSparseBiMatrix2D:
         self.sparse_column_values(column).min_by(TotalOrd::total_cmp)
     }
 
+    #[inline]
     /// Returns an iterator over the values of a column.
     ///
     /// # Arguments

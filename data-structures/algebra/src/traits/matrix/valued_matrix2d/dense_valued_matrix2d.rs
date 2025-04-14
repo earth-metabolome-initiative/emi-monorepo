@@ -14,6 +14,7 @@ pub trait DenseValuedMatrix2D: DenseMatrix2D + ValuedMatrix2D + DenseValuedMatri
     where
         Self: 'a;
 
+    #[inline]
     /// Returns the maximal value on the row.
     ///
     /// # Arguments
@@ -30,6 +31,7 @@ pub trait DenseValuedMatrix2D: DenseMatrix2D + ValuedMatrix2D + DenseValuedMatri
         self.row_values(row).max_by(TotalOrd::total_cmp)
     }
 
+    #[inline]
     /// Returns the maximal value and its column on the row.
     ///
     /// # Arguments
@@ -52,6 +54,7 @@ pub trait DenseValuedMatrix2D: DenseMatrix2D + ValuedMatrix2D + DenseValuedMatri
             .max_by(|(_, value1), (_, value2)| value1.total_cmp(value2))
     }
 
+    #[inline]
     /// Returns the minimal value on the row.
     ///
     /// # Arguments
@@ -68,6 +71,7 @@ pub trait DenseValuedMatrix2D: DenseMatrix2D + ValuedMatrix2D + DenseValuedMatri
         self.row_values(row).min_by(TotalOrd::total_cmp)
     }
 
+    #[inline]
     /// Returns the minimal value and its column on the row.
     ///
     /// # Arguments
@@ -100,6 +104,7 @@ impl<M: DenseValuedMatrix2D> DenseValuedMatrix2D for &M {
     where
         Self: 'a;
 
+    #[inline]
     fn row_values(&self, row: Self::RowIndex) -> Self::RowValues<'_> {
         (*self).row_values(row)
     }

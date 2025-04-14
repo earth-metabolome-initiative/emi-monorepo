@@ -8,6 +8,7 @@ algebra.workspace = true
 sorted-vec.workspace = true
 common-traits.workspace = true
 serde = { workspace = true, optional = true }
+arbitrary = { workspace = true, optional = true }
 
 [lints]
 workspace = true
@@ -15,5 +16,6 @@ workspace = true
 [features]
 default = ["std"]
 std = ["alloc", "sorted-vec/std"]
+arbitrary = ["algebra/arbitrary", "dep:arbitrary"]
 alloc = ["sorted-vec/alloc"]
 serde = ["algebra/serde", "dep:serde"]

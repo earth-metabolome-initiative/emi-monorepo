@@ -13,7 +13,7 @@ pub mod spectrum_mut;
 
 pub use reference_spectra::{
     AspirinSpectrum, CocaineSpectrum, GlucoseSpectrum, HydroxyCholesterolSpectrum,
-    PhenylalanineSpectrum, SalicinSpectrum,
+    PhenylalanineSpectrum, SalicinSpectrum, EpimeloscineSpectrum
 };
 pub use spectra::Spectra;
 pub use spectral_filter::SpectralFilter;

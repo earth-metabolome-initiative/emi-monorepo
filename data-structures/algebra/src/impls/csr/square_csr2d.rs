@@ -1,6 +1,9 @@
 //! Submodule providing a definition of a CSR matrix.
 use core::fmt::Debug;
 
+#[cfg(feature = "arbitrary")]
+mod arbitrary_impl;
+
 use crate::prelude::*;
 
 #[derive(Clone)]
@@ -195,30 +198,37 @@ where
     where
         Self: 'a;
 
+    #[inline]
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.csr.sparse_row(row)
     }
 
+    #[inline]
     fn sparse_columns(&self) -> Self::SparseColumns<'_> {
         self.csr.sparse_columns()
     }
 
+    #[inline]
     fn sparse_rows(&self) -> Self::SparseRows<'_> {
         self.csr.sparse_rows()
     }
 
+    #[inline]
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
         self.csr.empty_row_indices()
     }
 
+    #[inline]
     fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
         self.csr.non_empty_row_indices()
     }
 
+    #[inline]
     fn number_of_empty_rows(&self) -> Self::RowIndex {
         self.csr.number_of_empty_rows()
     }
 
+    #[inline]
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         self.csr.number_of_non_empty_rows()
     }
@@ -289,9 +299,9 @@ where
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        Idx: PositiveInteger + IntoUsize + TryFrom<SparseIndex> + TryFromUsize,
-    > TransposableMatrix2D<Self> for SquareCSR2D<SparseIndex, Idx>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    Idx: PositiveInteger + IntoUsize + TryFrom<SparseIndex> + TryFromUsize,
+> TransposableMatrix2D<Self> for SquareCSR2D<SparseIndex, Idx>
 where
     Self: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,
     CSR2D<SparseIndex, Idx, Idx>: Matrix2D<RowIndex = Idx, ColumnIndex = Idx>,

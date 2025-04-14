@@ -5,6 +5,9 @@ use algebra::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 use super::generic_monoplex_monopartite_graph_builder::MonoplexMonopartiteGraphBuilderError;
 use crate::traits::{BidirectionalVocabulary, Edges, Graph, MonopartiteGraph, MonoplexGraph};
 
+#[cfg(feature = "arbitrary")]
+mod arbitrary_impl;
+
 /// Struct representing a generic graph.
 pub struct GenericGraph<Nodes, Edges> {
     /// The nodes of the graph.

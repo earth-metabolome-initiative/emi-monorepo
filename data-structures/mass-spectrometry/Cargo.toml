@@ -10,5 +10,9 @@ common-traits.workspace = true
 sorted-vec.workspace = true
 graph.workspace = true
 
-[lints]
-workspace = true
+[dev-dependencies]
+criterion.workspace = true
+
+[[bench]]
+name = "exact_cosine"
+harness = false

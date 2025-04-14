@@ -84,6 +84,7 @@ where
 {
     type Item = <M as ValuedMatrix>::Value;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let dense_column_index = self.column_indices.next()?;
         if let Some(backup_sparse_column_index) = self.next_column_index {
@@ -104,9 +105,8 @@ where
             );
             if dense_column_index == sparse_column_index {
                 return self.sparse_values.as_mut().and_then(Iterator::next);
-            } else {
-                self.next_column_index = Some(sparse_column_index);
             }
+            self.next_column_index = Some(sparse_column_index);
         }
         Some((self.matrix.map)((self.row_index, dense_column_index)))
     }
@@ -119,6 +119,7 @@ where
     M::ColumnIndex: IntoUsize + TryFromUsize,
     Map: Fn((M::RowIndex, M::ColumnIndex)) -> M::Value,
 {
+    #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         let dense_column_index = self.column_indices.next_back()?;
         if let Some(backup_sparse_column_index) = self.next_back_column_index {
@@ -127,16 +128,15 @@ where
                 return self
                     .sparse_values
                     .as_mut()
-                    .and_then(|sparse_values| sparse_values.next_back());
+                    .and_then(DoubleEndedIterator::next_back);
             }
         } else if let Some(sparse_column_index) =
             self.sparse_column_indices.as_mut().and_then(DoubleEndedIterator::next_back)
         {
             if dense_column_index == sparse_column_index {
                 return self.sparse_values.as_mut().and_then(DoubleEndedIterator::next_back);
-            } else {
-                self.next_back_column_index = Some(sparse_column_index);
             }
+            self.next_back_column_index = Some(sparse_column_index);
         }
         Some((self.matrix.map)((self.row_index, dense_column_index)))
     }

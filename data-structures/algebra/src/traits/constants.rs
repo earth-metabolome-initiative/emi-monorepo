@@ -10,6 +10,11 @@ pub trait One {
     /// The one value.
     const ONE: Self;
 }
+/// Trait for the number two.
+pub trait Two {
+    /// The two value.
+    const TWO: Self;
+}
 
 /// Trait for the number ten.
 pub trait Ten {
@@ -25,7 +30,7 @@ pub trait Bounded {
     const MAX: Self;
 }
 
-/// Macro implementing the [`Bounded`], [`Zero`], [`One`], and [`Ten`] traits
+/// Macro implementing the [`Bounded`], [`Zero`], [`One`], [`Two`], and [`Ten`] traits
 /// for numeric types.
 macro_rules! impl_numeric_traits {
     ($($t:ty),+) => {
@@ -35,6 +40,9 @@ macro_rules! impl_numeric_traits {
             }
             impl One for $t {
                 const ONE: Self = 1;
+            }
+            impl Two for $t {
+                const TWO: Self = 0;
             }
             impl Ten for $t {
                 const TEN: Self = 10;
@@ -47,7 +55,7 @@ macro_rules! impl_numeric_traits {
     };
 }
 
-/// Macro implementing the [`Bounded`], [`Zero`], [`One`], and [`Ten`] traits
+/// Macro implementing the [`Bounded`], [`Zero`], [`One`], [`Two`], and [`Ten`] traits
 /// for floating-point types.
 macro_rules! impl_float_traits {
     ($($t:ty),+) => {
@@ -57,6 +65,9 @@ macro_rules! impl_float_traits {
             }
             impl One for $t {
                 const ONE: Self = 1.0;
+            }
+            impl Two for $t {
+                const TWO: Self = 2.0;
             }
             impl Ten for $t {
                 const TEN: Self = 10.0;

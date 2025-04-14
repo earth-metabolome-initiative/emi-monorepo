@@ -11,12 +11,14 @@ pub trait Finite {
 }
 
 impl Finite for f32 {
+    #[inline]
     fn is_finite(&self) -> bool {
         !self.is_nan() && !self.is_infinite()
     }
 }
 
 impl Finite for f64 {
+    #[inline]
     fn is_finite(&self) -> bool {
         !self.is_nan() && !self.is_infinite()
     }
@@ -27,7 +29,8 @@ macro_rules! impl_finite_for_integers {
 	($($t:ty),+) => {
 		$(
 			impl Finite for $t {
-				fn is_finite(&self) -> bool {
+				#[inline]
+                fn is_finite(&self) -> bool {
 					true
 				}
 			}

@@ -17,6 +17,7 @@ pub enum HopcroftKarpError {
 
 /// Trait providing the Hopcroft-Karp algorithm for the assignment problem.
 pub trait HopcroftKarp: SparseMatrix2D {
+    #[allow(clippy::type_complexity)]
     /// Return the assignment as assigned by the Hopcroft-Karp algorithm.
     ///
     /// # Errors

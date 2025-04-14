@@ -11,6 +11,7 @@ where
 {
     type Coordinates = M::Coordinates;
 
+    #[inline]
     fn shape(&self) -> Vec<usize> {
         vec![self.number_of_rows().into_usize(), self.number_of_columns().into_usize()]
     }
@@ -25,6 +26,7 @@ where
     type RowIndex = M::RowIndex;
     type ColumnIndex = M::ColumnIndex;
 
+    #[inline]
     fn number_of_columns(&self) -> Self::ColumnIndex {
         let number_of_columns: usize = self.matrix.number_of_columns().into_usize();
         let number_of_rows: usize = self.matrix.number_of_rows().into_usize();
@@ -35,6 +37,7 @@ where
         number_of_columns
     }
 
+    #[inline]
     fn number_of_rows(&self) -> Self::RowIndex {
         let number_of_columns: usize = self.matrix.number_of_columns().into_usize();
         let number_of_rows: usize = self.matrix.number_of_rows().into_usize();
