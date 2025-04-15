@@ -4,11 +4,11 @@
 
 use algebra::prelude::IntoUsize;
 
-use super::{TopologicalSorting, topological_sorting::TopologicalSortingError};
+use crate::traits::MonoplexMonopartiteGraph;
 
 /// Trait providing the `root_nodes` method, which returns the root nodes of the
 /// graph. A root node is a node with no predecessors.
-pub trait RootNodes: TopologicalSorting {
+pub trait RootNodes: MonoplexMonopartiteGraph {
     /// Returns the root nodes of the graph.
     fn root_nodes(&self) -> Vec<Self::NodeId> {
         // Create a vector to store whether a node has been visited or not
@@ -31,20 +31,6 @@ pub trait RootNodes: TopologicalSorting {
             .filter_map(|(node, visited)| if visited { None } else { Some(node) })
             .collect()
     }
-
-    /// Returns the topological order of the graph.
-    ///
-    /// # Errors
-    ///
-    /// * `TopologicalSortingError::UnreachableNodes` - If some nodes are not
-    ///   reachable from the root nodes.
-    fn topological_sort_from_roots(&self) -> Result<Vec<Self::NodeId>, TopologicalSortingError> {
-        // Get the root nodes of the graph.
-        let root_nodes = self.root_nodes();
-
-        // Perform a topological sort from the root nodes.
-        self.topological_sort_from_nodes(&root_nodes)
-    }
 }
 
-impl<G: TopologicalSorting> RootNodes for G {}
+impl<G: MonoplexMonopartiteGraph> RootNodes for G {}
