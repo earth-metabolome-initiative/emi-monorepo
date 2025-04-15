@@ -13,36 +13,3 @@ CREATE TABLE IF NOT EXISTS procedure_step_models (
 	CONSTRAINT prev_check CHECK (must_be_distinct_i32(prev_procedure_step_model_id, id)),
 	CONSTRAINT next_prev_check CHECK (must_be_distinct_i32(next_procedure_step_model_id, prev_procedure_step_model_id))
 );
-
-CREATE TABLE IF NOT EXISTS procedure_step_model_instrument_categories (
-	id SERIAL PRIMARY KEY,
-	procedure_step_model_id INT NOT NULL REFERENCES procedure_step_models(id),
-	procedure_model_instrument_category_id INT NOT NULL REFERENCES procedure_model_instrument_categories(id),
-	step_model_instrument_category_id INT NOT NULL REFERENCES step_model_instrument_categories(id),
-	created_by INT NOT NULL REFERENCES users(id),
-	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-	updated_by INT NOT NULL REFERENCES users(id),
-	updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS procedure_step_model_nameplate_categories (
-	id SERIAL PRIMARY KEY,
-	procedure_step_model_id INT NOT NULL REFERENCES procedure_step_models(id),
-	procedure_model_nameplate_category_id INT NOT NULL REFERENCES procedure_model_nameplate_categories(id),
-	step_model_nameplate_category_id INT NOT NULL REFERENCES step_model_nameplate_categories(id),
-	created_by INT NOT NULL REFERENCES users(id),
-	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-	updated_by INT NOT NULL REFERENCES users(id),
-	updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS procedure_step_model_container_categories (
-	id SERIAL PRIMARY KEY,
-	procedure_step_model_id INT NOT NULL REFERENCES procedure_step_models(id),
-	procedure_model_container_category_id INT NOT NULL REFERENCES procedure_model_container_categories(id),
-	step_model_container_category_id INT NOT NULL REFERENCES step_model_container_categories(id),
-	created_by INT NOT NULL REFERENCES users(id),
-	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-	updated_by INT NOT NULL REFERENCES users(id),
-	updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);

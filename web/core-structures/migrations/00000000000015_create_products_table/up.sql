@@ -14,6 +14,24 @@ CREATE TABLE IF NOT EXISTS products (
 
 CREATE TABLE IF NOT EXISTS instrument_models (
 	id INTEGER PRIMARY KEY REFERENCES products(id),
+	created_by INTEGER NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_by INTEGER NOT NULL REFERENCES users(id),
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS weighing_instrument_models (
+	id INTEGER PRIMARY KEY REFERENCES instrument_models(id),
+	error_kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(error_kilograms)),
+	created_by INTEGER NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_by INTEGER NOT NULL REFERENCES users(id),
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS instrument_model_categories (
+	id SERIAL PRIMARY KEY,
+	instrument_model_id INTEGER NOT NULL REFERENCES instrument_models(id),
 	instrument_category_id SMALLINT NOT NULL REFERENCES instrument_categories(id),
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
