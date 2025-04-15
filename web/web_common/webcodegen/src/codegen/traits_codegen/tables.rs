@@ -13,8 +13,8 @@ use syn::Ident;
 use time_requirements::prelude::{Task, TimeTracker};
 
 use crate::{
-    codegen::{CODEGEN_INSERTABLES_PATH, CODEGEN_UPDATABLES_PATH},
     Codegen, Table,
+    codegen::{CODEGEN_INSERTABLES_PATH, CODEGEN_UPDATABLES_PATH},
 };
 
 impl Codegen<'_> {

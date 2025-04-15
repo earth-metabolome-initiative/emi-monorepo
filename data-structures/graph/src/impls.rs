@@ -11,14 +11,14 @@ mod sorted_vec;
 
 mod array;
 mod implicit_numeric_vocabularies;
+mod slice;
 mod sorted_array;
 mod tuple;
-mod slice;
 
 #[cfg(any(feature = "std", feature = "alloc"))]
-mod ranged_csr;
-#[cfg(any(feature = "std", feature = "alloc"))]
 mod ragged_vec;
+#[cfg(any(feature = "std", feature = "alloc"))]
+mod ranged_csr;
 
 #[cfg(any(feature = "std", feature = "alloc"))]
 mod csr2d;

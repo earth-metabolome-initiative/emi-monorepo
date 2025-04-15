@@ -6,9 +6,7 @@ use graph::{
         Builder, DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder,
         GenericVocabularyBuilder, MonopartiteGraph, MonoplexGraph, RootNodes,
     },
-    traits::{
-        EdgesBuilder, MonopartiteGraphBuilder, MonoplexGraphBuilder, VocabularyBuilder,
-    },
+    traits::{EdgesBuilder, MonopartiteGraphBuilder, MonoplexGraphBuilder, VocabularyBuilder},
 };
 use sorted_vec::prelude::SortedVec;
 

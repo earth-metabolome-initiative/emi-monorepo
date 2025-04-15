@@ -16,8 +16,8 @@ pub use syntaxes::Syntax;
 use time_requirements::prelude::{Task, TimeTracker};
 
 use crate::{
-    errors::{CodeGenerationError, WebCodeGenError},
     Column, PgExtension, PgType, Table,
+    errors::{CodeGenerationError, WebCodeGenError},
 };
 
 pub const CODEGEN_DIRECTORY: &str = "codegen";

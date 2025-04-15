@@ -8,10 +8,11 @@ use reqwest::Url;
 use serde::Deserialize;
 
 use super::{
-    taxon_entry::OpenTreeOfLifeTaxonEntry, taxon_entry_builder::OpenTreeOfLifeTaxonEntryBuilder,
-    taxonomy::OpenTreeOfLifeTaxonomy, version::OpenTreeOfLifeVersion, OpenTreeOfLifeRank,
+    OpenTreeOfLifeRank, taxon_entry::OpenTreeOfLifeTaxonEntry,
+    taxon_entry_builder::OpenTreeOfLifeTaxonEntryBuilder, taxonomy::OpenTreeOfLifeTaxonomy,
+    version::OpenTreeOfLifeVersion,
 };
-use crate::{traits::TaxonomyBuilder, TaxonEntryBuilder};
+use crate::{TaxonEntryBuilder, traits::TaxonomyBuilder};
 
 #[derive(Default)]
 /// Implementation of the taxonomy trait for the Open Tree of Life.

@@ -1,7 +1,7 @@
 //! Submodule providing the CSV Column struct.
 
 use crate::{
-    csv_table::CSVTable, data_types::DataType, metadata::CSVColumnMetadata, CSVSchemaError,
+    CSVSchemaError, csv_table::CSVTable, data_types::DataType, metadata::CSVColumnMetadata,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

@@ -29,9 +29,9 @@
 //! EXECUTE FUNCTION updated_at_trigger();
 //! ```
 
-use diesel::{connection::SimpleConnection, PgConnection};
+use diesel::{PgConnection, connection::SimpleConnection};
 
-use crate::{errors::WebCodeGenError, Column, Table};
+use crate::{Column, Table, errors::WebCodeGenError};
 
 impl Table {
     #[must_use]

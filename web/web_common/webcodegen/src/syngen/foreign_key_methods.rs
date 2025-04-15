@@ -6,7 +6,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
 
-use crate::{codegen::Syntax, errors::WebCodeGenError, Table};
+use crate::{Table, codegen::Syntax, errors::WebCodeGenError};
 
 impl Table {
     /// Returns all of the implementations of `Foreign<F>` for the table struct.

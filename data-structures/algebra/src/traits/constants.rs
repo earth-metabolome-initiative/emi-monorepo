@@ -30,8 +30,8 @@ pub trait Bounded {
     const MAX: Self;
 }
 
-/// Macro implementing the [`Bounded`], [`Zero`], [`One`], [`Two`], and [`Ten`] traits
-/// for numeric types.
+/// Macro implementing the [`Bounded`], [`Zero`], [`One`], [`Two`], and [`Ten`]
+/// traits for numeric types.
 macro_rules! impl_numeric_traits {
     ($($t:ty),+) => {
         $(
@@ -55,8 +55,8 @@ macro_rules! impl_numeric_traits {
     };
 }
 
-/// Macro implementing the [`Bounded`], [`Zero`], [`One`], [`Two`], and [`Ten`] traits
-/// for floating-point types.
+/// Macro implementing the [`Bounded`], [`Zero`], [`One`], [`Two`], and [`Ten`]
+/// traits for floating-point types.
 macro_rules! impl_float_traits {
     ($($t:ty),+) => {
         $(

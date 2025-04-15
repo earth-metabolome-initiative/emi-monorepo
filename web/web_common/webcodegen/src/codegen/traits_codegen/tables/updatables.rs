@@ -9,7 +9,7 @@ use diesel::PgConnection;
 use quote::quote;
 use syn::Ident;
 
-use crate::{codegen::CODEGEN_UPDATABLE_PATH, Codegen, Table};
+use crate::{Codegen, Table, codegen::CODEGEN_UPDATABLE_PATH};
 
 impl Codegen<'_> {
     /// Generates the [`Insertable`] and [`Insertable`]-adjacent traits

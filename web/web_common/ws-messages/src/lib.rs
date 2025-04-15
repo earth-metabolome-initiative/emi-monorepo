@@ -2,5 +2,5 @@
 
 pub mod backend;
 pub mod frontend;
-pub use backend::BackendMessage;
-pub use frontend::FrontendMessage;
+pub use backend::B2FMessage;
+pub use frontend::F2BMessage;

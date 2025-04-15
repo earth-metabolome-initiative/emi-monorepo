@@ -1,9 +1,9 @@
 //! Submodule providing the implementation of the `SparseMatrix2D` trait
 //! and related traits for the `PaddedMatrix2D` struct.
 
-use super::{padded_coordinates::PaddedCoordinates, PaddedMatrix2D};
+use super::{PaddedMatrix2D, padded_coordinates::PaddedCoordinates};
 use crate::{
-    impls::{ranged::SimpleRanged, CSR2DColumns},
+    impls::{CSR2DColumns, ranged::SimpleRanged},
     traits::{
         IntoUsize, Matrix2D, SizedRowsSparseMatrix2D, SizedSparseMatrix, SparseMatrix,
         SparseMatrix2D, TryFromUsize, Zero,
@@ -20,7 +20,7 @@ where
         = PaddedCoordinates<&'a Self>
     where
         Self: 'a;
-    
+
     #[inline]
     fn is_empty(&self) -> bool {
         self.number_of_rows() == M::RowIndex::ZERO
@@ -91,7 +91,7 @@ where
         = SimpleRanged<M::RowIndex>
     where
         Self: 'a;
-    
+
     #[inline]
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
         core::iter::empty()

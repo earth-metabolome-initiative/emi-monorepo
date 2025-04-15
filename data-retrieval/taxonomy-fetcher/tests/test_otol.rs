@@ -2,8 +2,8 @@
 
 use strum::IntoEnumIterator;
 use taxonomy_fetcher::{
-    impls::open_tree_of_life::{OpenTreeOfLifeTaxonomyBuilder, OpenTreeOfLifeVersion},
     TaxonomyBuilder,
+    impls::open_tree_of_life::{OpenTreeOfLifeTaxonomyBuilder, OpenTreeOfLifeVersion},
 };
 
 #[tokio::test]

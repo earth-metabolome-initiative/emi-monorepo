@@ -5,7 +5,7 @@ use std::{collections::HashMap, io::Write, path::Path};
 use chrono::{NaiveDateTime, TimeDelta};
 use chrono_humanize::{Accuracy, HumanTime, Tense};
 use plotters::prelude::*;
-use tabled::{settings::Style, Table, Tabled};
+use tabled::{Table, Tabled, settings::Style};
 
 use crate::{prelude::TimeTracker, task::CompletedTask};
 

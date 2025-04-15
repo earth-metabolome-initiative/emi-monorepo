@@ -3,7 +3,7 @@ use diesel::result::Error as DieselError;
 use snake_case_sanitizer::SanitizationErrors;
 
 use crate::{
-    custom_schema_constraints::ConstraintError, CheckConstraint, Column, PgProc, PgType, Table,
+    CheckConstraint, Column, PgProc, PgType, Table, custom_schema_constraints::ConstraintError,
 };
 
 #[derive(Debug)]

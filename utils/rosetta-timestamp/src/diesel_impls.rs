@@ -5,7 +5,6 @@ mod postgres;
 #[cfg(feature = "sqlite")]
 mod sqlite;
 
-
 /// The [`TimestampUTC`] SQL type.
 ///
 /// ### [`ToSql`] impls

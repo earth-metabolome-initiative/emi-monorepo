@@ -11,7 +11,7 @@ use flate2::bufread::GzDecoder;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use tar::Archive;
 
-use crate::{reports::ExtractionReport, DownloaderError};
+use crate::{DownloaderError, reports::ExtractionReport};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 /// Enum defining the set of extensions for the extraction of compressed files.

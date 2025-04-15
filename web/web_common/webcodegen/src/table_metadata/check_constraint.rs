@@ -1,6 +1,6 @@
 use diesel::{
-    pg::PgConnection, BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable,
-    QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
+    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
+    RunQueryDsl, Selectable, SelectableHelper, pg::PgConnection,
 };
 use proc_macro2::{Span, TokenStream};
 use sqlparser::{
@@ -635,7 +635,10 @@ where
                         let (right, _, right_returning_type) =
                             self.parse(right, Some(&left_returning_type), conn)?;
                         if left_returning_type != right_returning_type {
-                            unimplemented!("Equality between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}", self.check_constraint);
+                            unimplemented!(
+                                "Equality between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}",
+                                self.check_constraint
+                            );
                         }
                         let operator_symbol: syn::BinOp = match op {
                             BinaryOperator::Eq => syn::BinOp::Eq(syn::token::EqEq::default()),
@@ -663,7 +666,10 @@ where
                         let (right, _, right_returning_type) =
                             self.parse(right, type_hint, conn)?;
                         if left_returning_type != right_returning_type {
-                            unimplemented!("Binary operation between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}", self.check_constraint);
+                            unimplemented!(
+                                "Binary operation between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}",
+                                self.check_constraint
+                            );
                         }
                         if left_returning_type.is_numeric() && right_returning_type.is_numeric() {
                             let operator_symbol: syn::BinOp = match op {

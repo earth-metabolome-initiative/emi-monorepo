@@ -91,10 +91,12 @@ impl std::fmt::Display for CSVSchemaError {
                 column_name,
                 foreign_table_name,
                 foreign_column_name,
-            } => write!(
-                f,
-                "Unknown foreign key: {table_name}.{column_name} -> {foreign_table_name}.{foreign_column_name}",
-            ),
+            } => {
+                write!(
+                    f,
+                    "Unknown foreign key: {table_name}.{column_name} -> {foreign_table_name}.{foreign_column_name}",
+                )
+            }
             CSVSchemaError::Loop(table) => {
                 write!(f, "Loop in foreign key starting from table: {table:?}")
             }

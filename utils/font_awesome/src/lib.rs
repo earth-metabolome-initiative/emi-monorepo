@@ -4507,9 +4507,13 @@ impl Icon {
             Icon::Eight => "A numeral 8, representing the number.",
             Icon::Nine => "A numeral 9, representing the number.",
             Icon::A => "A lowercase letter 'a', representing the letter.",
-            Icon::AccessibleIcon => "An icon of a person in a wheelchair, indicating accessibility.",
+            Icon::AccessibleIcon => {
+                "An icon of a person in a wheelchair, indicating accessibility."
+            }
             Icon::AddressBook => "A book with a person's silhouette, representing a contact list.",
-            Icon::AddressCard => "A card with a person's silhouette, indicating contact information.",
+            Icon::AddressCard => {
+                "A card with a person's silhouette, indicating contact information."
+            }
             Icon::Algolia => "The logo of Algolia, representing the search engine.",
             Icon::AlignCenter => "Text aligned to the center, representing text formatting.",
             Icon::AlignJustify => "Text justified, representing text formatting.",
@@ -4518,8 +4522,12 @@ impl Icon {
             Icon::Alipay => "The logo of Alipay, representing the payment platform.",
             Icon::AmazonPay => "The logo of Amazon Pay, representing the payment service.",
             Icon::Anchor => "An anchor, representing stability or maritime themes.",
-            Icon::AnchorCircleCheck => "An anchor with a circled check mark, representing stability.",
-            Icon::AnchorCircleExclamation => "An anchor with a circled exclamation mark, representing caution.",
+            Icon::AnchorCircleCheck => {
+                "An anchor with a circled check mark, representing stability."
+            }
+            Icon::AnchorCircleExclamation => {
+                "An anchor with a circled exclamation mark, representing caution."
+            }
             Icon::AnchorCircleXmark => "An anchor with a circled `X`, representing instability.",
             Icon::AnchorLock => "An anchor with a lock, representing stability and security.",
             Icon::Android => "The logo of Android, an operating system for mobile devices.",
@@ -4537,62 +4545,124 @@ impl Icon {
             Icon::AppleWhole => "A whole apple, representing the fruit.",
             Icon::Archway => "An architectural arch, representing structure or gateways.",
             Icon::ArrowDown => "An arrow pointing down, representing downward direction.",
-            Icon::ArrowDown19 => "An arrow pointing down with numbers 1 to 9, representing sorting.",
-            Icon::ArrowDown91 => "An arrow pointing down with numbers 9 to 1, representing sorting in reverse.",
+            Icon::ArrowDown19 => {
+                "An arrow pointing down with numbers 1 to 9, representing sorting."
+            }
+            Icon::ArrowDown91 => {
+                "An arrow pointing down with numbers 9 to 1, representing sorting in reverse."
+            }
             Icon::ArrowDownAZ => "An arrow pointing down from A to Z, representing sorting.",
             Icon::ArrowDownLong => "A long arrow pointing down, indicating downward direction.",
-            Icon::ArrowDownShortWide => "A short wide arrow pointing down, indicating sorting from smallest to largest.",
-            Icon::ArrowDownUpAcrossLine => "Arrows pointing down and up across a line, representing bidirectional movement.",
-            Icon::ArrowDownUpLock => "An arrow pointing down and up with a lock, representing secure bidirectional movement.",
-            Icon::ArrowDownWideShort => "A short wide arrow pointing down, indicating sorting from largest to smallest.",
-            Icon::ArrowDownZA => "An arrow pointing down with letters Z to A, representing reverse alphabetical order.",
+            Icon::ArrowDownShortWide => {
+                "A short wide arrow pointing down, indicating sorting from smallest to largest."
+            }
+            Icon::ArrowDownUpAcrossLine => {
+                "Arrows pointing down and up across a line, representing bidirectional movement."
+            }
+            Icon::ArrowDownUpLock => {
+                "An arrow pointing down and up with a lock, representing secure bidirectional movement."
+            }
+            Icon::ArrowDownWideShort => {
+                "A short wide arrow pointing down, indicating sorting from largest to smallest."
+            }
+            Icon::ArrowDownZA => {
+                "An arrow pointing down with letters Z to A, representing reverse alphabetical order."
+            }
             Icon::ArrowLeft => "An arrow pointing to the left, indicating direction or back.",
-            Icon::ArrowLeftLong => "A long arrow pointing left, representing extended backward direction.",
+            Icon::ArrowLeftLong => {
+                "A long arrow pointing left, representing extended backward direction."
+            }
             Icon::ArrowPointer => "An arrow pointer, representing a cursor or selection.",
             Icon::ArrowRight => "A right arrow, representing forward direction.",
-            Icon::ArrowRightArrowLeft => "Arrows pointing right and left, representing bidirectional movement.",
+            Icon::ArrowRightArrowLeft => {
+                "Arrows pointing right and left, representing bidirectional movement."
+            }
             Icon::ArrowRightFromBracket => "A right arrow coming from a bracket, indicating exit.",
-            Icon::ArrowRightLong => "A long arrow pointing right, indicating extended forward direction.",
+            Icon::ArrowRightLong => {
+                "A long arrow pointing right, indicating extended forward direction."
+            }
             Icon::ArrowRightToBracket => "A right arrow pointing to a bracket, indicating entry.",
-            Icon::ArrowRightToCity => "A right arrow pointing to a city, representing urban direction.",
-            Icon::ArrowRotateLeft => "An arrow rotating to the left, indicating undo or backward movement.",
-            Icon::ArrowRotateRight => "An arrow rotating to the right, indicating redo or forward movement.",
+            Icon::ArrowRightToCity => {
+                "A right arrow pointing to a city, representing urban direction."
+            }
+            Icon::ArrowRotateLeft => {
+                "An arrow rotating to the left, indicating undo or backward movement."
+            }
+            Icon::ArrowRotateRight => {
+                "An arrow rotating to the right, indicating redo or forward movement."
+            }
             Icon::ArrowTrendDown => "A downward trending arrow, representing decline.",
             Icon::ArrowTrendUp => "An upward trending arrow, representing growth or increase.",
             Icon::ArrowTurnDown => "An arrow turning down, representing downward movement.",
             Icon::ArrowTurnUp => "An arrow turning up, representing upward movement.",
             Icon::ArrowUp => "An upward arrow, indicating upward direction or increase.",
             Icon::ArrowUp19 => "An arrow pointing up with numbers 1 to 9, representing sorting.",
-            Icon::ArrowUp91 => "An arrow pointing up with numbers 9 to 1, representing reverse sorting.",
-            Icon::ArrowUpAZ => "An arrow pointing up with letters A to Z, representing sorting in alphabetical order.",
-            Icon::ArrowUpFromBracket => "A bracket with an upward arrow, indicating upload or elevation.",
-            Icon::ArrowUpFromGroundWater => "A ground water pump with an arrow pointing up, indicating water extraction.",
-            Icon::ArrowUpFromWaterPump => "A water pump with an arrow pointing up, indicating water extraction.",
+            Icon::ArrowUp91 => {
+                "An arrow pointing up with numbers 9 to 1, representing reverse sorting."
+            }
+            Icon::ArrowUpAZ => {
+                "An arrow pointing up with letters A to Z, representing sorting in alphabetical order."
+            }
+            Icon::ArrowUpFromBracket => {
+                "A bracket with an upward arrow, indicating upload or elevation."
+            }
+            Icon::ArrowUpFromGroundWater => {
+                "A ground water pump with an arrow pointing up, indicating water extraction."
+            }
+            Icon::ArrowUpFromWaterPump => {
+                "A water pump with an arrow pointing up, indicating water extraction."
+            }
             Icon::ArrowUpLong => "A long arrow pointing up, indicating upward direction.",
-            Icon::ArrowUpRightDots => "An arrow pointing up and right with dots, representing movement or progression.",
-            Icon::ArrowUpRightFromSquare => "An arrow pointing up-right from a square, representing an external link.",
-            Icon::ArrowUpShortWide => "A short wide arrow pointing up, indicating sorting from smallest to largest.",
-            Icon::ArrowUpWideShort => "A short wide arrow pointing up, indicating sorting from largest to smallest.",
-            Icon::ArrowUpZA => "An arrow pointing up with letters Z to A, representing reverse alphabetical order.",
-            Icon::ArrowsDownToLine => "Arrows pointing down to a line, representing downward movement.",
-            Icon::ArrowsDownToPeople => "Arrows pointing down to people, representing distribution or allocation.",
-            Icon::ArrowsLeftRight => "Arrows pointing left and right, representing bidirectional movement.",
-            Icon::ArrowsLeftRightToLine => "Arrows pointing left and right to a line, representing directional alignment.",
+            Icon::ArrowUpRightDots => {
+                "An arrow pointing up and right with dots, representing movement or progression."
+            }
+            Icon::ArrowUpRightFromSquare => {
+                "An arrow pointing up-right from a square, representing an external link."
+            }
+            Icon::ArrowUpShortWide => {
+                "A short wide arrow pointing up, indicating sorting from smallest to largest."
+            }
+            Icon::ArrowUpWideShort => {
+                "A short wide arrow pointing up, indicating sorting from largest to smallest."
+            }
+            Icon::ArrowUpZA => {
+                "An arrow pointing up with letters Z to A, representing reverse alphabetical order."
+            }
+            Icon::ArrowsDownToLine => {
+                "Arrows pointing down to a line, representing downward movement."
+            }
+            Icon::ArrowsDownToPeople => {
+                "Arrows pointing down to people, representing distribution or allocation."
+            }
+            Icon::ArrowsLeftRight => {
+                "Arrows pointing left and right, representing bidirectional movement."
+            }
+            Icon::ArrowsLeftRightToLine => {
+                "Arrows pointing left and right to a line, representing directional alignment."
+            }
             Icon::ArrowsRotate => "Rotating arrows, representing refresh or rotation.",
             Icon::ArrowsSpin => "Arrows in a spinning motion, representing rotation or refresh.",
             Icon::ArrowsSplitUpAndLeft => "Arrows splitting up and left, representing divergence.",
             Icon::ArrowsToCircle => "Arrows pointing to a circle, representing centralization.",
             Icon::ArrowsToDot => "Arrows pointing to a dot, representing convergence or focus.",
             Icon::ArrowsToEye => "Arrows pointing to an eye, representing focus or attention.",
-            Icon::ArrowsTurnRight => "A set of arrows turning right, representing a directional change.",
+            Icon::ArrowsTurnRight => {
+                "A set of arrows turning right, representing a directional change."
+            }
             Icon::ArrowsTurnToDots => "Arrows turning to dots, representing conversion or focus.",
-            Icon::ArrowsUpDown => "Arrows pointing up and down, representing bidirectional movement.",
-            Icon::ArrowsUpDownLeftRight => "Arrows pointing in all directions, indicating movement or navigation.",
+            Icon::ArrowsUpDown => {
+                "Arrows pointing up and down, representing bidirectional movement."
+            }
+            Icon::ArrowsUpDownLeftRight => {
+                "Arrows pointing in all directions, indicating movement or navigation."
+            }
             Icon::ArrowsUpToLine => "Arrows pointing up to a line, indicating upward movement.",
             Icon::Asterisk => "An asterisk, representing additional information or footnotes.",
             Icon::At => "The at symbol (@), representing email or social media.",
             Icon::Atom => "An atom, representing science or physics.",
-            Icon::AudioDescription => "A screen with sound waves, indicating audio description for the visually impaired.",
+            Icon::AudioDescription => {
+                "A screen with sound waves, indicating audio description for the visually impaired."
+            }
             Icon::AustralSign => "The symbol for the Argentine austral, indicating currency.",
             Icon::Award => "A medal, representing achievement or recognition.",
             Icon::B => "The letter \"B\", representing the alphabet.",
@@ -4610,7 +4680,9 @@ impl Icon {
             Icon::Ban => "A circle with a slash, indicating prohibition.",
             Icon::BanSmoking => "A cigarette with a ban symbol, representing no smoking.",
             Icon::Bandage => "A bandage, representing first aid or healing.",
-            Icon::BangladeshiTakaSign => "The symbol for the Bangladeshi taka, indicating currency.",
+            Icon::BangladeshiTakaSign => {
+                "The symbol for the Bangladeshi taka, indicating currency."
+            }
             Icon::Barcode => "A barcode, representing scanning or product identification.",
             Icon::Bars => "Three horizontal bars, indicating a menu or list.",
             Icon::BarsProgress => "Bars showing progress, representing loading or progression.",
@@ -4635,7 +4707,9 @@ impl Icon {
             Icon::Bicycle => "An icon of a bicycle, representing cycling.",
             Icon::Binoculars => "A pair of binoculars, indicating search or exploration.",
             Icon::Biohazard => "A biohazard symbol, representing hazardous materials.",
-            Icon::Bitcoin => "The logo of Bitcoin, representing the cryptocurrency, with a black background.",
+            Icon::Bitcoin => {
+                "The logo of Bitcoin, representing the cryptocurrency, with a black background."
+            }
             Icon::BitcoinSign => "The symbol for Bitcoin, indicating cryptocurrency.",
             Icon::Blender => "A blender, representing kitchen appliances.",
             Icon::BlenderPhone => "A blender with a phone, representing multitasking or devices.",
@@ -4652,13 +4726,19 @@ impl Icon {
             Icon::BookAtlas => "A book with maps, representing an atlas or geography.",
             Icon::BookBible => "A book representing the Bible, a holy book in Christianity.",
             Icon::BookBookmark => "A book with a bookmark, representing reading or saved pages.",
-            Icon::BookJournalWhills => "A book representing the Journal of the Whills from Star Wars.",
+            Icon::BookJournalWhills => {
+                "A book representing the Journal of the Whills from Star Wars."
+            }
             Icon::BookMedical => "A medical book, representing healthcare knowledge.",
             Icon::BookOpen => "An open book, representing reading or literature.",
-            Icon::BookOpenReader => "An open book with a user icon, representing reading or studying.",
+            Icon::BookOpenReader => {
+                "An open book with a user icon, representing reading or studying."
+            }
             Icon::BookQuran => "A book representing the Quran, a holy book in Islam.",
             Icon::BookSkull => "A book with a skull, representing danger or mystery.",
-            Icon::BookTanakh => "A book representing the Tanakh, a canonical collection in Judaism.",
+            Icon::BookTanakh => {
+                "A book representing the Tanakh, a canonical collection in Judaism."
+            }
             Icon::Bookmark => "A bookmark, indicating saved items or favorites.",
             Icon::BorderAll => "An icon representing all borders.",
             Icon::BorderNone => "A border with no lines, indicating no borders.",
@@ -4680,13 +4760,19 @@ impl Icon {
             Icon::BrazilianRealSign => "The symbol for the Brazilian real, indicating currency.",
             Icon::BreadSlice => "A slice of bread, representing food.",
             Icon::Bridge => "A simple bridge, representing infrastructure.",
-            Icon::BridgeCircleCheck => "A bridge with a circled check mark, indicating an approved bridge.",
-            Icon::BridgeCircleExclamation => "A bridge with a circled exclamation mark, indicating a bridge with caution.",
+            Icon::BridgeCircleCheck => {
+                "A bridge with a circled check mark, indicating an approved bridge."
+            }
+            Icon::BridgeCircleExclamation => {
+                "A bridge with a circled exclamation mark, indicating a bridge with caution."
+            }
             Icon::BridgeCircleXmark => "A bridge with a circled `X`, indicating a closed bridge.",
             Icon::BridgeLock => "A bridge with a lock, representing security.",
             Icon::BridgeWater => "A bridge over water, representing infrastructure.",
             Icon::Briefcase => "A briefcase, representing work or business.",
-            Icon::BriefcaseMedical => "A briefcase with a medical cross, representing medical supplies.",
+            Icon::BriefcaseMedical => {
+                "A briefcase with a medical cross, representing medical supplies."
+            }
             Icon::Broom => "A broom, representing cleaning.",
             Icon::BroomBall => "A broom with a ball, representing cleaning or a sport.",
             Icon::Brush => "A brush, representing painting or art.",
@@ -4696,25 +4782,43 @@ impl Icon {
             Icon::BugSlash => "A bug with a slash, indicating no bugs.",
             Icon::Bugs => "Multiple bugs, representing software issues or pests.",
             Icon::Building => "A tall building, indicating construction or urban areas.",
-            Icon::BuildingCircleArrowRight => "A building with a circled arrow pointing right, representing a building exit.",
-            Icon::BuildingCircleCheck => "A building with a circled check mark, representing an approved building.",
-            Icon::BuildingCircleExclamation => "A building with a circled exclamation mark, representing a building with caution.",
-            Icon::BuildingCircleXmark => "A building with a circled `X`, representing a closed building.",
-            Icon::BuildingColumns => "A building with columns, representing classical architecture.",
+            Icon::BuildingCircleArrowRight => {
+                "A building with a circled arrow pointing right, representing a building exit."
+            }
+            Icon::BuildingCircleCheck => {
+                "A building with a circled check mark, representing an approved building."
+            }
+            Icon::BuildingCircleExclamation => {
+                "A building with a circled exclamation mark, representing a building with caution."
+            }
+            Icon::BuildingCircleXmark => {
+                "A building with a circled `X`, representing a closed building."
+            }
+            Icon::BuildingColumns => {
+                "A building with columns, representing classical architecture."
+            }
             Icon::BuildingFlag => "A building with a flag, representing government or institution.",
             Icon::BuildingLock => "A building with a lock, representing security.",
-            Icon::BuildingNgo => "A building with 'NGO', representing a non-governmental organization.",
+            Icon::BuildingNgo => {
+                "A building with 'NGO', representing a non-governmental organization."
+            }
             Icon::BuildingShield => "A building with a shield, representing security.",
             Icon::BuildingUn => "A building with 'UN', representing the United Nations.",
-            Icon::BuildingUser => "A building with a user icon, representing a workplace or office.",
-            Icon::BuildingWheat => "A building with wheat, representing agriculture or agribusiness.",
+            Icon::BuildingUser => {
+                "A building with a user icon, representing a workplace or office."
+            }
+            Icon::BuildingWheat => {
+                "A building with wheat, representing agriculture or agribusiness."
+            }
             Icon::Bullhorn => "A bullhorn, representing announcements or public address.",
             Icon::Bullseye => "A bullseye, representing a target or goal.",
             Icon::Burger => "A burger, representing food or fast food.",
             Icon::Burst => "An explosion or burst, representing impact or energy.",
             Icon::Bus => "A bus, representing public transportation.",
             Icon::BusSimple => "A simple bus, representing public transportation.",
-            Icon::BusinessTime => "A briefcase with a clock, representing business hours or time management.",
+            Icon::BusinessTime => {
+                "A briefcase with a clock, representing business hours or time management."
+            }
             Icon::C => "A capital letter 'C', representing the letter.",
             Icon::CableCar => "A cable car, representing a type of public transportation.",
             Icon::CakeCandles => "A cake with candles, representing celebration or birthday.",
@@ -4747,29 +4851,47 @@ impl Icon {
             Icon::CaretRight => "A caret pointing right, indicating forward direction.",
             Icon::CaretUp => "An upward pointing caret, indicating expansion or scroll up.",
             Icon::Carrot => "A carrot, representing the vegetable.",
-            Icon::CartArrowDown => "A shopping cart with a downward arrow, representing adding to cart.",
+            Icon::CartArrowDown => {
+                "A shopping cart with a downward arrow, representing adding to cart."
+            }
             Icon::CartFlatbed => "A flatbed cart, representing transportation or logistics.",
-            Icon::CartFlatbedSuitcase => "A flatbed cart with a suitcase, representing luggage transport.",
+            Icon::CartFlatbedSuitcase => {
+                "A flatbed cart with a suitcase, representing luggage transport."
+            }
             Icon::CartPlus => "A shopping cart with a plus sign, representing adding to cart.",
             Icon::CartShopping => "A shopping cart, representing commerce or shopping.",
             Icon::CashRegister => "A cash register, indicating point of sale or retail.",
             Icon::Cat => "A cat, representing the animal.",
-            Icon::CcAmazonPay => "The logo of CC Amazon Pay, representing the credit card payment service.",
+            Icon::CcAmazonPay => {
+                "The logo of CC Amazon Pay, representing the credit card payment service."
+            }
             Icon::CcAmex => "The logo of CC Amex, representing the credit card payment service.",
-            Icon::CcApplePay => "The logo of CC Apple Pay, representing the credit card payment service.",
-            Icon::CcDinersClub => "The logo of CC Diners Club, representing the credit card payment service.",
-            Icon::CcDiscover => "The logo of CC Discover, representing the credit card payment service.",
+            Icon::CcApplePay => {
+                "The logo of CC Apple Pay, representing the credit card payment service."
+            }
+            Icon::CcDinersClub => {
+                "The logo of CC Diners Club, representing the credit card payment service."
+            }
+            Icon::CcDiscover => {
+                "The logo of CC Discover, representing the credit card payment service."
+            }
             Icon::CcJcb => "The logo of CC JCB, representing the credit card payment service.",
             Icon::CcMastercard => "The logo of MasterCard, indicating a credit card or payment.",
-            Icon::CcPaypal => "The logo of CC PayPal, representing the credit card payment service.",
-            Icon::CcStripe => "The logo of CC Stripe, representing the credit card payment service.",
+            Icon::CcPaypal => {
+                "The logo of CC PayPal, representing the credit card payment service."
+            }
+            Icon::CcStripe => {
+                "The logo of CC Stripe, representing the credit card payment service."
+            }
             Icon::CcVisa => "The logo of Visa credit card, indicating payment.",
             Icon::CediSign => "The symbol for the Ghanaian cedi, indicating currency.",
             Icon::CentSign => "The symbol for cent, indicating currency.",
             Icon::Certificate => "A certificate, indicating achievement or certification.",
             Icon::Chair => "A chair, representing seating or furniture.",
             Icon::Chalkboard => "A chalkboard, representing teaching or education.",
-            Icon::ChalkboardUser => "A chalkboard with a user icon, representing teaching or instruction.",
+            Icon::ChalkboardUser => {
+                "A chalkboard with a user icon, representing teaching or instruction."
+            }
             Icon::ChampagneGlasses => "Two champagne glasses clinking, representing celebration.",
             Icon::ChargingStation => "A charging station, representing electric vehicle charging.",
             Icon::ChartArea => "An area chart, representing data trends.",
@@ -4794,7 +4916,9 @@ impl Icon {
             Icon::ChevronDown => "A downward chevron, representing a dropdown or more options.",
             Icon::ChevronLeft => "A chevron pointing left, indicating backward direction.",
             Icon::ChevronRight => "A chevron pointing right, indicating forward direction.",
-            Icon::ChevronUp => "A chevron pointing upwards, indicating upward movement or navigation.",
+            Icon::ChevronUp => {
+                "A chevron pointing upwards, indicating upward movement or navigation."
+            }
             Icon::Child => "A child, indicating a young person.",
             Icon::ChildCombatant => "A child holding a weapon, representing child soldiers.",
             Icon::ChildDress => "A child in a dress, representing a young girl.",
@@ -4802,26 +4926,50 @@ impl Icon {
             Icon::Children => "Two children, representing youth or family.",
             Icon::Church => "A church building, representing a place of worship.",
             Icon::Circle => "A simple circle, representing shape or completeness.",
-            Icon::CircleArrowDown => "A circle with an arrow pointing down, indicating downward movement.",
-            Icon::CircleArrowLeft => "A circle with an arrow pointing left, indicating backward movement.",
-            Icon::CircleArrowRight => "A circle with an arrow pointing right, indicating forward movement.",
-            Icon::CircleArrowUp => "A circle with an arrow pointing up, indicating upward movement.",
+            Icon::CircleArrowDown => {
+                "A circle with an arrow pointing down, indicating downward movement."
+            }
+            Icon::CircleArrowLeft => {
+                "A circle with an arrow pointing left, indicating backward movement."
+            }
+            Icon::CircleArrowRight => {
+                "A circle with an arrow pointing right, indicating forward movement."
+            }
+            Icon::CircleArrowUp => {
+                "A circle with an arrow pointing up, indicating upward movement."
+            }
             Icon::CircleCheck => "A check mark inside a circle, indicating confirmation.",
-            Icon::CircleChevronDown => "A circle with a chevron pointing down, indicating downward direction.",
-            Icon::CircleChevronLeft => "A circle with a chevron pointing left, indicating backward direction.",
-            Icon::CircleChevronRight => "A circle with a chevron pointing right, indicating forward direction.",
-            Icon::CircleChevronUp => "A circle with a chevron pointing up, indicating upward direction.",
+            Icon::CircleChevronDown => {
+                "A circle with a chevron pointing down, indicating downward direction."
+            }
+            Icon::CircleChevronLeft => {
+                "A circle with a chevron pointing left, indicating backward direction."
+            }
+            Icon::CircleChevronRight => {
+                "A circle with a chevron pointing right, indicating forward direction."
+            }
+            Icon::CircleChevronUp => {
+                "A circle with a chevron pointing up, indicating upward direction."
+            }
             Icon::CircleDollarToSlot => "A circle with a dollar sign and slot, indicating payment.",
             Icon::CircleDot => "A circle with a dot, indicating focus or selection.",
-            Icon::CircleDown => "A downward arrow inside a circle, indicating scroll down or download.",
-            Icon::CircleExclamation => "An exclamation mark inside a circle, indicating important information or alerts.",
+            Icon::CircleDown => {
+                "A downward arrow inside a circle, indicating scroll down or download."
+            }
+            Icon::CircleExclamation => {
+                "An exclamation mark inside a circle, indicating important information or alerts."
+            }
             Icon::CircleH => "A circle with an 'H', representing hospital.",
-            Icon::CircleHalfStroke => "A half-filled circle, representing partial loading or status.",
+            Icon::CircleHalfStroke => {
+                "A half-filled circle, representing partial loading or status."
+            }
             Icon::CircleInfo => "A circle with an 'i', representing information.",
             Icon::CircleLeft => "A circle with a left arrow, indicating backward direction.",
             Icon::CircleMinus => "A circle with a minus sign, indicating subtraction.",
             Icon::CircleNodes => "A circle with nodes, representing connections or network.",
-            Icon::CircleNotch => "A circle with a notch, representing a loading or progress indicator.",
+            Icon::CircleNotch => {
+                "A circle with a notch, representing a loading or progress indicator."
+            }
             Icon::CirclePause => "A circle with a pause symbol, indicating media pause.",
             Icon::CirclePlay => "A circle with a play symbol, indicating media playback.",
             Icon::CirclePlus => "A circle with a plus sign, indicating addition.",
@@ -4837,12 +4985,18 @@ impl Icon {
             Icon::Clipboard => "A clipboard, representing note-taking or data recording.",
             Icon::ClipboardCheck => "A clipboard with a check mark, representing completed tasks.",
             Icon::ClipboardList => "A clipboard with a list, representing tasks or notes.",
-            Icon::ClipboardQuestion => "A clipboard with a question mark, representing inquiry or uncertainty.",
+            Icon::ClipboardQuestion => {
+                "A clipboard with a question mark, representing inquiry or uncertainty."
+            }
             Icon::ClipboardUser => "A clipboard with a user icon, representing user data or forms.",
             Icon::Clock => "A clock face, indicating time.",
-            Icon::ClockRotateLeft => "A clock with an arrow rotating left, representing time reversal.",
+            Icon::ClockRotateLeft => {
+                "A clock with an arrow rotating left, representing time reversal."
+            }
             Icon::Clone => "Two overlapping squares, indicating duplication or cloning.",
-            Icon::ClosedCaptioning => "A closed captioning symbol, representing subtitles or accessibility.",
+            Icon::ClosedCaptioning => {
+                "A closed captioning symbol, representing subtitles or accessibility."
+            }
             Icon::Cloud => "A cloud, representing cloud storage or weather.",
             Icon::CloudArrowDown => "A cloud with a downward arrow, representing cloud download.",
             Icon::CloudArrowUp => "A cloud with an upward arrow, indicating upload to the cloud.",
@@ -4855,26 +5009,40 @@ impl Icon {
             Icon::CloudShowersWater => "A cloud with water droplets, representing rain.",
             Icon::CloudSun => "A cloud with a sun, representing partly cloudy weather.",
             Icon::CloudSunRain => "A cloud with sun and rain, representing mixed weather.",
-            Icon::Cloudflare => "The logo of Cloudflare, representing the web infrastructure company.",
+            Icon::Cloudflare => {
+                "The logo of Cloudflare, representing the web infrastructure company."
+            }
             Icon::Clover => "A clover, representing luck or St. Patrick's Day.",
             Icon::Code => "An icon representing coding or programming.",
             Icon::CodeBranch => "A branch in code, indicating version control or branching.",
             Icon::CodeCommit => "A check mark, representing a code commit.",
-            Icon::CodeCompare => "Two pieces of code being compared, indicating code review or comparison.",
+            Icon::CodeCompare => {
+                "Two pieces of code being compared, indicating code review or comparison."
+            }
             Icon::CodeFork => "A forked path, representing branching in code.",
             Icon::CodeMerge => "A symbol representing code merging.",
             Icon::CodePullRequest => "A symbol representing a pull request in code versioning.",
-            Icon::Codepen => "The logo of CodePen, a social development environment for front-end designers and developers.",
+            Icon::Codepen => {
+                "The logo of CodePen, a social development environment for front-end designers and developers."
+            }
             Icon::Coins => "Coins, representing money or currency.",
             Icon::ColonSign => "A colon symbol, representing punctuation or separation.",
             Icon::Comment => "A speech bubble, indicating comments or communication.",
-            Icon::CommentDollar => "A speech bubble with a dollar sign, representing financial comments.",
-            Icon::CommentDots => "A speech bubble with dots, representing comments or conversation.",
-            Icon::CommentMedical => "A speech bubble with a medical cross, representing medical communication.",
+            Icon::CommentDollar => {
+                "A speech bubble with a dollar sign, representing financial comments."
+            }
+            Icon::CommentDots => {
+                "A speech bubble with dots, representing comments or conversation."
+            }
+            Icon::CommentMedical => {
+                "A speech bubble with a medical cross, representing medical communication."
+            }
             Icon::CommentSlash => "A speech bubble with a slash, indicating no comments.",
             Icon::CommentSms => "A speech bubble with \"SMS\", representing text messaging.",
             Icon::Comments => "Multiple speech bubbles, indicating conversation or comments.",
-            Icon::CommentsDollar => "A speech bubble with a dollar sign, representing financial discussions.",
+            Icon::CommentsDollar => {
+                "A speech bubble with a dollar sign, representing financial discussions."
+            }
             Icon::CompactDisc => "A compact disc, representing media storage.",
             Icon::Compass => "A compass, representing navigation or direction.",
             Icon::CompassDrafting => "A drafting compass, representing design or architecture.",
@@ -4901,8 +5069,12 @@ impl Icon {
             Icon::Cubes => "Multiple cubes, representing 3D objects.",
             Icon::CubesStacked => "Stacked cubes, representing building blocks.",
             Icon::D => "A capital letter 'D', representing the letter.",
-            Icon::DAndD => "The logo of Dungeons & Dragons, representing the tabletop role-playing game.",
-            Icon::DAndDBeyond => "The logo of D&D Beyond, representing the Dungeons & Dragons toolset.",
+            Icon::DAndD => {
+                "The logo of Dungeons & Dragons, representing the tabletop role-playing game."
+            }
+            Icon::DAndDBeyond => {
+                "The logo of D&D Beyond, representing the Dungeons & Dragons toolset."
+            }
             Icon::Database => "A stack of disks, representing a database.",
             Icon::DeleteLeft => "An arrow pointing left with a line, representing backspace.",
             Icon::Democrat => "The logo of the Democratic Party, representing the political party.",
@@ -4913,7 +5085,9 @@ impl Icon {
             Icon::DiagramProject => "A diagram showing a project, representing planning.",
             Icon::DiagramSuccessor => "A diagram showing successors, representing progression.",
             Icon::Diamond => "A diamond, representing luxury or value.",
-            Icon::DiamondTurnRight => "A diamond turned to the right, representing geometric shapes.",
+            Icon::DiamondTurnRight => {
+                "A diamond turned to the right, representing geometric shapes."
+            }
             Icon::Dice => "A pair of dice, representing games or chance.",
             Icon::DiceD20 => "A 20-sided die, representing tabletop gaming.",
             Icon::DiceD6 => "A six-sided die, representing gaming or chance.",
@@ -4936,7 +5110,9 @@ impl Icon {
             Icon::DoorClosed => "A closed door, representing privacy or security.",
             Icon::DoorOpen => "An open door, indicating entry or exit.",
             Icon::Dove => "A dove, representing peace.",
-            Icon::DownLeftAndUpRightToCenter => "Arrows pointing down-left and up-right to a center, representing convergence.",
+            Icon::DownLeftAndUpRightToCenter => {
+                "Arrows pointing down-left and up-right to a center, representing convergence."
+            }
             Icon::DownLong => "A long arrow pointing down, representing downward direction.",
             Icon::Download => "A downward arrow, typically used to indicate download actions.",
             Icon::Dragon => "A dragon, representing mythical creatures or fantasy.",
@@ -4966,7 +5142,9 @@ impl Icon {
             Icon::Ellipsis => "A horizontal ellipsis, representing more options.",
             Icon::EllipsisVertical => "A vertical ellipsis, representing more options.",
             Icon::Envelope => "A closed envelope, representing email or messages.",
-            Icon::EnvelopeCircleCheck => "An envelope with a circled check, representing approved mail.",
+            Icon::EnvelopeCircleCheck => {
+                "An envelope with a circled check, representing approved mail."
+            }
             Icon::EnvelopeOpen => "An open envelope, representing received message.",
             Icon::EnvelopeOpenText => "An open envelope with text, representing received message.",
             Icon::EnvelopesBulk => "Multiple envelopes, representing bulk mail.",
@@ -4981,7 +5159,9 @@ impl Icon {
             Icon::Eye => "An eye, indicating visibility or views.",
             Icon::EyeDropper => "An eyedropper, representing precision or medical use.",
             Icon::EyeLowVision => "An eye with low vision, representing visual impairment.",
-            Icon::EyeSlash => "An eye with a slash through it, indicating hidden or invisible content.",
+            Icon::EyeSlash => {
+                "An eye with a slash through it, indicating hidden or invisible content."
+            }
             Icon::F => "A capital letter 'F', representing the letter.",
             Icon::FaceAngry => "An angry face, representing anger.",
             Icon::FaceDizzy => "A dizzy face, representing confusion.",
@@ -4994,17 +5174,25 @@ impl Icon {
             Icon::FaceGrinBeamSweat => "A grinning face with beam and sweat, representing relief.",
             Icon::FaceGrinHearts => "A grinning face with hearts, representing love.",
             Icon::FaceGrinSquint => "A grinning face with squinted eyes, representing humor.",
-            Icon::FaceGrinSquintTears => "A grinning face with squinting eyes and tears, representing laughter.",
+            Icon::FaceGrinSquintTears => {
+                "A grinning face with squinting eyes and tears, representing laughter."
+            }
             Icon::FaceGrinStars => "A grinning face with stars, representing excitement.",
             Icon::FaceGrinTears => "A grinning face with tears, representing laughter.",
             Icon::FaceGrinTongue => "A grinning face with tongue out, representing playfulness.",
-            Icon::FaceGrinTongueSquint => "A grinning face with tongue out and squinted eyes, representing silliness.",
-            Icon::FaceGrinTongueWink => "A grinning face with tongue out and wink, representing silliness.",
+            Icon::FaceGrinTongueSquint => {
+                "A grinning face with tongue out and squinted eyes, representing silliness."
+            }
+            Icon::FaceGrinTongueWink => {
+                "A grinning face with tongue out and wink, representing silliness."
+            }
             Icon::FaceGrinWide => "A wide grinning face, representing happiness.",
             Icon::FaceGrinWink => "A grinning face with a wink, representing playfulness.",
             Icon::FaceKiss => "A kissing face, representing affection.",
             Icon::FaceKissBeam => "A kissing face with beams, representing love.",
-            Icon::FaceKissWinkHeart => "A kissing face with a wink and heart, representing affection.",
+            Icon::FaceKissWinkHeart => {
+                "A kissing face with a wink and heart, representing affection."
+            }
             Icon::FaceLaugh => "A laughing face, representing humor.",
             Icon::FaceLaughBeam => "A laughing face with beams, representing joy.",
             Icon::FaceLaughSquint => "A laughing face with squinted eyes, representing humor.",
@@ -5016,12 +5204,16 @@ impl Icon {
             Icon::FaceSadTear => "A sad face with a tear, representing sadness or crying.",
             Icon::FaceSmile => "A smiling face, indicating happiness or friendliness.",
             Icon::FaceSmileBeam => "A smiling face with beams, representing joy.",
-            Icon::FaceSmileWink => "A smiling face with a wink, representing happiness or playfulness.",
+            Icon::FaceSmileWink => {
+                "A smiling face with a wink, representing happiness or playfulness."
+            }
             Icon::FaceSurprise => "A surprised face, representing shock.",
             Icon::FaceTired => "A tired face, representing fatigue.",
             Icon::Facebook => "The logo of Facebook, representing the social media platform.",
             Icon::Fan => "A fan, representing cooling or ventilation.",
-            Icon::FantasyFlightGames => "The logo of Fantasy Flight Games, representing the game publisher.",
+            Icon::FantasyFlightGames => {
+                "The logo of Fantasy Flight Games, representing the game publisher."
+            }
             Icon::Faucet => "A faucet, representing plumbing or water.",
             Icon::FaucetDrip => "A faucet with a drip, representing water or plumbing.",
             Icon::Fax => "A fax machine, representing facsimile transmission.",
@@ -5034,26 +5226,36 @@ impl Icon {
             Icon::FileArrowUp => "A file with an upward arrow, representing file upload.",
             Icon::FileAudio => "A file with an audio symbol, representing audio files.",
             Icon::FileCircleCheck => "A file with a circled check, representing approved files.",
-            Icon::FileCircleExclamation => "A file with a circled exclamation mark, representing important files.",
+            Icon::FileCircleExclamation => {
+                "A file with a circled exclamation mark, representing important files."
+            }
             Icon::FileCircleMinus => "A file with a circled minus, representing removed files.",
             Icon::FileCirclePlus => "A file with a circled plus, representing added files.",
-            Icon::FileCircleQuestion => "A file with a circled question mark, representing unknown files.",
+            Icon::FileCircleQuestion => {
+                "A file with a circled question mark, representing unknown files."
+            }
             Icon::FileCircleXmark => "A file with a circled `X`, representing deleted files.",
             Icon::FileCode => "A file with code, representing programming files.",
-            Icon::FileContract => "A document with a signature line, indicating a contract or agreement.",
+            Icon::FileContract => {
+                "A document with a signature line, indicating a contract or agreement."
+            }
             Icon::FileCsv => "A file with CSV text, representing CSV files.",
             Icon::FileExcel => "A document with the Excel logo, indicating a spreadsheet file.",
             Icon::FileExport => "A document with an arrow pointing out, indicating file export.",
             Icon::FileImage => "A file with an image, representing image files.",
             Icon::FileImport => "A document with an arrow pointing in, indicating file import.",
             Icon::FileInvoice => "A document with an invoice, indicating billing or payments.",
-            Icon::FileInvoiceDollar => "A file with a dollar sign, representing financial documents.",
+            Icon::FileInvoiceDollar => {
+                "A file with a dollar sign, representing financial documents."
+            }
             Icon::FileLines => "A file with lines, representing documents.",
             Icon::FileMedical => "A file with a medical symbol, representing medical records.",
             Icon::FilePdf => "A file with a PDF symbol, representing a document.",
             Icon::FilePen => "A file with a pen, representing editable documents.",
             Icon::FilePowerpoint => "A file with a PowerPoint symbol, representing presentations.",
-            Icon::FilePrescription => "A file with a prescription symbol, representing medical records.",
+            Icon::FilePrescription => {
+                "A file with a prescription symbol, representing medical records."
+            }
             Icon::FileShield => "A file with a shield, representing secure documents.",
             Icon::FileSignature => "A file with a signature, representing signed documents.",
             Icon::FileVideo => "A file with a video symbol, representing video files.",
@@ -5064,7 +5266,9 @@ impl Icon {
             Icon::FillDrip => "A paint bucket dripping, representing paint or color fill.",
             Icon::Film => "A strip of film, representing movies or filming.",
             Icon::Filter => "A funnel filter, representing filtration or sorting.",
-            Icon::FilterCircleDollar => "A filter with a circled dollar sign, representing financial filtering.",
+            Icon::FilterCircleDollar => {
+                "A filter with a circled dollar sign, representing financial filtering."
+            }
             Icon::FilterCircleXmark => "A filter with a circled X, representing filter removal.",
             Icon::Fingerprint => "A fingerprint, representing identity or security.",
             Icon::Fire => "A flame, representing fire or heat.",
@@ -5092,13 +5296,19 @@ impl Icon {
             Icon::Football => "A football, representing the sport.",
             Icon::Forward => "An arrow pointing right, indicating forward or next.",
             Icon::ForwardFast => "Two arrows pointing forward, representing fast forward.",
-            Icon::ForwardStep => "An arrow pointing forward with a vertical line, indicating step forward.",
+            Icon::ForwardStep => {
+                "An arrow pointing forward with a vertical line, indicating step forward."
+            }
             Icon::FrancSign => "The symbol for the franc, indicating currency.",
             Icon::Frog => "A frog, representing the animal.",
             Icon::Futbol => "A soccer ball, representing the sport of soccer.",
             Icon::G => "A capital letter 'G', representing the letter.",
-            Icon::GalacticRepublic => "The logo of the Galactic Republic, representing the Star Wars faction.",
-            Icon::GalacticSenate => "The logo of the Galactic Senate, representing the Star Wars faction.",
+            Icon::GalacticRepublic => {
+                "The logo of the Galactic Republic, representing the Star Wars faction."
+            }
+            Icon::GalacticSenate => {
+                "The logo of the Galactic Senate, representing the Star Wars faction."
+            }
             Icon::Gamepad => "A video game controller, representing gaming.",
             Icon::GasPump => "A gas pump, representing fuel or energy.",
             Icon::Gauge => "A speedometer or gauge, representing measurement or speed.",
@@ -5127,12 +5337,16 @@ impl Icon {
             Icon::Gopuram => "A gopuram, representing a Hindu temple tower.",
             Icon::GraduationCap => "A graduation cap, representing education or graduation.",
             Icon::GreaterThan => "A greater than sign, representing mathematical operations.",
-            Icon::GreaterThanEqual => "A greater than or equal sign, representing mathematical operations.",
+            Icon::GreaterThanEqual => {
+                "A greater than or equal sign, representing mathematical operations."
+            }
             Icon::Grip => "Dots indicating grip or draggable interface.",
             Icon::GripLines => "Horizontal lines indicating grip or draggable interface.",
             Icon::GripLinesVertical => "Vertical lines indicating grip or draggable interface.",
             Icon::GripVertical => "Vertical dots indicating grip or draggable interface.",
-            Icon::GroupArrowsRotate => "Multiple arrows rotating around a group, indicating movement or rotation.",
+            Icon::GroupArrowsRotate => {
+                "Multiple arrows rotating around a group, indicating movement or rotation."
+            }
             Icon::GuaraniSign => "The symbol for the Paraguayan guaraní, indicating currency.",
             Icon::Guitar => "A guitar, representing music.",
             Icon::Gun => "A gun, representing firearms.",
@@ -5144,37 +5358,59 @@ impl Icon {
             Icon::HandDots => "A hand with dots, representing tactile or touch.",
             Icon::HandFist => "A fist, representing strength or power.",
             Icon::HandHolding => "A hand holding something, representing support.",
-            Icon::HandHoldingDollar => "A hand holding a dollar sign, representing financial support.",
+            Icon::HandHoldingDollar => {
+                "A hand holding a dollar sign, representing financial support."
+            }
             Icon::HandHoldingDroplet => "A hand holding a droplet, representing water or liquid.",
-            Icon::HandHoldingHand => "A hand holding another hand, representing support or assistance.",
+            Icon::HandHoldingHand => {
+                "A hand holding another hand, representing support or assistance."
+            }
             Icon::HandHoldingHeart => "A hand holding a heart, symbolizing charity or care.",
-            Icon::HandHoldingMedical => "A hand holding a medical symbol, representing healthcare or support.",
+            Icon::HandHoldingMedical => {
+                "A hand holding a medical symbol, representing healthcare or support."
+            }
             Icon::HandLizard => "A hand making a lizard gesture, representing the animal.",
-            Icon::HandMiddleFinger => "A hand making the middle finger gesture, representing rudeness.",
+            Icon::HandMiddleFinger => {
+                "A hand making the middle finger gesture, representing rudeness."
+            }
             Icon::HandPeace => "A hand making a peace sign, representing peace or victory.",
             Icon::HandPointDown => "A hand pointing down, representing direction.",
             Icon::HandPointLeft => "A hand pointing to the left, representing direction.",
             Icon::HandPointRight => "A hand pointing to the right, representing direction.",
             Icon::HandPointUp => "A hand pointing upwards, indicating direction or emphasis.",
             Icon::HandPointer => "A hand pointer, representing selection or clicking.",
-            Icon::HandScissors => "A hand making a scissors gesture, representing the game rock-paper-scissors.",
+            Icon::HandScissors => {
+                "A hand making a scissors gesture, representing the game rock-paper-scissors."
+            }
             Icon::HandSparkles => "A hand with sparkles, representing magic or cleanliness.",
             Icon::HandSpock => "A hand making the Vulcan salute, representing Star Trek.",
             Icon::Handcuffs => "A pair of handcuffs, representing law enforcement or restraint.",
             Icon::Hands => "Two hands, indicating help or collaboration.",
             Icon::HandsAslInterpreting => "Hands signing in ASL, representing sign language.",
-            Icon::HandsBound => "A pair of hands bound together, representing restraint or solidarity.",
+            Icon::HandsBound => {
+                "A pair of hands bound together, representing restraint or solidarity."
+            }
             Icon::HandsBubbles => "Hands with bubbles, representing washing or cleanliness.",
             Icon::HandsClapping => "Hands clapping, representing applause or appreciation.",
-            Icon::HandsHolding => "A pair of hands holding something, representing support or unity.",
-            Icon::HandsHoldingChild => "A pair of hands holding a child, representing care or protection.",
-            Icon::HandsHoldingCircle => "A pair of hands holding a circle, representing support or unity.",
+            Icon::HandsHolding => {
+                "A pair of hands holding something, representing support or unity."
+            }
+            Icon::HandsHoldingChild => {
+                "A pair of hands holding a child, representing care or protection."
+            }
+            Icon::HandsHoldingCircle => {
+                "A pair of hands holding a circle, representing support or unity."
+            }
             Icon::HandsPraying => "Hands in a praying position, representing prayer or hope.",
             Icon::Handshake => "Two hands shaking, indicating agreement or partnership.",
-            Icon::HandshakeAngle => "A handshake at an angle, representing agreement or partnership.",
+            Icon::HandshakeAngle => {
+                "A handshake at an angle, representing agreement or partnership."
+            }
             Icon::HandshakeSimple => "A simple handshake, representing agreement or partnership.",
             Icon::HandshakeSimpleSlash => "A handshake with a slash, indicating no agreement.",
-            Icon::HandshakeSlash => "Two hands shaking with a slash through them, indicating no agreement or social distancing.",
+            Icon::HandshakeSlash => {
+                "Two hands shaking with a slash through them, indicating no agreement or social distancing."
+            }
             Icon::Hanukiah => "A Hanukkah menorah, representing the Jewish festival.",
             Icon::HardDrive => "A hard drive, representing computer storage.",
             Icon::Hashtag => "A hashtag symbol, representing social media or categorization.",
@@ -5191,10 +5427,18 @@ impl Icon {
             Icon::Headset => "A headset, representing audio communication.",
             Icon::Heart => "A heart shape, symbolizing love or likes.",
             Icon::HeartCircleBolt => "A heart with a circled bolt, representing energetic love.",
-            Icon::HeartCircleCheck => "A heart with a circled check mark, representing acceptance or love.",
-            Icon::HeartCircleExclamation => "A heart inside a circle with an exclamation mark, representing urgent health.",
-            Icon::HeartCircleMinus => "A heart inside a circle with a minus sign, representing health reduction.",
-            Icon::HeartCirclePlus => "A heart inside a circle with a plus sign, representing health or medical support.",
+            Icon::HeartCircleCheck => {
+                "A heart with a circled check mark, representing acceptance or love."
+            }
+            Icon::HeartCircleExclamation => {
+                "A heart inside a circle with an exclamation mark, representing urgent health."
+            }
+            Icon::HeartCircleMinus => {
+                "A heart inside a circle with a minus sign, representing health reduction."
+            }
+            Icon::HeartCirclePlus => {
+                "A heart inside a circle with a plus sign, representing health or medical support."
+            }
             Icon::HeartCircleXmark => "A heart with a circled `X`, representing rejection or loss.",
             Icon::HeartCrack => "A broken heart, representing heartbreak or sadness.",
             Icon::HeartPulse => "A heart with a pulse line, representing health or cardiology.",
@@ -5218,28 +5462,46 @@ impl Icon {
             Icon::Hourglass => "An hourglass, representing time.",
             Icon::HourglassEnd => "An hourglass almost empty, representing time running out.",
             Icon::HourglassHalf => "An hourglass half full, representing time.",
-            Icon::HourglassStart => "An hourglass with sand at the top, indicating the start of a timer.",
+            Icon::HourglassStart => {
+                "An hourglass with sand at the top, indicating the start of a timer."
+            }
             Icon::House => "A simple outline of a house.",
             Icon::HouseChimney => "A house with a chimney, representing a home.",
             Icon::HouseChimneyCrack => "A house with a chimney and crack, representing damage.",
-            Icon::HouseChimneyMedical => "A house with a chimney and medical symbol, representing a home medical facility.",
-            Icon::HouseChimneyUser => "A house with a chimney and user, representing a home resident.",
+            Icon::HouseChimneyMedical => {
+                "A house with a chimney and medical symbol, representing a home medical facility."
+            }
+            Icon::HouseChimneyUser => {
+                "A house with a chimney and user, representing a home resident."
+            }
             Icon::HouseChimneyWindow => "A house with a chimney and window, representing a home.",
             Icon::HouseCircleCheck => "A house with a circled check mark, representing approval.",
-            Icon::HouseCircleExclamation => "A house with a circled exclamation mark, representing caution.",
+            Icon::HouseCircleExclamation => {
+                "A house with a circled exclamation mark, representing caution."
+            }
             Icon::HouseCircleXmark => "A house with a circled `X`, representing exclusion.",
             Icon::HouseCrack => "A house with a crack, representing damage or earthquake.",
             Icon::HouseFire => "A house with flames, representing a fire emergency.",
             Icon::HouseFlag => "A house with a flag, representing home pride.",
             Icon::HouseFloodWater => "A house with water, representing flooding.",
-            Icon::HouseFloodWaterCircleArrowRight => "A house with water and an arrow, representing flood direction.",
+            Icon::HouseFloodWaterCircleArrowRight => {
+                "A house with water and an arrow, representing flood direction."
+            }
             Icon::HouseLaptop => "A house with a laptop, representing remote work or home office.",
             Icon::HouseLock => "A house with a lock, representing home security.",
             Icon::HouseMedical => "A house with a medical symbol, representing a medical facility.",
-            Icon::HouseMedicalCircleCheck => "A house with a medical symbol and a check mark, representing an approved medical facility.",
-            Icon::HouseMedicalCircleExclamation => "A house with a medical symbol and an exclamation mark, representing a medical facility with caution.",
-            Icon::HouseMedicalCircleXmark => "A house with a medical symbol and an `X`, representing a medical facility with restriction.",
-            Icon::HouseMedicalFlag => "A house with a medical flag, representing a medical facility.",
+            Icon::HouseMedicalCircleCheck => {
+                "A house with a medical symbol and a check mark, representing an approved medical facility."
+            }
+            Icon::HouseMedicalCircleExclamation => {
+                "A house with a medical symbol and an exclamation mark, representing a medical facility with caution."
+            }
+            Icon::HouseMedicalCircleXmark => {
+                "A house with a medical symbol and an `X`, representing a medical facility with restriction."
+            }
+            Icon::HouseMedicalFlag => {
+                "A house with a medical flag, representing a medical facility."
+            }
             Icon::HouseSignal => "A house with a signal, representing smart home or connectivity.",
             Icon::HouseTsunami => "A house with a tsunami wave, representing natural disaster.",
             Icon::HouseUser => "A house with a user inside, representing home or resident.",
@@ -5257,7 +5519,9 @@ impl Icon {
             Icon::Image => "A picture or photo icon, representing image content.",
             Icon::ImagePortrait => "A portrait image, representing photos or profiles.",
             Icon::Images => "Multiple images, representing photo galleries or collections.",
-            Icon::Inbox => "A tray filled with documents, representing an inbox or received messages.",
+            Icon::Inbox => {
+                "A tray filled with documents, representing an inbox or received messages."
+            }
             Icon::Indent => "An indented line, representing text formatting.",
             Icon::IndianRupeeSign => "The symbol for the Indian rupee, indicating currency.",
             Icon::Industry => "A factory, representing industry or manufacturing.",
@@ -5293,21 +5557,29 @@ impl Icon {
             Icon::Laptop => "A laptop computer, representing computing or work.",
             Icon::LaptopCode => "A laptop with code, representing programming or development.",
             Icon::LaptopFile => "A laptop with a file, representing digital documents.",
-            Icon::LaptopMedical => "A laptop with a medical symbol, representing telehealth or medical records.",
+            Icon::LaptopMedical => {
+                "A laptop with a medical symbol, representing telehealth or medical records."
+            }
             Icon::LariSign => "The symbol for the Georgian lari, indicating currency.",
             Icon::LayerGroup => "Three stacked layers, indicating layering or grouping.",
             Icon::Leaf => "A leaf, representing nature or eco-friendliness.",
             Icon::LeftLong => "A long arrow pointing left, indicating direction.",
-            Icon::LeftRight => "An arrow pointing left and right, indicating bidirectional movement.",
+            Icon::LeftRight => {
+                "An arrow pointing left and right, indicating bidirectional movement."
+            }
             Icon::Lemon => "A lemon fruit, indicating the fruit or something sour.",
             Icon::LessThan => "A less than sign, representing mathematical operations.",
-            Icon::LessThanEqual => "A less than or equal sign, representing mathematical operations.",
+            Icon::LessThanEqual => {
+                "A less than or equal sign, representing mathematical operations."
+            }
             Icon::LifeRing => "A life ring, representing safety or rescue.",
             Icon::Lightbulb => "A lightbulb, representing ideas or illumination.",
             Icon::LinesLeaning => "Leaning lines, representing design or structure.",
             Icon::Link => "A chain link, indicating a hyperlink or connection.",
             Icon::LinkSlash => "A broken link, representing a disconnected hyperlink.",
-            Icon::Linkedin => "The logo of LinkedIn, representing the professional networking site.",
+            Icon::Linkedin => {
+                "The logo of LinkedIn, representing the professional networking site."
+            }
             Icon::LiraSign => "The symbol for the Italian lira, indicating currency.",
             Icon::List => "A simple list, representing items or data.",
             Icon::ListCheck => "A list with check marks, representing tasks or to-do lists.",
@@ -5326,13 +5598,27 @@ impl Icon {
             Icon::LungsVirus => "A pair of lungs with a virus, representing respiratory illness.",
             Icon::M => "A capital letter 'M', representing the letter.",
             Icon::Magnet => "A horseshoe magnet, representing attraction or magnetic fields.",
-            Icon::MagnifyingGlass => "A magnifying glass, often used to represent search functionality.",
-            Icon::MagnifyingGlassArrowRight => "A magnifying glass with a right arrow, representing search direction.",
-            Icon::MagnifyingGlassChart => "A magnifying glass with a chart, representing detailed analysis.",
-            Icon::MagnifyingGlassDollar => "A magnifying glass with a dollar sign, representing financial search.",
-            Icon::MagnifyingGlassLocation => "A magnifying glass over a location pin, representing search location.",
-            Icon::MagnifyingGlassMinus => "A magnifying glass with a minus sign, representing zoom out or search.",
-            Icon::MagnifyingGlassPlus => "A magnifying glass with a plus sign, representing zoom in or search.",
+            Icon::MagnifyingGlass => {
+                "A magnifying glass, often used to represent search functionality."
+            }
+            Icon::MagnifyingGlassArrowRight => {
+                "A magnifying glass with a right arrow, representing search direction."
+            }
+            Icon::MagnifyingGlassChart => {
+                "A magnifying glass with a chart, representing detailed analysis."
+            }
+            Icon::MagnifyingGlassDollar => {
+                "A magnifying glass with a dollar sign, representing financial search."
+            }
+            Icon::MagnifyingGlassLocation => {
+                "A magnifying glass over a location pin, representing search location."
+            }
+            Icon::MagnifyingGlassMinus => {
+                "A magnifying glass with a minus sign, representing zoom out or search."
+            }
+            Icon::MagnifyingGlassPlus => {
+                "A magnifying glass with a plus sign, representing zoom in or search."
+            }
             Icon::ManatSign => "The symbol for the Azerbaijani manat, indicating currency.",
             Icon::Map => "A folded map, representing navigation or geography.",
             Icon::MapLocation => "A map with a pin, representing location or navigation.",
@@ -5340,15 +5626,29 @@ impl Icon {
             Icon::MapPin => "A map pin, representing location or navigation.",
             Icon::Marker => "A marker, representing writing or drawing tools.",
             Icon::Mars => "The symbol for Mars, representing the planet or male gender.",
-            Icon::MarsAndVenus => "The symbols for Mars and Venus, representing gender or relationships.",
-            Icon::MarsAndVenusBurst => "The symbols for Mars and Venus with a burst, indicating gender diversity.",
+            Icon::MarsAndVenus => {
+                "The symbols for Mars and Venus, representing gender or relationships."
+            }
+            Icon::MarsAndVenusBurst => {
+                "The symbols for Mars and Venus with a burst, indicating gender diversity."
+            }
             Icon::MarsDouble => "Two Mars symbols, representing male gender or masculinity.",
-            Icon::MarsStroke => "The Mars stroke symbol, representing a variation of the male gender symbol.",
-            Icon::MarsStrokeRight => "The symbol for Mars with a right arrow, indicating male gender or masculinity.",
-            Icon::MarsStrokeUp => "The symbol for Mars with an upward arrow, indicating male gender or masculinity.",
+            Icon::MarsStroke => {
+                "The Mars stroke symbol, representing a variation of the male gender symbol."
+            }
+            Icon::MarsStrokeRight => {
+                "The symbol for Mars with a right arrow, indicating male gender or masculinity."
+            }
+            Icon::MarsStrokeUp => {
+                "The symbol for Mars with an upward arrow, indicating male gender or masculinity."
+            }
             Icon::MartiniGlass => "A martini glass, representing beverages or cocktails.",
-            Icon::MartiniGlassCitrus => "A martini glass with a citrus slice, representing beverages or cocktails.",
-            Icon::MartiniGlassEmpty => "An empty martini glass, representing beverages or cocktails.",
+            Icon::MartiniGlassCitrus => {
+                "A martini glass with a citrus slice, representing beverages or cocktails."
+            }
+            Icon::MartiniGlassEmpty => {
+                "An empty martini glass, representing beverages or cocktails."
+            }
             Icon::Mask => "A theater mask, representing performance or disguise.",
             Icon::MaskFace => "A face mask, representing health or safety.",
             Icon::MaskVentilator => "A medical mask, representing health protection.",
@@ -5359,13 +5659,19 @@ impl Icon {
             Icon::Medium => "The logo of Medium, a publishing platform.",
             Icon::Memory => "A microchip, representing memory or computing hardware.",
             Icon::Menorah => "A menorah, representing the Jewish candelabrum.",
-            Icon::Mercury => "The symbol for the planet Mercury, representing the celestial body or the element.",
+            Icon::Mercury => {
+                "The symbol for the planet Mercury, representing the celestial body or the element."
+            }
             Icon::Message => "A speech bubble, representing communication or messaging.",
             Icon::Meteor => "A meteor, representing space or celestial events.",
             Icon::Microchip => "A microchip, representing technology or computing.",
             Icon::Microphone => "A microphone, representing audio or recording.",
-            Icon::MicrophoneLines => "A microphone with lines, representing audio recording or broadcasting.",
-            Icon::MicrophoneLinesSlash => "A microphone with a slash, indicating no audio recording.",
+            Icon::MicrophoneLines => {
+                "A microphone with lines, representing audio recording or broadcasting."
+            }
+            Icon::MicrophoneLinesSlash => {
+                "A microphone with a slash, indicating no audio recording."
+            }
             Icon::MicrophoneSlash => "A microphone with a slash, indicating mute or no sound.",
             Icon::Microscope => "A microscope, representing science or research.",
             Icon::MillSign => "A sign for mills, representing currency or measurement.",
@@ -5373,20 +5679,30 @@ impl Icon {
             Icon::Minus => "A minus sign, indicating subtraction or decrease.",
             Icon::Mitten => "A mitten, representing winter clothing.",
             Icon::Mobile => "A mobile phone, indicating communication or devices.",
-            Icon::MobileButton => "A mobile phone with buttons, representing old-style mobile device.",
+            Icon::MobileButton => {
+                "A mobile phone with buttons, representing old-style mobile device."
+            }
             Icon::MobileRetro => "A retro mobile phone, representing old technology.",
             Icon::MobileScreen => "A mobile phone, representing mobile device.",
             Icon::MobileScreenButton => "A mobile phone with a button, representing mobile device.",
             Icon::MoneyBill => "A paper bill, representing money or currency.",
             Icon::MoneyBill1 => "A money bill, representing payment or currency.",
-            Icon::MoneyBill1Wave => "A money bill with a wave, representing payment or transaction.",
+            Icon::MoneyBill1Wave => {
+                "A money bill with a wave, representing payment or transaction."
+            }
             Icon::MoneyBillTransfer => "A money bill with an arrow, indicating financial transfer.",
-            Icon::MoneyBillTrendUp => "A money bill with an upward trend, representing financial growth.",
+            Icon::MoneyBillTrendUp => {
+                "A money bill with an upward trend, representing financial growth."
+            }
             Icon::MoneyBillWave => "A waving money bill, representing cash flow.",
-            Icon::MoneyBillWheat => "A money bill with wheat, representing agricultural subsidy or trade.",
+            Icon::MoneyBillWheat => {
+                "A money bill with wheat, representing agricultural subsidy or trade."
+            }
             Icon::MoneyBills => "A stack of money bills, representing wealth or currency.",
             Icon::MoneyCheck => "A check, representing financial transactions.",
-            Icon::MoneyCheckDollar => "A check with a dollar sign, representing financial transactions.",
+            Icon::MoneyCheckDollar => {
+                "A check with a dollar sign, representing financial transactions."
+            }
             Icon::Monument => "A monument, representing historical or cultural significance.",
             Icon::Moon => "A crescent moon, representing night or sleep mode.",
             Icon::MortarPestle => "A mortar and pestle, representing grinding or pharmacy.",
@@ -5396,7 +5712,9 @@ impl Icon {
             Icon::Motorcycle => "A motorcycle, representing motorbiking.",
             Icon::Mound => "A mound of earth, representing a small hill or pile.",
             Icon::Mountain => "A mountain, representing nature or hiking.",
-            Icon::MountainCity => "A cityscape with mountains, representing urban and natural landscape.",
+            Icon::MountainCity => {
+                "A cityscape with mountains, representing urban and natural landscape."
+            }
             Icon::MountainSun => "A mountain with a sun, indicating landscape or outdoors.",
             Icon::MugHot => "A hot mug, representing a hot beverage.",
             Icon::MugSaucer => "A mug on a saucer, representing coffee or tea.",
@@ -5407,12 +5725,18 @@ impl Icon {
             Icon::NetworkWired => "A network of connected nodes, representing wired networking.",
             Icon::Neuter => "The gender symbol for neuter, indicating neutrality.",
             Icon::Newspaper => "A newspaper, indicating news or publications.",
-            Icon::NfcDirectional => "The logo of NFC Directional, representing near-field communication.",
-            Icon::NfcSymbol => "The NFC (Near Field Communication) symbol, representing wireless communication.",
+            Icon::NfcDirectional => {
+                "The logo of NFC Directional, representing near-field communication."
+            }
+            Icon::NfcSymbol => {
+                "The NFC (Near Field Communication) symbol, representing wireless communication."
+            }
             Icon::NotEqual => "A not equal sign, indicating inequality or difference.",
             Icon::Notdef => "The .notdef glyph, representing missing characters in typography.",
             Icon::NoteSticky => "A sticky note, representing reminders or notes.",
-            Icon::NotesMedical => "A clipboard with medical notes, representing healthcare documentation.",
+            Icon::NotesMedical => {
+                "A clipboard with medical notes, representing healthcare documentation."
+            }
             Icon::O => "A capital letter 'O', representing the letter or shape.",
             Icon::ObjectGroup => "An icon of grouped objects, indicating grouping.",
             Icon::ObjectUngroup => "An icon of separated objects, indicating ungrouping.",
@@ -5446,7 +5770,9 @@ impl Icon {
             Icon::PenRuler => "A pen and ruler, representing drawing or design.",
             Icon::PenToSquare => "A pen writing on a square, indicating editing or writing.",
             Icon::Pencil => "A pencil, representing writing or editing.",
-            Icon::PeopleArrows => "Two people with arrows pointing towards each other, representing communication or interaction.",
+            Icon::PeopleArrows => {
+                "Two people with arrows pointing towards each other, representing communication or interaction."
+            }
             Icon::PeopleCarryBox => "People carrying a box, representing moving or teamwork.",
             Icon::PeopleGroup => "Multiple people, representing a group or community.",
             Icon::PeopleLine => "People standing in line, representing queue.",
@@ -5456,37 +5782,71 @@ impl Icon {
             Icon::PepperHot => "A hot pepper, representing spicy food.",
             Icon::Percent => "A percent sign, indicating percentages or discounts.",
             Icon::Person => "A person, representing an individual or user.",
-            Icon::PersonArrowDownToLine => "A person with an arrow pointing down to a line, indicating descending or moving down.",
-            Icon::PersonArrowUpFromLine => "A person with an arrow pointing up from a line, indicating rising or moving up.",
+            Icon::PersonArrowDownToLine => {
+                "A person with an arrow pointing down to a line, indicating descending or moving down."
+            }
+            Icon::PersonArrowUpFromLine => {
+                "A person with an arrow pointing up from a line, indicating rising or moving up."
+            }
             Icon::PersonBiking => "A person biking, representing cycling.",
             Icon::PersonBooth => "A person in a booth, indicating privacy or voting.",
-            Icon::PersonBreastfeeding => "A person breastfeeding, representing motherhood or childcare.",
+            Icon::PersonBreastfeeding => {
+                "A person breastfeeding, representing motherhood or childcare."
+            }
             Icon::PersonBurst => "A person with a burst, indicating excitement or energy.",
             Icon::PersonCane => "A person with a cane, representing disability or assistance.",
-            Icon::PersonChalkboard => "A person at a chalkboard, representing teaching or presentation.",
-            Icon::PersonCircleCheck => "A person inside a circle with a check mark, representing verification.",
-            Icon::PersonCircleExclamation => "A person with a circled exclamation mark, indicating warning.",
-            Icon::PersonCircleMinus => "A person with a circled minus, indicating removal or exclusion.",
-            Icon::PersonCirclePlus => "A person with a circled plus, indicating addition or inclusion.",
-            Icon::PersonCircleQuestion => "A person with a circled question mark, indicating inquiry or uncertainty.",
+            Icon::PersonChalkboard => {
+                "A person at a chalkboard, representing teaching or presentation."
+            }
+            Icon::PersonCircleCheck => {
+                "A person inside a circle with a check mark, representing verification."
+            }
+            Icon::PersonCircleExclamation => {
+                "A person with a circled exclamation mark, indicating warning."
+            }
+            Icon::PersonCircleMinus => {
+                "A person with a circled minus, indicating removal or exclusion."
+            }
+            Icon::PersonCirclePlus => {
+                "A person with a circled plus, indicating addition or inclusion."
+            }
+            Icon::PersonCircleQuestion => {
+                "A person with a circled question mark, indicating inquiry or uncertainty."
+            }
             Icon::PersonCircleXmark => "A person with a circled `X`, indicating exclusion.",
             Icon::PersonDigging => "A person digging, representing construction or excavation.",
-            Icon::PersonDotsFromLine => "A person with dots moving from a line, representing transition or movement.",
+            Icon::PersonDotsFromLine => {
+                "A person with dots moving from a line, representing transition or movement."
+            }
             Icon::PersonDress => "A person wearing a dress, representing clothing or fashion.",
-            Icon::PersonDressBurst => "A person in a dress with a burst, indicating excitement or motion.",
+            Icon::PersonDressBurst => {
+                "A person in a dress with a burst, indicating excitement or motion."
+            }
             Icon::PersonDrowning => "A person drowning, representing danger in water.",
             Icon::PersonFalling => "A person falling, representing accident or failure.",
-            Icon::PersonFallingBurst => "A person falling with a burst, representing injury or accident.",
-            Icon::PersonHalfDress => "A person wearing half a dress, representing fashion or gender fluidity.",
+            Icon::PersonFallingBurst => {
+                "A person falling with a burst, representing injury or accident."
+            }
+            Icon::PersonHalfDress => {
+                "A person wearing half a dress, representing fashion or gender fluidity."
+            }
             Icon::PersonHarassing => "A person harassing another, representing harassment.",
             Icon::PersonHiking => "A person hiking, representing outdoor activities.",
-            Icon::PersonMilitaryPointing => "A military person pointing, indicating direction or command.",
-            Icon::PersonMilitaryRifle => "A military person holding a rifle, representing armed forces.",
-            Icon::PersonMilitaryToPerson => "A military person saluting another person, representing respect.",
+            Icon::PersonMilitaryPointing => {
+                "A military person pointing, indicating direction or command."
+            }
+            Icon::PersonMilitaryRifle => {
+                "A military person holding a rifle, representing armed forces."
+            }
+            Icon::PersonMilitaryToPerson => {
+                "A military person saluting another person, representing respect."
+            }
             Icon::PersonPraying => "A person praying, representing spirituality or religion.",
             Icon::PersonPregnant => "A pregnant person, representing pregnancy.",
             Icon::PersonRays => "A person with rays, representing radiance or positivity.",
-            Icon::PersonRifle => "A person holding a rifle, representing shooting sports or military.",
+            Icon::PersonRifle => {
+                "A person holding a rifle, representing shooting sports or military."
+            }
             Icon::PersonRunning => "A person running, representing movement or exercise.",
             Icon::PersonShelter => "A person under a shelter, representing protection or safety.",
             Icon::PersonSkating => "A person skating, representing the sport or activity.",
@@ -5494,19 +5854,29 @@ impl Icon {
             Icon::PersonSkiingNordic => "A person skiing Nordic style, representing skiing.",
             Icon::PersonSnowboarding => "A person snowboarding, representing winter sports.",
             Icon::PersonSwimming => "A person swimming, representing swimming or water sports.",
-            Icon::PersonThroughWindow => "A person moving through a window, indicating escape or emergency exit.",
+            Icon::PersonThroughWindow => {
+                "A person moving through a window, indicating escape or emergency exit."
+            }
             Icon::PersonWalking => "A person walking, representing movement.",
-            Icon::PersonWalkingArrowLoopLeft => "A person walking with a looping arrow to the left, indicating return or reverse.",
+            Icon::PersonWalkingArrowLoopLeft => {
+                "A person walking with a looping arrow to the left, indicating return or reverse."
+            }
             Icon::PersonWalkingArrowRight => "A person walking with an arrow, indicating movement.",
-            Icon::PersonWalkingDashedLineArrowRight => "A person walking with a dashed line and arrow, indicating a guided path.",
+            Icon::PersonWalkingDashedLineArrowRight => {
+                "A person walking with a dashed line and arrow, indicating a guided path."
+            }
             Icon::PersonWalkingLuggage => "A person walking with luggage, indicating travel.",
-            Icon::PersonWalkingWithCane => "A person walking with a cane, indicating disability or assistance.",
+            Icon::PersonWalkingWithCane => {
+                "A person walking with a cane, indicating disability or assistance."
+            }
             Icon::PesetaSign => "The symbol for the Spanish peseta, indicating currency.",
             Icon::PesoSign => "The symbol for the Philippine peso, indicating currency.",
             Icon::Phone => "A phone, representing communication or contact.",
             Icon::PhoneFlip => "A phone flipped, indicating mobile communication.",
             Icon::PhoneSlash => "A phone with a slash, indicating no calls.",
-            Icon::PhoneVolume => "A phone handset with sound waves, indicating a call or audio settings.",
+            Icon::PhoneVolume => {
+                "A phone handset with sound waves, indicating a call or audio settings."
+            }
             Icon::PhotoFilm => "A strip of photo film, representing photography.",
             Icon::PiggyBank => "A piggy bank, representing savings or finance.",
             Icon::Pills => "A pair of pills, representing medication.",
@@ -5514,8 +5884,12 @@ impl Icon {
             Icon::PlaceOfWorship => "A place of worship, indicating religious services.",
             Icon::Plane => "An airplane, indicating travel or flights.",
             Icon::PlaneArrival => "A plane arriving, indicating air travel arrival.",
-            Icon::PlaneCircleCheck => "A plane with a circled check mark, representing flight confirmation.",
-            Icon::PlaneCircleExclamation => "A plane with a circled exclamation mark, indicating travel alert.",
+            Icon::PlaneCircleCheck => {
+                "A plane with a circled check mark, representing flight confirmation."
+            }
+            Icon::PlaneCircleExclamation => {
+                "A plane with a circled exclamation mark, indicating travel alert."
+            }
             Icon::PlaneCircleXmark => "A plane with a circled `X`, indicating no flying.",
             Icon::PlaneDeparture => "A plane taking off, indicating air travel.",
             Icon::PlaneLock => "A plane with a lock, indicating secure travel.",
@@ -5528,8 +5902,12 @@ impl Icon {
             Icon::Plug => "An electrical plug, indicating power or connectivity.",
             Icon::PlugCircleBolt => "A plug with a circled bolt, indicating powered connection.",
             Icon::PlugCircleCheck => "A plug with a circled check, indicating secure connection.",
-            Icon::PlugCircleExclamation => "A plug with a circled exclamation mark, representing power alert.",
-            Icon::PlugCircleMinus => "A plug with a circled minus sign, representing power reduction.",
+            Icon::PlugCircleExclamation => {
+                "A plug with a circled exclamation mark, representing power alert."
+            }
+            Icon::PlugCircleMinus => {
+                "A plug with a circled minus sign, representing power reduction."
+            }
             Icon::PlugCirclePlus => "A plug with a circled plus, indicating connection.",
             Icon::PlugCircleXmark => "A plug with a circled `X`, indicating no connection.",
             Icon::Plus => "A cross, representing addition or positivity.",
@@ -5540,8 +5918,12 @@ impl Icon {
             Icon::Poop => "A pile of poop, representing waste or humor.",
             Icon::PowerOff => "A power button, indicating shutdown or turning off.",
             Icon::Prescription => "A prescription symbol, indicating medical prescription.",
-            Icon::PrescriptionBottle => "A prescription bottle, representing medicine or healthcare.",
-            Icon::PrescriptionBottleMedical => "A medical prescription bottle, indicating medication.",
+            Icon::PrescriptionBottle => {
+                "A prescription bottle, representing medicine or healthcare."
+            }
+            Icon::PrescriptionBottleMedical => {
+                "A medical prescription bottle, indicating medication."
+            }
             Icon::Print => "A printer, representing printing documents.",
             Icon::PumpMedical => "A medical pump, indicating medical equipment.",
             Icon::PumpSoap => "A soap dispenser, representing hygiene or cleanliness.",
@@ -5570,16 +5952,26 @@ impl Icon {
             Icon::Restroom => "A man and woman icon, indicating restroom facilities.",
             Icon::Retweet => "Two arrows forming a square, indicating retweet or repost.",
             Icon::Ribbon => "A ribbon, representing awareness or decoration.",
-            Icon::RightFromBracket => "An arrow pointing right from a bracket, indicating exit or move.",
-            Icon::RightLeft => "An arrow pointing right and left, indicating bidirectional movement.",
+            Icon::RightFromBracket => {
+                "An arrow pointing right from a bracket, indicating exit or move."
+            }
+            Icon::RightLeft => {
+                "An arrow pointing right and left, indicating bidirectional movement."
+            }
             Icon::RightLong => "A long arrow pointing right, indicating forward direction.",
-            Icon::RightToBracket => "An arrow pointing right into a bracket, indicating entering or logging in.",
+            Icon::RightToBracket => {
+                "An arrow pointing right into a bracket, indicating entering or logging in."
+            }
             Icon::Ring => "A ring, representing jewelry or engagement.",
             Icon::Road => "A road, indicating travel or transportation.",
             Icon::RoadBarrier => "A road barrier, indicating roadblock or construction.",
             Icon::RoadBridge => "A bridge, representing transportation infrastructure.",
-            Icon::RoadCircleCheck => "A road with a circled check mark, representing approved routes.",
-            Icon::RoadCircleExclamation => "A road with a circled exclamation mark, indicating caution or warning.",
+            Icon::RoadCircleCheck => {
+                "A road with a circled check mark, representing approved routes."
+            }
+            Icon::RoadCircleExclamation => {
+                "A road with a circled exclamation mark, indicating caution or warning."
+            }
             Icon::RoadCircleXmark => "A road with a circled `X`, indicating road closure.",
             Icon::RoadLock => "A road with a lock, indicating restricted access.",
             Icon::RoadSpikes => "Spikes on the road, representing security or vehicle stop.",
@@ -5606,16 +5998,28 @@ impl Icon {
             Icon::SatelliteDish => "A satellite dish, representing communication.",
             Icon::ScaleBalanced => "A balanced scale, representing justice or equality.",
             Icon::ScaleUnbalanced => "A tilted scale, indicating imbalance.",
-            Icon::ScaleUnbalancedFlip => "A tilted scale, indicating imbalance, flipped horizzontally.",
+            Icon::ScaleUnbalancedFlip => {
+                "A tilted scale, indicating imbalance, flipped horizzontally."
+            }
             Icon::School => "A school building, representing education.",
-            Icon::SchoolCircleCheck => "A school building with a check mark in a circle, indicating school approval.",
-            Icon::SchoolCircleExclamation => "A school with a circled exclamation mark, representing school alert.",
-            Icon::SchoolCircleXmark => "A school with a circled X, representing school closure or cancellation.",
-            Icon::SchoolFlag => "A school building with a flag, representing education or school pride.",
+            Icon::SchoolCircleCheck => {
+                "A school building with a check mark in a circle, indicating school approval."
+            }
+            Icon::SchoolCircleExclamation => {
+                "A school with a circled exclamation mark, representing school alert."
+            }
+            Icon::SchoolCircleXmark => {
+                "A school with a circled X, representing school closure or cancellation."
+            }
+            Icon::SchoolFlag => {
+                "A school building with a flag, representing education or school pride."
+            }
             Icon::SchoolLock => "A school building with a lock, indicating school security.",
             Icon::Scissors => "A pair of scissors, representing cutting or crafting.",
             Icon::Screwdriver => "A screwdriver, representing tools or repair.",
-            Icon::ScrewdriverWrench => "A screwdriver and wrench crossed, representing tools or repair.",
+            Icon::ScrewdriverWrench => {
+                "A screwdriver and wrench crossed, representing tools or repair."
+            }
             Icon::Scroll => "A scroll, representing a document or parchment.",
             Icon::ScrollTorah => "A scroll, representing the Torah or ancient texts.",
             Icon::SdCard => "An SD card, representing storage or memory.",
@@ -5624,14 +6028,18 @@ impl Icon {
             Icon::Server => "A server, representing data storage or hosting.",
             Icon::Shapes => "A collection of geometric shapes, representing design or layout.",
             Icon::Share => "An arrow pointing outwards, indicating sharing content.",
-            Icon::ShareFromSquare => "An arrow coming out of a square, indicating sharing or exporting.",
+            Icon::ShareFromSquare => {
+                "An arrow coming out of a square, indicating sharing or exporting."
+            }
             Icon::ShareNodes => "Three connected nodes, representing sharing or networking.",
             Icon::SheetPlastic => "A sheet of plastic, representing material.",
             Icon::ShekelSign => "The symbol for the Israeli shekel, indicating currency.",
             Icon::Shield => "A shield, representing protection or security.",
             Icon::ShieldCat => "A shield with a cat, representing pet protection.",
             Icon::ShieldDog => "A shield with a dog, representing pet protection.",
-            Icon::ShieldHalved => "A shield split in half, indicating partial protection or security.",
+            Icon::ShieldHalved => {
+                "A shield split in half, indicating partial protection or security."
+            }
             Icon::ShieldHeart => "A shield with a heart, representing health protection.",
             Icon::ShieldVirus => "A shield with a virus, representing antivirus protection.",
             Icon::Ship => "A ship, representing maritime transportation.",
@@ -5646,12 +6054,16 @@ impl Icon {
             Icon::Shuffle => "Two arrows crossing, indicating shuffle or random order.",
             Icon::ShuttleSpace => "A space shuttle, representing space exploration.",
             Icon::SignHanging => "A hanging sign, representing a signboard or notice.",
-            Icon::Signal => "A signal tower with waves, representing communication or connectivity.",
+            Icon::Signal => {
+                "A signal tower with waves, representing communication or connectivity."
+            }
             Icon::Signature => "A handwritten signature, indicating signing or approval.",
             Icon::SignsPost => "A signpost, representing directions or navigation.",
             Icon::SimCard => "A SIM card, representing mobile connectivity.",
             Icon::Sink => "A sink, representing kitchen or bathroom fixtures.",
-            Icon::Sitemap => "A hierarchical diagram, representing a sitemap or organization chart.",
+            Icon::Sitemap => {
+                "A hierarchical diagram, representing a sitemap or organization chart."
+            }
             Icon::Skull => "A simple skull, representing death or danger.",
             Icon::SkullCrossbones => "A skull with crossbones, representing danger or pirates.",
             Icon::Slack => "The logo of Slack, a communication platform for teams.",
@@ -5667,12 +6079,16 @@ impl Icon {
             Icon::Socks => "A pair of socks, representing clothing.",
             Icon::SolarPanel => "A solar panel, representing solar energy.",
             Icon::Sort => "Three stacked horizontal lines, indicating sorting.",
-            Icon::SortDown => "A list with a downward arrow, indicating sorting in descending order.",
+            Icon::SortDown => {
+                "A list with a downward arrow, indicating sorting in descending order."
+            }
             Icon::SortUp => "A list with an upward arrow, indicating sorting in ascending order.",
             Icon::Soundcloud => "The logo of SoundCloud, representing the music platform.",
             Icon::Spa => "A flower with petals, representing relaxation or spa.",
             Icon::SpaceAwesome => "The logo of Space Awesome, representing the brand or company.",
-            Icon::SpaghettiMonsterFlying => "A flying spaghetti monster, representing parody religion.",
+            Icon::SpaghettiMonsterFlying => {
+                "A flying spaghetti monster, representing parody religion."
+            }
             Icon::SpellCheck => "A check mark with ABC, representing spell checking.",
             Icon::Spider => "A spider, representing the arachnid or Halloween.",
             Icon::Spinner => "A spinning circle, indicating loading or processing.",
@@ -5682,30 +6098,58 @@ impl Icon {
             Icon::SprayCan => "A spray can, representing painting or spraying.",
             Icon::SprayCanSparkles => "A spray can emitting sparkles, representing spray effects.",
             Icon::Square => "A simple square, representing shape or stop.",
-            Icon::SquareArrowUpRight => "A square with an arrow pointing up and right, indicating expansion or exit.",
-            Icon::SquareCaretDown => "A square with a downward caret, representing more options or dropdowns.",
-            Icon::SquareCaretLeft => "A square with a leftward caret, representing navigation or more options.",
-            Icon::SquareCaretRight => "A square with a rightward caret, representing navigation or more options.",
-            Icon::SquareCaretUp => "A square with an upward caret, representing navigation or more options.",
+            Icon::SquareArrowUpRight => {
+                "A square with an arrow pointing up and right, indicating expansion or exit."
+            }
+            Icon::SquareCaretDown => {
+                "A square with a downward caret, representing more options or dropdowns."
+            }
+            Icon::SquareCaretLeft => {
+                "A square with a leftward caret, representing navigation or more options."
+            }
+            Icon::SquareCaretRight => {
+                "A square with a rightward caret, representing navigation or more options."
+            }
+            Icon::SquareCaretUp => {
+                "A square with an upward caret, representing navigation or more options."
+            }
             Icon::SquareCheck => "A square with a check mark, indicating completion or approval.",
             Icon::SquareEnvelope => "A square with an envelope, representing mail or messages.",
-            Icon::SquareFull => "A square completely filled, representing fullness or completeness.",
+            Icon::SquareFull => {
+                "A square completely filled, representing fullness or completeness."
+            }
             Icon::SquareH => "A square with an 'H', representing hospital.",
             Icon::SquareMinus => "A square with a minus sign, indicating removal or decrease.",
             Icon::SquareNfi => "A square with 'NFI', indicating an undefined acronym.",
             Icon::SquareParking => "A square with a 'P', representing parking.",
             Icon::SquarePen => "A square with a pen, representing editing or writing.",
-            Icon::SquarePersonConfined => "A square with a person confined inside, representing isolation.",
-            Icon::SquarePhone => "A square with a phone icon, representing communication or device.",
-            Icon::SquarePhoneFlip => "A square with a phone icon flipped, indicating phone rotation.",
+            Icon::SquarePersonConfined => {
+                "A square with a person confined inside, representing isolation."
+            }
+            Icon::SquarePhone => {
+                "A square with a phone icon, representing communication or device."
+            }
+            Icon::SquarePhoneFlip => {
+                "A square with a phone icon flipped, indicating phone rotation."
+            }
             Icon::SquarePlus => "A square with a plus sign, indicating addition or increase.",
-            Icon::SquarePollHorizontal => "A square with horizontal bars, representing a horizontal poll or chart.",
-            Icon::SquarePollVertical => "A square with vertical bars, representing a vertical poll or chart.",
-            Icon::SquareRootVariable => "A square with a variable inside a root symbol, representing mathematics.",
+            Icon::SquarePollHorizontal => {
+                "A square with horizontal bars, representing a horizontal poll or chart."
+            }
+            Icon::SquarePollVertical => {
+                "A square with vertical bars, representing a vertical poll or chart."
+            }
+            Icon::SquareRootVariable => {
+                "A square with a variable inside a root symbol, representing mathematics."
+            }
             Icon::SquareRss => "A square with RSS icon, representing news feed.",
-            Icon::SquareShareNodes => "A square with nodes connected by lines, indicating sharing or networking.",
+            Icon::SquareShareNodes => {
+                "A square with nodes connected by lines, indicating sharing or networking."
+            }
             Icon::SquareSteam => "A square with the Steam logo, representing the gaming platform.",
-            Icon::SquareUpRight => "A square with a bold arrow pointing up and right, indicating expansion or exit.",
+            Icon::SquareUpRight => {
+                "A square with a bold arrow pointing up and right, indicating expansion or exit."
+            }
             Icon::SquareVirus => "A square with virus icons, representing illness or infection.",
             Icon::SquareXmark => "A square with an `X`, representing rejection or closure.",
             Icon::Squarespace => "The logo of Squarespace, a website building platform.",
@@ -5717,11 +6161,17 @@ impl Icon {
             Icon::Star => "A star, often used to represent favorites or ratings.",
             Icon::StarAndCrescent => "A star and crescent, representing Islam.",
             Icon::StarHalf => "A half-filled star, indicating partial rating.",
-            Icon::StarHalfStroke => "A half-filled star, indicating partial rating, with a stroke around it.",
+            Icon::StarHalfStroke => {
+                "A half-filled star, indicating partial rating, with a stroke around it."
+            }
             Icon::StarOfDavid => "A star of David, representing Judaism.",
-            Icon::StarOfLife => "A six-pointed star with a rod in the center, representing emergency medical services.",
+            Icon::StarOfLife => {
+                "A six-pointed star with a rod in the center, representing emergency medical services."
+            }
             Icon::Steam => "The logo of Steam, representing the gaming platform.",
-            Icon::SteamSymbol => "The logo of Steam, representing the gaming platform, with white background.",
+            Icon::SteamSymbol => {
+                "The logo of Steam, representing the gaming platform, with white background."
+            }
             Icon::SterlingSign => "The symbol for the British pound, indicating currency.",
             Icon::Stethoscope => "A stethoscope, representing medical examination or healthcare.",
             Icon::Stop => "A stop sign, indicating cessation or pause.",
@@ -5730,7 +6180,9 @@ impl Icon {
             Icon::Store => "A storefront, representing retail or shops.",
             Icon::StoreSlash => "A store with a slash, indicating closed or no store.",
             Icon::StreetView => "A street view symbol, representing navigation or mapping.",
-            Icon::Strikethrough => "Text with a line through it, indicating deletion or correction.",
+            Icon::Strikethrough => {
+                "Text with a line through it, indicating deletion or correction."
+            }
             Icon::Stripe => "The logo of Stripe, a payment processing platform.",
             Icon::StripeS => "The logo of Stripe, representing the payment processing platform.",
             Icon::Stroopwafel => "A stroopwafel, representing the Dutch treat.",
@@ -5752,10 +6204,14 @@ impl Icon {
             Icon::TableCellsRowLock => "A table with a locked row, indicating fixed data.",
             Icon::TableColumns => "A table with columns, representing data organization.",
             Icon::TableList => "A table with a list, representing data organization.",
-            Icon::TableTennisPaddleBall => "A table tennis paddle with a ball, representing the sport.",
+            Icon::TableTennisPaddleBall => {
+                "A table tennis paddle with a ball, representing the sport."
+            }
             Icon::Tablet => "A tablet device, representing mobile computing.",
             Icon::TabletButton => "A tablet with a button, representing a touchscreen device.",
-            Icon::TabletScreenButton => "A tablet with a screen and button, representing a digital device.",
+            Icon::TabletScreenButton => {
+                "A tablet with a screen and button, representing a digital device."
+            }
             Icon::Tablets => "Two pills, representing medication or tablets.",
             Icon::TachographDigital => "A digital tachograph, representing vehicle monitoring.",
             Icon::Tag => "A price tag, indicating labels or pricing.",
@@ -5766,20 +6222,36 @@ impl Icon {
             Icon::Taxi => "A taxi cab, representing transportation service.",
             Icon::Teeth => "A set of teeth, representing dental health.",
             Icon::TeethOpen => "An open mouth with teeth, representing dental health or smiling.",
-            Icon::TemperatureArrowDown => "A thermometer with a downward arrow, indicating falling temperature.",
-            Icon::TemperatureArrowUp => "A thermometer with an upward arrow, indicating rising temperature.",
+            Icon::TemperatureArrowDown => {
+                "A thermometer with a downward arrow, indicating falling temperature."
+            }
+            Icon::TemperatureArrowUp => {
+                "A thermometer with an upward arrow, indicating rising temperature."
+            }
             Icon::TemperatureEmpty => "A thermometer empty, representing no temperature reading.",
             Icon::TemperatureFull => "A thermometer full, representing very high temperature.",
             Icon::TemperatureHalf => "A thermometer half full, representing moderate temperature.",
-            Icon::TemperatureHigh => "A thermometer with high reading, indicating high temperature.",
+            Icon::TemperatureHigh => {
+                "A thermometer with high reading, indicating high temperature."
+            }
             Icon::TemperatureLow => "A thermometer with low reading, indicating low temperature.",
-            Icon::TemperatureQuarter => "A thermometer one-quarter full, representing low temperature.",
-            Icon::TemperatureThreeQuarters => "A thermometer three-quarters full, representing high temperature.",
+            Icon::TemperatureQuarter => {
+                "A thermometer one-quarter full, representing low temperature."
+            }
+            Icon::TemperatureThreeQuarters => {
+                "A thermometer three-quarters full, representing high temperature."
+            }
             Icon::TengeSign => "The symbol for the Kazakhstani tenge, indicating currency.",
             Icon::Tent => "A single tent, representing camping or temporary shelter.",
-            Icon::TentArrowDownToLine => "A tent with an arrow pointing down to a line, representing a campsite.",
-            Icon::TentArrowLeftRight => "A tent with arrows pointing left and right, indicating horizontal setup.",
-            Icon::TentArrowTurnLeft => "A tent with an arrow turning left, indicating directional setup.",
+            Icon::TentArrowDownToLine => {
+                "A tent with an arrow pointing down to a line, representing a campsite."
+            }
+            Icon::TentArrowLeftRight => {
+                "A tent with arrows pointing left and right, indicating horizontal setup."
+            }
+            Icon::TentArrowTurnLeft => {
+                "A tent with an arrow turning left, indicating directional setup."
+            }
             Icon::TentArrowsDown => "A tent with arrows pointing down, indicating tent setup.",
             Icon::Tents => "Multiple tents, representing camping or temporary shelter.",
             Icon::Terminal => "A computer terminal, representing command line or coding.",
@@ -5798,9 +6270,13 @@ impl Icon {
             Icon::ToggleOn => "A switch in the 'on' position, indicating activation.",
             Icon::Toilet => "A toilet, representing restrooms.",
             Icon::ToiletPaper => "A roll of toilet paper, indicating sanitation.",
-            Icon::ToiletPaperSlash => "A toilet paper roll with a slash, indicating no toilet paper.",
+            Icon::ToiletPaperSlash => {
+                "A toilet paper roll with a slash, indicating no toilet paper."
+            }
             Icon::ToiletPortable => "A portable toilet, representing outdoor facilities.",
-            Icon::ToiletsPortable => "Portable toilets, indicating temporary sanitation facilities.",
+            Icon::ToiletsPortable => {
+                "Portable toilets, indicating temporary sanitation facilities."
+            }
             Icon::Toolbox => "A toolbox, representing tools or repair.",
             Icon::Tooth => "A tooth, representing dentistry or oral health.",
             Icon::ToriiGate => "A torii gate, representing Japanese culture.",
@@ -5815,12 +6291,16 @@ impl Icon {
             Icon::Train => "A train, representing railway transport.",
             Icon::TrainSubway => "A subway train, representing underground transportation.",
             Icon::TrainTram => "A tram, representing public transportation.",
-            Icon::Transgender => "A combined male and female symbol, representing transgender identity.",
+            Icon::Transgender => {
+                "A combined male and female symbol, representing transgender identity."
+            }
             Icon::Trash => "A trash can, representing deletion or garbage.",
             Icon::TrashCan => "A trash can, representing waste disposal.",
             Icon::Tree => "A tree, representing nature or the environment.",
             Icon::TreeCity => "A tree with a cityscape, representing urban nature or parks.",
-            Icon::TriangleExclamation => "A triangle with an exclamation mark, indicating warning or caution.",
+            Icon::TriangleExclamation => {
+                "A triangle with an exclamation mark, indicating warning or caution."
+            }
             Icon::Trophy => "A trophy, representing achievement or awards.",
             Icon::Trowel => "A trowel, representing construction or gardening.",
             Icon::TrowelBricks => "A trowel with bricks, representing construction or masonry.",
@@ -5829,7 +6309,9 @@ impl Icon {
             Icon::TruckDroplet => "A truck with a droplet, representing liquid transport.",
             Icon::TruckFast => "A fast-moving truck, indicating quick delivery or shipment.",
             Icon::TruckField => "A truck in a field, indicating agricultural transport.",
-            Icon::TruckFieldUn => "A truck in a field, indicating agricultural transport, with UN letters on it.",
+            Icon::TruckFieldUn => {
+                "A truck in a field, indicating agricultural transport, with UN letters on it."
+            }
             Icon::TruckFront => "A front view of a truck, indicating transportation or delivery.",
             Icon::TruckMedical => "A medical truck, representing emergency medical transport.",
             Icon::TruckMonster => "A monster truck, indicating a large, powerful vehicle.",
@@ -5852,43 +6334,75 @@ impl Icon {
             Icon::Unlock => "An open padlock, indicating access or security.",
             Icon::UnlockKeyhole => "An open padlock with a keyhole, indicating access or security.",
             Icon::Unsplash => "The logo of Unsplash, representing the photo sharing platform.",
-            Icon::UpDown => "An arrow pointing up and another pointing down, indicating vertical movement.",
-            Icon::UpDownLeftRight => "Arrows pointing in all four directions, indicating omnidirectional movement.",
+            Icon::UpDown => {
+                "An arrow pointing up and another pointing down, indicating vertical movement."
+            }
+            Icon::UpDownLeftRight => {
+                "Arrows pointing in all four directions, indicating omnidirectional movement."
+            }
             Icon::UpLong => "A long arrow pointing up, indicating upward direction or increase.",
-            Icon::UpRightAndDownLeftFromCenter => "An arrow pointing up right and down left from center, indicating movement.",
-            Icon::UpRightFromSquare => "An arrow pointing up and right from a square, indicating expansion or exit.",
+            Icon::UpRightAndDownLeftFromCenter => {
+                "An arrow pointing up right and down left from center, indicating movement."
+            }
+            Icon::UpRightFromSquare => {
+                "An arrow pointing up and right from a square, indicating expansion or exit."
+            }
             Icon::Upload => "An arrow pointing upward from a box, indicating upload.",
             Icon::User => "An outline of a person, indicating a user or profile.",
-            Icon::UserAstronaut => "A user icon wearing an astronaut helmet, representing an astronaut or space exploration.",
-            Icon::UserCheck => "A user icon with a check mark, indicating user approval or verification.",
-            Icon::UserClock => "A user icon with a clock, indicating user schedule or time management.",
-            Icon::UserDoctor => "A user icon with a stethoscope, representing a doctor or healthcare professional.",
+            Icon::UserAstronaut => {
+                "A user icon wearing an astronaut helmet, representing an astronaut or space exploration."
+            }
+            Icon::UserCheck => {
+                "A user icon with a check mark, indicating user approval or verification."
+            }
+            Icon::UserClock => {
+                "A user icon with a clock, indicating user schedule or time management."
+            }
+            Icon::UserDoctor => {
+                "A user icon with a stethoscope, representing a doctor or healthcare professional."
+            }
             Icon::UserGear => "A user icon with a gear, representing user settings or management.",
-            Icon::UserGraduate => "A user wearing a graduation cap, indicating education or graduation.",
+            Icon::UserGraduate => {
+                "A user wearing a graduation cap, indicating education or graduation."
+            }
             Icon::UserGroup => "Multiple user icons, indicating a group or community.",
             Icon::UserInjured => "A user with an injury, representing injury or accident.",
             Icon::UserLarge => "A large user icon, indicating a prominent user.",
-            Icon::UserLargeSlash => "A large user icon with a slash, representing user removal or restriction.",
+            Icon::UserLargeSlash => {
+                "A large user icon with a slash, representing user removal or restriction."
+            }
             Icon::UserLock => "A user with a lock, representing account security.",
             Icon::UserMinus => "A user icon with a minus sign, indicating user removal.",
-            Icon::UserNinja => "A user icon with a ninja mask, indicating a stealthy or anonymous user.",
+            Icon::UserNinja => {
+                "A user icon with a ninja mask, indicating a stealthy or anonymous user."
+            }
             Icon::UserNurse => "A user with a nurse hat, representing medical staff.",
             Icon::UserPen => "A user icon with a pen, representing user editing or writing.",
             Icon::UserPlus => "A user icon with a plus sign, indicating adding a user.",
-            Icon::UserSecret => "A user with a finger over their lips, indicating secrecy or confidentiality.",
+            Icon::UserSecret => {
+                "A user with a finger over their lips, indicating secrecy or confidentiality."
+            }
             Icon::UserShield => "A user with a shield, representing user protection or security.",
             Icon::UserSlash => "A user icon with a slash, indicating a removed or blocked user.",
             Icon::UserTag => "A user with a tag, representing user identification.",
             Icon::UserTie => "A user icon with a tie, indicating a professional user.",
             Icon::UserXmark => "A user with a circled X, representing user removal.",
             Icon::Users => "Multiple user icons, representing a group or community.",
-            Icon::UsersBetweenLines => "Multiple user icons between lines, indicating collaboration or communication.",
-            Icon::UsersGear => "Multiple user icons with a gear, representing user settings or management.",
+            Icon::UsersBetweenLines => {
+                "Multiple user icons between lines, indicating collaboration or communication."
+            }
+            Icon::UsersGear => {
+                "Multiple user icons with a gear, representing user settings or management."
+            }
             Icon::UsersLine => "Multiple users in a line, representing a group or queue.",
             Icon::UsersRays => "Multiple users with rays, representing community or influence.",
-            Icon::UsersRectangle => "Multiple user icons inside a rectangle, representing a group or community.",
+            Icon::UsersRectangle => {
+                "Multiple user icons inside a rectangle, representing a group or community."
+            }
             Icon::UsersSlash => "Multiple user icons with a slash, indicating no users or blocked.",
-            Icon::UsersViewfinder => "A user icon inside a viewfinder, representing focus on users.",
+            Icon::UsersViewfinder => {
+                "A user icon inside a viewfinder, representing focus on users."
+            }
             Icon::Utensils => "A fork and knife, representing dining or food.",
             Icon::V => "A capital letter 'V', representing the letter.",
             Icon::VanShuttle => "A shuttle van, representing transportation.",
@@ -5900,15 +6414,21 @@ impl Icon {
             Icon::Vest => "A vest, representing clothing.",
             Icon::VestPatches => "A vest with patches, representing protective gear.",
             Icon::Vial => "A vial, representing a small container for liquids.",
-            Icon::VialCircleCheck => "A vial with a circled check mark, representing approved substance.",
+            Icon::VialCircleCheck => {
+                "A vial with a circled check mark, representing approved substance."
+            }
             Icon::VialVirus => "A vial with a virus, representing medical testing.",
             Icon::Vials => "Two laboratory vials, representing testing or experimentation.",
             Icon::Video => "A video camera, indicating video content or recording.",
-            Icon::VideoSlash => "A video symbol with a slash, indicating no video or disabled video.",
+            Icon::VideoSlash => {
+                "A video symbol with a slash, indicating no video or disabled video."
+            }
             Icon::Vihara => "A Buddhist temple, representing a place of worship.",
             Icon::Virus => "A virus, representing infection or disease.",
             Icon::VirusCovid => "A representation of the COVID-19 virus.",
-            Icon::VirusCovidSlash => "A virus symbol with a slash, representing COVID-19 eradication.",
+            Icon::VirusCovidSlash => {
+                "A virus symbol with a slash, representing COVID-19 eradication."
+            }
             Icon::VirusSlash => "A virus with a slash, indicating antivirus or no virus.",
             Icon::Viruses => "Multiple virus icons, representing infections or disease.",
             Icon::Voicemail => "An icon of a cassette tape, representing voicemail messages.",
@@ -5919,11 +6439,15 @@ impl Icon {
             Icon::VolumeOff => "A speaker without sound waves, indicating no volume.",
             Icon::VolumeXmark => "A speaker with an `X`, indicating mute or no sound.",
             Icon::VrCardboard => "The logo of Google Cardboard, a VR platform.",
-            Icon::W => "A capital letter 'W', representing the letter or something starting with W.",
+            Icon::W => {
+                "A capital letter 'W', representing the letter or something starting with W."
+            }
             Icon::WalkieTalkie => "A walkie-talkie, representing communication devices.",
             Icon::Wallet => "A wallet, representing money or finances.",
             Icon::WandMagic => "A magic wand, representing magical effects.",
-            Icon::WandMagicSparkles => "A magic wand with sparkles, indicating magical effects or settings.",
+            Icon::WandMagicSparkles => {
+                "A magic wand with sparkles, indicating magical effects or settings."
+            }
             Icon::WandSparkles => "A magic wand with sparkles, indicating magic or settings.",
             Icon::Warehouse => "A warehouse building, representing storage or logistics.",
             Icon::Water => "A water droplet, representing liquid or hydration.",
@@ -5933,7 +6457,9 @@ impl Icon {
             Icon::WeightHanging => "A hanging weight, representing heavy lifting or measurement.",
             Icon::WeightScale => "A weight scale, representing measurement of weight.",
             Icon::WheatAwn => "A stalk of wheat, representing grain or agriculture.",
-            Icon::WheatAwnCircleExclamation => "A circle with wheat and an exclamation mark, representing gluten alert.",
+            Icon::WheatAwnCircleExclamation => {
+                "A circle with wheat and an exclamation mark, representing gluten alert."
+            }
             Icon::Wheelchair => "A simple wheelchair, representing accessibility.",
             Icon::WheelchairMove => "A wheelchair with motion lines, representing mobility.",
             Icon::WhiskeyGlass => "A whiskey glass, representing alcohol or beverages.",
@@ -5946,7 +6472,9 @@ impl Icon {
             Icon::WineBottle => "A wine bottle, representing alcohol or beverages.",
             Icon::WineGlass => "A wine glass, representing drinking or celebration.",
             Icon::WineGlassEmpty => "An empty wine glass, representing a drink.",
-            Icon::WizardsOfTheCoast => "The logo of Wizards of the Coast, representing the game company.",
+            Icon::WizardsOfTheCoast => {
+                "The logo of Wizards of the Coast, representing the game company."
+            }
             Icon::WonSign => "The symbol for the South Korean won, indicating currency.",
             Icon::Wordpress => "The logo of WordPress, a popular content management system.",
             Icon::Worm => "A worm, representing the animal or an insult.",

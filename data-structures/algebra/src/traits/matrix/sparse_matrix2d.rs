@@ -167,10 +167,7 @@ pub trait SparseBiMatrix2D:
     /// The type of the underlying sparse matrix.
     type SparseMatrix: SparseMatrix2D<RowIndex = Self::RowIndex, ColumnIndex = Self::ColumnIndex>;
     /// The type of the underlying transposed sparse matrix.
-    type SparseTransposedMatrix: SparseMatrix2D<
-        RowIndex = Self::ColumnIndex,
-        ColumnIndex = Self::RowIndex,
-    >;
+    type SparseTransposedMatrix: SparseMatrix2D<RowIndex = Self::ColumnIndex, ColumnIndex = Self::RowIndex>;
 
     #[inline]
     /// Returns an iterator over the sparse rows of a column.
@@ -205,15 +202,9 @@ pub trait SizedSparseBiMatrix2D:
     > + SizedSparseMatrix2D
 {
     /// The type of the underlying sparse matrix.
-    type SizedSparseMatrix: SizedSparseMatrix2D<
-        RowIndex = Self::RowIndex,
-        ColumnIndex = Self::ColumnIndex,
-    >;
+    type SizedSparseMatrix: SizedSparseMatrix2D<RowIndex = Self::RowIndex, ColumnIndex = Self::ColumnIndex>;
     /// The type of the underlying transposed sparse matrix.
-    type SizedSparseTransposedMatrix: SizedSparseMatrix2D<
-        RowIndex = Self::ColumnIndex,
-        ColumnIndex = Self::RowIndex,
-    >;
+    type SizedSparseTransposedMatrix: SizedSparseMatrix2D<RowIndex = Self::ColumnIndex, ColumnIndex = Self::RowIndex>;
 
     #[inline]
     /// Returns the number of defined values in a column.
@@ -255,10 +246,7 @@ pub trait SparseSymmetricMatrix2D:
     + SparseMatrix2D
 {
     /// The underlying symmetric sparse matrix type.
-    type SymmetricSparseMatrix: SparseMatrix2D<
-        RowIndex = Self::RowIndex,
-        ColumnIndex = Self::ColumnIndex,
-    >;
+    type SymmetricSparseMatrix: SparseMatrix2D<RowIndex = Self::RowIndex, ColumnIndex = Self::ColumnIndex>;
 }
 
 impl<M> SparseSymmetricMatrix2D for M

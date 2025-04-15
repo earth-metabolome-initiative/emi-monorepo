@@ -1,7 +1,7 @@
 //! Simple test for directed edges.
 
 use ::graph::prelude::*;
-use algebra::impls::{SquareCSR2D, UpperTriangularCSR2D, CSR2D};
+use algebra::impls::{CSR2D, SquareCSR2D, UpperTriangularCSR2D};
 use common_traits::builder::Builder;
 
 #[test]

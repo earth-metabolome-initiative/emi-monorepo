@@ -3,7 +3,7 @@
 use arbitrary::{Arbitrary, Unstructured};
 
 use crate::{
-    prelude::{MutabilityError, CSR2D},
+    prelude::{CSR2D, MutabilityError},
     traits::{IntoUsize, MatrixMut, PositiveInteger, SparseMatrixMut, TryFromUsize},
 };
 

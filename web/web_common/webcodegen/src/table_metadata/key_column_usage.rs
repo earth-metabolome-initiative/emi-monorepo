@@ -1,6 +1,6 @@
 use diesel::{
-    pg::PgConnection, ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl,
-    Selectable,
+    ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
+    pg::PgConnection,
 };
 
 use crate::errors::WebCodeGenError;

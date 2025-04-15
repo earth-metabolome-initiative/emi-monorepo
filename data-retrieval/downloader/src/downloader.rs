@@ -7,7 +7,7 @@ use indicatif::{MultiProgress, ProgressBar, ProgressIterator};
 use reqwest::{Client, Response};
 
 use crate::{
-    errors::DownloaderError, reports::TaskReport, utils::set_bar_style, CompressionExtension, Task,
+    CompressionExtension, Task, errors::DownloaderError, reports::TaskReport, utils::set_bar_style,
 };
 
 /// Download task.

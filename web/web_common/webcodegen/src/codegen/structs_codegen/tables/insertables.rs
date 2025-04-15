@@ -8,11 +8,11 @@ use proc_macro2::TokenStream;
 use syn::Ident;
 
 use crate::{
+    Codegen, Column, Table,
     codegen::{
         CODEGEN_DIRECTORY, CODEGEN_INSERTABLES_PATH, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
     },
     errors::{CheckConstraintError, CodeGenerationError, WebCodeGenError},
-    Codegen, Column, Table,
 };
 
 impl Table {
@@ -53,8 +53,10 @@ impl Table {
     ///
     /// * If the name of the insertable attributes cannot be retrieved.
     pub fn insertable_enum_ty(&self) -> Result<syn::Type, WebCodeGenError> {
-        Ok(syn::parse_str(&format!("crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_INSERTABLES_PATH}::{}",
-            self.insertable_enum_name()?))?)
+        Ok(syn::parse_str(&format!(
+            "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_INSERTABLES_PATH}::{}",
+            self.insertable_enum_name()?
+        ))?)
     }
 
     /// Returns the [`Type`](syn::Type) for the insertable variant.
@@ -63,8 +65,10 @@ impl Table {
     ///
     /// * If the name of the insertable variant cannot be retrieved.
     pub fn insertable_variant_ty(&self) -> Result<syn::Type, WebCodeGenError> {
-        Ok(syn::parse_str(&format!("crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_INSERTABLES_PATH}::{}",
-            self.insertable_variant_name()?))?)
+        Ok(syn::parse_str(&format!(
+            "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_INSERTABLES_PATH}::{}",
+            self.insertable_variant_name()?
+        ))?)
     }
 
     /// Returns the [`Ident`](syn::Ident) for the insertable variant.
@@ -100,8 +104,10 @@ impl Table {
     ///
     /// * If the name of the insertable variant builder cannot be retrieved.
     pub fn insertable_builder_ty(&self) -> Result<syn::Type, WebCodeGenError> {
-        Ok(syn::parse_str(&format!("crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_INSERTABLES_PATH}::{}",
-            self.insertable_builder_name()?))?)
+        Ok(syn::parse_str(&format!(
+            "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_INSERTABLES_PATH}::{}",
+            self.insertable_builder_name()?
+        ))?)
     }
 }
 

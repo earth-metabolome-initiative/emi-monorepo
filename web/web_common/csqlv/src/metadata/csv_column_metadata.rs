@@ -4,7 +4,7 @@ use std::{
     collections::{HashMap, HashSet},
 };
 
-use crate::{data_types::DataType, errors::CSVSchemaError, CSVSchema};
+use crate::{CSVSchema, data_types::DataType, errors::CSVSchemaError};
 
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

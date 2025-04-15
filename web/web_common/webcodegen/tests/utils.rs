@@ -7,13 +7,13 @@ use std::{
 };
 
 use diesel::{Connection, PgConnection};
-use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
+use diesel_migrations::{EmbeddedMigrations, MigrationHarness, embed_migrations};
 use pgrx_validation::EXTENSION_NAME;
 use quote::quote;
 use testcontainers::{
+    ContainerAsync, GenericImage, ImageExt, TestcontainersError,
     core::{IntoContainerPort, WaitFor},
     runners::AsyncRunner,
-    ContainerAsync, GenericImage, ImageExt, TestcontainersError,
 };
 
 const DEFAULT_MIGRATIONS: EmbeddedMigrations = embed_migrations!("./test_migrations");
@@ -128,7 +128,9 @@ async fn setup_docker(
     // extension.
 
     if !std::path::Path::new(&extension_directory).exists() {
-        panic!("The extension directory does not exist. Most likely you forgot to build the extension. Refer to the `pgrx_validation` README for more informations.");
+        panic!(
+            "The extension directory does not exist. Most likely you forgot to build the extension. Refer to the `pgrx_validation` README for more informations."
+        );
     }
 
     GenericImage::new("postgres", "17-bookworm")

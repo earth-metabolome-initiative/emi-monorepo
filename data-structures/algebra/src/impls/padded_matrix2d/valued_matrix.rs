@@ -1,7 +1,7 @@
 //! Submodule for the `PaddedMatrix2D` struct, implementing the `ValuedMatrix`
 //! trait and its related traits.
 
-use super::{imputed_row_values::ImputedRowValues, PaddedMatrix2D};
+use super::{PaddedMatrix2D, imputed_row_values::ImputedRowValues};
 use crate::{
     impls::M2DValues,
     traits::{

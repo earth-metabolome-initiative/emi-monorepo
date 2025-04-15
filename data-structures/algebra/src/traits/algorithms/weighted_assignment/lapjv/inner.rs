@@ -74,7 +74,7 @@ where
 impl<M: DenseValuedMatrix2D + ?Sized> Inner<'_, M>
 where
     M::Value: Number,
-{   
+{
     #[inline]
     pub(super) fn column_reduction(&mut self) -> Result<(), LAPJVError> {
         debug_assert!(

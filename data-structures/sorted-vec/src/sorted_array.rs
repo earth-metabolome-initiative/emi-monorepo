@@ -24,11 +24,7 @@ where
         } else {
             // We identify the offending entry by returning the first unsorted entry.
             let unsorted_entry = array.windows(2).find_map(|window| {
-                if window[0] > window[1] {
-                    Some(window[1].clone())
-                } else {
-                    None
-                }
+                if window[0] > window[1] { Some(window[1].clone()) } else { None }
             });
             if let Some(entry) = unsorted_entry {
                 Err(Error::UnsortedEntry(entry))

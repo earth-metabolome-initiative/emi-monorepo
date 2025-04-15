@@ -6,7 +6,7 @@ use std::{fmt::Display, str::FromStr};
 use serde::Serialize;
 
 use super::rank::CatalogOfLifeRank;
-use crate::{impls::generic::taxon_entry::GenericTaxonEntry, TaxonIdentifier};
+use crate::{TaxonIdentifier, impls::generic::taxon_entry::GenericTaxonEntry};
 
 #[derive(Debug, Eq, Clone, Copy, PartialEq, Hash)]
 /// Represents in an efficient manner IDs such as:

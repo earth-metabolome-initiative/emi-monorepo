@@ -1,7 +1,7 @@
 use diesel::pg::PgConnection;
 
 use super::ConstraintError;
-use crate::{custom_schema_constraints::CustomColumnConstraint, errors::WebCodeGenError, Column};
+use crate::{Column, custom_schema_constraints::CustomColumnConstraint, errors::WebCodeGenError};
 
 /// Check that a column has a specific type
 pub struct HasSpecificTypeConstraint<'column> {

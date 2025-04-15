@@ -336,8 +336,12 @@ mod tests {
 
         assert!(config.add_config_parameter(ConfigV5::IsotopeSettingsFilter(true)).is_err());
 
-        assert!(config
-            .add_config_parameter(ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::Bio])))
-            .is_err());
+        assert!(
+            config
+                .add_config_parameter(ConfigV5::FormulaSearchDB(DBVector::from(vec![
+                    SearchDB::Bio
+                ])))
+                .is_err()
+        );
     }
 }

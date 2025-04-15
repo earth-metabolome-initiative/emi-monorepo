@@ -18,11 +18,7 @@ pub const EXTENSION_NAME: &str = "pgrx_validation";
 ///
 /// * `validation_errors::SingleFieldError::EmptyText` if the string is empty.
 pub fn must_not_be_empty(value: &str) -> Result<(), validation_errors::SingleFieldError> {
-    if value.is_empty() {
-        Err(validation_errors::SingleFieldError::EmptyText(()))
-    } else {
-        Ok(())
-    }
+    if value.is_empty() { Err(validation_errors::SingleFieldError::EmptyText(())) } else { Ok(()) }
 }
 
 #[validation]

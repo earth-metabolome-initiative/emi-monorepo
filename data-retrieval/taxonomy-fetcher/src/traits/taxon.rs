@@ -1,6 +1,6 @@
 //! Submodule proving a trait defining a taxon entry.
 
-use crate::traits::{taxonomy::Taxonomy, TaxonEntry};
+use crate::traits::{TaxonEntry, taxonomy::Taxonomy};
 
 /// Trait defining a taxon entry.
 pub trait Taxon<'a>: Sized

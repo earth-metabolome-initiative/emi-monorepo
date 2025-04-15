@@ -1,6 +1,6 @@
 //! Iterator of the sparse coordinates of the CSR2D matrix.
 
-use core::iter::{repeat_n, RepeatN};
+use core::iter::{RepeatN, repeat_n};
 
 use crate::prelude::*;
 

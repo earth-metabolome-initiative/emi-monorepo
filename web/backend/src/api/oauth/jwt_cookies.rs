@@ -29,7 +29,6 @@ use crate::errors::BackendError;
 /// Set a const with the expected cookie name.
 pub(crate) const REFRESH_COOKIE_NAME: &str = "refresh_token";
 
-
 pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpResponse {
     log::info!("Eliminating cookies");
     let refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, "")
@@ -467,7 +466,6 @@ pub(crate) async fn access_token_validator(
         Err(_) => Err((BackendError::Unauthorized.into(), req)),
     }
 }
-
 
 pub struct UserWrapper {
     pub user: User,

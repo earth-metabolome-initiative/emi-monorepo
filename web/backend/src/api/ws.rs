@@ -1,5 +1,5 @@
 //! Submodule providing websocket services post-authentication.
-use actix_web::{get, rt, web, Error, HttpRequest, HttpResponse};
+use actix_web::{Error, HttpRequest, HttpResponse, get, rt, web};
 use actix_ws::AggregatedMessage;
 use futures::StreamExt;
 

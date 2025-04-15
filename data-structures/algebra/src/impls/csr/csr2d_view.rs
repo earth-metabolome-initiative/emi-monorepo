@@ -65,7 +65,7 @@ impl<CSR: SparseMatrix2D> DoubleEndedIterator for CSR2DView<'_, CSR> {
                 }
                 Ordering::Greater => {
                     self.back_row += CSR::RowIndex::ONE;
-                    self.back =Some(self.csr2d.sparse_row(self.back_row));
+                    self.back = Some(self.csr2d.sparse_row(self.back_row));
                     self.next_back()
                 }
             }

@@ -218,7 +218,9 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<String, WebCod
 
         // Temporal types
         "timestamp without time zone" | "timestamp" => "diesel::sql_types::Timestamp",
-        "timestamp with time zone" | "timestamptz" => "rosetta_timestamp::diesel_impls::TimestampUTC",
+        "timestamp with time zone" | "timestamptz" => {
+            "rosetta_timestamp::diesel_impls::TimestampUTC"
+        }
         "time" => "diesel::sql_types::Time",
         "date" => "diesel::sql_types::Date",
         "interval" => "diesel::sql_types::Interval",

@@ -1,7 +1,7 @@
 use diesel::{
-    pg::PgConnection, result::Error as DieselError, BoolExpressionMethods, ExpressionMethods,
-    JoinOnDsl, OptionalExtension, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
-    SelectableHelper,
+    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, Queryable,
+    QueryableByName, RunQueryDsl, Selectable, SelectableHelper, pg::PgConnection,
+    result::Error as DieselError,
 };
 use inflector::Inflector;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
@@ -9,12 +9,12 @@ use syn::{Ident, Type};
 
 use super::{
     check_constraint::CheckConstraint,
-    pg_type::{rust_type_str, PgType, COPY_TYPES},
+    pg_type::{COPY_TYPES, PgType, rust_type_str},
     table::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS},
 };
 use crate::{
-    errors::WebCodeGenError, table_metadata::pg_type::postgres_type_to_diesel, KeyColumnUsage,
-    Table,
+    KeyColumnUsage, Table, errors::WebCodeGenError,
+    table_metadata::pg_type::postgres_type_to_diesel,
 };
 
 /// Struct defining the `information_schema.columns` table.
@@ -486,7 +486,6 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    ///
     pub fn table(&self, conn: &mut PgConnection) -> Result<Table, WebCodeGenError> {
         use crate::schema::tables;
         tables::table

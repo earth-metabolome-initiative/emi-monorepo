@@ -1,4 +1,5 @@
-//! Submodule defining the error enumeration that may be happen within the server.
+//! Submodule defining the error enumeration that may be happen within the
+//! server.
 
 mod from_impls;
 
@@ -12,7 +13,8 @@ pub(crate) enum BackendError {
     PostgresConnectionError(diesel::ConnectionError),
     /// The connection pool timed out while trying to execute a query.
     PostgresPoolTimeoutError,
-    /// An error that occurred while trying to execute a query on the Postgres database.
+    /// An error that occurred while trying to execute a query on the Postgres
+    /// database.
     PostgresQueryError(diesel::result::Error),
     /// An error that occurred due to some error mis-configuration.
     EnvironmentError(std::env::VarError),

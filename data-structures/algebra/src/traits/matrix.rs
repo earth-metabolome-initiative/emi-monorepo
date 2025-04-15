@@ -12,8 +12,8 @@ mod valued_matrix2d;
 
 pub use dense_matrix::*;
 pub use dense_matrix2d::*;
-pub use matrix2d::*;
 pub use matrix_mut::*;
+pub use matrix2d::*;
 pub use sparse_matrix2d::*;
 pub use square_matrix::*;
 pub use transposed_valued_matrix2d::*;

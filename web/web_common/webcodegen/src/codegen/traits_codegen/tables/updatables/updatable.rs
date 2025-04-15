@@ -7,7 +7,7 @@ use std::path::Path;
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 
-use crate::{errors::WebCodeGenError, Codegen, Table};
+use crate::{Codegen, Table, errors::WebCodeGenError};
 
 impl Table {
     /// Returns whether the table allows for the implementation of the

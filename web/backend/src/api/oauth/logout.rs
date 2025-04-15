@@ -6,7 +6,7 @@ use actix_web_httpauth::extractors::bearer::BearerAuth;
 
 use crate::{
     api::oauth::jwt_cookies::{
-        eliminate_cookies, JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME
+        JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME, eliminate_cookies,
     },
     errors::BackendError,
 };

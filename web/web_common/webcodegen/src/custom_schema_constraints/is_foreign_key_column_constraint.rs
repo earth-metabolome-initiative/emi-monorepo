@@ -1,7 +1,7 @@
 use diesel::pg::PgConnection;
 
 use super::ConstraintError;
-use crate::{custom_schema_constraints::CustomColumnConstraint, errors::WebCodeGenError, Column};
+use crate::{Column, custom_schema_constraints::CustomColumnConstraint, errors::WebCodeGenError};
 
 #[derive(Debug)]
 /// A constraint that checks if a column is a foreign key column

@@ -16,7 +16,6 @@ pub const FULL_LOGOUT_ENDPOINT: &str =
 /// Name of the cookie storing whether the user is online
 pub const USER_ONLINE_COOKIE_NAME: &str = "user_online";
 
-
 #[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq, Clone)]
 /// Struct representing the access token used to authenticate the user.
 pub struct AccessToken {

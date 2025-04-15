@@ -1,5 +1,5 @@
 use crate::{
-    csv_columns::CSVColumn, errors::CSVSchemaError, metadata::CSVTableMetadata, CSVSchema,
+    CSVSchema, csv_columns::CSVColumn, errors::CSVSchemaError, metadata::CSVTableMetadata,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

@@ -1,7 +1,7 @@
 //! Submodule defining traits regarding tables that can be extended with new
 //! rows.
-use common_traits::prelude::BuilderError;
 use backend_request_errors::BackendRequestError;
+use common_traits::prelude::BuilderError;
 
 /// A trait for types that can be inserted into the database.
 pub trait Insertable {
@@ -91,9 +91,9 @@ pub trait BackendInsertableVariant: InsertableVariant {
 /// create the insertable variant.
 pub trait InsertableBuilder:
     common_traits::prelude::Builder<
-    Object = <Self as InsertableBuilder>::Product,
-    Error = InsertError<<Self as common_traits::prelude::Builder>::Attribute>,
->
+        Object = <Self as InsertableBuilder>::Product,
+        Error = InsertError<<Self as common_traits::prelude::Builder>::Attribute>,
+    >
 {
     /// The associated row type which can be inserted into the database.
     type Row: Insertable<InsertableBuilder = Self, InsertableVariant = Self::Product>;

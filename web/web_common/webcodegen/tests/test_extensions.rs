@@ -3,7 +3,7 @@
 
 mod utils;
 
-use diesel_migrations::{embed_migrations, EmbeddedMigrations};
+use diesel_migrations::{EmbeddedMigrations, embed_migrations};
 use utils::*;
 use webcodegen::*;
 

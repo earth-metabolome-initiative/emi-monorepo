@@ -12,10 +12,10 @@ use quote::quote;
 use syn::Ident;
 
 use crate::{
+    Codegen, Table,
     codegen::{
         CODEGEN_INSERTABLE_BUILDER_PATH, CODEGEN_INSERTABLE_PATH, CODEGEN_INSERTABLE_VARIANT_PATH,
     },
-    Codegen, Table,
 };
 
 impl Codegen<'_> {

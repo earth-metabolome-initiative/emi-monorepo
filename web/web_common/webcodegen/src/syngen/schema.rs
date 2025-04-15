@@ -5,7 +5,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
 
-use crate::{errors::WebCodeGenError, Table};
+use crate::{Table, errors::WebCodeGenError};
 
 impl Table {
     /// Returns the Syn `TokenStream` for the diesel schema definition for the

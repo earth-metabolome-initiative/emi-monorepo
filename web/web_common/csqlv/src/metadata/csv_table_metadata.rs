@@ -6,10 +6,10 @@ use inflector::Inflector;
 
 use super::csv_column_metadata::{CSVColumnMetadata, CSVColumnMetadataBuilder};
 use crate::{
+    CSVSchema,
     data_types::DataType,
     errors::CSVSchemaError,
     extensions::{delimiter_from_path, file_name_without_extension, has_compression_extension},
-    CSVSchema,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

@@ -7,7 +7,7 @@ use diesel::{
 use syn::punctuated::Punctuated;
 
 use super::PgType;
-use crate::{errors::WebCodeGenError, PgExtension};
+use crate::{PgExtension, errors::WebCodeGenError};
 
 /// Represents the `pg_proc` system catalog table in `PostgreSQL`.
 /// This table stores information about functions and procedures.

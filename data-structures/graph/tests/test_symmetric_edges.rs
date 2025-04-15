@@ -1,7 +1,7 @@
 //! Simple test for symmetric edges.
 
 use ::graph::prelude::*;
-use algebra::impls::{SymmetricCSR2D, CSR2D};
+use algebra::impls::{CSR2D, SymmetricCSR2D};
 use common_traits::builder::Builder;
 
 #[test]

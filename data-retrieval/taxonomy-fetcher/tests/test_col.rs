@@ -1,6 +1,6 @@
 //! Test whether the COL taxonomy fetcher works as expected.
 
-use taxonomy_fetcher::{impls::catalog_of_life::CatalogOfLifeTaxonomyBuilder, TaxonomyBuilder};
+use taxonomy_fetcher::{TaxonomyBuilder, impls::catalog_of_life::CatalogOfLifeTaxonomyBuilder};
 
 #[tokio::test]
 async fn test_all_col() {

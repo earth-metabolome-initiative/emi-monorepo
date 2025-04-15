@@ -3,8 +3,8 @@
 use indicatif::{ProgressBar, ProgressIterator};
 use strum::IntoEnumIterator;
 use taxonomy_fetcher::{
-    impls::ncbi::{NCBITaxonomyBuilder, NCBIVersion},
     TaxonomyBuilder,
+    impls::ncbi::{NCBITaxonomyBuilder, NCBIVersion},
 };
 
 #[tokio::test]

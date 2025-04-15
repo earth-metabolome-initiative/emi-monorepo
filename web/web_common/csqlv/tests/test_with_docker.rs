@@ -2,9 +2,9 @@
 use csqlv::{CSVSchemaBuilder, CSVSchemaError};
 use diesel::pg::PgConnection;
 use testcontainers::{
+    ContainerAsync, GenericImage, ImageExt,
     core::{IntoContainerPort, Mount, WaitFor},
     runners::AsyncRunner,
-    ContainerAsync, GenericImage, ImageExt,
 };
 
 const DATABASE_NAME: &str = "test_db";

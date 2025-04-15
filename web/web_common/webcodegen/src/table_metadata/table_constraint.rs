@@ -1,12 +1,12 @@
 use std::io::Write;
 
 use diesel::{
+    ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
     backend::Backend,
     deserialize::{FromSql, FromSqlRow},
     expression::AsExpression,
     pg::PgConnection,
     serialize::{IsNull, Output, ToSql},
-    ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
 };
 use serde::{Deserialize, Serialize};
 

@@ -17,6 +17,10 @@ pub enum KahnError {
 pub trait Kahn: SparseSquareMatrix {
     /// Returns the indices to rearrange the rows of the matrix in a topological
     /// order.
+    ///
+    /// # Errors
+    ///
+    /// * If the graph contains a cycle, an error is returned.
     fn kahn(&self) -> Result<Vec<Self::Index>, KahnError> {
         let mut in_degree = vec![Self::Index::ZERO; self.order().into_usize()];
         let mut frontier = Vec::new();
@@ -43,7 +47,7 @@ pub trait Kahn: SparseSquareMatrix {
                 temporary_frontier.extend(self.sparse_row(row_id).filter_map(|successor_id| {
                     in_degree[successor_id.into_usize()] -= Self::Index::ONE;
                     (in_degree[successor_id.into_usize()] == Self::Index::ZERO)
-                        .then(|| successor_id)
+                        .then_some(successor_id)
                 }));
             }
 

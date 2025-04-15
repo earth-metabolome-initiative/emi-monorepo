@@ -1,6 +1,6 @@
 use diesel::{
-    pg::PgConnection, BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable,
-    QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
+    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
+    RunQueryDsl, Selectable, SelectableHelper, pg::PgConnection,
 };
 
 use super::Column;

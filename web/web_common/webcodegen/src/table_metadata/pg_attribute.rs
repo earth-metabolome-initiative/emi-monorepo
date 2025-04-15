@@ -3,7 +3,7 @@ use diesel::{
     ExpressionMethods, PgConnection, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
 };
 
-use crate::{errors::WebCodeGenError, PgType};
+use crate::{PgType, errors::WebCodeGenError};
 
 /// Represents a `PostgreSQL` attribute (column) in a table.
 ///

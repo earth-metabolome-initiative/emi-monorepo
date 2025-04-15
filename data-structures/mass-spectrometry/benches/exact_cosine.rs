@@ -33,11 +33,11 @@ fn bench_exact_cosine(c: &mut Criterion) {
     let mut epimeloscine_group = c.benchmark_group("epimeloscine");
     epimeloscine_group.sample_size(10);
 
-	epimeloscine_group.bench_function("cosine_salicin_epimeloscine", |b| {
+    epimeloscine_group.bench_function("cosine_salicin_epimeloscine", |b| {
         b.iter(|| cosine.similarity(black_box(&salicin), black_box(&epimeloscine)))
     });
 
-	epimeloscine_group.bench_function("cosine_hydroxy_cholesterol_epimeloscine", |b| {
+    epimeloscine_group.bench_function("cosine_hydroxy_cholesterol_epimeloscine", |b| {
         b.iter(|| cosine.similarity(black_box(&hydroxy_cholesterol), black_box(&epimeloscine)))
     });
 

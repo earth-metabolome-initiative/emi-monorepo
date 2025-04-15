@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use actix_cors::Cors;
 use actix_files::NamedFile;
 use actix_web::{
-    get, http::header, middleware::Logger, web, App, HttpRequest, HttpServer, Responder,
+    App, HttpRequest, HttpServer, Responder, get, http::header, middleware::Logger, web,
 };
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use redis::Client;

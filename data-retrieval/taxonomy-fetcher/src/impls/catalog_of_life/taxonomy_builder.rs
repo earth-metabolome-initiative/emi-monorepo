@@ -7,11 +7,11 @@ use downloader::Downloader;
 use serde::Deserialize;
 
 use super::{
-    rank::CatalogOfLifeRank, taxon_entry::CatalogOfLifeTaxonEntry,
+    COLId, rank::CatalogOfLifeRank, taxon_entry::CatalogOfLifeTaxonEntry,
     taxon_entry_builder::CatalogOfLifeTaxonEntryBuilder, taxonomy::CatalogOfLifeTaxonomy,
-    version::CatalogOfLifeVersion, COLId,
+    version::CatalogOfLifeVersion,
 };
-use crate::{traits::TaxonomyBuilder, TaxonEntryBuilder};
+use crate::{TaxonEntryBuilder, traits::TaxonomyBuilder};
 
 #[derive(Default)]
 /// Implementation of the taxonomy trait for the Open Tree of Life.

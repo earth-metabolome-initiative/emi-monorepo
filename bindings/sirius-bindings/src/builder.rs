@@ -122,9 +122,9 @@ impl SiriusBuilder<Version5> {
     ///     .unwrap()
     ///     .build();
     ///
-    /// assert!(SiriusBuilder::default()
-    ///     .formula_search_db(DBVector::from(vec![SearchDB::Hmdb]))
-    ///     .is_ok());
+    /// assert!(
+    ///     SiriusBuilder::default().formula_search_db(DBVector::from(vec![SearchDB::Hmdb])).is_ok()
+    /// );
     /// ```
     ///
     /// # Errors
@@ -382,7 +382,7 @@ impl SiriusBuilder<Version5> {
     ) -> Result<Self, String> {
         if ms1_minimal_intensity_to_consider < 0.0 {
             return Err(format!(
-                "MS1 minimal intensity to consider must be positive. You provided {ms1_minimal_intensity_to_consider}.", 
+                "MS1 minimal intensity to consider must be positive. You provided {ms1_minimal_intensity_to_consider}.",
             ));
         }
         self.config.add_config_parameter(ConfigV5::MS1MinimalIntensityToConsider(

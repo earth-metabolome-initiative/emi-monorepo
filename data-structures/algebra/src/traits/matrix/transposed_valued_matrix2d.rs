@@ -16,16 +16,16 @@ pub trait ValuedBiMatrix2D:
 {
     /// The type of the underlying valued matrix.
     type ValuedMatrix: ValuedMatrix2D<
-        RowIndex = Self::RowIndex,
-        ColumnIndex = Self::ColumnIndex,
-        Value = Self::Value,
-    >;
+            RowIndex = Self::RowIndex,
+            ColumnIndex = Self::ColumnIndex,
+            Value = Self::Value,
+        >;
     /// The type of the underlying transposed valued matrix.
     type ValuedTransposedMatrix: ValuedMatrix2D<
-        RowIndex = Self::ColumnIndex,
-        ColumnIndex = Self::RowIndex,
-        Value = Self::Value,
-    >;
+            RowIndex = Self::ColumnIndex,
+            ColumnIndex = Self::RowIndex,
+            Value = Self::Value,
+        >;
 }
 
 /// Trait defining a sparse matrix which supports efficient operations on
@@ -111,17 +111,17 @@ where
             SizedSparseTransposedMatrix = <M as ValuedBiMatrix2D>::ValuedTransposedMatrix,
         >,
     M::ValuedMatrix: SparseValuedMatrix2D<
-        RowIndex = Self::RowIndex,
-        ColumnIndex = Self::ColumnIndex,
-        SparseIndex = Self::SparseIndex,
-        Value = Self::Value,
-    >,
+            RowIndex = Self::RowIndex,
+            ColumnIndex = Self::ColumnIndex,
+            SparseIndex = Self::SparseIndex,
+            Value = Self::Value,
+        >,
     M::ValuedTransposedMatrix: SparseValuedMatrix2D<
-        RowIndex = Self::ColumnIndex,
-        ColumnIndex = Self::RowIndex,
-        SparseIndex = Self::SparseIndex,
-        Value = Self::Value,
-    >,
+            RowIndex = Self::ColumnIndex,
+            ColumnIndex = Self::RowIndex,
+            SparseIndex = Self::SparseIndex,
+            Value = Self::Value,
+        >,
 {
     type ValuedSparseMatrix = M::ValuedMatrix;
     type ValuedSparseTransposedMatrix = M::ValuedTransposedMatrix;
@@ -137,10 +137,10 @@ pub trait SymmetricValuedMatrix2D:
 {
     /// The type of the underlying symmetric valued matrix.
     type SymmetricValuedMatrix: ValuedMatrix2D<
-        RowIndex = Self::RowIndex,
-        ColumnIndex = Self::ColumnIndex,
-        Value = Self::Value,
-    >;
+            RowIndex = Self::RowIndex,
+            ColumnIndex = Self::ColumnIndex,
+            Value = Self::Value,
+        >;
 }
 
 impl<M> SymmetricValuedMatrix2D for M
@@ -151,10 +151,10 @@ where
             ValuedTransposedMatrix = <M as SymmetricMatrix2D>::SymmetricMatrix,
         >,
     M::SymmetricMatrix: ValuedMatrix2D<
-        RowIndex = Self::RowIndex,
-        ColumnIndex = Self::ColumnIndex,
-        Value = Self::Value,
-    >,
+            RowIndex = Self::RowIndex,
+            ColumnIndex = Self::ColumnIndex,
+            Value = Self::Value,
+        >,
 {
     type SymmetricValuedMatrix = M::SymmetricMatrix;
 }
@@ -167,20 +167,20 @@ pub trait SparseSymmetricValuedMatrix2D:
 {
     /// The underlying symmetric sparse matrix type.
     type SymmetricSparseValuedMatrix: SparseValuedMatrix2D<
-        RowIndex = Self::RowIndex,
-        ColumnIndex = Self::ColumnIndex,
-        Value = Self::Value,
-    >;
+            RowIndex = Self::RowIndex,
+            ColumnIndex = Self::ColumnIndex,
+            Value = Self::Value,
+        >;
 }
 
 impl<M> SparseSymmetricValuedMatrix2D for M
 where
     M: SymmetricValuedMatrix2D + SparseMatrix2D,
     M::SymmetricValuedMatrix: SparseValuedMatrix2D<
-        RowIndex = Self::RowIndex,
-        ColumnIndex = Self::ColumnIndex,
-        Value = Self::Value,
-    >,
+            RowIndex = Self::RowIndex,
+            ColumnIndex = Self::ColumnIndex,
+            Value = Self::Value,
+        >,
 {
     type SymmetricSparseValuedMatrix = M::SymmetricValuedMatrix;
 }

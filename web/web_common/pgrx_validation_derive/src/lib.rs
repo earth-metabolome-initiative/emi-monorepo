@@ -4,7 +4,7 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, spanned::Spanned, visit_mut::VisitMut, Expr, ExprCall, ExprPath};
+use syn::{Expr, ExprCall, ExprPath, parse_macro_input, spanned::Spanned, visit_mut::VisitMut};
 
 struct MethodRenamer;
 

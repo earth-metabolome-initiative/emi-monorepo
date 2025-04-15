@@ -1,5 +1,5 @@
 use diesel::{
-    pg::PgConnection, ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl,
+    ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, pg::PgConnection,
 };
 
 use crate::errors::WebCodeGenError;

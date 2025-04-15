@@ -1,9 +1,9 @@
 use diesel::pg::PgConnection;
 
 use crate::{
+    Column,
     custom_schema_constraints::{ConstraintError, CustomColumnConstraint},
     errors::WebCodeGenError,
-    Column,
 };
 
 #[derive(Default)]

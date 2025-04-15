@@ -391,80 +391,228 @@ impl NCBIVersion {
     /// Returns the URL associated with the version.
     pub fn url(&self) -> &str {
         match self {
-            NCBIVersion::V2018_12_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2018-12-01.zip",
-            NCBIVersion::V2019_01_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-01-01.zip",
-            NCBIVersion::V2019_02_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-02-01.zip",
-            NCBIVersion::V2019_03_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-03-01.zip",
-            NCBIVersion::V2019_04_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-04-01.zip",
-            NCBIVersion::V2019_05_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-05-01.zip",
-            NCBIVersion::V2019_06_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-06-01.zip",
-            NCBIVersion::V2019_07_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-07-01.zip",
-            NCBIVersion::V2019_08_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-08-01.zip",
-            NCBIVersion::V2019_09_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-09-01.zip",
-            NCBIVersion::V2019_10_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-10-01.zip",
-            NCBIVersion::V2019_11_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-11-01.zip",
-            NCBIVersion::V2019_12_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-12-01.zip",
-            NCBIVersion::V2020_01_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-01-01.zip",
-            NCBIVersion::V2020_02_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-02-01.zip",
-            NCBIVersion::V2020_03_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-03-01.zip",
-            NCBIVersion::V2020_04_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-04-01.zip",
-            NCBIVersion::V2020_05_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-05-01.zip",
-            NCBIVersion::V2020_05_31 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-05-31.zip",
-            NCBIVersion::V2020_07_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-07-01.zip",
-            NCBIVersion::V2020_08_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-08-01.zip",
-            NCBIVersion::V2020_09_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-09-01.zip",
-            NCBIVersion::V2020_10_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-10-01.zip",
-            NCBIVersion::V2020_11_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-11-01.zip",
-            NCBIVersion::V2020_12_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-12-01.zip",
-            NCBIVersion::V2021_01_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-01-01.zip",
-            NCBIVersion::V2021_02_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-02-01.zip",
-            NCBIVersion::V2021_03_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-03-01.zip",
-            NCBIVersion::V2021_04_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-04-01.zip",
-            NCBIVersion::V2021_05_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-05-01.zip",
-            NCBIVersion::V2021_06_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-06-01.zip",
-            NCBIVersion::V2021_07_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-07-01.zip",
-            NCBIVersion::V2021_08_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-08-01.zip",
-            NCBIVersion::V2021_09_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-09-01.zip",
-            NCBIVersion::V2021_10_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-10-01.zip",
-            NCBIVersion::V2021_11_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-11-01.zip",
-            NCBIVersion::V2021_12_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-12-01.zip",
-            NCBIVersion::V2022_01_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-01-01.zip",
-            NCBIVersion::V2022_02_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-02-01.zip",
-            NCBIVersion::V2022_03_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-03-01.zip",
-            NCBIVersion::V2022_04_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-04-01.zip",
-            NCBIVersion::V2022_05_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-05-01.zip",
-            NCBIVersion::V2022_06_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-06-01.zip",
-            NCBIVersion::V2022_07_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-07-01.zip",
-            NCBIVersion::V2022_08_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-08-01.zip",
-            NCBIVersion::V2022_09_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-09-01.zip",
-            NCBIVersion::V2022_10_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-10-01.zip",
-            NCBIVersion::V2022_11_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-11-01.zip",
-            NCBIVersion::V2022_12_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-12-01.zip",
-            NCBIVersion::V2023_01_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-01-01.zip",
-            NCBIVersion::V2023_02_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-02-01.zip",
-            NCBIVersion::V2023_03_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-03-01.zip",
-            NCBIVersion::V2023_04_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-04-01.zip",
-            NCBIVersion::V2023_05_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-05-01.zip",
-            NCBIVersion::V2023_06_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-06-01.zip",
-            NCBIVersion::V2023_07_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-07-01.zip",
-            NCBIVersion::V2023_08_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-08-01.zip",
-            NCBIVersion::V2023_09_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-09-01.zip",
-            NCBIVersion::V2023_10_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-10-01.zip",
-            NCBIVersion::V2023_11_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-11-01.zip",
-            NCBIVersion::V2023_12_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-12-01.zip",
-            NCBIVersion::V2024_01_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-01-01.zip",
-            NCBIVersion::V2024_02_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-02-01.zip",
-            NCBIVersion::V2024_03_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-03-01.zip",
-            NCBIVersion::V2024_04_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-04-01.zip",
-            NCBIVersion::V2024_05_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-05-01.zip",
-            NCBIVersion::V2024_06_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-06-01.zip",
-            NCBIVersion::V2024_07_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-07-01.zip",
-            NCBIVersion::V2024_08_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-08-01.zip",
-            NCBIVersion::V2024_09_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-09-01.zip",
-            NCBIVersion::V2024_10_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-10-01.zip",
-            NCBIVersion::V2024_11_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-11-01.zip",
-            NCBIVersion::V2024_12_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-12-01.zip",
-            NCBIVersion::V2025_01_01 => "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2025-01-01.zip",
+            NCBIVersion::V2018_12_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2018-12-01.zip"
+            }
+            NCBIVersion::V2019_01_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-01-01.zip"
+            }
+            NCBIVersion::V2019_02_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-02-01.zip"
+            }
+            NCBIVersion::V2019_03_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-03-01.zip"
+            }
+            NCBIVersion::V2019_04_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-04-01.zip"
+            }
+            NCBIVersion::V2019_05_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-05-01.zip"
+            }
+            NCBIVersion::V2019_06_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-06-01.zip"
+            }
+            NCBIVersion::V2019_07_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-07-01.zip"
+            }
+            NCBIVersion::V2019_08_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-08-01.zip"
+            }
+            NCBIVersion::V2019_09_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-09-01.zip"
+            }
+            NCBIVersion::V2019_10_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-10-01.zip"
+            }
+            NCBIVersion::V2019_11_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-11-01.zip"
+            }
+            NCBIVersion::V2019_12_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2019-12-01.zip"
+            }
+            NCBIVersion::V2020_01_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-01-01.zip"
+            }
+            NCBIVersion::V2020_02_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-02-01.zip"
+            }
+            NCBIVersion::V2020_03_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-03-01.zip"
+            }
+            NCBIVersion::V2020_04_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-04-01.zip"
+            }
+            NCBIVersion::V2020_05_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-05-01.zip"
+            }
+            NCBIVersion::V2020_05_31 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-05-31.zip"
+            }
+            NCBIVersion::V2020_07_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-07-01.zip"
+            }
+            NCBIVersion::V2020_08_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-08-01.zip"
+            }
+            NCBIVersion::V2020_09_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-09-01.zip"
+            }
+            NCBIVersion::V2020_10_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-10-01.zip"
+            }
+            NCBIVersion::V2020_11_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-11-01.zip"
+            }
+            NCBIVersion::V2020_12_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2020-12-01.zip"
+            }
+            NCBIVersion::V2021_01_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-01-01.zip"
+            }
+            NCBIVersion::V2021_02_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-02-01.zip"
+            }
+            NCBIVersion::V2021_03_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-03-01.zip"
+            }
+            NCBIVersion::V2021_04_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-04-01.zip"
+            }
+            NCBIVersion::V2021_05_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-05-01.zip"
+            }
+            NCBIVersion::V2021_06_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-06-01.zip"
+            }
+            NCBIVersion::V2021_07_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-07-01.zip"
+            }
+            NCBIVersion::V2021_08_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-08-01.zip"
+            }
+            NCBIVersion::V2021_09_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-09-01.zip"
+            }
+            NCBIVersion::V2021_10_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-10-01.zip"
+            }
+            NCBIVersion::V2021_11_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-11-01.zip"
+            }
+            NCBIVersion::V2021_12_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2021-12-01.zip"
+            }
+            NCBIVersion::V2022_01_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-01-01.zip"
+            }
+            NCBIVersion::V2022_02_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-02-01.zip"
+            }
+            NCBIVersion::V2022_03_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-03-01.zip"
+            }
+            NCBIVersion::V2022_04_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-04-01.zip"
+            }
+            NCBIVersion::V2022_05_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-05-01.zip"
+            }
+            NCBIVersion::V2022_06_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-06-01.zip"
+            }
+            NCBIVersion::V2022_07_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-07-01.zip"
+            }
+            NCBIVersion::V2022_08_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-08-01.zip"
+            }
+            NCBIVersion::V2022_09_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-09-01.zip"
+            }
+            NCBIVersion::V2022_10_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-10-01.zip"
+            }
+            NCBIVersion::V2022_11_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-11-01.zip"
+            }
+            NCBIVersion::V2022_12_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2022-12-01.zip"
+            }
+            NCBIVersion::V2023_01_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-01-01.zip"
+            }
+            NCBIVersion::V2023_02_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-02-01.zip"
+            }
+            NCBIVersion::V2023_03_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-03-01.zip"
+            }
+            NCBIVersion::V2023_04_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-04-01.zip"
+            }
+            NCBIVersion::V2023_05_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-05-01.zip"
+            }
+            NCBIVersion::V2023_06_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-06-01.zip"
+            }
+            NCBIVersion::V2023_07_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-07-01.zip"
+            }
+            NCBIVersion::V2023_08_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-08-01.zip"
+            }
+            NCBIVersion::V2023_09_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-09-01.zip"
+            }
+            NCBIVersion::V2023_10_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-10-01.zip"
+            }
+            NCBIVersion::V2023_11_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-11-01.zip"
+            }
+            NCBIVersion::V2023_12_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2023-12-01.zip"
+            }
+            NCBIVersion::V2024_01_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-01-01.zip"
+            }
+            NCBIVersion::V2024_02_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-02-01.zip"
+            }
+            NCBIVersion::V2024_03_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-03-01.zip"
+            }
+            NCBIVersion::V2024_04_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-04-01.zip"
+            }
+            NCBIVersion::V2024_05_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-05-01.zip"
+            }
+            NCBIVersion::V2024_06_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-06-01.zip"
+            }
+            NCBIVersion::V2024_07_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-07-01.zip"
+            }
+            NCBIVersion::V2024_08_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-08-01.zip"
+            }
+            NCBIVersion::V2024_09_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-09-01.zip"
+            }
+            NCBIVersion::V2024_10_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-10-01.zip"
+            }
+            NCBIVersion::V2024_11_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-11-01.zip"
+            }
+            NCBIVersion::V2024_12_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2024-12-01.zip"
+            }
+            NCBIVersion::V2025_01_01 => {
+                "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2025-01-01.zip"
+            }
         }
     }
     /// Returns the name of the directory containing the version.

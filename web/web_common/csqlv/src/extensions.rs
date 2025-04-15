@@ -193,9 +193,5 @@ pub fn file_name_without_extension(path: &Path) -> Option<&str> {
     let path: &Path =
         if has_compression_extension(path) { Path::new(path.file_stem()?.to_str()?) } else { path };
 
-    if has_supported_extension(path) {
-        path.file_stem()?.to_str()
-    } else {
-        None
-    }
+    if has_supported_extension(path) { path.file_stem()?.to_str() } else { None }
 }

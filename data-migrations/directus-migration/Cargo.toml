@@ -14,6 +14,7 @@ postgis_diesel.workspace = true
 web_common_traits.workspace = true
 tokio.workspace = true
 const_format.workspace = true
+rosetta-timestamp = { workspace = true, features = ["serde", "postgres"] }
 core-structures = { workspace = true, features = ["backend"] }
 
 [features]

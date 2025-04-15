@@ -11,8 +11,8 @@ use super::{
     taxonomy::NCBITaxonomy, version::NCBIVersion,
 };
 use crate::{
-    impls::ncbi::rank::NCBIRank, traits::TaxonomyBuilder,
-    utils::separator_fixed_reader::SeparatorFixedReader, TaxonEntryBuilder,
+    TaxonEntryBuilder, impls::ncbi::rank::NCBIRank, traits::TaxonomyBuilder,
+    utils::separator_fixed_reader::SeparatorFixedReader,
 };
 
 #[derive(Default)]

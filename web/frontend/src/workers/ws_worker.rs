@@ -77,11 +77,11 @@ impl WebsocketWorker {
         //                 Ok(message) => {
         //                     match message.try_into() {
         //                         Ok(message) => {
-        //                             scope.send_message(InternalMessage::Backend(message));
-        //                         }
-        //                         Err(err) => {
-        //                             log::error!("Error deserializing message: {:?}", err);
-        //                         }
+        //                             
+        // scope.send_message(InternalMessage::Backend(message));               
+        // }                         Err(err) => {
+        //                             log::error!("Error deserializing message: {:?}",
+        // err);                         }
         //                     }
         //                 }
         //                 Err(err) => {

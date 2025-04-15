@@ -15,7 +15,7 @@ use sparse_rows_with_padded_diagonal::SparseRowsWithPaddedDiagonal;
 mod sparse_row_values_with_padded_diagonal;
 use sparse_row_values_with_padded_diagonal::SparseRowValuesWithPaddedDiagonal;
 
-use super::{ranged::SimpleRanged, CSR2DColumns, CSR2DView, M2DValues, MutabilityError};
+use super::{CSR2DColumns, CSR2DView, M2DValues, MutabilityError, ranged::SimpleRanged};
 
 #[cfg(feature = "arbitrary")]
 mod arbitrary_impl;

@@ -125,10 +125,7 @@ where
         if let Some(backup_sparse_column_index) = self.next_back_column_index {
             if dense_column_index == backup_sparse_column_index {
                 self.next_back_column_index = None;
-                return self
-                    .sparse_values
-                    .as_mut()
-                    .and_then(DoubleEndedIterator::next_back);
+                return self.sparse_values.as_mut().and_then(DoubleEndedIterator::next_back);
             }
         } else if let Some(sparse_column_index) =
             self.sparse_column_indices.as_mut().and_then(DoubleEndedIterator::next_back)

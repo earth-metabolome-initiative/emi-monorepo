@@ -2,7 +2,7 @@
 
 use std::{fmt::Display, str::FromStr};
 
-use serde::{de::Deserialize, Serialize};
+use serde::{Serialize, de::Deserialize};
 use strum::EnumIter;
 
 use super::taxon_entry::NCBITaxonEntry;

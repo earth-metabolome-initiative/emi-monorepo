@@ -82,7 +82,10 @@ impl<A: core::fmt::Display> core::fmt::Display for SingleFieldError<A> {
                 write!(f, "Please provide a value for the {field_name} field.")
             }
             SingleFieldError::InvalidMail(field_name) => {
-                write!(f, "The {field_name} field contains an invalid email address. Please check and try again.")
+                write!(
+                    f,
+                    "The {field_name} field contains an invalid email address. Please check and try again."
+                )
             }
             SingleFieldError::UnexpectedNegativeOrZeroValue(field_name) => {
                 write!(f, "The {field_name} field must be a positive number greater than zero.")

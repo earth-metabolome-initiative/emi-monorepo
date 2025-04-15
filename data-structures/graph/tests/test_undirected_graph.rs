@@ -1,7 +1,7 @@
 //! Simple test for undirected graph.
 
 use ::graph::prelude::*;
-use algebra::impls::{SymmetricCSR2D, CSR2D};
+use algebra::impls::{CSR2D, SymmetricCSR2D};
 use common_traits::builder::Builder;
 use sorted_vec::prelude::SortedVec;
 

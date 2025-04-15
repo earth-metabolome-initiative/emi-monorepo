@@ -1,24 +1,24 @@
 use std::collections::{HashMap, HashSet};
 
 use diesel::{
-    pg::PgConnection, result::Error as DieselError, BoolExpressionMethods, ExpressionMethods,
-    JoinOnDsl, NullableExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl,
-    Selectable, SelectableHelper,
+    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, NullableExpressionMethods, QueryDsl,
+    Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper, pg::PgConnection,
+    result::Error as DieselError,
 };
 use inflector::Inflector;
 use itertools::Itertools;
 use proc_macro2::TokenStream;
 use quote::quote;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
-use syn::{parse_str, Ident, Type};
+use syn::{Ident, Type, parse_str};
 
 use super::PgTrigger;
 use crate::{
+    CheckConstraint, Column, PgIndex, TableConstraint,
     codegen::{
         CODEGEN_DIESEL_MODULE, CODEGEN_DIRECTORY, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
     },
     errors::WebCodeGenError,
-    CheckConstraint, Column, PgIndex, TableConstraint,
 };
 
 /// Reserved Rust words that cannot be used as identifiers.
