@@ -36,6 +36,7 @@ pub enum CatalogOfLifeVersion {
 
 impl CatalogOfLifeVersion {
     /// Returns the release date of the version.
+    #[must_use]
     pub fn year(&self) -> u16 {
         match self {
             CatalogOfLifeVersion::V2013 => 2013,
@@ -54,6 +55,7 @@ impl CatalogOfLifeVersion {
     }
 
     /// Returns the URL associated with the version.
+    #[must_use]
     pub fn url(&self) -> &str {
         match self {
             CatalogOfLifeVersion::V2013 => {
@@ -96,10 +98,11 @@ impl CatalogOfLifeVersion {
     }
 
     /// Returns the path to the taxonomy file in the archive.
+    #[must_use]
     pub fn taxonomy_file(&self) -> &str {
         match self {
             CatalogOfLifeVersion::V2024 => "2024_dwca/Taxon.tsv",
-            _ => panic!("Taxonomy file not available for version {:?}", self),
+            _ => panic!("Taxonomy file not available for version {self:?}"),
         }
     }
 }

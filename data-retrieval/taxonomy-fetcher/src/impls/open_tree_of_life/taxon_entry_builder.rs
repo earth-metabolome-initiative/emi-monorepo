@@ -1,5 +1,5 @@
-//! Submodule implementing the TaxonEntryBuilder trait for the Open Tree of Life
-//! taxonomy.
+//! Submodule implementing the `TaxonEntryBuilder` trait for the Open Tree of
+//! Life taxonomy.
 
 /// Implementation of the taxon entry builder for the Open Tree of Life
 /// taxonomy.

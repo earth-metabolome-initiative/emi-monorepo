@@ -47,6 +47,7 @@ pub enum OpenTreeOfLifeVersion {
 
 impl OpenTreeOfLifeVersion {
     /// Returns the release date of the version.
+    #[must_use]
     pub fn release_date(&self) -> NaiveDateTime {
         match self {
             OpenTreeOfLifeVersion::V2_2 => {
@@ -104,6 +105,7 @@ impl OpenTreeOfLifeVersion {
     }
 
     /// Returns the URL associated with the version.
+    #[must_use]
     pub fn url(&self) -> &str {
         match self {
             OpenTreeOfLifeVersion::V2_2 => "https://files.opentreeoflife.org/ott/ott2.2/ott2.2.tgz",
@@ -129,6 +131,7 @@ impl OpenTreeOfLifeVersion {
     }
 
     /// Returns the path to the taxonomy file in the archive.
+    #[must_use]
     pub fn taxonomy_file(&self) -> &str {
         match self {
             OpenTreeOfLifeVersion::V2_2 => "ott2.2/ott2.2/taxonomy",
@@ -152,6 +155,7 @@ impl OpenTreeOfLifeVersion {
     }
 
     /// Returns the path to the synonyms file in the archive.
+    #[must_use]
     pub fn synonyms_file(&self) -> &str {
         match self {
             OpenTreeOfLifeVersion::V2_2 => "ott2.2/ott2.2/synonyms",

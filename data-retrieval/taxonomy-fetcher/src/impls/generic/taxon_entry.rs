@@ -1,4 +1,4 @@
-//! Submodule implementing the TaxonEntry for a generic taxonomy.
+//! Submodule implementing the `TaxonEntry` for a generic taxonomy.
 
 use crate::traits::{Rank, TaxonEntry, TaxonIdentifier};
 

@@ -1,4 +1,4 @@
-//! Submodule implementing the TaxonEntryBuilder trait for the NCBI taxonomy.
+//! Submodule implementing the `TaxonEntryBuilder` trait for the NCBI taxonomy.
 
 /// Implementation of the taxon entry builder for the NCBI taxonomy.
 pub type NCBITaxonEntryBuilder =

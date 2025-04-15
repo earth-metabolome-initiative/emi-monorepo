@@ -147,7 +147,7 @@ struct NodesRow {
     /// 1 if node inherits mitochondrial gencode from parent.
     #[serde(deserialize_with = "deserialize_bool")]
     inherited_mgc_flag: bool,
-    /// 1 if name is suppressed in GenBank entry lineage.
+    /// 1 if name is suppressed in `GenBank` entry lineage.
     #[serde(deserialize_with = "deserialize_bool")]
     genbank_hidden_flag: bool,
     /// 1 if this subtree has no sequence data yet.
@@ -257,8 +257,7 @@ impl TaxonomyBuilder for NCBITaxonomyBuilder {
 
             assert_eq!(
                 record.tax_id, name_row.tax_id,
-                "Taxon identifiers do not match: {:?}, {:?}, version: {:?}",
-                record, name_row, version
+                "Taxon identifiers do not match: {record:?}, {name_row:?}, version: {version:?}"
             );
 
             let taxon_entry = NCBITaxonEntryBuilder::default()

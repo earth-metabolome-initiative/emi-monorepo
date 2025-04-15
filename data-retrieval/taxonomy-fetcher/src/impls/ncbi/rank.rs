@@ -11,7 +11,7 @@ use crate::{errors::TaxonEntryBuilderError, traits::Rank};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 /// Enumeration of the ranks used in the NCBI taxonomy.
 pub enum NCBIRank {
-    /// BioType
+    /// `BioType`
     BioType,
     /// Class
     Class,
@@ -29,9 +29,9 @@ pub enum NCBIRank {
     Genotype,
     /// Genus
     Genus,
-    /// InfraClass
+    /// `InfraClass`
     InfraClass,
-    /// InfraOrder
+    /// `InfraOrder`
     InfraOrder,
     /// Isolate
     Isolate,
@@ -43,15 +43,15 @@ pub enum NCBIRank {
     NoRank,
     /// Order
     Order,
-    /// ParvOrder
+    /// `ParvOrder`
     ParvOrder,
-    /// PathoGroup
+    /// `PathoGroup`
     PathoGroup,
     /// Phylum
     Phylum,
     /// Section
     Section,
-    /// SeroGroup
+    /// `SeroGroup`
     SeroGroup,
     /// Serotype
     Serotype,
@@ -65,37 +65,37 @@ pub enum NCBIRank {
     SpeciesSubgroup,
     /// Strain
     Strain,
-    /// SubClass
+    /// `SubClass`
     SubClass,
-    /// SubCohort
+    /// `SubCohort`
     SubCohort,
-    /// SubFamily
+    /// `SubFamily`
     SubFamily,
-    /// SubGenus
+    /// `SubGenus`
     SubGenus,
-    /// SubKingdom
+    /// `SubKingdom`
     SubKingdom,
-    /// SubOrder
+    /// `SubOrder`
     SubOrder,
-    /// SubPhylum
+    /// `SubPhylum`
     SubPhylum,
-    /// SubSection
+    /// `SubSection`
     SubSection,
-    /// SubSpecies
+    /// `SubSpecies`
     Subspecies,
-    /// SubTribe
+    /// `SubTribe`
     SubTribe,
-    /// SubVariety
+    /// `SubVariety`
     SubVariety,
-    /// SuperClass
+    /// `SuperClass`
     SuperClass,
-    /// SuperFamily
+    /// `SuperFamily`
     SuperFamily,
-    /// SuperKingdom
+    /// `SuperKingdom`
     SuperKingdom,
-    /// SuperOrder
+    /// `SuperOrder`
     SuperOrder,
-    /// SuperPhylum
+    /// `SuperPhylum`
     SuperPhylum,
     /// Tribe
     Tribe,

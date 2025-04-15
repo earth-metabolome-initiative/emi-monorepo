@@ -1,5 +1,5 @@
-//! Submodule implementing the TaxonEntryBuilder trait for the Open Tree of Life
-//! taxonomy.
+//! Submodule implementing the `TaxonEntryBuilder` trait for the Open Tree of
+//! Life taxonomy.
 
 use super::taxon_entry::GenericTaxonEntry;
 use crate::traits::{Rank, TaxonEntryBuilder, TaxonIdentifier, TaxonomyBuilder};
@@ -17,7 +17,7 @@ pub struct GenericTaxonEntryBuilder<Id: TaxonIdentifier, R: Rank> {
     parent_id: Option<Id>,
 }
 
-/// Implementation of the Default trait for GenericTaxonEntryBuilder
+/// Implementation of the Default trait for `GenericTaxonEntryBuilder`
 impl<Id: TaxonIdentifier, R: Rank> Default for GenericTaxonEntryBuilder<Id, R> {
     fn default() -> Self {
         Self { id: None, name: None, rank: None, parent_id: None }

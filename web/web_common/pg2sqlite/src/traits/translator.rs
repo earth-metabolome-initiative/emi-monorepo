@@ -11,14 +11,13 @@ pub trait Translator {
     type SQLiteEntry;
 
     /// Translate a `PostgreSQL` entry to a `SQLite` entry.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `schema` - The schema to be used for the translation.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * `crate::errors::Error` - If the translation fails.
-    /// 
     fn translate(&self, schema: &Self::Schema) -> Result<Self::SQLiteEntry, crate::errors::Error>;
 }

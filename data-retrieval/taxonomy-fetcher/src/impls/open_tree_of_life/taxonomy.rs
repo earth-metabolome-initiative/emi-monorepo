@@ -22,7 +22,7 @@ impl Taxonomy for OpenTreeOfLifeTaxonomy {
     type Version = OpenTreeOfLifeVersion;
     type Taxon<'a> = OpenTreeOfLifeTaxon<'a>;
 
-    fn name(&self) -> &str {
+    fn name(&self) -> &'static str {
         "Open Tree of Life"
     }
 
@@ -41,7 +41,7 @@ impl Taxonomy for OpenTreeOfLifeTaxonomy {
             .iter()
             .find(|entry| &entry.id == id)
             .map(|entry| OpenTreeOfLifeTaxon { taxon_entry: entry, taxonomy: self })
-            .ok_or(crate::errors::TaxonomyError::TaxonNotFound(id.clone()))
+            .ok_or(crate::errors::TaxonomyError::TaxonNotFound(*id))
     }
 
     fn root(&self) -> Self::Taxon<'_> {

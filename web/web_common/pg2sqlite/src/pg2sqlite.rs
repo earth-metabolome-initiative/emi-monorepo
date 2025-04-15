@@ -137,9 +137,9 @@ impl Pg2Sqlite {
     /// # Errors
     ///
     /// * If the translation could not be performed.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// * If the progress bar could not be created.
     pub fn translate(self) -> Result<Vec<Statement>, crate::errors::Error> {
         let bar = indicatif::ProgressBar::new(self.pg_statements.len() as u64);

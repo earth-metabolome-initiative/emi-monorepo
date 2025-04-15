@@ -59,7 +59,7 @@ impl<'de> Deserialize<'de> for SourceInfo {
         }
 
         if !s.contains(':') {
-            return Err(serde::de::Error::custom(format!("Invalid source information: '{}'", s)));
+            return Err(serde::de::Error::custom(format!("Invalid source information: '{s}'")));
         }
 
         let mut parts = s.split(':');
@@ -69,10 +69,10 @@ impl<'de> Deserialize<'de> for SourceInfo {
         if source.starts_with("additions") {
             let mut parts = source.split('-');
             let _source = parts.next().unwrap();
-            let primary_id = u32::from_str_radix(&parts.next().unwrap(), 10)
-                .map_err(serde::de::Error::custom)?;
-            let secondary_id = u32::from_str_radix(&parts.next().unwrap(), 10)
-                .map_err(serde::de::Error::custom)?;
+            let primary_id =
+                u32::from_str_radix(parts.next().unwrap(), 10).map_err(serde::de::Error::custom)?;
+            let secondary_id =
+                u32::from_str_radix(parts.next().unwrap(), 10).map_err(serde::de::Error::custom)?;
             let tertiary_id = u32::from_str_radix(id, 10).map_err(serde::de::Error::custom)?;
             return Ok(SourceInfo::Additions(primary_id, secondary_id, tertiary_id));
         }
@@ -82,7 +82,7 @@ impl<'de> Deserialize<'de> for SourceInfo {
             "h2007" => Ok(SourceInfo::H2007),
             "ncbi" | "worms" | "gbif" | "irmng" | "study713" | "if" => {
                 let numeric_id: u32 =
-                    u32::from_str_radix(&id, 10).map_err(serde::de::Error::custom)?;
+                    u32::from_str_radix(id, 10).map_err(serde::de::Error::custom)?;
                 match source {
                     "ncbi" => Ok(SourceInfo::NCBI(numeric_id)),
                     "worms" => Ok(SourceInfo::Worms(numeric_id)),
@@ -93,7 +93,7 @@ impl<'de> Deserialize<'de> for SourceInfo {
                     _ => unreachable!(),
                 }
             }
-            unknown => Err(serde::de::Error::custom(format!("Unknown source: '{}'", unknown))),
+            unknown => Err(serde::de::Error::custom(format!("Unknown source: '{unknown}'"))),
         }
     }
 }
@@ -191,7 +191,7 @@ impl<'de> Deserialize<'de> for OTOLFlag {
             "edited" => Ok(OTOLFlag::Edited),
             "flagged" => Ok(OTOLFlag::Flagged),
             "forced_visible" => Ok(OTOLFlag::ForcedVisible),
-            _ => Err(serde::de::Error::custom(format!("Unknown flag: '{}'", s))),
+            _ => Err(serde::de::Error::custom(format!("Unknown flag: '{s}'"))),
         }
     }
 }

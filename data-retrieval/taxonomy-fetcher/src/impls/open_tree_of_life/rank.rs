@@ -34,7 +34,7 @@ pub enum OpenTreeOfLifeRank {
     SuperPhylum,
     /// Infraphylum rank.
     Infraphylum,
-    /// SubPhylum rank.
+    /// `SubPhylum` rank.
     SubPhylum,
     /// Class rank.
     Class,
@@ -68,7 +68,7 @@ pub enum OpenTreeOfLifeRank {
     Subgenus,
     /// Forma
     Forma,
-    /// SubForm
+    /// `SubForm`
     SubForm,
     /// Species group rank.
     SpeciesGroup,
@@ -82,15 +82,15 @@ pub enum OpenTreeOfLifeRank {
     InfraSpecifiNname,
     /// Varietas
     Varietas,
-    /// SubVarietas
+    /// `SubVarietas`
     SubVarietas,
     /// Tribe
     Tribe,
-    /// SuperTribe
+    /// `SuperTribe`
     SuperTribe,
-    /// SubTribe
+    /// `SubTribe`
     SubTribe,
-    /// SubDivision rank
+    /// `SubDivision` rank
     SubDivision,
     /// Section rank.
     Section,
@@ -98,7 +98,7 @@ pub enum OpenTreeOfLifeRank {
     SubSection,
     /// Cohort rank.
     Cohort,
-    /// SubCohort rank.
+    /// `SubCohort` rank.
     SubCohort,
     /// Samples
     Samples,
@@ -108,6 +108,7 @@ pub enum OpenTreeOfLifeRank {
 
 impl OpenTreeOfLifeRank {
     /// Returns true if the rank is a no-rank terminal.
+    #[must_use]
     pub fn is_no_rank_terminal(&self) -> bool {
         matches!(self, OpenTreeOfLifeRank::NoRankTerminal)
     }

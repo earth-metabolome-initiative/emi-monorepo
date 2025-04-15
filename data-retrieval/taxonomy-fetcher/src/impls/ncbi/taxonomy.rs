@@ -18,7 +18,7 @@ impl Taxonomy for NCBITaxonomy {
     type Version = NCBIVersion;
     type Taxon<'a> = NCBITaxon<'a>;
 
-    fn name(&self) -> &str {
+    fn name(&self) -> &'static str {
         "NCBI"
     }
 
@@ -37,7 +37,7 @@ impl Taxonomy for NCBITaxonomy {
             .iter()
             .find(|entry| &entry.id == id)
             .map(|entry| NCBITaxon { taxon_entry: entry, taxonomy: self })
-            .ok_or(crate::errors::TaxonomyError::TaxonNotFound(id.clone()))
+            .ok_or(crate::errors::TaxonomyError::TaxonNotFound(*id))
     }
 
     fn root(&self) -> Self::Taxon<'_> {

@@ -31,7 +31,7 @@ impl TaxonIdentifier for COLId {}
 impl Display for COLId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            COLId::One(char) => write!(f, "{}", char),
+            COLId::One(char) => write!(f, "{char}"),
             COLId::Two(chars) => write!(f, "{}", std::str::from_utf8(chars).unwrap()),
             COLId::Three(chars) => write!(f, "{}", std::str::from_utf8(chars).unwrap()),
             COLId::Four(chars) => write!(f, "{}", std::str::from_utf8(chars).unwrap()),
@@ -66,7 +66,7 @@ impl FromStr for COLId {
                 chars.copy_from_slice(&s.as_bytes()[..5]);
                 Ok(COLId::Five(chars))
             }
-            length => Err(format!("Invalid length for COLId: {}", length)),
+            length => Err(format!("Invalid length for COLId: {length}")),
         }
     }
 }

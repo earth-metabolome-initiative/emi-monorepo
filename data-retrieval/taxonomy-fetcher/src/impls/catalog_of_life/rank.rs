@@ -29,49 +29,49 @@ pub enum CatalogOfLifeRank {
     Other,
     /// Species.
     Species,
-    /// SubSpecies.
+    /// `SubSpecies`.
     SubSpecies,
     /// Variety.
     Variety,
-    /// SubVariety
+    /// `SubVariety`
     SubVariety,
     /// Genus
     Genus,
-    /// SubGenus
+    /// `SubGenus`
     SubGenus,
     /// infrageneric name
     InfragenericName,
     /// Kingdom
     Kingdom,
-    /// SubKingdom
+    /// `SubKingdom`
     SubKingdom,
     /// Realm
     Realm,
     /// Family
     Family,
-    /// EbiFamily
+    /// `EbiFamily`
     EbiFamily,
-    /// EpiFamily
+    /// `EpiFamily`
     EpiFamily,
-    /// InfraFamily
+    /// `InfraFamily`
     InfraFamily,
-    /// SuperFamily
+    /// `SuperFamily`
     SuperFamily,
-    /// SubFamily
+    /// `SubFamily`
     SubFamily,
     /// Form
     Form,
-    /// SubForm
+    /// `SubForm`
     SubForm,
     /// Forma Specialis
     FormaSpecialis,
     /// Tribe
     Tribe,
-    /// SuperTribe
+    /// `SuperTribe`
     SuperTribe,
     /// Sub Tribe
     SubTribe,
-    /// InfraTribe
+    /// `InfraTribe`
     InfraTribe,
     /// Infraspecific Name
     InfraspecificName,
@@ -81,7 +81,7 @@ pub enum CatalogOfLifeRank {
     SpeciesAggregate,
     /// Order
     Order,
-    /// InfraOrder
+    /// `InfraOrder`
     InfraOrder,
     /// Parvorder
     Parvorder,
@@ -89,7 +89,7 @@ pub enum CatalogOfLifeRank {
     SuperOrder,
     /// Sub Order
     SubOrder,
-    /// NanOrder
+    /// `NanOrder`
     NanOrder,
     /// Proles
     Proles,
@@ -99,23 +99,23 @@ pub enum CatalogOfLifeRank {
     Mutatio,
     /// Phylum
     Phylum,
-    /// SubPhylum
+    /// `SubPhylum`
     SubPhylum,
     /// parvphylum
     Parvphylum,
-    /// InfraPhylum
+    /// `InfraPhylum`
     InfraPhylum,
     /// Class
     Class,
-    /// MegaClass
+    /// `MegaClass`
     MegaClass,
-    /// SuperClass
+    /// `SuperClass`
     SuperClass,
-    /// InfraClass
+    /// `InfraClass`
     InfraClass,
     /// Sub Class
     SubClass,
-    /// SubterClass
+    /// `SubterClass`
     SubterClass,
     /// Natio
     Natio,

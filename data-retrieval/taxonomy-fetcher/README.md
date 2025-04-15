@@ -10,8 +10,8 @@ Fetches the iNaturalist taxonomy archive (taxonomy-fetcher.dwca.zip) and extract
 2. Process taxa.csv
 Generates a simplified CSV file with the following columns:
     - id
-    - parent_id (extracted from parentNameUsageID)
-    - taxon_name (scientific name)
+    - `parent_id` (extracted from parentNameUsageID)
+    - `taxon_name` (scientific name)
 
 ## Installation
 
@@ -52,14 +52,14 @@ The dataset will be saved and extracted to the taxonomy-fetcher-output/ director
 cargo run -- process
 ```
 
-This generates extracted_taxa.csv in the taxonomy-fetcher-output/ directory.
+This generates `extracted_taxa.csv` in the taxonomy-fetcher-output/ directory.
 
 ## Output
 
 After processing, the simplified CSV will look like:
 
 
-id|parent_id|taxon_name
+id|`parent_id`|`taxon_name`
 ---|---|---
 1|48460|Animalia
 2|1|Chordata
@@ -68,22 +68,22 @@ id|parent_id|taxon_name
 
 At the moment we have such tables :
 
-id|parent_id|taxon_name
+id|`parent_id`|`taxon_name`
 ---|---|---
 1|48460|Animalia
 2|1|Chordata
 
-If insert as such in the DB this is an issue. Indeed parent_id beeing a foreign key to id, we can't have a parent_id that is not in the id column.
+If insert as such in the DB this is an issue. Indeed `parent_id` beeing a foreign key to id, we can't have a `parent_id` that is not in the id column.
 One solution would be to decouple the table in two tables :
 
-id|taxon_name
+id|`taxon_name`
 ---|---
 1|Animalia
 2|Chordata
 
 and
 
-id|parent_id
+id|`parent_id`
 ---|---
 1|48460
 2|1

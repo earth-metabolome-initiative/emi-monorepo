@@ -79,21 +79,21 @@ pub enum TaxonEntryBuilderError<TE: TaxonEntry> {
 impl<TE: TaxonEntry> std::fmt::Display for TaxonEntryBuilderError<TE> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::ParentNotFound(taxon) => write!(f, "Parent taxon not found: {}", taxon),
-            Self::DuplicateIdentifierError(id) => write!(f, "Duplicate taxon identifier: {}", id),
-            Self::DuplicateNameError(name) => write!(f, "Duplicate taxon name: {}", name),
+            Self::ParentNotFound(taxon) => write!(f, "Parent taxon not found: {taxon}"),
+            Self::DuplicateIdentifierError(id) => write!(f, "Duplicate taxon identifier: {id}"),
+            Self::DuplicateNameError(name) => write!(f, "Duplicate taxon name: {name}"),
             Self::InconsistentRankError { parent, child } => {
-                write!(f, "Inconsistent rank: parent {} child {}", parent, child)
+                write!(f, "Inconsistent rank: parent {parent} child {child}")
             }
             Self::CircularReferenceError(taxon) => {
-                write!(f, "Circular reference: {}", taxon)
+                write!(f, "Circular reference: {taxon}")
             }
-            Self::UnknownRank(rank) => write!(f, "Unknown rank: '{}'", rank),
+            Self::UnknownRank(rank) => write!(f, "Unknown rank: '{rank}'"),
             Self::UnknownTaxonomicalStatus(status) => {
-                write!(f, "Unknown taxonomical status: '{}'", status)
+                write!(f, "Unknown taxonomical status: '{status}'")
             }
             Self::UnknownTaxonomicalNameClass(name_class) => {
-                write!(f, "Unknown taxonomical name class: '{}'", name_class)
+                write!(f, "Unknown taxonomical name class: '{name_class}'")
             }
             Self::MissingRank => write!(f, "Missing rank"),
             Self::MissingName => write!(f, "Missing name"),

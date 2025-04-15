@@ -184,7 +184,7 @@ impl TaxonomyBuilder for CatalogOfLifeTaxonomyBuilder {
                 .set_rank(record.rank)?
                 .build(&self)?;
 
-            self.id_to_position.insert(taxon_entry.id.clone(), self.taxon_entries.len() as u32);
+            self.id_to_position.insert(taxon_entry.id, self.taxon_entries.len() as u32);
             self.name_to_position.insert(taxon_entry.name.clone(), self.taxon_entries.len() as u32);
             if record.parent_uid.is_none() {
                 if self.root_position.is_some() {
@@ -203,7 +203,7 @@ impl TaxonomyBuilder for CatalogOfLifeTaxonomyBuilder {
         // We check for each taxon entry that has a parent that the parent exists.
         for taxon_entry in &self.taxon_entries {
             if let Some(parent_id) = &taxon_entry.parent_id {
-                if !self.id_to_position.contains_key(&parent_id) {
+                if !self.id_to_position.contains_key(parent_id) {
                     return Err(crate::errors::TaxonEntryBuilderError::ParentNotFound(
                         taxon_entry.clone(),
                     )

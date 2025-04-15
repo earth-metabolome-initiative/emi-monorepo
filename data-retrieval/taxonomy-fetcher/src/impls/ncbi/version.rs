@@ -9,158 +9,159 @@ use crate::traits::TaxonVersion;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter)]
 /// Enum representing the versions of the NCBI taxonomy.
 pub enum NCBIVersion {
-    /// The 2018_12_01 version of the NCBI taxonomy.
+    /// The `2018_12_01` version of the NCBI taxonomy.
     V2018_12_01,
-    /// The 2019_01_01 version of the NCBI taxonomy.
+    /// The `2019_01_01` version of the NCBI taxonomy.
     V2019_01_01,
-    /// The 2019_02_01 version of the NCBI taxonomy.
+    /// The `2019_02_01` version of the NCBI taxonomy.
     V2019_02_01,
-    /// The 2019_03_01 version of the NCBI taxonomy.
+    /// The `2019_03_01` version of the NCBI taxonomy.
     V2019_03_01,
-    /// The 2019_04_01 version of the NCBI taxonomy.
+    /// The `2019_04_01` version of the NCBI taxonomy.
     V2019_04_01,
-    /// The 2019_05_01 version of the NCBI taxonomy.
+    /// The `2019_05_01` version of the NCBI taxonomy.
     V2019_05_01,
-    /// The 2019_06_01 version of the NCBI taxonomy.
+    /// The `2019_06_01` version of the NCBI taxonomy.
     V2019_06_01,
-    /// The 2019_07_01 version of the NCBI taxonomy.
+    /// The `2019_07_01` version of the NCBI taxonomy.
     V2019_07_01,
-    /// The 2019_08_01 version of the NCBI taxonomy.
+    /// The `2019_08_01` version of the NCBI taxonomy.
     V2019_08_01,
-    /// The 2019_09_01 version of the NCBI taxonomy.
+    /// The `2019_09_01` version of the NCBI taxonomy.
     V2019_09_01,
-    /// The 2019_10_01 version of the NCBI taxonomy.
+    /// The `2019_10_01` version of the NCBI taxonomy.
     V2019_10_01,
-    /// The 2019_11_01 version of the NCBI taxonomy.
+    /// The `2019_11_01` version of the NCBI taxonomy.
     V2019_11_01,
-    /// The 2019_12_01 version of the NCBI taxonomy.
+    /// The `2019_12_01` version of the NCBI taxonomy.
     V2019_12_01,
-    /// The 2020_01_01 version of the NCBI taxonomy.
+    /// The `2020_01_01` version of the NCBI taxonomy.
     V2020_01_01,
-    /// The 2020_02_01 version of the NCBI taxonomy.
+    /// The `2020_02_01` version of the NCBI taxonomy.
     V2020_02_01,
-    /// The 2020_03_01 version of the NCBI taxonomy.
+    /// The `2020_03_01` version of the NCBI taxonomy.
     V2020_03_01,
-    /// The 2020_04_01 version of the NCBI taxonomy.
+    /// The `2020_04_01` version of the NCBI taxonomy.
     V2020_04_01,
-    /// The 2020_05_01 version of the NCBI taxonomy.
+    /// The `2020_05_01` version of the NCBI taxonomy.
     V2020_05_01,
-    /// The 2020_05_31 version of the NCBI taxonomy.
+    /// The `2020_05_31` version of the NCBI taxonomy.
     V2020_05_31,
-    /// The 2020_07_01 version of the NCBI taxonomy.
+    /// The `2020_07_01` version of the NCBI taxonomy.
     V2020_07_01,
-    /// The 2020_08_01 version of the NCBI taxonomy.
+    /// The `2020_08_01` version of the NCBI taxonomy.
     V2020_08_01,
-    /// The 2020_09_01 version of the NCBI taxonomy.
+    /// The `2020_09_01` version of the NCBI taxonomy.
     V2020_09_01,
-    /// The 2020_10_01 version of the NCBI taxonomy.
+    /// The `2020_10_01` version of the NCBI taxonomy.
     V2020_10_01,
-    /// The 2020_11_01 version of the NCBI taxonomy.
+    /// The `2020_11_01` version of the NCBI taxonomy.
     V2020_11_01,
-    /// The 2020_12_01 version of the NCBI taxonomy.
+    /// The `2020_12_01` version of the NCBI taxonomy.
     V2020_12_01,
-    /// The 2021_01_01 version of the NCBI taxonomy.
+    /// The `2021_01_01` version of the NCBI taxonomy.
     V2021_01_01,
-    /// The 2021_02_01 version of the NCBI taxonomy.
+    /// The `2021_02_01` version of the NCBI taxonomy.
     V2021_02_01,
-    /// The 2021_03_01 version of the NCBI taxonomy.
+    /// The `2021_03_01` version of the NCBI taxonomy.
     V2021_03_01,
-    /// The 2021_04_01 version of the NCBI taxonomy.
+    /// The `2021_04_01` version of the NCBI taxonomy.
     V2021_04_01,
-    /// The 2021_05_01 version of the NCBI taxonomy.
+    /// The `2021_05_01` version of the NCBI taxonomy.
     V2021_05_01,
-    /// The 2021_06_01 version of the NCBI taxonomy.
+    /// The `2021_06_01` version of the NCBI taxonomy.
     V2021_06_01,
-    /// The 2021_07_01 version of the NCBI taxonomy.
+    /// The `2021_07_01` version of the NCBI taxonomy.
     V2021_07_01,
-    /// The 2021_08_01 version of the NCBI taxonomy.
+    /// The `2021_08_01` version of the NCBI taxonomy.
     V2021_08_01,
-    /// The 2021_09_01 version of the NCBI taxonomy.
+    /// The `2021_09_01` version of the NCBI taxonomy.
     V2021_09_01,
-    /// The 2021_10_01 version of the NCBI taxonomy.
+    /// The `2021_10_01` version of the NCBI taxonomy.
     V2021_10_01,
-    /// The 2021_11_01 version of the NCBI taxonomy.
+    /// The `2021_11_01` version of the NCBI taxonomy.
     V2021_11_01,
-    /// The 2021_12_01 version of the NCBI taxonomy.
+    /// The `2021_12_01` version of the NCBI taxonomy.
     V2021_12_01,
-    /// The 2022_01_01 version of the NCBI taxonomy.
+    /// The `2022_01_01` version of the NCBI taxonomy.
     V2022_01_01,
-    /// The 2022_02_01 version of the NCBI taxonomy.
+    /// The `2022_02_01` version of the NCBI taxonomy.
     V2022_02_01,
-    /// The 2022_03_01 version of the NCBI taxonomy.
+    /// The `2022_03_01` version of the NCBI taxonomy.
     V2022_03_01,
-    /// The 2022_04_01 version of the NCBI taxonomy.
+    /// The `2022_04_01` version of the NCBI taxonomy.
     V2022_04_01,
-    /// The 2022_05_01 version of the NCBI taxonomy.
+    /// The `2022_05_01` version of the NCBI taxonomy.
     V2022_05_01,
-    /// The 2022_06_01 version of the NCBI taxonomy.
+    /// The `2022_06_01` version of the NCBI taxonomy.
     V2022_06_01,
-    /// The 2022_07_01 version of the NCBI taxonomy.
+    /// The `2022_07_01` version of the NCBI taxonomy.
     V2022_07_01,
-    /// The 2022_08_01 version of the NCBI taxonomy.
+    /// The `2022_08_01` version of the NCBI taxonomy.
     V2022_08_01,
-    /// The 2022_09_01 version of the NCBI taxonomy.
+    /// The `2022_09_01` version of the NCBI taxonomy.
     V2022_09_01,
-    /// The 2022_10_01 version of the NCBI taxonomy.
+    /// The `2022_10_01` version of the NCBI taxonomy.
     V2022_10_01,
-    /// The 2022_11_01 version of the NCBI taxonomy.
+    /// The `2022_11_01` version of the NCBI taxonomy.
     V2022_11_01,
-    /// The 2022_12_01 version of the NCBI taxonomy.
+    /// The `2022_12_01` version of the NCBI taxonomy.
     V2022_12_01,
-    /// The 2023_01_01 version of the NCBI taxonomy.
+    /// The `2023_01_01` version of the NCBI taxonomy.
     V2023_01_01,
-    /// The 2023_02_01 version of the NCBI taxonomy.
+    /// The `2023_02_01` version of the NCBI taxonomy.
     V2023_02_01,
-    /// The 2023_03_01 version of the NCBI taxonomy.
+    /// The `2023_03_01` version of the NCBI taxonomy.
     V2023_03_01,
-    /// The 2023_04_01 version of the NCBI taxonomy.
+    /// The `2023_04_01` version of the NCBI taxonomy.
     V2023_04_01,
-    /// The 2023_05_01 version of the NCBI taxonomy.
+    /// The `2023_05_01` version of the NCBI taxonomy.
     V2023_05_01,
-    /// The 2023_06_01 version of the NCBI taxonomy.
+    /// The `2023_06_01` version of the NCBI taxonomy.
     V2023_06_01,
-    /// The 2023_07_01 version of the NCBI taxonomy.
+    /// The `2023_07_01` version of the NCBI taxonomy.
     V2023_07_01,
-    /// The 2023_08_01 version of the NCBI taxonomy.
+    /// The `2023_08_01` version of the NCBI taxonomy.
     V2023_08_01,
-    /// The 2023_09_01 version of the NCBI taxonomy.
+    /// The `2023_09_01` version of the NCBI taxonomy.
     V2023_09_01,
-    /// The 2023_10_01 version of the NCBI taxonomy.
+    /// The `2023_10_01` version of the NCBI taxonomy.
     V2023_10_01,
-    /// The 2023_11_01 version of the NCBI taxonomy.
+    /// The `2023_11_01` version of the NCBI taxonomy.
     V2023_11_01,
-    /// The 2023_12_01 version of the NCBI taxonomy.
+    /// The `2023_12_01` version of the NCBI taxonomy.
     V2023_12_01,
-    /// The 2024_01_01 version of the NCBI taxonomy.
+    /// The `2024_01_01` version of the NCBI taxonomy.
     V2024_01_01,
-    /// The 2024_02_01 version of the NCBI taxonomy.
+    /// The `2024_02_01` version of the NCBI taxonomy.
     V2024_02_01,
-    /// The 2024_03_01 version of the NCBI taxonomy.
+    /// The `2024_03_01` version of the NCBI taxonomy.
     V2024_03_01,
-    /// The 2024_04_01 version of the NCBI taxonomy.
+    /// The `2024_04_01` version of the NCBI taxonomy.
     V2024_04_01,
-    /// The 2024_05_01 version of the NCBI taxonomy.
+    /// The `2024_05_01` version of the NCBI taxonomy.
     V2024_05_01,
-    /// The 2024_06_01 version of the NCBI taxonomy.
+    /// The `2024_06_01` version of the NCBI taxonomy.
     V2024_06_01,
-    /// The 2024_07_01 version of the NCBI taxonomy.
+    /// The `2024_07_01` version of the NCBI taxonomy.
     V2024_07_01,
-    /// The 2024_08_01 version of the NCBI taxonomy.
+    /// The `2024_08_01` version of the NCBI taxonomy.
     V2024_08_01,
-    /// The 2024_09_01 version of the NCBI taxonomy.
+    /// The `2024_09_01` version of the NCBI taxonomy.
     V2024_09_01,
-    /// The 2024_10_01 version of the NCBI taxonomy.
+    /// The `2024_10_01` version of the NCBI taxonomy.
     V2024_10_01,
-    /// The 2024_11_01 version of the NCBI taxonomy.
+    /// The `2024_11_01` version of the NCBI taxonomy.
     V2024_11_01,
-    /// The 2024_12_01 version of the NCBI taxonomy.
+    /// The `2024_12_01` version of the NCBI taxonomy.
     V2024_12_01,
-    /// The 2025_01_01 version of the NCBI taxonomy.
+    /// The `2025_01_01` version of the NCBI taxonomy.
     V2025_01_01,
 }
 
 impl NCBIVersion {
     /// Returns the release date of the version.
+    #[must_use]
     pub fn release_date(&self) -> NaiveDateTime {
         match self {
             NCBIVersion::V2018_12_01 => {
@@ -389,6 +390,7 @@ impl NCBIVersion {
     }
 
     /// Returns the URL associated with the version.
+    #[must_use]
     pub fn url(&self) -> &str {
         match self {
             NCBIVersion::V2018_12_01 => {
@@ -616,8 +618,9 @@ impl NCBIVersion {
         }
     }
     /// Returns the name of the directory containing the version.
+    #[must_use]
     pub fn directory(&self) -> String {
-        self.url().split('/').last().unwrap().split('.').next().unwrap().to_owned()
+        self.url().split('/').next_back().unwrap().split('.').next().unwrap().to_owned()
     }
 }
 

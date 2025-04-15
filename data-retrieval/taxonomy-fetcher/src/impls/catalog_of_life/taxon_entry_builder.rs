@@ -1,4 +1,4 @@
-//! Submodule implementing the TaxonEntryBuilder trait for the Catalog of Life
+//! Submodule implementing the `TaxonEntryBuilder` trait for the Catalog of Life
 //! taxonomy.
 
 /// Implementation of the taxon entry builder for the Catalog of Life taxonomy.
