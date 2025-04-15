@@ -16,14 +16,11 @@ impl DirectusFolder {
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<
-        Option<
-            crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder,
-        >,
+        Option<crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder>,
         diesel::result::Error,
     > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(parent) = self.parent.as_ref() else {
             return Ok(None);
         };
@@ -32,9 +29,9 @@ impl DirectusFolder {
                 crate::codegen::diesel_codegen::tables::directus_folders::directus_folders::dsl::id
                     .eq(parent),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder>(
+                conn,
+            )
             .await
             .map(Some)
     }
@@ -43,9 +40,8 @@ impl DirectusFolder {
         conn: &mut diesel_async::AsyncPgConnection,
         parent: &crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_folders::directus_folders::dsl::parent

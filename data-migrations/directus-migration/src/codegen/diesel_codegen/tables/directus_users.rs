@@ -14,14 +14,15 @@ diesel::table! {
     diesel::sql_types::Text, role -> diesel::sql_types::Nullable <
     rosetta_uuid::diesel_impls::Uuid >, token -> diesel::sql_types::Nullable <
     diesel::sql_types::Text >, last_access -> diesel::sql_types::Nullable <
-    diesel::sql_types::Timestamptz >, last_page -> diesel::sql_types::Nullable <
-    diesel::sql_types::Text >, provider -> diesel::sql_types::Text, external_identifier
-    -> diesel::sql_types::Nullable < diesel::sql_types::Text >, auth_data ->
-    diesel::sql_types::Nullable < diesel::sql_types::Json >, email_notifications ->
-    diesel::sql_types::Nullable < diesel::sql_types::Bool >, appearance ->
-    diesel::sql_types::Nullable < diesel::sql_types::Text >, theme_dark ->
-    diesel::sql_types::Nullable < diesel::sql_types::Text >, theme_light ->
-    diesel::sql_types::Nullable < diesel::sql_types::Text >, theme_light_overrides ->
-    diesel::sql_types::Nullable < diesel::sql_types::Json >, theme_dark_overrides ->
-    diesel::sql_types::Nullable < diesel::sql_types::Json > }
+    rosetta_timestamp::diesel_impls::TimestampUTC >, last_page ->
+    diesel::sql_types::Nullable < diesel::sql_types::Text >, provider ->
+    diesel::sql_types::Text, external_identifier -> diesel::sql_types::Nullable <
+    diesel::sql_types::Text >, auth_data -> diesel::sql_types::Nullable <
+    diesel::sql_types::Json >, email_notifications -> diesel::sql_types::Nullable <
+    diesel::sql_types::Bool >, appearance -> diesel::sql_types::Nullable <
+    diesel::sql_types::Text >, theme_dark -> diesel::sql_types::Nullable <
+    diesel::sql_types::Text >, theme_light -> diesel::sql_types::Nullable <
+    diesel::sql_types::Text >, theme_light_overrides -> diesel::sql_types::Nullable <
+    diesel::sql_types::Json >, theme_dark_overrides -> diesel::sql_types::Nullable <
+    diesel::sql_types::Json > }
 }

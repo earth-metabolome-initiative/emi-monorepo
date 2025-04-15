@@ -10,7 +10,7 @@ pub struct DirectusDashboard {
     pub name: String,
     pub icon: String,
     pub note: Option<String>,
-    pub date_created: Option<chrono::DateTime<chrono::Utc>>,
+    pub date_created: Option<rosetta_timestamp::TimestampUTC>,
     pub user_created: Option<rosetta_uuid::Uuid>,
     pub color: Option<String>,
 }
@@ -23,9 +23,8 @@ impl DirectusDashboard {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
@@ -34,9 +33,7 @@ impl DirectusDashboard {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_created),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
             .await
             .map(Some)
     }
@@ -45,9 +42,8 @@ impl DirectusDashboard {
         conn: &mut diesel_async::AsyncPgConnection,
         user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_dashboards::directus_dashboards::dsl::user_created

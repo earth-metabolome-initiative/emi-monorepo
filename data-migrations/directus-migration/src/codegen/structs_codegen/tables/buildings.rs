@@ -7,9 +7,9 @@ pub struct Building {
     pub id: i32,
     pub status: String,
     pub user_created: Option<rosetta_uuid::Uuid>,
-    pub date_created: Option<chrono::DateTime<chrono::Utc>>,
+    pub date_created: Option<rosetta_timestamp::TimestampUTC>,
     pub user_updated: Option<rosetta_uuid::Uuid>,
-    pub date_updated: Option<chrono::DateTime<chrono::Utc>>,
+    pub date_updated: Option<rosetta_timestamp::TimestampUTC>,
     pub university: Option<i32>,
     pub building_name: Option<String>,
     pub address: Option<String>,
@@ -23,9 +23,8 @@ impl Building {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
@@ -34,9 +33,7 @@ impl Building {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_created),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
             .await
             .map(Some)
     }
@@ -48,9 +45,8 @@ impl Building {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
@@ -59,9 +55,7 @@ impl Building {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_updated),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
             .await
             .map(Some)
     }
@@ -73,9 +67,8 @@ impl Building {
         Option<crate::codegen::structs_codegen::tables::universities::University>,
         diesel::result::Error,
     > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(university) = self.university.as_ref() else {
             return Ok(None);
         };
@@ -84,9 +77,7 @@ impl Building {
                 crate::codegen::diesel_codegen::tables::universities::universities::dsl::id
                     .eq(university),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::universities::University,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::universities::University>(conn)
             .await
             .map(Some)
     }
@@ -95,9 +86,8 @@ impl Building {
         conn: &mut diesel_async::AsyncPgConnection,
         user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::buildings::buildings::dsl::user_created
@@ -111,9 +101,8 @@ impl Building {
         conn: &mut diesel_async::AsyncPgConnection,
         user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::buildings::buildings::dsl::user_updated
@@ -127,9 +116,8 @@ impl Building {
         conn: &mut diesel_async::AsyncPgConnection,
         university: &crate::codegen::structs_codegen::tables::universities::University,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::buildings::buildings::dsl::university

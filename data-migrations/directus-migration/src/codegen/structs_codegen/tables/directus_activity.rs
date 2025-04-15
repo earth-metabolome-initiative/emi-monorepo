@@ -9,7 +9,7 @@ pub struct DirectusActivity {
     pub id: i32,
     pub action: String,
     pub user: Option<rosetta_uuid::Uuid>,
-    pub timestamp: chrono::DateTime<chrono::Utc>,
+    pub timestamp: rosetta_timestamp::TimestampUTC,
     pub ip: Option<String>,
     pub user_agent: Option<String>,
     pub collection: String,

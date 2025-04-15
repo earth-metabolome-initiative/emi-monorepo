@@ -3,7 +3,10 @@
 use core_structures::{
     codegen::structs_codegen::tables::insertables::InsertableUserAttributes,
     tables::insertables::{
-        InsertableAddressAttributes, InsertableBrandAttributes, InsertableCityAttributes, InsertableInstrumentAttributes, InsertableInstrumentLocationAttributes, InsertableInstrumentModelAttributes, InsertableProductAttributes, InsertableRoomAttributes, InsertableUserEmailAttributes
+        InsertableAddressAttributes, InsertableBrandAttributes, InsertableCityAttributes,
+        InsertableInstrumentAttributes, InsertableInstrumentLocationAttributes,
+        InsertableInstrumentModelAttributes, InsertableProductAttributes, InsertableRoomAttributes,
+        InsertableUserEmailAttributes,
     },
 };
 use web_common_traits::database::InsertError;

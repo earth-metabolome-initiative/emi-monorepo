@@ -7,9 +7,9 @@ pub struct Container {
     pub id: i32,
     pub status: Option<String>,
     pub user_created: Option<rosetta_uuid::Uuid>,
-    pub date_created: Option<chrono::DateTime<chrono::Utc>>,
+    pub date_created: Option<rosetta_timestamp::TimestampUTC>,
     pub user_updated: Option<rosetta_uuid::Uuid>,
-    pub date_updated: Option<chrono::DateTime<chrono::Utc>>,
+    pub date_updated: Option<rosetta_timestamp::TimestampUTC>,
     pub used: bool,
     pub reserved: bool,
     pub uuid_container: Option<rosetta_uuid::Uuid>,
@@ -33,9 +33,8 @@ impl Container {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
@@ -44,9 +43,7 @@ impl Container {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_created),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
             .await
             .map(Some)
     }
@@ -58,9 +55,8 @@ impl Container {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
@@ -69,9 +65,7 @@ impl Container {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_updated),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
             .await
             .map(Some)
     }
@@ -80,14 +74,11 @@ impl Container {
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<
-        Option<
-            crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-        >,
+        Option<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
         diesel::result::Error,
     > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(container_model) = self.container_model.as_ref() else {
             return Ok(None);
         };
@@ -96,9 +87,9 @@ impl Container {
                 crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::id
                     .eq(container_model),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::container_models::ContainerModel>(
+                conn,
+            )
             .await
             .map(Some)
     }
@@ -110,9 +101,8 @@ impl Container {
         Option<crate::codegen::structs_codegen::tables::universities::University>,
         diesel::result::Error,
     > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(location) = self.location.as_ref() else {
             return Ok(None);
         };
@@ -121,9 +111,7 @@ impl Container {
                 crate::codegen::diesel_codegen::tables::universities::universities::dsl::id
                     .eq(location),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::universities::University,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::universities::University>(conn)
             .await
             .map(Some)
     }
@@ -135,9 +123,8 @@ impl Container {
         Option<crate::codegen::structs_codegen::tables::containers::Container>,
         diesel::result::Error,
     > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(parent_container) = self.parent_container.as_ref() else {
             return Ok(None);
         };
@@ -146,9 +133,7 @@ impl Container {
                 crate::codegen::diesel_codegen::tables::containers::containers::dsl::id
                     .eq(parent_container),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::containers::Container,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::containers::Container>(conn)
             .await
             .map(Some)
     }
@@ -157,9 +142,8 @@ impl Container {
         conn: &mut diesel_async::AsyncPgConnection,
         user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::containers::containers::dsl::user_created
@@ -173,9 +157,8 @@ impl Container {
         conn: &mut diesel_async::AsyncPgConnection,
         user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::containers::containers::dsl::user_updated
@@ -189,9 +172,8 @@ impl Container {
         conn: &mut diesel_async::AsyncPgConnection,
         container_model: &crate::codegen::structs_codegen::tables::container_models::ContainerModel,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::containers::containers::dsl::container_model
@@ -205,9 +187,8 @@ impl Container {
         conn: &mut diesel_async::AsyncPgConnection,
         location: &crate::codegen::structs_codegen::tables::universities::University,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::containers::containers::dsl::location
@@ -221,9 +202,8 @@ impl Container {
         conn: &mut diesel_async::AsyncPgConnection,
         parent_container: &crate::codegen::structs_codegen::tables::containers::Container,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::containers::containers::dsl::parent_container
@@ -237,16 +217,13 @@ impl Container {
         container_id: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, OptionalExtension};
         Self::table()
-            .filter(
-                diesel::ExpressionMethods::eq(
-                    crate::codegen::diesel_codegen::tables::containers::containers::container_id,
-                    container_id,
-                ),
-            )
+            .filter(diesel::ExpressionMethods::eq(
+                crate::codegen::diesel_codegen::tables::containers::containers::container_id,
+                container_id,
+            ))
             .first::<Self>(conn)
             .await
             .optional()
@@ -256,16 +233,13 @@ impl Container {
         old_id: Option<&str>,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, OptionalExtension};
         Self::table()
-            .filter(
-                diesel::ExpressionMethods::eq(
-                    crate::codegen::diesel_codegen::tables::containers::containers::old_id,
-                    old_id,
-                ),
-            )
+            .filter(diesel::ExpressionMethods::eq(
+                crate::codegen::diesel_codegen::tables::containers::containers::old_id,
+                old_id,
+            ))
             .first::<Self>(conn)
             .await
             .optional()

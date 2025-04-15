@@ -1,9 +1,10 @@
 diesel::table! {
     #[sql_name = "Field_Data"] public.field_data(id) { id -> diesel::sql_types::Integer,
     user_created -> diesel::sql_types::Nullable < rosetta_uuid::diesel_impls::Uuid >,
-    date_created -> diesel::sql_types::Nullable < diesel::sql_types::Timestamptz >,
-    user_updated -> diesel::sql_types::Nullable < rosetta_uuid::diesel_impls::Uuid >,
-    date_updated -> diesel::sql_types::Nullable < diesel::sql_types::Timestamptz >,
+    date_created -> diesel::sql_types::Nullable <
+    rosetta_timestamp::diesel_impls::TimestampUTC >, user_updated ->
+    diesel::sql_types::Nullable < rosetta_uuid::diesel_impls::Uuid >, date_updated ->
+    diesel::sql_types::Nullable < rosetta_timestamp::diesel_impls::TimestampUTC >,
     collector_fullname -> diesel::sql_types::Nullable < diesel::sql_types::Text >,
     observation_subject -> diesel::sql_types::Nullable < diesel::sql_types::Text >,
     inat_upload -> diesel::sql_types::Nullable < diesel::sql_types::Integer >, is_wild ->

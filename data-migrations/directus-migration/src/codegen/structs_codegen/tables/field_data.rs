@@ -6,9 +6,9 @@
 pub struct FieldDatum {
     pub id: i32,
     pub user_created: Option<rosetta_uuid::Uuid>,
-    pub date_created: Option<chrono::DateTime<chrono::Utc>>,
+    pub date_created: Option<rosetta_timestamp::TimestampUTC>,
     pub user_updated: Option<rosetta_uuid::Uuid>,
-    pub date_updated: Option<chrono::DateTime<chrono::Utc>>,
+    pub date_updated: Option<rosetta_timestamp::TimestampUTC>,
     pub collector_fullname: Option<String>,
     pub observation_subject: Option<String>,
     pub inat_upload: Option<i32>,
@@ -54,9 +54,8 @@ impl FieldDatum {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
@@ -65,9 +64,7 @@ impl FieldDatum {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_created),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
             .await
             .map(Some)
     }
@@ -79,9 +76,8 @@ impl FieldDatum {
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
@@ -90,9 +86,7 @@ impl FieldDatum {
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
                     .eq(user_updated),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
-            >(conn)
+            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
             .await
             .map(Some)
     }
@@ -101,9 +95,8 @@ impl FieldDatum {
         conn: &mut diesel_async::AsyncPgConnection,
         user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::field_data::field_data::dsl::user_created
@@ -117,9 +110,8 @@ impl FieldDatum {
         conn: &mut diesel_async::AsyncPgConnection,
         user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::field_data::field_data::dsl::user_updated
@@ -133,16 +125,13 @@ impl FieldDatum {
         sample_id: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, OptionalExtension};
         Self::table()
-            .filter(
-                diesel::ExpressionMethods::eq(
-                    crate::codegen::diesel_codegen::tables::field_data::field_data::sample_id,
-                    sample_id,
-                ),
-            )
+            .filter(diesel::ExpressionMethods::eq(
+                crate::codegen::diesel_codegen::tables::field_data::field_data::sample_id,
+                sample_id,
+            ))
             .first::<Self>(conn)
             .await
             .optional()

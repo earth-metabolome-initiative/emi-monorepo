@@ -10,9 +10,7 @@ pub struct Address {
     pub street: String,
     pub street_number: String,
     pub postal_code: String,
-    pub geolocation: postgis_diesel::types::GeometryContainer<
-        postgis_diesel::types::Point,
-    >,
+    pub geolocation: postgis_diesel::types::GeometryContainer<postgis_diesel::types::Point>,
     pub city_code: String,
 }
 impl Address {}

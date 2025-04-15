@@ -7,6 +7,6 @@ diesel::table! {
     diesel::sql_types::Nullable < rosetta_uuid::diesel_impls::Uuid >, reject ->
     diesel::sql_types::Nullable < rosetta_uuid::diesel_impls::Uuid >, flow ->
     rosetta_uuid::diesel_impls::Uuid, date_created -> diesel::sql_types::Nullable <
-    diesel::sql_types::Timestamptz >, user_created -> diesel::sql_types::Nullable <
-    rosetta_uuid::diesel_impls::Uuid > }
+    rosetta_timestamp::diesel_impls::TimestampUTC >, user_created ->
+    diesel::sql_types::Nullable < rosetta_uuid::diesel_impls::Uuid > }
 }

@@ -1,7 +1,6 @@
 //! Submodule to insert missing instruments present in the Directus database
 //! but not in the Portal database.
 
-use super::get_room;
 use core_structures::{
     Instrument as PortalInstrument, InstrumentLocation as PortalInstrumentLocation,
     InstrumentModel as PortalInstrumentModel, InstrumentState as PortalInstrumentState,
@@ -13,7 +12,7 @@ use web_common_traits::{
     prelude::Builder,
 };
 
-use super::get_user;
+use super::{get_room, get_user};
 use crate::codegen::Instrument as DirectusInstrument;
 
 /// Inserts missing instruments into the Portal database
