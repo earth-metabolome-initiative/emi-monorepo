@@ -9,7 +9,7 @@ pub trait SalicinSpectrum: SpectrumAlloc {
 }
 
 /// The precursor mass over charge value for salicin.
-pub const SALICIN_PRECURSOR_MZ: f32 = 321.0750;
+pub const SALICIN_PRECURSOR_MZ: f32 = 321.075;
 
 /// The mass over charge values for salicin.
 pub const SALICIN_MZ: [f32; 21] = [

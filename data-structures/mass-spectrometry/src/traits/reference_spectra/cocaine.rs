@@ -9,23 +9,23 @@ pub trait CocaineSpectrum: SpectrumAlloc {
 }
 
 /// The precursor mass over charge value for cocaine.
-pub const COCAINE_PRECURSOR_MZ: f32 = 304.153137;
+pub const COCAINE_PRECURSOR_MZ: f32 = 304.153_14;
 
 /// The mass over charge values for cocaine.
 pub const COCAINE_MZ: [f32; 9] = [
-    82.064789, 105.033249, 109.213745, 119.04921, 150.0914, 182.117676, 185.804688, 226.579071,
-    304.153137,
+    82.064_79, 105.033_25, 109.213745, 119.04921, 150.0914, 182.117_68, 185.804_69, 226.579_07,
+    304.153_14,
 ];
 /// The intensities for cocaine.
 pub const COCAINE_INTENSITIES: [f32; 9] = [
-    13342.493164,
-    3264.133545,
-    1584.27478,
-    2382.930908,
-    3257.366211,
-    133504.296875,
-    1849.140137,
-    1391.734497,
+    13_342.493,
+    3_264.133_5,
+    1_584.274_8,
+    2_382.931,
+    3_257.366_2,
+    133_504.3,
+    1_849.140_1,
+    1_391.734_5,
     86052.375,
 ];
 

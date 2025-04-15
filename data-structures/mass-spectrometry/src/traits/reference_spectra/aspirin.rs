@@ -9,7 +9,7 @@ pub trait AspirinSpectrum: SpectrumAlloc {
 }
 
 /// The precursor mass over charge value for aspirin.
-pub const ASPIRIN_PRECURSOR_MZ: f32 = 181.0490;
+pub const ASPIRIN_PRECURSOR_MZ: f32 = 181.049;
 
 /// The mass over charge values for aspirin.
 pub const ASPIRIN_MZ: [f32; 29] = [
