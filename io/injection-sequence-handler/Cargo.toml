@@ -1,0 +1,11 @@
+[package]
+name = "injection-sequence-handler"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde.workspace = true
+algebra.workspace = true
+
+[lints]
+workspace = true
