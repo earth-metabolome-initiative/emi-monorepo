@@ -1,4 +1,4 @@
-//! Unit tests to verify the correctness of the LAPjv algorithm implementation.
+//! Unit tests to verify the correctness of the `LAPjv` algorithm implementation.
 
 use algebra::{
     impls::ValuedCSR2D,
@@ -73,7 +73,7 @@ fn test_lapjv_tall_rectangular() -> Result<(), LAPJVError> {
 }
 
 #[test]
-/// Tests a corner case that caused an infinite loop in the LAPjv algorithm.
+/// Tests a corner case that caused an infinite loop in the `LAPjv` algorithm.
 /// The algorithm should not hang and should return a valid assignment.
 fn test_lapjv_infinite_loop1() -> Result<(), LAPJVError> {
     let mut csr: ValuedCSR2D<u8, u8, u8, f64> = ValuedCSR2D::with_sparse_shaped_capacity((3, 3), 2);
@@ -88,7 +88,7 @@ fn test_lapjv_infinite_loop1() -> Result<(), LAPJVError> {
 }
 
 #[test]
-/// Tests a corner case that caused an infinite loop in the LAPjv algorithm.
+/// Tests a corner case that caused an infinite loop in the `LAPjv` algorithm.
 /// The algorithm should not hang and should return a valid assignment.
 fn test_lapjv_infinite_loop2() -> Result<(), LAPJVError> {
     let mut csr: ValuedCSR2D<u8, u8, u8, f64> = ValuedCSR2D::with_sparse_shaped_capacity((3, 3), 2);
@@ -103,7 +103,7 @@ fn test_lapjv_infinite_loop2() -> Result<(), LAPJVError> {
 }
 
 #[test]
-/// Tests a corner case that caused an infinite loop in the LAPjv algorithm.
+/// Tests a corner case that caused an infinite loop in the `LAPjv` algorithm.
 /// The algorithm should not hang and should return a valid assignment.
 fn test_lapjv_infinite_loop3() -> Result<(), LAPJVError> {
     let mut csr: ValuedCSR2D<u8, u8, u8, f64> = ValuedCSR2D::with_sparse_shaped_capacity((3, 3), 2);
@@ -117,7 +117,7 @@ fn test_lapjv_infinite_loop3() -> Result<(), LAPJVError> {
 }
 
 #[test]
-/// Tests a corner case that caused an infinite loop in the LAPjv algorithm.
+/// Tests a corner case that caused an infinite loop in the `LAPjv` algorithm.
 /// The algorithm should not hang and should return a valid assignment.
 fn test_lapjv_infinite_loop4() -> Result<(), LAPJVError> {
     let mut csr: ValuedCSR2D<u8, u8, u8, f64> = ValuedCSR2D::with_sparse_shaped_capacity((3, 3), 2);

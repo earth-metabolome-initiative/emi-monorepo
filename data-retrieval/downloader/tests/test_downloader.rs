@@ -1,11 +1,11 @@
 //! Primary module in the test suite for the downloader crate.
 use downloader::{CompressionExtension, Downloader, Task};
 
-const DOCUMENT_URL: &'static str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/document.txt";
-const DOCUMENT_GZIP_URL: &'static str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/document.txt.gz";
-const DOCUMENT_TAR_URL: &'static str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/tarball.tar";
-const DOCUMENT_TARGZ_URL: &'static str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/tarball.tar.gz";
-const DOCUMENT_ZIP_URL: &'static str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/zipped.zip";
+const DOCUMENT_URL: &str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/document.txt";
+const DOCUMENT_GZIP_URL: &str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/document.txt.gz";
+const DOCUMENT_TAR_URL: &str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/tarball.tar";
+const DOCUMENT_TARGZ_URL: &str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/tarball.tar.gz";
+const DOCUMENT_ZIP_URL: &str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/zipped.zip";
 
 #[tokio::test]
 async fn test_document_download() {

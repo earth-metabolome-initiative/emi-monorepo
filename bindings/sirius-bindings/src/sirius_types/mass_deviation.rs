@@ -137,10 +137,10 @@ mod tests {
     #[test]
     fn test_mass_deviation_display() {
         let ppm = MassDeviation::Ppm(10.0);
-        assert_eq!(format!("{}", ppm), "10 ppm");
+        assert_eq!(format!("{ppm}"), "10 ppm");
 
         let da = MassDeviation::Da(0.1);
-        assert_eq!(format!("{}", da), "0.1 Da");
+        assert_eq!(format!("{da}"), "0.1 Da");
     }
     #[test]
     fn test_error_if_negative_value_with_funtion_call() {

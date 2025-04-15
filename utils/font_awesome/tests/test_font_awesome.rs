@@ -1,4 +1,4 @@
-//! Small test suite for the font_awesome module.
+//! Small test suite for the `font_awesome` module.
 
 use font_awesome::Icon;
 use strum::IntoEnumIterator;

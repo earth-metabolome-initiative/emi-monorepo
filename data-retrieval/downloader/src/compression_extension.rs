@@ -72,7 +72,7 @@ impl CompressionExtension {
     pub fn extract_name(&self, source: &Path) -> String {
         match self {
             CompressionExtension::Tar => {
-                if source.extension().map_or(false, |ext| ext == "tar") {
+                if source.extension().is_some_and(|ext| ext == "tar") {
                     source.with_extension("").to_string_lossy().to_string()
                 } else {
                     // We add the '.extracted' extension to the file.
@@ -80,12 +80,12 @@ impl CompressionExtension {
                 }
             }
             CompressionExtension::TarGz => {
-                if source.extension().map_or(false, |ext| ext == "tgz") {
+                if source.extension().is_some_and(|ext| ext == "tgz") {
                     source.with_extension("").to_string_lossy().to_string()
-                } else if source.extension().map_or(false, |ext| ext == "gz")
+                } else if source.extension().is_some_and(|ext| ext == "gz")
                     && source
                         .file_stem()
-                        .map_or(false, |stem| stem.to_string_lossy().ends_with(".tar"))
+                        .is_some_and(|stem| stem.to_string_lossy().ends_with(".tar"))
                 {
                     let path_string = source.file_stem().unwrap().to_string_lossy().to_string();
                     let path = Path::new(&path_string);
@@ -96,7 +96,7 @@ impl CompressionExtension {
                 }
             }
             CompressionExtension::Zip => {
-                if source.extension().map_or(false, |ext| ext == "zip") {
+                if source.extension().is_some_and(|ext| ext == "zip") {
                     source.with_extension("").to_string_lossy().to_string()
                 } else {
                     // We add the '.extracted' extension to the file.
@@ -104,7 +104,7 @@ impl CompressionExtension {
                 }
             }
             CompressionExtension::Gzip => {
-                if source.extension().map_or(false, |ext| ext == "gz" || ext == "gzip") {
+                if source.extension().is_some_and(|ext| ext == "gz" || ext == "gzip") {
                     source.with_extension("").to_string_lossy().to_string()
                 } else {
                     // We add the '.extracted' extension to the file.
@@ -112,7 +112,7 @@ impl CompressionExtension {
                 }
             }
             CompressionExtension::Xz => {
-                if source.extension().map_or(false, |ext| ext == "xz") {
+                if source.extension().is_some_and(|ext| ext == "xz") {
                     source.with_extension("").to_string_lossy().to_string()
                 } else {
                     // We add the '.extracted' extension to the file.
@@ -206,7 +206,7 @@ impl CompressionExtension {
                 todo!()
             }
             CompressionExtension::Unknown => {}
-        };
+        }
 
         progress_bar.finish_with_message("Extraction complete");
 

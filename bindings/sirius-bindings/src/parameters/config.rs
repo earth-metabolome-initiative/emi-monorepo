@@ -797,7 +797,7 @@ mod tests {
             ConfigV5::AdductSettingsDetectable(AdductsVector::from(vec![Adducts::MplusHplus]))
                 .into_default()
                 .to_string()
-        )
+        );
     }
     #[test]
     fn check_negative_mass_deviation_panics() {

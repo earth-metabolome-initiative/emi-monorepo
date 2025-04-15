@@ -14,7 +14,7 @@ pub fn test_symmetric_edges() {
         .build()
         .unwrap();
 
-    println!("{:?}", edges);
+    println!("{edges:?}");
     assert_eq!(edges.number_of_edges(), 11);
     assert_eq!(edges.number_of_self_loops(), 1);
 

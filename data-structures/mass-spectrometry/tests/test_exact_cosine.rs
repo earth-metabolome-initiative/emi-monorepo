@@ -1,10 +1,8 @@
 //! Submodule to test execution of the exact algorithm with cosine
 //! similarity.
 
-use algebra::prelude::SparseMatrix2D;
 use mass_spectrometry::prelude::{
-    AspirinSpectrum, CocaineSpectrum, ExactCosine, GenericSpectrum, GlucoseSpectrum,
-    HydroxyCholesterolSpectrum, PhenylalanineSpectrum, SalicinSpectrum, ScalarSimilarity, Spectrum,
+    CocaineSpectrum, ExactCosine, GenericSpectrum, GlucoseSpectrum, ScalarSimilarity, Spectrum,
 };
 
 #[test]

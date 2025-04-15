@@ -22,7 +22,7 @@ impl IsBlurry for image::GrayImage {
 fn compute_fft(image: &image::GrayImage) -> Vec<Complex<f32>> {
     let (width, height) = image.dimensions();
     let mut input: Vec<Complex<f32>> =
-        image.pixels().map(|p| Complex::new(p[0] as f32, 0.0)).collect();
+        image.pixels().map(|p| Complex::new(f32::from(p[0]), 0.0)).collect();
 
     let mut planner = FftPlanner::new();
     let fft = planner.plan_fft_forward(width as usize * height as usize);
