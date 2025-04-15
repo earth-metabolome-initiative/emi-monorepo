@@ -27,8 +27,8 @@ pub trait RootNodes: TopologicalSorting {
         // Finally, we iterate over all nodes and keep the nodes that have not
         // been visited. A node is considered visited if it has a predecessor.
         self.node_ids()
-            .zip(visited.into_iter())
-            .filter_map(|(node, visited)| if !visited { Some(node) } else { None })
+            .zip(visited)
+            .filter_map(|(node, visited)| if visited { None } else { Some(node) })
             .collect()
     }
 

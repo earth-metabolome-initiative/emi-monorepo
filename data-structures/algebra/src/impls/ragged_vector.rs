@@ -259,6 +259,21 @@ where
 
         Ok(())
     }
+
+    fn increase_shape(&mut self, shape: Self::Coordinates) -> Result<(), Self::Error> {
+        if shape.0 < self.number_of_rows {
+            return Err(MutabilityError::IncompatibleShape);
+        }
+
+        if shape.1 < self.number_of_columns {
+            return Err(MutabilityError::IncompatibleShape);
+        }
+
+        self.number_of_rows = shape.0;
+        self.number_of_columns = shape.1;
+
+        Ok(())
+    }
 }
 
 impl<SparseIndex, RowIndex, ColumnIndex>

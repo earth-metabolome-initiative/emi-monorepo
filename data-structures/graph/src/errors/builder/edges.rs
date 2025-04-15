@@ -4,7 +4,7 @@ use core::fmt::Debug;
 
 use algebra::{
     impls::{MutabilityError, SymmetricCSR2D, UpperTriangularCSR2D},
-    prelude::{IntoUsize, PositiveInteger, TryFromUsize},
+    prelude::{Matrix2D, SizedSparseMatrix2D, TryFromUsize},
 };
 
 use crate::traits::{Edges, EdgesBuilderOptions};
@@ -59,13 +59,13 @@ impl<V: Edges> From<MutabilityError<V::Matrix>> for EdgesBuilderError<V> {
     }
 }
 
-impl<
-    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    Idx: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
-> From<EdgesBuilderError<UpperTriangularCSR2D<SparseIndex, Idx>>>
-    for EdgesBuilderError<SymmetricCSR2D<SparseIndex, Idx>>
+impl<M> From<EdgesBuilderError<UpperTriangularCSR2D<M>>> for EdgesBuilderError<SymmetricCSR2D<M>>
+where
+    M: SizedSparseMatrix2D<ColumnIndex = <M as Matrix2D>::RowIndex>,
+    M::RowIndex: TryFromUsize,
+    M::SparseIndex: TryFromUsize,
 {
-    fn from(e: EdgesBuilderError<UpperTriangularCSR2D<SparseIndex, Idx>>) -> Self {
+    fn from(e: EdgesBuilderError<UpperTriangularCSR2D<M>>) -> Self {
         match e {
             EdgesBuilderError::BuilderError(e) => EdgesBuilderError::BuilderError(e),
             EdgesBuilderError::NumberOfEdges { expected, actual } => {

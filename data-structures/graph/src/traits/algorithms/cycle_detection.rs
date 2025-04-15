@@ -25,7 +25,7 @@ impl<'graph, G: MonoplexMonopartiteGraph + ?Sized> From<&'graph G> for CycleDete
     }
 }
 
-impl<'graph, G: MonoplexMonopartiteGraph + ?Sized> CycleDetector<'graph, G> {
+impl<G: MonoplexMonopartiteGraph + ?Sized> CycleDetector<'_, G> {
     /// Recursive function to detect cycles in the graph.
     fn dfs(&mut self, node: G::NodeId) -> bool {
         if !self.visited[node.into_usize()] {
@@ -33,9 +33,9 @@ impl<'graph, G: MonoplexMonopartiteGraph + ?Sized> CycleDetector<'graph, G> {
             self.stack.push(node);
 
             for successor_node_id in self.graph.successors(node) {
-                if !self.visited[successor_node_id.into_usize()] && self.dfs(successor_node_id) {
-                    return true;
-                } else if self.stack.contains(&successor_node_id) {
+                if !self.visited[successor_node_id.into_usize()] && self.dfs(successor_node_id)
+                    || self.stack.contains(&successor_node_id)
+                {
                     return true;
                 }
             }

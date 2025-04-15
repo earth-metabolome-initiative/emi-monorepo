@@ -1,7 +1,7 @@
 //! Simple test for undirected graph.
 
 use ::graph::prelude::*;
-use algebra::impls::SymmetricCSR2D;
+use algebra::impls::{SymmetricCSR2D, CSR2D};
 use common_traits::builder::Builder;
 use sorted_vec::prelude::SortedVec;
 
@@ -15,7 +15,7 @@ pub fn test_undirected_graph() {
         .symbols(nodes.into_iter().enumerate())
         .build()
         .unwrap();
-    let edges: SymmetricCSR2D<usize, usize> = UndiEdgesBuilder::default()
+    let edges: SymmetricCSR2D<CSR2D<usize, usize, usize>> = UndiEdgesBuilder::default()
         .expected_number_of_edges(edges.len())
         .expected_shape(nodes.len())
         .edges(edges.into_iter())

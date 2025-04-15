@@ -1,6 +1,6 @@
 //! Test submodule for the `TopologicalSorting` trait.
 
-use algebra::impls::SquareCSR2D;
+use algebra::impls::{SquareCSR2D, CSR2D};
 use graph::{
     prelude::{
         Builder, DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder,
@@ -33,7 +33,7 @@ fn test_topological_sorting() -> Result<(), Box<dyn std::error::Error>> {
         .expected_number_of_symbols(nodes.len())
         .symbols(nodes.into_iter().enumerate())
         .build()?;
-    let edges: SquareCSR2D<usize, usize> = DiEdgesBuilder::default()
+    let edges: SquareCSR2D<CSR2D<usize, usize, usize>> = DiEdgesBuilder::default()
         .expected_number_of_edges(edges.len())
         .expected_shape(nodes.len())
         .edges(edges.into_iter())

@@ -47,10 +47,10 @@ impl<SparseIndex: Zero, RowIndex: Zero, ColumnIndex: Zero> Default
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
-    > SparseMatrixMut for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+> SparseMatrixMut for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: SparseMatrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex, SparseIndex = SparseIndex>,
 {
@@ -77,10 +77,10 @@ where
 }
 
 impl<
-        SparseIndex,
-        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        ColumnIndex: PositiveInteger + IntoUsize,
-    > Matrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize,
+> Matrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     type Coordinates = (RowIndex, ColumnIndex);
 
@@ -90,10 +90,10 @@ impl<
 }
 
 impl<
-        SparseIndex,
-        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        ColumnIndex: PositiveInteger + IntoUsize,
-    > Matrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize,
+> Matrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     type RowIndex = RowIndex;
     type ColumnIndex = ColumnIndex;
@@ -106,7 +106,8 @@ impl<
         debug_assert!(
             self.offsets.len() - 1 <= self.number_of_rows.into_usize(),
             "The matrix is in an illegal state where the number of rows {} is less than the number of rows in the offsets {}.",
-            self.number_of_rows.into_usize(), self.offsets.len()
+            self.number_of_rows.into_usize(),
+            self.offsets.len()
         );
         self.number_of_rows
     }
@@ -117,10 +118,10 @@ impl<
 }
 
 impl<
-        SparseIndex,
-        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        ColumnIndex: PositiveInteger + IntoUsize,
-    > Matrix2DRef for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize,
+> Matrix2DRef for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     fn number_of_rows_ref(&self) -> &Self::RowIndex {
         &self.number_of_rows
@@ -132,10 +133,10 @@ impl<
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
-    > SparseMatrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+> SparseMatrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
@@ -155,10 +156,10 @@ where
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
-    > SizedSparseMatrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+> SizedSparseMatrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
@@ -168,10 +169,10 @@ where
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
-    > RankSelectSparseMatrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+> RankSelectSparseMatrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
@@ -198,10 +199,10 @@ where
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
-    > SparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+> SparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
@@ -259,10 +260,10 @@ where
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
-    > SizedSparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+> SizedSparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
@@ -270,6 +271,13 @@ where
         if self.offsets.len() <= row.into_usize() && row <= self.number_of_rows() {
             return self.number_of_defined_values();
         }
+        debug_assert!(
+            row <= self.number_of_rows(),
+            "The matrix is in an illegal state where the row index {row} is greater than the number of rows {}, with number of columns {}, with offset size {}.",
+            self.number_of_rows(),
+            self.number_of_columns(),
+            self.offsets.len()
+        );
         self.offsets[row.into_usize()]
     }
 
@@ -289,10 +297,10 @@ where
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
-    > SizedRowsSparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+> SizedRowsSparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
@@ -318,10 +326,10 @@ where
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
-    > MatrixMut for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+> MatrixMut for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
@@ -385,16 +393,29 @@ where
             self.offsets.push(last_offset + SparseIndex::ONE);
             Ok(())
         } else {
+            println!("The row is not the last row: {row}, {column}.");
             Err(MutabilityError::UnorderedRowIndex(row))
         }
+    }
+
+    fn increase_shape(
+        &mut self,
+        (number_of_rows, number_of_columns): Self::Coordinates,
+    ) -> Result<(), Self::Error> {
+        if number_of_rows < self.number_of_rows() || number_of_columns < self.number_of_columns() {
+            return Err(MutabilityError::IncompatibleShape);
+        }
+        self.number_of_rows = self.number_of_rows.max(number_of_rows);
+        self.number_of_columns = self.number_of_columns.max(number_of_columns);
+        Ok(())
     }
 }
 
 impl<
-        SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-        ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
-    > TransposableMatrix2D<CSR2D<SparseIndex, ColumnIndex, RowIndex>>
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+> TransposableMatrix2D<CSR2D<SparseIndex, ColumnIndex, RowIndex>>
     for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,

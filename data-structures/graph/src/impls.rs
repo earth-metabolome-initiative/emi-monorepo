@@ -13,6 +13,7 @@ mod array;
 mod implicit_numeric_vocabularies;
 mod sorted_array;
 mod tuple;
+mod slice;
 
 #[cfg(any(feature = "std", feature = "alloc"))]
 mod ranged_csr;

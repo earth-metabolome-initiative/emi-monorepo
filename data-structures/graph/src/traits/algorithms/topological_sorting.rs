@@ -26,6 +26,13 @@ impl std::error::Error for TopologicalSortingError {}
 
 /// Trait defining the topological sorting algorithm.
 pub trait TopologicalSorting: MonoplexMonopartiteGraph {
+    /// Returns whether the current graph labelling follows a
+    /// topological order, which means that for every directed edge (u, v),
+    /// u comes before v in the ordering.
+    fn is_topologically_sorted(&self) -> bool {
+        self.sparse_coordinates().all(|(src, dst)| src <= dst)
+    }
+
     /// Returns the topological order of the graph from the provided node.
     ///
     /// # Arguments
@@ -60,7 +67,7 @@ pub trait TopologicalSorting: MonoplexMonopartiteGraph {
     /// # Errors
     ///
     /// * `TopologicalSortingError::UnreachableNodes` - If some nodes are not
-    ///  reachable from the root nodes.
+    ///   reachable from the root nodes.
     fn topological_sort_from_nodes(
         &self,
         nodes: &[Self::NodeId],

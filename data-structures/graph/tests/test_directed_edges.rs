@@ -1,14 +1,14 @@
 //! Simple test for directed edges.
 
 use ::graph::prelude::*;
-use algebra::impls::{SquareCSR2D, UpperTriangularCSR2D};
+use algebra::impls::{SquareCSR2D, UpperTriangularCSR2D, CSR2D};
 use common_traits::builder::Builder;
 
 #[test]
 /// First simple test for directed edges.
 pub fn test_square_directed_edges() {
     let edges: Vec<(usize, usize)> = vec![(1, 2), (1, 3), (2, 2), (2, 3), (3, 4), (4, 5)];
-    let edges: SquareCSR2D<usize, usize> = DiEdgesBuilder::default()
+    let edges: SquareCSR2D<_> = DiEdgesBuilder::default()
         .expected_number_of_edges(edges.len())
         .edges(edges.into_iter())
         .build()
@@ -67,7 +67,7 @@ pub fn test_square_directed_edges() {
 /// First simple test for triangular edges.
 pub fn test_triangular_directed_edges() {
     let edges: Vec<(usize, usize)> = vec![(1, 2), (1, 3), (2, 2), (2, 3), (3, 4), (4, 5)];
-    let edges: UpperTriangularCSR2D<usize, usize> = GenericEdgesBuilder::default()
+    let edges: UpperTriangularCSR2D<CSR2D<usize, usize, usize>> = GenericEdgesBuilder::default()
         .expected_number_of_edges(edges.len())
         .edges(edges.into_iter())
         .build()

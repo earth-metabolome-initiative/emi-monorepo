@@ -1,6 +1,6 @@
 //! Test submodule for the `RootNodes` trait.
 
-use algebra::impls::SquareCSR2D;
+use algebra::impls::{CSR2D, SquareCSR2D};
 use graph::{
     prelude::{
         Builder, DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder,
@@ -22,7 +22,7 @@ fn test_no_root_nodes() -> Result<(), Box<dyn std::error::Error>> {
         .expected_number_of_symbols(nodes.len())
         .symbols(nodes.into_iter().enumerate())
         .build()?;
-    let edges: SquareCSR2D<usize, usize> = DiEdgesBuilder::default()
+    let edges: SquareCSR2D<CSR2D<usize, usize, usize>> = DiEdgesBuilder::default()
         .expected_number_of_edges(edges.len())
         .expected_shape(nodes.len())
         .edges(edges.into_iter())
@@ -49,19 +49,14 @@ fn test_root_nodes() -> Result<(), Box<dyn std::error::Error>> {
     let nodes: SortedVec<usize> = GenericVocabularyBuilder::default()
         .expected_number_of_symbols(nodes.len())
         .symbols(nodes.into_iter().enumerate())
-        .build()
-        .unwrap();
-    let edges: SquareCSR2D<usize, usize> = DiEdgesBuilder::default()
+        .build()?;
+    let edges: SquareCSR2D<CSR2D<usize, usize, usize>> = DiEdgesBuilder::default()
         .expected_number_of_edges(edges.len())
         .expected_shape(nodes.len())
         .edges(edges.into_iter())
-        .build()
-        .unwrap();
-    let graph: DiGraph<usize> = GenericMonoplexMonopartiteGraphBuilder::default()
-        .nodes(nodes)
-        .edges(edges)
-        .build()
-        .unwrap();
+        .build()?;
+    let graph: DiGraph<usize> =
+        GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
 
     assert_eq!(graph.number_of_nodes(), 6);
     assert_eq!(graph.number_of_edges(), 5);

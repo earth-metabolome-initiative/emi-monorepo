@@ -5,7 +5,7 @@
 //! * They are bipartite, i.e., they have two types of nodes.
 //! * They are monoplex, i.e., they have only one type of edges.
 
-use algebra::prelude::{IntoUsize, SparseMatrix2D, Zero};
+use algebra::prelude::{SparseMatrix2D, Zero};
 
 use super::{BipartiteGraph, Edges, MonoplexGraph};
 
@@ -52,22 +52,23 @@ pub trait MonoplexBipartiteGraph:
 
     /// Returns a DOT representation for the Monoplex Bipartite Graph.
     fn to_mb_dot(&self) -> String {
+        use std::fmt::Write;
         let mut dot = String::new();
-        dot.push_str("graph {\n");
+        writeln!(dot, "  graph {{").unwrap();
 
         for left_node_id in self.left_node_ids() {
-            dot.push_str(&format!("  L{} [color=red];\n", left_node_id.into_usize()));
+            writeln!(dot, "  L{left_node_id} [color=red];").unwrap();
         }
 
         for right_node_id in self.right_node_ids() {
-            dot.push_str(&format!("  R{} [color=blue];\n", right_node_id.into_usize()));
+            writeln!(dot, "  R{right_node_id} [color=blue];").unwrap();
         }
 
         for (src, dst) in self.edges().sparse_coordinates() {
-            dot.push_str(&format!("  L{} -> R{};\n", src.into_usize(), dst.into_usize()));
+            writeln!(dot, "  L{src} -> R{dst};").unwrap();
         }
 
-        dot.push_str("}\n");
+        writeln!(dot, "  }}").unwrap();
         dot
     }
 }

@@ -9,7 +9,7 @@ use crate::errors::builder::vocabulary::VocabularyBuilderError;
 
 /// Trait defining a conversion between a source symbol and a destination
 /// symbol.
-pub trait Vocabulary: Debug + Clone {
+pub trait Vocabulary: Debug {
     /// The source symbol.
     type SourceSymbol: Symbol;
     /// The destination symbol.
@@ -41,6 +41,35 @@ pub trait Vocabulary: Debug + Clone {
     fn destinations(&self) -> Self::Destinations<'_>;
 }
 
+impl<V: Vocabulary + ?Sized> Vocabulary for &V {
+    type SourceSymbol = V::SourceSymbol;
+    type DestinationSymbol = V::DestinationSymbol;
+    type Sources<'a>
+        = V::Sources<'a>
+    where
+        Self: 'a;
+    type Destinations<'a>
+        = V::Destinations<'a>
+    where
+        Self: 'a;
+
+    fn convert(&self, source: &Self::SourceSymbol) -> Option<Self::DestinationSymbol> {
+        (*self).convert(source)
+    }
+
+    fn len(&self) -> usize {
+        (*self).len()
+    }
+
+    fn sources(&self) -> Self::Sources<'_> {
+        (*self).sources()
+    }
+
+    fn destinations(&self) -> Self::Destinations<'_> {
+        (*self).destinations()
+    }
+}
+
 /// Trait defining a conversion between a source symbol and a destination symbol
 /// reference.
 pub trait VocabularyRef: Vocabulary {
@@ -56,11 +85,32 @@ pub trait VocabularyRef: Vocabulary {
     fn destination_refs(&self) -> Self::DestinationRefs<'_>;
 }
 
+impl<V: VocabularyRef + ?Sized> VocabularyRef for &V {
+    type DestinationRefs<'a>
+        = V::DestinationRefs<'a>
+    where
+        Self: 'a;
+
+    fn convert_ref(&self, source: &Self::SourceSymbol) -> Option<&Self::DestinationSymbol> {
+        (*self).convert_ref(source)
+    }
+
+    fn destination_refs(&self) -> Self::DestinationRefs<'_> {
+        (*self).destination_refs()
+    }
+}
+
 /// Trait defining a bidirectional conversion between a source symbol and a
 /// destination symbol.
 pub trait BidirectionalVocabulary: Vocabulary {
     /// Converts a destination symbol into a source symbol.
     fn invert(&self, destination: &Self::DestinationSymbol) -> Option<Self::SourceSymbol>;
+}
+
+impl<V: BidirectionalVocabulary + ?Sized> BidirectionalVocabulary for &V {
+    fn invert(&self, destination: &Self::DestinationSymbol) -> Option<Self::SourceSymbol> {
+        (*self).invert(destination)
+    }
 }
 
 /// Trait defining a bidirectional conversion between a destination symbol and a
@@ -76,6 +126,21 @@ pub trait BidirectionalVocabularyRef: BidirectionalVocabulary + VocabularyRef {
 
     /// Returns an iterator over the references of the source symbols.
     fn source_refs(&self) -> Self::SourceRefs<'_>;
+}
+
+impl<V: BidirectionalVocabularyRef + ?Sized> BidirectionalVocabularyRef for &V {
+    type SourceRefs<'a>
+        = V::SourceRefs<'a>
+    where
+        Self: 'a;
+
+    fn invert_ref(&self, destination: &Self::DestinationSymbol) -> Option<&Self::SourceSymbol> {
+        (*self).invert_ref(destination)
+    }
+
+    fn source_refs(&self) -> Self::SourceRefs<'_> {
+        (*self).source_refs()
+    }
 }
 
 /// Trait defining a growable vocabulary.

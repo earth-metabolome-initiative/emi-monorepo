@@ -4,15 +4,16 @@ use algebra::prelude::*;
 
 use crate::{errors::builder::edges::EdgesBuilderError, prelude::*};
 
-impl<
-    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
-> Edges for SquareCSR2D<SparseIndex, Idx>
+impl<M> Edges for SquareCSR2D<M>
+where
+    M: SizedRowsSparseMatrix2D<ColumnIndex = <Self as Matrix2D>::RowIndex>,
+    M::RowIndex: TryFromUsize,
+    M::SparseIndex: TryFromUsize,
 {
     type Edge = <Self as Matrix>::Coordinates;
-    type SourceNodeId = Idx;
-    type DestinationNodeId = Idx;
-    type EdgeId = SparseIndex;
+    type SourceNodeId = <Self as Matrix2D>::RowIndex;
+    type DestinationNodeId = <Self as Matrix2D>::ColumnIndex;
+    type EdgeId = <Self as SparseMatrix>::SparseIndex;
     type Matrix = Self;
 
     fn matrix(&self) -> &Self::Matrix {
@@ -20,10 +21,15 @@ impl<
     }
 }
 
-impl<
-    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
-> GrowableEdges for SquareCSR2D<SparseIndex, Idx>
+impl<M> GrowableEdges for SquareCSR2D<M>
+where
+    M: SparseMatrixMut<
+            MinimalShape = <Self as Matrix>::Coordinates,
+            Entry = <Self as Matrix>::Coordinates,
+            Error = MutabilityError<M>,
+        > + SizedRowsSparseMatrix2D<ColumnIndex = <Self as Matrix2D>::RowIndex>,
+    M::RowIndex: TryFromUsize,
+    M::SparseIndex: TryFromUsize,
 {
     type GrowableMatrix = Self;
     type Error = EdgesBuilderError<Self>;

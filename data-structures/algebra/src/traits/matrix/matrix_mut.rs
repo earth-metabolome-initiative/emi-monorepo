@@ -26,6 +26,36 @@ pub trait MatrixMut: Matrix + Default {
     /// - The entry is out of bounds.
     /// - The entry is already defined.
     fn add(&mut self, entry: Self::Entry) -> Result<(), Self::Error>;
+
+    /// Creates a new matrix with the given entries.
+    ///
+    /// # Arguments
+    ///
+    /// * `entries` - The entries to add to the matrix.
+    ///
+    /// # Errors
+    ///
+    /// * If the entries are not provided in the expected order.
+    /// * If the entry is out of bounds.
+    /// * If the entry is already defined.
+    fn from_entries<I: IntoIterator<Item = Self::Entry>>(entries: I) -> Result<Self, Self::Error> {
+        let mut matrix = Self::default();
+        for entry in entries {
+            matrix.add(entry)?;
+        }
+        Ok(matrix)
+    }
+
+    /// Set the matrix to the given larger shape.
+    ///
+    /// # Arguments
+    ///
+    /// * `shape` - The larger shape of the matrix.
+    ///
+    /// # Errors
+    ///
+    /// * If the shape is smaller than the current shape.
+    fn increase_shape(&mut self, shape: Self::Coordinates) -> Result<(), Self::Error>;
 }
 
 /// Trait defining a bi-dimensional mutable matrix.

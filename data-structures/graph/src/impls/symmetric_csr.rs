@@ -4,15 +4,16 @@ use algebra::prelude::*;
 
 use crate::prelude::*;
 
-impl<
-    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
-> Edges for SymmetricCSR2D<SparseIndex, Idx>
+impl<M> Edges for SymmetricCSR2D<M>
+where
+    M: SizedSparseMatrix2D<ColumnIndex = <Self as Matrix2D>::RowIndex>,
+    M::RowIndex: TryFromUsize,
+    M::SparseIndex: TryFromUsize,
 {
     type Edge = <Self as Matrix>::Coordinates;
-    type SourceNodeId = Idx;
-    type DestinationNodeId = Idx;
-    type EdgeId = SparseIndex;
+    type SourceNodeId = <Self as Matrix2D>::RowIndex;
+    type DestinationNodeId = <Self as Matrix2D>::RowIndex;
+    type EdgeId = <Self as SparseMatrix>::SparseIndex;
     type Matrix = Self;
 
     fn matrix(&self) -> &Self::Matrix {
@@ -20,13 +21,12 @@ impl<
     }
 }
 
-impl<
-    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    Idx: PositiveInteger + TryFromUsize + IntoUsize + TryFrom<SparseIndex>,
-    DE: MonopartiteEdges,
-> FromDirectedMonopartiteEdges<DE> for SymmetricCSR2D<SparseIndex, Idx>
+impl<M, DE: MonopartiteEdges> FromDirectedMonopartiteEdges<DE> for SymmetricCSR2D<M>
 where
+    M: SizedSparseMatrix2D<ColumnIndex = <Self as Matrix2D>::RowIndex>,
     DE::MonopartiteMatrix: Symmetrize<Self>,
+    M::RowIndex: TryFromUsize,
+    M::SparseIndex: TryFromUsize,
 {
     fn from_directed_edges(edges: DE) -> Self {
         edges.matrix().symmetrize()

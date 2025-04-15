@@ -1,14 +1,14 @@
 //! Simple test for symmetric edges.
 
 use ::graph::prelude::*;
-use algebra::impls::SymmetricCSR2D;
+use algebra::impls::{SymmetricCSR2D, CSR2D};
 use common_traits::builder::Builder;
 
 #[test]
 /// First simple test for symmetric edges.
 pub fn test_symmetric_edges() {
     let edges: Vec<(usize, usize)> = vec![(1, 2), (1, 3), (2, 2), (2, 3), (3, 4), (4, 5)];
-    let edges: SymmetricCSR2D<usize, usize> = UndiEdgesBuilder::default()
+    let edges: SymmetricCSR2D<CSR2D<usize, usize, usize>> = UndiEdgesBuilder::default()
         .expected_number_of_edges(edges.len())
         .edges(edges.into_iter())
         .build()

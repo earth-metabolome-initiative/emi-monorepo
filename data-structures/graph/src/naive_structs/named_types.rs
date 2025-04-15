@@ -9,10 +9,11 @@ use super::{
 };
 
 /// Type alias for a generic directed graph.
-pub type DiGraph<NodeSymbol> = GenericGraph<SortedVec<NodeSymbol>, SquareCSR2D<usize, usize>>;
+pub type DiGraph<NodeSymbol> =
+    GenericGraph<SortedVec<NodeSymbol>, SquareCSR2D<CSR2D<usize, usize, usize>>>;
 /// Type alias for a generic directed edges list builder.
 pub type DiEdgesBuilder<EdgeIterator> =
-    GenericEdgesBuilder<EdgeIterator, SquareCSR2D<usize, usize>>;
+    GenericEdgesBuilder<EdgeIterator, SquareCSR2D<CSR2D<usize, usize, usize>>>;
 
 /// Type alias for a generic directed bipartite graph.
 pub type BiGraph<LeftNodeSymbol, RightNodeSymbol> = GenericBiGraph<
@@ -22,7 +23,7 @@ pub type BiGraph<LeftNodeSymbol, RightNodeSymbol> = GenericBiGraph<
 >;
 /// Type alias for a generic directed bipartite edges list builder.
 pub type BiEdgesBuilder<EdgeIterator> =
-    GenericEdgesBuilder<EdgeIterator, UpperTriangularCSR2D<usize, usize>>;
+    GenericEdgesBuilder<EdgeIterator, UpperTriangularCSR2D<CSR2D<usize, usize, usize>>>;
 
 /// Type alias for a generic weighted directed bipartite graph.
 pub type WeightedBiGraph<LeftNodeSymbol, RightNodeSymbol> = GenericBiGraph<
@@ -32,10 +33,11 @@ pub type WeightedBiGraph<LeftNodeSymbol, RightNodeSymbol> = GenericBiGraph<
 >;
 
 /// Type alias for a generic undirected graph.
-pub type UndiGraph<NodeSymbol> = GenericGraph<SortedVec<NodeSymbol>, SymmetricCSR2D<usize, usize>>;
+pub type UndiGraph<NodeSymbol> =
+    GenericGraph<SortedVec<NodeSymbol>, SymmetricCSR2D<CSR2D<usize, usize, usize>>>;
 /// Type alias for a generic undirected edges list builder.
 pub type UndiEdgesBuilder<EdgeIterator> = GenericUndirectedMonopartiteEdgesBuilder<
     EdgeIterator,
-    UpperTriangularCSR2D<usize, usize>,
-    SymmetricCSR2D<usize, usize>,
+    UpperTriangularCSR2D<CSR2D<usize, usize, usize>>,
+    SymmetricCSR2D<CSR2D<usize, usize, usize>>,
 >;
