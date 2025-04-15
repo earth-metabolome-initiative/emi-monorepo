@@ -49,7 +49,7 @@ impl<'a, R: BufRead> BufRead for SeparatorFixedReader<'a, R> {
     }
 
     fn consume(&mut self, amt: usize) {
-        self.reader.consume(amt)
+        self.reader.consume(amt);
     }
 
     fn read_line(&mut self, buf: &mut String) -> std::io::Result<usize> {
@@ -60,7 +60,7 @@ impl<'a, R: BufRead> BufRead for SeparatorFixedReader<'a, R> {
             return Ok(0); // EOF
         }
 
-        let replaced = buffer.replace(&self.needle, &self.separator);
+        let replaced = buffer.replace(self.needle, self.separator);
 
         buf.push_str(&replaced);
 

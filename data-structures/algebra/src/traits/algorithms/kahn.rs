@@ -44,10 +44,9 @@ pub trait Kahn: SparseSquareMatrix {
             for row_id in frontier.drain(..) {
                 topological_order[row_id.into_usize()] = number_of_visited_nodes;
                 number_of_visited_nodes += Self::Index::ONE;
-                temporary_frontier.extend(self.sparse_row(row_id).filter_map(|successor_id| {
+                temporary_frontier.extend(self.sparse_row(row_id).filter(|successor_id| {
                     in_degree[successor_id.into_usize()] -= Self::Index::ONE;
-                    (in_degree[successor_id.into_usize()] == Self::Index::ZERO)
-                        .then_some(successor_id)
+                    in_degree[successor_id.into_usize()] == Self::Index::ZERO
                 }));
             }
 

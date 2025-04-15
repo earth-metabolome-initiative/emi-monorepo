@@ -27,6 +27,11 @@ pub trait Spectrum {
     /// Returns the number of peaks in the Spectrum.
     fn len(&self) -> usize;
 
+    /// Returns whether the Spectrum is empty.
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     /// Returns an iterator over the intensities in the Spectrum, SORTED by mass
     /// over charge.
     fn intensities(&self) -> Self::SortedIntensitiesIter<'_>;
