@@ -21,7 +21,7 @@ impl<'a, R> SeparatorFixedReader<'a, R> {
 
 /// Implementation of `Read` for `SeparatorFixedReader`, which
 /// replaces the needle with the separator in each line being read.
-impl<'a, R: BufRead> Read for SeparatorFixedReader<'a, R> {
+impl<R: BufRead> Read for SeparatorFixedReader<'_, R> {
     fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
         let mut buffer = String::new();
         let bytes_read = self.reader.read_line(&mut buffer)?;
@@ -30,7 +30,7 @@ impl<'a, R: BufRead> Read for SeparatorFixedReader<'a, R> {
             return Ok(0); // EOF
         }
 
-        let replaced = buffer.replace(&self.needle, &self.separator);
+        let replaced = buffer.replace(self.needle, self.separator);
 
         let bytes = replaced.as_bytes();
         let len = bytes.len();
@@ -42,8 +42,8 @@ impl<'a, R: BufRead> Read for SeparatorFixedReader<'a, R> {
     }
 }
 
-/// Implements BufRead for `SeparatorFixedReader`.
-impl<'a, R: BufRead> BufRead for SeparatorFixedReader<'a, R> {
+/// Implements `BufRead` for `SeparatorFixedReader`.
+impl<R: BufRead> BufRead for SeparatorFixedReader<'_, R> {
     fn fill_buf(&mut self) -> std::io::Result<&[u8]> {
         self.reader.fill_buf()
     }

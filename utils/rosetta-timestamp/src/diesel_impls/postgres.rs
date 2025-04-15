@@ -1,5 +1,5 @@
 //! Submodule proving the implementations of the traits relative to Diesel with
-//! PostgreSQL as the backend.
+//! `PostgreSQL` as the backend.
 
 impl diesel::deserialize::FromSql<crate::diesel_impls::TimestampUTC, diesel::pg::Pg>
     for crate::TimestampUTC

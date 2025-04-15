@@ -1,11 +1,11 @@
 //! Submodule providing the error enumeration that may occur during the
-//! translation between Postgres and SQLite.
+//! translation between `PostgreSQL` and `SQLite`.
 
 use sqlparser::parser::ParserError;
 
 #[derive(Debug)]
-/// Error enumeration that may occur during the translation between Postgres and
-/// SQLite.
+/// Error enumeration that may occur during the translation between `PostgreSQL` and
+/// `SQLite`.
 pub enum Error {
     /// Error that may occur during the parsing of a SQL statement.
     ParserError(ParserError),

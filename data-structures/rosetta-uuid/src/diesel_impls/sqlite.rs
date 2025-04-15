@@ -1,4 +1,4 @@
-//! Implementation for the [SQLite Backend](diesel::sqlite::Sqlite).
+//! Implementation for the [`SQLite` Backend](diesel::sqlite::Sqlite).
 
 impl diesel::deserialize::FromSql<crate::diesel_impls::Uuid, diesel::sqlite::Sqlite>
     for crate::Uuid

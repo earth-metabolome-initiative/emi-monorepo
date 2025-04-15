@@ -1,3 +1,3 @@
-# PG2SQLite
+# `PG2SQLite`
 
-Library to migrate with minimal amount of changes from PostgreSQL to SQLite.
+Library to migrate with minimal amount of changes from `PostgreSQL` to `SQLite`.

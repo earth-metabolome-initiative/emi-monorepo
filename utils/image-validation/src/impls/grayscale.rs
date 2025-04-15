@@ -30,7 +30,7 @@ fn compute_fft(image: &image::GrayImage) -> Vec<Complex<f32>> {
     input
 }
 
-fn analyze_high_freq(data: &Vec<Complex<f32>>) -> f32 {
+fn analyze_high_freq(data: &[Complex<f32>]) -> f32 {
     let length = data.len();
     let window_size = (length as f32 / 2.1).round() as usize;
     let center_index = length / 2;

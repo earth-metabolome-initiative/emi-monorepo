@@ -114,7 +114,7 @@ impl Translator for CreateIndex {
         // If the index is a GIN or GiST index, we need to translate it into a table
         // with a FTS5 virtual table. This is because SQLite does not support
         // GIN or GiST indexes.
-        if let Some(IndexType::GIN) | Some(IndexType::GiST) = self.using {
+        if let Some(IndexType::GIN | IndexType::GiST) = self.using {
             let _fts5_table = create_fts5_from_index(self);
         }
 

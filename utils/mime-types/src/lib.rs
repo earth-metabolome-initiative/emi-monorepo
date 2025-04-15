@@ -12,6 +12,7 @@ pub enum GenericFileFormat {
 }
 
 impl GenericFileFormat {
+    #[must_use]
     /// Returns the MIME types associated with the file format.
     pub fn mime_types(&self) -> &'static [&'static str] {
         match self {
@@ -21,6 +22,7 @@ impl GenericFileFormat {
         }
     }
 
+    #[must_use]
     /// Returns the file extensions associated with the file format.
     pub fn extensions(&self) -> &'static [&'static str] {
         match self {

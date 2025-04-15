@@ -23,16 +23,19 @@ pub struct AccessToken {
 }
 
 impl AccessToken {
+    #[must_use]
     /// Creates a new access token.
     pub fn new(token: String) -> Self {
         Self { token }
     }
 
+    #[must_use]
     /// Creates a new access token from a string slice.
     pub fn token(&self) -> &str {
         &self.token
     }
 
+    #[must_use]
     /// Creates a new access token from a string slice.
     pub fn header(&self) -> (&str, String) {
         ("Authorization", format!("Bearer {}", self.token))

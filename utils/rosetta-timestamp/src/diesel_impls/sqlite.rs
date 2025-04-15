@@ -1,5 +1,5 @@
 //! Submodule proving the implementations of the traits relative to Diesel with
-//! SQLite as the backend.
+//! `SQLite` as the backend.
 
 impl diesel::deserialize::FromSql<crate::diesel_impls::TimestampUTC, diesel::sqlite::Sqlite>
     for crate::TimestampUTC

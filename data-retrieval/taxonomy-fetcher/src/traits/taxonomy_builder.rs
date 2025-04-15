@@ -3,21 +3,24 @@ use crate::traits::taxon_version::TaxonVersion;
 
 /// Trait defining a taxonomy builder.
 pub trait TaxonomyBuilder: Sized + Default {
-    /// The type of TaxonEntry to build.
+    /// The type of `TaxonEntry` to build.
     type TaxonEntry: super::TaxonEntry;
     /// Type of the taxonomy to build.
     type Taxonomy: super::Taxonomy<TaxonEntry = Self::TaxonEntry>;
     /// Type of the taxon builder to use.
     type TaxonEntryBuilder: super::TaxonEntryBuilder<TaxonEntry = Self::TaxonEntry>;
 
+    #[must_use]
     /// Creates a new taxonomy builder with the latest version.
     fn latest() -> Self {
         Self::default().version(<Self::Taxonomy as super::Taxonomy>::Version::latest())
     }
 
+    #[must_use]
     /// Sets the version of the taxonomy to build.
     fn version(self, version: <Self::Taxonomy as super::Taxonomy>::Version) -> Self;
 
+    #[must_use]
     /// Sets the directory where the taxonomy is stored.
     fn directory(self, directory: std::path::PathBuf) -> Self;
 

@@ -17,7 +17,7 @@ impl Translator for CreateTable {
                 .map(|c| c.translate(schema))
                 .collect::<Result<Vec<Option<TableConstraint>>, _>>()?
                 .into_iter()
-                .filter_map(|c| c)
+                .flatten()
                 .collect(),
             ..self.clone()
         })

@@ -1,4 +1,4 @@
-//! Submodule for traits used in the translation between Postgres and SQLite.
+//! Submodule for traits used in the translation between `PostgreSQL` and `SQLite`.
 
 pub mod translator;
 pub use translator::Translator;

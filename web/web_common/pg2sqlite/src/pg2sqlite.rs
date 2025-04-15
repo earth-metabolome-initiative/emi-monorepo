@@ -6,9 +6,9 @@ use sqlparser::ast::Statement;
 use crate::prelude::Translator;
 
 #[derive(Debug, Clone, Default)]
-/// Struct to translate between a PostgreSQL entry and a SQLite entry.
+/// Struct to translate between a `PostgreSQL` entry and a `SQLite` entry.
 pub struct Pg2Sqlite {
-    /// The set of postgreSQL statements to be translated.
+    /// The set of `PostgreSQL` statements to be translated.
     pub pg_statements: Vec<Statement>,
     /// Whether to show a loading bar of the translation progress.
     pub verbose: bool,
@@ -17,32 +17,35 @@ pub struct Pg2Sqlite {
 }
 
 impl Pg2Sqlite {
+    #[must_use]
     /// Sets to show a loading bar of the translation progress.
     pub fn verbose(mut self) -> Self {
         self.verbose = true;
         self
     }
 
-    /// Adds a new SQL statement to the set of PostgreSQL statements to be
+    #[must_use]
+    /// Adds a new SQL statement to the set of `PostgreSQL` statements to be
     /// translated.
     pub fn statement(mut self, statement: Statement) -> Self {
         self.pg_statements.push(statement);
         self
     }
 
+    #[must_use]
     /// Sets to drop check constraints containing unsupported functions.
     pub fn remove_unsupported_check_constraints(mut self) -> Self {
         self.remove_unsupported_check_constraints = true;
         self
     }
 
-    /// Adds a new SQL String to be parsed and added to the set of PostgreSQL
+    /// Adds a new SQL String to be parsed and added to the set of `PostgreSQL`
     /// statements to be translated.
     ///
     /// # Arguments
     ///
     /// * `statement` - The SQL statement to be parsed and added to the set of
-    ///   PostgreSQL statements to be translated.
+    ///   `PostgreSQL` statements to be translated.
     ///
     /// # Returns
     ///
@@ -64,12 +67,12 @@ impl Pg2Sqlite {
     }
 
     /// Adds a new path with an SQL file to be parsed and added to the set of
-    /// PostgreSQL statements to be translated.
+    /// `PostgreSQL` statements to be translated.
     ///
     /// # Arguments
     ///
     /// * `path` - The path to the SQL file to be parsed and added to the set of
-    ///   PostgreSQL statements to be translated.
+    ///   `PostgreSQL` statements to be translated.
     ///
     /// # Returns
     ///
@@ -86,7 +89,7 @@ impl Pg2Sqlite {
     }
 
     /// Adds all of the `up.sql` migrations found under the given directory to
-    /// the set of PostgreSQL statements to be translated.
+    /// the set of `PostgreSQL` statements to be translated.
     ///
     /// # Arguments
     ///
@@ -124,16 +127,20 @@ impl Pg2Sqlite {
         Ok(self)
     }
 
-    /// Translates the set of PostgreSQL statements to SQLite statements.
+    /// Translates the set of `PostgreSQL` statements to `SQLite` statements.
     ///
     /// # Returns
     ///
-    /// * A Result containing the set of SQLite statements or an error if the
-    ///  translation could not be performed.
+    /// * A Result containing the set of `SQLite` statements or an error if the
+    ///   translation could not be performed.
     ///
     /// # Errors
     ///
     /// * If the translation could not be performed.
+    /// 
+    /// # Panics
+    /// 
+    /// * If the progress bar could not be created.
     pub fn translate(self) -> Result<Vec<Statement>, crate::errors::Error> {
         let bar = indicatif::ProgressBar::new(self.pg_statements.len() as u64);
         bar.set_style(

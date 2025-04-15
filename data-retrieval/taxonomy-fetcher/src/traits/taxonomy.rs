@@ -59,8 +59,8 @@ pub trait Taxonomy {
             let taxon_entry: CSVTaxonEntry<Self::TaxonEntry> = CSVTaxonEntry {
                 id: *taxon.id(),
                 name: taxon.name().to_string(),
-                parent_id: taxon.parent_id().map(|id| *id),
-                rank: taxon.rank().clone(),
+                parent_id: taxon.parent_id().copied(),
+                rank: *taxon.rank(),
             };
             writer.serialize(taxon_entry)?;
         }
