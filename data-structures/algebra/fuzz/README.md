@@ -98,3 +98,17 @@ and to run the crash cases:
 ```bash
 cargo hfuzz run-debug lapjv hfuzz_workspace/*/*.fuzz
 ```
+
+### Kahn's Algorithm
+
+The Kahn algorithm is a topological sorting algorithm for directed acyclic graphs (DAGs).
+
+```bash
+cargo hfuzz run kahn
+```
+
+and to run the crash cases:
+
+```bash
+cargo hfuzz run-debug kahn hfuzz_workspace/*/*.fuzz
+```

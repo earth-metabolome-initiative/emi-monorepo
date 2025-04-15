@@ -170,7 +170,12 @@ where
         Self: 'a;
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
-        self.data[row.into_usize()].iter().copied()
+        let slice = if row.into_usize() >= self.data.len() {
+            &[]
+        } else {
+            self.data[row.into_usize()].as_slice()
+        };
+        slice.iter().copied()
     }
 
     fn sparse_columns(&self) -> Self::SparseColumns<'_> {

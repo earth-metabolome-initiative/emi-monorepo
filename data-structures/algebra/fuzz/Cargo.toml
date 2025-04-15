@@ -51,6 +51,13 @@ test = false
 doc = false
 
 [[bin]]
+name = "kahn"
+path = "fuzz_targets/kahn.rs"
+test = false
+doc = false
+
+
+[[bin]]
 name = "generic_matrix2d_with_padded_diagonal"
 path = "fuzz_targets/generic_matrix2d_with_padded_diagonal.rs"
 test = false

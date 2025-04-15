@@ -3,27 +3,28 @@
 use arbitrary::{Arbitrary, Unstructured};
 
 use crate::{
-    prelude::{CSR2D, SquareCSR2D},
-    traits::{IntoUsize, PositiveInteger, SparseMatrix, TryFromUsize},
+    prelude::{CSR2D, Matrix2D, MatrixMut, SquareCSR2D},
+    traits::{IntoUsize, PositiveInteger, SparseMatrix, SparseMatrix2D, TryFromUsize},
 };
 
-impl<'a, SparseIndex, Idx> Arbitrary<'a> for SquareCSR2D<SparseIndex, Idx>
+impl<'a, M> Arbitrary<'a> for SquareCSR2D<M>
 where
-    SparseIndex: TryFromUsize + IntoUsize + PositiveInteger,
-    Idx: PositiveInteger + for<'b> Arbitrary<'b> + TryFrom<SparseIndex> + IntoUsize + TryFromUsize,
+    M: Arbitrary<'a> + MatrixMut + SparseMatrix2D<ColumnIndex = <M as Matrix2D>::RowIndex>,
+    M::RowIndex: TryFromUsize + IntoUsize + PositiveInteger,
 {
     fn arbitrary(u: &mut Unstructured<'a>) -> arbitrary::Result<Self> {
-        let mut csr: CSR2D<SparseIndex, Idx, Idx> = CSR2D::arbitrary(u)?;
-        let number_of_diagonal_values = Idx::try_from_usize(
-            csr.sparse_coordinates()
+        let mut matrix: M = M::arbitrary(u)?;
+        let number_of_diagonal_values = M::RowIndex::try_from_usize(
+            matrix
+                .sparse_coordinates()
                 .filter(|(row_index, column_index)| row_index == column_index)
                 .count(),
         )
         .map_err(|_| arbitrary::Error::IncorrectFormat)?;
 
-		csr.number_of_columns = csr.number_of_columns.max(csr.number_of_rows);
-        csr.number_of_rows = csr.number_of_rows.max(csr.number_of_columns);
+        let side = matrix.number_of_rows().max(matrix.number_of_columns());
+        matrix.increase_shape((side, side)).map_err(|_| arbitrary::Error::IncorrectFormat)?;
 
-        Ok(Self { csr, number_of_diagonal_values })
+        Ok(Self { matrix, number_of_diagonal_values })
     }
 }
