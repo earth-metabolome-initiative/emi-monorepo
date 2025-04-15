@@ -1,8 +1,8 @@
 //! Trait defining a plate format and the vial positions.
 // example: a Thermo 54 vials plate is labelled from A1 to F9.
 
-use data-str
-trait RackFormat {
+
+pub trait RackFormat {
     /// Number of rows in the plate.
     fn rows(&self) -> usize;
     /// Number of columns in the plate.

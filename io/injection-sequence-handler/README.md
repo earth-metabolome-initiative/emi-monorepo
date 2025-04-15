@@ -1,2 +1,21 @@
 ## injection-sequence-handler crate
 
+The objective of this crate is to read and write injection sequence readable by a proprietary software piloting a mass-spectrometer.
+For example the Thermo Xcalibur software.
+
+An examples of such sequence is:
+
+```csv
+Bracket Type=4,,,,,,,,,,,,,,,,,,,
+Sample Type,File Name,Path,Instrument Method,Process Method,Calibration File,Position,Inj Vol,Level,Sample Wt,Sample Vol,ISTD Amt,Dil Factor,L1 Study,L2 Client,L3 Laboratory,L4 Company,L5 Phone,Comment,Sample Name
+Unknown,20241126_CVOL_bk_mapp_pre_001,C:\Xcalibur\Data,C:\Xcalibur\Methods\method1,,,B:F1,1,,0,0,0,0,,,,,,,
+Unknown,20241126_CVOL_bk_mapp_pre_002,C:\Xcalibur\Data,C:\Xcalibur\Methods\method1,,,B:F1,1,,,,,,,,,,,,
+Unknown,20241126_CVOL_bk_mapp_pre_003,C:\Xcalibur\Data,C:\Xcalibur\Methods\method1,,,B:F1,1,,,,,,,,,,,,
+Unknown,20241126_CVOL_mapp_01_91_003,C:\Xcalibur\Data,C:\Xcalibur\Methods\method1,,,B:A3,1,,,,,,,,,,,,
+Unknown,20241126_CVOL_mapp_01_91_006,C:\Xcalibur\Data,C:\Xcalibur\Methods\method1,,,B:A6,1,,,,,,,,,,,,
+Unknown,20241126_CVOL_mapp_01_91_009,C:\Xcalibur\Data,C:\Xcalibur\Methods\method1,,,B:A9,1,,,,,,,,,,,,
+Unknown,20241126_CVOL_mapp_01_91_012,C:\Xcalibur\Data,C:\Xcalibur\Methods\method1,,,B:B3,1,,,,,,,,,,,,
+Unknown,20241126_CVOL_mapp_01_91_015,C:\Xcalibur\Data,C:\Xcalibur\Methods\method1,,,B:B6,1,,,,,,,,,,,,
+```
+
+
