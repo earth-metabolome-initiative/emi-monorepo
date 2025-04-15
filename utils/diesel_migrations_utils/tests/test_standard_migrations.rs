@@ -3,6 +3,9 @@ use std::path::Path;
 
 use diesel_migrations_utils::prelude::*;
 
+mod utils;
+use utils::copy_dir_all;
+
 #[test]
 /// Test to check that the standard migrations are correctly loaded.
 pub fn test_standard_migrations() {
@@ -16,20 +19,6 @@ pub fn test_standard_migrations() {
     assert_eq!(migrations[1].number(), 3);
     assert_eq!(migrations[1].name(), "second_migration");
     assert_eq!(migrations[1].directory(), "00000000000003_second_migration");
-}
-
-fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> std::io::Result<()> {
-    std::fs::create_dir_all(&dst)?;
-    for entry in std::fs::read_dir(src)? {
-        let entry = entry?;
-        let ty = entry.file_type()?;
-        if ty.is_dir() {
-            copy_dir_all(entry.path(), dst.as_ref().join(entry.file_name()))?;
-        } else {
-            std::fs::copy(entry.path(), dst.as_ref().join(entry.file_name()))?;
-        }
-    }
-    Ok(())
 }
 
 #[test]

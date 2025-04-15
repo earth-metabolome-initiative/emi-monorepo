@@ -2,6 +2,8 @@
 
 use std::path::{Path, PathBuf};
 
+use sqlparser::ast::Statement;
+
 use crate::errors::Error;
 
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
@@ -127,8 +129,85 @@ impl Migration {
         format!("{:014}_{}", self.number, self.name)
     }
 
+    /// Returns an iterator over all of the tables created in the up migration.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - The parent path of the migration.
+    ///
+    /// # Raises
+    ///
+    /// * `Error::ReadingMigrationFailed` - If the migration cannot be read.
+    /// * `Error::ParsingMigrationFailed` - If the migration cannot be parsed.
+    pub fn tables(&self, parent: &Path) -> Result<impl Iterator<Item = String>, Error> {
+        Ok(self.up_statements(parent)?.into_iter().filter_map(|statement| {
+            if let Statement::CreateTable(create_table) = statement {
+                Some(create_table.name.to_string())
+            } else {
+                None
+            }
+        }))
+    }
+
+    /// Returns an iterator over all of the foreign tables referenced in the
+    /// up migration.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - The parent path of the migration.
+    ///
+    /// # Raises
+    ///
+    /// * `Error::ReadingMigrationFailed` - If the migration cannot be read.
+    /// * `Error::ParsingMigrationFailed` - If the migration cannot be parsed.
+    pub fn foreign_tables(&self, parent: &Path) -> Result<impl Iterator<Item = String>, Error> {
+        Ok(self
+            .up_statements(parent)?
+            .into_iter()
+            .filter_map(|statement| {
+                if let Statement::CreateTable(create_table) = statement {
+                    Some(create_table)
+                } else {
+                    None
+                }
+            })
+            .flat_map(|create_table| {
+                create_table
+                    .columns
+                    .into_iter()
+                    .flat_map(|column| column.options.into_iter())
+                    .filter_map(|option| {
+                        if let sqlparser::ast::ColumnOption::ForeignKey { foreign_table, .. } =
+                            option.option
+                        {
+                            Some(foreign_table.to_string())
+                        } else {
+                            None
+                        }
+                    })
+                    .chain(create_table.constraints.into_iter().filter_map(|constraint| {
+                        if let sqlparser::ast::TableConstraint::ForeignKey {
+                            foreign_table, ..
+                        } = constraint
+                        {
+                            Some(foreign_table.to_string())
+                        } else {
+                            None
+                        }
+                    }))
+            }))
+    }
+
     #[must_use]
     /// Returns the SQL content of the up migration.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - The parent path of the migration.
+    ///
+    /// # Errors
+    ///
+    /// * `Error::ReadingMigrationFailed` - If the migration cannot be read.
     pub fn up(&self, parent: &Path) -> Result<String, Error> {
         let path = parent.join(self.directory()).join("up.sql");
         std::fs::read_to_string(path).map_err(|error| {
@@ -138,6 +217,29 @@ impl Migration {
                 error.to_string(),
             )
         })
+    }
+
+    #[must_use]
+    /// Returns the statements in the up migration.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - The parent path of the migration.
+    ///
+    /// # Errors
+    ///
+    /// * `Error::ReadingMigrationFailed` - If the migration cannot be read.
+    /// * `Error::ParsingMigrationFailed` - If the migration cannot be parsed.
+    pub fn up_statements(&self, parent: &Path) -> Result<Vec<Statement>, Error> {
+        let statements = self.up(parent)?;
+        let statements = sqlparser::parser::Parser::parse_sql(
+            &sqlparser::dialect::PostgreSqlDialect {},
+            statements.as_str(),
+        )
+        .map_err(|error| {
+            Error::ParsingMigrationFailed(self.number, crate::prelude::MigrationKind::Up, error)
+        })?;
+        Ok(statements)
     }
 
     #[must_use]

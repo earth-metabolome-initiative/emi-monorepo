@@ -1,5 +1,7 @@
 //! Submodule providing errors for the migrations utility.
 
+use sqlparser::parser::ParserError;
+
 use crate::prelude::MigrationKind;
 
 #[derive(Debug, PartialEq)]
@@ -28,6 +30,10 @@ pub enum Error {
     ConnectionFailed(diesel::ConnectionError),
     /// When executing a migration fails
     ExecutingMigrationFailed(u64, MigrationKind, diesel::result::Error),
+    /// When parsing a migration fails
+    ParsingMigrationFailed(u64, MigrationKind, ParserError),
+    /// When the migrations directory order does not form a DAG
+    NotDAG,
 }
 
 impl From<std::io::Error> for Error {
