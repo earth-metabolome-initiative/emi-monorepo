@@ -8,22 +8,15 @@
 use yew::prelude::*;
 use yewdux::prelude::*;
 
-use crate::stores::{app_state, user_state};
+use crate::stores::app_state;
 
 #[function_component(Logout)]
 /// Logout button for the sidebar.
 pub fn logout() -> Html {
-    let (_, dispatch) = use_store::<user_state::UserState>();
     let (_, app_dispatch) = use_store::<app_state::AppState>();
 
-    let on_logout = {
-        Callback::from(move |_: MouseEvent| {
-            user_state::logout(dispatch.clone(), app_dispatch.clone());
-        })
-    };
-
     html! {
-        <button onclick={on_logout} class="btn btn-primary logout">
+        <button class="btn btn-primary logout">
             <i class="fas fa-right-from-bracket"></i>
             {'\u{00a0}'}
             {"Logout"}

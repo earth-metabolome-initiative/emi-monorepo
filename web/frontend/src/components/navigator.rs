@@ -8,21 +8,17 @@ use yew_router::prelude::*;
 use yewdux::prelude::*;
 
 use crate::{
-    components::{
-        badge::BadgeSize, hamburger::Hamburger, sidebar::Sidebar, Badge,
-    },
+    components::{Badge, badge::BadgeSize, hamburger::Hamburger, sidebar::Sidebar},
     router::AppRoute,
     stores::{app_state::AppState, user_state::UserState},
     workers::{
-        ws_worker::{ComponentMessage, WebsocketMessage},
         WebsocketWorker,
+        ws_worker::{ComponentMessage, WebsocketMessage},
     },
 };
 
 pub struct Navigator {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
-    user_state: Rc<UserState>,
-    user_dispatch: Dispatch<UserState>,
     app_state: Rc<AppState>,
     app_dispatch: Dispatch<AppState>,
     toggle_timeout: Option<Timeout>,
@@ -32,15 +28,10 @@ impl Navigator {
     fn sidebar_open(&self) -> bool {
         self.app_state.sidebar_open()
     }
-
-    fn user(&self) -> Option<Rc<User>> {
-        self.user_state.user()
-    }
 }
 
 pub enum NavigatorMessage {
     Backend(WebsocketMessage),
-    UserState(Rc<UserState>),
     AppState(Rc<AppState>),
     ToggleSidebar(bool),
     SetSidebarVisibility(bool),
@@ -54,9 +45,6 @@ impl Component for Navigator {
     type Properties = NavigatorProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let user_dispatch = Dispatch::<UserState>::global()
-            .subscribe(ctx.link().callback(NavigatorMessage::UserState));
-        let user_state = user_dispatch.get();
         let app_dispatch = Dispatch::<AppState>::global()
             .subscribe(ctx.link().callback(NavigatorMessage::AppState));
         let app_state = app_dispatch.get();
@@ -68,21 +56,11 @@ impl Component for Navigator {
             }
         }));
 
-        websocket.send(ComponentMessage::UserState(user_state.user()));
-        websocket.send(ComponentMessage::Connect(window().location().hostname().unwrap()));
-
-        Self { websocket, user_state, user_dispatch, app_state, app_dispatch, toggle_timeout: None }
+        Self { websocket, app_state, app_dispatch, toggle_timeout: None }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            NavigatorMessage::UserState(user_state) => {
-                if self.user_state == user_state {
-                    return false;
-                }
-                self.user_state = user_state;
-                true
-            }
             NavigatorMessage::AppState(app_state) => {
                 if self.app_state == app_state {
                     return false;
@@ -91,17 +69,6 @@ impl Component for Navigator {
                 self.app_state = app_state;
 
                 true
-            }
-            NavigatorMessage::Backend(WebsocketMessage::RefreshUser(user)) => {
-                log::info!("Received new access token");
-                self.user_dispatch.reduce_mut(|state| {
-                    state.set_user(user);
-                });
-                false
-            }
-            NavigatorMessage::Backend(WebsocketMessage::Notification(notification)) => {
-                log::info!("Received notification: {:?}", notification);
-                false
             }
             NavigatorMessage::Backend(_) => false,
             NavigatorMessage::SetSidebarVisibility(visibility) => {
@@ -142,23 +109,23 @@ impl Component for Navigator {
                         </Link<AppRoute>>
                     </h1>
                     // <SearchBar />
-                    if let Some(user) = self.user() {
-                        if user.inner.has_complete_profile() {
-                            <Badge<User> size={BadgeSize::Small} badge={user.clone()}/>
-                        } else {
-                            <Link<AppRoute> classes="right_nav_button fill-profile" to={AppRoute::UsersUpdate { id: user.inner.id }}>
-                                <i class="fas fa-clipboard-check"></i>
-                                {'\u{00a0}'}
-                                <span>{"Fill profile"}</span>
-                            </Link<AppRoute>>
-                        }
-                    } else {
-                        <Link<AppRoute> classes="right_nav_button login" to={AppRoute::Login}>
-                            <i class="fas fa-right-to-bracket"></i>
-                            {'\u{00a0}'}
-                            <span>{"Login"}</span>
-                        </Link<AppRoute>>
-                    }
+                    // if let Some(user) = self.user() {
+                    //     if user.inner.has_complete_profile() {
+                    //         <Badge<User> size={BadgeSize::Small} badge={user.clone()}/>
+                    //     } else {
+                    //         <Link<AppRoute> classes="right_nav_button fill-profile" to={AppRoute::UsersUpdate { id: user.inner.id }}>
+                    //             <i class="fas fa-clipboard-check"></i>
+                    //             {'\u{00a0}'}
+                    //             <span>{"Fill profile"}</span>
+                    //         </Link<AppRoute>>
+                    //     }
+                    // } else {
+                    //     <Link<AppRoute> classes="right_nav_button login" to={AppRoute::Login}>
+                    //         <i class="fas fa-right-to-bracket"></i>
+                    //         {'\u{00a0}'}
+                    //         <span>{"Login"}</span>
+                    //     </Link<AppRoute>>
+                    // }
                 </nav>
                 <Sidebar visible={self.sidebar_open()} onclose={toggle} />
             </>

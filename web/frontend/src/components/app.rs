@@ -4,7 +4,7 @@ use yew_router::prelude::*;
 
 use crate::{
     components::*,
-    router::{switch, AppRoute},
+    router::{AppRoute, switch},
     workers::*,
 };
 

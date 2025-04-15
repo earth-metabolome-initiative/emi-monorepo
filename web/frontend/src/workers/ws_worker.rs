@@ -3,16 +3,15 @@ use std::{
     rc::Rc,
 };
 
+use api_path::api::ws::FULL_ENDPOINT;
 use core_structures::User;
 use futures::{SinkExt, StreamExt};
-use gloo::timers::callback::Timeout;
 use gloo_net::websocket::futures::WebSocket;
 use rosetta_uuid::Uuid;
 use serde::{Deserialize, Serialize};
+use ws_messages::{B2FMessage, F2BMessage};
 use yew::platform::spawn_local;
 use yew_agent::worker::{HandlerId, Worker};
-use ws_messages::FrontendMessage;
-use api_path::api::ws::FULL_ENDPOINT;
 
 const NOMINAL_CLOSURE_CODE: u16 = 1000;
 
@@ -22,46 +21,27 @@ pub struct WebsocketWorker {
     subscribers: HashSet<HandlerId>,
     tasks: HashMap<Uuid, HandlerId>,
     user: Option<Rc<User>>,
-    websocket_sender: Option<futures::channel::mpsc::Sender<FrontendMessage>>,
+    websocket_sender: Option<futures::channel::mpsc::Sender<F2BMessage>>,
     reconnection_attempt: u32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 /// Messages from the frontend to the web-worker.
-pub enum ComponentMessage {
-    Operation(Operation),
-    UserState(Option<Rc<User>>),
-    // Connect to the provided hostname.
-    Connect(String),
-}
+pub enum ComponentMessage {}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 /// Messages from the websocket web-worker to the frontend.
-pub enum WebsocketMessage {
-    Notification(NotificationMessage),
-    SearchTable(Vec<u8>),
-    GetTable(Option<String>, Vec<u8>),
-    /// Contains the serialized object in the cases
-    /// where the operation was an update of get, and
-    /// None in the case of a delete operation.
-    Completed(Option<Vec<u8>>),
-    Error(ApiError),
-    RefreshUser(Rc<User>),
-}
+pub enum WebsocketMessage {}
 
 pub enum InternalMessage {
-    Backend(BackendMessage),
-    Frontend(HandlerId, ComponentMessage),
-    Disconnect(Option<CloseReason>),
-    User(Option<Rc<User>>),
-    Reconnect(String),
+    Backend(B2FMessage),
 }
 
 impl WebsocketWorker {
     fn connect_to_websocket(
         hostname: &str,
         scope: &yew_agent::prelude::WorkerScope<Self>,
-    ) -> Result<futures::channel::mpsc::Sender<FrontendMessage>, String> {
+    ) -> Result<futures::channel::mpsc::Sender<F2BMessage>, String> {
         let websocket = WebSocket::open(&format!("wss://{hostname}{FULL_ENDPOINT}"))
             .map_err(|err| format!("Error opening websocket connection: {:?}", err))?;
 
@@ -75,44 +55,44 @@ impl WebsocketWorker {
 
         let (mut write, mut read) = websocket.split();
 
-        let (sender, mut receiver) = futures::channel::mpsc::channel::<FrontendMessage>(1000);
+        let (sender, mut receiver) = futures::channel::mpsc::channel::<F2BMessage>(1000);
 
-        spawn_local(async move {
-            while let Some(frontend_message) = receiver.next().await {
-                if write.send(frontend_message.into()).await.is_err() {
-                    log::error!("Error sending to websocket");
-                    break;
-                }
-            }
-            log::debug!("Websocket sender closed");
-        });
+        // spawn_local(async move {
+        //     while let Some(frontend_message) = receiver.next().await {
+        //         if write.send(frontend_message.into()).await.is_err() {
+        //             log::error!("Error sending to websocket");
+        //             break;
+        //         }
+        //     }
+        //     log::debug!("Websocket sender closed");
+        // });
 
         let hostname = hostname.to_owned();
 
-        {
-            let scope = scope.clone();
-            spawn_local(async move {
-                while let Some(backend_message) = read.next().await {
-                    match backend_message {
-                        Ok(message) => {
-                            match message.try_into() {
-                                Ok(message) => {
-                                    scope.send_message(InternalMessage::Backend(message));
-                                }
-                                Err(err) => {
-                                    log::error!("Error deserializing message: {:?}", err);
-                                }
-                            }
-                        }
-                        Err(err) => {
-                            log::error!("Error reading from websocket: {:?}", err);
-                            break;
-                        }
-                    }
-                }
-                scope.send_message(InternalMessage::Reconnect(hostname));
-            });
-        }
+        // {
+        //     let scope = scope.clone();
+        //     spawn_local(async move {
+        //         while let Some(backend_message) = read.next().await {
+        //             match backend_message {
+        //                 Ok(message) => {
+        //                     match message.try_into() {
+        //                         Ok(message) => {
+        //                             scope.send_message(InternalMessage::Backend(message));
+        //                         }
+        //                         Err(err) => {
+        //                             log::error!("Error deserializing message: {:?}", err);
+        //                         }
+        //                     }
+        //                 }
+        //                 Err(err) => {
+        //                     log::error!("Error reading from websocket: {:?}", err);
+        //                     break;
+        //                 }
+        //             }
+        //         }
+        //         scope.send_message(InternalMessage::Reconnect(hostname));
+        //     });
+        // }
 
         Ok(sender)
     }
@@ -139,129 +119,12 @@ impl Worker for WebsocketWorker {
         internal_message: Self::Message,
     ) {
         match internal_message {
-            InternalMessage::User(user) => {
-                self.user = user;
-            }
             InternalMessage::Backend(backend_message) => {
                 match backend_message {
-                    BackendMessage::Notification(notification) => {
-                        // TODO! HANDLE UPDATE OF THE DATABASE!
-                        log::debug!("Notification received: {:?}", notification);
-                    }
-                    BackendMessage::Completed(task_id, maybe_row) => {
-                        log::debug!("Task completed: {:?}", task_id);
-                        // We can remove this task from the queue.
-                        if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, WebsocketMessage::Completed(maybe_row));
-                        }
-                    }
-                    BackendMessage::Error(task_id, error) => {
-                        log::debug!("Task failed: {:?}", error);
-                        // We can remove this task from the queue.
-                        if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, WebsocketMessage::Error(error));
-                        }
-                    }
-                    BackendMessage::Close(close_reason) => {
-                        // We need to close the websocket connection.
-                        scope.send_message(InternalMessage::Disconnect(close_reason));
-                    }
-                    BackendMessage::GetTable(task_id, task_name, row) => {
-                        // We save locally the table data (maybe?)
-                        // We can remove this task from the queue.
-                        if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope
-                                .respond(subscriber_id, WebsocketMessage::GetTable(task_name, row));
-                        }
-                    }
-                    BackendMessage::SearchTable(task_id, rows) => {
-                        // We save locally the search results (maybe?)
-                        if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, WebsocketMessage::SearchTable(rows));
-                        }
-                    }
-                    BackendMessage::RefreshUser(user) => {
-                        let rc_user = Rc::from(user);
-                        self.user = Some(rc_user.clone());
-
-                        // We need to update the access token in the user state.
-                        for sub in &self.subscribers {
-                            scope.respond(*sub, WebsocketMessage::RefreshUser(rc_user.clone()));
-                        }
+                    B2FMessage::Pong => {
+                        log::debug!("Received pong from backend");
                     }
                 };
-            }
-            InternalMessage::Frontend(subscriber_id, message) => {
-                match message {
-                    ComponentMessage::Connect(hostname) => {
-                        scope.send_message(InternalMessage::Reconnect(hostname));
-                    }
-                    ComponentMessage::UserState(user) => {
-                        scope.send_message(InternalMessage::User(user));
-                    }
-                    ComponentMessage::Operation(operation) => {
-                        if operation.requires_authentication() && self.user.is_none() {
-                            // When the user is offline, but some operation requires authentication,
-                            // we need to return an error.
-                            log::error!("Unauthorized operation: {:?}", operation);
-                            scope.respond(
-                                subscriber_id,
-                                WebsocketMessage::Error(ApiError::Unauthorized),
-                            );
-                            return;
-                        }
-
-                        // TODO! Add here the task to the client database!
-
-                        let task_id = Uuid::new_v4();
-                        self.tasks.insert(task_id, subscriber_id);
-
-                        if self.websocket_sender.as_mut().map_or(true, |sender| {
-                            sender
-                                .try_send(FrontendMessage::Task(task_id, operation.clone()))
-                                .is_err()
-                        }) {
-                            self.database_sender
-                                .try_send((
-                                    task_id,
-                                    self.user.as_ref().map(|user| user.inner.id),
-                                    operation,
-                                ))
-                                .unwrap();
-                        }
-                    }
-                }
-            }
-            InternalMessage::Disconnect(_closure_code) => {
-                if let Some(mut sender) = self.websocket_sender.take() {
-                    spawn_local(async move {
-                        let _ = sender.close().await;
-                    });
-                }
-            }
-            InternalMessage::Reconnect(hostname) => {
-                if let Some(mut sender) = self.websocket_sender.take() {
-                    spawn_local(async move {
-                        let _ = sender.close().await;
-                    });
-                }
-                if let Ok(sender) = Self::connect_to_websocket(&hostname, scope) {
-                    log::debug!("Reconnected to websocket");
-                    self.reconnection_attempt = 0;
-                    self.websocket_sender = Some(sender);
-                    // TODO! RESEND ALL TASKS!
-                } else {
-                    log::debug!(
-                        "Failed to reconnect to websocket, attempting again in {} seconds",
-                        2_u32.pow(self.reconnection_attempt)
-                    );
-                    self.reconnection_attempt += 1;
-                    let scope = scope.clone();
-                    Timeout::new(2_u32.pow(self.reconnection_attempt) * 1000, move || {
-                        scope.send_message(InternalMessage::Reconnect(hostname));
-                    })
-                    .forget();
-                }
             }
         }
     }
@@ -278,24 +141,12 @@ impl Worker for WebsocketWorker {
         self.subscribers.remove(&id);
     }
 
-    fn destroy(
-        &mut self,
-        scope: &yew_agent::prelude::WorkerScope<Self>,
-        _destruct: yew_agent::worker::WorkerDestroyHandle<Self>,
-    ) {
-        log::debug!("Destroying websocket worker");
-        scope.send_message(InternalMessage::Disconnect(Some(CloseReason::new(
-            NOMINAL_CLOSURE_CODE,
-            Some("Worker destroyed"),
-        ))));
-    }
-
     fn received(
         &mut self,
         scope: &yew_agent::prelude::WorkerScope<Self>,
         frontend_message: Self::Input,
         subscriber_id: HandlerId,
     ) {
-        scope.send_message(InternalMessage::Frontend(subscriber_id, frontend_message));
+        todo!();
     }
 }

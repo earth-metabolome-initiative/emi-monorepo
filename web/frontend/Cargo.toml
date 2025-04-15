@@ -21,6 +21,8 @@ bincode.workspace = true
 api-path.workspace = true
 ws-messages.workspace = true
 common-traits.workspace = true
+log.workspace = true
+futures.workspace = true
 web_common_traits = { workspace = true, features = ["frontend"] }
 core-structures = { workspace = true, features = ["frontend"] }
 postgis_diesel = { workspace = true, default-features = false, features = ["serde", "sqlite"] }
@@ -34,12 +36,10 @@ yew = { version = "0.21.0", features = ["csr"] }
 yew-router = "0.18.0"
 # The doc-tests feature is required to avoid errors from the Rust Analyzer,
 # but it is not actually used in the code.
-yewdux = { version = "0.11.0" }
+yewdux = "0.11.0"
 gloo-net = "0.5.0"
 gloo-console = "0.3.0"
 wasm-logger = "0.2.0"
-log = "0.4.25"
-futures.workspace = true
 rustrict = "0.7.33"
 js-sys = "0.3.77"
 leaflet = "0.4.1"
