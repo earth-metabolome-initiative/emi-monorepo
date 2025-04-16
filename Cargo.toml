@@ -57,12 +57,19 @@ bytes = "1.10.0"
 bincode = "1.3.3"
 sqlparser = { git = "https://github.com/apache/datafusion-sqlparser-rs.git", branch = "main" }
 arbitrary = { version = "1", features = ["derive"] }
-diesel = { version = "2.2" }
-diesel-async = { version = "0.5", features = ["pool", "bb8"] }
+diesel = { version = "2.2", features = ["extras", "sqlite", "postgres"] }
+diesel-async = { version = "0.5", features = [
+    "pool",
+    "bb8",
+    "sqlite",
+    "postgres",
+] }
 diesel_full_text_search = "2.2"
 redis = { version = "0.29", features = ["tokio-comp"] }
 postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel.git", features = [
     "serde",
+    "sqlite",
+    "postgres",
 ], default-features = false, branch = "sqlite" }
 chrono = { version = "0.4.39", features = ["serde"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
@@ -72,6 +79,9 @@ strum_macros = "0.26.4"
 zip = "2.2.2"
 pgrx = "0.13"
 image = "0.25.5"
+rsa = { version = "0.9.8" }
+rand = { version = "0.8" }
+base64ct = { version = "1.6" }
 pgrx-sql-entity-graph = "0.13"
 criterion = { version = "0.5", features = ["html_reports"] }
 rosetta-uuid = { path = "data-structures/rosetta-uuid" }

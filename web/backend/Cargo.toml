@@ -14,14 +14,8 @@ description = "Backend for the Earth Metabolome Initiative"
 
 [dependencies]
 chrono.workspace = true
-diesel = { workspace = true, features = [
-	"postgres",
-	"extras",
-] }
-diesel-async = { workspace = true, features = [
-	"postgres",
-	"bb8",
-] }
+diesel.workspace = true
+diesel-async.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 rosetta-uuid.workspace = true
@@ -29,7 +23,10 @@ bincode.workspace = true
 futures.workspace = true
 api-path.workspace = true
 backend-request-errors.workspace = true
-postgis_diesel = { workspace = true, features = ["serde", "postgres"] }
+postgis_diesel.workspace = true
+rand.workspace = true
+rsa.workspace = true
+base64ct.workspace = true
 core-structures = { workspace = true, features = ["backend"] }
 web_common_traits = { workspace = true, features = ["backend"] }
 openssl = { version = "0.10" }

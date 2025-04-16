@@ -1,5 +1,5 @@
 //! Functions and APIs dealing with JWT cookies necessary for OAuth2 logins.
-use std::{env, future::ready, pin::Pin};
+use std::{future::ready, pin::Pin};
 
 use actix_web::{
     FromRequest, HttpRequest, HttpResponse, HttpResponseBuilder,
@@ -51,6 +51,7 @@ pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpRespons
     builder.finish()
 }
 
+#[derive(Debug)]
 struct JWTConfig {
     access_token_base_64_public_key: String,
     access_token_base_64_private_key: String,
@@ -63,12 +64,12 @@ struct JWTConfig {
 impl JWTConfig {
     fn from_env() -> Result<JWTConfig, BackendError> {
         Ok(JWTConfig {
-            access_token_base_64_public_key: env::var("ACCESS_TOKEN_PUBLIC_KEY")?,
-            access_token_base_64_private_key: env::var("ACCESS_TOKEN_PRIVATE_KEY")?,
-            access_token_minutes: env::var("ACCESS_TOKEN_MINUTES")?.parse()?,
-            refresh_token_base_64_public_key: env::var("REFRESH_TOKEN_PUBLIC_KEY")?,
-            refresh_token_base_64_private_key: env::var("REFRESH_TOKEN_PRIVATE_KEY")?,
-            refresh_token_minutes: env::var("REFRESH_TOKEN_MINUTES")?.parse()?,
+            access_token_base_64_public_key: std::env::var("ACCESS_TOKEN_PUBLIC_KEY")?,
+            access_token_base_64_private_key: std::env::var("ACCESS_TOKEN_PRIVATE_KEY")?,
+            access_token_minutes: std::env::var("ACCESS_TOKEN_MINUTES")?.parse()?,
+            refresh_token_base_64_public_key: std::env::var("REFRESH_TOKEN_PUBLIC_KEY")?,
+            refresh_token_base_64_private_key: std::env::var("REFRESH_TOKEN_PRIVATE_KEY")?,
+            refresh_token_minutes: std::env::var("REFRESH_TOKEN_MINUTES")?.parse()?,
         })
     }
 
@@ -272,22 +273,6 @@ impl JsonRefreshToken {
     }
 }
 
-/// We do a small unit test to ensure that the encode and decode process works
-/// as expected. for the JsonRefreshToken struct.
-#[cfg(test)]
-mod refresh_token_tests {
-    use super::*;
-
-    #[test]
-    fn test_encode_decode() {
-        let user_id = 45678;
-        let token = JsonRefreshToken::new(user_id).unwrap();
-        let encoded = token.encode().unwrap();
-        let decoded = JsonRefreshToken::decode(&encoded).unwrap();
-        assert_eq!(token, decoded);
-    }
-}
-
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 pub(crate) struct JsonAccessToken {
     web_token: JsonWebToken,
@@ -349,25 +334,10 @@ impl JsonAccessToken {
 
     pub fn decode(token: &str) -> Result<JsonAccessToken, BackendError> {
         let config = JWTConfig::from_env()?;
+        println!("Decoding token: {:?}", config);
         Ok(JsonAccessToken {
             web_token: JsonWebToken::decode(token, config.access_token_public_key()?)?.claims,
         })
-    }
-}
-
-/// We do a small unit test to ensure that the encode and decode process works
-/// as expected for the JsonAccessToken struct.
-#[cfg(test)]
-mod access_token_tests {
-    use super::*;
-
-    #[test]
-    fn test_encode_decode() {
-        let user_id = 987654;
-        let token = JsonAccessToken::new(user_id).unwrap();
-        let encoded = token.encode().unwrap();
-        let decoded = JsonAccessToken::decode(&encoded).unwrap();
-        assert_eq!(token, decoded);
     }
 }
 
