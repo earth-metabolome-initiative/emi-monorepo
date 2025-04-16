@@ -181,7 +181,7 @@ impl<'a> CSVTable<'a> {
             if column.artificial {
                 continue;
             }
-            writeln!(sql, "    {},\n", column.name(self.schema)?)?;
+            writeln!(sql, "    {},", column.name(self.schema)?)?;
         }
 
         sql.pop();
@@ -197,12 +197,12 @@ impl<'a> CSVTable<'a> {
             if let Some(foreign_table) = column.foreign_table() {
                 writeln!(
                     sql,
-                    "    {}.{},\n",
+                    "    {}.{},",
                     foreign_table.name(),
                     foreign_table.primary_key().name()?
                 )?;
             } else {
-                writeln!(sql, "    {}.{},\n", temporary_table_name, column.name()?)?;
+                writeln!(sql, "    {}.{},", temporary_table_name, column.name()?)?;
             }
         }
         sql.pop();
