@@ -5,9 +5,7 @@ edition = "2024"
 
 [dependencies]
 chrono.workspace = true
-diesel = { workspace = true, optional = true, default-features = false, features = [
-	"chrono",
-] }
+diesel = { workspace = true, optional = true, features = ["chrono"] }
 pgrx-sql-entity-graph = { workspace = true, optional = true }
 pgrx = { workspace = true, optional = true, features = ["pg17"] }
 serde = { workspace = true, optional = true }
