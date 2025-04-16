@@ -3,9 +3,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        HOST_UID: ${USER_ID}
+        HOST_GID: ${GROUP_ID}
+    environment:
+      - HOST_UID=${USER_ID}
+      - HOST_GID=${GROUP_ID}
     container_name: pgrx_builder
     volumes:
       - ../../..:/workspace  # Mount the entire monorepo
-      - ./pgrx_validation:/workspace/extension # Output directory
+      - ./extension:/home/appuser/extension # Output directory
     working_dir: /workspace/web/web_common/pgrx_validation
     entrypoint: ["/workspace/web/web_common/pgrx_validation/build.sh"]
+    user: "${USER_ID}:${GROUP_ID}"

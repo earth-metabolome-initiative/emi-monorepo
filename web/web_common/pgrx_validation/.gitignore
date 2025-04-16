@@ -4,5 +4,3 @@
 *.iml
 **/*.rs.bk
 Cargo.lock
-extension
-pgrx_validation

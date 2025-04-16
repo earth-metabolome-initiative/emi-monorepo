@@ -16,12 +16,13 @@ Re-defining a validation multiple times is a waste of time, and prone to errors 
 
 ## Building the extension
 
-To build the extension into the local folder `./pgrx_validation`, you can run:
+To build the extension into the local folder `./extension`, you can run:
 
 ```bash
-docker compose build
-docker compose up
+USER_ID=$(id -u) GROUP_ID=$(id -g) docker compose up
 ```
+
+Where the `USER_ID` and `GROUP_ID` environment variables are used to set the user and group IDs inside the container to match those of the host system. This is important to avoid polluting the `target` directory with files owned by the root user, which would make it impossible to delete them from the host system.
 
 DO NOT just run `cargo build` or `cargo pgrx package` as you may not have the correct version of `PostgreSQL` installed on your system or several other dynamically linked libraries, such as `GLIBC`. Instead, always use the `docker compose` command.
 

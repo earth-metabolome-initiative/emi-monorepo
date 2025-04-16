@@ -4,7 +4,7 @@
 ::pgrx::pgrx_embed!();
 
 #[cfg(not(feature = "pgrx"))]
-/// Stub function to allow compilation without Postgres
+/// Stub function to allow compilation without pgrx
 fn main() {
     println!("Hello, pgrx_validation");
 }
