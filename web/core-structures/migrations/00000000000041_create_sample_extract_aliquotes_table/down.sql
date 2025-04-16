@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS sample_extract_aliquotes;

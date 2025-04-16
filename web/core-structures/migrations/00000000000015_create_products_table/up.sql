@@ -23,10 +23,27 @@ CREATE TABLE IF NOT EXISTS instrument_models (
 CREATE TABLE IF NOT EXISTS weighing_instrument_models (
 	id INTEGER PRIMARY KEY REFERENCES instrument_models(id),
 	error_kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(error_kilograms)),
+	minimum_measurable_kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(minimum_measurable_kilograms)),
+	maximum_measurable_kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(maximum_measurable_kilograms)),
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INTEGER NOT NULL REFERENCES users(id),
-	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	CONSTRAINT error_smaller_than_minimum CHECK (must_be_strictly_smaller_than_f32(error_kilograms, minimum_measurable_kilograms))
+	CONSTRAINT min_max_measurable CHECK (must_be_strictly_smaller_than_f32(minimum_measurable_kilograms, maximum_measurable_kilograms))
+);
+
+CREATE TABLE IF NOT EXISTS aliquoting_instrument_models (
+	id INTEGER PRIMARY KEY REFERENCES instrument_models(id),
+	error_liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(error_liters)),
+	minimum_measurable_liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(minimum_measurable_liters)),
+	maximum_measurable_liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(maximum_measurable_liters)),
+	created_by INTEGER NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_by INTEGER NOT NULL REFERENCES users(id),
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	CONSTRAINT error_smaller_than_minimum CHECK (must_be_strictly_smaller_than_f32(error_liters, minimum_measurable_liters)),
+	CONSTRAINT min_max_measurable CHECK (must_be_strictly_smaller_than_f32(minimum_measurable_liters, maximum_measurable_liters))
 );
 
 CREATE TABLE IF NOT EXISTS instrument_model_categories (

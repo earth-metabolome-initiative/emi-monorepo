@@ -16,9 +16,9 @@ CREATE TABLE IF NOT EXISTS step_instruments (
 	step_id INT NOT NULL REFERENCES steps(id),
 	instrument_id SMALLINT NOT NULL REFERENCES instruments(id),
 	created_by INT NOT NULL REFERENCES users(id),
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INT NOT NULL REFERENCES users(id),
-	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Table providing the nameplate models used within a certain step
@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS step_nameplate_models (
 	step_id INT NOT NULL REFERENCES steps(id),
 	nameplate_model_id SMALLINT NOT NULL REFERENCES nameplate_models(id),
 	created_by INT NOT NULL REFERENCES users(id),
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INT NOT NULL REFERENCES users(id),
-	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS step_container_models (
@@ -37,9 +37,9 @@ CREATE TABLE IF NOT EXISTS step_container_models (
 	step_id INT NOT NULL REFERENCES steps(id),
 	container_model_id INT NOT NULL REFERENCES container_models(id),
 	created_by INT NOT NULL REFERENCES users(id),
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INT NOT NULL REFERENCES users(id),
-	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS step_storage_containers (
@@ -47,9 +47,9 @@ CREATE TABLE IF NOT EXISTS step_storage_containers (
 	step_id INT NOT NULL REFERENCES steps(id),
 	storage_container_id UUID NOT NULL REFERENCES storage_containers(id),
 	created_by INT NOT NULL REFERENCES users(id),
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INT NOT NULL REFERENCES users(id),
-	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS step_tool_models (
@@ -57,9 +57,21 @@ CREATE TABLE IF NOT EXISTS step_tool_models (
 	step_id INT NOT NULL REFERENCES steps(id),
 	tool_model_id INT NOT NULL REFERENCES tool_models(id),
 	created_by INT NOT NULL REFERENCES users(id),
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INT NOT NULL REFERENCES users(id),
-	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS freeze_drying_steps (
+	id INTEGER PRIMARY KEY REFERENCES steps(id),
+	field_sample_id INTEGER NOT NULL REFERENCES field_samples(id),
+	freeze_drying_step_model_id INTEGER NOT NULL REFERENCES freeze_drying_step_models(id),
+	instrument_id SMALLINT NOT NULL REFERENCES instruments(id),
+	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms)),
+	created_by INT NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_by INT NOT NULL REFERENCES users(id),
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS weighing_steps (
@@ -69,19 +81,32 @@ CREATE TABLE IF NOT EXISTS weighing_steps (
 	instrument_id SMALLINT NOT NULL REFERENCES instruments(id),
 	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms)),
 	created_by INT NOT NULL REFERENCES users(id),
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INT NOT NULL REFERENCES users(id),
-	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS fractioning_steps (
+	id INTEGER PRIMARY KEY REFERENCES steps(id),
+	field_sample_id INTEGER NOT NULL REFERENCES field_samples(id),
+	lab_sample_id INTEGER NOT NULL REFERENCES lab_samples(id),
+	fractioning_step_model_id INTEGER NOT NULL REFERENCES fractioning_step_models(id),
+	instrument_id SMALLINT NOT NULL REFERENCES instruments(id),
+	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms)),
+	created_by INT NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_by INT NOT NULL REFERENCES users(id),
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS aliquoting_steps (
 	id INTEGER PRIMARY KEY REFERENCES steps(id),
-	field_sample_id INTEGER NOT NULL REFERENCES field_samples(id),
-	weighing_step_model_id INTEGER NOT NULL REFERENCES weighing_step_models(id),
+	sample_extract_id UUID NOT NULL REFERENCES sample_extracts(id),
+	sample_extract_aliquote_id UUID NOT NULL REFERENCES sample_extract_aliquotes(id),
 	instrument_id SMALLINT NOT NULL REFERENCES instruments(id),
-	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms)),
+	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters)),
 	created_by INT NOT NULL REFERENCES users(id),
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INT NOT NULL REFERENCES users(id),
-	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
