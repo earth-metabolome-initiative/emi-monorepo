@@ -2,7 +2,8 @@
 use time_requirements::prelude::*;
 
 /// Generate a time tracker for testing.
-#[must_use] pub fn time_tracker() -> TimeTracker {
+#[must_use]
+pub fn time_tracker() -> TimeTracker {
     let mut tracker = TimeTracker::new("Test Project");
 
     let task1 = Task::new("Test Task 1");

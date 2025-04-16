@@ -6,7 +6,7 @@ use crate::traits::{has_repeated_colors::RepeatedColors, is_transparent::IsTrans
 
 impl IsTransparent for image::DynamicImage {
     fn is_transparent(&self) -> bool {
-        use image::ColorType::{La16, La8, Rgba16, Rgba8};
+        use image::ColorType::{La8, La16, Rgba8, Rgba16};
         match self.color() {
             La8 | La16 | Rgba8 | Rgba16 => self.pixels().any(|(_, _, pixel)| pixel.0[3] < 220),
             _ => false,

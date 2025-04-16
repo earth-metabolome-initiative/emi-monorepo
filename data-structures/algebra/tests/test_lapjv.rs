@@ -1,4 +1,5 @@
-//! Unit tests to verify the correctness of the `LAPjv` algorithm implementation.
+//! Unit tests to verify the correctness of the `LAPjv` algorithm
+//! implementation.
 
 use algebra::{
     impls::ValuedCSR2D,

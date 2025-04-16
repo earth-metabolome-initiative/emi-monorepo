@@ -69,11 +69,10 @@ impl<'a> TryFrom<&'a Path> for CompressionExtension {
 impl CompressionExtension {
     #[must_use]
     /// Determines an appropriate name for the extracted file.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `source` - The path to the compressed file.
-    /// 
     pub fn extract_name(&self, source: &Path) -> String {
         match self {
             CompressionExtension::Tar => {

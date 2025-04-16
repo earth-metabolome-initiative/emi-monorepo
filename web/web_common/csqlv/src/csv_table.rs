@@ -164,11 +164,11 @@ impl<'a> CSVTable<'a> {
     /// Returns the SQL to populate the table.
     ///
     /// # Errors
-    /// 
+    ///
     /// * If the format of the table is invalid.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// * If the schema is in an invalid state and the foreign table does not
     ///   exist.
     pub fn populate(&self) -> Result<String, CSVSchemaError> {

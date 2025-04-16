@@ -48,7 +48,7 @@ pub enum CSVSchemaError {
     /// Error indicating a failure to execute a migration.
     MigrationError(diesel::result::Error),
     /// Error indicating a failure to format a string.
-    FormatError(std::fmt::Error)
+    FormatError(std::fmt::Error),
 }
 
 impl From<csv::Error> for CSVSchemaError {
