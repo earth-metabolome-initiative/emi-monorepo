@@ -4,11 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-diesel = { version = "2.2", features = [
-	"postgres",
-	"chrono",
-	"uuid",
-] }
+diesel = { workspace = true, features = ["postgres", "chrono", "uuid"] }
 itertools = "0.13.0"
 serde.workspace = true
 syn.workspace = true
@@ -31,19 +27,19 @@ trybuild.workspace = true
 serde_json.workspace = true
 chrono.workspace = true
 ipnetwork = "0.20.0"
-rosetta-uuid = {workspace = true, features = ["diesel", "serde", "postgres"]}
-rosetta-timestamp = {workspace = true, features = ["diesel", "serde", "postgres"]}
+rosetta-uuid = { workspace = true, features = ["diesel", "serde", "postgres"] }
+rosetta-timestamp = { workspace = true, features = [
+	"diesel",
+	"serde",
+	"postgres",
+] }
 web_common_traits.workspace = true
 macaddr = "1.0.1"
 postgis_diesel.workspace = true
 diesel_full_text_search.workspace = true
-diesel-async = { workspace = true, features = [
-	"postgres",
-	"bb8",
-] }
+diesel-async = { workspace = true, features = ["postgres", "bb8"] }
 validation-errors.workspace = true
 pgrx_validation.workspace = true
-
 
 [features]
 default = ["diesel", "serde", "postgres"]

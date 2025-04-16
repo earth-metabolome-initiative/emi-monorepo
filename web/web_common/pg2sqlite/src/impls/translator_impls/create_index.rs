@@ -99,6 +99,7 @@ fn create_fts5_from_index(create_index: &CreateIndex) -> CreateTable {
         cluster_by: None,
         hive_distribution: sqlparser::ast::HiveDistributionStyle::NONE,
         options: None,
+        inherits: None,
         partition_by: None,
         order_by: None,
         clustered_by: None,

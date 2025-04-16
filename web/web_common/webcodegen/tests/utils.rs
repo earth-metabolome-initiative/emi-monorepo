@@ -121,7 +121,7 @@ async fn setup_docker(
     database_port: u16,
     database_name: &str,
 ) -> Result<ContainerAsync<GenericImage>, TestcontainersError> {
-    let extension_directory = format!("../pgrx_validation/{EXTENSION_NAME}");
+    let extension_directory = format!("../pgrx_validation/extension");
 
     // We check whether the extension directory exists, or we raise an adequate
     // error warning the reader that they most likely need to build the
@@ -129,7 +129,7 @@ async fn setup_docker(
 
     if !std::path::Path::new(&extension_directory).exists() {
         panic!(
-            "The extension directory does not exist. Most likely you forgot to build the extension. Refer to the `pgrx_validation` README for more informations."
+            "The extension directory `{extension_directory}` does not exist. Most likely you forgot to build the extension. Refer to the `pgrx_validation` README for more information."
         );
     }
 
