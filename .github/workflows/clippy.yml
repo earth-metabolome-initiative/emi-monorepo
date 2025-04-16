@@ -2,20 +2,21 @@ name: Clippy
 
 
 on:
-  push:
-    branches: ["*"]
-  pull_request:
-    branches: ["*"]
+  workflow_run:
+    workflows: ["Rust Format Check"]
+    types:
+      - completed
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   clippy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install Clippy
         run:
           rustup toolchain install nightly --component clippy
