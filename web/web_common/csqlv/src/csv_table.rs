@@ -163,28 +163,31 @@ impl<'a> CSVTable<'a> {
 
     /// Returns the SQL to populate the table.
     ///
+    /// # Errors
+    /// 
+    /// * If the format of the table is invalid.
+    /// 
     /// # Panics
+    /// 
     /// * If the schema is in an invalid state and the foreign table does not
     ///   exist.
     pub fn populate(&self) -> Result<String, CSVSchemaError> {
+        use std::fmt::Write;
         let mut sql = self.temporary_table()?;
 
-        sql.push_str(&format!(
-            "\nTRUNCATE TABLE {} RESTART IDENTITY CASCADE;\n",
-            self.table_metadata.name
-        ));
-        sql.push_str(&format!("\nINSERT INTO {} (\n", self.table_metadata.name));
+        writeln!(sql, "\nTRUNCATE TABLE {} RESTART IDENTITY CASCADE;\n", self.table_metadata.name)?;
+        writeln!(sql, "\nINSERT INTO {} (\n", self.table_metadata.name)?;
         for column in &self.table_metadata.columns {
             if column.artificial {
                 continue;
             }
-            sql.push_str(&format!("    {},\n", column.name(self.schema)?));
+            writeln!(sql, "    {},\n", column.name(self.schema)?)?;
         }
 
         sql.pop();
         sql.pop();
 
-        sql.push_str("\n) SELECT\n");
+        writeln!(sql, "\n) SELECT")?;
         let temporary_table_name = self.table_metadata.temporary_table_name();
 
         for column in self.columns() {
@@ -192,23 +195,24 @@ impl<'a> CSVTable<'a> {
                 continue;
             }
             if let Some(foreign_table) = column.foreign_table() {
-                sql.push_str(&format!(
+                writeln!(
+                    sql,
                     "    {}.{},\n",
                     foreign_table.name(),
                     foreign_table.primary_key().name()?
-                ));
+                )?;
             } else {
-                sql.push_str(&format!("    {}.{},\n", temporary_table_name, column.name()?));
+                writeln!(sql, "    {}.{},\n", temporary_table_name, column.name()?)?;
             }
         }
         sql.pop();
         sql.pop();
 
-        sql.push_str("\nFROM\n");
-        sql.push_str(&format!("    {temporary_table_name}"));
+        writeln!(sql, "\nFROM\n    {temporary_table_name}")?;
         for column in self.columns() {
             if let Some(foreign_table) = column.foreign_table() {
-                sql.push_str(&format!(
+                writeln!(
+                    sql,
                     "\n    JOIN {} ON {}.{}_{} = {}.{}",
                     foreign_table.name(),
                     temporary_table_name,
@@ -216,13 +220,12 @@ impl<'a> CSVTable<'a> {
                     column.foreign_column_name().unwrap(),
                     foreign_table.name(),
                     column.foreign_column_name().unwrap()
-                ));
+                )?;
             }
         }
 
-        sql.push_str(";\n");
-
-        sql.push_str(&format!("\nDROP TABLE {temporary_table_name};\n",));
+        writeln!(sql, ";",)?;
+        writeln!(sql, "\nDROP TABLE {temporary_table_name};",)?;
 
         Ok(sql)
     }

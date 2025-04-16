@@ -47,6 +47,8 @@ pub enum CSVSchemaError {
     ConnectionError(diesel::ConnectionError),
     /// Error indicating a failure to execute a migration.
     MigrationError(diesel::result::Error),
+    /// Error indicating a failure to format a string.
+    FormatError(std::fmt::Error)
 }
 
 impl From<csv::Error> for CSVSchemaError {
@@ -70,6 +72,12 @@ impl From<diesel::ConnectionError> for CSVSchemaError {
 impl From<diesel::result::Error> for CSVSchemaError {
     fn from(err: diesel::result::Error) -> CSVSchemaError {
         CSVSchemaError::MigrationError(err)
+    }
+}
+
+impl From<std::fmt::Error> for CSVSchemaError {
+    fn from(err: std::fmt::Error) -> CSVSchemaError {
+        CSVSchemaError::FormatError(err)
     }
 }
 
@@ -106,6 +114,7 @@ impl std::fmt::Display for CSVSchemaError {
             CSVSchemaError::EmptyColumn => write!(f, "Empty column"),
             CSVSchemaError::ConnectionError(e) => write!(f, "Connection Error: {e}"),
             CSVSchemaError::MigrationError(e) => write!(f, "Migration Error: {e}"),
+            CSVSchemaError::FormatError(e) => write!(f, "Format Error: {e}"),
         }
     }
 }
