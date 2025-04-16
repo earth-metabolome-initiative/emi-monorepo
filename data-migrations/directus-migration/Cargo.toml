@@ -20,6 +20,6 @@ core-structures = { workspace = true, features = ["backend"] }
 [features]
 default = ["serde", "64-column-tables"]
 serde = []
-postgres = ["diesel-async/postgres", "diesel/extras", "postgis_diesel/diesel", "core-structures/postgres"]
+postgres = ["diesel-async/postgres", "diesel/extras", "postgis_diesel/postgres", "core-structures/postgres"]
 32-column-tables = ["postgres"]
 64-column-tables = ["32-column-tables", "diesel/64-column-tables"]
