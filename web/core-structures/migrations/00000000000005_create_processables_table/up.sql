@@ -1,0 +1,4 @@
+-- UP MIGRATION
+CREATE TABLE IF NOT EXISTS processables (
+    id UUID PRIMARY KEY NOT NULL REFERENCES trackables(id)
+);

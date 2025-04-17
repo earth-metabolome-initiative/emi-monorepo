@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS step_model_instrument_models (
 -- Table providing the instrument types necessary for a given abstract procedure model
 CREATE TABLE IF NOT EXISTS step_model_instruments (
 	id INTEGER PRIMARY KEY REFERENCES step_model_instrument_models(id),
-	instrument_id SMALLINT NOT NULL REFERENCES instruments(id),
+	instrument_id UUID NOT NULL REFERENCES instruments(id),
 	created_by INT NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_by INT NOT NULL REFERENCES users(id),
@@ -89,17 +89,50 @@ CREATE TABLE IF NOT EXISTS step_model_tool_categories (
 -- HERE BEGIN THE SPECIALIZED STEP MODELS TABLES --
 ---------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS freeze_drying_step_models (
+CREATE TABLE IF NOT EXISTS sampling_step_models (
 	id INTEGER PRIMARY KEY REFERENCES step_models(id),
-	step_model_instrument_category_id INT NOT NULL REFERENCES step_model_instrument_categories(id),
-	expected_kelvin REAL NOT NULL CHECK (must_be_strictly_positive_f32(expected_kelvin)),
-	expected_pascal REAL NOT NULL CHECK (must_be_strictly_positive_f32(expected_pascal)),
+	created_by INT NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_by INT NOT NULL REFERENCES users(id),
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS organism_sampling_step_models (
+	id INTEGER PRIMARY KEY REFERENCES step_models(id),
 	created_by INT NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_by INT NOT NULL REFERENCES users(id),
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	CONSTRAINT check_kelvin CHECK (must_be_strictly_smaller_than_f32(expected_kelvin, 250.0)),
 	CONSTRAINT check_pascal CHECK (must_be_strictly_smaller_than_f32(expected_pascal, 100.0))
+);
+
+CREATE TABLE IF NOT EXISTS aliquoting_step_models (
+	id INTEGER PRIMARY KEY REFERENCES sampling_step_models(id),
+	step_model_instrument_category_id INT NOT NULL REFERENCES step_model_instrument_categories(id),
+	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters)),
+	created_by INT NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_by INT NOT NULL REFERENCES users(id),
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS freeze_drying_step_models (
+	id INTEGER PRIMARY KEY REFERENCES step_models(id),
+	step_model_instrument_category_id INT NOT NULL REFERENCES step_model_instrument_categories(id),
+	expected_kelvin REAL NOT NULL CHECK (must_be_strictly_positive_f32(expected_kelvin)),
+	expected_pascal REAL NOT NULL CHECK (must_be_strictly_positive_f32(expected_pascal)),
+	expected_seconds REAL NOT NULL CHECK (must_be_strictly_positive_f32(expected_seconds)),
+	created_by INT NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_by INT NOT NULL REFERENCES users(id),
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	CONSTRAINT check_kelvin CHECK (must_be_strictly_smaller_than_f32(expected_kelvin, 250.0)),
+	CONSTRAINT check_pascal CHECK (must_be_strictly_smaller_than_f32(expected_pascal, 100.0)),
+	-- Should always be greater than 2 hours
+	CONSTRAINT check_seconds_minimum CHECK (must_be_strictly_greater_than_f32(expected_seconds, 7200.0)),
+	-- Should always be less than 7 days
+	CONSTRAINT check_seconds_maximum CHECK (must_be_strictly_smaller_than_f32(expected_seconds, 604800.0))
 );
 
 CREATE TABLE IF NOT EXISTS weighing_step_models (
@@ -127,20 +160,13 @@ CREATE TABLE IF NOT EXISTS grinding_step_models (
 	id INTEGER PRIMARY KEY REFERENCES step_models(id),
 	step_model_instrument_category_id INT NOT NULL REFERENCES step_model_instrument_categories(id),
 	seconds REAL NOT NULL CHECK (must_be_strictly_positive_f32(seconds)),
-	created_by INT NOT NULL REFERENCES users(id),
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	updated_by INT NOT NULL REFERENCES users(id),
-	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS aliquoting_step_models (
-	id INTEGER PRIMARY KEY REFERENCES step_models(id),
-	step_model_instrument_category_id INT NOT NULL REFERENCES step_model_instrument_categories(id),
-	expected_liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(expected_liters)),
-	tolerance_liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(tolerance_liters)),
+	hertz REAL NOT NULL CHECK (must_be_strictly_positive_f32(hertz)),
 	created_by INT NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_by INT NOT NULL REFERENCES users(id),
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	CONSTRAINT check_tolerance CHECK (must_be_strictly_smaller_than_f32(tolerance_liters, expected_liters))
+	CONSTRAINT check_seconds_upper CHECK (must_be_strictly_smaller_than_f32(seconds, 1800.0)),
+	CONSTRAINT check_seconds_lower CHECK (must_be_strictly_greater_than_f32(seconds, 10.0)),
+	CONSTRAINT check_hertz_upper CHECK (must_be_strictly_smaller_than_f32(hertz, 100.0)),
+	CONSTRAINT check_hertz_lower CHECK (must_be_strictly_greater_than_f32(hertz, 0.0))
 );

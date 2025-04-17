@@ -1,18 +1,5 @@
 CREATE TABLE IF NOT EXISTS organisms (
-  id UUID PRIMARY KEY,
-  name TEXT CHECK (must)
-  nameplate_category_id SMALLINT NOT NULL REFERENCES nameplate_categories(id),
-  project_id INTEGER NOT NULL REFERENCES projects(id),
-  created_by INTEGER NOT NULL REFERENCES users(id),
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_by INTEGER NOT NULL REFERENCES users(id),
-  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS organism_locations (
-	id UUID PRIMARY KEY,
-	organism_id UUID NOT NULL REFERENCES organisms(id),
-	geolocation GEOGRAPHY(POINT, 4326) NOT NULL,
-	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	created_by INTEGER NOT NULL REFERENCES users(id)
+  id UUID PRIMARY KEY REFERENCES trackables(id),
+  name TEXT CHECK (must_not_be_empty(name)),
+  nameplate_category_id SMALLINT NOT NULL REFERENCES nameplate_categories(id)
 );
