@@ -334,7 +334,6 @@ impl JsonAccessToken {
 
     pub fn decode(token: &str) -> Result<JsonAccessToken, BackendError> {
         let config = JWTConfig::from_env()?;
-        println!("Decoding token: {:?}", config);
         Ok(JsonAccessToken {
             web_token: JsonWebToken::decode(token, config.access_token_public_key()?)?.claims,
         })
