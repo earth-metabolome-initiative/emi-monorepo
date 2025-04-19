@@ -432,7 +432,6 @@ where
 
             Ok(())
         } else {
-            println!("The row is not the last row: {row}, {column}.");
             Err(MutabilityError::UnorderedCoordinate((row, column)))
         }
     }

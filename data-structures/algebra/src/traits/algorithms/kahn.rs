@@ -2,7 +2,7 @@
 //! sparse matrices, which provides the Kahn's algorithm for topological
 //! sorting.
 
-use crate::traits::{IntoUsize, One, SparseSquareMatrix, Zero};
+use crate::traits::{IntoUsize, One, SparseMatrix2D, SquareMatrix, Zero};
 
 #[derive(Debug, Clone, PartialEq)]
 /// Error enumeration for Kahn's algorithm.
@@ -12,7 +12,7 @@ pub enum KahnError {
 }
 
 /// Kahn's algorithm for topological sorting.
-pub trait Kahn: SparseSquareMatrix {
+pub trait Kahn: SquareMatrix + SparseMatrix2D {
     /// Returns the indices to rearrange the rows of the matrix in a topological
     /// order.
     ///
@@ -59,4 +59,4 @@ pub trait Kahn: SparseSquareMatrix {
     }
 }
 
-impl<G: SparseSquareMatrix> Kahn for G {}
+impl<G: SquareMatrix + SparseMatrix2D> Kahn for G {}

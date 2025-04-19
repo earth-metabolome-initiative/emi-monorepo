@@ -4,7 +4,7 @@
 
 use crate::{
     impls::{LowerBoundedSquareMatrix, SubsetSquareMatrix},
-    traits::{IntoUsize, SparseMatrix2D, SquareMatrix, SparseMatrix, Tarjan, Zero, One},
+    traits::{IntoUsize, SparseMatrix2D, SquareMatrix, Tarjan, Zero, One},
 };
 use lender::prelude::{Lending, Lender};
 
@@ -27,9 +27,7 @@ impl<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> From<&'lend mut InnerJohn
 {
     fn from(parent: &'lend mut InnerJohnsonIterator<'matrix, M>) -> Self {
         let mut circuit_search = Self { current_component: parent.current_component.as_ref().unwrap(), current_root_id: parent.data.current_root_id, data: &mut parent.data, row_iterators: Vec::new() };
-        println!("Starting circuit search for root {}", circuit_search.current_root_id);
         debug_assert!(circuit_search.data.stack.is_empty(), "Stack should be empty at the start of the circuit search");
-        // TODO! This clear is only necessary due to a bug in the `lender` crate.
         circuit_search.data.found_circuit = false;
         circuit_search.data.current_root_id += M::Index::ONE;
         circuit_search.register_circuit_search(circuit_search.current_root_id);
@@ -87,7 +85,6 @@ impl<M: SquareMatrix + SparseMatrix2D> CircuitSearch<'_, '_, M> {
         }
         debug_assert!(self.data.stack.is_empty(), "Stack should be empty after removing last circuit search");
         debug_assert!(self.row_iterators.is_empty(), "Row iterators should be empty after removing last circuit search");
-        println!("Stack at address {} looks like: {:?}", self.data.stack.as_ptr() as usize, self.data.stack);
         None
     }
 
@@ -98,7 +95,6 @@ impl<M: SquareMatrix + SparseMatrix2D> CircuitSearch<'_, '_, M> {
     fn register_circuit_search(&mut self, row_id: M::Index) {
         debug_assert!(self.data.stack.len() < self.data.block_map.len(), "Stack length {} should be less than block map length {}", self.data.stack.len(), self.data.block_map.len());
         debug_assert!(self.row_iterators.len() < self.data.block_map.len(), "Row iterators length {} should be less than block map length {}", self.row_iterators.len(), self.data.block_map.len());
-        println!("Pushing row {row_id} to stack at address {}", self.data.stack.as_ptr() as usize);
         self.data.stack.push(row_id);
         self.row_iterators.push(self.current_component.sparse_row(row_id));
         self.data.blocked[row_id.into_usize()] = true;
@@ -108,7 +104,6 @@ impl<M: SquareMatrix + SparseMatrix2D> CircuitSearch<'_, '_, M> {
         let row_id = self.data.stack.pop().unwrap();
         let mut row_iterator = self.row_iterators.pop().unwrap();
         debug_assert!(row_iterator.next().is_none(), "Row iterator should be empty after popping");
-        println!("Completed circuit search for row {row_id}, having found circuit: {}, stack at address {}: {:?}, number of row_iterators: {}", self.data.found_circuit, self.data.stack.as_ptr() as usize, self.data.stack, self.row_iterators.len());
         if self.data.found_circuit {
             self.unblock(row_id);
         } else {
@@ -128,7 +123,6 @@ impl<'lend2, M: SquareMatrix + SparseMatrix2D> Lending<'lend2> for CircuitSearch
 
 impl<M: SquareMatrix + SparseMatrix2D> Lender for CircuitSearch<'_, '_, M> {
     fn next(& mut self) -> Option<<Self as Lending<'_>>::Lend> {
-        println!("State of stack: {:?}", self.data.stack);
         self.search_circuit()
     }
 }
@@ -171,11 +165,9 @@ impl<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> Lending<'lend> for InnerJ
 
 impl< M: SquareMatrix + SparseMatrix2D> Lender for InnerJohnsonIterator<'_, M> {
     fn next(&mut self) -> Option<<Self as Lending<'_>>::Lend> {        
-        println!("State of stack: {:?}", self.data.stack);
         while self.data.current_root_id < self.matrix.order() {
             let bounded_matrix =
                 LowerBoundedSquareMatrix::new(self.matrix, self.data.current_root_id).unwrap();
-            println!("Bounded matrix: {:?}, {}", bounded_matrix.sparse_coordinates().collect::<Vec<_>>(), self.data.current_root_id);
             let Some((new_root_id, mut strongly_connected_component_with_smallest_node)): Option<(
                 M::Index,
                 Vec<M::Index>,
