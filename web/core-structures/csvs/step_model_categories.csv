@@ -9,3 +9,4 @@ store sample,"A step involving the storage of a sample in a sample container.",v
 storage,"A step involving the storage of samples or organisms in a controlled environment.",boxes-packing
 weighing,"A step involving the measurement of the weight of samples or organisms.",weight-scale
 aliquoting,"A step involving the division of a sample into smaller portions for analysis or storage.",vials
+sampling,"A step involving the collection of samples from organisms or environments.",vials
