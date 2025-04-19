@@ -35,7 +35,8 @@ members = [
     "utils/image-validation",
     "utils/mime-types",
     "web/web_common/ws-messages",
-    "utils/rosetta-timestamp", "utils/iter-utils",
+    "utils/rosetta-timestamp",
+    "utils/iter-utils",
 
 ]
 
