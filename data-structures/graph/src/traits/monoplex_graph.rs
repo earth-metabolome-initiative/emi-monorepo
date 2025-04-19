@@ -28,7 +28,17 @@ pub trait MonoplexGraph: super::Graph {
     ) -> <<Self::Edges as Edges>::Matrix as SparseMatrix2D>::SparseRow<'_> {
         self.edges().successors(source_node_id)
     }
-
+    /// Returns whether the given source node has successors.
+    /// 
+    /// # Arguments 
+    /// 
+    /// * `source_node_id` - The identifier of the source node.
+    fn has_successors(
+        &self,
+        source_node_id: <Self::Edges as super::Edges>::SourceNodeId,
+     ) -> bool{
+        self.edges().has_successors(source_node_id)
+     }
     /// Returns the outbound degree of the node with the given identifier.
     ///
     /// # Arguments

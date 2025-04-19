@@ -3,7 +3,7 @@
 
 use algebra::prelude::{
     IntoUsize, MatrixMut, PositiveInteger, SizedRowsSparseMatrix2D, SizedSparseMatrix,
-    SparseMatrix, SparseMatrix2D, SparseMatrixMut, TryFromUsize,
+    SparseMatrix, SparseMatrix2D, SparseMatrixMut, TryFromUsize, Zero
 };
 
 use super::Edge;
@@ -49,6 +49,18 @@ pub trait Edges {
         source: Self::SourceNodeId,
     ) -> <Self::Matrix as SparseMatrix2D>::SparseRow<'_> {
         self.matrix().sparse_row(source)
+    }
+
+    /// Returns whether the given source node has successors.
+    /// 
+    /// # Arguments 
+    /// 
+    /// * `source` - The identifier of the source node.
+    fn has_successors(
+       &self,
+       source: Self::SourceNodeId
+    ) -> bool{
+        self.out_degree(source) >Self::DestinationNodeId::ZERO
     }
 
     /// Returns the outbound degree of the node with the given identifier.
