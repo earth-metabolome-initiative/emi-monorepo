@@ -5,8 +5,9 @@ use pg2sqlite::prelude::Pg2Sqlite;
 
 #[test]
 /// Test translating the core migrations used in the `core-structures` crate.
-pub fn test_translator() {
+fn test_translator() {
     let translated_migrations = Pg2Sqlite::default()
+        .remove_unsupported_check_constraints()
         .verbose()
         .ups("../../core-structures/migrations")
         .expect("Failed to load the migrations")
