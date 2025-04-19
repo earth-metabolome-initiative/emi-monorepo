@@ -21,7 +21,8 @@ impl Translator for DataType {
             DataType::Uuid => {
                 // SQLite does not have a UUID type, so we use BLOB instead as
                 // a workaround, as described in the `rosetta-uuid` crate.
-                Ok(DataType::Blob(None))},
+                Ok(DataType::Blob(None))
+            }
             DataType::Timestamp(None, sqlparser::ast::TimezoneInfo::WithTimeZone) => {
                 // SQLite does not support timezone information, and these type of
                 // fields are commonly converted to TEXT.

@@ -56,18 +56,17 @@ impl Pg2Sqlite {
     ///
     /// * If the SQL file could not be read.
     /// * If the SQL file could not be parsed.
-    pub fn file<P: AsRef<std::path::Path>>(mut self, path: P) -> Result<Self, crate::errors::Error> {
+    pub fn file<P: AsRef<std::path::Path>>(
+        mut self,
+        path: P,
+    ) -> Result<Self, crate::errors::Error> {
         let path = path.as_ref();
         let content = std::fs::read_to_string(path)?;
         let stmt = sqlparser::parser::Parser::parse_sql(
             &sqlparser::dialect::PostgreSqlDialect {},
             &content,
-        ).map_err(|e| {
-            crate::errors::Error::ParserError(
-                path.to_string_lossy().to_string(),
-                e,
-            )
-        })?;
+        )
+        .map_err(|e| crate::errors::Error::ParserError(path.to_string_lossy().to_string(), e))?;
         for statement in stmt {
             self = self.statement(statement);
         }
