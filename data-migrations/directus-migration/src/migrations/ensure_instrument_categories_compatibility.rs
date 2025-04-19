@@ -21,7 +21,7 @@ use crate::codegen::InstrumentType as DirectusInstrumentType;
 /// * If the Portal database connection fails, an error is returned.
 /// * If the Instrument Types in the Directus database do not match those in the
 ///   Portal database, an error is returned.
-pub async fn ensure_instrument_types_compatibility(
+pub async fn ensure_instrument_categories_compatibility(
     directus_conn: &mut AsyncPgConnection,
     portal_conn: &mut AsyncPgConnection,
 ) -> Result<(), crate::error::Error> {
