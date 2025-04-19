@@ -151,12 +151,12 @@ impl MigrationDirectory {
         let graph = self.graph()?;
 
         let topological_order_from_roots = graph.edges().kahn().map_err(|_| Error::NotDAG)?;
+        let mut reverse_index = vec![0; self.migrations.len()];
+        topological_order_from_roots.into_iter().enumerate().for_each(|(i, migration_id)| {
+            reverse_index[migration_id] = i;
+        });
 
-        println!("The topological order of the migrations is: {:?}", topological_order_from_roots);
-
-        Ok(topological_order_from_roots
-            .into_iter()
-            .map(|migration_id| &self.migrations[migration_id]))
+        Ok(reverse_index.into_iter().map(|migration_id| &self.migrations[migration_id]))
     }
 
     /// Iterates on the migrations.
