@@ -24,7 +24,6 @@ fn test_sanitization() {
         .remove_leading_underscores()
         .remove_trailing_underscores();
     for (input, expected) in EXPECTED_CASES.iter() {
-        println!("input: {}, expected: {}", input, expected);
         assert_eq!(sanitizer.to_snake_case(input).unwrap(), *expected);
     }
 }
