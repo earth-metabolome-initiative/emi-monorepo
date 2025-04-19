@@ -174,8 +174,8 @@ pub fn must_be_strictly_positive_f32(
 ///
 /// # Errors
 ///
-/// * `validation_errors::SingleFieldError::TooLowValue(())` if the value is not
-///   strictly greater than the lower bound.
+/// * `validation_errors::SingleFieldError::MustBeGreaterThan(())` if the value
+///   is not strictly greater than the lower bound.
 pub fn must_be_strictly_greater_than_f32(
     value: f32,
     lower_bound: f32,
@@ -183,7 +183,7 @@ pub fn must_be_strictly_greater_than_f32(
     if value > lower_bound {
         Ok(())
     } else {
-        Err(validation_errors::SingleFieldError::TooLowValue((), lower_bound as f64))
+        Err(validation_errors::SingleFieldError::MustBeGreaterThan((), lower_bound as f64))
     }
 }
 
@@ -197,8 +197,8 @@ pub fn must_be_strictly_greater_than_f32(
 ///
 /// # Errors
 ///
-/// * `validation_errors::SingleFieldError::TooLowValue(())` if the value is not
-///   strictly smaller than the lower bound.
+/// * `validation_errors::SingleFieldError::MustBeGreaterThan(())` if the value
+///   is not strictly smaller than the lower bound.
 pub fn must_be_strictly_smaller_than_f32(
     value: f32,
     lower_bound: f32,
@@ -206,7 +206,7 @@ pub fn must_be_strictly_smaller_than_f32(
     if value < lower_bound {
         Ok(())
     } else {
-        Err(validation_errors::SingleFieldError::TooHighValue((), lower_bound as f64))
+        Err(validation_errors::SingleFieldError::MustBeSmallerThan((), lower_bound as f64))
     }
 }
 
@@ -220,8 +220,8 @@ pub fn must_be_strictly_smaller_than_f32(
 ///
 /// # Errors
 ///
-/// * `validation_errors::SingleFieldError::TooLowValue(())` if the value is not
-///   strictly greater than the lower bound.
+/// * `validation_errors::SingleFieldError::MustBeGreaterThan(())` if the value
+///   is not strictly greater than the lower bound.
 pub fn must_be_strictly_greater_than_f64(
     value: f64,
     lower_bound: f64,
@@ -229,7 +229,7 @@ pub fn must_be_strictly_greater_than_f64(
     if value > lower_bound {
         Ok(())
     } else {
-        Err(validation_errors::SingleFieldError::TooLowValue((), lower_bound))
+        Err(validation_errors::SingleFieldError::MustBeGreaterThan((), lower_bound))
     }
 }
 
@@ -243,8 +243,8 @@ pub fn must_be_strictly_greater_than_f64(
 ///
 /// # Errors
 ///
-/// * `validation_errors::SingleFieldError::TooLowValue(())` if the value is not
-///   strictly smaller than the lower bound.
+/// * `validation_errors::SingleFieldError::MustBeGreaterThan(())` if the value
+///   is not strictly smaller than the lower bound.
 pub fn must_be_strictly_smaller_than_f64(
     value: f64,
     lower_bound: f64,
@@ -252,7 +252,7 @@ pub fn must_be_strictly_smaller_than_f64(
     if value < lower_bound {
         Ok(())
     } else {
-        Err(validation_errors::SingleFieldError::TooHighValue((), lower_bound))
+        Err(validation_errors::SingleFieldError::MustBeSmallerThan((), lower_bound))
     }
 }
 
@@ -364,11 +364,11 @@ mod tests {
         assert!(must_be_strictly_greater_than_f64(3.0_f64, 2.0_f64).is_ok());
         assert_eq!(
             must_be_strictly_greater_than_f64(3.0_f64, 3.0_f64).unwrap_err(),
-            validation_errors::SingleFieldError::TooLowValue((), 3.0)
+            validation_errors::SingleFieldError::MustBeGreaterThan((), 3.0)
         );
         assert_eq!(
             must_be_strictly_greater_than_f64(3.0_f64, 4.0_f64).unwrap_err(),
-            validation_errors::SingleFieldError::TooLowValue((), 4.0)
+            validation_errors::SingleFieldError::MustBeGreaterThan((), 4.0)
         );
     }
 
@@ -377,11 +377,11 @@ mod tests {
         assert!(must_be_strictly_smaller_than_f64(3.0_f64, 4.0_f64).is_ok());
         assert_eq!(
             must_be_strictly_smaller_than_f64(3.0_f64, 3.0_f64).unwrap_err(),
-            validation_errors::SingleFieldError::TooHighValue((), 3.0)
+            validation_errors::SingleFieldError::MustBeSmallerThan((), 3.0)
         );
         assert_eq!(
             must_be_strictly_smaller_than_f64(3.0_f64, 2.0_f64).unwrap_err(),
-            validation_errors::SingleFieldError::TooHighValue((), 2.0)
+            validation_errors::SingleFieldError::MustBeSmallerThan((), 2.0)
         );
     }
 }
