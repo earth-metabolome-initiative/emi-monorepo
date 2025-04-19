@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS photographs (
 	id UUID PRIMARY KEY,
-	path TEXT NOT NULL UNIQUE CHECK (must_be_jpeg(path))
+	path TEXT NOT NULL UNIQUE CHECK (must_be_jpeg(path)),
 	created_by INT NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_by INT NOT NULL REFERENCES users(id),

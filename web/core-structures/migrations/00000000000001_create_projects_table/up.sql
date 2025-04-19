@@ -24,21 +24,3 @@ CREATE TABLE IF NOT EXISTS projects (
     CONSTRAINT project_parent CHECK (must_be_distinct_i32(parent_project_id, id)),
     CONSTRAINT name_description CHECK (must_be_distinct(name, description))
 );
-
-CREATE OR REPLACE FUNCTION concat_projects_name_description(
-  name text,
-  description text
-) RETURNS text AS $$
-BEGIN
-  CASE
-    WHEN description IS NULL THEN
-      RETURN name;
-    ELSE
-      RETURN name || ' ' || description;
-  END CASE;
-END;
-$$ LANGUAGE plpgsql IMMUTABLE STRICT PARALLEL SAFE;
-
-CREATE INDEX IF NOT EXISTS projects_name_description_trgm_idx ON projects USING gin (
-  concat_projects_name_description(name, description) gin_trgm_ops
-);

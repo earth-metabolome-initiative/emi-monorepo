@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS step_models (
 	description TEXT NOT NULL CHECK (must_not_be_empty(description)),
 	-- How long a step can be snoozed for. When None, the step is not snoozable.
 	-- Examples of snoozable steps are: "put on gloves before collecting".
-	snoozable_for INTERVAL,
+	snoozable BOOLEAN NOT NULL DEFAULT FALSE,
 	-- Whether this step can be copied to a new procedure of the same type,
 	-- such as the case when you are collecting multiple samples from the same
 	-- organism. In such a case, you would specify that the step defining the

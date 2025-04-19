@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS weighing_instrument_models (
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INTEGER NOT NULL REFERENCES users(id),
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	CONSTRAINT error_smaller_than_minimum CHECK (must_be_strictly_smaller_than_f32(error_kilograms, minimum_measurable_kilograms))
+	CONSTRAINT error_smaller_than_minimum CHECK (must_be_strictly_smaller_than_f32(error_kilograms, minimum_measurable_kilograms)),
 	CONSTRAINT min_max_measurable CHECK (must_be_strictly_smaller_than_f32(minimum_measurable_kilograms, maximum_measurable_kilograms))
 );
 
