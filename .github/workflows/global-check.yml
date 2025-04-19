@@ -15,12 +15,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - name: Run check
-        run: cargo check
+        - uses: actions/checkout@v4
+        - name: Install OS dependencies
+          run: sudo apt-get update && sudo apt-get install -y libfontconfig-dev
+        - name: Set up Rust
+          uses: actions-rs/toolchain@v1
+          with:
+            toolchain: stable
+            override: true
+        - name: Run check
+          run: cargo check
 
