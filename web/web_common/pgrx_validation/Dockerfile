@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     pkg-config \
     libpq-dev \
+    sqlite3 \
+    libsqlite3-dev \
     postgresql-server-dev-17 \
     && rm -rf /var/lib/apt/lists/*
 
