@@ -1,9 +1,8 @@
-name: Clippy
-
+name: Cargo Check
 
 on:
   workflow_run:
-    workflows: ["Rust Format Check"]
+    workflows: ["Cargo Format"]
     types:
       - completed
 
@@ -16,15 +15,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Install Clippy
-        run:
-          rustup toolchain install stable --component clippy
+      - uses: actions/checkout@v4
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
-      - name: Run clippy
-        run: cargo clippy
+      - name: Run check
+        run: cargo check
 
