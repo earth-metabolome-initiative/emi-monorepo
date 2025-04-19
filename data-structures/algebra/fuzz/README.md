@@ -112,3 +112,31 @@ and to run the crash cases:
 ```bash
 cargo hfuzz run-debug kahn hfuzz_workspace/*/*.fuzz
 ```
+
+### Tarjan's Algorithm
+
+The Tarjan algorithm is a strongly connected components algorithm for directed graphs.
+
+```bash
+cargo hfuzz run tarjan
+```
+
+and to run the crash cases:
+
+```bash
+cargo hfuzz run-debug tarjan hfuzz_workspace/*/*.fuzz
+```
+
+### Johnson's Algorithm for simple circuits
+
+The Johnson algorithm is an algorithm for finding all simple circuits in a directed graph.
+
+```bash
+cargo hfuzz run johnson_cycle
+```
+
+and to run the crash cases:
+
+```bash
+cargo hfuzz run-debug johnson_cycle hfuzz_workspace/*/*.fuzz
+```

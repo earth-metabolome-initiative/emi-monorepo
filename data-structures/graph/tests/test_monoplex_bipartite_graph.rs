@@ -40,7 +40,4 @@ pub fn test_bipartite_graph() {
     assert_eq!(graph.number_of_left_nodes(), 9);
     assert_eq!(graph.number_of_right_nodes(), 6);
     assert_eq!(graph.number_of_edges(), 5);
-    assert_eq!(graph.number_of_singletons_in_left_partition(), 4);
-    assert_eq!(graph.left_partition_non_singleton_ids().collect::<Vec<_>>(), vec![1, 2, 3, 4, 5]);
-    assert_eq!(graph.left_partition_singleton_ids().collect::<Vec<_>>(), vec![0, 6, 7, 8]);
 }

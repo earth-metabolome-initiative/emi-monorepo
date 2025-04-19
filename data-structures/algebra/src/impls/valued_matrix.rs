@@ -5,7 +5,7 @@ use core::fmt::Debug;
 
 use super::{CSR2D, MutabilityError};
 use crate::traits::{
-    IntoUsize, Matrix, Matrix2D, Matrix2DRef, MatrixMut, One, PositiveInteger,
+    EmptyRows, IntoUsize, Matrix, Matrix2D, Matrix2DRef, MatrixMut, One, PositiveInteger,
     RankSelectSparseMatrix, SizedRowsSparseMatrix2D, SizedSparseMatrix, SizedSparseMatrix2D,
     SizedSparseValuedMatrix, SparseMatrix, SparseMatrix2D, SparseMatrixMut, SparseValuedMatrix,
     SparseValuedMatrix2D, TryFromUsize, ValuedMatrix, ValuedMatrix2D, Zero,
@@ -135,14 +135,6 @@ where
         = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SparseMatrix2D>::SparseRows<'a>
     where
         Self: 'a;
-    type EmptyRowIndices<'a>
-        = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SparseMatrix2D>::EmptyRowIndices<'a>
-    where
-        Self: 'a;
-    type NonEmptyRowIndices<'a>
-        = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as SparseMatrix2D>::NonEmptyRowIndices<'a>
-    where
-        Self: 'a;
 
     #[inline]
     fn sparse_rows(&self) -> Self::SparseRows<'_> {
@@ -158,6 +150,21 @@ where
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.csr.sparse_row(row)
     }
+}
+
+impl<SparseIndex, RowIndex, ColumnIndex, Value> EmptyRows
+    for ValuedCSR2D<SparseIndex, RowIndex, ColumnIndex, Value>
+where
+    CSR2D<SparseIndex, RowIndex, ColumnIndex>: EmptyRows,
+{
+    type EmptyRowIndices<'a>
+        = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as EmptyRows>::EmptyRowIndices<'a>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a>
+        = <CSR2D<SparseIndex, RowIndex, ColumnIndex> as EmptyRows>::NonEmptyRowIndices<'a>
+    where
+        Self: 'a;
 
     #[inline]
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
@@ -250,6 +257,11 @@ where
     #[inline]
     fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_> {
         self.csr.sparse_coordinates()
+    }
+
+    #[inline]
+    fn last_sparse_coordinates(&self) -> Option<Self::Coordinates> {
+        self.csr.last_sparse_coordinates()
     }
 
     #[inline]

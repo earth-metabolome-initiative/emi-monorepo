@@ -1,8 +1,6 @@
 //! Submodule providing the `Kahn` trait and its blanket implementation for
 //! sparse matrices, which provides the Kahn's algorithm for topological
-//! sorting, plus an additional method to attempt to convert an arbitrary matrix
-//! into an upper triangular matrix, which would fail if the matrix contains
-//! cycles.
+//! sorting.
 
 use crate::traits::{IntoUsize, One, SparseSquareMatrix, Zero};
 
@@ -54,6 +52,7 @@ pub trait Kahn: SparseSquareMatrix {
         }
 
         if number_of_visited_nodes != self.order() {
+            println!("topological_order: {:?}", topological_order);
             return Err(KahnError::Cycle);
         }
 

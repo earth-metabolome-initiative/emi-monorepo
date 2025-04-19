@@ -150,6 +150,28 @@ where
         self.into()
     }
 
+    fn last_sparse_coordinates(&self) -> Option<Self::Coordinates> {
+        if self.is_empty() {
+            return None;
+        }
+        let last_row = self
+            .offsets
+            .len()
+            .checked_sub(2)
+            .and_then(|x| RowIndex::try_from_usize(x).ok())
+            .expect("The offsets should always have at least one element.");
+        debug_assert!(
+            self.number_of_defined_values_in_row(last_row) > ColumnIndex::ZERO,
+            "The last row stores in the offsets should always have at least one column, as all subsequent empty rows should be left implicit and represented by the `number_of_rows` field."
+        );
+        let last_column = self
+            .column_indices
+            .last()
+            .copied()
+            .expect("The column indices cannot be empty if the matrix is not empty.");
+        Some((last_row, last_column))
+    }
+
     fn is_empty(&self) -> bool {
         self.number_of_defined_values() == SparseIndex::ZERO
     }
@@ -203,8 +225,6 @@ impl<
     RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
     ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
 > SparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
-where
-    Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
     type SparseRow<'a>
         = core::iter::Copied<core::slice::Iter<'a, Self::ColumnIndex>>
@@ -215,16 +235,7 @@ where
     where
         Self: 'a;
     type SparseRows<'a>
-        = CSR2DRows<'a, Self>
-    where
-        Self: 'a;
-
-    type EmptyRowIndices<'a>
-        = CSR2DEmptyRowIndices<'a, Self>
-    where
-        Self: 'a;
-    type NonEmptyRowIndices<'a>
-        = CSR2DNonEmptyRowIndices<'a, Self>
+        = CSR2DSizedRows<'a, Self>
     where
         Self: 'a;
 
@@ -241,7 +252,22 @@ where
     fn sparse_rows(&self) -> Self::SparseRows<'_> {
         self.into()
     }
+}
 
+impl<
+    SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+> EmptyRows for CSR2D<SparseIndex, RowIndex, ColumnIndex>
+{
+    type EmptyRowIndices<'a>
+        = CSR2DEmptyRowIndices<'a, Self>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a>
+        = CSR2DNonEmptyRowIndices<'a, Self>
+    where
+        Self: 'a;
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         self.number_of_non_empty_rows
     }
@@ -305,7 +331,7 @@ where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
 {
     type SparseRowSizes<'a>
-        = CSR2DRowSizes<'a, Self>
+        = CSR2DSizedRowsizes<'a, Self>
     where
         Self: 'a;
 
@@ -344,7 +370,7 @@ where
             }
             // We check that the provided column is provided in sorted order.
             if self.sparse_row(row).last().is_some_and(|last| last > column) {
-                return Err(MutabilityError::UnorderedColumnIndex(column));
+                return Err(MutabilityError::UnorderedCoordinate((row, column)));
             }
 
             if column == ColumnIndex::MAX {
@@ -364,6 +390,12 @@ where
             // indices.
             self.column_indices.push(column);
             self.number_of_columns = self.number_of_columns.max(column + ColumnIndex::ONE);
+
+            debug_assert_eq!(
+                self.sparse_row(row).last(),
+                Some(column),
+                "The last column of the row {row} should be equal to the column {column}."
+            );
 
             Ok(())
         } else if row.into_usize() >= self.offsets.len() - 1 {
@@ -391,10 +423,17 @@ where
             self.number_of_columns = self.number_of_columns.max(column + ColumnIndex::ONE);
             self.number_of_rows = self.number_of_rows.max(row + RowIndex::ONE);
             self.offsets.push(last_offset + SparseIndex::ONE);
+
+            debug_assert_eq!(
+                self.sparse_row(row).last(),
+                Some(column),
+                "The last column of the row {row} should be equal to the column {column}."
+            );
+
             Ok(())
         } else {
             println!("The row is not the last row: {row}, {column}.");
-            Err(MutabilityError::UnorderedRowIndex(row))
+            Err(MutabilityError::UnorderedCoordinate((row, column)))
         }
     }
 

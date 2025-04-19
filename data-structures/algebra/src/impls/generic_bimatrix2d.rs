@@ -73,6 +73,12 @@ where
     fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_> {
         self.matrix.sparse_coordinates()
     }
+
+    #[inline]
+    fn last_sparse_coordinates(&self) -> Option<Self::Coordinates> {
+        self.matrix.last_sparse_coordinates()
+    }
+
     #[inline]
     fn is_empty(&self) -> bool {
         self.matrix.is_empty()
@@ -127,15 +133,6 @@ where
     where
         Self: 'a;
 
-    type EmptyRowIndices<'a>
-        = M::EmptyRowIndices<'a>
-    where
-        Self: 'a;
-    type NonEmptyRowIndices<'a>
-        = M::NonEmptyRowIndices<'a>
-    where
-        Self: 'a;
-
     #[inline]
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.matrix.sparse_row(row)
@@ -150,6 +147,22 @@ where
     fn sparse_rows(&self) -> Self::SparseRows<'_> {
         self.matrix.sparse_rows()
     }
+}
+
+impl<M, T> EmptyRows for GenericBiMatrix2D<M, T>
+where
+    T: EmptyRows,
+    M: TransposableMatrix2D<T, RowIndex = T::ColumnIndex, ColumnIndex = T::RowIndex>,
+    M: EmptyRows,
+{
+    type EmptyRowIndices<'a>
+        = M::EmptyRowIndices<'a>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a>
+        = M::NonEmptyRowIndices<'a>
+    where
+        Self: 'a;
 
     #[inline]
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {

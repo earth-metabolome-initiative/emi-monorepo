@@ -29,10 +29,8 @@ impl<M: Matrix2D> core::fmt::Display for Error<M> {
 
 /// Enumeration for the errors associated with failed mutable operations.
 pub enum MutabilityError<M: Matrix2D + ?Sized> {
-    /// Unexpected row index.
-    UnorderedRowIndex(M::RowIndex),
-    /// Unexpected column index.
-    UnorderedColumnIndex(M::ColumnIndex),
+    /// Unexpected coordinate.
+    UnorderedCoordinate(M::Coordinates),
     /// Duplicated entry.
     DuplicatedEntry(M::Coordinates),
     /// Entry out of bounds.
@@ -67,9 +65,8 @@ impl<M: Matrix2D> From<MutabilityError<M>> for Error<M> {
 impl<M: Matrix2D> core::fmt::Display for MutabilityError<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            MutabilityError::UnorderedRowIndex(index) => write!(f, "Unordered row index: {index}"),
-            MutabilityError::UnorderedColumnIndex(index) => {
-                write!(f, "Unordered column index: {index}")
+            MutabilityError::UnorderedCoordinate(coordinates) => {
+                write!(f, "Unordered coordinate: {coordinates:?}")
             }
             MutabilityError::DuplicatedEntry(coordinates) => {
                 write!(f, "Duplicated entry: {coordinates:?}")
@@ -99,10 +96,7 @@ where
 {
     fn from(error: MutabilityError<SquareCSR2D<M>>) -> Self {
         match error {
-            MutabilityError::UnorderedRowIndex(index) => MutabilityError::UnorderedRowIndex(index),
-            MutabilityError::UnorderedColumnIndex(index) => {
-                MutabilityError::UnorderedColumnIndex(index)
-            }
+            MutabilityError::UnorderedCoordinate(coordinates) => MutabilityError::UnorderedCoordinate(coordinates),
             MutabilityError::DuplicatedEntry(coordinates) => {
                 MutabilityError::DuplicatedEntry(coordinates)
             }
@@ -121,10 +115,7 @@ where
 {
     fn from(error: MutabilityError<UpperTriangularCSR2D<M>>) -> Self {
         match error {
-            MutabilityError::UnorderedRowIndex(index) => MutabilityError::UnorderedRowIndex(index),
-            MutabilityError::UnorderedColumnIndex(index) => {
-                MutabilityError::UnorderedColumnIndex(index)
-            }
+            MutabilityError::UnorderedCoordinate(coordinates) => MutabilityError::UnorderedCoordinate(coordinates),
             MutabilityError::DuplicatedEntry(coordinates) => {
                 MutabilityError::DuplicatedEntry(coordinates)
             }
@@ -143,10 +134,7 @@ where
 {
     fn from(error: MutabilityError<M>) -> Self {
         match error {
-            MutabilityError::UnorderedRowIndex(index) => MutabilityError::UnorderedRowIndex(index),
-            MutabilityError::UnorderedColumnIndex(index) => {
-                MutabilityError::UnorderedColumnIndex(index)
-            }
+            MutabilityError::UnorderedCoordinate(coordinates) => MutabilityError::UnorderedCoordinate(coordinates),
             MutabilityError::DuplicatedEntry(coordinates) => {
                 MutabilityError::DuplicatedEntry(coordinates)
             }
@@ -170,10 +158,7 @@ where
 {
     fn from(error: MutabilityError<CSR2D<SparseIndex, RowIndex, ColumnIndex>>) -> Self {
         match error {
-            MutabilityError::UnorderedRowIndex(index) => MutabilityError::UnorderedRowIndex(index),
-            MutabilityError::UnorderedColumnIndex(index) => {
-                MutabilityError::UnorderedColumnIndex(index)
-            }
+            MutabilityError::UnorderedCoordinate(coordinates) => MutabilityError::UnorderedCoordinate(coordinates),
             MutabilityError::DuplicatedEntry(coordinates) => {
                 MutabilityError::DuplicatedEntry(coordinates)
             }

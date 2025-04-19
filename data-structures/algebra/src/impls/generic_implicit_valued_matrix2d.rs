@@ -1,8 +1,8 @@
 //! Submodule proving a 2D matrix with implicit values.
 
 use crate::traits::{
-    ImplicitValuedMatrix, ImplicitValuedSparseMatrix, ImplicitValuedSparseRowIterator, IntoUsize,
-    Matrix, Matrix2D, Matrix2DRef, RankSelectSparseMatrix, SizedRowsSparseMatrix2D,
+    EmptyRows, ImplicitValuedMatrix, ImplicitValuedSparseMatrix, ImplicitValuedSparseRowIterator,
+    IntoUsize, Matrix, Matrix2D, Matrix2DRef, RankSelectSparseMatrix, SizedRowsSparseMatrix2D,
     SizedSparseMatrix, SizedSparseMatrix2D, SizedSparseValuedMatrix, SparseMatrix, SparseMatrix2D,
     SparseValuedMatrix, SparseValuedMatrix2D, ValuedMatrix, ValuedMatrix2D,
 };
@@ -98,6 +98,11 @@ where
     }
 
     #[inline]
+    fn last_sparse_coordinates(&self) -> Option<Self::Coordinates> {
+        self.matrix.last_sparse_coordinates()
+    }
+
+    #[inline]
     fn is_empty(&self) -> bool {
         self.matrix.is_empty()
     }
@@ -147,14 +152,6 @@ where
         = M::SparseRows<'a>
     where
         Self: 'a;
-    type EmptyRowIndices<'a>
-        = M::EmptyRowIndices<'a>
-    where
-        Self: 'a;
-    type NonEmptyRowIndices<'a>
-        = M::NonEmptyRowIndices<'a>
-    where
-        Self: 'a;
 
     #[inline]
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
@@ -170,7 +167,21 @@ where
     fn sparse_rows(&self) -> Self::SparseRows<'_> {
         self.matrix.sparse_rows()
     }
+}
 
+impl<M, Map, Value> EmptyRows for GenericImplicitValuedMatrix2D<M, Map, Value>
+where
+    M: EmptyRows,
+    Map: Fn(M::Coordinates) -> Value,
+{
+    type EmptyRowIndices<'a>
+        = M::EmptyRowIndices<'a>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a>
+        = M::NonEmptyRowIndices<'a>
+    where
+        Self: 'a;
     #[inline]
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
         self.matrix.empty_row_indices()

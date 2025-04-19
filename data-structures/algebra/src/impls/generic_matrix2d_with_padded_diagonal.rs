@@ -4,8 +4,8 @@
 //! rectangular, new rows and columns will be added to make it square.
 
 use crate::traits::{
-    Bounded, IntoUsize, Matrix, Matrix2D, SparseMatrix, SparseMatrix2D, SparseValuedMatrix,
-    SparseValuedMatrix2D, TryFromUsize, ValuedMatrix, ValuedMatrix2D, Zero,
+    Bounded, EmptyRows, IntoUsize, Matrix, Matrix2D, One, SparseMatrix, SparseMatrix2D,
+    SparseValuedMatrix, SparseValuedMatrix2D, TryFromUsize, ValuedMatrix, ValuedMatrix2D, Zero,
 };
 
 mod sparse_row_with_padded_diagonal;
@@ -145,8 +145,22 @@ where
         CSR2DView::from(self)
     }
 
+    fn last_sparse_coordinates(&self) -> Option<Self::Coordinates> {
+        // Since the diagonal is padded, the last coordinates are the last
+        // row and column of the matrix, unless the matrix is empty.
+        if self.is_empty() {
+            return None;
+        }
+        Some((
+            self.number_of_rows() - M::RowIndex::ONE,
+            self.number_of_columns() - M::ColumnIndex::ONE,
+        ))
+    }
+
     fn is_empty(&self) -> bool {
-        false
+        // The matrix is solely empty when it has no rows and no columns.
+        self.number_of_rows() == M::RowIndex::ZERO
+            && self.number_of_columns() == M::ColumnIndex::ZERO
     }
 }
 
@@ -164,6 +178,31 @@ where
         = CSR2DColumns<'a, Self>
     where
         Self: 'a;
+
+    type SparseRows<'a>
+        = SparseRowsWithPaddedDiagonal<'a, Self>
+    where
+        Self: 'a;
+
+    fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
+        SparseRowWithPaddedDiagonal::new(&self.matrix, row).unwrap()
+    }
+
+    fn sparse_rows(&self) -> Self::SparseRows<'_> {
+        SparseRowsWithPaddedDiagonal::from(self)
+    }
+
+    fn sparse_columns(&self) -> Self::SparseColumns<'_> {
+        CSR2DColumns::from(self)
+    }
+}
+
+impl<M, Map> EmptyRows for GenericMatrix2DWithPaddedDiagonal<M, Map>
+where
+    M: EmptyRows,
+    M::RowIndex: IntoUsize + TryFromUsize,
+    M::ColumnIndex: IntoUsize + TryFromUsize,
+{
     type EmptyRowIndices<'a>
         = core::iter::Empty<Self::RowIndex>
     where
@@ -172,11 +211,6 @@ where
         = SimpleRanged<Self::RowIndex>
     where
         Self: 'a;
-    type SparseRows<'a>
-        = SparseRowsWithPaddedDiagonal<'a, Self>
-    where
-        Self: 'a;
-
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
         // Since we are artificially always adding rows and columns, we
         // will never have empty rows.
@@ -199,18 +233,6 @@ where
         // Since we are artificially always adding rows and columns, we
         // will always have non-empty rows.
         self.number_of_rows()
-    }
-
-    fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
-        SparseRowWithPaddedDiagonal::new(&self.matrix, row).unwrap()
-    }
-
-    fn sparse_rows(&self) -> Self::SparseRows<'_> {
-        SparseRowsWithPaddedDiagonal::from(self)
-    }
-
-    fn sparse_columns(&self) -> Self::SparseColumns<'_> {
-        CSR2DColumns::from(self)
     }
 }
 

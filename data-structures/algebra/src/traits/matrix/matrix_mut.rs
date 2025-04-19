@@ -40,10 +40,29 @@ pub trait MatrixMut: Matrix + Default {
     /// * If the entry is already defined.
     fn from_entries<I: IntoIterator<Item = Self::Entry>>(entries: I) -> Result<Self, Self::Error> {
         let mut matrix = Self::default();
-        for entry in entries {
-            matrix.add(entry)?;
-        }
+        matrix.extend(entries)?;
         Ok(matrix)
+    }
+
+    /// Extends the matrix with the given entries.
+    ///
+    /// # Arguments
+    ///
+    /// * `entries` - The entries to add to the matrix.
+    ///
+    /// # Errors
+    ///
+    /// * If the entries are not provided in the expected order.
+    /// * If the entry is out of bounds.
+    /// * If the entry is already defined.
+    fn extend<I: IntoIterator<Item = Self::Entry>>(
+        &mut self,
+        entries: I,
+    ) -> Result<(), Self::Error> {
+        for entry in entries {
+            self.add(entry)?;
+        }
+        Ok(())
     }
 
     /// Set the matrix to the given larger shape.

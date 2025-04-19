@@ -47,8 +47,11 @@ impl<SparseIndex: Zero, RowIndex: Zero, R: Ranged> Default
     }
 }
 
-impl<SparseIndex: PositiveInteger + IntoUsize, RowIndex: PositiveInteger + IntoUsize, R: Ranged>
-    SparseMatrixMut for RangedCSR2D<SparseIndex, RowIndex, R>
+impl<
+    SparseIndex: PositiveInteger + IntoUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    R: Ranged,
+> SparseMatrixMut for RangedCSR2D<SparseIndex, RowIndex, R>
 where
     Self: SparseMatrix2D<RowIndex = RowIndex, ColumnIndex = R::Step, SparseIndex = SparseIndex>,
 {
@@ -114,8 +117,11 @@ impl<SparseIndex, RowIndex: PositiveInteger + IntoUsize + TryFromUsize, R: Range
     }
 }
 
-impl<SparseIndex: PositiveInteger + IntoUsize, RowIndex: PositiveInteger + IntoUsize, R: Ranged>
-    SparseMatrix for RangedCSR2D<SparseIndex, RowIndex, R>
+impl<
+    SparseIndex: PositiveInteger + IntoUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    R: Ranged,
+> SparseMatrix for RangedCSR2D<SparseIndex, RowIndex, R>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = R::Step>,
 {
@@ -130,14 +136,29 @@ where
         self.into()
     }
 
+    fn last_sparse_coordinates(&self) -> Option<Self::Coordinates> {
+        if self.is_empty() {
+            return None;
+        }
+        let last_row_index = RowIndex::try_from_usize(self.ranges.len() - 1)
+            .expect("The matrix is in a valid state.");
+        let last_row_with_values = self.ranges.last().expect("The matrix should not be empty.");
+        let last_column =
+            last_row_with_values.clone().last().expect("The last row should not be empty.");
+        Some((last_row_index, last_column))
+    }
+
     #[inline]
     fn is_empty(&self) -> bool {
         self.number_of_defined_values == SparseIndex::ZERO
     }
 }
 
-impl<SparseIndex: PositiveInteger + IntoUsize, RowIndex: PositiveInteger + IntoUsize, R: Ranged>
-    SizedSparseMatrix for RangedCSR2D<SparseIndex, RowIndex, R>
+impl<
+    SparseIndex: PositiveInteger + IntoUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    R: Ranged,
+> SizedSparseMatrix for RangedCSR2D<SparseIndex, RowIndex, R>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = R::Step>,
 {
@@ -147,10 +168,11 @@ where
     }
 }
 
-impl<SparseIndex: PositiveInteger + IntoUsize, RowIndex: PositiveInteger + IntoUsize, R: Ranged>
-    SparseMatrix2D for RangedCSR2D<SparseIndex, RowIndex, R>
-where
-    Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = R::Step>,
+impl<
+    SparseIndex: PositiveInteger + IntoUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    R: Ranged,
+> SparseMatrix2D for RangedCSR2D<SparseIndex, RowIndex, R>
 {
     type SparseRow<'a>
         = R
@@ -161,15 +183,7 @@ where
     where
         Self: 'a;
     type SparseRows<'a>
-        = crate::impls::CSR2DRows<'a, Self>
-    where
-        Self: 'a;
-    type EmptyRowIndices<'a>
-        = crate::impls::CSR2DEmptyRowIndices<'a, Self>
-    where
-        Self: 'a;
-    type NonEmptyRowIndices<'a>
-        = crate::impls::CSR2DNonEmptyRowIndices<'a, Self>
+        = crate::impls::CSR2DSizedRows<'a, Self>
     where
         Self: 'a;
 
@@ -187,7 +201,22 @@ where
     fn sparse_rows(&self) -> Self::SparseRows<'_> {
         self.into()
     }
+}
 
+impl<
+    SparseIndex: PositiveInteger + IntoUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    R: Ranged,
+> EmptyRows for RangedCSR2D<SparseIndex, RowIndex, R>
+{
+    type EmptyRowIndices<'a>
+        = crate::impls::CSR2DEmptyRowIndices<'a, Self>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a>
+        = crate::impls::CSR2DNonEmptyRowIndices<'a, Self>
+    where
+        Self: 'a;
     #[inline]
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
         self.into()
@@ -209,13 +238,16 @@ where
     }
 }
 
-impl<SparseIndex: PositiveInteger + IntoUsize, RowIndex: PositiveInteger + IntoUsize, R: Ranged>
-    SizedRowsSparseMatrix2D for RangedCSR2D<SparseIndex, RowIndex, R>
+impl<
+    SparseIndex: PositiveInteger + IntoUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    R: Ranged,
+> SizedRowsSparseMatrix2D for RangedCSR2D<SparseIndex, RowIndex, R>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = R::Step>,
 {
     type SparseRowSizes<'a>
-        = crate::impls::CSR2DRowSizes<'a, Self>
+        = crate::impls::CSR2DSizedRowsizes<'a, Self>
     where
         Self: 'a;
 
@@ -230,8 +262,11 @@ where
     }
 }
 
-impl<SparseIndex: PositiveInteger + IntoUsize, RowIndex: PositiveInteger + IntoUsize, R: Ranged>
-    MatrixMut for RangedCSR2D<SparseIndex, RowIndex, R>
+impl<
+    SparseIndex: PositiveInteger + IntoUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    R: Ranged,
+> MatrixMut for RangedCSR2D<SparseIndex, RowIndex, R>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = R::Step>,
 {
@@ -251,7 +286,7 @@ where
                     return Err(MutabilityError::DuplicatedEntry((row, column)));
                 }
                 RangedError::OutOfRange => {
-                    return Err(MutabilityError::UnorderedColumnIndex(column));
+                    return Err(MutabilityError::UnorderedCoordinate((row, column)));
                 }
             }
         }
@@ -287,6 +322,8 @@ impl<SparseIndex: PositiveInteger + IntoUsize, R1: Ranged, R2: Ranged>
 where
     Self: Matrix2D<RowIndex = R2::Step, ColumnIndex = R1::Step>,
     RangedCSR2D<SparseIndex, R1::Step, R2>: Matrix2D<RowIndex = R1::Step, ColumnIndex = R2::Step>,
+    R1::Step: TryFromUsize,
+    R2::Step: TryFromUsize,
 {
     fn transpose(&self) -> RangedCSR2D<SparseIndex, R1::Step, R2> {
         // We initialize the transposed matrix.

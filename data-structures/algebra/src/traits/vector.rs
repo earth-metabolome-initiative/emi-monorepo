@@ -9,7 +9,7 @@ pub trait Vector: Index<<Self as Vector>::Index, Output = <Self as Vector>::Valu
     /// The value of the vector.
     type Value;
     /// Iterator over the values in the vector.
-    type Iter<'a>: Iterator<Item = &'a Self::Value>
+    type Iter<'a>: Iterator<Item = &'a Self::Value> + Clone + DoubleEndedIterator
     where
         Self: 'a;
     /// The index of the vector.

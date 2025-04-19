@@ -24,17 +24,6 @@ pub trait SparseMatrix2D: Matrix2D + SparseMatrix {
     where
         Self: 'a;
 
-    /// Iterator over the row indices of the empty rows.
-    type EmptyRowIndices<'a>: Iterator<Item = Self::RowIndex>
-        + DoubleEndedIterator<Item = Self::RowIndex>
-    where
-        Self: 'a;
-    /// Iterator over the row indices of the non-empty rows.
-    type NonEmptyRowIndices<'a>: Iterator<Item = Self::RowIndex>
-        + DoubleEndedIterator<Item = Self::RowIndex>
-    where
-        Self: 'a;
-
     /// Returns an iterator over the sparse columns of a row.
     ///
     /// # Arguments
@@ -47,18 +36,6 @@ pub trait SparseMatrix2D: Matrix2D + SparseMatrix {
 
     /// Returns an iterator over all the rows of the matrix.
     fn sparse_rows(&self) -> Self::SparseRows<'_>;
-
-    /// Returns the number of empty rows.
-    fn number_of_empty_rows(&self) -> Self::RowIndex;
-
-    /// Returns the number of non-empty rows.
-    fn number_of_non_empty_rows(&self) -> Self::RowIndex;
-
-    /// Returns an iterator over the row indices of the empty rows.
-    fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_>;
-
-    /// Returns an iterator over the row indices of the non-empty rows.
-    fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_>;
 }
 
 impl<M: SparseMatrix2D> SparseMatrix2D for &M {
@@ -72,14 +49,6 @@ impl<M: SparseMatrix2D> SparseMatrix2D for &M {
         Self: 'a;
     type SparseRows<'a>
         = M::SparseRows<'a>
-    where
-        Self: 'a;
-    type EmptyRowIndices<'a>
-        = M::EmptyRowIndices<'a>
-    where
-        Self: 'a;
-    type NonEmptyRowIndices<'a>
-        = M::NonEmptyRowIndices<'a>
     where
         Self: 'a;
 
@@ -97,6 +66,43 @@ impl<M: SparseMatrix2D> SparseMatrix2D for &M {
     fn sparse_rows(&self) -> Self::SparseRows<'_> {
         (*self).sparse_rows()
     }
+}
+
+/// Trait characterizing the properties of a matrix with empty rows.
+pub trait EmptyRows: SparseMatrix2D {
+    /// Iterator over the row indices of the empty rows.
+    type EmptyRowIndices<'a>: Iterator<Item = Self::RowIndex>
+        + DoubleEndedIterator<Item = Self::RowIndex>
+    where
+        Self: 'a;
+    /// Iterator over the row indices of the non-empty rows.
+    type NonEmptyRowIndices<'a>: Iterator<Item = Self::RowIndex>
+        + DoubleEndedIterator<Item = Self::RowIndex>
+    where
+        Self: 'a;
+
+    /// Returns the number of empty rows.
+    fn number_of_empty_rows(&self) -> Self::RowIndex;
+
+    /// Returns the number of non-empty rows.
+    fn number_of_non_empty_rows(&self) -> Self::RowIndex;
+
+    /// Returns an iterator over the row indices of the empty rows.
+    fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_>;
+
+    /// Returns an iterator over the row indices of the non-empty rows.
+    fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_>;
+}
+
+impl<M: EmptyRows> EmptyRows for &M {
+    type EmptyRowIndices<'a>
+        = M::EmptyRowIndices<'a>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a>
+        = M::NonEmptyRowIndices<'a>
+    where
+        Self: 'a;
 
     #[inline]
     fn number_of_empty_rows(&self) -> Self::RowIndex {

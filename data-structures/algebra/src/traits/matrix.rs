@@ -99,6 +99,9 @@ pub trait SparseMatrix: Matrix {
     /// Returns an iterator of the sparse coordinates of the matrix.
     fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_>;
 
+    /// Returns the last sparse entry in the matrix.
+    fn last_sparse_coordinates(&self) -> Option<Self::Coordinates>;
+
     /// Returns whether the matrix is empty.
     fn is_empty(&self) -> bool;
 }
@@ -112,6 +115,10 @@ impl<M: SparseMatrix> SparseMatrix for &M {
 
     fn sparse_coordinates(&self) -> Self::SparseCoordinates<'_> {
         (*self).sparse_coordinates()
+    }
+
+    fn last_sparse_coordinates(&self) -> Option<Self::Coordinates> {
+        (*self).last_sparse_coordinates()
     }
 
     fn is_empty(&self) -> bool {

@@ -12,10 +12,24 @@ pub trait SquareMatrix: Matrix2D<RowIndex = Self::Index, ColumnIndex = Self::Ind
     fn order(&self) -> Self::Index;
 }
 
+impl<M: SquareMatrix> SquareMatrix for &M {
+    type Index = M::Index;
+
+    fn order(&self) -> Self::Index {
+        (*self).order()
+    }
+}
+
 /// Trait defining a sparse square matrix.
 pub trait SparseSquareMatrix: SquareMatrix + SparseMatrix2D {
     /// Returns the number of defined values in the main diagonal.
     fn number_of_defined_diagonal_values(&self) -> Self::Index;
+}
+
+impl<M: SparseSquareMatrix> SparseSquareMatrix for &M {
+    fn number_of_defined_diagonal_values(&self) -> Self::Index {
+        (*self).number_of_defined_diagonal_values()
+    }
 }
 
 /// Trait defining a matrix that can be symmetrized.

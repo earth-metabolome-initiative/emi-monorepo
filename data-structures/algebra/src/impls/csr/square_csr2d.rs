@@ -135,6 +135,10 @@ where
     fn is_empty(&self) -> bool {
         self.matrix.is_empty()
     }
+
+    fn last_sparse_coordinates(&self) -> Option<Self::Coordinates> {
+        self.matrix.last_sparse_coordinates()
+    }
 }
 
 impl<M> SizedSparseMatrix for SquareCSR2D<M>
@@ -176,15 +180,6 @@ where
     where
         Self: 'a;
 
-    type EmptyRowIndices<'a>
-        = <M as SparseMatrix2D>::EmptyRowIndices<'a>
-    where
-        Self: 'a;
-    type NonEmptyRowIndices<'a>
-        = <M as SparseMatrix2D>::NonEmptyRowIndices<'a>
-    where
-        Self: 'a;
-
     #[inline]
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.matrix.sparse_row(row)
@@ -199,7 +194,20 @@ where
     fn sparse_rows(&self) -> Self::SparseRows<'_> {
         self.matrix.sparse_rows()
     }
+}
 
+impl<M> EmptyRows for SquareCSR2D<M>
+where
+    M: EmptyRows<ColumnIndex = <Self as Matrix2D>::RowIndex>,
+{
+    type EmptyRowIndices<'a>
+        = <M as EmptyRows>::EmptyRowIndices<'a>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a>
+        = <M as EmptyRows>::NonEmptyRowIndices<'a>
+    where
+        Self: 'a;
     #[inline]
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
         self.matrix.empty_row_indices()

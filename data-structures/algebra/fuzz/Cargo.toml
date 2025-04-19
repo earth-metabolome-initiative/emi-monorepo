@@ -56,6 +56,17 @@ path = "fuzz_targets/kahn.rs"
 test = false
 doc = false
 
+[[bin]]
+name = "tarjan"
+path = "fuzz_targets/tarjan.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "johnson_cycle"
+path = "fuzz_targets/johnson_cycle.rs"
+test = false
+doc = false
 
 [[bin]]
 name = "generic_matrix2d_with_padded_diagonal"

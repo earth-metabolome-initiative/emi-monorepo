@@ -35,7 +35,7 @@ members = [
     "utils/image-validation",
     "utils/mime-types",
     "web/web_common/ws-messages",
-    "utils/rosetta-timestamp",
+    "utils/rosetta-timestamp", "utils/iter-utils",
 
 ]
 
@@ -99,6 +99,7 @@ inflector = { path = "utils/inflector" }
 core-structures = { path = "web/core-structures" }
 core-structures-builder = { path = "web/core-structures/core-structures-builder" }
 ws-messages = { path = "web/web_common/ws-messages" }
+iter-utils = { path = "utils/iter-utils" }
 regex = "1.11"
 plotters = "0.3.7"
 futures = "0.3.31"
@@ -107,6 +108,7 @@ trybuild = "1"
 const_format = "0.2.34"
 log = "0.4"
 rustfft = "6.2.0"
+lender = "0.3.1"
 api-path = { path = "web/web_common/api-path" }
 time-requirements = { path = "utils/time-requirements" }
 algebra = { path = "data-structures/algebra" }

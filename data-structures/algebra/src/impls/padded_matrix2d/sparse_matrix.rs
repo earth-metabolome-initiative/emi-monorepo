@@ -5,8 +5,8 @@ use super::{PaddedMatrix2D, padded_coordinates::PaddedCoordinates};
 use crate::{
     impls::{CSR2DColumns, ranged::SimpleRanged},
     traits::{
-        IntoUsize, Matrix2D, SizedRowsSparseMatrix2D, SizedSparseMatrix, SparseMatrix,
-        SparseMatrix2D, TryFromUsize, Zero,
+        EmptyRows, IntoUsize, Matrix2D, One, SizedRowsSparseMatrix2D, SizedSparseMatrix,
+        SparseMatrix, SparseMatrix2D, TryFromUsize, Zero,
     },
 };
 
@@ -25,6 +25,16 @@ where
     fn is_empty(&self) -> bool {
         self.number_of_rows() == M::RowIndex::ZERO
             && self.number_of_columns() == M::ColumnIndex::ZERO
+    }
+
+    fn last_sparse_coordinates(&self) -> Option<Self::Coordinates> {
+        if self.is_empty() {
+            return None;
+        }
+        Some((
+            self.number_of_rows() - M::RowIndex::ONE,
+            self.number_of_columns() - M::ColumnIndex::ONE,
+        ))
     }
 
     #[inline]
@@ -51,7 +61,7 @@ where
     M::ColumnIndex: IntoUsize + TryFromUsize,
 {
     type SparseRowSizes<'a>
-        = crate::impls::CSR2DRowSizes<'a, Self>
+        = crate::impls::CSR2DSizedRowsizes<'a, Self>
     where
         Self: 'a;
 
@@ -80,9 +90,31 @@ where
     where
         Self: 'a;
     type SparseRows<'a>
-        = crate::impls::CSR2DRows<'a, Self>
+        = crate::impls::CSR2DSizedRows<'a, Self>
     where
         Self: 'a;
+
+    #[inline]
+    fn sparse_row(&self, _row: Self::RowIndex) -> Self::SparseRow<'_> {
+        self.column_indices()
+    }
+
+    #[inline]
+    fn sparse_columns(&self) -> Self::SparseColumns<'_> {
+        self.into()
+    }
+
+    #[inline]
+    fn sparse_rows(&self) -> Self::SparseRows<'_> {
+        self.into()
+    }
+}
+
+impl<M: EmptyRows, Map> EmptyRows for PaddedMatrix2D<M, Map>
+where
+    M::RowIndex: IntoUsize + TryFromUsize,
+    M::ColumnIndex: IntoUsize + TryFromUsize,
+{
     type EmptyRowIndices<'a>
         = core::iter::Empty<M::RowIndex>
     where
@@ -110,20 +142,5 @@ where
     #[inline]
     fn number_of_non_empty_rows(&self) -> Self::RowIndex {
         self.number_of_rows()
-    }
-
-    #[inline]
-    fn sparse_row(&self, _row: Self::RowIndex) -> Self::SparseRow<'_> {
-        self.column_indices()
-    }
-
-    #[inline]
-    fn sparse_columns(&self) -> Self::SparseColumns<'_> {
-        self.into()
-    }
-
-    #[inline]
-    fn sparse_rows(&self) -> Self::SparseRows<'_> {
-        self.into()
     }
 }

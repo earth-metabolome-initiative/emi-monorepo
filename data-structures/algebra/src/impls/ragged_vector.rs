@@ -6,7 +6,7 @@ use super::MutabilityError;
 use crate::{
     prelude::Zero,
     traits::{
-        IntoUsize, Matrix, Matrix2D, Matrix2DRef, MatrixMut, PositiveInteger,
+        EmptyRows, IntoUsize, Matrix, Matrix2D, Matrix2DRef, MatrixMut, PositiveInteger,
         SizedRowsSparseMatrix2D, SizedSparseMatrix, SparseMatrix, SparseMatrix2D, SparseMatrixMut,
         TransposableMatrix2D, TryFromUsize,
     },
@@ -110,7 +110,7 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> SparseMatrix
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
     ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: PositiveInteger + IntoUsize,
 {
@@ -124,6 +124,19 @@ where
         self.into()
     }
 
+    fn last_sparse_coordinates(&self) -> Option<Self::Coordinates> {
+        if self.is_empty() {
+            return None;
+        }
+        let last_row_index =
+            RowIndex::try_from_usize(self.data.len() - 1).expect("The matrix is in a valid state.");
+        let last_row_with_values: &Vec<ColumnIndex> =
+            self.data.last().expect("The matrix should not be empty.");
+        let last_column =
+            last_row_with_values.iter().last().copied().expect("The last row should not be empty.");
+        Some((last_row_index, last_column))
+    }
+
     fn is_empty(&self) -> bool {
         self.number_of_defined_values == SparseIndex::ZERO
     }
@@ -132,7 +145,7 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> SizedSparseMatrix
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
     ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: PositiveInteger + IntoUsize,
 {
@@ -144,7 +157,7 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> SparseMatrix2D
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
     ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: PositiveInteger + IntoUsize,
 {
@@ -157,15 +170,7 @@ where
     where
         Self: 'a;
     type SparseRows<'a>
-        = crate::impls::CSR2DRows<'a, Self>
-    where
-        Self: 'a;
-    type EmptyRowIndices<'a>
-        = crate::impls::CSR2DEmptyRowIndices<'a, Self>
-    where
-        Self: 'a;
-    type NonEmptyRowIndices<'a>
-        = crate::impls::CSR2DNonEmptyRowIndices<'a, Self>
+        = crate::impls::CSR2DSizedRows<'a, Self>
     where
         Self: 'a;
 
@@ -185,7 +190,23 @@ where
     fn sparse_rows(&self) -> Self::SparseRows<'_> {
         self.into()
     }
+}
 
+impl<SparseIndex, RowIndex, ColumnIndex> EmptyRows
+    for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
+where
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    SparseIndex: PositiveInteger + IntoUsize,
+{
+    type EmptyRowIndices<'a>
+        = crate::impls::CSR2DEmptyRowIndices<'a, Self>
+    where
+        Self: 'a;
+    type NonEmptyRowIndices<'a>
+        = crate::impls::CSR2DNonEmptyRowIndices<'a, Self>
+    where
+        Self: 'a;
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
         self.into()
     }
@@ -206,12 +227,12 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> SizedRowsSparseMatrix2D
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize,
+    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
     ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: PositiveInteger + IntoUsize,
 {
     type SparseRowSizes<'a>
-        = crate::impls::CSR2DRowSizes<'a, Self>
+        = crate::impls::CSR2DSizedRowsizes<'a, Self>
     where
         Self: 'a;
 
@@ -248,7 +269,7 @@ where
                 return Err(MutabilityError::DuplicatedEntry((row, column)));
             }
             if *last_column > column {
-                return Err(MutabilityError::UnorderedColumnIndex(column));
+                return Err(MutabilityError::UnorderedCoordinate((row, column)));
             }
         }
 
