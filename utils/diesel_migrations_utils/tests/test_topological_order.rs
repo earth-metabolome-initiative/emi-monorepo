@@ -41,7 +41,7 @@ pub fn test_out_of_order_migrations_topological_sorting() {
     // Then, we sort the migrations in `out_of_order_migrations_to_be_sorted`.
     let out_of_order =
         MigrationDirectory::try_from("out_of_order_migrations_to_be_sorted").unwrap();
-    out_of_order.order_topologically().unwrap();
+    out_of_order.topologically_sort().unwrap();
 
     // Finally, we check that the migrations are now topologically sorted.
     let out_of_order =

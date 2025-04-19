@@ -4,7 +4,7 @@ use std::{collections::HashMap, path::Path};
 
 use algebra::{
     impls::SquareCSR2D,
-    prelude::{Kahn, MatrixMut, RaggedVector},
+    prelude::{Johnson, Kahn, MatrixMut, RaggedVector},
 };
 use graph::{
     prelude::{
@@ -51,7 +51,22 @@ impl<'a> TryFrom<&'a Path> for MigrationDirectory {
             }
         }
 
-        Ok(MigrationDirectory { migrations, directory })
+        let migrations = MigrationDirectory { migrations, directory };
+
+        let graph = migrations.graph()?;
+        if let Some(circuit) = graph.edges().johnson().next() {
+            return Err(Error::CircularDependency(
+                circuit
+                    .into_iter()
+                    .map(|migration_id| {
+                        let migration = &migrations.migrations[migration_id];
+                        (migration.number(), migration.name().to_owned())
+                    })
+                    .collect(),
+            ));
+        }
+
+        Ok(migrations)
     }
 }
 
@@ -102,6 +117,8 @@ impl MigrationDirectory {
                             // We get the migration number of the foreign table.
                             migration_map.get(&foreign_table)
                         })
+                        // We remove self-loops
+                        .filter(|&&parent_migration_id| parent_migration_id != child_migration_id)
                         .copied()
                         .collect();
                     parent_migration_ids.sort_unstable();
@@ -325,7 +342,7 @@ impl MigrationDirectory {
     ///
     /// * If the migrations syntax cannot be parsed with `sqlparser`
     /// * If the migrations cannot be moved
-    pub fn order_topologically(self) -> Result<MigrationDirectory, Error> {
+    pub fn topologically_sort(self) -> Result<MigrationDirectory, Error> {
         let path: &Path = Path::new(&self.directory);
         // First, we shift all of the migrations to the largest migration number + 1
         // so to avoid any conflicts while proceeding with the topological sorting.
