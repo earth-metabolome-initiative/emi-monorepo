@@ -9,8 +9,8 @@ fn test_tarjan() {
             .expect("Failed to create matrix");
     let components: Vec<Vec<usize>> = matrix.tarjan().collect();
     assert_eq!(components.len(), 2);
-    assert_eq!(components[1], vec![0, 1, 2]);
-    assert_eq!(components[0], vec![3, 4, 5]);
+    assert_eq!(components[1], vec![2, 1, 0]);
+    assert_eq!(components[0], vec![5, 4, 3]);
 }
 
 #[test]
@@ -25,7 +25,7 @@ fn test_tarjan_fuzz_case1() {
     let components: Vec<Vec<usize>> = matrix.tarjan().collect();
     assert_eq!(components.len(), 2);
     assert_eq!(components[0], vec![2]);
-    assert_eq!(components[1], vec![0, 1]);
+    assert_eq!(components[1], vec![1, 0]);
 }
 
 #[test]

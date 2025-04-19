@@ -35,9 +35,15 @@ impl<M: SquareMatrix> LowerBoundedSquareMatrix<M> {
     ///
     /// * `matrix` - The matrix to be sliced.
     /// * `index` - The row id of the slice.
+    /// 
+    /// # Errors
+    /// 
+    /// * If the index is greater than or equal to the order of the matrix, an
+    ///   `OutOfBounds` error is returned. 
+    /// 
     pub fn new(matrix: M, index: M::Index) -> Result<Self, MutabilityError<M>> {
         if index >= matrix.order() {
-            return Err(MutabilityError::UnorderedCoordinate((index, index)));
+            return Err(MutabilityError::OutOfBounds((index, index)));
         }
         Ok(Self { matrix, index })
     }

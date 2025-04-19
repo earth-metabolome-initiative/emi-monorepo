@@ -1,4 +1,4 @@
-//! Submodule providing the Intersection trait and the IntersectionIter trait,
+//! Submodule providing the Intersection trait and the `IntersectionIter` trait,
 //! which determines the intersection of two sorted iterators.
 
 #[derive(Debug, Clone)]
@@ -67,16 +67,16 @@ where
                     let current_left = self.left_next.take();
                     self.left_next = self.left.next().or_else(|| self.left_next_back.take());
                     self.right_next = self.right.next().or_else(|| self.right_next_back.take());
-                    debug_assert!(self.left_next.as_ref().map_or(true, |x| x > &left));
-                    debug_assert!(self.right_next.as_ref().map_or(true, |x| x > &right));
+                    debug_assert!(self.left_next.as_ref().is_none_or(|x| x > &left));
+                    debug_assert!(self.right_next.as_ref().is_none_or(|x| x > &right));
                     current_left
                 } else if left < right {
                     self.left_next = self.left.next().or_else(|| self.left_next_back.take());
-                    debug_assert!(self.left_next.as_ref().map_or(true, |x| x > &left));
+                    debug_assert!(self.left_next.as_ref().is_none_or(|x| x > &left));
                     self.next()
                 } else {
                     self.right_next = self.right.next().or_else(|| self.right_next_back.take());
-                    debug_assert!(self.right_next.as_ref().map_or(true, |x| x > &right));
+                    debug_assert!(self.right_next.as_ref().is_none_or(|x| x > &right));
                     self.next()
                 }
             }
@@ -102,17 +102,17 @@ where
                     self.left_next_back = self.left.next_back().or_else(|| self.left_next.take());
                     self.right_next_back =
                         self.right.next_back().or_else(|| self.right_next.take());
-                    debug_assert!(self.left_next_back.as_ref().map_or(true, |x| x < &left));
-                    debug_assert!(self.right_next_back.as_ref().map_or(true, |x| x < &right));
+                    debug_assert!(self.left_next_back.as_ref().is_none_or(|x| x < &left));
+                    debug_assert!(self.right_next_back.as_ref().is_none_or(|x| x < &right));
                     current_left
                 } else if left > right {
                     self.left_next_back = self.left.next_back().or_else(|| self.left_next.take());
-                    debug_assert!(self.left_next_back.as_ref().map_or(true, |x| x < &left));
+                    debug_assert!(self.left_next_back.as_ref().is_none_or(|x| x < &left));
                     self.next_back()
                 } else {
                     self.right_next_back =
                         self.right.next_back().or_else(|| self.right_next.take());
-                    debug_assert!(self.right_next_back.as_ref().map_or(true, |x| x < &right));
+                    debug_assert!(self.right_next_back.as_ref().is_none_or(|x| x < &right));
                     self.next_back()
                 }
             }

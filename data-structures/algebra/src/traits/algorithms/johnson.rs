@@ -8,6 +8,7 @@ use crate::{
 };
 use lender::prelude::{Lending, Lender};
 
+#[allow(clippy::type_complexity)]
 /// Iterator for Johnson's algorithm.
 struct CircuitSearch<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> 
 {
@@ -36,7 +37,7 @@ impl<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> From<&'lend mut InnerJohn
     }
 }
 
-impl<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> CircuitSearch<'lend, 'matrix, M> {
+impl<M: SquareMatrix + SparseMatrix2D> CircuitSearch<'_, '_, M> {
     fn unblock(&mut self, row_id: M::Index) {
         self.data.blocked[row_id.into_usize()] = false;
         let row_block = core::mem::replace(&mut self.data.block_map[row_id.into_usize()], Vec::new());
@@ -91,7 +92,7 @@ impl<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> CircuitSearch<'lend, 'mat
     }
 
     fn last_circuit_next_column(&mut self) -> Option<M::Index> {
-        self.row_iterators.last_mut().and_then(|row_iter| row_iter.next())
+        self.row_iterators.last_mut().and_then(Iterator::next)
     }
 
     fn register_circuit_search(&mut self, row_id: M::Index) {
@@ -120,13 +121,13 @@ impl<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> CircuitSearch<'lend, 'mat
     }
 }
 
-impl<'lend2, 'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> Lending<'lend2> for CircuitSearch<'lend, 'matrix, M> {
+impl<'lend2, M: SquareMatrix + SparseMatrix2D> Lending<'lend2> for CircuitSearch<'_, '_, M> {
     type Lend = &'lend2 [M::Index];
 }
 
 
-impl<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> Lender for CircuitSearch<'lend, 'matrix, M> {
-    fn next<'lend2>(&'lend2 mut self) -> Option<<Self as Lending<'lend2>>::Lend> {
+impl<M: SquareMatrix + SparseMatrix2D> Lender for CircuitSearch<'_, '_, M> {
+    fn next(& mut self) -> Option<<Self as Lending<'_>>::Lend> {
         println!("State of stack: {:?}", self.data.stack);
         self.search_circuit()
     }
@@ -168,8 +169,8 @@ impl<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> Lending<'lend> for InnerJ
     type Lend = CircuitSearch<'lend, 'matrix, M>;
 }
 
-impl<'matrix, M: SquareMatrix + SparseMatrix2D> Lender for InnerJohnsonIterator<'matrix, M> {
-    fn next<'lend>(&'lend mut self) -> Option<<Self as Lending<'lend>>::Lend> {        
+impl< M: SquareMatrix + SparseMatrix2D> Lender for InnerJohnsonIterator<'_, M> {
+    fn next(&mut self) -> Option<<Self as Lending<'_>>::Lend> {        
         println!("State of stack: {:?}", self.data.stack);
         while self.data.current_root_id < self.matrix.order() {
             let bounded_matrix =
@@ -194,7 +195,7 @@ impl<'matrix, M: SquareMatrix + SparseMatrix2D> Lender for InnerJohnsonIterator<
             debug_assert!(self.data.current_root_id <= new_root_id, "current_root_id {} should be less than or equal to new_root_id {new_root_id} in scc {strongly_connected_component_with_smallest_node:?}", self.data.current_root_id);
 
             self.data.current_root_id = new_root_id;
-            for row_id in strongly_connected_component_with_smallest_node.iter() {
+            for row_id in &strongly_connected_component_with_smallest_node {
                 self.data.blocked[row_id.into_usize()] = false;
                 self.data.block_map[row_id.into_usize()].clear();
             }
@@ -240,11 +241,11 @@ impl<'matrix, M: SquareMatrix + SparseMatrix2D> From<&'matrix M> for JohnsonIter
     }
 }
 
-impl<'matrix, M: SquareMatrix + SparseMatrix2D> Iterator for JohnsonIterator<'matrix, M> {
+impl<M: SquareMatrix + SparseMatrix2D> Iterator for JohnsonIterator<'_, M> {
     type Item = Vec<M::Index>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.inner.next().map(|circuit| circuit.to_vec())
+        self.inner.next().map(<[M::Index]>::to_vec)
     }
 }
 

@@ -48,7 +48,7 @@ impl<'matrix, M: SquareMatrix + SparseMatrix2D + ?Sized> From<&'matrix M>
     }
 }
 
-impl<'matrix, M: SquareMatrix + SparseMatrix2D + ?Sized> TarjanIterator<'matrix, M> {
+impl<M: SquareMatrix + SparseMatrix2D + ?Sized> TarjanIterator<'_, M> {
     fn register_new_scc_search(&mut self, row_id: M::Index) {
         self.indices[row_id.into_usize()] = Some(self.number_of_strongly_connected_components);
         self.lowlink[row_id.into_usize()] = Some(self.number_of_strongly_connected_components);
@@ -90,7 +90,7 @@ impl<'matrix, M: SquareMatrix + SparseMatrix2D + ?Sized> TarjanIterator<'matrix,
     }
 
     fn last_scc_next_column_id(&mut self) -> Option<M::Index> {
-        self.sparse_row_stack.last_mut().and_then(|coordinates| coordinates.next())
+        self.sparse_row_stack.last_mut().and_then(Iterator::next)
     }
 }
 

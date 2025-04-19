@@ -52,7 +52,6 @@ pub trait Kahn: SparseSquareMatrix {
         }
 
         if number_of_visited_nodes != self.order() {
-            println!("topological_order: {:?}", topological_order);
             return Err(KahnError::Cycle);
         }
 
