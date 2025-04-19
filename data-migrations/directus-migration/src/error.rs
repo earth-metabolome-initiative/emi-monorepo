@@ -4,9 +4,9 @@ use core_structures::{
     codegen::structs_codegen::tables::insertables::InsertableUserAttributes,
     tables::insertables::{
         InsertableAddressAttributes, InsertableBrandAttributes, InsertableCityAttributes,
-        InsertableInstrumentAttributes, InsertableInstrumentLocationAttributes,
-        InsertableInstrumentModelAttributes, InsertableProductAttributes, InsertableRoomAttributes,
-        InsertableUserEmailAttributes,
+        InsertableCommercialProductAttributes, InsertableInstrumentAttributes,
+        InsertableInstrumentLocationAttributes, InsertableInstrumentModelAttributes,
+        InsertableRoomAttributes, InsertableUserEmailAttributes,
     },
 };
 use web_common_traits::database::InsertError;
@@ -44,7 +44,7 @@ pub enum Error {
     /// Unknown brand status
     UnknownBrandStatus(String),
     /// Unknown instrument type
-    UnknownInstrumentType(Box<DirectusInstrumentType>),
+    UnknownInstrumentCategory(Box<DirectusInstrumentType>),
     /// Unknown brand
     UnknownBrand(Box<DirectusBrand>),
     /// Unknown instrument state
@@ -64,7 +64,7 @@ pub enum Error {
     /// Failed to insert brand
     BrandInsertError(InsertError<InsertableBrandAttributes>),
     /// Failed to insert product.
-    ProductInsertError(InsertError<InsertableProductAttributes>),
+    ProductInsertError(InsertError<InsertableCommercialProductAttributes>),
     /// Failed to insert instrument model.
     InstrumentModelInsertError(InsertError<InsertableInstrumentModelAttributes>),
     /// Failed to insert instrument
@@ -147,8 +147,8 @@ impl From<InsertError<InsertableInstrumentLocationAttributes>> for Error {
     }
 }
 
-impl From<InsertError<InsertableProductAttributes>> for Error {
-    fn from(value: InsertError<InsertableProductAttributes>) -> Self {
+impl From<InsertError<InsertableCommercialProductAttributes>> for Error {
+    fn from(value: InsertError<InsertableCommercialProductAttributes>) -> Self {
         Error::ProductInsertError(value)
     }
 }

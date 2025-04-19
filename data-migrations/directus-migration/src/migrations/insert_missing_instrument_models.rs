@@ -2,8 +2,8 @@
 //! are present in the Directus database but not in the Portal database.
 
 use core_structures::{
-    Brand as PortalBrand, InstrumentModel as PortalInstrumentModel,
-    InstrumentType as PortalInstrumentType, Product as PortalProduct,
+    Brand as PortalBrand, CommercialProduct as PortalCommercialProduct,
+    InstrumentCategory as PortalInstrumentCategory, InstrumentModel as PortalInstrumentModel,
 };
 use diesel_async::AsyncPgConnection;
 use web_common_traits::{
@@ -30,9 +30,12 @@ pub(crate) async fn insert_missing_instrument_models(
 ) -> Result<(), crate::error::Error> {
     let directus_instrument_models = DirectusInstrumentModel::load_all(directus_conn).await?;
     for directus_instrument_model in directus_instrument_models {
-        let portal_product: PortalProduct = if let Some(portal_product) =
-            PortalProduct::from_name(&directus_instrument_model.instrument_model, portal_conn)
-                .await?
+        let portal_product: PortalCommercialProduct = if let Some(portal_product) =
+            PortalCommercialProduct::from_name(
+                &directus_instrument_model.instrument_model,
+                portal_conn,
+            )
+            .await?
         {
             portal_product
         } else {
@@ -65,7 +68,7 @@ pub(crate) async fn insert_missing_instrument_models(
                 get_user(&directus_updated_by, directus_conn, portal_conn).await?;
 
             // We need to insert the product first
-            PortalProduct::new()
+            PortalCommercialProduct::new()
                 .name(directus_instrument_model.instrument_model.clone())?
                 .brand_id(portal_brand.id)?
                 .created_by(portal_created_by.id)?
@@ -79,7 +82,7 @@ pub(crate) async fn insert_missing_instrument_models(
 
         let directus_instrument_type =
             directus_instrument_model.instrument_type(directus_conn).await?;
-        let portal_instrument_type = PortalInstrumentType::from_name(
+        let portal_instrument_category = PortalInstrumentCategory::from_name(
             directus_instrument_type.instrument_type.as_ref().ok_or_else(|| {
                 crate::error::Error::MissingInstrumentTypeName(Box::from(
                     directus_instrument_type.clone(),
@@ -89,12 +92,15 @@ pub(crate) async fn insert_missing_instrument_models(
         )
         .await?
         .ok_or_else(|| {
-            crate::error::Error::UnknownInstrumentType(Box::from(directus_instrument_type.clone()))
+            crate::error::Error::UnknownInstrumentCategory(Box::from(
+                directus_instrument_type.clone(),
+            ))
         })?;
+
+        todo!("Register the instrument model categories!");
 
         let _portal_instrument_model = PortalInstrumentModel::new()
             .id(portal_product.id)?
-            .instrument_type_id(portal_instrument_type.id)?
             .created_by(portal_product.created_by)?
             .updated_by(portal_product.updated_by)?
             .updated_at(portal_product.updated_at)?

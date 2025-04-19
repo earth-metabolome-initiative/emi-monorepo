@@ -3,8 +3,8 @@ mod error;
 mod migrations;
 use diesel_async::{AsyncConnection, AsyncPgConnection};
 use migrations::{
-    ensure_instrument_categories_compatibility, insert_missing_brands, insert_missing_instrument_models,
-    insert_missing_instruments, insert_missing_users,
+    ensure_instrument_categories_compatibility, insert_missing_brands,
+    insert_missing_instrument_models, insert_missing_instruments, insert_missing_users,
 };
 
 const DIRECTUS_DATABASE_NAME: &str = "directus";

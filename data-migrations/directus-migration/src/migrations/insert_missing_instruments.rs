@@ -2,9 +2,9 @@
 //! but not in the Portal database.
 
 use core_structures::{
-    Instrument as PortalInstrument, InstrumentLocation as PortalInstrumentLocation,
-    InstrumentModel as PortalInstrumentModel, InstrumentState as PortalInstrumentState,
-    Product as PortalProduct,
+    CommercialProduct as CommercialProductProduct, Instrument as PortalInstrument,
+    InstrumentLocation as PortalInstrumentLocation, InstrumentModel as PortalInstrumentModel,
+    InstrumentState as PortalInstrumentState,
 };
 use diesel_async::AsyncPgConnection;
 use web_common_traits::{
@@ -57,14 +57,16 @@ pub(crate) async fn insert_missing_instruments(
                     crate::error::Error::UnknownInstrumentState(directus_instrument.status.clone())
                 })?;
         let directus_instrument_model = directus_instrument.instrument_model(directus_conn).await?;
-        let portal_product =
-            PortalProduct::from_name(&directus_instrument_model.instrument_model, portal_conn)
-                .await?
-                .ok_or_else(|| {
-                    crate::error::Error::UnknownInstrumentModel(Box::from(
-                        directus_instrument_model.clone(),
-                    ))
-                })?;
+        let portal_product = CommercialProductProduct::from_name(
+            &directus_instrument_model.instrument_model,
+            portal_conn,
+        )
+        .await?
+        .ok_or_else(|| {
+            crate::error::Error::UnknownInstrumentModel(Box::from(
+                directus_instrument_model.clone(),
+            ))
+        })?;
 
         let portal_instrument_model =
             PortalInstrumentModel::from_id(portal_conn, &portal_product).await.map_err(|_| {
