@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
     RunQueryDsl, Selectable, SelectableHelper, pg::PgConnection,
@@ -31,7 +33,7 @@ pub struct CheckConstraint {
 
 const POSTGIS_CONSTRAINTS: [&str; 1] = ["spatial_ref_sys_srid_check"];
 
-struct TranslateExpression<'a, C1, C2> {
+struct TranslateExpression<'a, C1: Debug, C2: Debug> {
     check_constraint: &'a CheckConstraint,
     contextual_columns: &'a [C1],
     self_columns: &'a [C2],
@@ -144,8 +146,8 @@ impl ReturningType {
 
 impl<C1, C2> TranslateExpression<'_, C1, C2>
 where
-    C1: AsRef<Column>,
-    C2: AsRef<Column>,
+    C1: AsRef<Column> + Debug,
+    C2: AsRef<Column> + Debug,
 {
     /// Returns a reference to the column that corresponds to the provided
     /// column. It gives first priority to the columns in the
@@ -759,7 +761,7 @@ impl CheckConstraint {
     /// # Panics
     ///
     /// * If the parser check clause cannot be parsed
-    pub fn to_syn<E: AsRef<PgExtension>, C1: AsRef<Column>, C2: AsRef<Column>>(
+    pub fn to_syn<E: AsRef<PgExtension>, C1: AsRef<Column> + Debug, C2: AsRef<Column> + Debug>(
         &self,
         contextual_columns: &[C1],
         self_columns: &[C2],
@@ -919,27 +921,6 @@ impl CheckConstraint {
             .map_err(WebCodeGenError::from)
     }
 
-    /// Load all the check constraints from the database
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Returns
-    ///
-    /// A `Result` containing a `Vec` of `CheckConstraint` if the operation was
-    /// successful, or a `WebCodeGenError` if an error occurred
-    ///
-    /// # Errors
-    ///
-    /// If an error occurs while loading the constraints from the database
-    pub fn load_all_check_constraints(
-        conn: &mut PgConnection,
-    ) -> Result<Vec<Self>, WebCodeGenError> {
-        use crate::schema::check_constraints;
-        check_constraints::table.load::<CheckConstraint>(conn).map_err(WebCodeGenError::from)
-    }
-
     /// Returns all the columns associated to this check constraint
     ///
     /// # Arguments
@@ -1002,35 +983,5 @@ impl CheckConstraint {
         conn: &mut PgConnection,
     ) -> Result<bool, WebCodeGenError> {
         self.columns(conn).map(|columns| columns.len() > 1)
-    }
-
-    /// Load all the check constraints from the database
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Returns
-    ///
-    /// A `Result` containing a `Vec` of `CheckConstraint` if the operation was
-    /// successful, or a `WebCodeGenError` if an error occurred
-    ///
-    /// # Errors
-    ///
-    /// If an error occurs while loading the constraints from the database
-    pub fn load_check_constraints(
-        conn: &mut PgConnection,
-        constraint_name: &str,
-        constraint_schema: Option<&str>,
-        constraint_catalog: &str,
-    ) -> Result<Vec<Self>, WebCodeGenError> {
-        use crate::schema::check_constraints;
-        let constraint_schema = constraint_schema.unwrap_or("public");
-        check_constraints::table
-            .filter(check_constraints::constraint_name.eq(constraint_name))
-            .filter(check_constraints::constraint_schema.eq(constraint_schema))
-            .filter(check_constraints::constraint_catalog.eq(constraint_catalog))
-            .load::<CheckConstraint>(conn)
-            .map_err(WebCodeGenError::from)
     }
 }

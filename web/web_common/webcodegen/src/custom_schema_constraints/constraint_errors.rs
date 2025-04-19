@@ -7,7 +7,7 @@ use crate::Column;
 /// Error type for custom schema constraints.
 pub enum ConstraintError {
     /// The column is unexpectedly nullable.
-    UnexpectedNullableColumn(String),
+    UnexpectedNullableColumn(String, String),
     /// The column name is unexpectedly uppercase.
     UnexpectedUppercaseColumn(String),
     /// The table name is unexpectedly uppercase.
@@ -47,8 +47,8 @@ pub enum ConstraintError {
 impl Display for ConstraintError {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         match self {
-            ConstraintError::UnexpectedNullableColumn(column_name) => {
-                write!(f, "Unexpected nullable column: {column_name}")
+            ConstraintError::UnexpectedNullableColumn(table_name, column_name) => {
+                write!(f, "Unexpected nullable column: {table_name}.{column_name}")
             }
             ConstraintError::UnexpectedUppercaseColumn(column_name) => {
                 write!(f, "Unexpected uppercase column: {column_name}")

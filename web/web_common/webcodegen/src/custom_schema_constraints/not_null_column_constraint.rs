@@ -27,7 +27,11 @@ impl CustomColumnConstraint for NotNullColumnConstraint {
         column: &Column,
     ) -> Result<(), WebCodeGenError> {
         if self.column_name == column.column_name && column.is_nullable() {
-            return Err(ConstraintError::UnexpectedNullableColumn(self.column_name.clone()).into());
+            return Err(ConstraintError::UnexpectedNullableColumn(
+                column.table_name.clone(),
+                self.column_name.clone(),
+            )
+            .into());
         }
         Ok(())
     }

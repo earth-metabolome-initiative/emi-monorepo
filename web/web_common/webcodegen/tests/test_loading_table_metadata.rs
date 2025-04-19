@@ -74,7 +74,6 @@ async fn test_user_table() {
         ReferentialConstraint::load_all_referential_constraints(&mut conn);
     let _all_constraint_column_usage =
         ConstraintColumnUsage::load_all_constraint_column_usages(&mut conn);
-    let _all_check_constraint = CheckConstraint::load_all_check_constraints(&mut conn);
     let _all_constraint_table_usage = ConstraintTableUsage::load_all(&mut conn);
     let _all_domain_constraint = DomainConstraint::load_all_domain_constraints(&mut conn);
 
