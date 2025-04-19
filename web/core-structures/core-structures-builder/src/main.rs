@@ -24,6 +24,19 @@ pub async fn main() {
     // We ensure that the migrations directory has all expected properties.
     let mut time_tracker = TimeTracker::new("Building Core Structures");
     let task = Task::new("Checking Migrations Directory");
+
+    // We delete empty directories in the `migrations` directory which may occur
+    // when some git collision occurs.
+    for entry in std::fs::read_dir("../migrations").unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_dir() {
+            let path = entry.path();
+            if path.read_dir().unwrap().count() == 0 {
+                std::fs::remove_dir_all(path).unwrap();
+            }
+        }
+    }
+
     let mut extension_migrations =
         MigrationDirectory::try_from("../extensions_migrations").unwrap();
     if !extension_migrations.is_dense() {
@@ -33,6 +46,10 @@ pub async fn main() {
     if !migrations.is_topologically_sorted().unwrap() {
         migrations = migrations.topologically_sort().unwrap();
     }
+    assert!(
+        migrations.is_topologically_sorted().unwrap(),
+        "The migrations are not topologically sorted.",
+    );
 
     if !migrations.is_dense() {
         migrations = migrations.redensify().unwrap();
