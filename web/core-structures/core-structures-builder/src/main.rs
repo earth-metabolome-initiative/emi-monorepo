@@ -30,6 +30,10 @@ pub async fn main() {
         extension_migrations = extension_migrations.redensify().unwrap();
     }
     let mut migrations = MigrationDirectory::try_from("../migrations").unwrap();
+    if !migrations.is_topologically_sorted().unwrap() {
+        migrations = migrations.topologically_sort().unwrap();
+    }
+
     if !migrations.is_dense() {
         migrations = migrations.redensify().unwrap();
     }
