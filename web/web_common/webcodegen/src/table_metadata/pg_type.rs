@@ -129,7 +129,7 @@ pub fn rust_type_str<S: AsRef<str>>(
     Ok(match type_name.as_ref() {
         // Numeric types
         "integer" | "int4" => "i32",
-        "smallint" => "i16",
+        "smallint" | "int2" => "i16",
         "bigint" => "i64",
         "real" | "float4" => "f32",
         "double precision" | "float8" | "numeric" => "f64",
@@ -137,7 +137,7 @@ pub fn rust_type_str<S: AsRef<str>>(
         "oid" => "u32",
 
         // Text types
-        "character varying" | "text" | "name" | "xml" | "character" | "char" | "citext" => "String",
+        "character varying" | "varchar" | "text" | "name" | "xml" | "character" | "char" | "citext" => "String",
 
         // Boolean types
         "boolean" | "bool" => "bool",
