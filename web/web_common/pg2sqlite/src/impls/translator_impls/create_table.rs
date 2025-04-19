@@ -11,6 +11,11 @@ impl Translator for CreateTable {
 
     fn translate(&self, schema: &Self::Schema) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         Ok(Self {
+            columns: self
+                .columns
+                .iter()
+                .map(|c| c.translate(schema))
+                .collect::<Result<Vec<_>, _>>()?,
             constraints: self
                 .constraints
                 .iter()

@@ -39,33 +39,6 @@ impl Pg2Sqlite {
         self
     }
 
-    /// Adds a new SQL String to be parsed and added to the set of `PostgreSQL`
-    /// statements to be translated.
-    ///
-    /// # Arguments
-    ///
-    /// * `statement` - The SQL statement to be parsed and added to the set of
-    ///   `PostgreSQL` statements to be translated.
-    ///
-    /// # Returns
-    ///
-    /// A Result containing the updated `Pg2Sqlite` struct or an error if the
-    /// SQL statement could not be parsed.
-    ///
-    /// # Errors
-    ///
-    /// * If the SQL statement could not be parsed.
-    pub fn sql(mut self, statement: &str) -> Result<Self, crate::errors::Error> {
-        let stmt = sqlparser::parser::Parser::parse_sql(
-            &sqlparser::dialect::PostgreSqlDialect {},
-            statement,
-        )?;
-        for statement in stmt {
-            self = self.statement(statement);
-        }
-        Ok(self)
-    }
-
     /// Adds a new path with an SQL file to be parsed and added to the set of
     /// `PostgreSQL` statements to be translated.
     ///
@@ -83,9 +56,22 @@ impl Pg2Sqlite {
     ///
     /// * If the SQL file could not be read.
     /// * If the SQL file could not be parsed.
-    pub fn file<P: AsRef<std::path::Path>>(self, path: P) -> Result<Self, crate::errors::Error> {
+    pub fn file<P: AsRef<std::path::Path>>(mut self, path: P) -> Result<Self, crate::errors::Error> {
+        let path = path.as_ref();
         let content = std::fs::read_to_string(path)?;
-        self.sql(&content)
+        let stmt = sqlparser::parser::Parser::parse_sql(
+            &sqlparser::dialect::PostgreSqlDialect {},
+            &content,
+        ).map_err(|e| {
+            crate::errors::Error::ParserError(
+                path.to_string_lossy().to_string(),
+                e,
+            )
+        })?;
+        for statement in stmt {
+            self = self.statement(statement);
+        }
+        Ok(self)
     }
 
     /// Adds all of the `up.sql` migrations found under the given directory to

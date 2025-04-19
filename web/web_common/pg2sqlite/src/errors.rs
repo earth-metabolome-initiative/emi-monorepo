@@ -8,17 +8,11 @@ use sqlparser::parser::ParserError;
 /// and `SQLite`.
 pub enum Error {
     /// Error that may occur during the parsing of a SQL statement.
-    ParserError(ParserError),
+    ParserError(String, ParserError),
     /// Error that may occur during the reading of a file.
     IoError(std::io::Error),
     /// Error when a function is not available in the schema.
     UndefinedFunction(String),
-}
-
-impl From<ParserError> for Error {
-    fn from(err: ParserError) -> Self {
-        Error::ParserError(err)
-    }
 }
 
 impl From<std::io::Error> for Error {
