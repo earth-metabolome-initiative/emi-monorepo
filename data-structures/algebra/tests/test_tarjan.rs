@@ -48,7 +48,7 @@ fn test_tarjan_fuzz_case2() {
 /// Test case identified by fuzzing the Tarjan algorithm.
 fn test_tarjan_fuzz_case3() {
     let matrix: SquareCSR2D<CSR2D<usize, usize, usize>> =
-            SquareCSR2D::from_entries(vec![(1, 1), (1, 2)]).unwrap();
+        SquareCSR2D::from_entries(vec![(1, 1), (1, 2)]).unwrap();
     let components: Vec<Vec<usize>> = matrix.tarjan().collect();
     assert_eq!(components.len(), 3);
     assert_eq!(components[0], vec![0]);

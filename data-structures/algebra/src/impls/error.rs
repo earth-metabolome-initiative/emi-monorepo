@@ -96,7 +96,9 @@ where
 {
     fn from(error: MutabilityError<SquareCSR2D<M>>) -> Self {
         match error {
-            MutabilityError::UnorderedCoordinate(coordinates) => MutabilityError::UnorderedCoordinate(coordinates),
+            MutabilityError::UnorderedCoordinate(coordinates) => {
+                MutabilityError::UnorderedCoordinate(coordinates)
+            }
             MutabilityError::DuplicatedEntry(coordinates) => {
                 MutabilityError::DuplicatedEntry(coordinates)
             }
@@ -115,7 +117,9 @@ where
 {
     fn from(error: MutabilityError<UpperTriangularCSR2D<M>>) -> Self {
         match error {
-            MutabilityError::UnorderedCoordinate(coordinates) => MutabilityError::UnorderedCoordinate(coordinates),
+            MutabilityError::UnorderedCoordinate(coordinates) => {
+                MutabilityError::UnorderedCoordinate(coordinates)
+            }
             MutabilityError::DuplicatedEntry(coordinates) => {
                 MutabilityError::DuplicatedEntry(coordinates)
             }
@@ -134,7 +138,9 @@ where
 {
     fn from(error: MutabilityError<M>) -> Self {
         match error {
-            MutabilityError::UnorderedCoordinate(coordinates) => MutabilityError::UnorderedCoordinate(coordinates),
+            MutabilityError::UnorderedCoordinate(coordinates) => {
+                MutabilityError::UnorderedCoordinate(coordinates)
+            }
             MutabilityError::DuplicatedEntry(coordinates) => {
                 MutabilityError::DuplicatedEntry(coordinates)
             }
@@ -158,7 +164,9 @@ where
 {
     fn from(error: MutabilityError<CSR2D<SparseIndex, RowIndex, ColumnIndex>>) -> Self {
         match error {
-            MutabilityError::UnorderedCoordinate(coordinates) => MutabilityError::UnorderedCoordinate(coordinates),
+            MutabilityError::UnorderedCoordinate(coordinates) => {
+                MutabilityError::UnorderedCoordinate(coordinates)
+            }
             MutabilityError::DuplicatedEntry(coordinates) => {
                 MutabilityError::DuplicatedEntry(coordinates)
             }

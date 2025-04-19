@@ -2,7 +2,7 @@
 //! `SubsetSquareMatrix` struct.
 
 use super::SubsetSquareMatrix;
-use crate::traits::{Matrix, Matrix2D, SquareMatrix, SparseMatrix2D};
+use crate::traits::{Matrix, Matrix2D, SparseMatrix2D, SquareMatrix};
 
 impl<M, I> Matrix for SubsetSquareMatrix<M, I>
 where

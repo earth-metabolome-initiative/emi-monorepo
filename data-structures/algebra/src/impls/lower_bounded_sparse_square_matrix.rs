@@ -7,9 +7,9 @@ use std::fmt::Debug;
 use super::MutabilityError;
 use crate::traits::SquareMatrix;
 
+mod lower_bounded_sparse_row;
 mod matrix;
 mod sparse_matrix;
-mod lower_bounded_sparse_row;
 
 /// A sliced square matrix.
 pub struct LowerBoundedSquareMatrix<M: SquareMatrix> {
@@ -35,12 +35,11 @@ impl<M: SquareMatrix> LowerBoundedSquareMatrix<M> {
     ///
     /// * `matrix` - The matrix to be sliced.
     /// * `index` - The row id of the slice.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the index is greater than or equal to the order of the matrix, an
-    ///   `OutOfBounds` error is returned. 
-    /// 
+    ///   `OutOfBounds` error is returned.
     pub fn new(matrix: M, index: M::Index) -> Result<Self, MutabilityError<M>> {
         if index >= matrix.order() {
             return Err(MutabilityError::OutOfBounds((index, index)));

@@ -2,15 +2,16 @@
 //! sparse matrices, which provides the Johnson's algorithm for finding all
 //! cycles in a sparse matrix.
 
+use lender::prelude::{Lender, Lending};
+
 use crate::{
     impls::{LowerBoundedSquareMatrix, SubsetSquareMatrix},
-    traits::{IntoUsize, SparseMatrix2D, SquareMatrix, Tarjan, Zero, One},
+    traits::{IntoUsize, One, SparseMatrix2D, SquareMatrix, Tarjan, Zero},
 };
-use lender::prelude::{Lending, Lender};
 
 #[allow(clippy::type_complexity)]
 /// Iterator for Johnson's algorithm.
-struct CircuitSearch<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> 
+struct CircuitSearch<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D>
 {
     /// The matrix to find cycles in.
     data: &'lend mut Data<&'matrix M>,
@@ -22,12 +23,20 @@ struct CircuitSearch<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D>
     row_iterators: Vec<<SubsetSquareMatrix<LowerBoundedSquareMatrix<&'matrix M>, Vec<M::Index>> as SparseMatrix2D>::SparseRow<'lend>>,
 }
 
-impl<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> From<&'lend mut InnerJohnsonIterator<'matrix, M>>
-    for CircuitSearch<'lend, 'matrix, M>
+impl<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D>
+    From<&'lend mut InnerJohnsonIterator<'matrix, M>> for CircuitSearch<'lend, 'matrix, M>
 {
     fn from(parent: &'lend mut InnerJohnsonIterator<'matrix, M>) -> Self {
-        let mut circuit_search = Self { current_component: parent.current_component.as_ref().unwrap(), current_root_id: parent.data.current_root_id, data: &mut parent.data, row_iterators: Vec::new() };
-        debug_assert!(circuit_search.data.stack.is_empty(), "Stack should be empty at the start of the circuit search");
+        let mut circuit_search = Self {
+            current_component: parent.current_component.as_ref().unwrap(),
+            current_root_id: parent.data.current_root_id,
+            data: &mut parent.data,
+            row_iterators: Vec::new(),
+        };
+        debug_assert!(
+            circuit_search.data.stack.is_empty(),
+            "Stack should be empty at the start of the circuit search"
+        );
         circuit_search.data.found_circuit = false;
         circuit_search.data.current_root_id += M::Index::ONE;
         circuit_search.register_circuit_search(circuit_search.current_root_id);
@@ -38,7 +47,8 @@ impl<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> From<&'lend mut InnerJohn
 impl<M: SquareMatrix + SparseMatrix2D> CircuitSearch<'_, '_, M> {
     fn unblock(&mut self, row_id: M::Index) {
         self.data.blocked[row_id.into_usize()] = false;
-        let row_block = core::mem::replace(&mut self.data.block_map[row_id.into_usize()], Vec::new());
+        let row_block =
+            core::mem::replace(&mut self.data.block_map[row_id.into_usize()], Vec::new());
         for column_id in row_block {
             if self.data.blocked[column_id.into_usize()] {
                 self.unblock(column_id);
@@ -74,17 +84,23 @@ impl<M: SquareMatrix + SparseMatrix2D> CircuitSearch<'_, '_, M> {
                     self.data.found_circuit = true;
                     return Some(self.data.stack.as_slice());
                 }
-    
+
                 if !self.is_blocked(column_id) {
                     self.register_circuit_search(column_id);
                     return self.next_circuit();
                 }
             }
-    
+
             self.remove_last_circuit_search();
         }
-        debug_assert!(self.data.stack.is_empty(), "Stack should be empty after removing last circuit search");
-        debug_assert!(self.row_iterators.is_empty(), "Row iterators should be empty after removing last circuit search");
+        debug_assert!(
+            self.data.stack.is_empty(),
+            "Stack should be empty after removing last circuit search"
+        );
+        debug_assert!(
+            self.row_iterators.is_empty(),
+            "Row iterators should be empty after removing last circuit search"
+        );
         None
     }
 
@@ -93,8 +109,18 @@ impl<M: SquareMatrix + SparseMatrix2D> CircuitSearch<'_, '_, M> {
     }
 
     fn register_circuit_search(&mut self, row_id: M::Index) {
-        debug_assert!(self.data.stack.len() < self.data.block_map.len(), "Stack length {} should be less than block map length {}", self.data.stack.len(), self.data.block_map.len());
-        debug_assert!(self.row_iterators.len() < self.data.block_map.len(), "Row iterators length {} should be less than block map length {}", self.row_iterators.len(), self.data.block_map.len());
+        debug_assert!(
+            self.data.stack.len() < self.data.block_map.len(),
+            "Stack length {} should be less than block map length {}",
+            self.data.stack.len(),
+            self.data.block_map.len()
+        );
+        debug_assert!(
+            self.row_iterators.len() < self.data.block_map.len(),
+            "Row iterators length {} should be less than block map length {}",
+            self.row_iterators.len(),
+            self.data.block_map.len()
+        );
         self.data.stack.push(row_id);
         self.row_iterators.push(self.current_component.sparse_row(row_id));
         self.data.blocked[row_id.into_usize()] = true;
@@ -120,9 +146,8 @@ impl<'lend2, M: SquareMatrix + SparseMatrix2D> Lending<'lend2> for CircuitSearch
     type Lend = &'lend2 [M::Index];
 }
 
-
 impl<M: SquareMatrix + SparseMatrix2D> Lender for CircuitSearch<'_, '_, M> {
-    fn next(& mut self) -> Option<<Self as Lending<'_>>::Lend> {
+    fn next(&mut self) -> Option<<Self as Lending<'_>>::Lend> {
         self.search_circuit()
     }
 }
@@ -145,7 +170,13 @@ impl<M: SquareMatrix + SparseMatrix2D> From<M> for Data<M> {
         let order = matrix.order();
         let blocked = vec![false; order.into_usize()];
         let block_map = vec![Vec::new(); order.into_usize()];
-        Self { current_root_id: M::Index::ZERO, blocked, stack: Vec::new(), found_circuit: false, block_map }
+        Self {
+            current_root_id: M::Index::ZERO,
+            blocked,
+            stack: Vec::new(),
+            found_circuit: false,
+            block_map,
+        }
     }
 }
 
@@ -156,22 +187,24 @@ struct InnerJohnsonIterator<'matrix, M: SquareMatrix + SparseMatrix2D> {
     /// The underlying data structure for the algorithm.
     data: Data<&'matrix M>,
     /// The current component matrix.
-    current_component: Option<SubsetSquareMatrix<LowerBoundedSquareMatrix<&'matrix M>, Vec<M::Index>>>,
+    current_component:
+        Option<SubsetSquareMatrix<LowerBoundedSquareMatrix<&'matrix M>, Vec<M::Index>>>,
 }
 
-impl<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> Lending<'lend> for InnerJohnsonIterator<'matrix, M> {
+impl<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> Lending<'lend>
+    for InnerJohnsonIterator<'matrix, M>
+{
     type Lend = CircuitSearch<'lend, 'matrix, M>;
 }
 
-impl< M: SquareMatrix + SparseMatrix2D> Lender for InnerJohnsonIterator<'_, M> {
-    fn next(&mut self) -> Option<<Self as Lending<'_>>::Lend> {        
+impl<M: SquareMatrix + SparseMatrix2D> Lender for InnerJohnsonIterator<'_, M> {
+    fn next(&mut self) -> Option<<Self as Lending<'_>>::Lend> {
         while self.data.current_root_id < self.matrix.order() {
             let bounded_matrix =
                 LowerBoundedSquareMatrix::new(self.matrix, self.data.current_root_id).unwrap();
-            let Some((new_root_id, mut strongly_connected_component_with_smallest_node)): Option<(
-                M::Index,
-                Vec<M::Index>,
-            )> = bounded_matrix
+            let Some((new_root_id, mut strongly_connected_component_with_smallest_node)): Option<
+                (M::Index, Vec<M::Index>),
+            > = bounded_matrix
                 .tarjan()
                 // We skip the singletons, as they are not cycles.
                 .filter(|scc| scc.len() > 1)
@@ -183,8 +216,12 @@ impl< M: SquareMatrix + SparseMatrix2D> Lender for InnerJohnsonIterator<'_, M> {
                 self.data.current_root_id = self.matrix.order();
                 break;
             };
-            
-            debug_assert!(self.data.current_root_id <= new_root_id, "current_root_id {} should be less than or equal to new_root_id {new_root_id} in scc {strongly_connected_component_with_smallest_node:?}", self.data.current_root_id);
+
+            debug_assert!(
+                self.data.current_root_id <= new_root_id,
+                "current_root_id {} should be less than or equal to new_root_id {new_root_id} in scc {strongly_connected_component_with_smallest_node:?}",
+                self.data.current_root_id
+            );
 
             self.data.current_root_id = new_root_id;
             for row_id in &strongly_connected_component_with_smallest_node {
@@ -201,7 +238,12 @@ impl< M: SquareMatrix + SparseMatrix2D> Lender for InnerJohnsonIterator<'_, M> {
             // The bug is currently documented here: https://github.com/WanderLanz/Lender/pull/8
             // Once the bug is fixed, we can remove this clear.
             self.data.stack.clear();
-            debug_assert!(self.data.stack.is_empty(), "Stack at address {} should be empty at the start of the circuit search, but in parent is {:?}", self.data.stack.as_ptr() as usize, self.data.stack);
+            debug_assert!(
+                self.data.stack.is_empty(),
+                "Stack at address {} should be empty at the start of the circuit search, but in parent is {:?}",
+                self.data.stack.as_ptr() as usize,
+                self.data.stack
+            );
 
             return Some(CircuitSearch::from(self));
         }
@@ -210,14 +252,11 @@ impl< M: SquareMatrix + SparseMatrix2D> Lender for InnerJohnsonIterator<'_, M> {
     }
 }
 
-
-impl<'matrix, M: SquareMatrix + SparseMatrix2D> From<&'matrix M> for InnerJohnsonIterator<'matrix, M> {
+impl<'matrix, M: SquareMatrix + SparseMatrix2D> From<&'matrix M>
+    for InnerJohnsonIterator<'matrix, M>
+{
     fn from(matrix: &'matrix M) -> Self {
-        Self {
-            matrix,
-            data: Data::from(matrix),
-            current_component: None
-        }
+        Self { matrix, data: Data::from(matrix), current_component: None }
     }
 }
 
