@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS procedure_model_container_categories (
 
 CREATE TABLE IF NOT EXISTS procedure_model_tool_categories (
 	id SERIAL PRIMARY KEY,
-	quantity SMALLINT NOT NULL CHECK (must_be_strictly_positive_i32(quantity)),
+	quantity INTEGER NOT NULL CHECK (must_be_strictly_positive_i32(quantity)),
 	procedure_model_id INTEGER NOT NULL REFERENCES procedure_models(id),
 	tool_category_id SMALLINT NOT NULL REFERENCES tool_categories(id),
 	created_by INTEGER NOT NULL REFERENCES users(id),
