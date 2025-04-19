@@ -36,9 +36,7 @@ let schema: CSVSchema = CSVSchemaBuilder::default()
     .from_dir("./tests/bands")
     .unwrap();
 
-let sql: String = schema.to_sql().unwrap();
-
-println!("{}", sql);
+let _sql: String = schema.to_sql().unwrap();
 ```
 
 See below a detailed breakdown of the syntax used in the CSVs used in the example above.
