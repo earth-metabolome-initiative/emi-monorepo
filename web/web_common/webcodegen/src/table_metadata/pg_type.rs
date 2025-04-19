@@ -137,7 +137,8 @@ pub fn rust_type_str<S: AsRef<str>>(
         "oid" => "u32",
 
         // Text types
-        "character varying" | "varchar" | "text" | "name" | "xml" | "character" | "char" | "citext" => "String",
+        "character varying" | "varchar" | "text" | "name" | "xml" | "character" | "char"
+        | "citext" => "String",
 
         // Boolean types
         "boolean" | "bool" => "bool",

@@ -4,7 +4,7 @@ use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
     RunQueryDsl, Selectable, SelectableHelper, pg::PgConnection,
 };
-use proc_macro2::{Span, TokenStream};
+use proc_macro2::TokenStream;
 use sqlparser::{
     ast::{
         BinaryOperator, Expr, FunctionArg, FunctionArgExpr, FunctionArgumentList, FunctionArguments,
@@ -12,7 +12,6 @@ use sqlparser::{
     dialect::PostgreSqlDialect,
     parser::Parser,
 };
-use syn::Ident;
 
 use super::{Column, PgConstraint, PgExtension, PgOperator, PgProc, PgType};
 use crate::errors::{CheckConstraintError, UnsupportedCheckConstraintErrorSyntax, WebCodeGenError};
@@ -401,9 +400,17 @@ where
         let function_path = function.path(conn)?;
 
         let map_err = if function.returns_result(conn)? {
-            let validation_crate = Ident::new("validation_errors", Span::call_site());
             let attributes_enumeration = self.attributes_enumeration;
-            let validation_error = match scoped_columns.len() {
+
+            let attributes = scoped_columns
+                .iter()
+                .map(|scoped_column| {
+                    let camel_cased = scoped_column.camel_case_ident()?;
+                    Ok(quote::quote! { #attributes_enumeration::#camel_cased })
+                })
+                .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+
+            match scoped_columns.len() {
                 0 => {
                     return Err(CheckConstraintError::UnsupportedSyntax(
                         Box::new(self.check_constraint.clone()),
@@ -413,29 +420,17 @@ where
                 }
                 1 => {
                     quote::quote! {
-                        #validation_crate::SingleFieldError
+                        .map_err(|e| e.rename_field(#(#attributes),* ))
                     }
                 }
                 2 => {
                     quote::quote! {
-                        #validation_crate::DoubleFieldError
+                        .map_err(|e| e.rename_fields(#(#attributes),* ))
                     }
                 }
                 _ => {
                     unimplemented!("More than two scoped columns not supported");
                 }
-            };
-
-            let attributes = scoped_columns
-                .into_iter()
-                .map(|scoped_column| {
-                    let camel_cased = scoped_column.camel_case_ident()?;
-                    Ok(quote::quote! { #attributes_enumeration::#camel_cased })
-                })
-                .collect::<Result<Vec<_>, WebCodeGenError>>()?;
-
-            quote::quote! {
-                .map_err(|e: #validation_error| e.rename(#(#attributes),* ))
             }
         } else {
             TokenStream::new()
