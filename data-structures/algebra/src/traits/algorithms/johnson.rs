@@ -199,7 +199,7 @@ impl<'lend, 'matrix, M: SquareMatrix + SparseMatrix2D> Lending<'lend>
 
 impl<M: SquareMatrix + SparseMatrix2D> Lender for InnerJohnsonIterator<'_, M> {
     fn next(&mut self) -> Option<<Self as Lending<'_>>::Lend> {
-        while self.data.current_root_id < self.matrix.order() {
+        if self.data.current_root_id < self.matrix.order() {
             let bounded_matrix =
                 LowerBoundedSquareMatrix::new(self.matrix, self.data.current_root_id).unwrap();
             let Some((new_root_id, mut strongly_connected_component_with_smallest_node)): Option<
@@ -214,7 +214,7 @@ impl<M: SquareMatrix + SparseMatrix2D> Lender for InnerJohnsonIterator<'_, M> {
                 // No strongly connected components left, so we can
                 // break out of the loop.
                 self.data.current_root_id = self.matrix.order();
-                break;
+                return None;
             };
 
             debug_assert!(
