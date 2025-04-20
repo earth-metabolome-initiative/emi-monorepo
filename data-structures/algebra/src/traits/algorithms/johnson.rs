@@ -48,7 +48,7 @@ impl<M: SquareMatrix + SparseMatrix2D> CircuitSearch<'_, '_, M> {
     fn unblock(&mut self, row_id: M::Index) {
         self.data.blocked[row_id.into_usize()] = false;
         let row_block =
-            core::mem::replace(&mut self.data.block_map[row_id.into_usize()], Vec::new());
+            core::mem::take(&mut self.data.block_map[row_id.into_usize()]);
         for column_id in row_block {
             if self.data.blocked[column_id.into_usize()] {
                 self.unblock(column_id);

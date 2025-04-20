@@ -22,7 +22,7 @@ pub struct OpenTreeOfLifeTaxonomyBuilder {
     /// Set the directory where the taxonomy is stored.
     directory: Option<std::path::PathBuf>,
     /// Root of the taxonomy.
-    root_position: Option<u32>,
+    root_position: Option<usize>,
     /// Taxon entries.
     taxon_entries: Vec<OpenTreeOfLifeTaxonEntry>,
     /// Hashmap from taxon name to position in taxon entries.
@@ -73,7 +73,7 @@ impl<'de> Deserialize<'de> for SourceInfo {
                 u32::from_str_radix(parts.next().unwrap(), 10).map_err(serde::de::Error::custom)?;
             let secondary_id =
                 u32::from_str_radix(parts.next().unwrap(), 10).map_err(serde::de::Error::custom)?;
-            let tertiary_id = u32::from_str_radix(id, 10).map_err(serde::de::Error::custom)?;
+            let tertiary_id = id.parse::<u32>().map_err(serde::de::Error::custom)?;
             return Ok(SourceInfo::Additions(primary_id, secondary_id, tertiary_id));
         }
 
@@ -313,7 +313,7 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
                 if self.root_position.is_some() {
                     return Err(crate::errors::TaxonomyBuilderError::MultipleRoots);
                 }
-                self.root_position = Some(self.taxon_entries.len() as u32);
+                self.root_position = Some(self.taxon_entries.len());
             }
             self.taxon_entries.push(taxon_entry);
         }

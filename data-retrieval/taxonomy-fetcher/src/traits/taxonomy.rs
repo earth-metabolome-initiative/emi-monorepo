@@ -49,6 +49,14 @@ pub trait Taxonomy {
     fn taxons(&self) -> impl Iterator<Item = Self::Taxon<'_>> + '_;
 
     /// Writes the taxonomy to a CSV file.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `path`: The path where to write out the taxonomy.
+    /// 
+    /// # Errors
+    /// 
+    /// * If an IOError occurs while writing out the taxonomy.
     fn to_csv(
         &self,
         path: &str,

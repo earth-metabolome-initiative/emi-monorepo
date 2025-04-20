@@ -46,8 +46,12 @@ pub enum OpenTreeOfLifeVersion {
 }
 
 impl OpenTreeOfLifeVersion {
-    /// Returns the release date of the version.
     #[must_use]
+    /// Returns the release date of the version.
+    /// 
+    /// # Panics
+    /// 
+    /// * If one of the dates used therein are incorrect.
     pub fn release_date(&self) -> NaiveDateTime {
         match self {
             OpenTreeOfLifeVersion::V2_2 => {
@@ -78,7 +82,7 @@ impl OpenTreeOfLifeVersion {
                 NaiveDateTime::parse_from_str("2016-10-02 00:45", "%Y-%m-%d %H:%M").unwrap()
             }
             OpenTreeOfLifeVersion::V3_0 => {
-                NaiveDateTime::parse_from_str("2015-10-13 03:37", "%Y-%m-%d %H:%M").unwrap()
+                NaiveDateTime::parse_from_str("2017-02-26 03:37", "%Y-%m-%d %H:%M").unwrap()
             }
             OpenTreeOfLifeVersion::V3_1 => {
                 NaiveDateTime::parse_from_str("2019-09-16 20:09", "%Y-%m-%d %H:%M").unwrap()
