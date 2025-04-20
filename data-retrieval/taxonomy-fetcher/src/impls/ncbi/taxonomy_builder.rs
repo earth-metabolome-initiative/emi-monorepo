@@ -1,9 +1,9 @@
 //! Implementation of the taxonomy builder for the NCBI taxonomy.
 
-use std::{io::BufReader, str::FromStr};
+use std::{io::BufReader, path::PathBuf, str::FromStr};
 
 use csv::ReaderBuilder;
-use downloader::Downloader;
+use downloader::{Downloader, Task};
 use serde::Deserialize;
 
 use super::{
@@ -202,8 +202,16 @@ impl TaxonomyBuilder for NCBITaxonomyBuilder {
         mut self,
     ) -> Result<Self::Taxonomy, crate::errors::TaxonomyBuilderError<Self::TaxonEntry>> {
         let version = self.version.ok_or(crate::errors::TaxonomyBuilderError::MissingVersion)?;
+        let mut task: Task = version.url().try_into()?;
+        if let Some(directory) = &self.directory {
+            let path = PathBuf::from(&task.target_path);
+            let path_with_directory = directory.join(&path);
+            let path_with_directory: String =
+                path_with_directory.as_path().to_str().unwrap().to_owned();
+            task = task.target_path(&path_with_directory);
+        }
         let _reports = Downloader::default()
-            .task(version.url())?
+            .task(task)?
             .extract()
             .cache()
             .show_loading_bar()

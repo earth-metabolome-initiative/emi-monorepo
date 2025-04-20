@@ -20,6 +20,6 @@ async fn test_all_ncbi() {
         let fetcher = NCBITaxonomyBuilder::default().version(version);
 
         // We fetch the taxonomy.
-        let taxonomy = fetcher.build().await.unwrap();
+        let _taxonomy = fetcher.build().await.unwrap();
     }
 }
