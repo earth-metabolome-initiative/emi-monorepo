@@ -164,7 +164,7 @@ impl TaxonomyBuilder for CatalogOfLifeTaxonomyBuilder {
             let path_with_directory = directory.join(&path);
             let path_with_directory: String =
                 path_with_directory.as_path().to_str().unwrap().to_owned();
-                task = task.target_path(&path_with_directory);
+            task = task.target_path(&path_with_directory);
         }
         let _reports = Downloader::default()
             .task(task)?
