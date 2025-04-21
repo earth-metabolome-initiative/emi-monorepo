@@ -26,14 +26,14 @@ pub struct OpenTreeOfLifeTaxonomyBuilder {
     /// Taxon entries.
     taxon_entries: Vec<OpenTreeOfLifeTaxonEntry>,
     /// Hashmap from taxon name to position in taxon entries.
-    name_to_position: std::collections::HashMap<String, u32>,
+    name_to_position: std::collections::HashMap<String, usize>,
     /// Hashmap from taxon identifier to position in taxon entries.
-    id_to_position: std::collections::HashMap<u32, u32>,
+    id_to_position: std::collections::HashMap<u32, usize>,
 }
 
+#[allow(clippy::upper_case_acronyms)]
 #[derive(Debug, PartialEq, Eq)]
 /// Enum defining the source information of a taxon.
-
 enum SourceInfo {
     Silva(String),
     NCBI(u32),
@@ -70,9 +70,9 @@ impl<'de> Deserialize<'de> for SourceInfo {
             let mut parts = source.split('-');
             let _source = parts.next().unwrap();
             let primary_id =
-                u32::from_str_radix(parts.next().unwrap(), 10).map_err(serde::de::Error::custom)?;
+                parts.next().unwrap().parse::<u32>().map_err(serde::de::Error::custom)?;
             let secondary_id =
-                u32::from_str_radix(parts.next().unwrap(), 10).map_err(serde::de::Error::custom)?;
+                parts.next().unwrap().parse::<u32>().map_err(serde::de::Error::custom)?;
             let tertiary_id = id.parse::<u32>().map_err(serde::de::Error::custom)?;
             return Ok(SourceInfo::Additions(primary_id, secondary_id, tertiary_id));
         }
@@ -82,7 +82,7 @@ impl<'de> Deserialize<'de> for SourceInfo {
             "h2007" => Ok(SourceInfo::H2007),
             "ncbi" | "worms" | "gbif" | "irmng" | "study713" | "if" => {
                 let numeric_id: u32 =
-                    u32::from_str_radix(id, 10).map_err(serde::de::Error::custom)?;
+                    id.parse::<u32>().map_err(serde::de::Error::custom)?;
                 match source {
                     "ncbi" => Ok(SourceInfo::NCBI(numeric_id)),
                     "worms" => Ok(SourceInfo::Worms(numeric_id)),
@@ -231,13 +231,6 @@ struct TaxonomyRow {
     flags: Vec<OTOLFlag>,
 }
 
-impl TaxonomyRow {
-    /// Returns whether the current taxon should be skipped.
-    fn should_skip(&self) -> bool {
-        false
-    }
-}
-
 impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
     type TaxonEntry = OpenTreeOfLifeTaxonEntry;
     type Taxonomy = OpenTreeOfLifeTaxonomy;
@@ -263,7 +256,7 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
         &self,
         id: &<Self::TaxonEntry as crate::traits::TaxonEntry>::Id,
     ) -> Option<&Self::TaxonEntry> {
-        self.id_to_position.get(id).map(|&pos| &self.taxon_entries[pos as usize])
+        self.id_to_position.get(id).map(|&pos| &self.taxon_entries[pos])
     }
 
     async fn build(
@@ -296,10 +289,6 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
         for record in csv_reader.deserialize() {
             let record: TaxonomyRow = record?;
 
-            if record.should_skip() {
-                continue;
-            }
-
             let taxon_entry = OpenTreeOfLifeTaxonEntryBuilder::default()
                 .set_id(record.uid)?
                 .set_name(record.name)?
@@ -307,8 +296,8 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
                 .set_rank(record.rank)?
                 .build(&self)?;
 
-            self.id_to_position.insert(taxon_entry.id, self.taxon_entries.len() as u32);
-            self.name_to_position.insert(taxon_entry.name.clone(), self.taxon_entries.len() as u32);
+            self.id_to_position.insert(taxon_entry.id, self.taxon_entries.len());
+            self.name_to_position.insert(taxon_entry.name.clone(), self.taxon_entries.len());
             if record.parent_uid.is_none() {
                 if self.root_position.is_some() {
                     return Err(crate::errors::TaxonomyBuilderError::MultipleRoots);

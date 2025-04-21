@@ -56,7 +56,7 @@ pub trait Taxonomy {
     /// 
     /// # Errors
     /// 
-    /// * If an IOError occurs while writing out the taxonomy.
+    /// * If an `IOError` occurs while writing out the taxonomy.
     fn to_csv(
         &self,
         path: &str,

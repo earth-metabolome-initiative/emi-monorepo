@@ -8,7 +8,7 @@ pub struct NCBITaxonomy {
     /// Version of the NCBI taxonomy.
     pub version: NCBIVersion,
     /// Root of the taxonomy.
-    pub root_position: u32,
+    pub root_position: usize,
     /// Taxon entries.
     pub taxon_entries: Vec<NCBITaxonEntry>,
 }
@@ -41,7 +41,7 @@ impl Taxonomy for NCBITaxonomy {
     }
 
     fn root(&self) -> Self::Taxon<'_> {
-        NCBITaxon { taxon_entry: &self.taxon_entries[self.root_position as usize], taxonomy: self }
+        NCBITaxon { taxon_entry: &self.taxon_entries[self.root_position], taxonomy: self }
     }
 
     fn taxons(&self) -> impl Iterator<Item = Self::Taxon<'_>> + '_ {

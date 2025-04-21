@@ -12,7 +12,7 @@ pub struct CatalogOfLifeTaxonomy {
     /// Version of the Open Tree of Life taxonomy.
     pub version: CatalogOfLifeVersion,
     /// Root of the taxonomy.
-    pub root_position: u32,
+    pub root_position: usize,
     /// Taxon entries.
     pub taxon_entries: Vec<CatalogOfLifeTaxonEntry>,
 }

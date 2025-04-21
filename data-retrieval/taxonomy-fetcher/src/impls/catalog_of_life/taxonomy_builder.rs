@@ -21,13 +21,13 @@ pub struct CatalogOfLifeTaxonomyBuilder {
     /// Set the directory where the taxonomy is stored.
     directory: Option<std::path::PathBuf>,
     /// Root of the taxonomy.
-    root_position: Option<u32>,
+    root_position: Option<usize>,
     /// Taxon entries.
     taxon_entries: Vec<CatalogOfLifeTaxonEntry>,
     /// Hashmap from taxon name to position in taxon entries.
-    name_to_position: std::collections::HashMap<String, u32>,
+    name_to_position: std::collections::HashMap<String, usize>,
     /// Hashmap from taxon identifier to position in taxon entries.
-    id_to_position: std::collections::HashMap<COLId, u32>,
+    id_to_position: std::collections::HashMap<COLId, usize>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -151,7 +151,7 @@ impl TaxonomyBuilder for CatalogOfLifeTaxonomyBuilder {
         &self,
         id: &<Self::TaxonEntry as crate::traits::TaxonEntry>::Id,
     ) -> Option<&Self::TaxonEntry> {
-        self.id_to_position.get(id).map(|&pos| &self.taxon_entries[pos as usize])
+        self.id_to_position.get(id).map(|&pos| &self.taxon_entries[pos])
     }
 
     async fn build(
@@ -192,13 +192,13 @@ impl TaxonomyBuilder for CatalogOfLifeTaxonomyBuilder {
                 .set_rank(record.rank)?
                 .build(&self)?;
 
-            self.id_to_position.insert(taxon_entry.id, self.taxon_entries.len() as u32);
-            self.name_to_position.insert(taxon_entry.name.clone(), self.taxon_entries.len() as u32);
+            self.id_to_position.insert(taxon_entry.id, self.taxon_entries.len());
+            self.name_to_position.insert(taxon_entry.name.clone(), self.taxon_entries.len());
             if record.parent_uid.is_none() {
                 if self.root_position.is_some() {
                     return Err(crate::errors::TaxonomyBuilderError::MultipleRoots);
                 }
-                self.root_position = Some(self.taxon_entries.len() as u32);
+                self.root_position = Some(self.taxon_entries.len());
             }
             self.taxon_entries.push(taxon_entry);
         }

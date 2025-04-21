@@ -617,8 +617,8 @@ impl NCBIVersion {
             }
         }
     }
-    /// Returns the name of the directory containing the version.
     #[must_use]
+    /// Returns the name of the directory containing the version.
     pub fn directory(&self) -> String {
         self.url().split('/').next_back().unwrap().split('.').next().unwrap().to_owned()
     }

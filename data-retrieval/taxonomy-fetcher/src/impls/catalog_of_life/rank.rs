@@ -307,7 +307,7 @@ impl FromStr for CatalogOfLifeRank {
             "realm" => Ok(CatalogOfLifeRank::Realm),
             "family" => Ok(CatalogOfLifeRank::Family),
             "ebifamily" => Ok(CatalogOfLifeRank::EbiFamily),
-            "epifamily" => Ok(CatalogOfLifeRank::EbiFamily),
+            "epifamily" => Ok(CatalogOfLifeRank::EpiFamily),
             "infrafamily" => Ok(CatalogOfLifeRank::InfraFamily),
             "superfamily" => Ok(CatalogOfLifeRank::SuperFamily),
             "subfamily" => Ok(CatalogOfLifeRank::SubFamily),
