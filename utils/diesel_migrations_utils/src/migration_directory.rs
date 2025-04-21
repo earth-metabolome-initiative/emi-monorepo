@@ -113,7 +113,7 @@ impl MigrationDirectory {
                         .ok()
                         .into_iter()
                         .flatten()
-                        .flat_map(|foreign_table| {
+                        .filter_map(|foreign_table| {
                             // We get the migration number of the foreign table.
                             migration_map.get(&foreign_table)
                         })
@@ -165,8 +165,9 @@ impl MigrationDirectory {
     }
 
     /// Returns the largest migration number.
+    #[must_use]
     pub fn max_migration_number(&self) -> Option<u64> {
-        self.migrations.iter().map(|migration| migration.number()).max()
+        self.migrations.iter().map(super::migration::Migration::number).max()
     }
 
     /// Returns whether the migrations are currently ordered topologically,

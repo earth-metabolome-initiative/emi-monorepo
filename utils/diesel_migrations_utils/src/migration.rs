@@ -219,7 +219,6 @@ impl Migration {
         })
     }
 
-    #[must_use]
     /// Returns the statements in the up migration.
     ///
     /// # Arguments
@@ -242,7 +241,6 @@ impl Migration {
         Ok(statements)
     }
 
-    #[must_use]
     /// Returns the SQL content of the down migration.
     pub fn down(&self, parent: &Path) -> Result<String, Error> {
         let path = parent.join(self.directory()).join("down.sql");

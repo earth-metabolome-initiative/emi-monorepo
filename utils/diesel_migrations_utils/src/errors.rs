@@ -55,31 +55,31 @@ impl From<diesel::ConnectionError> for Error {
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::InvalidMigration(msg) => write!(f, "Invalid migration: {}", msg),
-            Error::MissingUpMigration(num) => write!(f, "Missing up migration: {}", num),
-            Error::MissingDownMigration(num) => write!(f, "Missing down migration: {}", num),
+            Error::InvalidMigration(msg) => write!(f, "Invalid migration: {msg}"),
+            Error::MissingUpMigration(num) => write!(f, "Missing up migration: {num}"),
+            Error::MissingDownMigration(num) => write!(f, "Missing down migration: {num}"),
             Error::DuplicateMigrationNumber(num) => {
-                write!(f, "Duplicate migration number: {}", num)
+                write!(f, "Duplicate migration number: {num}")
             }
             Error::InvalidSql(num, kind, msg) => {
-                write!(f, "Invalid SQL in migration {} ({}): {}", num, kind, msg)
+                write!(f, "Invalid SQL in migration {num} ({kind}): {msg}")
             }
             Error::MovingMigrationFailed { source, destination } => {
-                write!(f, "Moving migration from {} to {} failed", source, destination)
+                write!(f, "Moving migration from {source} to {destination} failed")
             }
             Error::ReadingMigrationFailed(num, kind, msg) => {
-                write!(f, "Reading migration {} ({}): {}", num, kind, msg)
+                write!(f, "Reading migration {num} ({kind}): {msg}")
             }
-            Error::ConnectionFailed(err) => write!(f, "Connection failed: {}", err),
+            Error::ConnectionFailed(err) => write!(f, "Connection failed: {err}"),
             Error::ExecutingMigrationFailed(num, kind, err) => {
-                write!(f, "Executing migration {} ({}): {}", num, kind, err)
+                write!(f, "Executing migration {num} ({kind}): {err}")
             }
             Error::ParsingMigrationFailed(num, kind, err) => {
-                write!(f, "Parsing migration {} ({}): {}", num, kind, err)
+                write!(f, "Parsing migration {num} ({kind}): {err}")
             }
             Error::NotDAG => write!(f, "The migrations directory does not form a DAG"),
             Error::CircularDependency(deps) => {
-                write!(f, "Circular dependencies detected: {:?}", deps)
+                write!(f, "Circular dependencies detected: {deps:?}")
             }
         }
     }
