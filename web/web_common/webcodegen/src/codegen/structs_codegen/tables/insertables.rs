@@ -196,7 +196,7 @@ impl Codegen<'_> {
                     } else {
                         let camel_cased_column_ident = column.camel_case_ident()?;
                         quote::quote! {
-                            #column_ident: self.#column_ident.ok_or_else(|| common_traits::prelude::BuilderError::IncompleteBuild(#insertable_enum::#camel_cased_column_ident))?
+                            #column_ident: self.#column_ident.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(#insertable_enum::#camel_cased_column_ident))?
                         }
                     })
                 }).collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
@@ -307,7 +307,7 @@ impl Codegen<'_> {
                         impl TryFrom<#insertable_variant_ident> for #insertable_builder_ident {
                             type Error = <Self as common_traits::prelude::Builder>::Error;
                             fn try_from(insertable_variant: #insertable_variant_ident) -> Result<Self, Self::Error> {
-                                Ok(Self::default() #(#insertable_variant_builder_assignments)*)
+                                Self::default() #(#insertable_variant_builder_assignments)*
                             }
                         }
                     })?,
