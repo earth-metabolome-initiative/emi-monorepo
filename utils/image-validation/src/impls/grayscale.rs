@@ -41,6 +41,7 @@ fn analyze_high_freq(data: &[Complex<f32>]) -> f32 {
 }
 
 impl IsDark for image::GrayImage {
+    #[allow(clippy::cast_precision_loss)]
     fn is_dark(&self, threshold: Option<f32>) -> bool {
         let threshold = threshold.unwrap_or(0.1);
         let threshold_u8 = (threshold * 255.0) as u8;
@@ -50,11 +51,12 @@ impl IsDark for image::GrayImage {
                 dark_pixels += 1;
             }
         }
-        dark_pixels as f32 / self.width() as f32 / self.height() as f32 > 0.5
+        dark_pixels > self.width() * self.height() / 2
     }
 }
 
 impl IsLight for image::GrayImage {
+    #[allow(clippy::cast_precision_loss)]
     fn is_light(&self, threshold: Option<f32>) -> bool {
         let threshold = threshold.unwrap_or(0.8);
         let threshold_u8 = (threshold * 255.0) as u8;
@@ -64,6 +66,6 @@ impl IsLight for image::GrayImage {
                 light_pixels += 1;
             }
         }
-        light_pixels as f32 / self.width() as f32 / self.height() as f32 > 0.5
+        light_pixels > self.width() * self.height() / 2
     }
 }

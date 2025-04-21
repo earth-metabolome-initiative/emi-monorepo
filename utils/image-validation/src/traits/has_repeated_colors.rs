@@ -7,5 +7,5 @@ pub trait RepeatedColors {
     ///
     /// # Arguments
     /// * `number_of_colors`: The number of most common colors to consider.
-    fn get_repeated_colors_rate(&self, number_of_colors: usize) -> f32;
+    fn get_repeated_colors_rate(&self, number_of_colors: usize) -> f64;
 }

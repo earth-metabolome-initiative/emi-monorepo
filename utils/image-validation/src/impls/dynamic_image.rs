@@ -1,6 +1,7 @@
 //! Implementation of traits for [`DynamicImage`](image::DynamicImage).
 
 use image::{GenericImageView, Pixel};
+use rustfft::num_traits::float::TotalOrder;
 
 use crate::traits::{has_repeated_colors::RepeatedColors, is_transparent::IsTransparent};
 
@@ -15,20 +16,20 @@ impl IsTransparent for image::DynamicImage {
 }
 
 impl RepeatedColors for image::DynamicImage {
-    fn get_repeated_colors_rate(&self, number_of_colors: usize) -> f32 {
+    fn get_repeated_colors_rate(&self, number_of_colors: usize) -> f64 {
         use std::collections::HashMap;
-        let mut color_count: HashMap<image::Rgb<u8>, u32> = HashMap::new();
+        let mut color_count: HashMap<image::Rgb<u8>, f64> = HashMap::new();
         let (width, height) = self.dimensions();
 
         for (_, _, pixel) in self.pixels() {
-            *color_count.entry(pixel.to_rgb()).or_insert(0) += 1;
+            *color_count.entry(pixel.to_rgb()).or_insert(0.0) += 1.0;
         }
 
-        let mut counts: Vec<u32> = color_count.values().copied().collect();
-        counts.sort_unstable_by(|a, b| b.cmp(a)); // Sort in descending order
+        let mut counts: Vec<f64> = color_count.values().copied().collect();
+        counts.sort_unstable_by(TotalOrder::total_cmp);
 
-        let top_ten_sum: u32 = counts.iter().take(number_of_colors).sum();
-        let total_pixels = width * height;
-        top_ten_sum as f32 / total_pixels as f32
+        let top_ten_sum: f64 = counts.iter().take(number_of_colors).sum();
+        let total_pixels = f64::from(width) * f64::from(height);
+        top_ten_sum / total_pixels
     }
 }
