@@ -135,7 +135,7 @@ impl Migration {
     ///
     /// * `parent` - The parent path of the migration.
     ///
-    /// # Raises
+    /// # Errors
     ///
     /// * `Error::ReadingMigrationFailed` - If the migration cannot be read.
     /// * `Error::ParsingMigrationFailed` - If the migration cannot be parsed.
@@ -156,7 +156,7 @@ impl Migration {
     ///
     /// * `parent` - The parent path of the migration.
     ///
-    /// # Raises
+    /// # Errors
     ///
     /// * `Error::ReadingMigrationFailed` - If the migration cannot be read.
     /// * `Error::ParsingMigrationFailed` - If the migration cannot be parsed.
@@ -241,6 +241,10 @@ impl Migration {
     }
 
     /// Returns the SQL content of the down migration.
+    ///
+    /// # Errors
+    ///
+    /// * `Error::ReadingMigrationFailed` - If the migration cannot be read.
     pub fn down(&self, parent: &Path) -> Result<String, Error> {
         let path = parent.join(self.directory()).join("down.sql");
         std::fs::read_to_string(path).map_err(|error| {
