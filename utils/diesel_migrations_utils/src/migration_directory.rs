@@ -239,6 +239,10 @@ impl MigrationDirectory {
     }
 
     /// Iterates on the down migrations.
+    ///
+    /// # Errors
+    ///
+    /// * If the down migration cannot be read.
     pub fn downs(&self) -> Result<Vec<String>, Error> {
         let path: &Path = Path::new(&self.directory);
         self.migrations
@@ -323,6 +327,10 @@ impl MigrationDirectory {
     }
 
     /// Redensifies the migrations and returns the newly densified migrations.
+    ///
+    /// # Errors
+    ///
+    /// * If the migrations cannot be moved
     pub fn redensify(self) -> Result<Self, Error> {
         let path = Path::new(&self.directory);
         Ok(MigrationDirectory {
