@@ -45,7 +45,7 @@ async fn test_user_table() {
 
     // We check that all tables that have the `updated_at` column also have the
     // trigger to update the column
-    for table in all_tables.iter() {
+    for table in &all_tables {
         if table.has_updated_at_column(&mut conn).unwrap() {
             assert!(
                 table.updated_at_trigger_exists(&mut conn).unwrap(),

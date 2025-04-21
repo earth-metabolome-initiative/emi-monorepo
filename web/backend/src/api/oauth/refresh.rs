@@ -44,8 +44,7 @@ pub(crate) async fn refresh_access_token(
     let refresh_token = JsonRefreshToken::decode(refresh_cookie.value())?;
 
     // If the token is expired, we return an error.
-    if refresh_token.is_expired() || !refresh_token.is_still_present_in_redis(redis_client).await?
-    {
+    if refresh_token.is_expired() || !refresh_token.is_still_present_in_redis(redis_client).await? {
         return Err(BackendError::Unauthorized);
     }
 

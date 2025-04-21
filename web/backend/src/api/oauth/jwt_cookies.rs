@@ -503,7 +503,7 @@ impl FromRequest for UserWrapper {
 
         Box::pin(async move {
             let token = bearer.token();
-            let access_token = match JsonAccessToken::decode(token.as_ref()) {
+            let access_token = match JsonAccessToken::decode(token) {
                 Ok(token) => token,
                 Err(_) => {
                     log::debug!("Unable to decode access token");
