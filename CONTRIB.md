@@ -6,7 +6,7 @@ I wrote a short [Rust setup tutorial](https://github.com/LucaCappelletti94/linux
 
 ## Setting up the Monorepo environment
 
-In the monorepo you will find 
+In the monorepo you will find:
 
 ```bash
 pip install pre-commit
