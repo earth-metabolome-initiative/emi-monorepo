@@ -39,7 +39,7 @@ pub(crate) async fn get_room(
         Ok(PortalRoom::new()
             .name(directus_room.room_name.clone())?
             .description(directus_room.comment.clone())?
-            .qrcode(directus_room.qr_code.clone())?
+            .qrcode(directus_room.qr_code)?
             .addresses_id(address.id)?
             .geolocation(match directus_room.geolocation.clone() {
                 postgis_diesel::types::GeometryContainer::Point(geolocation) => geolocation,
