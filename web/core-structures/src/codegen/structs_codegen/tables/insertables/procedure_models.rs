@@ -129,48 +129,46 @@ impl common_traits::prelude::Builder for InsertableProcedureModelBuilder {
     type Attribute = InsertableProcedureModelAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureModelAttributes::Name,
-                )
-            })?,
-            description: self.description.ok_or_else(|| {
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableProcedureModelAttributes::Name,
+            ))?,
+            description: self.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelAttributes::Description,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableProcedureModel> for InsertableProcedureModelBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableProcedureModel) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

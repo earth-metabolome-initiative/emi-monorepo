@@ -160,48 +160,46 @@ impl common_traits::prelude::Builder for InsertableToolModelBuilder {
     type Attribute = InsertableToolModelAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableToolModelAttributes::Id,
-                )
-            })?,
-            tool_category_id: self.tool_category_id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableToolModelAttributes::Id,
+            ))?,
+            tool_category_id: self.tool_category_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableToolModelAttributes::ToolCategoryId,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableToolModelAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableToolModelAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableToolModelAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableToolModelAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableToolModel> for InsertableToolModelBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableToolModel) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .tool_category_id(insertable_variant.tool_category_id)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

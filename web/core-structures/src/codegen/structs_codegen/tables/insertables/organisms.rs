@@ -104,26 +104,24 @@ impl common_traits::prelude::Builder for InsertableOrganismBuilder {
     type Attribute = InsertableOrganismAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganismAttributes::Id,
-                )
-            })?,
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableOrganismAttributes::Id,
+            ))?,
             name: self.name,
-            nameplate_category_id: self.nameplate_category_id.ok_or_else(|| {
+            nameplate_category_id: self.nameplate_category_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableOrganismAttributes::NameplateCategoryId,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableOrganism> for InsertableOrganismBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableOrganism) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .name(insertable_variant.name)?
-            .nameplate_category_id(insertable_variant.nameplate_category_id)?)
+            .nameplate_category_id(insertable_variant.nameplate_category_id)?
     }
 }

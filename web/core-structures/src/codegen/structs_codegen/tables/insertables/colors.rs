@@ -61,30 +61,28 @@ impl common_traits::prelude::Builder for InsertableColorBuilder {
     type Attribute = InsertableColorAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableColorAttributes::Name,
-                )
-            })?,
-            hexadecimal_value: self.hexadecimal_value.ok_or_else(|| {
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableColorAttributes::Name,
+            ))?,
+            hexadecimal_value: self.hexadecimal_value.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableColorAttributes::HexadecimalValue,
-                )
-            })?,
-            description: self.description.ok_or_else(|| {
+                ),
+            )?,
+            description: self.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableColorAttributes::Description,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableColor> for InsertableColorBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableColor) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .name(insertable_variant.name)?
             .hexadecimal_value(insertable_variant.hexadecimal_value)?
-            .description(insertable_variant.description)?)
+            .description(insertable_variant.description)?
     }
 }

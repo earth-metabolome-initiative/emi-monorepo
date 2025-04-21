@@ -176,36 +176,36 @@ impl common_traits::prelude::Builder for InsertableStepModelNameplateCategoryBui
     type Attribute = InsertableStepModelNameplateCategoryAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            step_model_id: self.step_model_id.ok_or_else(|| {
+            step_model_id: self.step_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelNameplateCategoryAttributes::StepModelId,
-                )
-            })?,
-            nameplate_category_id: self.nameplate_category_id.ok_or_else(|| {
+                ),
+            )?,
+            nameplate_category_id: self.nameplate_category_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelNameplateCategoryAttributes::NameplateCategoryId,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelNameplateCategoryAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelNameplateCategoryAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelNameplateCategoryAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelNameplateCategoryAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
@@ -214,12 +214,12 @@ impl TryFrom<InsertableStepModelNameplateCategory> for InsertableStepModelNamepl
     fn try_from(
         insertable_variant: InsertableStepModelNameplateCategory,
     ) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .step_model_id(insertable_variant.step_model_id)?
             .nameplate_category_id(insertable_variant.nameplate_category_id)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

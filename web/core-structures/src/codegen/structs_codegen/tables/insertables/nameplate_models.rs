@@ -164,48 +164,46 @@ impl common_traits::prelude::Builder for InsertableNameplateModelBuilder {
     type Attribute = InsertableNameplateModelAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableNameplateModelAttributes::Id,
-                )
-            })?,
-            nameplate_category_id: self.nameplate_category_id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableNameplateModelAttributes::Id,
+            ))?,
+            nameplate_category_id: self.nameplate_category_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableNameplateModelAttributes::NameplateCategoryId,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableNameplateModelAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableNameplateModelAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableNameplateModelAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableNameplateModelAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableNameplateModel> for InsertableNameplateModelBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableNameplateModel) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .nameplate_category_id(insertable_variant.nameplate_category_id)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

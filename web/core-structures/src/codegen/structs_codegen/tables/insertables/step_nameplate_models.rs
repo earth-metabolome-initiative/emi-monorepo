@@ -134,42 +134,38 @@ impl common_traits::prelude::Builder for InsertableStepNameplateModelBuilder {
     type Attribute = InsertableStepNameplateModelAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepNameplateModelAttributes::Id,
-                )
-            })?,
-            step_id: self.step_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepNameplateModelAttributes::StepId,
-                )
-            })?,
-            nameplate_model_id: self.nameplate_model_id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableStepNameplateModelAttributes::Id,
+            ))?,
+            step_id: self.step_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableStepNameplateModelAttributes::StepId,
+            ))?,
+            nameplate_model_id: self.nameplate_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepNameplateModelAttributes::NameplateModelId,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepNameplateModelAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepNameplateModelAttributes::CreatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableStepNameplateModel> for InsertableStepNameplateModelBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableStepNameplateModel) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .step_id(insertable_variant.step_id)?
             .nameplate_model_id(insertable_variant.nameplate_model_id)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?)
+            .created_at(insertable_variant.created_at)?
     }
 }

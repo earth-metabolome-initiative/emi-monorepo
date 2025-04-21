@@ -141,48 +141,46 @@ impl common_traits::prelude::Builder for InsertableBrandBuilder {
     type Attribute = InsertableBrandAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableBrandAttributes::Name,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableBrandAttributes::Name,
+            ))?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableBrandAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableBrandAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableBrandAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableBrandAttributes::UpdatedAt,
-                )
-            })?,
-            brand_state_id: self.brand_state_id.ok_or_else(|| {
+                ),
+            )?,
+            brand_state_id: self.brand_state_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableBrandAttributes::BrandStateId,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableBrand> for InsertableBrandBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableBrand) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .name(insertable_variant.name)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
             .updated_at(insertable_variant.updated_at)?
-            .brand_state_id(insertable_variant.brand_state_id)?)
+            .brand_state_id(insertable_variant.brand_state_id)?
     }
 }

@@ -85,11 +85,9 @@ impl common_traits::prelude::Builder for InsertableSpatialRefSyBuilder {
     type Attribute = InsertableSpatialRefSyAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            srid: self.srid.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableSpatialRefSyAttributes::Srid,
-                )
-            })?,
+            srid: self.srid.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableSpatialRefSyAttributes::Srid,
+            ))?,
             auth_name: self.auth_name,
             auth_srid: self.auth_srid,
             srtext: self.srtext,
@@ -100,11 +98,11 @@ impl common_traits::prelude::Builder for InsertableSpatialRefSyBuilder {
 impl TryFrom<InsertableSpatialRefSy> for InsertableSpatialRefSyBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableSpatialRefSy) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .srid(insertable_variant.srid)?
             .auth_name(insertable_variant.auth_name)?
             .auth_srid(insertable_variant.auth_srid)?
             .srtext(insertable_variant.srtext)?
-            .proj4text(insertable_variant.proj4text)?)
+            .proj4text(insertable_variant.proj4text)?
     }
 }

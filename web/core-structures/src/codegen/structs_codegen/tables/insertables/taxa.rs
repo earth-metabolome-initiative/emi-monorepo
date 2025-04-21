@@ -82,30 +82,26 @@ impl common_traits::prelude::Builder for InsertableTaxonBuilder {
     type Attribute = InsertableTaxonAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(InsertableTaxonAttributes::Id)
-            })?,
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTaxonAttributes::Name,
-                )
-            })?,
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableTaxonAttributes::Id,
+            ))?,
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableTaxonAttributes::Name,
+            ))?,
             parent_id: self.parent_id,
-            rank_id: self.rank_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTaxonAttributes::RankId,
-                )
-            })?,
+            rank_id: self.rank_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableTaxonAttributes::RankId,
+            ))?,
         })
     }
 }
 impl TryFrom<InsertableTaxon> for InsertableTaxonBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableTaxon) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .name(insertable_variant.name)?
             .parent_id(insertable_variant.parent_id)?
-            .rank_id(insertable_variant.rank_id)?)
+            .rank_id(insertable_variant.rank_id)?
     }
 }

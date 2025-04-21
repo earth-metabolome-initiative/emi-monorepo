@@ -117,36 +117,36 @@ impl common_traits::prelude::Builder for InsertableOrganismTaxonBuilder {
     type Attribute = InsertableOrganismTaxonAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            created_by: self.created_by.ok_or_else(|| {
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableOrganismTaxonAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableOrganismTaxonAttributes::CreatedAt,
-                )
-            })?,
-            organism_id: self.organism_id.ok_or_else(|| {
+                ),
+            )?,
+            organism_id: self.organism_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableOrganismTaxonAttributes::OrganismId,
-                )
-            })?,
-            taxon_id: self.taxon_id.ok_or_else(|| {
+                ),
+            )?,
+            taxon_id: self.taxon_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableOrganismTaxonAttributes::TaxonId,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableOrganismTaxon> for InsertableOrganismTaxonBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableOrganismTaxon) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .organism_id(insertable_variant.organism_id)?
-            .taxon_id(insertable_variant.taxon_id)?)
+            .taxon_id(insertable_variant.taxon_id)?
     }
 }

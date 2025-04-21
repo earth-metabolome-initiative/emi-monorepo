@@ -79,24 +79,22 @@ impl common_traits::prelude::Builder for InsertableTeamMemberBuilder {
     type Attribute = InsertableTeamMemberAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            team_id: self.team_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTeamMemberAttributes::TeamId,
-                )
-            })?,
-            member_id: self.member_id.ok_or_else(|| {
+            team_id: self.team_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableTeamMemberAttributes::TeamId,
+            ))?,
+            member_id: self.member_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTeamMemberAttributes::MemberId,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableTeamMember> for InsertableTeamMemberBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableTeamMember) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .team_id(insertable_variant.team_id)?
-            .member_id(insertable_variant.member_id)?)
+            .member_id(insertable_variant.member_id)?
     }
 }

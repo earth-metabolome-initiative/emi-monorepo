@@ -236,46 +236,44 @@ impl common_traits::prelude::Builder for InsertableAliquotingInstrumentModelBuil
     type Attribute = InsertableAliquotingInstrumentModelAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableAliquotingInstrumentModelAttributes::Id,
-                )
-            })?,
-            error_liters: self.error_liters.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableAliquotingInstrumentModelAttributes::Id,
+            ))?,
+            error_liters: self.error_liters.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAliquotingInstrumentModelAttributes::ErrorLiters,
-                )
-            })?,
-            minimum_measurable_liters: self.minimum_measurable_liters.ok_or_else(|| {
+                ),
+            )?,
+            minimum_measurable_liters: self.minimum_measurable_liters.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAliquotingInstrumentModelAttributes::MinimumMeasurableLiters,
-                )
-            })?,
-            maximum_measurable_liters: self.maximum_measurable_liters.ok_or_else(|| {
+                ),
+            )?,
+            maximum_measurable_liters: self.maximum_measurable_liters.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAliquotingInstrumentModelAttributes::MaximumMeasurableLiters,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAliquotingInstrumentModelAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAliquotingInstrumentModelAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAliquotingInstrumentModelAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAliquotingInstrumentModelAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
@@ -284,7 +282,7 @@ impl TryFrom<InsertableAliquotingInstrumentModel> for InsertableAliquotingInstru
     fn try_from(
         insertable_variant: InsertableAliquotingInstrumentModel,
     ) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .error_liters(insertable_variant.error_liters)?
             .minimum_measurable_liters(insertable_variant.minimum_measurable_liters)?
@@ -292,6 +290,6 @@ impl TryFrom<InsertableAliquotingInstrumentModel> for InsertableAliquotingInstru
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

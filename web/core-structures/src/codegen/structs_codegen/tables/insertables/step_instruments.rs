@@ -132,42 +132,38 @@ impl common_traits::prelude::Builder for InsertableStepInstrumentBuilder {
     type Attribute = InsertableStepInstrumentAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepInstrumentAttributes::Id,
-                )
-            })?,
-            step_id: self.step_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepInstrumentAttributes::StepId,
-                )
-            })?,
-            instrument_id: self.instrument_id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableStepInstrumentAttributes::Id,
+            ))?,
+            step_id: self.step_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableStepInstrumentAttributes::StepId,
+            ))?,
+            instrument_id: self.instrument_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepInstrumentAttributes::InstrumentId,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepInstrumentAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepInstrumentAttributes::CreatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableStepInstrument> for InsertableStepInstrumentBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableStepInstrument) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .step_id(insertable_variant.step_id)?
             .instrument_id(insertable_variant.instrument_id)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?)
+            .created_at(insertable_variant.created_at)?
     }
 }

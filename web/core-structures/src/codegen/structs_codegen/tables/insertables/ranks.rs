@@ -50,24 +50,22 @@ impl common_traits::prelude::Builder for InsertableRankBuilder {
     type Attribute = InsertableRankAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableRankAttributes::Name,
-                )
-            })?,
-            description: self.description.ok_or_else(|| {
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableRankAttributes::Name,
+            ))?,
+            description: self.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRankAttributes::Description,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableRank> for InsertableRankBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableRank) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .name(insertable_variant.name)?
-            .description(insertable_variant.description)?)
+            .description(insertable_variant.description)?
     }
 }

@@ -72,36 +72,36 @@ impl common_traits::prelude::Builder for InsertableUserBuilder {
     type Attribute = InsertableUserAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            first_name: self.first_name.ok_or_else(|| {
+            first_name: self.first_name.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableUserAttributes::FirstName,
-                )
-            })?,
-            last_name: self.last_name.ok_or_else(|| {
+                ),
+            )?,
+            last_name: self.last_name.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableUserAttributes::LastName,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableUserAttributes::CreatedAt,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableUserAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableUser> for InsertableUserBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableUser) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .first_name(insertable_variant.first_name)?
             .last_name(insertable_variant.last_name)?
             .created_at(insertable_variant.created_at)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

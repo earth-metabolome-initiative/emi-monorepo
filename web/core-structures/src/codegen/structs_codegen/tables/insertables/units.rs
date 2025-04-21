@@ -99,36 +99,30 @@ impl common_traits::prelude::Builder for InsertableUnitBuilder {
     type Attribute = InsertableUnitAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableUnitAttributes::Name,
-                )
-            })?,
-            unit: self.unit.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableUnitAttributes::Unit,
-                )
-            })?,
-            icon_id: self.icon_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableUnitAttributes::IconId,
-                )
-            })?,
-            color_id: self.color_id.ok_or_else(|| {
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableUnitAttributes::Name,
+            ))?,
+            unit: self.unit.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableUnitAttributes::Unit,
+            ))?,
+            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableUnitAttributes::IconId,
+            ))?,
+            color_id: self.color_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableUnitAttributes::ColorId,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableUnit> for InsertableUnitBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableUnit) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .name(insertable_variant.name)?
             .unit(insertable_variant.unit)?
             .icon_id(insertable_variant.icon_id)?
-            .color_id(insertable_variant.color_id)?)
+            .color_id(insertable_variant.color_id)?
     }
 }

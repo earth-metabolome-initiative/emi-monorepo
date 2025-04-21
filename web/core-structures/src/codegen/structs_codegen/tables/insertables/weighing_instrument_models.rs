@@ -244,46 +244,44 @@ impl common_traits::prelude::Builder for InsertableWeighingInstrumentModelBuilde
     type Attribute = InsertableWeighingInstrumentModelAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableWeighingInstrumentModelAttributes::Id,
-                )
-            })?,
-            error_kilograms: self.error_kilograms.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableWeighingInstrumentModelAttributes::Id,
+            ))?,
+            error_kilograms: self.error_kilograms.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableWeighingInstrumentModelAttributes::ErrorKilograms,
-                )
-            })?,
-            minimum_measurable_kilograms: self.minimum_measurable_kilograms.ok_or_else(|| {
+                ),
+            )?,
+            minimum_measurable_kilograms: self.minimum_measurable_kilograms.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableWeighingInstrumentModelAttributes::MinimumMeasurableKilograms,
-                )
-            })?,
-            maximum_measurable_kilograms: self.maximum_measurable_kilograms.ok_or_else(|| {
+                ),
+            )?,
+            maximum_measurable_kilograms: self.maximum_measurable_kilograms.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableWeighingInstrumentModelAttributes::MaximumMeasurableKilograms,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableWeighingInstrumentModelAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableWeighingInstrumentModelAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableWeighingInstrumentModelAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableWeighingInstrumentModelAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
@@ -292,7 +290,7 @@ impl TryFrom<InsertableWeighingInstrumentModel> for InsertableWeighingInstrument
     fn try_from(
         insertable_variant: InsertableWeighingInstrumentModel,
     ) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .error_kilograms(insertable_variant.error_kilograms)?
             .minimum_measurable_kilograms(insertable_variant.minimum_measurable_kilograms)?
@@ -300,6 +298,6 @@ impl TryFrom<InsertableWeighingInstrumentModel> for InsertableWeighingInstrument
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

@@ -87,36 +87,34 @@ impl common_traits::prelude::Builder for InsertableUserEmailBuilder {
     type Attribute = InsertableUserEmailAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            email: self.email.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableUserEmailAttributes::Email,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+            email: self.email.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableUserEmailAttributes::Email,
+            ))?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableUserEmailAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableUserEmailAttributes::CreatedAt,
-                )
-            })?,
-            primary_email: self.primary_email.ok_or_else(|| {
+                ),
+            )?,
+            primary_email: self.primary_email.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableUserEmailAttributes::PrimaryEmail,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableUserEmail> for InsertableUserEmailBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableUserEmail) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .email(insertable_variant.email)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
-            .primary_email(insertable_variant.primary_email)?)
+            .primary_email(insertable_variant.primary_email)?
     }
 }

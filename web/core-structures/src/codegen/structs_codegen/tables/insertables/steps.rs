@@ -154,52 +154,52 @@ impl common_traits::prelude::Builder for InsertableStepBuilder {
     type Attribute = InsertableStepAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(InsertableStepAttributes::Id)
-            })?,
-            procedure_id: self.procedure_id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableStepAttributes::Id,
+            ))?,
+            procedure_id: self.procedure_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepAttributes::ProcedureId,
-                )
-            })?,
-            step_model_id: self.step_model_id.ok_or_else(|| {
+                ),
+            )?,
+            step_model_id: self.step_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepAttributes::StepModelId,
-                )
-            })?,
-            begun_at: self.begun_at.ok_or_else(|| {
+                ),
+            )?,
+            begun_at: self.begun_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepAttributes::BegunAt,
-                )
-            })?,
-            finished_at: self.finished_at.ok_or_else(|| {
+                ),
+            )?,
+            finished_at: self.finished_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepAttributes::FinishedAt,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepAttributes::CreatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableStep> for InsertableStepBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableStep) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .procedure_id(insertable_variant.procedure_id)?
             .step_model_id(insertable_variant.step_model_id)?
             .begun_at(insertable_variant.begun_at)?
             .finished_at(insertable_variant.finished_at)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?)
+            .created_at(insertable_variant.created_at)?
     }
 }

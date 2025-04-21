@@ -9,7 +9,6 @@ diesel::table! {
     rosetta_timestamp::diesel_impls::TimestampUTC, updated_by ->
     diesel::sql_types::Integer, updated_at ->
     rosetta_timestamp::diesel_impls::TimestampUTC, expected_end_date ->
-    diesel::sql_types::Nullable < rosetta_timestamp::diesel_impls::TimestampUTC >,
-    end_date -> diesel::sql_types::Nullable <
-    rosetta_timestamp::diesel_impls::TimestampUTC > }
+    rosetta_timestamp::diesel_impls::TimestampUTC, end_date ->
+    rosetta_timestamp::diesel_impls::TimestampUTC }
 }

@@ -174,48 +174,48 @@ impl common_traits::prelude::Builder for InsertableStepModelToolCategoryBuilder 
     type Attribute = InsertableStepModelToolCategoryAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            step_model_id: self.step_model_id.ok_or_else(|| {
+            step_model_id: self.step_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelToolCategoryAttributes::StepModelId,
-                )
-            })?,
-            tool_category_id: self.tool_category_id.ok_or_else(|| {
+                ),
+            )?,
+            tool_category_id: self.tool_category_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelToolCategoryAttributes::ToolCategoryId,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelToolCategoryAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelToolCategoryAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelToolCategoryAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelToolCategoryAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableStepModelToolCategory> for InsertableStepModelToolCategoryBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableStepModelToolCategory) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .step_model_id(insertable_variant.step_model_id)?
             .tool_category_id(insertable_variant.tool_category_id)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

@@ -178,54 +178,52 @@ impl common_traits::prelude::Builder for InsertableInstrumentBuilder {
     type Attribute = InsertableInstrumentAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            instrument_model_id: self.instrument_model_id.ok_or_else(|| {
+            instrument_model_id: self.instrument_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentAttributes::InstrumentModelId,
-                )
-            })?,
-            instrument_state_id: self.instrument_state_id.ok_or_else(|| {
+                ),
+            )?,
+            instrument_state_id: self.instrument_state_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentAttributes::InstrumentStateId,
-                )
-            })?,
-            qrcode: self.qrcode.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableInstrumentAttributes::Qrcode,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            qrcode: self.qrcode.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableInstrumentAttributes::Qrcode,
+            ))?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableInstrument> for InsertableInstrumentBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableInstrument) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .instrument_model_id(insertable_variant.instrument_model_id)?
             .instrument_state_id(insertable_variant.instrument_state_id)?
             .qrcode(insertable_variant.qrcode)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

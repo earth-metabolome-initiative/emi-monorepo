@@ -196,55 +196,47 @@ impl common_traits::prelude::Builder for InsertableGrindingStepModelBuilder {
     type Attribute = InsertableGrindingStepModelAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableGrindingStepModelAttributes::Id,
+            ))?,
+            step_model_instrument_category_id: self.step_model_instrument_category_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableGrindingStepModelAttributes::Id,
-                )
-            })?,
-            step_model_instrument_category_id: self.step_model_instrument_category_id.ok_or_else(
-                || {
-                    common_traits::prelude::BuilderError::IncompleteBuild(
-                        InsertableGrindingStepModelAttributes::StepModelInstrumentCategoryId,
-                    )
-                },
+                    InsertableGrindingStepModelAttributes::StepModelInstrumentCategoryId,
+                ),
             )?,
-            seconds: self.seconds.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableGrindingStepModelAttributes::Seconds,
-                )
-            })?,
-            hertz: self.hertz.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableGrindingStepModelAttributes::Hertz,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+            seconds: self.seconds.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableGrindingStepModelAttributes::Seconds,
+            ))?,
+            hertz: self.hertz.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableGrindingStepModelAttributes::Hertz,
+            ))?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableGrindingStepModelAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableGrindingStepModelAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableGrindingStepModelAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableGrindingStepModelAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableGrindingStepModel> for InsertableGrindingStepModelBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableGrindingStepModel) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .step_model_instrument_category_id(
                 insertable_variant.step_model_instrument_category_id,
@@ -254,6 +246,6 @@ impl TryFrom<InsertableGrindingStepModel> for InsertableGrindingStepModelBuilder
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

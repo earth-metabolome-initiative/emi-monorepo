@@ -62,8 +62,8 @@ pub struct InsertableProject {
     created_at: rosetta_timestamp::TimestampUTC,
     updated_by: i32,
     updated_at: rosetta_timestamp::TimestampUTC,
-    expected_end_date: Option<rosetta_timestamp::TimestampUTC>,
-    end_date: Option<rosetta_timestamp::TimestampUTC>,
+    expected_end_date: rosetta_timestamp::TimestampUTC,
+    end_date: rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProject {
     #[cfg(feature = "postgres")]
@@ -306,16 +306,16 @@ impl InsertableProjectBuilder {
     }
     pub fn expected_end_date(
         mut self,
-        expected_end_date: Option<rosetta_timestamp::TimestampUTC>,
+        expected_end_date: rosetta_timestamp::TimestampUTC,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.expected_end_date = expected_end_date;
+        self.expected_end_date = Some(expected_end_date);
         Ok(self)
     }
     pub fn end_date(
         mut self,
-        end_date: Option<rosetta_timestamp::TimestampUTC>,
+        end_date: rosetta_timestamp::TimestampUTC,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.end_date = end_date;
+        self.end_date = Some(end_date);
         Ok(self)
     }
 }
@@ -325,68 +325,70 @@ impl common_traits::prelude::Builder for InsertableProjectBuilder {
     type Attribute = InsertableProjectAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProjectAttributes::Id,
-                )
-            })?,
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProjectAttributes::Name,
-                )
-            })?,
-            description: self.description.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableProjectAttributes::Id,
+            ))?,
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableProjectAttributes::Name,
+            ))?,
+            description: self.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::Description,
-                )
-            })?,
-            state_id: self.state_id.ok_or_else(|| {
+                ),
+            )?,
+            state_id: self.state_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::StateId,
-                )
-            })?,
-            icon_id: self.icon_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProjectAttributes::IconId,
-                )
-            })?,
-            color_id: self.color_id.ok_or_else(|| {
+                ),
+            )?,
+            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableProjectAttributes::IconId,
+            ))?,
+            color_id: self.color_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::ColorId,
-                )
-            })?,
+                ),
+            )?,
             parent_project_id: self.parent_project_id,
             budget: self.budget,
             expenses: self.expenses,
-            created_by: self.created_by.ok_or_else(|| {
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::UpdatedAt,
-                )
-            })?,
-            expected_end_date: self.expected_end_date,
-            end_date: self.end_date,
+                ),
+            )?,
+            expected_end_date: self.expected_end_date.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableProjectAttributes::ExpectedEndDate,
+                ),
+            )?,
+            end_date: self.end_date.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableProjectAttributes::EndDate,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableProject> for InsertableProjectBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableProject) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
@@ -401,6 +403,6 @@ impl TryFrom<InsertableProject> for InsertableProjectBuilder {
             .updated_by(insertable_variant.updated_by)?
             .updated_at(insertable_variant.updated_at)?
             .expected_end_date(insertable_variant.expected_end_date)?
-            .end_date(insertable_variant.end_date)?)
+            .end_date(insertable_variant.end_date)?
     }
 }

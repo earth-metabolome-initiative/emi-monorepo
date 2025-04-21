@@ -138,54 +138,48 @@ impl common_traits::prelude::Builder for InsertableLoginProviderBuilder {
     type Attribute = InsertableLoginProviderAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableLoginProviderAttributes::Name,
-                )
-            })?,
-            icon_id: self.icon_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableLoginProviderAttributes::IconId,
-                )
-            })?,
-            color_id: self.color_id.ok_or_else(|| {
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableLoginProviderAttributes::Name,
+            ))?,
+            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableLoginProviderAttributes::IconId,
+            ))?,
+            color_id: self.color_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableLoginProviderAttributes::ColorId,
-                )
-            })?,
-            client_id_var_name: self.client_id_var_name.ok_or_else(|| {
+                ),
+            )?,
+            client_id_var_name: self.client_id_var_name.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableLoginProviderAttributes::ClientIdVarName,
-                )
-            })?,
-            redirect_uri_var_name: self.redirect_uri_var_name.ok_or_else(|| {
+                ),
+            )?,
+            redirect_uri_var_name: self.redirect_uri_var_name.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableLoginProviderAttributes::RedirectUriVarName,
-                )
-            })?,
-            oauth_url: self.oauth_url.ok_or_else(|| {
+                ),
+            )?,
+            oauth_url: self.oauth_url.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableLoginProviderAttributes::OauthUrl,
-                )
-            })?,
-            scope: self.scope.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableLoginProviderAttributes::Scope,
-                )
-            })?,
+                ),
+            )?,
+            scope: self.scope.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableLoginProviderAttributes::Scope,
+            ))?,
         })
     }
 }
 impl TryFrom<InsertableLoginProvider> for InsertableLoginProviderBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableLoginProvider) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .name(insertable_variant.name)?
             .icon_id(insertable_variant.icon_id)?
             .color_id(insertable_variant.color_id)?
             .client_id_var_name(insertable_variant.client_id_var_name)?
             .redirect_uri_var_name(insertable_variant.redirect_uri_var_name)?
             .oauth_url(insertable_variant.oauth_url)?
-            .scope(insertable_variant.scope)?)
+            .scope(insertable_variant.scope)?
     }
 }

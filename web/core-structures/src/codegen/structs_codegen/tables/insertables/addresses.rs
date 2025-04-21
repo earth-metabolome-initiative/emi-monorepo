@@ -126,48 +126,46 @@ impl common_traits::prelude::Builder for InsertableAddressBuilder {
     type Attribute = InsertableAddressAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            iso: self.iso.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableAddressAttributes::Iso,
-                )
-            })?,
-            city_code: self.city_code.ok_or_else(|| {
+            iso: self.iso.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableAddressAttributes::Iso,
+            ))?,
+            city_code: self.city_code.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAddressAttributes::CityCode,
-                )
-            })?,
-            street_name: self.street_name.ok_or_else(|| {
+                ),
+            )?,
+            street_name: self.street_name.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAddressAttributes::StreetName,
-                )
-            })?,
-            street_number: self.street_number.ok_or_else(|| {
+                ),
+            )?,
+            street_number: self.street_number.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAddressAttributes::StreetNumber,
-                )
-            })?,
-            postal_code: self.postal_code.ok_or_else(|| {
+                ),
+            )?,
+            postal_code: self.postal_code.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAddressAttributes::PostalCode,
-                )
-            })?,
-            geolocation: self.geolocation.ok_or_else(|| {
+                ),
+            )?,
+            geolocation: self.geolocation.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAddressAttributes::Geolocation,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableAddress> for InsertableAddressBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableAddress) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .iso(insertable_variant.iso)?
             .city_code(insertable_variant.city_code)?
             .street_name(insertable_variant.street_name)?
             .street_number(insertable_variant.street_number)?
             .postal_code(insertable_variant.postal_code)?
-            .geolocation(insertable_variant.geolocation)?)
+            .geolocation(insertable_variant.geolocation)?
     }
 }

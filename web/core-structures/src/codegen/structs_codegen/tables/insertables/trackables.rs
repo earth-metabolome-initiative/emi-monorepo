@@ -205,53 +205,51 @@ impl common_traits::prelude::Builder for InsertableTrackableBuilder {
     type Attribute = InsertableTrackableAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTrackableAttributes::Id,
-                )
-            })?,
-            container_model_id: self.container_model_id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableTrackableAttributes::Id,
+            ))?,
+            container_model_id: self.container_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableAttributes::ContainerModelId,
-                )
-            })?,
-            project_id: self.project_id.ok_or_else(|| {
+                ),
+            )?,
+            project_id: self.project_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableAttributes::ProjectId,
-                )
-            })?,
-            trackable_state_id: self.trackable_state_id.ok_or_else(|| {
+                ),
+            )?,
+            trackable_state_id: self.trackable_state_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableAttributes::TrackableStateId,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableTrackable> for InsertableTrackableBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableTrackable) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .container_model_id(insertable_variant.container_model_id)?
             .project_id(insertable_variant.project_id)?
@@ -259,6 +257,6 @@ impl TryFrom<InsertableTrackable> for InsertableTrackableBuilder {
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

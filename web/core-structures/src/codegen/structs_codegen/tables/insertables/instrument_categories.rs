@@ -78,30 +78,26 @@ impl common_traits::prelude::Builder for InsertableInstrumentCategoryBuilder {
     type Attribute = InsertableInstrumentCategoryAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableInstrumentCategoryAttributes::Name,
-                )
-            })?,
-            description: self.description.ok_or_else(|| {
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableInstrumentCategoryAttributes::Name,
+            ))?,
+            description: self.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentCategoryAttributes::Description,
-                )
-            })?,
-            icon_id: self.icon_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableInstrumentCategoryAttributes::IconId,
-                )
-            })?,
+                ),
+            )?,
+            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableInstrumentCategoryAttributes::IconId,
+            ))?,
         })
     }
 }
 impl TryFrom<InsertableInstrumentCategory> for InsertableInstrumentCategoryBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableInstrumentCategory) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
-            .icon_id(insertable_variant.icon_id)?)
+            .icon_id(insertable_variant.icon_id)?
     }
 }

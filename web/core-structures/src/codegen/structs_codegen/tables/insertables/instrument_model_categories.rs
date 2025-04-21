@@ -178,36 +178,36 @@ impl common_traits::prelude::Builder for InsertableInstrumentModelCategoryBuilde
     type Attribute = InsertableInstrumentModelCategoryAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            instrument_model_id: self.instrument_model_id.ok_or_else(|| {
+            instrument_model_id: self.instrument_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentModelCategoryAttributes::InstrumentModelId,
-                )
-            })?,
-            instrument_category_id: self.instrument_category_id.ok_or_else(|| {
+                ),
+            )?,
+            instrument_category_id: self.instrument_category_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentModelCategoryAttributes::InstrumentCategoryId,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentModelCategoryAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentModelCategoryAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentModelCategoryAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentModelCategoryAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
@@ -216,12 +216,12 @@ impl TryFrom<InsertableInstrumentModelCategory> for InsertableInstrumentModelCat
     fn try_from(
         insertable_variant: InsertableInstrumentModelCategory,
     ) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .instrument_model_id(insertable_variant.instrument_model_id)?
             .instrument_category_id(insertable_variant.instrument_category_id)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

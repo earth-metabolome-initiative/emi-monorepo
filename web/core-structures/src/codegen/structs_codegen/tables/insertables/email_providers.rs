@@ -91,24 +91,24 @@ impl common_traits::prelude::Builder for InsertableEmailProviderBuilder {
     type Attribute = InsertableEmailProviderAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            email_id: self.email_id.ok_or_else(|| {
+            email_id: self.email_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableEmailProviderAttributes::EmailId,
-                )
-            })?,
-            login_provider_id: self.login_provider_id.ok_or_else(|| {
+                ),
+            )?,
+            login_provider_id: self.login_provider_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableEmailProviderAttributes::LoginProviderId,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableEmailProvider> for InsertableEmailProviderBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableEmailProvider) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .email_id(insertable_variant.email_id)?
-            .login_provider_id(insertable_variant.login_provider_id)?)
+            .login_provider_id(insertable_variant.login_provider_id)?
     }
 }

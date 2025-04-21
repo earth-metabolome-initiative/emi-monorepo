@@ -229,53 +229,51 @@ impl common_traits::prelude::Builder for InsertableFractioningStepBuilder {
     type Attribute = InsertableFractioningStepAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableFractioningStepAttributes::Id,
-                )
-            })?,
-            source_processable_id: self.source_processable_id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableFractioningStepAttributes::Id,
+            ))?,
+            source_processable_id: self.source_processable_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepAttributes::SourceProcessableId,
-                )
-            })?,
-            destination_processable_id: self.destination_processable_id.ok_or_else(|| {
+                ),
+            )?,
+            destination_processable_id: self.destination_processable_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepAttributes::DestinationProcessableId,
-                )
-            })?,
-            fractioning_step_model_id: self.fractioning_step_model_id.ok_or_else(|| {
+                ),
+            )?,
+            fractioning_step_model_id: self.fractioning_step_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepAttributes::FractioningStepModelId,
-                )
-            })?,
-            instrument_id: self.instrument_id.ok_or_else(|| {
+                ),
+            )?,
+            instrument_id: self.instrument_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepAttributes::InstrumentId,
-                )
-            })?,
-            kilograms: self.kilograms.ok_or_else(|| {
+                ),
+            )?,
+            kilograms: self.kilograms.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepAttributes::Kilograms,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepAttributes::CreatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableFractioningStep> for InsertableFractioningStepBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableFractioningStep) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .source_processable_id(insertable_variant.source_processable_id)?
             .destination_processable_id(insertable_variant.destination_processable_id)?
@@ -283,6 +281,6 @@ impl TryFrom<InsertableFractioningStep> for InsertableFractioningStepBuilder {
             .instrument_id(insertable_variant.instrument_id)?
             .kilograms(insertable_variant.kilograms)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?)
+            .created_at(insertable_variant.created_at)?
     }
 }

@@ -98,44 +98,36 @@ impl common_traits::prelude::Builder for InsertableOrganizationBuilder {
     type Attribute = InsertableOrganizationAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganizationAttributes::Name,
-                )
-            })?,
-            url: self.url.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganizationAttributes::Url,
-                )
-            })?,
-            country: self.country.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganizationAttributes::Country,
-                )
-            })?,
-            alpha_two_code: self.alpha_two_code.ok_or_else(|| {
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableOrganizationAttributes::Name,
+            ))?,
+            url: self.url.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableOrganizationAttributes::Url,
+            ))?,
+            country: self.country.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableOrganizationAttributes::Country,
+            ))?,
+            alpha_two_code: self.alpha_two_code.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableOrganizationAttributes::AlphaTwoCode,
-                )
-            })?,
+                ),
+            )?,
             state_province: self.state_province,
-            domain: self.domain.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganizationAttributes::Domain,
-                )
-            })?,
+            domain: self.domain.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableOrganizationAttributes::Domain,
+            ))?,
         })
     }
 }
 impl TryFrom<InsertableOrganization> for InsertableOrganizationBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableOrganization) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .name(insertable_variant.name)?
             .url(insertable_variant.url)?
             .country(insertable_variant.country)?
             .alpha_two_code(insertable_variant.alpha_two_code)?
             .state_province(insertable_variant.state_province)?
-            .domain(insertable_variant.domain)?)
+            .domain(insertable_variant.domain)?
     }
 }

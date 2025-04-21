@@ -70,24 +70,22 @@ impl common_traits::prelude::Builder for InsertableSpectrumBuilder {
     type Attribute = InsertableSpectrumAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableSpectrumAttributes::Id,
-                )
-            })?,
-            spectra_collection_id: self.spectra_collection_id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableSpectrumAttributes::Id,
+            ))?,
+            spectra_collection_id: self.spectra_collection_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableSpectrumAttributes::SpectraCollectionId,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableSpectrum> for InsertableSpectrumBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableSpectrum) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
-            .spectra_collection_id(insertable_variant.spectra_collection_id)?)
+            .spectra_collection_id(insertable_variant.spectra_collection_id)?
     }
 }

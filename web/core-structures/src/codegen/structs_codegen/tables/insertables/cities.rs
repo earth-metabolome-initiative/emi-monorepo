@@ -78,28 +78,24 @@ impl common_traits::prelude::Builder for InsertableCityBuilder {
     type Attribute = InsertableCityAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableCityAttributes::Name,
-                )
-            })?,
-            code: self.code.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableCityAttributes::Code,
-                )
-            })?,
-            iso: self.iso.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(InsertableCityAttributes::Iso)
-            })?,
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableCityAttributes::Name,
+            ))?,
+            code: self.code.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableCityAttributes::Code,
+            ))?,
+            iso: self.iso.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableCityAttributes::Iso,
+            ))?,
         })
     }
 }
 impl TryFrom<InsertableCity> for InsertableCityBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableCity) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .name(insertable_variant.name)?
             .code(insertable_variant.code)?
-            .iso(insertable_variant.iso)?)
+            .iso(insertable_variant.iso)?
     }
 }

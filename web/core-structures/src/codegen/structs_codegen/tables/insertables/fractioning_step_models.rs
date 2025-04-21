@@ -226,55 +226,51 @@ impl common_traits::prelude::Builder for InsertableFractioningStepModelBuilder {
     type Attribute = InsertableFractioningStepModelAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableFractioningStepModelAttributes::Id,
+            ))?,
+            step_model_instrument_category_id: self.step_model_instrument_category_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableFractioningStepModelAttributes::Id,
-                )
-            })?,
-            step_model_instrument_category_id: self.step_model_instrument_category_id.ok_or_else(
-                || {
-                    common_traits::prelude::BuilderError::IncompleteBuild(
-                        InsertableFractioningStepModelAttributes::StepModelInstrumentCategoryId,
-                    )
-                },
+                    InsertableFractioningStepModelAttributes::StepModelInstrumentCategoryId,
+                ),
             )?,
-            expected_kilograms: self.expected_kilograms.ok_or_else(|| {
+            expected_kilograms: self.expected_kilograms.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepModelAttributes::ExpectedKilograms,
-                )
-            })?,
-            tolerance_kilograms: self.tolerance_kilograms.ok_or_else(|| {
+                ),
+            )?,
+            tolerance_kilograms: self.tolerance_kilograms.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepModelAttributes::ToleranceKilograms,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepModelAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepModelAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepModelAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepModelAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableFractioningStepModel> for InsertableFractioningStepModelBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableFractioningStepModel) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .step_model_instrument_category_id(
                 insertable_variant.step_model_instrument_category_id,
@@ -284,6 +280,6 @@ impl TryFrom<InsertableFractioningStepModel> for InsertableFractioningStepModelB
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

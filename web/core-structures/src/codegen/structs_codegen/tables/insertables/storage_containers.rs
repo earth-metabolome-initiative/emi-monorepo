@@ -111,36 +111,34 @@ impl common_traits::prelude::Builder for InsertableStorageContainerBuilder {
     type Attribute = InsertableStorageContainerAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStorageContainerAttributes::Id,
-                )
-            })?,
-            container_model_id: self.container_model_id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableStorageContainerAttributes::Id,
+            ))?,
+            container_model_id: self.container_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStorageContainerAttributes::ContainerModelId,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStorageContainerAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStorageContainerAttributes::CreatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableStorageContainer> for InsertableStorageContainerBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableStorageContainer) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .container_model_id(insertable_variant.container_model_id)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?)
+            .created_at(insertable_variant.created_at)?
     }
 }

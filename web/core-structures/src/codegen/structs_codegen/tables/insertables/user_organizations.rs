@@ -85,24 +85,22 @@ impl common_traits::prelude::Builder for InsertableUserOrganizationBuilder {
     type Attribute = InsertableUserOrganizationAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            user_id: self.user_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableUserOrganizationAttributes::UserId,
-                )
-            })?,
-            organization_id: self.organization_id.ok_or_else(|| {
+            user_id: self.user_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableUserOrganizationAttributes::UserId,
+            ))?,
+            organization_id: self.organization_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableUserOrganizationAttributes::OrganizationId,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableUserOrganization> for InsertableUserOrganizationBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableUserOrganization) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .user_id(insertable_variant.user_id)?
-            .organization_id(insertable_variant.organization_id)?)
+            .organization_id(insertable_variant.organization_id)?
     }
 }

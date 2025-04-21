@@ -58,17 +58,15 @@ impl common_traits::prelude::Builder for InsertableProcessableBuilder {
     type Attribute = InsertableProcessableAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcessableAttributes::Id,
-                )
-            })?,
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableProcessableAttributes::Id,
+            ))?,
         })
     }
 }
 impl TryFrom<InsertableProcessable> for InsertableProcessableBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableProcessable) -> Result<Self, Self::Error> {
-        Ok(Self::default().id(insertable_variant.id)?)
+        Self::default().id(insertable_variant.id)?
     }
 }

@@ -256,62 +256,58 @@ impl common_traits::prelude::Builder for InsertableTeamBuilder {
     type Attribute = InsertableTeamAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(InsertableTeamAttributes::Id)
-            })?,
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTeamAttributes::Name,
-                )
-            })?,
-            description: self.description.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableTeamAttributes::Id,
+            ))?,
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableTeamAttributes::Name,
+            ))?,
+            description: self.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTeamAttributes::Description,
-                )
-            })?,
-            icon_id: self.icon_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTeamAttributes::IconId,
-                )
-            })?,
-            color_id: self.color_id.ok_or_else(|| {
+                ),
+            )?,
+            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableTeamAttributes::IconId,
+            ))?,
+            color_id: self.color_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTeamAttributes::ColorId,
-                )
-            })?,
-            state_id: self.state_id.ok_or_else(|| {
+                ),
+            )?,
+            state_id: self.state_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTeamAttributes::StateId,
-                )
-            })?,
+                ),
+            )?,
             parent_team_id: self.parent_team_id,
-            created_by: self.created_by.ok_or_else(|| {
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTeamAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTeamAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTeamAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTeamAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableTeam> for InsertableTeamBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableTeam) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
@@ -322,6 +318,6 @@ impl TryFrom<InsertableTeam> for InsertableTeamBuilder {
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

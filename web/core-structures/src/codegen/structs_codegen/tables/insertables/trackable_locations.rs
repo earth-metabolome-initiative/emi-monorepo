@@ -168,50 +168,48 @@ impl common_traits::prelude::Builder for InsertableTrackableLocationBuilder {
     type Attribute = InsertableTrackableLocationAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTrackableLocationAttributes::Id,
-                )
-            })?,
-            trackable_id: self.trackable_id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableTrackableLocationAttributes::Id,
+            ))?,
+            trackable_id: self.trackable_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableLocationAttributes::TrackableId,
-                )
-            })?,
+                ),
+            )?,
             storage_container_id: self.storage_container_id,
-            geolocation: self.geolocation.ok_or_else(|| {
+            geolocation: self.geolocation.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableLocationAttributes::Geolocation,
-                )
-            })?,
-            inferred: self.inferred.ok_or_else(|| {
+                ),
+            )?,
+            inferred: self.inferred.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableLocationAttributes::Inferred,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableLocationAttributes::CreatedAt,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableLocationAttributes::CreatedBy,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableTrackableLocation> for InsertableTrackableLocationBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableTrackableLocation) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .trackable_id(insertable_variant.trackable_id)?
             .storage_container_id(insertable_variant.storage_container_id)?
             .geolocation(insertable_variant.geolocation)?
             .inferred(insertable_variant.inferred)?
             .created_at(insertable_variant.created_at)?
-            .created_by(insertable_variant.created_by)?)
+            .created_by(insertable_variant.created_by)?
     }
 }

@@ -98,42 +98,38 @@ impl common_traits::prelude::Builder for InsertableDocumentFormatBuilder {
     type Attribute = InsertableDocumentFormatAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            extension: self.extension.ok_or_else(|| {
+            extension: self.extension.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableDocumentFormatAttributes::Extension,
-                )
-            })?,
-            mime_type: self.mime_type.ok_or_else(|| {
+                ),
+            )?,
+            mime_type: self.mime_type.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableDocumentFormatAttributes::MimeType,
-                )
-            })?,
-            description: self.description.ok_or_else(|| {
+                ),
+            )?,
+            description: self.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableDocumentFormatAttributes::Description,
-                )
-            })?,
-            icon_id: self.icon_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableDocumentFormatAttributes::IconId,
-                )
-            })?,
-            color: self.color.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableDocumentFormatAttributes::Color,
-                )
-            })?,
+                ),
+            )?,
+            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableDocumentFormatAttributes::IconId,
+            ))?,
+            color: self.color.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableDocumentFormatAttributes::Color,
+            ))?,
         })
     }
 }
 impl TryFrom<InsertableDocumentFormat> for InsertableDocumentFormatBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableDocumentFormat) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .extension(insertable_variant.extension)?
             .mime_type(insertable_variant.mime_type)?
             .description(insertable_variant.description)?
             .icon_id(insertable_variant.icon_id)?
-            .color(insertable_variant.color)?)
+            .color(insertable_variant.color)?
     }
 }

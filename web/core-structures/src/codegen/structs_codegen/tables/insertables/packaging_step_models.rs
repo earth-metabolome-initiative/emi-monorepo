@@ -136,42 +136,42 @@ impl common_traits::prelude::Builder for InsertablePackagingStepModelBuilder {
     type Attribute = InsertablePackagingStepModelAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            packaging_model_id: self.packaging_model_id.ok_or_else(|| {
+            packaging_model_id: self.packaging_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertablePackagingStepModelAttributes::PackagingModelId,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertablePackagingStepModelAttributes::CreatedAt,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertablePackagingStepModelAttributes::UpdatedAt,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertablePackagingStepModelAttributes::CreatedBy,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertablePackagingStepModelAttributes::UpdatedBy,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertablePackagingStepModel> for InsertablePackagingStepModelBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertablePackagingStepModel) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .packaging_model_id(insertable_variant.packaging_model_id)?
             .created_at(insertable_variant.created_at)?
             .updated_at(insertable_variant.updated_at)?
             .created_by(insertable_variant.created_by)?
-            .updated_by(insertable_variant.updated_by)?)
+            .updated_by(insertable_variant.updated_by)?
     }
 }

@@ -136,42 +136,38 @@ impl common_traits::prelude::Builder for InsertableNameplateCategoryBuilder {
     type Attribute = InsertableNameplateCategoryAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableNameplateCategoryAttributes::Name,
-                )
-            })?,
-            permanence_category_id: self.permanence_category_id.ok_or_else(|| {
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableNameplateCategoryAttributes::Name,
+            ))?,
+            permanence_category_id: self.permanence_category_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableNameplateCategoryAttributes::PermanenceCategoryId,
-                )
-            })?,
-            description: self.description.ok_or_else(|| {
+                ),
+            )?,
+            description: self.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableNameplateCategoryAttributes::Description,
-                )
-            })?,
-            icon_id: self.icon_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableNameplateCategoryAttributes::IconId,
-                )
-            })?,
-            color_id: self.color_id.ok_or_else(|| {
+                ),
+            )?,
+            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableNameplateCategoryAttributes::IconId,
+            ))?,
+            color_id: self.color_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableNameplateCategoryAttributes::ColorId,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableNameplateCategory> for InsertableNameplateCategoryBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableNameplateCategory) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .name(insertable_variant.name)?
             .permanence_category_id(insertable_variant.permanence_category_id)?
             .description(insertable_variant.description)?
             .icon_id(insertable_variant.icon_id)?
-            .color_id(insertable_variant.color_id)?)
+            .color_id(insertable_variant.color_id)?
     }
 }

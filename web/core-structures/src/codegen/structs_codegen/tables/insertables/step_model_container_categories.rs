@@ -226,46 +226,46 @@ impl common_traits::prelude::Builder for InsertableStepModelContainerCategoryBui
     type Attribute = InsertableStepModelContainerCategoryAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            step_model_id: self.step_model_id.ok_or_else(|| {
+            step_model_id: self.step_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelContainerCategoryAttributes::StepModelId,
-                )
-            })?,
-            container_category_id: self.container_category_id.ok_or_else(|| {
+                ),
+            )?,
+            container_category_id: self.container_category_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelContainerCategoryAttributes::ContainerCategoryId,
-                )
-            })?,
-            expected_kelvin: self.expected_kelvin.ok_or_else(|| {
+                ),
+            )?,
+            expected_kelvin: self.expected_kelvin.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelContainerCategoryAttributes::ExpectedKelvin,
-                )
-            })?,
-            tolerance_kelvin: self.tolerance_kelvin.ok_or_else(|| {
+                ),
+            )?,
+            tolerance_kelvin: self.tolerance_kelvin.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelContainerCategoryAttributes::ToleranceKelvin,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelContainerCategoryAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelContainerCategoryAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelContainerCategoryAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepModelContainerCategoryAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
@@ -274,7 +274,7 @@ impl TryFrom<InsertableStepModelContainerCategory> for InsertableStepModelContai
     fn try_from(
         insertable_variant: InsertableStepModelContainerCategory,
     ) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .step_model_id(insertable_variant.step_model_id)?
             .container_category_id(insertable_variant.container_category_id)?
             .expected_kelvin(insertable_variant.expected_kelvin)?
@@ -282,6 +282,6 @@ impl TryFrom<InsertableStepModelContainerCategory> for InsertableStepModelContai
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

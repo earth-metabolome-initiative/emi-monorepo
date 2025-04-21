@@ -101,36 +101,32 @@ impl common_traits::prelude::Builder for InsertableProjectStateBuilder {
     type Attribute = InsertableProjectStateAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProjectStateAttributes::Name,
-                )
-            })?,
-            description: self.description.ok_or_else(|| {
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableProjectStateAttributes::Name,
+            ))?,
+            description: self.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectStateAttributes::Description,
-                )
-            })?,
-            icon_id: self.icon_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProjectStateAttributes::IconId,
-                )
-            })?,
-            color_id: self.color_id.ok_or_else(|| {
+                ),
+            )?,
+            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableProjectStateAttributes::IconId,
+            ))?,
+            color_id: self.color_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectStateAttributes::ColorId,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableProjectState> for InsertableProjectStateBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableProjectState) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
             .icon_id(insertable_variant.icon_id)?
-            .color_id(insertable_variant.color_id)?)
+            .color_id(insertable_variant.color_id)?
     }
 }

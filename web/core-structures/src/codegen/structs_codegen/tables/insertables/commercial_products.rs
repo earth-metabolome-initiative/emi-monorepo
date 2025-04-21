@@ -200,54 +200,52 @@ impl common_traits::prelude::Builder for InsertableCommercialProductBuilder {
     type Attribute = InsertableCommercialProductAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableCommercialProductAttributes::Name,
-                )
-            })?,
-            description: self.description.ok_or_else(|| {
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableCommercialProductAttributes::Name,
+            ))?,
+            description: self.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableCommercialProductAttributes::Description,
-                )
-            })?,
-            photograph_id: self.photograph_id.ok_or_else(|| {
+                ),
+            )?,
+            photograph_id: self.photograph_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableCommercialProductAttributes::PhotographId,
-                )
-            })?,
+                ),
+            )?,
             deprecation_date: self.deprecation_date,
-            brand_id: self.brand_id.ok_or_else(|| {
+            brand_id: self.brand_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableCommercialProductAttributes::BrandId,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableCommercialProductAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableCommercialProductAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableCommercialProductAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableCommercialProductAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableCommercialProduct> for InsertableCommercialProductBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableCommercialProduct) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
             .photograph_id(insertable_variant.photograph_id)?
@@ -256,6 +254,6 @@ impl TryFrom<InsertableCommercialProduct> for InsertableCommercialProductBuilder
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

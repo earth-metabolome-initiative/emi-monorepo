@@ -138,42 +138,38 @@ impl common_traits::prelude::Builder for InsertableStepStorageContainerBuilder {
     type Attribute = InsertableStepStorageContainerAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepStorageContainerAttributes::Id,
-                )
-            })?,
-            step_id: self.step_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepStorageContainerAttributes::StepId,
-                )
-            })?,
-            storage_container_id: self.storage_container_id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableStepStorageContainerAttributes::Id,
+            ))?,
+            step_id: self.step_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableStepStorageContainerAttributes::StepId,
+            ))?,
+            storage_container_id: self.storage_container_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepStorageContainerAttributes::StorageContainerId,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepStorageContainerAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepStorageContainerAttributes::CreatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableStepStorageContainer> for InsertableStepStorageContainerBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableStepStorageContainer) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .step_id(insertable_variant.step_id)?
             .storage_container_id(insertable_variant.storage_container_id)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?)
+            .created_at(insertable_variant.created_at)?
     }
 }

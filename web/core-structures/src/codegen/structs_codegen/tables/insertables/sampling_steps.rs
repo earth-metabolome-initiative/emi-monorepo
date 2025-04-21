@@ -148,42 +148,40 @@ impl common_traits::prelude::Builder for InsertableSamplingStepBuilder {
     type Attribute = InsertableSamplingStepAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableSamplingStepAttributes::Id,
-                )
-            })?,
-            processable_id: self.processable_id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableSamplingStepAttributes::Id,
+            ))?,
+            processable_id: self.processable_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableSamplingStepAttributes::ProcessableId,
-                )
-            })?,
-            trackable_id: self.trackable_id.ok_or_else(|| {
+                ),
+            )?,
+            trackable_id: self.trackable_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableSamplingStepAttributes::TrackableId,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableSamplingStepAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableSamplingStepAttributes::CreatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableSamplingStep> for InsertableSamplingStepBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableSamplingStep) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .processable_id(insertable_variant.processable_id)?
             .trackable_id(insertable_variant.trackable_id)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?)
+            .created_at(insertable_variant.created_at)?
     }
 }

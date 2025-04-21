@@ -223,63 +223,57 @@ impl common_traits::prelude::Builder for InsertableOrganismObservationBuilder {
     type Attribute = InsertableOrganismObservationAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganismObservationAttributes::Id,
-                )
-            })?,
-            wild: self.wild.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganismObservationAttributes::Wild,
-                )
-            })?,
-            project_id: self.project_id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableOrganismObservationAttributes::Id,
+            ))?,
+            wild: self.wild.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableOrganismObservationAttributes::Wild,
+            ))?,
+            project_id: self.project_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableOrganismObservationAttributes::ProjectId,
-                )
-            })?,
-            organism_id: self.organism_id.ok_or_else(|| {
+                ),
+            )?,
+            organism_id: self.organism_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableOrganismObservationAttributes::OrganismId,
-                )
-            })?,
-            subject_id: self.subject_id.ok_or_else(|| {
+                ),
+            )?,
+            subject_id: self.subject_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableOrganismObservationAttributes::SubjectId,
-                )
-            })?,
-            picture: self.picture.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganismObservationAttributes::Picture,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            picture: self.picture.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableOrganismObservationAttributes::Picture,
+            ))?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableOrganismObservationAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableOrganismObservationAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableOrganismObservationAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableOrganismObservationAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableOrganismObservation> for InsertableOrganismObservationBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableOrganismObservation) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .wild(insertable_variant.wild)?
             .project_id(insertable_variant.project_id)?
@@ -289,6 +283,6 @@ impl TryFrom<InsertableOrganismObservation> for InsertableOrganismObservationBui
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

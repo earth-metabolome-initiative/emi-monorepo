@@ -192,41 +192,41 @@ impl common_traits::prelude::Builder for InsertableProcedureModelToolCategoryBui
     type Attribute = InsertableProcedureModelToolCategoryAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            quantity: self.quantity.ok_or_else(|| {
+            quantity: self.quantity.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelToolCategoryAttributes::Quantity,
-                )
-            })?,
-            procedure_model_id: self.procedure_model_id.ok_or_else(|| {
+                ),
+            )?,
+            procedure_model_id: self.procedure_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelToolCategoryAttributes::ProcedureModelId,
-                )
-            })?,
-            tool_category_id: self.tool_category_id.ok_or_else(|| {
+                ),
+            )?,
+            tool_category_id: self.tool_category_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelToolCategoryAttributes::ToolCategoryId,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelToolCategoryAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelToolCategoryAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelToolCategoryAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelToolCategoryAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
@@ -235,13 +235,13 @@ impl TryFrom<InsertableProcedureModelToolCategory> for InsertableProcedureModelT
     fn try_from(
         insertable_variant: InsertableProcedureModelToolCategory,
     ) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .quantity(insertable_variant.quantity)?
             .procedure_model_id(insertable_variant.procedure_model_id)?
             .tool_category_id(insertable_variant.tool_category_id)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

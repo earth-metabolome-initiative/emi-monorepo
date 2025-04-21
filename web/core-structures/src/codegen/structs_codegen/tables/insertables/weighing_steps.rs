@@ -196,54 +196,52 @@ impl common_traits::prelude::Builder for InsertableWeighingStepBuilder {
     type Attribute = InsertableWeighingStepAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableWeighingStepAttributes::Id,
-                )
-            })?,
-            processable_id: self.processable_id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableWeighingStepAttributes::Id,
+            ))?,
+            processable_id: self.processable_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableWeighingStepAttributes::ProcessableId,
-                )
-            })?,
-            weighing_step_model_id: self.weighing_step_model_id.ok_or_else(|| {
+                ),
+            )?,
+            weighing_step_model_id: self.weighing_step_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableWeighingStepAttributes::WeighingStepModelId,
-                )
-            })?,
-            instrument_id: self.instrument_id.ok_or_else(|| {
+                ),
+            )?,
+            instrument_id: self.instrument_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableWeighingStepAttributes::InstrumentId,
-                )
-            })?,
-            kilograms: self.kilograms.ok_or_else(|| {
+                ),
+            )?,
+            kilograms: self.kilograms.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableWeighingStepAttributes::Kilograms,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableWeighingStepAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableWeighingStepAttributes::CreatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableWeighingStep> for InsertableWeighingStepBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableWeighingStep) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .processable_id(insertable_variant.processable_id)?
             .weighing_step_model_id(insertable_variant.weighing_step_model_id)?
             .instrument_id(insertable_variant.instrument_id)?
             .kilograms(insertable_variant.kilograms)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?)
+            .created_at(insertable_variant.created_at)?
     }
 }

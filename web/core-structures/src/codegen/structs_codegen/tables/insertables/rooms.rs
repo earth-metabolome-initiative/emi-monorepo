@@ -172,58 +172,54 @@ impl common_traits::prelude::Builder for InsertableRoomBuilder {
     type Attribute = InsertableRoomAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableRoomAttributes::Name,
-                )
-            })?,
-            description: self.description.ok_or_else(|| {
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableRoomAttributes::Name,
+            ))?,
+            description: self.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRoomAttributes::Description,
-                )
-            })?,
-            qrcode: self.qrcode.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableRoomAttributes::Qrcode,
-                )
-            })?,
-            addresses_id: self.addresses_id.ok_or_else(|| {
+                ),
+            )?,
+            qrcode: self.qrcode.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableRoomAttributes::Qrcode,
+            ))?,
+            addresses_id: self.addresses_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRoomAttributes::AddressesId,
-                )
-            })?,
-            geolocation: self.geolocation.ok_or_else(|| {
+                ),
+            )?,
+            geolocation: self.geolocation.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRoomAttributes::Geolocation,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRoomAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRoomAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRoomAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRoomAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableRoom> for InsertableRoomBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableRoom) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
             .qrcode(insertable_variant.qrcode)?
@@ -232,6 +228,6 @@ impl TryFrom<InsertableRoom> for InsertableRoomBuilder {
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

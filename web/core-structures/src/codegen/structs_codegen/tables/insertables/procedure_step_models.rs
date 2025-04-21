@@ -269,45 +269,45 @@ impl common_traits::prelude::Builder for InsertableProcedureStepModelBuilder {
     type Attribute = InsertableProcedureStepModelAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            procedure_model_id: self.procedure_model_id.ok_or_else(|| {
+            procedure_model_id: self.procedure_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureStepModelAttributes::ProcedureModelId,
-                )
-            })?,
-            step_model_id: self.step_model_id.ok_or_else(|| {
+                ),
+            )?,
+            step_model_id: self.step_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureStepModelAttributes::StepModelId,
-                )
-            })?,
+                ),
+            )?,
             next_procedure_step_model_id: self.next_procedure_step_model_id,
             prev_procedure_step_model_id: self.prev_procedure_step_model_id,
-            created_by: self.created_by.ok_or_else(|| {
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureStepModelAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureStepModelAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureStepModelAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureStepModelAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableProcedureStepModel> for InsertableProcedureStepModelBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableProcedureStepModel) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .procedure_model_id(insertable_variant.procedure_model_id)?
             .step_model_id(insertable_variant.step_model_id)?
             .next_procedure_step_model_id(insertable_variant.next_procedure_step_model_id)?
@@ -315,6 +315,6 @@ impl TryFrom<InsertableProcedureStepModel> for InsertableProcedureStepModelBuild
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

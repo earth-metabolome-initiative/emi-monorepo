@@ -134,42 +134,38 @@ impl common_traits::prelude::Builder for InsertableStepContainerModelBuilder {
     type Attribute = InsertableStepContainerModelAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepContainerModelAttributes::Id,
-                )
-            })?,
-            step_id: self.step_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepContainerModelAttributes::StepId,
-                )
-            })?,
-            container_model_id: self.container_model_id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableStepContainerModelAttributes::Id,
+            ))?,
+            step_id: self.step_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableStepContainerModelAttributes::StepId,
+            ))?,
+            container_model_id: self.container_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepContainerModelAttributes::ContainerModelId,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepContainerModelAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableStepContainerModelAttributes::CreatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableStepContainerModel> for InsertableStepContainerModelBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableStepContainerModel) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .step_id(insertable_variant.step_id)?
             .container_model_id(insertable_variant.container_model_id)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?)
+            .created_at(insertable_variant.created_at)?
     }
 }

@@ -231,60 +231,56 @@ impl common_traits::prelude::Builder for InsertableFreezeDryingStepModelBuilder 
     type Attribute = InsertableFreezeDryingStepModelAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            id: self.id.ok_or_else(|| {
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableFreezeDryingStepModelAttributes::Id,
+            ))?,
+            step_model_instrument_category_id: self.step_model_instrument_category_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableFreezeDryingStepModelAttributes::Id,
-                )
-            })?,
-            step_model_instrument_category_id: self.step_model_instrument_category_id.ok_or_else(
-                || {
-                    common_traits::prelude::BuilderError::IncompleteBuild(
-                        InsertableFreezeDryingStepModelAttributes::StepModelInstrumentCategoryId,
-                    )
-                },
+                    InsertableFreezeDryingStepModelAttributes::StepModelInstrumentCategoryId,
+                ),
             )?,
-            expected_kelvin: self.expected_kelvin.ok_or_else(|| {
+            expected_kelvin: self.expected_kelvin.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFreezeDryingStepModelAttributes::ExpectedKelvin,
-                )
-            })?,
-            expected_pascal: self.expected_pascal.ok_or_else(|| {
+                ),
+            )?,
+            expected_pascal: self.expected_pascal.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFreezeDryingStepModelAttributes::ExpectedPascal,
-                )
-            })?,
-            expected_seconds: self.expected_seconds.ok_or_else(|| {
+                ),
+            )?,
+            expected_seconds: self.expected_seconds.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFreezeDryingStepModelAttributes::ExpectedSeconds,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFreezeDryingStepModelAttributes::CreatedBy,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFreezeDryingStepModelAttributes::CreatedAt,
-                )
-            })?,
-            updated_by: self.updated_by.ok_or_else(|| {
+                ),
+            )?,
+            updated_by: self.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFreezeDryingStepModelAttributes::UpdatedBy,
-                )
-            })?,
-            updated_at: self.updated_at.ok_or_else(|| {
+                ),
+            )?,
+            updated_at: self.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFreezeDryingStepModelAttributes::UpdatedAt,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableFreezeDryingStepModel> for InsertableFreezeDryingStepModelBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableFreezeDryingStepModel) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .id(insertable_variant.id)?
             .step_model_instrument_category_id(
                 insertable_variant.step_model_instrument_category_id,
@@ -295,6 +291,6 @@ impl TryFrom<InsertableFreezeDryingStepModel> for InsertableFreezeDryingStepMode
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?)
+            .updated_at(insertable_variant.updated_at)?
     }
 }

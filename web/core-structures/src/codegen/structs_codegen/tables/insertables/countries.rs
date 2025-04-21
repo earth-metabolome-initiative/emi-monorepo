@@ -72,36 +72,28 @@ impl common_traits::prelude::Builder for InsertableCountryBuilder {
     type Attribute = InsertableCountryAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            iso: self.iso.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableCountryAttributes::Iso,
-                )
-            })?,
-            emoji: self.emoji.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableCountryAttributes::Emoji,
-                )
-            })?,
-            unicode: self.unicode.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableCountryAttributes::Unicode,
-                )
-            })?,
-            name: self.name.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableCountryAttributes::Name,
-                )
-            })?,
+            iso: self.iso.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableCountryAttributes::Iso,
+            ))?,
+            emoji: self.emoji.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableCountryAttributes::Emoji,
+            ))?,
+            unicode: self.unicode.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableCountryAttributes::Unicode,
+            ))?,
+            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableCountryAttributes::Name,
+            ))?,
         })
     }
 }
 impl TryFrom<InsertableCountry> for InsertableCountryBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableCountry) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .iso(insertable_variant.iso)?
             .emoji(insertable_variant.emoji)?
             .unicode(insertable_variant.unicode)?
-            .name(insertable_variant.name)?)
+            .name(insertable_variant.name)?
     }
 }

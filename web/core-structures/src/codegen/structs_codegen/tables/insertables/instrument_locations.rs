@@ -121,36 +121,34 @@ impl common_traits::prelude::Builder for InsertableInstrumentLocationBuilder {
     type Attribute = InsertableInstrumentLocationAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            instrument_id: self.instrument_id.ok_or_else(|| {
+            instrument_id: self.instrument_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentLocationAttributes::InstrumentId,
-                )
-            })?,
-            room_id: self.room_id.ok_or_else(|| {
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableInstrumentLocationAttributes::RoomId,
-                )
-            })?,
-            created_at: self.created_at.ok_or_else(|| {
+                ),
+            )?,
+            room_id: self.room_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableInstrumentLocationAttributes::RoomId,
+            ))?,
+            created_at: self.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentLocationAttributes::CreatedAt,
-                )
-            })?,
-            created_by: self.created_by.ok_or_else(|| {
+                ),
+            )?,
+            created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableInstrumentLocationAttributes::CreatedBy,
-                )
-            })?,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableInstrumentLocation> for InsertableInstrumentLocationBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableInstrumentLocation) -> Result<Self, Self::Error> {
-        Ok(Self::default()
+        Self::default()
             .instrument_id(insertable_variant.instrument_id)?
             .room_id(insertable_variant.room_id)?
             .created_at(insertable_variant.created_at)?
-            .created_by(insertable_variant.created_by)?)
+            .created_by(insertable_variant.created_by)?
     }
 }

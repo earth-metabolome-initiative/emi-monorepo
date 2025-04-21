@@ -17,8 +17,8 @@ pub struct Project {
     pub created_at: rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,
     pub updated_at: rosetta_timestamp::TimestampUTC,
-    pub expected_end_date: Option<rosetta_timestamp::TimestampUTC>,
-    pub end_date: Option<rosetta_timestamp::TimestampUTC>,
+    pub expected_end_date: rosetta_timestamp::TimestampUTC,
+    pub end_date: rosetta_timestamp::TimestampUTC,
 }
 impl Project {
     #[cfg(feature = "postgres")]
