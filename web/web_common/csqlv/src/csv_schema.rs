@@ -178,6 +178,15 @@ impl CSVSchema {
     }
 
     /// Executes the SQL to delete the schema in `PostgreSQL`.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The connection to the database.
+    ///
+    /// # Errors
+    ///
+    /// * If the connection to the database fails.
+    /// * If the SQL execution fails.
     pub fn delete<C: diesel::Connection>(&self, conn: &mut C) -> Result<(), CSVSchemaError> {
         let sql = self.to_sql_delete();
         Ok(conn.batch_execute(&sql)?)

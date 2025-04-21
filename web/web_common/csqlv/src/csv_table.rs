@@ -1,3 +1,5 @@
+use std::fmt::Write;
+
 use crate::{
     CSVSchema, csv_columns::CSVColumn, errors::CSVSchemaError, metadata::CSVTableMetadata,
 };
@@ -9,7 +11,7 @@ pub struct CSVTable<'a> {
     pub(crate) table_metadata: &'a CSVTableMetadata,
 }
 
-impl<'a> CSVTable<'a> {
+impl CSVTable<'_> {
     #[must_use]
     /// Returns the name of the table.
     pub fn name(&self) -> &str {
@@ -74,11 +76,16 @@ impl<'a> CSVTable<'a> {
     }
 
     /// Returns the name of the table.
+    ///
+    /// # Errors
+    ///
+    /// * If the writing to the string fails because of an invalid format.
     pub fn to_sql(&self) -> Result<String, CSVSchemaError> {
         let mut sql = format!("CREATE TABLE IF NOT EXISTS {} (\n", self.table_metadata.name);
         for column in self.columns() {
-            sql.push_str(&format!(
-                "    {} {}{}{}{}{},\n",
+            writeln!(
+                sql,
+                "    {} {}{}{}{}{},",
                 column.name()?,
                 if let Some(foreign_table) = &column.foreign_table() {
                     foreign_table.primary_key().data_type().into_non_serial().to_sql()
@@ -97,11 +104,17 @@ impl<'a> CSVTable<'a> {
                 } else {
                     String::new()
                 }
-            ));
+            )?;
         }
         sql.pop();
         sql.pop();
         sql.push_str("\n);");
+
+        debug_assert!(
+            sqlparser::parser::Parser::parse_sql(&sqlparser::dialect::PostgreSqlDialect {}, &sql)
+                .is_ok(),
+            "The SQL generated is not valid: {sql}"
+        );
         Ok(sql)
     }
 
@@ -121,22 +134,24 @@ impl<'a> CSVTable<'a> {
                 continue;
             }
             if let Some(foreign_table) = column.foreign_table() {
-                sql.push_str(&format!(
-                    "    {}_{} {},\n",
+                writeln!(
+                    sql,
+                    "    {}_{} {},",
                     foreign_table.name(),
                     column.foreign_column_name().unwrap(),
                     column.data_type().to_sql(),
-                ));
+                )?;
                 continue;
             }
 
-            sql.push_str(&format!(
-                "    {} {}{}{},\n",
+            writeln!(
+                sql,
+                "    {} {}{}{},",
                 column.name()?,
                 column.data_type().to_sql(),
                 if column.is_unique() { " UNIQUE" } else { "" },
                 if column.is_nullable() { "" } else { " NOT NULL" },
-            ));
+            )?;
         }
 
         sql.pop();
@@ -147,15 +162,17 @@ impl<'a> CSVTable<'a> {
         let delimiter = self.table_metadata.delimiter();
 
         if self.table_metadata.gzip() {
-            sql.push_str(&format!(
-                "\nCOPY {temporary_table_name} FROM PROGRAM 'gzip -dc {}' DELIMITER '{delimiter}' CSV HEADER NULL '';\n",
+            writeln!(
+                sql,
+                "COPY {temporary_table_name} FROM PROGRAM 'gzip -dc {}' WITH DELIMITER '{delimiter}' CSV HEADER NULL '';",
                 self.table_metadata.path
-            ));
+            )?;
         } else {
-            sql.push_str(&format!(
-                "\nCOPY {temporary_table_name} FROM '{}' DELIMITER '{delimiter}' CSV HEADER NULL '';\n",
+            writeln!(
+                sql,
+                "COPY {temporary_table_name} FROM '{}' WITH DELIMITER '{delimiter}' CSV HEADER NULL '';",
                 self.table_metadata.path
-            ));
+            )?;
         }
 
         Ok(sql)
@@ -175,8 +192,8 @@ impl<'a> CSVTable<'a> {
         use std::fmt::Write;
         let mut sql = self.temporary_table()?;
 
-        writeln!(sql, "\nTRUNCATE TABLE {} RESTART IDENTITY CASCADE;\n", self.table_metadata.name)?;
-        writeln!(sql, "\nINSERT INTO {} (\n", self.table_metadata.name)?;
+        writeln!(sql, "\nTRUNCATE TABLE {} RESTART IDENTITY CASCADE;", self.table_metadata.name)?;
+        writeln!(sql, "\nINSERT INTO {} (", self.table_metadata.name)?;
         for column in &self.table_metadata.columns {
             if column.artificial {
                 continue;
