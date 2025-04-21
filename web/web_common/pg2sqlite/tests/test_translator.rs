@@ -18,7 +18,7 @@ fn test_translator() {
 
     // We try to parse the translated migrations using the `sqlparser` crate,
     // for the `SQLite` dialect.
-    for translated_migration in translated_migrations.iter() {
+    for translated_migration in &translated_migrations {
         sqlparser::parser::Parser::parse_sql(
             &sqlparser::dialect::SQLiteDialect {},
             &translated_migration.to_string(),
@@ -33,8 +33,8 @@ fn test_translator() {
         .expect("Failed to establish a connection to the SQLite database");
 
     for (i, translated_migration) in translated_migrations.iter().enumerate() {
-        connection
-            .batch_execute(&translated_migration.to_string())
-            .expect(&format!("Failed to run the migration {i}/{}", translated_migrations.len()));
+        connection.batch_execute(&translated_migration.to_string()).unwrap_or_else(|_| {
+            panic!("Failed to run the migration {i}/{}", translated_migrations.len())
+        });
     }
 }

@@ -10,15 +10,14 @@ async fn test_check_constraints(
     database_name: &str,
     conn: &mut PgConnection,
 ) -> Result<(), WebCodeGenError> {
-    let users = Table::load(conn, "users", None, &database_name).unwrap();
+    let users = Table::load(conn, "users", None, database_name).unwrap();
 
     let table_check_constraint = users.check_constraints(conn)?;
 
     assert_eq!(
         table_check_constraint.len(),
         5,
-        "Expected 5 check constraint, got: {:?}",
-        table_check_constraint
+        "Expected 5 check constraint, got: {table_check_constraint:?}"
     );
 
     let user_name_column = users.column_by_name(conn, "username")?;
@@ -46,7 +45,7 @@ async fn test_user_table() {
 
     // We check that all tables that have the `updated_at` column also have the
     // trigger to update the column
-    all_tables.iter().for_each(|table| {
+    for table in all_tables.iter() {
         if table.has_updated_at_column(&mut conn).unwrap() {
             assert!(
                 table.updated_at_trigger_exists(&mut conn).unwrap(),
@@ -54,7 +53,7 @@ async fn test_user_table() {
                 table_name = table.table_name
             );
         }
-    });
+    }
 
     // We check specifically that the `teams` table has the `updated_at` column
     // and the trigger to update it

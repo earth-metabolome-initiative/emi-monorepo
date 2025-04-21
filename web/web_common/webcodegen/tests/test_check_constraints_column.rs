@@ -24,14 +24,13 @@ async fn test_check_constraints_column() {
     {
         let column =
             Column::load(column_name, "constrained_users", "public", &database_name, &mut conn)
-                .expect(&format!("Failed to query database `{database_name}`"))
-                .expect(&format!("Failed to retrieve column `{column_name}`"));
+                .unwrap_or_else(|_| panic!("Failed to query database `{database_name}`"))
+                .unwrap_or_else(|| panic!("Failed to retrieve column `{column_name}`"));
 
         let column_check_constraints =
-            column.single_column_check_constraints(&mut conn).expect(&format!(
-                "Failed to query check constraints for column `{column_name}`",
-                column_name = column_name
-            ));
+            column.single_column_check_constraints(&mut conn).unwrap_or_else(|_| {
+                panic!("Failed to query check constraints for column `{column_name}`")
+            });
 
         assert_eq!(
             column_check_constraints.len(),
@@ -40,10 +39,12 @@ async fn test_check_constraints_column() {
         );
 
         for check_constraint in column_check_constraints {
-            let functions = check_constraint.functions(&mut conn).expect(&format!(
-                "Failed to query functions for check constraint `{check_constraint_name}`",
-                check_constraint_name = check_constraint.constraint_name
-            ));
+            let functions = check_constraint.functions(&mut conn).unwrap_or_else(|_| {
+                panic!(
+                    "Failed to query functions for check constraint `{check_constraint_name}`",
+                    check_constraint_name = check_constraint.constraint_name
+                )
+            });
             assert_eq!(
                 functions.len(),
                 expected_number_of_functions,

@@ -50,9 +50,6 @@ pub async fn main() {
     let mut report = Report::new(time_tracker);
     report.add_directory(Path::new("./time_tracker")).unwrap();
     report
-        .write(
-            &Path::new("time_requirements_report.md"),
-            &Path::new("time_requirements_report.png"),
-        )
+        .write(Path::new("time_requirements_report.md"), Path::new("time_requirements_report.png"))
         .unwrap();
 }

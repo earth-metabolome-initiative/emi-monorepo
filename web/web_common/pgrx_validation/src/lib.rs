@@ -315,17 +315,17 @@ mod tests {
 
     #[test]
     fn test_must_be_strictly_positive_f32() {
-        assert!(must_be_strictly_positive_f32(3.0 as f32).is_ok());
+        assert!(must_be_strictly_positive_f32(3.0_f32).is_ok());
         assert_eq!(
-            must_be_strictly_positive_f32(-3.0 as f32).unwrap_err(),
+            must_be_strictly_positive_f32(-3.0_f32).unwrap_err(),
             validation_errors::SingleFieldError::UnexpectedNegativeOrZeroValue(())
         );
         assert_eq!(
-            must_be_strictly_positive_f32(0.0 as f32).unwrap_err(),
+            must_be_strictly_positive_f32(0.0_f32).unwrap_err(),
             validation_errors::SingleFieldError::UnexpectedNegativeOrZeroValue(())
         );
         assert_eq!(
-            must_be_strictly_positive_f32(-0.0 as f32).unwrap_err(),
+            must_be_strictly_positive_f32(-0.0_f32).unwrap_err(),
             validation_errors::SingleFieldError::UnexpectedNegativeOrZeroValue(())
         )
     }

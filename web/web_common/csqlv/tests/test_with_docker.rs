@@ -33,7 +33,7 @@ async fn setup_docker() -> ContainerAsync<GenericImage> {
         .await;
 
     if let Err(e) = container {
-        eprintln!("Failed to start container: {:?}", e);
+        eprintln!("Failed to start container: {e:?}");
         std::process::exit(1);
     }
 
@@ -100,19 +100,19 @@ async fn test_user_table() {
 
     if let Err(err) = test_independent_csvs() {
         container.stop().await.expect("Failed to stop container.");
-        panic!("Failed to test independent CSVs: {:?}", err);
+        panic!("Failed to test independent CSVs: {err:?}");
     }
     if let Err(err) = test_tree_dependent_csvs() {
         container.stop().await.expect("Failed to stop container.");
-        panic!("Failed to test tree dependent CSVs: {:?}", err);
+        panic!("Failed to test tree dependent CSVs: {err:?}");
     }
     if let Err(err) = test_dag_dependent_csvs() {
         container.stop().await.expect("Failed to stop container.");
-        panic!("Failed to test DAG dependent CSVs: {:?}", err);
+        panic!("Failed to test DAG dependent CSVs: {err:?}");
     }
     if let Err(err) = test_bands_csvs() {
         container.stop().await.expect("Failed to stop container.");
-        panic!("Failed to test bands CSVs: {:?}", err);
+        panic!("Failed to test bands CSVs: {err:?}");
     }
 
     container.stop().await.expect("Failed to stop container.");

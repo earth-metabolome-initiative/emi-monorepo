@@ -1,10 +1,10 @@
-//! Submodule testing the Intersection struct and the IntersectionIter trait.
+//! Submodule testing the Intersection struct and the `IntersectionIter` trait.
 use iter_utils::prelude::*;
 
 #[test]
 fn test_intersection_iter() {
-    let left = vec![1, 2, 3, 4, 5];
-    let right = vec![3, 4, 5, 6, 7];
+    let left = [1, 2, 3, 4, 5];
+    let right = [3, 4, 5, 6, 7];
     let intersection: Vec<_> = left.iter().sorted_intersection(right.iter()).collect();
     assert_eq!(intersection, vec![&3, &4, &5]);
 }

@@ -23,13 +23,12 @@ async fn test_check_constraints_table() {
         [("constrained_users", 1), ("constrained_samples", 2), ("unconstrained_samples", 0)]
     {
         let table = Table::load(&mut conn, table_name, Some("public"), &database_name)
-            .expect(&format!("Failed to retrieve table `{table_name}`"));
+            .unwrap_or_else(|_| panic!("Failed to retrieve table `{table_name}`"));
 
         let table_check_constraints =
-            table.multi_column_check_constraints(&mut conn).expect(&format!(
-                "Failed to query check constraints for table `{table_name}`",
-                table_name = table_name
-            ));
+            table.multi_column_check_constraints(&mut conn).unwrap_or_else(|_| {
+                panic!("Failed to query check constraints for table `{table_name}`")
+            });
 
         assert_eq!(
             table_check_constraints.len(),

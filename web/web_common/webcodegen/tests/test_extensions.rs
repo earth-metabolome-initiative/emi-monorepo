@@ -34,8 +34,8 @@ async fn test_extensions_column() {
     let all_extensions = PgExtension::load_all(&mut conn).expect("Unable to query the database");
 
     // We check that the loaded extensions appear in the set of aLL extensions
-    for extension in [&uuid_extension, &pg_trgm_extension, &pgrx_validation_extension].iter() {
-        assert!(all_extensions.contains(extension), "Extension {:?} not found", extension);
+    for extension in &[&uuid_extension, &pg_trgm_extension, &pgrx_validation_extension] {
+        assert!(all_extensions.contains(extension), "Extension {extension:?} not found");
     }
 
     let uuid_functions = uuid_extension
@@ -57,7 +57,7 @@ async fn test_extensions_column() {
         (&pg_trgm_functions, &pg_trgm_extension),
         (&pgrx_validation_functions, &pgrx_validation_extension),
     ] {
-        for function in all_functions.iter() {
+        for function in all_functions {
             assert_eq!(
                 &function
                     .extension(&mut conn)

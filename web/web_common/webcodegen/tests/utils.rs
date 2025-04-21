@@ -8,7 +8,6 @@ use std::{
 
 use diesel::{Connection, PgConnection};
 use diesel_migrations::{EmbeddedMigrations, MigrationHarness, embed_migrations};
-use pgrx_validation::EXTENSION_NAME;
 use quote::quote;
 use testcontainers::{
     ContainerAsync, GenericImage, ImageExt, TestcontainersError,
@@ -53,7 +52,7 @@ fn find_file(directory: &str, extension: &str) -> Result<String, std::io::Error>
     }
     Err(std::io::Error::new(
         std::io::ErrorKind::NotFound,
-        format!("No file with extension {} found in {}", extension, directory),
+        format!("No file with extension {extension} found in {directory}"),
     ))
 }
 
@@ -95,7 +94,7 @@ pub fn establish_connection_to_postgres(
     let mut number_of_attempts = 0;
 
     while let Err(e) = PgConnection::establish(&database_url) {
-        eprintln!("Failed to establish connection: {:?}", e);
+        eprintln!("Failed to establish connection: {e:?}");
         std::thread::sleep(std::time::Duration::from_secs(1));
         if number_of_attempts > 10 {
             eprintln!("Failed to establish connection after 10 attempts");
@@ -121,17 +120,16 @@ async fn setup_docker(
     database_port: u16,
     database_name: &str,
 ) -> Result<ContainerAsync<GenericImage>, TestcontainersError> {
-    let extension_directory = format!("../pgrx_validation/extension");
+    let extension_directory = "../pgrx_validation/extension".to_string();
 
     // We check whether the extension directory exists, or we raise an adequate
     // error warning the reader that they most likely need to build the
     // extension.
 
-    if !std::path::Path::new(&extension_directory).exists() {
-        panic!(
-            "The extension directory `{extension_directory}` does not exist. Most likely you forgot to build the extension. Refer to the `pgrx_validation` README for more information."
-        );
-    }
+    assert!(
+        std::path::Path::new(&extension_directory).exists(),
+        "The extension directory `{extension_directory}` does not exist. Most likely you forgot to build the extension. Refer to the `pgrx_validation` README for more information."
+    );
 
     GenericImage::new("postgres", "17-bookworm")
         .with_wait_for(WaitFor::message_on_stderr("database system is ready to accept connections"))
@@ -196,7 +194,7 @@ pub async fn setup_database_with_migrations(
     migration: EmbeddedMigrations,
 ) -> Result<(ContainerAsync<GenericImage>, PgConnection, String), diesel::ConnectionError> {
     let port = random_port(test_name);
-    let database_name = format!("{}_db", test_name);
+    let database_name = format!("{test_name}_db");
     let docker = setup_docker(port, &database_name).await.expect("Failed to start container");
     let mut conn = establish_connection_to_postgres(port, &database_name)?;
     conn.run_pending_migrations(migration).unwrap();
@@ -208,12 +206,13 @@ pub async fn setup_database_with_migrations(
 /// # Arguments
 ///
 /// * `test_name` - The name of the test.
+#[must_use]
 pub fn random_port(test_name: &str) -> u16 {
     let mut hasher = DefaultHasher::default();
     test_name.hash(&mut hasher);
     let test_name_hash: u64 = hasher.finish();
-    let port = (test_name_hash % 30000) as u16 + 10000;
-    port
+
+    (test_name_hash % 30000) as u16 + 10000
 }
 
 /// Generate the code for a test and run it.
@@ -234,7 +233,7 @@ pub fn codegen_test(directory_name: &str) {
     }
     .to_string();
 
-    std::fs::write(&format!("tests/{directory_name}/main.rs"), file_content).unwrap();
+    std::fs::write(format!("tests/{directory_name}/main.rs"), file_content).unwrap();
     add_main_to_file(&format!("tests/{directory_name}/main.rs"));
-    builder.pass(&format!("tests/{directory_name}/main.rs"));
+    builder.pass(format!("tests/{directory_name}/main.rs"));
 }

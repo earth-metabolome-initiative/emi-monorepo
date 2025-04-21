@@ -11,7 +11,7 @@ pub struct CSVColumn<'a> {
     pub(crate) column_metadata: &'a CSVColumnMetadata,
 }
 
-impl<'a> CSVColumn<'a> {
+impl CSVColumn<'_> {
     /// Returns the name of the column.
     pub fn name(&self) -> Result<String, CSVSchemaError> {
         self.column_metadata.name(self.table.schema)

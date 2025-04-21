@@ -12,7 +12,7 @@ fn test_independent_csvs() {
     let first_table = &tables[0];
     let second_table = &tables[1];
     let columns = first_table.columns().collect::<Vec<_>>();
-    assert_eq!(columns.len(), 3, "Columns: {:?}", columns);
+    assert_eq!(columns.len(), 3, "Columns: {columns:?}");
     assert_eq!(columns[0].name().unwrap(), "id");
     assert_eq!(columns[1].name().unwrap(), "name");
     assert_eq!(columns[2].name().unwrap(), "description");

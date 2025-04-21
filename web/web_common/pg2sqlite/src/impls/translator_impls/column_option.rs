@@ -16,21 +16,20 @@ impl Translator for ColumnOptionDef {
                     name: self.name.clone(),
                     option: ColumnOption::Unique {
                         is_primary: *is_primary,
-                        characteristics: characteristics.clone(),
+                        characteristics: *characteristics,
                     },
                 }))
             }
             ColumnOption::Default(expr) => {
                 match expr {
                     Expr::Function(func) => {
-                        match func.name.0.first().and_then(|s| Some(s.as_ident()?.value.as_str())) {
-                            Some("CURRENT_TIMESTAMP") => {
-                                return Ok(Some(ColumnOptionDef {
-                                    name: self.name.clone(),
-                                    option: ColumnOption::Default(Expr::Function(func.clone())),
-                                }));
-                            }
-                            _ => {}
+                        if let Some("CURRENT_TIMESTAMP") =
+                            func.name.0.first().and_then(|s| Some(s.as_ident()?.value.as_str()))
+                        {
+                            return Ok(Some(ColumnOptionDef {
+                                name: self.name.clone(),
+                                option: ColumnOption::Default(Expr::Function(func.clone())),
+                            }));
                         }
                         unimplemented!("The default expression function {func:?} is not supported",)
                     }

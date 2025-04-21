@@ -1,6 +1,6 @@
 # CSQLV
 
-The CSQLV crate allows to easily integrate CSVs files (and also TSVs and SSVs) into your PostgreSQL database.
+The CSQLV crate allows to easily integrate CSVs files (and also TSVs and SSVs) into your `PostgreSQL` database.
 
 The crate will generate the necessary SQL to create the tables and relationships between them based on the CSVs files found in a given directory, with minimal metadata in the CSVs themselves. The types and their constraints are inferred from the data in the CSVs: for instance, if all the values in a column are integers smaller than 32767, the crate will infer that the column should be of type `SMALLINT`. Similarly, if no value in a column is empty, the crate will infer that the column should be `NOT NULL`. Same thing applies to `UNIQUE` constraints: if all the values in a column are unique, the crate will infer that the column should be `UNIQUE`.
 
@@ -56,7 +56,7 @@ So, if I have a SSV file called `players.ssv` with the following content:
 
 And a CSV file called `bands.csv` with the following content:
 
-| band        | foundation_year | founded_by:players.name |
+| band        | `foundation_year` | `founded_by:players.name` |
 |-------------|-----------------|-------------------------|
 | The Beatles | 1960            | Paul                    |
 | Nirvana     | 1987            | Kurt                    |

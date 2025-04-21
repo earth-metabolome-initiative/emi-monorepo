@@ -12,9 +12,9 @@ use crate::constants::DATABASE_NAME;
 pub(crate) fn execute_consistency_constraint_checks(
     conn: &mut PgConnection,
 ) -> Result<(), WebCodeGenError> {
-    CompatibleForeignTypeConstraint::default().check_all(DATABASE_NAME, None, conn)?;
-    LowercaseColumnConstraint::default().check_all(DATABASE_NAME, None, conn)?;
-    LowercaseTableConstraint::default().check_all(DATABASE_NAME, None, conn)?;
+    CompatibleForeignTypeConstraint.check_all(DATABASE_NAME, None, conn)?;
+    LowercaseColumnConstraint.check_all(DATABASE_NAME, None, conn)?;
+    LowercaseTableConstraint.check_all(DATABASE_NAME, None, conn)?;
     HasSpecificTypeConstraint::new("created_by", "integer").check_all(DATABASE_NAME, None, conn)?;
     HasSpecificTypeConstraint::new("updated_by", "integer").check_all(DATABASE_NAME, None, conn)?;
     HasSpecificTypeConstraint::new("created_at", "timestamp with time zone").check_all(
