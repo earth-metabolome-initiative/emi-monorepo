@@ -127,6 +127,6 @@ impl TryFrom<InsertableBrandState> for InsertableBrandStateBuilder {
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
             .color_id(insertable_variant.color_id)?
-            .icon_id(insertable_variant.icon_id)?
+            .icon_id(insertable_variant.icon_id)
     }
 }

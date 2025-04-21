@@ -130,6 +130,6 @@ impl TryFrom<InsertableDocumentFormat> for InsertableDocumentFormatBuilder {
             .mime_type(insertable_variant.mime_type)?
             .description(insertable_variant.description)?
             .icon_id(insertable_variant.icon_id)?
-            .color(insertable_variant.color)?
+            .color(insertable_variant.color)
     }
 }

@@ -181,6 +181,6 @@ impl TryFrom<InsertableBrand> for InsertableBrandBuilder {
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
             .updated_at(insertable_variant.updated_at)?
-            .brand_state_id(insertable_variant.brand_state_id)?
+            .brand_state_id(insertable_variant.brand_state_id)
     }
 }

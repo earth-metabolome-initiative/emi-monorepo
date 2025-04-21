@@ -249,7 +249,7 @@ impl Codegen<'_> {
                 .map(|column| {
                     let column_name = column.snake_case_ident()?;
                     Ok(quote::quote! {
-                        .#column_name(insertable_variant.#column_name)?
+                        .#column_name(insertable_variant.#column_name)
                     })
                 })
                 .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
@@ -307,7 +307,7 @@ impl Codegen<'_> {
                         impl TryFrom<#insertable_variant_ident> for #insertable_builder_ident {
                             type Error = <Self as common_traits::prelude::Builder>::Error;
                             fn try_from(insertable_variant: #insertable_variant_ident) -> Result<Self, Self::Error> {
-                                Self::default() #(#insertable_variant_builder_assignments)*
+                                Self::default() #(#insertable_variant_builder_assignments)?*
                             }
                         }
                     })?,

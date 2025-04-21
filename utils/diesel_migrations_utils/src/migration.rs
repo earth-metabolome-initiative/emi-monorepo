@@ -198,7 +198,6 @@ impl Migration {
             }))
     }
 
-    #[must_use]
     /// Returns the SQL content of the up migration.
     ///
     /// # Arguments

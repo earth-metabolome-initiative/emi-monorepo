@@ -182,6 +182,6 @@ impl TryFrom<InsertableSamplingStep> for InsertableSamplingStepBuilder {
             .processable_id(insertable_variant.processable_id)?
             .trackable_id(insertable_variant.trackable_id)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?
+            .created_at(insertable_variant.created_at)
     }
 }

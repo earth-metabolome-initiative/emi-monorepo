@@ -88,6 +88,10 @@ impl CSVSchema {
     }
 
     /// Returns the SQL to generate the schema in `PostgreSQL`.
+    ///
+    /// # Errors
+    ///
+    /// * If the SQL generation fails.
     pub fn to_sql(&self) -> Result<String, CSVSchemaError> {
         let mut sql = String::new();
         for table in self.tables_with_priority().iter().map(|(table, _)| table) {
@@ -129,6 +133,15 @@ impl CSVSchema {
     }
 
     /// Executes the SQL to generate the schema in `PostgreSQL`.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The connection to the database.
+    ///
+    /// # Errors
+    ///
+    /// * If the connection to the database fails.
+    /// * If the SQL execution fails.
     pub fn create<C: diesel::Connection>(&self, conn: &mut C) -> Result<(), CSVSchemaError> {
         let sql = self.to_sql()?;
         Ok(conn.batch_execute(&sql)?)

@@ -83,6 +83,6 @@ impl TryFrom<InsertableColor> for InsertableColorBuilder {
         Self::default()
             .name(insertable_variant.name)?
             .hexadecimal_value(insertable_variant.hexadecimal_value)?
-            .description(insertable_variant.description)?
+            .description(insertable_variant.description)
     }
 }

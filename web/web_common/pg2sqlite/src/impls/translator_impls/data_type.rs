@@ -12,12 +12,12 @@ impl Translator for DataType {
     fn translate(&self, _schema: &Self::Schema) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         match self {
             DataType::Text | DataType::Integer(None) | DataType::Real => Ok(self.clone()),
-            DataType::SmallInt(None) => Ok(DataType::Integer(None)),
-            DataType::Int(None) => Ok(DataType::Integer(None)),
+            DataType::SmallInt(None) | DataType::Int(None) | DataType::Boolean | DataType::Bool => {
+                Ok(DataType::Integer(None))
+            }
             DataType::Float(None) => Ok(DataType::Real),
             DataType::Bytea => Ok(DataType::Blob(None)),
             DataType::Varchar(_) => Ok(DataType::Text),
-            DataType::Boolean | DataType::Bool => Ok(DataType::Integer(None)),
             DataType::Uuid => {
                 // SQLite does not have a UUID type, so we use BLOB instead as
                 // a workaround, as described in the `rosetta-uuid` crate.

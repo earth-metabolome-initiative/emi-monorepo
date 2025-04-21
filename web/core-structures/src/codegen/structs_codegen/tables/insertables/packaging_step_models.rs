@@ -172,6 +172,6 @@ impl TryFrom<InsertablePackagingStepModel> for InsertablePackagingStepModelBuild
             .created_at(insertable_variant.created_at)?
             .updated_at(insertable_variant.updated_at)?
             .created_by(insertable_variant.created_by)?
-            .updated_by(insertable_variant.updated_by)?
+            .updated_by(insertable_variant.updated_by)
     }
 }

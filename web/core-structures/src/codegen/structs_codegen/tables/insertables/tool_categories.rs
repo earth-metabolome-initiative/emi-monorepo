@@ -96,6 +96,6 @@ impl TryFrom<InsertableToolCategory> for InsertableToolCategoryBuilder {
         Self::default()
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
-            .icon_id(insertable_variant.icon_id)?
+            .icon_id(insertable_variant.icon_id)
     }
 }

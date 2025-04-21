@@ -102,6 +102,6 @@ impl TryFrom<InsertableTaxon> for InsertableTaxonBuilder {
             .id(insertable_variant.id)?
             .name(insertable_variant.name)?
             .parent_id(insertable_variant.parent_id)?
-            .rank_id(insertable_variant.rank_id)?
+            .rank_id(insertable_variant.rank_id)
     }
 }

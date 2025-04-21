@@ -147,6 +147,6 @@ impl TryFrom<InsertableOrganismTaxon> for InsertableOrganismTaxonBuilder {
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .organism_id(insertable_variant.organism_id)?
-            .taxon_id(insertable_variant.taxon_id)?
+            .taxon_id(insertable_variant.taxon_id)
     }
 }

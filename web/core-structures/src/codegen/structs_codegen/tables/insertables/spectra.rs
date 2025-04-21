@@ -86,6 +86,6 @@ impl TryFrom<InsertableSpectrum> for InsertableSpectrumBuilder {
     fn try_from(insertable_variant: InsertableSpectrum) -> Result<Self, Self::Error> {
         Self::default()
             .id(insertable_variant.id)?
-            .spectra_collection_id(insertable_variant.spectra_collection_id)?
+            .spectra_collection_id(insertable_variant.spectra_collection_id)
     }
 }

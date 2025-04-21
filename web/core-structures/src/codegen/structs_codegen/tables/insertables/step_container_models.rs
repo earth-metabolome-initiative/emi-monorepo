@@ -166,6 +166,6 @@ impl TryFrom<InsertableStepContainerModel> for InsertableStepContainerModelBuild
             .step_id(insertable_variant.step_id)?
             .container_model_id(insertable_variant.container_model_id)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?
+            .created_at(insertable_variant.created_at)
     }
 }

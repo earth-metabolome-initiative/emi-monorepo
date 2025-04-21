@@ -96,6 +96,6 @@ impl TryFrom<InsertableCity> for InsertableCityBuilder {
         Self::default()
             .name(insertable_variant.name)?
             .code(insertable_variant.code)?
-            .iso(insertable_variant.iso)?
+            .iso(insertable_variant.iso)
     }
 }

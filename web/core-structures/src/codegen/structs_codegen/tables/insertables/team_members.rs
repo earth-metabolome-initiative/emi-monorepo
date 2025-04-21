@@ -93,8 +93,6 @@ impl common_traits::prelude::Builder for InsertableTeamMemberBuilder {
 impl TryFrom<InsertableTeamMember> for InsertableTeamMemberBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableTeamMember) -> Result<Self, Self::Error> {
-        Self::default()
-            .team_id(insertable_variant.team_id)?
-            .member_id(insertable_variant.member_id)?
+        Self::default().team_id(insertable_variant.team_id)?.member_id(insertable_variant.member_id)
     }
 }

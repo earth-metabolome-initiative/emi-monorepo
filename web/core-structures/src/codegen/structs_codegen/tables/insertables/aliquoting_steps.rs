@@ -223,6 +223,6 @@ impl TryFrom<InsertableAliquotingStep> for InsertableAliquotingStepBuilder {
             .destination_processable_id(insertable_variant.destination_processable_id)?
             .instrument_id(insertable_variant.instrument_id)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?
+            .created_at(insertable_variant.created_at)
     }
 }

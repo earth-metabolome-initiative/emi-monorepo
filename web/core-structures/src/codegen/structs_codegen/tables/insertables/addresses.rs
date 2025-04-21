@@ -166,6 +166,6 @@ impl TryFrom<InsertableAddress> for InsertableAddressBuilder {
             .street_name(insertable_variant.street_name)?
             .street_number(insertable_variant.street_number)?
             .postal_code(insertable_variant.postal_code)?
-            .geolocation(insertable_variant.geolocation)?
+            .geolocation(insertable_variant.geolocation)
     }
 }

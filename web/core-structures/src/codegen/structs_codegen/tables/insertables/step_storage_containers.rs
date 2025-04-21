@@ -170,6 +170,6 @@ impl TryFrom<InsertableStepStorageContainer> for InsertableStepStorageContainerB
             .step_id(insertable_variant.step_id)?
             .storage_container_id(insertable_variant.storage_container_id)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?
+            .created_at(insertable_variant.created_at)
     }
 }

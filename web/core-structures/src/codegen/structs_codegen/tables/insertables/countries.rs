@@ -94,6 +94,6 @@ impl TryFrom<InsertableCountry> for InsertableCountryBuilder {
             .iso(insertable_variant.iso)?
             .emoji(insertable_variant.emoji)?
             .unicode(insertable_variant.unicode)?
-            .name(insertable_variant.name)?
+            .name(insertable_variant.name)
     }
 }

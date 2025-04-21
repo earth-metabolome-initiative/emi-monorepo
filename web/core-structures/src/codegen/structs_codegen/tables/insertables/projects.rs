@@ -403,6 +403,6 @@ impl TryFrom<InsertableProject> for InsertableProjectBuilder {
             .updated_by(insertable_variant.updated_by)?
             .updated_at(insertable_variant.updated_at)?
             .expected_end_date(insertable_variant.expected_end_date)?
-            .end_date(insertable_variant.end_date)?
+            .end_date(insertable_variant.end_date)
     }
 }

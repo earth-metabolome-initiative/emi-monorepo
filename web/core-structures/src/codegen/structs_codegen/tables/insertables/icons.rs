@@ -64,8 +64,6 @@ impl common_traits::prelude::Builder for InsertableIconBuilder {
 impl TryFrom<InsertableIcon> for InsertableIconBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableIcon) -> Result<Self, Self::Error> {
-        Self::default()
-            .name(insertable_variant.name)?
-            .description(insertable_variant.description)?
+        Self::default().name(insertable_variant.name)?.description(insertable_variant.description)
     }
 }

@@ -67,6 +67,6 @@ impl common_traits::prelude::Builder for InsertableProcessableBuilder {
 impl TryFrom<InsertableProcessable> for InsertableProcessableBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableProcessable) -> Result<Self, Self::Error> {
-        Self::default().id(insertable_variant.id)?
+        Self::default().id(insertable_variant.id)
     }
 }

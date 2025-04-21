@@ -162,6 +162,6 @@ impl TryFrom<InsertableStepToolModel> for InsertableStepToolModelBuilder {
             .step_id(insertable_variant.step_id)?
             .tool_model_id(insertable_variant.tool_model_id)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?
+            .created_at(insertable_variant.created_at)
     }
 }

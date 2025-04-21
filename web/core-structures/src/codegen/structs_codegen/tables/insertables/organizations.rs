@@ -128,6 +128,6 @@ impl TryFrom<InsertableOrganization> for InsertableOrganizationBuilder {
             .country(insertable_variant.country)?
             .alpha_two_code(insertable_variant.alpha_two_code)?
             .state_province(insertable_variant.state_province)?
-            .domain(insertable_variant.domain)?
+            .domain(insertable_variant.domain)
     }
 }

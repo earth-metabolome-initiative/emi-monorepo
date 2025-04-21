@@ -78,6 +78,9 @@ impl<'a> TryFrom<&'a str> for MigrationDirectory {
     }
 }
 
+type MigrationGraph<'a> =
+    GenericGraph<&'a [Migration], SquareCSR2D<RaggedVector<usize, usize, usize>>>;
+
 impl MigrationDirectory {
     /// Returns the graph of dependencies between the migrations.
     ///
@@ -89,10 +92,7 @@ impl MigrationDirectory {
     /// # Errors
     ///
     /// * If the up migrations cannot be parsed with `sqlparser`
-    fn graph(
-        &self,
-    ) -> Result<GenericGraph<&[Migration], SquareCSR2D<RaggedVector<usize, usize, usize>>>, Error>
-    {
+    fn graph(&self) -> Result<MigrationGraph<'_>, Error> {
         let path: &Path = Path::new(&self.directory);
         // We create a map between the table names and the migrations.
         let mut migration_map: HashMap<String, usize> = HashMap::new();
@@ -147,6 +147,11 @@ impl MigrationDirectory {
     /// the migration. Then, we sort the migrations in topological order.
     /// This approach may be extended to include other types of statements
     /// such as indices, views, etc.
+    ///
+    /// # Errors
+    ///
+    /// * If the up migrations cannot be parsed with `sqlparser`
+    /// * If the dependencies of the migrations cannot be determined
     pub fn topological_order(&self) -> Result<impl Iterator<Item = &Migration>, Error> {
         let graph = self.graph()?;
 

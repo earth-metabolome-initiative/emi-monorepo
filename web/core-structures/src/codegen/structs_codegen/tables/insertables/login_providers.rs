@@ -180,6 +180,6 @@ impl TryFrom<InsertableLoginProvider> for InsertableLoginProviderBuilder {
             .client_id_var_name(insertable_variant.client_id_var_name)?
             .redirect_uri_var_name(insertable_variant.redirect_uri_var_name)?
             .oauth_url(insertable_variant.oauth_url)?
-            .scope(insertable_variant.scope)?
+            .scope(insertable_variant.scope)
     }
 }

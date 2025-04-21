@@ -101,6 +101,6 @@ impl TryFrom<InsertableUserOrganization> for InsertableUserOrganizationBuilder {
     fn try_from(insertable_variant: InsertableUserOrganization) -> Result<Self, Self::Error> {
         Self::default()
             .user_id(insertable_variant.user_id)?
-            .organization_id(insertable_variant.organization_id)?
+            .organization_id(insertable_variant.organization_id)
     }
 }

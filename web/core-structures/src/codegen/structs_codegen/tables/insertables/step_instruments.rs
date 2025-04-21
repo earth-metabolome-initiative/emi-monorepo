@@ -164,6 +164,6 @@ impl TryFrom<InsertableStepInstrument> for InsertableStepInstrumentBuilder {
             .step_id(insertable_variant.step_id)?
             .instrument_id(insertable_variant.instrument_id)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?
+            .created_at(insertable_variant.created_at)
     }
 }

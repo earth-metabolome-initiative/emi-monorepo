@@ -125,6 +125,6 @@ impl TryFrom<InsertableMaterial> for InsertableMaterialBuilder {
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
             .icon_id(insertable_variant.icon_id)?
-            .color_id(insertable_variant.color_id)?
+            .color_id(insertable_variant.color_id)
     }
 }

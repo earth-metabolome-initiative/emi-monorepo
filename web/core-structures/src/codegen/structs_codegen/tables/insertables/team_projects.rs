@@ -97,6 +97,6 @@ impl TryFrom<InsertableTeamProject> for InsertableTeamProjectBuilder {
     fn try_from(insertable_variant: InsertableTeamProject) -> Result<Self, Self::Error> {
         Self::default()
             .team_id(insertable_variant.team_id)?
-            .project_id(insertable_variant.project_id)?
+            .project_id(insertable_variant.project_id)
     }
 }

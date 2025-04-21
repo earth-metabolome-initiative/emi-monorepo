@@ -210,6 +210,6 @@ impl TryFrom<InsertableTrackableLocation> for InsertableTrackableLocationBuilder
             .geolocation(insertable_variant.geolocation)?
             .inferred(insertable_variant.inferred)?
             .created_at(insertable_variant.created_at)?
-            .created_by(insertable_variant.created_by)?
+            .created_by(insertable_variant.created_by)
     }
 }

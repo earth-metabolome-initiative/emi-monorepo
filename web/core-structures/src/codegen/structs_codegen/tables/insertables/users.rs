@@ -102,6 +102,6 @@ impl TryFrom<InsertableUser> for InsertableUserBuilder {
             .first_name(insertable_variant.first_name)?
             .last_name(insertable_variant.last_name)?
             .created_at(insertable_variant.created_at)?
-            .updated_at(insertable_variant.updated_at)?
+            .updated_at(insertable_variant.updated_at)
     }
 }

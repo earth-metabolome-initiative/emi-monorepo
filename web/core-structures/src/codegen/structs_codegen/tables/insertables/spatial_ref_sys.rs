@@ -103,6 +103,6 @@ impl TryFrom<InsertableSpatialRefSy> for InsertableSpatialRefSyBuilder {
             .auth_name(insertable_variant.auth_name)?
             .auth_srid(insertable_variant.auth_srid)?
             .srtext(insertable_variant.srtext)?
-            .proj4text(insertable_variant.proj4text)?
+            .proj4text(insertable_variant.proj4text)
     }
 }

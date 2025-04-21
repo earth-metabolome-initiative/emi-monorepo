@@ -149,6 +149,6 @@ impl TryFrom<InsertableInstrumentLocation> for InsertableInstrumentLocationBuild
             .instrument_id(insertable_variant.instrument_id)?
             .room_id(insertable_variant.room_id)?
             .created_at(insertable_variant.created_at)?
-            .created_by(insertable_variant.created_by)?
+            .created_by(insertable_variant.created_by)
     }
 }

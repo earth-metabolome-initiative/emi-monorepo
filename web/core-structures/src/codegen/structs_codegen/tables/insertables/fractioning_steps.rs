@@ -281,6 +281,6 @@ impl TryFrom<InsertableFractioningStep> for InsertableFractioningStepBuilder {
             .instrument_id(insertable_variant.instrument_id)?
             .kilograms(insertable_variant.kilograms)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?
+            .created_at(insertable_variant.created_at)
     }
 }

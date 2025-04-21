@@ -200,6 +200,6 @@ impl TryFrom<InsertableStep> for InsertableStepBuilder {
             .begun_at(insertable_variant.begun_at)?
             .finished_at(insertable_variant.finished_at)?
             .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?
+            .created_at(insertable_variant.created_at)
     }
 }

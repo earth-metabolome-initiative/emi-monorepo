@@ -122,6 +122,6 @@ impl TryFrom<InsertableOrganism> for InsertableOrganismBuilder {
         Self::default()
             .id(insertable_variant.id)?
             .name(insertable_variant.name)?
-            .nameplate_category_id(insertable_variant.nameplate_category_id)?
+            .nameplate_category_id(insertable_variant.nameplate_category_id)
     }
 }

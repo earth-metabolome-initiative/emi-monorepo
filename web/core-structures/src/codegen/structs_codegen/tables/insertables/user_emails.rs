@@ -115,6 +115,6 @@ impl TryFrom<InsertableUserEmail> for InsertableUserEmailBuilder {
             .email(insertable_variant.email)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
-            .primary_email(insertable_variant.primary_email)?
+            .primary_email(insertable_variant.primary_email)
     }
 }

@@ -123,6 +123,6 @@ impl TryFrom<InsertableUnit> for InsertableUnitBuilder {
             .name(insertable_variant.name)?
             .unit(insertable_variant.unit)?
             .icon_id(insertable_variant.icon_id)?
-            .color_id(insertable_variant.color_id)?
+            .color_id(insertable_variant.color_id)
     }
 }

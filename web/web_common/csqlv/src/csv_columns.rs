@@ -13,6 +13,10 @@ pub struct CSVColumn<'a> {
 
 impl CSVColumn<'_> {
     /// Returns the name of the column.
+    ///
+    /// # Errors
+    ///
+    /// * If the column name cannot be determined.
     pub fn name(&self) -> Result<String, CSVSchemaError> {
         self.column_metadata.name(self.table.schema)
     }

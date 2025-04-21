@@ -109,6 +109,6 @@ impl TryFrom<InsertableEmailProvider> for InsertableEmailProviderBuilder {
     fn try_from(insertable_variant: InsertableEmailProvider) -> Result<Self, Self::Error> {
         Self::default()
             .email_id(insertable_variant.email_id)?
-            .login_provider_id(insertable_variant.login_provider_id)?
+            .login_provider_id(insertable_variant.login_provider_id)
     }
 }
