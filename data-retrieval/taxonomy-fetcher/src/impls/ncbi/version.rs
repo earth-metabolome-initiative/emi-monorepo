@@ -160,8 +160,9 @@ pub enum NCBIVersion {
 }
 
 impl NCBIVersion {
-    /// Returns the release date of the version.
     #[must_use]
+    #[allow(clippy::too_many_lines)]
+    /// Returns the release date of the version.
     pub fn release_date(&self) -> NaiveDateTime {
         match self {
             NCBIVersion::V2018_12_01 => {
@@ -389,8 +390,9 @@ impl NCBIVersion {
         }
     }
 
-    /// Returns the URL associated with the version.
     #[must_use]
+    #[allow(clippy::too_many_lines)]
+    /// Returns the URL associated with the version.
     pub fn url(&self) -> &str {
         match self {
             NCBIVersion::V2018_12_01 => {

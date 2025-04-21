@@ -45,10 +45,7 @@ impl Taxonomy for CatalogOfLifeTaxonomy {
     }
 
     fn root(&self) -> Self::Taxon<'_> {
-        CatalogOfLifeTaxon {
-            taxon_entry: &self.taxon_entries[self.root_position as usize],
-            taxonomy: self,
-        }
+        CatalogOfLifeTaxon { taxon_entry: &self.taxon_entries[self.root_position], taxonomy: self }
     }
 
     fn taxons(&self) -> impl Iterator<Item = Self::Taxon<'_>> + '_ {

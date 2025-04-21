@@ -48,9 +48,9 @@ pub enum OpenTreeOfLifeVersion {
 impl OpenTreeOfLifeVersion {
     #[must_use]
     /// Returns the release date of the version.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// * If one of the dates used therein are incorrect.
     pub fn release_date(&self) -> NaiveDateTime {
         match self {

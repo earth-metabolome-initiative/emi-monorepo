@@ -38,10 +38,11 @@ pub trait TaxonEntryBuilder: Sized {
     /// # Arguments
     ///
     /// * `rank` - Rank of the taxon.
-    /// 
+    ///
     /// # Errors
-    /// 
-    /// * If the provided rank is invalid relatively to the other set parameters.
+    ///
+    /// * If the provided rank is invalid relatively to the other set
+    ///   parameters.
     fn set_rank(
         self,
         rank: <Self::TaxonEntry as super::TaxonEntry>::Rank,

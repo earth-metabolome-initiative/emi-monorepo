@@ -81,8 +81,7 @@ impl<'de> Deserialize<'de> for SourceInfo {
             "silva" => Ok(SourceInfo::Silva(id.to_owned())),
             "h2007" => Ok(SourceInfo::H2007),
             "ncbi" | "worms" | "gbif" | "irmng" | "study713" | "if" => {
-                let numeric_id: u32 =
-                    id.parse::<u32>().map_err(serde::de::Error::custom)?;
+                let numeric_id: u32 = id.parse::<u32>().map_err(serde::de::Error::custom)?;
                 match source {
                     "ncbi" => Ok(SourceInfo::NCBI(numeric_id)),
                     "worms" => Ok(SourceInfo::Worms(numeric_id)),

@@ -45,10 +45,7 @@ impl Taxonomy for OpenTreeOfLifeTaxonomy {
     }
 
     fn root(&self) -> Self::Taxon<'_> {
-        OpenTreeOfLifeTaxon {
-            taxon_entry: &self.taxon_entries[self.root_position],
-            taxonomy: self,
-        }
+        OpenTreeOfLifeTaxon { taxon_entry: &self.taxon_entries[self.root_position], taxonomy: self }
     }
 
     fn taxons(&self) -> impl Iterator<Item = Self::Taxon<'_>> + '_ {

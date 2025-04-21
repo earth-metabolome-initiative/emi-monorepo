@@ -20,13 +20,13 @@ pub trait Rank:
     Display + Debug + Hash + Copy + Clone + Eq + PartialEq + FromStr + Serialize + IntoEnumIterator
 {
     /// Writes out the ranks as a CSV.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `path`: The path where to write out the ranks.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If an `IOError` occurs while writing out the taxonomy.
     fn to_csv(path: &str) -> Result<(), std::io::Error> {
         let mut writer = csv::Writer::from_path(path)?;
