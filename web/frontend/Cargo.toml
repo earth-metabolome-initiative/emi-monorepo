@@ -25,7 +25,10 @@ log.workspace = true
 futures.workspace = true
 web_common_traits = { workspace = true, features = ["frontend"] }
 core-structures = { workspace = true, features = ["frontend"] }
-postgis_diesel = { workspace = true, default-features = false, features = ["serde", "sqlite"] }
+postgis_diesel = { workspace = true, default-features = false, features = [
+  "serde",
+  "sqlite",
+] }
 
 reqwasm = "0.5.0"
 gloo = "0.11.0"
@@ -37,17 +40,17 @@ yew-router = "0.18.0"
 # The doc-tests feature is required to avoid errors from the Rust Analyzer,
 # but it is not actually used in the code.
 yewdux = "0.11.0"
-gloo-net = "0.5.0"
+gloo-net = "0.6.0"
 gloo-console = "0.3.0"
 wasm-logger = "0.2.0"
 rustrict = "0.7.33"
 js-sys = "0.3.77"
 leaflet = "0.4.1"
 sublime_fuzzy = "0.7.0"
-implicit-clone = "0.4.9"
-image = "0.24.9"
+implicit-clone = "0.6"
+image.workspace = true
 base64 = "0.22.1"
-rxing = { version = "0.5.20", features = [
+rxing = { version = "0.7", features = [
   "wasm_support",
 ], default-features = false }
 yew-hooks = "0.3.3"

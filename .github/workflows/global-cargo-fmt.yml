@@ -2,9 +2,11 @@ name: Cargo Format
 
 on:
   push:
-    branches: [ '*' ]
+    paths:
+      - '**/*.rs'
   pull_request:
-    branches: [ '*' ]
+    paths:
+      - '**/*.rs'
 
 env:
   CARGO_TERM_COLOR: always

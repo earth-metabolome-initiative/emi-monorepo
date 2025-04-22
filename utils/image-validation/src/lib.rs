@@ -2,6 +2,7 @@
 
 mod impls;
 pub mod traits;
+pub mod error;
 
 /// Prelude module to re-export commonly used items.
 pub mod prelude {

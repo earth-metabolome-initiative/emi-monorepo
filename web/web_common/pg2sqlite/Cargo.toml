@@ -9,7 +9,7 @@ indicatif.workspace = true
 webcodegen.workspace = true
 
 [dev-dependencies]
-diesel = {workspace = true, features = ["sqlite"]}
+diesel = { workspace = true, features = ["sqlite"] }
 
 [lints]
 workspace = true

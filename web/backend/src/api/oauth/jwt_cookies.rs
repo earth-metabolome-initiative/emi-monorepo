@@ -389,7 +389,7 @@ fn encode_user_online_cookie<'a>() -> Result<Cookie<'a>, BackendError> {
 /// * `user_id` - The ID of the user that has logged in.
 /// * `state` - The state to redirect to after the login.
 /// * `redis_client` - The redis client to use for the login.
-pub(crate) async fn build_login_response<'a>(
+pub(crate) async fn build_login_response(
     user_id: i32,
     state: &str,
     redis_client: &redis::Client,

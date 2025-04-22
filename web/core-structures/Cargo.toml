@@ -20,25 +20,25 @@ validation-errors.workspace = true
 [features]
 default = ["serde"]
 serde = [
-	"postgis_diesel/serde",
-	"dep:serde",
-	"rosetta-uuid/serde",
-	"rosetta-timestamp/serde",
+  "postgis_diesel/serde",
+  "dep:serde",
+  "rosetta-uuid/serde",
+  "rosetta-timestamp/serde",
 ]
 postgres = [
-	"diesel-async/postgres",
-	"diesel/postgres",
-	"postgis_diesel/postgres",
-	"rosetta-uuid/postgres",
-	"rosetta-timestamp/postgres",
+  "diesel-async/postgres",
+  "diesel/postgres",
+  "postgis_diesel/postgres",
+  "rosetta-uuid/postgres",
+  "rosetta-timestamp/postgres",
 ]
 sqlite = [
-	"diesel-async/sqlite",
-	"diesel/sqlite",
-	"postgis_diesel/sqlite",
-	"diesel/returning_clauses_for_sqlite_3_35",
-	"rosetta-uuid/sqlite",
-	"rosetta-timestamp/sqlite",
+  "diesel-async/sqlite",
+  "diesel/sqlite",
+  "postgis_diesel/sqlite",
+  "diesel/returning_clauses_for_sqlite_3_35",
+  "rosetta-uuid/sqlite",
+  "rosetta-timestamp/sqlite",
 ]
 backend = ["postgres", "web_common_traits/backend"]
 frontend = ["sqlite", "web_common_traits/frontend"]

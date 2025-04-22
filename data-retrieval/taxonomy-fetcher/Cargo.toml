@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-zip = "0.6"
+zip.workspace = true
 tempfile = "3"
 openssl = { version = "0.10", features = ["vendored"] }
 tar = "0.4"
-downloader = {path = "../downloader"}
+downloader.workspace = true
 chrono.workspace = true
 tokio.workspace = true
 reqwest.workspace = true

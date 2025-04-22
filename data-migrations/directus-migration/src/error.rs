@@ -58,25 +58,25 @@ pub enum Error {
     /// Failed to execute a query
     QueryFailed(diesel::result::Error),
     /// Failed to insert user
-    UserInsertError(InsertError<InsertableUserAttributes>),
+    UserInsert(InsertError<InsertableUserAttributes>),
     /// Failed to insert Email
-    MailInsertError(InsertError<InsertableUserEmailAttributes>),
+    MailInsert(InsertError<InsertableUserEmailAttributes>),
     /// Failed to insert brand
-    BrandInsertError(InsertError<InsertableBrandAttributes>),
+    BrandInsert(InsertError<InsertableBrandAttributes>),
     /// Failed to insert product.
-    ProductInsertError(InsertError<InsertableCommercialProductAttributes>),
+    ProductInsert(InsertError<InsertableCommercialProductAttributes>),
     /// Failed to insert instrument model.
-    InstrumentModelInsertError(InsertError<InsertableInstrumentModelAttributes>),
+    InstrumentModelInsert(InsertError<InsertableInstrumentModelAttributes>),
     /// Failed to insert instrument
-    InstrumentInsertError(InsertError<InsertableInstrumentAttributes>),
+    InstrumentInsert(InsertError<InsertableInstrumentAttributes>),
     /// Failed to insert a new city
-    CityInsertError(InsertError<InsertableCityAttributes>),
+    CityInsert(InsertError<InsertableCityAttributes>),
     /// Failed to insert a new address
-    AddressInsertError(InsertError<InsertableAddressAttributes>),
+    AddressInsert(InsertError<InsertableAddressAttributes>),
     /// Failed to insert a new room
-    RoomInsertError(InsertError<InsertableRoomAttributes>),
+    RoomInsert(InsertError<InsertableRoomAttributes>),
     /// Failed to insert a new instrument location.
-    InstrumentLocationInsertError(InsertError<InsertableInstrumentLocationAttributes>),
+    InstrumentLocationInsert(InsertError<InsertableInstrumentLocationAttributes>),
     /// User never logged in
     UserNeverLoggedIn(Box<DirectusUser>),
 }
@@ -95,60 +95,60 @@ impl From<diesel::result::Error> for Error {
 
 impl From<InsertError<InsertableUserAttributes>> for Error {
     fn from(value: InsertError<InsertableUserAttributes>) -> Self {
-        Error::UserInsertError(value)
+        Error::UserInsert(value)
     }
 }
 
 impl From<InsertError<InsertableUserEmailAttributes>> for Error {
     fn from(value: InsertError<InsertableUserEmailAttributes>) -> Self {
-        Error::MailInsertError(value)
+        Error::MailInsert(value)
     }
 }
 
 impl From<InsertError<InsertableBrandAttributes>> for Error {
     fn from(value: InsertError<InsertableBrandAttributes>) -> Self {
-        Error::BrandInsertError(value)
+        Error::BrandInsert(value)
     }
 }
 
 impl From<InsertError<InsertableInstrumentModelAttributes>> for Error {
     fn from(value: InsertError<InsertableInstrumentModelAttributes>) -> Self {
-        Error::InstrumentModelInsertError(value)
+        Error::InstrumentModelInsert(value)
     }
 }
 
 impl From<InsertError<InsertableInstrumentAttributes>> for Error {
     fn from(value: InsertError<InsertableInstrumentAttributes>) -> Self {
-        Error::InstrumentInsertError(value)
+        Error::InstrumentInsert(value)
     }
 }
 
 impl From<InsertError<InsertableCityAttributes>> for Error {
     fn from(value: InsertError<InsertableCityAttributes>) -> Self {
-        Error::CityInsertError(value)
+        Error::CityInsert(value)
     }
 }
 
 impl From<InsertError<InsertableAddressAttributes>> for Error {
     fn from(value: InsertError<InsertableAddressAttributes>) -> Self {
-        Error::AddressInsertError(value)
+        Error::AddressInsert(value)
     }
 }
 
 impl From<InsertError<InsertableRoomAttributes>> for Error {
     fn from(value: InsertError<InsertableRoomAttributes>) -> Self {
-        Error::RoomInsertError(value)
+        Error::RoomInsert(value)
     }
 }
 
 impl From<InsertError<InsertableInstrumentLocationAttributes>> for Error {
     fn from(value: InsertError<InsertableInstrumentLocationAttributes>) -> Self {
-        Error::InstrumentLocationInsertError(value)
+        Error::InstrumentLocationInsert(value)
     }
 }
 
 impl From<InsertError<InsertableCommercialProductAttributes>> for Error {
     fn from(value: InsertError<InsertableCommercialProductAttributes>) -> Self {
-        Error::ProductInsertError(value)
+        Error::ProductInsert(value)
     }
 }

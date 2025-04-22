@@ -27,7 +27,12 @@ rosetta-timestamp.workspace = true
 
 [features]
 default = []
-pgrx = ["dep:pgrx", "pgrx_validation_derive/pgrx", "rosetta-uuid/pgrx", "rosetta-timestamp/pgrx"]
+pgrx = [
+  "dep:pgrx",
+  "pgrx_validation_derive/pgrx",
+  "rosetta-uuid/pgrx",
+  "rosetta-timestamp/pgrx",
+]
 pg12 = ["pgrx", "pgrx/pg12", "pgrx-tests/pg12"]
 pg13 = ["pgrx", "pgrx/pg13", "pgrx-tests/pg13"]
 pg14 = ["pgrx", "pgrx/pg14", "pgrx-tests/pg14"]

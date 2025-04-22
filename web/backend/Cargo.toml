@@ -10,8 +10,6 @@ categories = ["science", "database", "web", "api"]
 authors = ["Earth Metabolome Initiative"]
 description = "Backend for the Earth Metabolome Initiative"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 chrono.workspace = true
 diesel.workspace = true
@@ -31,24 +29,23 @@ core-structures = { workspace = true, features = ["backend"] }
 web_common_traits = { workspace = true, features = ["backend"] }
 openssl = { version = "0.10" }
 actix = "0.13"
-actix-cors = "0.7.0"
+actix-cors = "0.7.1"
 actix-rt = "2.10.0"
 actix-web = { version = "4.10", features = ["cookies", "openssl"] }
 actix-web-httpauth = "0.8.2"
-actix-service = "2.0.2"
-actix-http = "3.9.0"
+actix-service = "2.0.3"
+actix-http = "3.10.0"
 actix-files = "0.6.6"
 actix-ws.workspace = true
 log.workspace = true
-env_logger = "0.9"
-rust-argon2 = "1.0"
+env_logger = "0.11"
+rust-argon2 = "2.1"
 time = "0.3"
 jsonwebtoken = "9.3.1"
 reqwest.workspace = true
 email_address = "0.2.9"
 redis.workspace = true
-base64 = "0.21.7"
+base64 = "0.22"
 image.workspace = true
-identicon-rs = "5.0.1"
+identicon-rs = "6"
 strsim = "0.11.1"
-

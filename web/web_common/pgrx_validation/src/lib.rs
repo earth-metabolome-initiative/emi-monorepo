@@ -3,6 +3,7 @@
 #[cfg(feature = "pgrx")]
 ::pgrx::pg_module_magic!();
 
+use validator::ValidateEmail;
 use pgrx_validation_derive::validation;
 
 pub const EXTENSION_NAME: &str = "pgrx_validation";
@@ -103,7 +104,7 @@ pub fn must_be_distinct_uuid(
 ///   valid mail address.
 pub fn must_be_mail(value: &str) -> Result<(), validation_errors::SingleFieldError> {
     must_not_be_empty(value)?;
-    if validator::validate_email(value) {
+    if value.validate_email() {
         Ok(())
     } else {
         Err(validation_errors::SingleFieldError::InvalidMail(()))
