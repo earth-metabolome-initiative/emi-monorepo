@@ -17,6 +17,12 @@ const DATABASE_URL: &str = const_format::formatcp!(
 );
 
 async fn setup_docker() -> ContainerAsync<GenericImage> {
+    // We check whether `docker` is installed and running.
+    if !std::process::Command::new("docker").output().is_ok() {
+        eprintln!("Docker is not installed or not running.");
+        std::process::exit(1);
+    }
+
     let local_absolute_path = std::env::current_dir().unwrap();
     let local_absolute_path = local_absolute_path.to_str().unwrap();
 

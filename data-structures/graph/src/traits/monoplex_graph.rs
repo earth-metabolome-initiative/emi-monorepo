@@ -29,16 +29,13 @@ pub trait MonoplexGraph: super::Graph {
         self.edges().successors(source_node_id)
     }
     /// Returns whether the given source node has successors.
-    /// 
-    /// # Arguments 
-    /// 
+    ///
+    /// # Arguments
+    ///
     /// * `source_node_id` - The identifier of the source node.
-    fn has_successors(
-        &self,
-        source_node_id: <Self::Edges as super::Edges>::SourceNodeId,
-     ) -> bool{
+    fn has_successors(&self, source_node_id: <Self::Edges as super::Edges>::SourceNodeId) -> bool {
         self.edges().has_successors(source_node_id)
-     }
+    }
     /// Returns the outbound degree of the node with the given identifier.
     ///
     /// # Arguments

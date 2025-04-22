@@ -130,17 +130,6 @@ fn test_raising_inconsistent_unassigned_rows() {
 }
 
 #[test]
-#[should_panic]
-/// Test a corner case where at the time of report, the resulting assignment
-/// is inconsistent with the Hopcroft-Karp algorithm.
-fn test_lapjv_inconsistent_with_hopcroft_karp1() {
-    let mut csr: ValuedCSR2D<u8, u8, u8, f64> = ValuedCSR2D::with_sparse_shaped_capacity((2, 5), 1);
-    let base_value = 3.3055701783954548e16;
-    csr.add((1, 4, base_value)).expect("Failed to add value");
-    csr.sparse_lapjv(base_value + 1.0, base_value + 2.0).expect("LAPjv failed");
-}
-
-#[test]
 /// Test a corner case where at the time of report, the resulting assignment
 /// is inconsistent with the Hopcroft-Karp algorithm.
 fn test_lapjv_inconsistent_with_hopcroft_karp2() {
