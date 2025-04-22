@@ -15,7 +15,7 @@ Cargo.lock
 .env
 
 # Ingnoring .vscode folder
-.vscode
+.vscode/launch.json
 
 # Ignore .DS_Store
 .DS_Store
