@@ -122,13 +122,6 @@ backend-request-errors = { path = "web/web_common/backend-request-errors" }
 downloader = { path = "data-retrieval/downloader" }
 
 validator = { version = "0.20", features = ["derive"] }
-cargo-husky = { version = "1", features = [
-  "precommit-hook",
-  "run-cargo-fmt",
-  "run-cargo-check",
-  "run-cargo-clippy",
-  "run-cargo-test",
-] }
 web-sys = { version = "0.3.77" }
 
 [workspace.lints.rust]
