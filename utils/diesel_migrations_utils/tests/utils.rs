@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 //! Submodule for test utilities.
 
 use std::path::Path;

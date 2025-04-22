@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 //! Utility functions for testing.
 
 use std::{
