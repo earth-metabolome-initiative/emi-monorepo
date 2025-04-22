@@ -3,8 +3,8 @@
 #[cfg(feature = "pgrx")]
 ::pgrx::pg_module_magic!();
 
-use validator::ValidateEmail;
 use pgrx_validation_derive::validation;
+use validator::ValidateEmail;
 
 pub const EXTENSION_NAME: &str = "pgrx_validation";
 
