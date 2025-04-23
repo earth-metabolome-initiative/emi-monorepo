@@ -1,0 +1,14 @@
+[package]
+name = "init-migration"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+core-structures = { workspace = true, features = ["backend"] }
+const_format.workspace = true
+diesel-async.workspace = true
+diesel.workspace = true
+tokio.workspace = true
+
+[lints]
+workspace = true
