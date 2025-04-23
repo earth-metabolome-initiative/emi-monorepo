@@ -1,4 +1,3 @@
--- UP MIGRATION
 CREATE TABLE IF NOT EXISTS trackables (
     id UUID PRIMARY KEY,
     container_model_id INTEGER NOT NULL REFERENCES container_models(id),

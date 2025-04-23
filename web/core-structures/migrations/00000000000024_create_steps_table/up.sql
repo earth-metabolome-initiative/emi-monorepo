@@ -93,8 +93,8 @@ CREATE TABLE IF NOT EXISTS fractioning_steps (
 
 CREATE TABLE IF NOT EXISTS aliquoting_steps (
 	id UUID PRIMARY KEY REFERENCES steps(id),
-	source_processable_id UUID NOT NULL REFERENCES processables(id),
-	destination_processable_id UUID NOT NULL REFERENCES processables(id),
+	source_processable_id UUID NOT NULL REFERENCES volumetric_processables(id),
+	destination_processable_id UUID NOT NULL REFERENCES volumetric_processables(id),
 	instrument_id INTEGER NOT NULL REFERENCES instruments(id),
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP

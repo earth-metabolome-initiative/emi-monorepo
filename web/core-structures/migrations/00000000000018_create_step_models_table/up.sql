@@ -116,7 +116,6 @@ CREATE TABLE IF NOT EXISTS packaging_step_models (
 
 CREATE TABLE IF NOT EXISTS aliquoting_step_models (
 	id INTEGER PRIMARY KEY REFERENCES sampling_step_models(id),
-	step_model_instrument_category_id INTEGER NOT NULL REFERENCES step_model_instrument_categories(id),
 	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters)),
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -126,7 +125,6 @@ CREATE TABLE IF NOT EXISTS aliquoting_step_models (
 
 CREATE TABLE IF NOT EXISTS freeze_drying_step_models (
 	id INTEGER PRIMARY KEY REFERENCES step_models(id),
-	step_model_instrument_category_id INTEGER NOT NULL REFERENCES step_model_instrument_categories(id),
 	expected_kelvin REAL NOT NULL CHECK (must_be_strictly_positive_f32(expected_kelvin)),
 	expected_pascal REAL NOT NULL CHECK (must_be_strictly_positive_f32(expected_pascal)),
 	expected_seconds REAL NOT NULL CHECK (must_be_strictly_positive_f32(expected_seconds)),
@@ -144,7 +142,6 @@ CREATE TABLE IF NOT EXISTS freeze_drying_step_models (
 
 CREATE TABLE IF NOT EXISTS weighing_step_models (
 	id INTEGER PRIMARY KEY REFERENCES step_models(id),
-	step_model_instrument_category_id INTEGER NOT NULL REFERENCES step_model_instrument_categories(id),
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INTEGER NOT NULL REFERENCES users(id),
@@ -153,7 +150,6 @@ CREATE TABLE IF NOT EXISTS weighing_step_models (
 
 CREATE TABLE IF NOT EXISTS fractioning_step_models (
 	id INTEGER PRIMARY KEY REFERENCES step_models(id),
-	step_model_instrument_category_id INTEGER NOT NULL REFERENCES step_model_instrument_categories(id),
 	expected_kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(expected_kilograms)),
 	tolerance_kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(tolerance_kilograms)),
 	created_by INTEGER NOT NULL REFERENCES users(id),
@@ -165,7 +161,6 @@ CREATE TABLE IF NOT EXISTS fractioning_step_models (
 
 CREATE TABLE IF NOT EXISTS grinding_step_models (
 	id INTEGER PRIMARY KEY REFERENCES step_models(id),
-	step_model_instrument_category_id INTEGER NOT NULL REFERENCES step_model_instrument_categories(id),
 	seconds REAL NOT NULL CHECK (must_be_strictly_positive_f32(seconds)),
 	hertz REAL NOT NULL CHECK (must_be_strictly_positive_f32(hertz)),
 	created_by INTEGER NOT NULL REFERENCES users(id),
