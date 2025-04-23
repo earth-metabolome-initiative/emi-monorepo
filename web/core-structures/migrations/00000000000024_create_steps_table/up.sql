@@ -84,9 +84,38 @@ CREATE TABLE IF NOT EXISTS fractioning_steps (
 	id UUID PRIMARY KEY REFERENCES steps(id),
 	source_processable_id UUID NOT NULL REFERENCES processables(id),
 	destination_processable_id UUID NOT NULL REFERENCES processables(id),
-	fractioning_step_model_id INTEGER NOT NULL REFERENCES fractioning_step_models(id),
 	instrument_id INTEGER NOT NULL REFERENCES instruments(id),
 	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms)),
+	created_by INTEGER NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS shaking_steps (
+	id UUID PRIMARY KEY REFERENCES steps(id),
+	processable_id UUID NOT NULL REFERENCES processables(id),
+	created_by INTEGER NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ball_mill_steps (
+	id UUID PRIMARY KEY REFERENCES steps(id),
+	processable_id UUID NOT NULL REFERENCES processables(id),
+	instrument_id INTEGER NOT NULL REFERENCES instruments(id),
+	created_by INTEGER NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS centrifuge_steps (
+	id UUID PRIMARY KEY REFERENCES steps(id),
+	processable_id UUID NOT NULL REFERENCES processables(id),
+	instrument_id INTEGER NOT NULL REFERENCES instruments(id),
+	created_by INTEGER NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS disposal_steps (
+	id UUID PRIMARY KEY REFERENCES steps(id),
+	processable_id UUID NOT NULL REFERENCES processables(id),
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

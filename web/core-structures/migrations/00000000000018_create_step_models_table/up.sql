@@ -159,7 +159,24 @@ CREATE TABLE IF NOT EXISTS fractioning_step_models (
 	CHECK (must_be_strictly_smaller_than_f32(tolerance_kilograms, expected_kilograms))
 );
 
-CREATE TABLE IF NOT EXISTS grinding_step_models (
+CREATE TABLE IF NOT EXISTS shaking_step_models (
+	id INTEGER PRIMARY KEY REFERENCES step_models(id),
+	seconds REAL NOT NULL CHECK (must_be_strictly_positive_f32(seconds)),
+	created_by INTEGER NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_by INTEGER NOT NULL REFERENCES users(id),
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS disposal_step_models (
+	id INTEGER PRIMARY KEY REFERENCES step_models(id),
+	created_by INTEGER NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_by INTEGER NOT NULL REFERENCES users(id),
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ball_mill_step_models (
 	id INTEGER PRIMARY KEY REFERENCES step_models(id),
 	seconds REAL NOT NULL CHECK (must_be_strictly_positive_f32(seconds)),
 	hertz REAL NOT NULL CHECK (must_be_strictly_positive_f32(hertz)),
@@ -171,4 +188,18 @@ CREATE TABLE IF NOT EXISTS grinding_step_models (
 	CHECK (must_be_strictly_greater_than_f32(seconds, 10.0)),
 	CHECK (must_be_strictly_smaller_than_f32(hertz, 100.0)),
 	CHECK (must_be_strictly_greater_than_f32(hertz, 0.0))
+);
+
+CREATE TABLE IF NOT EXISTS centrifuge_step_models (
+	id INTEGER PRIMARY KEY REFERENCES step_models(id),
+	seconds REAL NOT NULL CHECK (must_be_strictly_positive_f32(seconds)),
+	rotation_per_minute REAL NOT NULL CHECK (must_be_strictly_positive_f32(rotation_per_minute)),
+	created_by INTEGER NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_by INTEGER NOT NULL REFERENCES users(id),
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	CHECK (must_be_strictly_smaller_than_f32(seconds, 3600.0)),
+	CHECK (must_be_greater_than_f32(seconds, 30.0)),
+	CHECK (must_be_smaller_than_f32(rotation_per_minute, 30000.0)),
+	CHECK (must_be_greater_than_f32(rotation_per_minute, 5000.0))
 );
