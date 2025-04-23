@@ -40,12 +40,14 @@ diesel_full_text_search.workspace = true
 diesel-async = { workspace = true, features = ["postgres", "bb8"] }
 validation-errors.workspace = true
 pgrx_validation.workspace = true
+yew.workspace = true
 
 [features]
 default = ["diesel", "serde", "postgres"]
 serde = []
-backend = ["diesel", "web_common_traits/backend"]
-frontend = ["web_common_traits/frontend"]
+yew = []
+backend = ["diesel", "web_common_traits/backend", "diesel/postgres"]
+frontend = ["web_common_traits/frontend", "yew", "diesel/sqlite"]
 diesel = ["postgis_diesel/diesel"]
 # Feature used in the context of the tests.
 postgres = ["diesel"]

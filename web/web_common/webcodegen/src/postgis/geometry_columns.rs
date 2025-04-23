@@ -61,10 +61,10 @@ impl GeometryColumn {
     /// * If the geometry type is unknown.
     pub fn supports_copy(&self) -> bool {
         match self.r#type.as_str() {
-            "POINT" => true,
+            "POINT" | "Point" => true,
             "LINESTRING" | "POLYGON" | "MULTIPOINT" | "MULTILINESTRING" | "MULTIPOLYGON"
             | "GEOMETRYCOLLECTION" | "GEOMETRY" => false,
-            _ => panic!("Unknown geometry type: {}", self.str_rust_type()),
+            _ => panic!("Unknown geometry type: {}", self.r#type.as_str()),
         }
     }
 

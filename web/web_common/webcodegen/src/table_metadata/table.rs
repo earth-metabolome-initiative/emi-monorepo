@@ -599,6 +599,45 @@ impl Table {
             .load::<Table>(conn)
     }
 
+    /// Returns whether the table supports the `Copy` trait.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// * If database connection fails.
+    pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(self.columns(conn)?.iter().all(|column| column.supports_copy(conn).unwrap_or(false)))
+    }
+
+    /// Returns whether the table supports the `Eq` trait.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// * If database connection fails.
+    pub fn supports_eq(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(self.columns(conn)?.iter().all(|column| column.supports_eq(conn).unwrap_or(false)))
+    }
+
+    /// Returns whether the table supports the `Hash` trait.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// * If database connection fails.
+    pub fn supports_hash(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(self.columns(conn)?.iter().all(|column| column.supports_hash(conn).unwrap_or(false)))
+    }
+
     /// Returns all tables in the database sorted topologically.
     ///
     /// # Arguments

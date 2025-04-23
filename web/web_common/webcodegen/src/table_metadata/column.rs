@@ -9,7 +9,7 @@ use syn::{Ident, Type};
 
 use super::{
     check_constraint::CheckConstraint,
-    pg_type::{COPY_TYPES, PgType, rust_type_str},
+    pg_type::{COPY_TYPES, EQ_TYPES, HASH_TYPES, PgType, rust_type_str},
     table::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS},
 };
 use crate::{
@@ -537,6 +537,40 @@ impl Column {
             Err(error) => {
                 if self.has_custom_type() {
                     Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.supports_copy(conn)?)
+                } else {
+                    Err(error)
+                }
+            }
+        }
+    }
+
+    /// Returns whether the column type supports the `Hash` trait.
+    pub fn supports_hash(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        if self.geometry(conn).is_ok() || self.geography(conn).is_ok() {
+            return Ok(false);
+        }
+        match rust_type_str(self.data_type_str(conn)?, conn) {
+            Ok(s) => Ok(HASH_TYPES.contains(&s)),
+            Err(error) => {
+                if self.has_custom_type() {
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.supports_hash(conn)?)
+                } else {
+                    Err(error)
+                }
+            }
+        }
+    }
+
+    /// Returns whether the column type supports the `Eq` trait.
+    pub fn supports_eq(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        if self.geometry(conn).is_ok() || self.geography(conn).is_ok() {
+            return Ok(false);
+        }
+        match rust_type_str(self.data_type_str(conn)?, conn) {
+            Ok(s) => Ok(EQ_TYPES.contains(&s)),
+            Err(error) => {
+                if self.has_custom_type() {
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.supports_eq(conn)?)
                 } else {
                     Err(error)
                 }

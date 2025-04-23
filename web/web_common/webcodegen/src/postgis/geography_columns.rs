@@ -78,11 +78,11 @@ impl GeographyColumn {
     ///
     /// * If the geography type is unknown.
     pub fn supports_copy(&self) -> bool {
-        match self.str_rust_type() {
-            "POINT" => true,
+        match self.r#type.as_str() {
+            "POINT" | "Point" => true,
             "LINESTRING" | "POLYGON" | "MULTIPOINT" | "MULTILINESTRING" | "MULTIPOLYGON"
             | "GEOMETRYCOLLECTION" | "GEOMETRY" => false,
-            _ => panic!("Unknown geography type: {}", self.str_rust_type()),
+            _ => panic!("Unknown geography type: {}", self.r#type.as_str()),
         }
     }
 }

@@ -43,10 +43,21 @@ impl Table {
 
         let diesel_derives_decorator = self.diesel_derives_decorator(conn)?;
         let primary_key_decorator = self.primary_key_decorator(conn)?;
+        let mut default_derives = vec![quote!(Debug), quote!(Clone), quote!(PartialEq)];
+        if self.supports_copy(conn)? {
+            default_derives.push(quote!(Copy));
+        }
+        if self.supports_eq(conn)? {
+            default_derives.push(quote!(Eq));
+        }
+        if self.supports_hash(conn)? {
+            default_derives.push(quote!(Hash));
+        }
 
         Ok(quote! {
-            #[derive(Debug, Clone)]
+            #[derive(#(#default_derives),*)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+            #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
             #diesel_derives_decorator
             #primary_key_decorator
             #[diesel(table_name = #table_path)]
