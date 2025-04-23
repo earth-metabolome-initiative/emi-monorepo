@@ -25,6 +25,7 @@ log.workspace = true
 futures.workspace = true
 web_common_traits = { workspace = true, features = ["frontend"] }
 core-structures = { workspace = true, features = ["frontend"] }
+diesel-async = { workspace = true, features = ["sqlite"] }
 postgis_diesel = { workspace = true, default-features = false, features = [
   "serde",
   "sqlite",

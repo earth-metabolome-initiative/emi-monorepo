@@ -1,18 +1,19 @@
 //! Login page of the application.
 
-use api_path::api::oauth::providers::LoginProviderCredentials;
 use yew::prelude::*;
 use yew_router::prelude::*;
 use yewdux::prelude::*;
 
-use crate::{components::login_provider::LoginProvider, router::AppRoute};
+use crate::{
+    components::login_provider::LoginProvider, router::AppRoute, stores::app_state::AppState,
+};
 
 #[function_component(Login)]
 pub fn login() -> Html {
     let navigator = use_navigator().unwrap();
-    let (user, _) = use_store::<UserState>();
+    let (state, _) = use_store::<AppState>();
 
-    if user.has_user() {
+    if state.user().is_some() {
         navigator.push(&AppRoute::Home);
     }
 

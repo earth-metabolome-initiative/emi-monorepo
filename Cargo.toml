@@ -36,7 +36,7 @@ members = [
   "utils/mime-types",
   "web/web_common/ws-messages",
   "utils/rosetta-timestamp",
-  "utils/iter-utils",
+  "utils/iter-utils", "data-migrations/init-migration",
 
 ]
 
@@ -58,24 +58,16 @@ bytes = "1.10.0"
 bincode = "2"
 sqlparser = { git = "https://github.com/apache/datafusion-sqlparser-rs.git", branch = "main" }
 arbitrary = { version = "1", features = ["derive"] }
-diesel = { version = "2.2", features = ["extras", "sqlite", "postgres"] }
-diesel-async = { version = "0.5", features = [
-  "pool",
-  "bb8",
-  "sqlite",
-  "postgres",
-] }
+diesel = { version = "2.2", features = ["extras"] }
+diesel-async = { version = "0.5" }
 diesel_full_text_search = "2.2"
 redis = { version = "0.29", features = ["tokio-comp"] }
-postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel.git", features = [
-  "serde",
-  "sqlite",
-  "postgres",
-], default-features = false, branch = "sqlite" }
+postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel.git", default-features = false, branch = "sqlite" }
 chrono = { version = "0.4.39", features = ["serde"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
 strum = { version = "0.27", features = ["derive"] }
+yew = { version = "0.21.0", features = ["csr"] }
 strum_macros = "0.27"
 zip = "2.6"
 pgrx = "0.14"
