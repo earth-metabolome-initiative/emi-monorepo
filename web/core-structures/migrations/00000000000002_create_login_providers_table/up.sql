@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS login_providers (
+  id SMALLSERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  icon_id SMALLINT NOT NULL REFERENCES icons(id),
+  color_id SMALLINT NOT NULL REFERENCES colors(id),
+  client_id VARCHAR(255) NOT NULL,
+  redirect_uri VARCHAR(255) NOT NULL,
+  oauth_url VARCHAR(255) NOT NULL,
+  scope VARCHAR(255) NOT NULL
+);

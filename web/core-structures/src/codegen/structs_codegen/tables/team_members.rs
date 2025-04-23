@@ -1,5 +1,6 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Copy, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
 #[diesel(primary_key(team_id, member_id))]
 #[diesel(

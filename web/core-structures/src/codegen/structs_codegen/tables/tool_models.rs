@@ -1,5 +1,6 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Copy, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::tool_models::tool_models)]

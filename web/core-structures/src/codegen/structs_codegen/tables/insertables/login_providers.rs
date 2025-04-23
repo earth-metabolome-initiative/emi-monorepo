@@ -4,8 +4,8 @@ pub enum InsertableLoginProviderAttributes {
     Name,
     IconId,
     ColorId,
-    ClientIdVarName,
-    RedirectUriVarName,
+    ClientId,
+    RedirectUri,
     OauthUrl,
     Scope,
 }
@@ -15,12 +15,8 @@ impl core::fmt::Display for InsertableLoginProviderAttributes {
             InsertableLoginProviderAttributes::Name => write!(f, "name"),
             InsertableLoginProviderAttributes::IconId => write!(f, "icon_id"),
             InsertableLoginProviderAttributes::ColorId => write!(f, "color_id"),
-            InsertableLoginProviderAttributes::ClientIdVarName => {
-                write!(f, "client_id_var_name")
-            }
-            InsertableLoginProviderAttributes::RedirectUriVarName => {
-                write!(f, "redirect_uri_var_name")
-            }
+            InsertableLoginProviderAttributes::ClientId => write!(f, "client_id"),
+            InsertableLoginProviderAttributes::RedirectUri => write!(f, "redirect_uri"),
             InsertableLoginProviderAttributes::OauthUrl => write!(f, "oauth_url"),
             InsertableLoginProviderAttributes::Scope => write!(f, "scope"),
         }
@@ -38,8 +34,8 @@ pub struct InsertableLoginProvider {
     name: String,
     icon_id: i16,
     color_id: i16,
-    client_id_var_name: String,
-    redirect_uri_var_name: String,
+    client_id: String,
+    redirect_uri: String,
     oauth_url: String,
     scope: String,
 }
@@ -76,8 +72,8 @@ pub struct InsertableLoginProviderBuilder {
     name: Option<String>,
     icon_id: Option<i16>,
     color_id: Option<i16>,
-    client_id_var_name: Option<String>,
-    redirect_uri_var_name: Option<String>,
+    client_id: Option<String>,
+    redirect_uri: Option<String>,
     oauth_url: Option<String>,
     scope: Option<String>,
 }
@@ -103,18 +99,18 @@ impl InsertableLoginProviderBuilder {
         self.color_id = Some(color_id);
         Ok(self)
     }
-    pub fn client_id_var_name(
+    pub fn client_id(
         mut self,
-        client_id_var_name: String,
+        client_id: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.client_id_var_name = Some(client_id_var_name);
+        self.client_id = Some(client_id);
         Ok(self)
     }
-    pub fn redirect_uri_var_name(
+    pub fn redirect_uri(
         mut self,
-        redirect_uri_var_name: String,
+        redirect_uri: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.redirect_uri_var_name = Some(redirect_uri_var_name);
+        self.redirect_uri = Some(redirect_uri);
         Ok(self)
     }
     pub fn oauth_url(
@@ -149,14 +145,14 @@ impl common_traits::prelude::Builder for InsertableLoginProviderBuilder {
                     InsertableLoginProviderAttributes::ColorId,
                 ),
             )?,
-            client_id_var_name: self.client_id_var_name.ok_or(
+            client_id: self.client_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableLoginProviderAttributes::ClientIdVarName,
+                    InsertableLoginProviderAttributes::ClientId,
                 ),
             )?,
-            redirect_uri_var_name: self.redirect_uri_var_name.ok_or(
+            redirect_uri: self.redirect_uri.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableLoginProviderAttributes::RedirectUriVarName,
+                    InsertableLoginProviderAttributes::RedirectUri,
                 ),
             )?,
             oauth_url: self.oauth_url.ok_or(
@@ -177,8 +173,8 @@ impl TryFrom<InsertableLoginProvider> for InsertableLoginProviderBuilder {
             .name(insertable_variant.name)?
             .icon_id(insertable_variant.icon_id)?
             .color_id(insertable_variant.color_id)?
-            .client_id_var_name(insertable_variant.client_id_var_name)?
-            .redirect_uri_var_name(insertable_variant.redirect_uri_var_name)?
+            .client_id(insertable_variant.client_id)?
+            .redirect_uri(insertable_variant.redirect_uri)?
             .oauth_url(insertable_variant.oauth_url)?
             .scope(insertable_variant.scope)
     }

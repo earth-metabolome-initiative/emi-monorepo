@@ -16,6 +16,7 @@ common-traits.workspace = true
 backend-request-errors.workspace = true
 pgrx_validation.workspace = true
 validation-errors.workspace = true
+yew = { workspace = true, optional = true }
 
 [features]
 default = ["serde"]
@@ -25,6 +26,7 @@ serde = [
   "rosetta-uuid/serde",
   "rosetta-timestamp/serde",
 ]
+yew = ["dep:yew"]
 postgres = [
   "diesel-async/postgres",
   "diesel/postgres",
@@ -41,4 +43,4 @@ sqlite = [
   "rosetta-timestamp/sqlite",
 ]
 backend = ["postgres", "web_common_traits/backend"]
-frontend = ["sqlite", "web_common_traits/frontend"]
+frontend = ["sqlite", "yew", "web_common_traits/frontend"]
