@@ -36,7 +36,8 @@ members = [
   "utils/mime-types",
   "web/web_common/ws-messages",
   "utils/rosetta-timestamp",
-  "utils/iter-utils", "data-migrations/init-migration",
+  "utils/iter-utils",
+  "data-migrations/init-migration",
 
 ]
 
