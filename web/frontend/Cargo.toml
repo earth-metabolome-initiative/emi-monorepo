@@ -23,9 +23,13 @@ ws-messages.workspace = true
 common-traits.workspace = true
 log.workspace = true
 futures.workspace = true
+sqlite-wasm-rs = { git = "https://github.com/LucaCappelletti94/sqlite-wasm-rs.git", default-features = false, features = [
+  "precompiled",
+] }
 web_common_traits = { workspace = true, features = ["frontend"] }
 core-structures = { workspace = true, features = ["frontend"] }
 diesel-async = { workspace = true, features = ["sqlite"] }
+diesel = { workspace = true, features = ["sqlite"] }
 postgis_diesel = { workspace = true, default-features = false, features = [
   "serde",
   "sqlite",
@@ -106,3 +110,6 @@ features = [
   "Navigator",
   "ImageData",
 ]
+
+[lints]
+workspace = true

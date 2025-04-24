@@ -95,6 +95,10 @@ pub struct Codegen<'a> {
     /// [`Updatable`](web_common_traits::database::Updatable) traits
     /// implementations.
     pub(super) enable_updatable_trait: bool,
+    /// Whether to enable the
+    /// [`Read`](web_common_traits::crud::Read) traits
+    /// implementations.
+    pub(super) enable_read_trait: bool,
 }
 
 impl<'a> Codegen<'a> {
@@ -107,6 +111,7 @@ impl<'a> Codegen<'a> {
             || self.enable_loadable_trait
             || self.enable_insertable_trait
             || self.enable_updatable_trait
+            || self.enable_read_trait
     }
 
     #[must_use]
@@ -352,6 +357,22 @@ impl<'a> Codegen<'a> {
     pub fn enable_updatable_trait(mut self) -> Self {
         self = self.enable_foreign_trait();
         self.enable_updatable_trait = true;
+        self
+    }
+
+    #[must_use]
+    /// Whether to enable the generation of the
+    /// [`Read`](web_common_traits::crud::Read) traits.
+    pub fn enable_read_trait(mut self) -> Self {
+        self = self.enable_table_structs();
+        self.enable_read_trait = true;
+        self
+    }
+
+    #[must_use]
+    /// Whether to enable the generation of all the CRUD operations.
+    pub fn enable_crud_operations(mut self) -> Self {
+        self = self.enable_read_trait();
         self
     }
 

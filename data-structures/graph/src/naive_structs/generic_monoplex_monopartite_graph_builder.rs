@@ -18,6 +18,7 @@ pub struct GenericMonoplexMonopartiteGraphBuilder<G: MonoplexMonopartiteGraph> {
 }
 
 #[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Enum to define the different attributes that can be set for the graph.
 pub enum MonoplexMonopartiteGraphBuilder {
     /// The nodes of the graph.

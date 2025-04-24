@@ -545,6 +545,14 @@ impl Column {
     }
 
     /// Returns whether the column type supports the `Hash` trait.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
     pub fn supports_hash(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         if self.geometry(conn).is_ok() || self.geography(conn).is_ok() {
             return Ok(false);
@@ -562,6 +570,14 @@ impl Column {
     }
 
     /// Returns whether the column type supports the `Eq` trait.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
     pub fn supports_eq(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         if self.geometry(conn).is_ok() || self.geography(conn).is_ok() {
             return Ok(false);

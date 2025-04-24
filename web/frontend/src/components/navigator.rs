@@ -1,43 +1,40 @@
+//! Navigator component for the application.
 use std::rc::Rc;
 
-use core_structures::User;
-use gloo::{timers::callback::Timeout, utils::window};
+use gloo::timers::callback::Timeout;
 use yew::prelude::*;
 use yew_agent::{prelude::WorkerBridgeHandle, scope_ext::AgentScopeExt};
 use yew_router::prelude::*;
-use yewdux::prelude::*;
 
 use crate::{
-    components::{Badge, badge::BadgeSize, hamburger::Hamburger, sidebar::Sidebar},
+    components::{hamburger::Hamburger, sidebar::Sidebar},
     router::AppRoute,
-    stores::{app_state::AppState, user_state::UserState},
-    workers::{
-        WebsocketWorker,
-        ws_worker::{ComponentMessage, WebsocketMessage},
-    },
+    stores::app_state::AppState,
 };
 
+/// Navigator component for the application.
 pub struct Navigator {
-    websocket: WorkerBridgeHandle<WebsocketWorker>,
-    app_state: Rc<AppState>,
-    app_dispatch: Dispatch<AppState>,
     toggle_timeout: Option<Timeout>,
 }
 
 impl Navigator {
     fn sidebar_open(&self) -> bool {
-        self.app_state.sidebar_open()
+        true
     }
 }
 
+/// Message types for the Navigator component.
 pub enum NavigatorMessage {
-    Backend(WebsocketMessage),
+    /// The application state has changed.
     AppState(Rc<AppState>),
+    /// Toggle the sidebar visibility.
     ToggleSidebar(bool),
+    /// Set the sidebar visibility.
     SetSidebarVisibility(bool),
 }
 
 #[derive(Clone, Properties, PartialEq)]
+/// Properties for the Navigator component.
 pub struct NavigatorProps {}
 
 impl Component for Navigator {
@@ -45,36 +42,24 @@ impl Component for Navigator {
     type Properties = NavigatorProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let app_dispatch = Dispatch::<AppState>::global()
-            .subscribe(ctx.link().callback(NavigatorMessage::AppState));
-        let app_state = app_dispatch.get();
-
-        let websocket = ctx.link().bridge_worker(Callback::from({
-            let link = ctx.link().clone();
-            move |message: WebsocketMessage| {
-                link.send_message(NavigatorMessage::Backend(message));
-            }
-        }));
-
-        Self { websocket, app_state, app_dispatch, toggle_timeout: None }
+        Self { toggle_timeout: None }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             NavigatorMessage::AppState(app_state) => {
-                if self.app_state == app_state {
-                    return false;
-                }
+                // if self.app_state == app_state {
+                //     return false;
+                // }
 
-                self.app_state = app_state;
+                // self.app_state = app_state;
 
                 true
             }
-            NavigatorMessage::Backend(_) => false,
             NavigatorMessage::SetSidebarVisibility(visibility) => {
-                self.app_dispatch.reduce_mut(|state| {
-                    state.set_sidebar_visibility(visibility);
-                });
+                // self.app_dispatch.reduce_mut(|state| {
+                //     state.set_sidebar_visibility(visibility);
+                // });
                 true
             }
             NavigatorMessage::ToggleSidebar(visibility) => {

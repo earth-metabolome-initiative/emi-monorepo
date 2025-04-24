@@ -17,6 +17,7 @@ mod constants;
 use constants::{DATABASE_NAME, DATABASE_URL};
 
 #[tokio::main]
+/// Main function to build the core structures.
 pub async fn main() {
     // Get the output directory
     let out_dir = Path::new("../src");
@@ -176,6 +177,7 @@ pub async fn main() {
             .enable_insertable_trait()
             .enable_foreign_trait()
             .enable_updatable_trait()
+            .enable_crud_operations()
             .beautify()
             .generate(&mut conn, DATABASE_NAME, None)
             .unwrap(),

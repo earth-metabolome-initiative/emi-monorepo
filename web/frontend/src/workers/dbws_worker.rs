@@ -1,3 +1,13 @@
+//! Hybrid Web Worker handling the SQLite database and the WebSocket connection.
+//!
+//! This worker is responsible for managing both the SQLite database and the
+//! WebSocket connection as at the time of writing (2025-04-24) is is not known
+//! how to send messages between Web Workers in the yew framework, or whether it
+//! would be desirable due to the potential overhead.
+//!
+//! Since it is unclear whether between worker communication is possible, this
+//! worker handles both the database and WebSocket connection to allow for
+//! internal comunication between the two.
 use std::{
     collections::{HashMap, HashSet},
     rc::Rc,
@@ -5,39 +15,38 @@ use std::{
 
 use api_path::api::ws::FULL_ENDPOINT;
 use core_structures::User;
+use db_worker::listen_notify::ListenNotify;
+use diesel::SqliteConnection;
+use diesel_async::sync_connection_wrapper::SyncConnectionWrapper;
 use futures::{SinkExt, StreamExt};
 use gloo_net::websocket::futures::WebSocket;
+use internal_message::db_internal_message::DBInternalMessage;
 use rosetta_uuid::Uuid;
-use serde::{Deserialize, Serialize};
-use ws_messages::{B2FMessage, F2BMessage};
-use yew::platform::spawn_local;
+use ws_messages::F2BMessage;
 use yew_agent::worker::{HandlerId, Worker};
+
+mod c2db_message;
+pub(crate) use c2db_message::C2DBMessage;
+mod db2c_message;
+pub(crate) use db2c_message::DB2CMessage;
+mod internal_message;
+pub(crate) use internal_message::InternalMessage;
+mod db_worker;
+mod ws_worker;
 
 const NOMINAL_CLOSURE_CODE: u16 = 1000;
 
-type UserId = i32;
-
-pub struct WebsocketWorker {
+/// Worker for handling WebSocket operations.
+pub struct DBWSWorker {
     subscribers: HashSet<HandlerId>,
     tasks: HashMap<Uuid, HandlerId>,
     user: Option<Rc<User>>,
+    conn: Option<SyncConnectionWrapper<SqliteConnection>>,
+    listen_notify: ListenNotify,
     websocket_sender: Option<futures::channel::mpsc::Sender<F2BMessage>>,
-    reconnection_attempt: u32,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-/// Messages from the frontend to the web-worker.
-pub enum ComponentMessage {}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-/// Messages from the websocket web-worker to the frontend.
-pub enum WebsocketMessage {}
-
-pub enum InternalMessage {
-    Backend(B2FMessage),
-}
-
-impl WebsocketWorker {
+impl DBWSWorker {
     fn connect_to_websocket(
         hostname: &str,
         scope: &yew_agent::prelude::WorkerScope<Self>,
@@ -98,18 +107,20 @@ impl WebsocketWorker {
     }
 }
 
-impl Worker for WebsocketWorker {
+impl Worker for DBWSWorker {
     type Message = InternalMessage;
-    type Input = ComponentMessage;
-    type Output = WebsocketMessage;
+    type Input = C2DBMessage;
+    type Output = DB2CMessage;
 
     fn create(scope: &yew_agent::prelude::WorkerScope<Self>) -> Self {
+        scope.send_message(DBInternalMessage::InstallSAHPool);
         Self {
             subscribers: HashSet::new(),
             tasks: HashMap::new(),
             user: None,
             websocket_sender: None,
-            reconnection_attempt: 0,
+            listen_notify: ListenNotify::default(),
+            conn: None,
         }
     }
 
@@ -119,12 +130,11 @@ impl Worker for WebsocketWorker {
         internal_message: Self::Message,
     ) {
         match internal_message {
-            InternalMessage::Backend(backend_message) => {
-                match backend_message {
-                    B2FMessage::Pong => {
-                        log::debug!("Received pong from backend");
-                    }
-                };
+            InternalMessage::DB(db_message) => {
+                self.update_database(scope, db_message);
+            }
+            InternalMessage::WS(ws_message) => {
+                self.update_websocket(scope, ws_message);
             }
         }
     }

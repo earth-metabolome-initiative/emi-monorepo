@@ -23,7 +23,7 @@ pub trait SinkNodes: MonoplexMonopartiteGraph {
         // Finally, we iterate over all nodes and keep the nodes that have not
         // been visited. A node is considered visited if it has a predecessor.
         self.node_ids()
-            .zip(visited.into_iter())
+            .zip(visited)
             .filter_map(
                 |(node, visited)| {
                     if visited && !self.has_successors(node) { Some(node) } else { None }

@@ -2,10 +2,9 @@
 //! Frontend.
 
 pub(crate) mod device_errors;
-pub(crate) use device_errors::DeviceError;
 pub(crate) mod geolocation_errors;
-pub(crate) use geolocation_errors::GeolocationError;
 
+#[allow(dead_code)]
 /// The errors which may occur in the Frontend.
 pub(crate) enum FrontendError {
     /// An error related to device operations.

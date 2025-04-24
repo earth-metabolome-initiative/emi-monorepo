@@ -28,7 +28,7 @@ impl Display for GeolocationError {
             GeolocationError::PermissionDenied => write!(f, "Permission denied."),
             GeolocationError::PositionUnavailable => write!(f, "Position unavailable."),
             GeolocationError::Timeout => write!(f, "Request timed out."),
-            GeolocationError::Unknown(msg) => write!(f, "Unknown error: {}", msg),
+            GeolocationError::Unknown(msg) => write!(f, "Unknown error: {msg}"),
         }
     }
 }
@@ -39,7 +39,7 @@ impl From<web_sys::PositionError> for GeolocationError {
             web_sys::PositionError::PERMISSION_DENIED => GeolocationError::PermissionDenied,
             web_sys::PositionError::POSITION_UNAVAILABLE => GeolocationError::PositionUnavailable,
             web_sys::PositionError::TIMEOUT => GeolocationError::Timeout,
-            unknown => GeolocationError::Unknown(format!("Position error code: {:?}", unknown)),
+            unknown => GeolocationError::Unknown(format!("Position error code: {unknown:?}")),
         }
     }
 }

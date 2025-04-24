@@ -6,6 +6,7 @@ use common_traits::prelude::Builder;
 use crate::traits::{Edges, GrowableEdges};
 
 #[derive(Clone, core::fmt::Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Options for building a edges.
 pub enum EdgesBuilderOptions {
     /// The source of the edges.

@@ -8,6 +8,7 @@ use proc_macro2::TokenStream;
 use super::Codegen;
 use crate::Table;
 
+mod crud;
 mod insertables;
 
 impl Codegen<'_> {
@@ -68,6 +69,26 @@ impl Codegen<'_> {
             self.generate_insertable_structs(root.join("insertables").as_path(), tables, conn)?;
             table_main_module.extend(quote::quote! {
                 pub mod insertables;
+            });
+        }
+
+        // If any of the CRUD traits are enabled, we generate the Table names enum.
+        if self.enable_read_trait {
+            self.generate_table_names_enumeration(root, tables)?;
+            table_main_module.extend(quote::quote! {
+                pub mod table_names;
+            });
+
+            self.generate_table_primary_keys_enumeration(root, tables, conn)?;
+            table_main_module.extend(quote::quote! {
+                pub mod table_primary_keys;
+            });
+        }
+
+        if self.enable_read_trait {
+            self.generate_read_structs(root.join("read").as_path(), tables)?;
+            table_main_module.extend(quote::quote! {
+                pub mod read;
             });
         }
 

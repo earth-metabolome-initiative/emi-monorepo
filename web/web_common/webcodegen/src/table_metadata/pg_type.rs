@@ -30,12 +30,28 @@ pub(crate) const COPY_TYPES: [&str; 8] = [
 ];
 
 /// Constant listing types supporting `Eq`.
-pub(crate) const EQ_TYPES: [&str; 6] =
-    ["i32", "i16", "i64", "bool", "rosetta_uuid::Uuid", "rosetta_timestamp::TimestampUTC"];
+pub(crate) const EQ_TYPES: [&str; 8] = [
+    "i32",
+    "i16",
+    "i64",
+    "bool",
+    "String",
+    "chrono::NaiveDateTime",
+    "rosetta_uuid::Uuid",
+    "rosetta_timestamp::TimestampUTC",
+];
 
 /// Constant listing types supporting `Hash`.
-pub(crate) const HASH_TYPES: [&str; 6] =
-    ["i32", "i16", "i64", "bool", "rosetta_uuid::Uuid", "rosetta_timestamp::TimestampUTC"];
+pub(crate) const HASH_TYPES: [&str; 8] = [
+    "i32",
+    "i16",
+    "i64",
+    "bool",
+    "String",
+    "chrono::NaiveDateTime",
+    "rosetta_uuid::Uuid",
+    "rosetta_timestamp::TimestampUTC",
+];
 
 /// Represents a `PostgreSQL` type.
 ///

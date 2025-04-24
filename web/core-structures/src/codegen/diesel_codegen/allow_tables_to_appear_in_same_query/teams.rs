@@ -1,7 +1,7 @@
-use crate::codegen::diesel_codegen::tables::{colors::colors, teams::teams};
-diesel::allow_tables_to_appear_in_same_query!(teams, colors);
-use crate::codegen::diesel_codegen::tables::users::users;
+use crate::codegen::diesel_codegen::tables::{teams::teams, users::users};
 diesel::allow_tables_to_appear_in_same_query!(teams, users);
+use crate::codegen::diesel_codegen::tables::colors::colors;
+diesel::allow_tables_to_appear_in_same_query!(teams, colors);
 use crate::codegen::diesel_codegen::tables::icons::icons;
 diesel::allow_tables_to_appear_in_same_query!(teams, icons);
 use crate::codegen::diesel_codegen::tables::team_states::team_states;

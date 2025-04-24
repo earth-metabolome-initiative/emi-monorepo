@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
@@ -72,5 +72,21 @@ impl LoginProvider {
             )
             .load::<Self>(conn)
             .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_name(
+        name: &str,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        Self::table()
+            .filter(diesel::ExpressionMethods::eq(
+                crate::codegen::diesel_codegen::tables::login_providers::login_providers::name,
+                name,
+            ))
+            .first::<Self>(conn)
+            .await
+            .optional()
     }
 }

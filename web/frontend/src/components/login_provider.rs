@@ -19,7 +19,7 @@ pub fn login_provider(provider: &OAuthLoginProvider) -> Html {
 
     html! {
         <a class="login-provider" href={url}>
-            <i class={format!("fab fa-{}", provider.icon)}></i>
+            // <i class={format!("fab fa-{}", provider.icon)}></i>
             {format!("Login with {}", provider.name)}
         </a>
     }

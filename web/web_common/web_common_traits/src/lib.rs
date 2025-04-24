@@ -2,6 +2,7 @@
 
 pub mod attributes;
 pub mod connection;
+pub mod crud;
 pub mod database;
 pub mod filtrable;
 pub mod insert_operation;
@@ -20,6 +21,7 @@ pub mod prelude {
     pub use crate::{
         attributes::*,
         connection::Connection,
+        crud::{Read, ReadAll},
         database::{
             Deletable, Foreign, Insertable, InsertableBuilder, InsertableVariant, Loadable,
         },

@@ -1,4 +1,7 @@
+//! Main entry point for the Yew application.
+
 #[cfg(target_arch = "wasm32")]
+/// Main entry point for the Yew application.
 fn main() {
     use frontend::components::App;
     // We initialize the logger for the frontend
@@ -8,6 +11,7 @@ fn main() {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
+/// Main entry point for the Yew application.
 fn main() {
     panic!("This binary is only for the wasm32 target");
 }

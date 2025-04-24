@@ -22,6 +22,7 @@ pub struct GenericMonoplexBipartiteGraphBuilder<G: MonoplexBipartiteGraph> {
 }
 
 #[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Enum to define the different attributes that can be set for the graph.
 pub enum MonoplexBipartiteGraphBuilder {
     /// The left nodes of the graph.

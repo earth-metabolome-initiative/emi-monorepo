@@ -6,12 +6,16 @@ use yew_router::prelude::*;
 use crate::router::AppRoute;
 
 #[derive(Clone, Properties, PartialEq)]
+/// Properties for the `ErrorPage` component.
 pub struct ErrorPageProps {
+    /// Error code to display.
     pub error_code: usize,
+    /// Error message to display.
     pub error_message: String,
 }
 
 #[function_component(ErrorPage)]
+/// Error page component.
 pub fn error_page(props: &ErrorPageProps) -> Html {
     let go_back_home = {
         let navigator = use_navigator().unwrap();

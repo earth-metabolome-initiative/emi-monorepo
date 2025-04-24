@@ -7,17 +7,21 @@ use yew_router::prelude::*;
 use yewdux::use_store;
 
 use super::logout::Logout;
-use crate::{router::AppRoute, stores::user_state::UserState};
+use crate::{router::AppRoute, stores::app_state::AppState};
 
 #[derive(Properties, Clone, PartialEq, Debug)]
+/// Properties for the Sidebar component.
 pub struct SidebarProps {
+    /// Whether the sidebar is visible or not.
     pub visible: bool,
+    /// Callback function to handle the close event.
     pub onclose: Callback<bool>,
 }
 
 #[function_component(Sidebar)]
+/// Sidebar component for the application.
 pub fn sidebar(props: &SidebarProps) -> Html {
-    let (user, _) = use_store::<UserState>();
+    let (state, _) = use_store::<AppState>();
     let route: AppRoute = use_route().unwrap_or_default();
     let node = use_node_ref();
     let onclose = props.onclose.clone();
@@ -47,7 +51,7 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                             <span>{"Home"}</span>
                         </Link<AppRoute>>
                     </li>
-                    {if user.has_user() {
+                    {if state.user().is_some() {
                         html! {
                             <li><Logout /></li>
                         }

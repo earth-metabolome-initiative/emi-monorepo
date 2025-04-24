@@ -11,7 +11,6 @@ use crate::{api::oauth::*, errors::BackendError};
 
 /// Struct representing the GitHub OAuth2 configuration.
 struct GitHubConfig {
-    client_id: String,
     client_secret: String,
     provider: LoginProvider,
 }
@@ -33,11 +32,7 @@ impl GitHubConfig {
         let provider = LoginProvider::from_name("GitHub", connection)
             .await?
             .ok_or_else(|| BackendError::UnknownLoginProvider("GitHub".to_string()))?;
-        Ok(GitHubConfig {
-            client_id: env::var(&provider.client_id_var_name)?,
-            client_secret: env::var(&provider.redirect_uri_var_name)?,
-            provider,
-        })
+        Ok(GitHubConfig { client_secret: env::var("GITHUB_CLIENT_SECRET")?, provider })
     }
 }
 
@@ -113,7 +108,7 @@ pub async fn get_github_oauth_token(
     let client = Client::new();
 
     let params = [
-        ("client_id", github_config.client_id.as_str()),
+        ("client_id", github_config.provider.client_id.as_str()),
         ("code", authorization_code),
         ("client_secret", github_config.client_secret.as_str()),
     ];

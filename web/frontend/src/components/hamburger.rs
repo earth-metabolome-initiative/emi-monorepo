@@ -6,12 +6,16 @@
 use yew::prelude::*;
 
 #[derive(Properties, Clone, PartialEq)]
+/// Properties for the Hamburger component.
 pub struct HamburgerProperties {
+    /// Whether the hamburger menu is active or not.
     pub is_active: bool,
+    /// Callback function to handle the click event.
     pub onclick: Callback<bool>,
 }
 
 #[function_component(Hamburger)]
+/// Hamburger menu component.
 pub fn hamburger(props: &HamburgerProperties) -> Html {
     let classes = if props.is_active {
         "hamburger hamburger--elastic is-active"

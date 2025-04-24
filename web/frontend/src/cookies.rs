@@ -23,9 +23,9 @@ fn check_cookie(cookie_name: &str) -> Result<bool, String> {
         .map_err(|_| "Failed to convert the document object into an HtmlDocument")?;
 
     if let Ok(cookie_str) = document.cookie() {
-        let cookies: Vec<&str> = cookie_str.split(';').map(|c| c.trim()).collect();
+        let cookies: Vec<&str> = cookie_str.split(';').map(str::trim).collect();
         for cookie in cookies {
-            let parts: Vec<&str> = cookie.split('=').map(|c| c.trim()).collect();
+            let parts: Vec<&str> = cookie.split('=').map(str::trim).collect();
             if parts.len() == 2 && parts[0] == cookie_name {
                 // Check if the cookie is http-only
                 if let Some(_cookie_element) = document
@@ -46,7 +46,7 @@ fn check_cookie(cookie_name: &str) -> Result<bool, String> {
 /// Returns whether the user is logged in.
 ///
 /// # Implementation details
-/// This function checks whether the USER_ONLINE_COOKIE_NAME cookie exists.
+/// This function checks whether the `USER_ONLINE_COOKIE_NAME` cookie exists.
 pub(crate) fn is_logged_in() -> bool {
     check_cookie(USER_ONLINE_COOKIE_NAME).unwrap_or(false)
 }

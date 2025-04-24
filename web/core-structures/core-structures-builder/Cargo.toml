@@ -14,3 +14,6 @@ time-requirements.workspace = true
 quote.workspace = true
 const_format.workspace = true
 diesel = { workspace = true, features = ["postgres"] }
+
+[lints]
+workspace = true

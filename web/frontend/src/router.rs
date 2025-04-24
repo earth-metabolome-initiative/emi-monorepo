@@ -4,7 +4,7 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::pages::*;
+use crate::pages::{home::Home, login::Login, not_found::NotFound};
 
 #[derive(Debug, Clone, PartialEq, Routable, Eq)]
 pub enum AppRoute {
@@ -17,7 +17,8 @@ pub enum AppRoute {
     NotFound,
 }
 
-/// The switch to map each instance of the AppRoute to the corresponding page.
+#[allow(clippy::needless_pass_by_value)]
+/// The switch to map each instance of the `AppRoute` to the corresponding page.
 ///
 /// # Arguments
 /// * `route` - The route to map.
