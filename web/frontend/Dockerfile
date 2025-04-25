@@ -1,28 +1,29 @@
 # Use a lightweight image as a base
 FROM rust:latest
 
+ARG HOST_UID
+ARG HOST_GID
+
 # Set the working directory inside the container
-WORKDIR /app/frontend
 
-RUN apt-get update && apt-get install -y tmux libnss3-tools build-essential procps curl file git
-
-# Install brew for later installation of mkcert
-RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# We install mkcert to generate certificates for the Yew frontend
-RUN brew install mkcert
+RUN apt-get update && apt-get install -y tmux
 
 # Expose the port that the Yew frontend will run on
 EXPOSE $TRUNK_PORT
 
-# We need to add the wasm compilation target to the image
-RUN rustup target add wasm32-unknown-unknown
+# Create non-root user
+RUN groupadd -g ${HOST_GID} appgroup && \
+    useradd -m -u ${HOST_UID} -g ${HOST_GID} appuser
 
-# Install the trunk package manager
+# Switch to non-root user
+USER appuser
+WORKDIR /home/appuser/app/web/frontend
+
+# Add .cargo/bin to PATH
+ENV PATH="/home/appuser/.cargo/bin:${PATH}"
+
+RUN rustup target add wasm32-unknown-unknown
 RUN cargo install --locked trunk
 
-# Install the certificates
-RUN mkcert -install
-
 # Command to run the Yew frontend application
-CMD tmux new-session -s yew 'bash /app/frontend/start.sh'
+CMD tmux new-session -s yew 'bash /home/appuser/app/web/frontend/start.sh'

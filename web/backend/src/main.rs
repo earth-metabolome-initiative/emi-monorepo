@@ -12,7 +12,7 @@ use redis::Client;
 
 /// Entrypoint to load the index.html file
 async fn index() -> impl Responder {
-    NamedFile::open("/app/frontend/dist/index.html")
+    NamedFile::open("/home/appuser/app/web/frontend/dist/index.html")
 }
 
 #[get("/{filename:.*}")]
@@ -22,9 +22,9 @@ async fn index() -> impl Responder {
 /// If the path happens to not exist, the server will return a 404 error.
 async fn frontend_static_files(req: HttpRequest) -> impl Responder {
     let path: PathBuf = req.match_info().query("filename").parse().unwrap();
-    match NamedFile::open(format!("/app/frontend/dist/{}", path.display())) {
+    match NamedFile::open(format!("/home/appuser/app/web/frontend/dist/{}", path.display())) {
         Ok(file) => file,
-        Err(_) => NamedFile::open("/app/frontend/dist/index.html").unwrap(),
+        Err(_) => NamedFile::open("/home/appuser/app/web/frontend/dist/index.html").unwrap(),
     }
 }
 
@@ -46,24 +46,12 @@ async fn main() -> std::io::Result<()> {
         Client::open(std::env::var("REDIS_URL").expect("REDIS_URL must be set").as_str())
             .expect("Error creating redis client");
 
-    // We remove the file "backend.building" if it exists
-    std::fs::remove_file("/app/backend/backend.building").unwrap_or_default();
-
-    // We write to a "backend.ready" file to indicate that
-    // the backend has finished compiling and is now starting.
-    let timestamp = chrono::Utc::now().to_rfc2822();
-    std::fs::write("/app/backend/backend.ready", format!("backend is ready at {}", timestamp))
-        .unwrap();
-
     let domain = std::env::var("DOMAIN").expect("DOMAIN is not available.");
 
     // load TLS keys
-    // to create a self-signed temporary cert for testing:
-    // `openssl req -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem
-    // -days 365 -subj '/CN=localhost'`
     let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
-    builder.set_private_key_file(format!("/app/nginx/{domain}-key.pem"), SslFiletype::PEM).unwrap();
-    builder.set_certificate_chain_file(format!("/app/nginx/{domain}.pem")).unwrap();
+    builder.set_private_key_file(format!("/home/appuser/app/web/nginx/{domain}-key.pem"), SslFiletype::PEM).unwrap();
+    builder.set_certificate_chain_file(format!("/home/appuser/app/web/nginx/{domain}.pem")).unwrap();
 
     // Start http server
     HttpServer::new(move || {

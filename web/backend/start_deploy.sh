@@ -1,6 +1,6 @@
 rustup update
 cargo update
-cd /app/frontend
+cd /home/appuser/app/web/frontend
 trunk build --release
-cd /app/backend
+cd /home/appuser/app/web/backend
 cargo run --release
