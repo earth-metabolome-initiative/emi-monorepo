@@ -7,7 +7,7 @@ use std::{
 use crate::{CSVSchema, data_types::DataType, errors::CSVSchemaError};
 
 #[allow(clippy::struct_excessive_bools)]
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 /// Struct representing a CSV column.
 pub struct CSVColumnMetadata {
     pub(crate) name: Option<String>,

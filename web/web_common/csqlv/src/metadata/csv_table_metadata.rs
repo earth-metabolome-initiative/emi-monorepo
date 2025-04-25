@@ -3,6 +3,7 @@ use std::path::Path;
 
 use csv::Reader;
 use inflector::Inflector;
+use serde::{Deserialize, Serialize};
 
 use super::csv_column_metadata::{CSVColumnMetadata, CSVColumnMetadataBuilder};
 use crate::{
@@ -12,7 +13,7 @@ use crate::{
     extensions::{delimiter_from_path, file_name_without_extension, has_compression_extension},
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 /// Struct representing a CSV table.
 pub struct CSVTableMetadata {
     /// Name of the table.
@@ -110,6 +111,10 @@ impl CSVTableMetadata {
         docker_root: &str,
         singularize: bool,
     ) -> Result<Self, CSVSchemaError> {
+        // We determine the internal path of the file, by replacing the root
+        // portion of the path with the docker root
+        let docker_path = path.to_string_lossy().to_string().replace(root, docker_root);
+
         // We check that the provided path ends with .csv or .csv.gz
         let (Some(table_name), Some(delimiter)) =
             (file_name_without_extension(path), delimiter_from_path(path))
@@ -121,10 +126,6 @@ impl CSVTableMetadata {
         if table_name.contains(|c: char| !(c.is_ascii_alphanumeric() || c == '_')) {
             return Err(CSVSchemaError::InvalidTableName(table_name.to_string()));
         }
-
-        // We determine the internal path of the file, by replacing the root
-        // portion of the path with the docker root
-        let docker_path = path.to_string_lossy().to_string().replace(root, docker_root);
 
         let mut reader_builder = csv::ReaderBuilder::new();
         reader_builder.has_headers(true);

@@ -50,8 +50,15 @@ async fn main() -> std::io::Result<()> {
 
     // load TLS keys
     let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
-    builder.set_private_key_file(format!("/home/appuser/app/web/nginx/{domain}-key.pem"), SslFiletype::PEM).unwrap();
-    builder.set_certificate_chain_file(format!("/home/appuser/app/web/nginx/{domain}.pem")).unwrap();
+    builder
+        .set_private_key_file(
+            format!("/home/appuser/app/web/nginx/{domain}-key.pem"),
+            SslFiletype::PEM,
+        )
+        .unwrap();
+    builder
+        .set_certificate_chain_file(format!("/home/appuser/app/web/nginx/{domain}.pem"))
+        .unwrap();
 
     // Start http server
     HttpServer::new(move || {

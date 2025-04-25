@@ -11,7 +11,16 @@ const PORTAL_DATABASE_URL: &str = const_format::formatcp!(
     "postgres://{PORTAL_DATABASE_USER}:{PORTAL_DATABASE_PASSWORD}@localhost:{PORTAL_DATABASE_PORT}/{PORTAL_DATABASE_NAME}",
 );
 
+#[allow(clippy::unused_async)]
 /// Executes the init migration.
+///
+/// # Arguments
+///
+/// * `portal_conn` - The connection to the database.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
 async fn transact_migration(_portal_conn: &mut AsyncPgConnection) -> Result<(), error::Error> {
     Ok(())
 }

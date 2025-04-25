@@ -5,6 +5,7 @@ use std::path::Path;
 use indicatif::ProgressIterator;
 
 use crate::{
+    SQLGenerationOptions,
     csv_table::CSVTable,
     errors::CSVSchemaError,
     extensions::{has_compression_extension, has_supported_extension},
@@ -89,26 +90,37 @@ impl CSVSchema {
 
     /// Returns the SQL to generate the schema in `PostgreSQL`.
     ///
+    /// # Arguments
+    ///
+    /// * `sql_generation_options` - The options for SQL generation.
+    ///
     /// # Errors
     ///
     /// * If the SQL generation fails.
-    pub fn to_sql(&self) -> Result<String, CSVSchemaError> {
+    pub fn to_sql(
+        &self,
+        sql_generation_options: &SQLGenerationOptions,
+    ) -> Result<String, CSVSchemaError> {
         let mut sql = String::new();
         for table in self.tables_with_priority().iter().map(|(table, _)| table) {
             sql.push_str(&table.to_sql()?);
             sql.push('\n');
-            sql.push_str(&table.populate()?);
-            sql.push('\n');
+            if sql_generation_options.include_population {
+                sql.push_str(&table.populate()?);
+                sql.push('\n');
+            }
         }
         Ok(sql)
     }
 
-    /// Connectes to the provided [`Connection`](diesel::Connection) and
+    #[cfg(feature = "diesel")]
+    /// Connected to the provided [`Connection`](diesel::Connection) and
     /// executes the SQL to generate the schema.
     ///
     /// # Arguments
     ///
     /// * `url` - The url to connect to the database.
+    /// * `sql_generation_options` - The options for SQL generation.
     ///
     /// # Errors
     ///
@@ -116,6 +128,7 @@ impl CSVSchema {
     pub fn connect_and_create<C: diesel::Connection>(
         &self,
         url: &str,
+        sql_generation_options: &SQLGenerationOptions,
     ) -> Result<(), CSVSchemaError> {
         let mut attempts = 0;
         loop {
@@ -127,23 +140,29 @@ impl CSVSchema {
                     std::thread::sleep(std::time::Duration::from_secs(1));
                     attempts += 1;
                 }
-                Ok(mut conn) => return self.create(&mut conn),
+                Ok(mut conn) => return self.create(&mut conn, sql_generation_options),
             }
         }
     }
 
+    #[cfg(feature = "diesel")]
     /// Executes the SQL to generate the schema in `PostgreSQL`.
     ///
     /// # Arguments
     ///
     /// * `conn` - The connection to the database.
+    /// * `sql_generation_options` - The options for SQL generation.
     ///
     /// # Errors
     ///
     /// * If the connection to the database fails.
     /// * If the SQL execution fails.
-    pub fn create<C: diesel::Connection>(&self, conn: &mut C) -> Result<(), CSVSchemaError> {
-        let sql = self.to_sql()?;
+    pub fn create<C: diesel::Connection>(
+        &self,
+        conn: &mut C,
+        sql_generation_options: &SQLGenerationOptions,
+    ) -> Result<(), CSVSchemaError> {
+        let sql = self.to_sql(sql_generation_options)?;
         Ok(conn.batch_execute(&sql)?)
     }
 
@@ -161,6 +180,7 @@ impl CSVSchema {
         sql
     }
 
+    #[cfg(feature = "diesel")]
     /// Connectes to the provided [`Connection`](diesel::Connection) and
     /// executes the SQL to delete the schema.
     ///
@@ -190,6 +210,7 @@ impl CSVSchema {
         }
     }
 
+    #[cfg(feature = "diesel")]
     /// Executes the SQL to delete the schema in `PostgreSQL`.
     ///
     /// # Arguments

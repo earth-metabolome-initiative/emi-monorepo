@@ -43,12 +43,18 @@ pub enum CSVSchemaError {
     InvalidTemporaryTableName(String),
     /// Error indicating an empty column.
     EmptyColumn,
+    #[cfg(feature = "diesel")]
     /// Error indicating a failure to connect to the database.
     ConnectionError(diesel::ConnectionError),
+    #[cfg(feature = "diesel")]
     /// Error indicating a failure to execute a migration.
     MigrationError(diesel::result::Error),
     /// Error indicating a failure to format a string.
     FormatError(std::fmt::Error),
+    /// Error indicating a serialization failure.
+    SerializationError(serde_json::Error),
+    /// Error indicating a deserialization failure.
+    DeserializationError(serde_json::Error),
 }
 
 impl From<csv::Error> for CSVSchemaError {
@@ -63,12 +69,14 @@ impl From<std::io::Error> for CSVSchemaError {
     }
 }
 
+#[cfg(feature = "diesel")]
 impl From<diesel::ConnectionError> for CSVSchemaError {
     fn from(err: diesel::ConnectionError) -> CSVSchemaError {
         CSVSchemaError::ConnectionError(err)
     }
 }
 
+#[cfg(feature = "diesel")]
 impl From<diesel::result::Error> for CSVSchemaError {
     fn from(err: diesel::result::Error) -> CSVSchemaError {
         CSVSchemaError::MigrationError(err)
@@ -112,9 +120,13 @@ impl std::fmt::Display for CSVSchemaError {
                 write!(f, "Invalid temporary table name: {e}")
             }
             CSVSchemaError::EmptyColumn => write!(f, "Empty column"),
+            #[cfg(feature = "diesel")]
             CSVSchemaError::ConnectionError(e) => write!(f, "Connection Error: {e}"),
+            #[cfg(feature = "diesel")]
             CSVSchemaError::MigrationError(e) => write!(f, "Migration Error: {e}"),
             CSVSchemaError::FormatError(e) => write!(f, "Format Error: {e}"),
+            CSVSchemaError::DeserializationError(e) => write!(f, "Deserialization Error: {e}"),
+            CSVSchemaError::SerializationError(e) => write!(f, "Serialization Error: {e}"),
         }
     }
 }

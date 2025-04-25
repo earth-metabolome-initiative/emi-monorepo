@@ -36,7 +36,7 @@ impl Translator for DataType {
             }
             DataType::Custom(name, ..) => {
                 match name.0.first().and_then(|s| Some(s.as_ident()?.value.as_str())) {
-                    Some("SERIAL") => Ok(DataType::Integer(None)),
+                    Some("SERIAL" | "SMALLSERIAL") => Ok(DataType::Integer(None)),
                     Some("GEOGRAPHY") => {
                         // SQLite does not have postgis support, but we have implemented
                         // support in the `postgis-diesel` crate for the `geometry` and

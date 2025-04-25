@@ -1,7 +1,7 @@
 //! Build the core structures.
 use std::path::Path;
 
-use csqlv::CSVSchemaBuilder;
+use csqlv::{CSVSchemaBuilder, SQLGenerationOptions};
 use diesel::{Connection, pg::PgConnection, result::DatabaseErrorKind};
 use diesel_migrations_utils::prelude::*;
 use taxonomy_fetcher::{
@@ -17,6 +17,7 @@ mod constants;
 use constants::{DATABASE_NAME, DATABASE_URL};
 
 #[tokio::main]
+#[allow(clippy::too_many_lines)]
 /// Main function to build the core structures.
 pub async fn main() {
     // Get the output directory
@@ -80,6 +81,7 @@ pub async fn main() {
     // Next, we build the SQL associated with the CSVs present in the 'csvs'
     // directory
     let task = Task::new("Building Schema from CSVs");
+    let sql_generation_options = SQLGenerationOptions::default().include_population();
     CSVSchemaBuilder::default()
         // To show a loading bar while processing the CSVs
         .verbose()
@@ -91,7 +93,7 @@ pub async fn main() {
         .container_directory("/app/csvs")
         .from_dir("../csvs")
         .unwrap()
-        .connect_and_create::<diesel::PgConnection>(DATABASE_URL)
+        .connect_and_create::<diesel::PgConnection>(DATABASE_URL, &sql_generation_options)
         .unwrap();
 
     time_tracker.add_completed_task(task);
@@ -99,7 +101,7 @@ pub async fn main() {
     // We execute the migrations
     let task = Task::new("Executing Migrations");
     match extension_migrations.connect_and_execute_ups::<diesel::PgConnection>(DATABASE_URL) {
-        Ok(_) => {}
+        Ok(()) => {}
         Err(MigrationError::ExecutingMigrationFailed(
             _,
             MigrationKind::Up,
@@ -117,7 +119,7 @@ pub async fn main() {
                     "directory."
                 ));
             } else {
-                panic!("{:?}", error);
+                panic!("{error:?}");
             }
         }
         error => error.unwrap(),

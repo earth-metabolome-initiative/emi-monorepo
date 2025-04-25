@@ -1,6 +1,7 @@
-//! Hybrid Web Worker handling the SQLite database and the WebSocket connection.
+//! Hybrid Web Worker handling the `SQLite` database and the WebSocket
+//! connection.
 //!
-//! This worker is responsible for managing both the SQLite database and the
+//! This worker is responsible for managing both the `SQLite` database and the
 //! WebSocket connection as at the time of writing (2025-04-24) is is not known
 //! how to send messages between Web Workers in the yew framework, or whether it
 //! would be desirable due to the potential overhead.
@@ -17,7 +18,6 @@ use api_path::api::ws::FULL_ENDPOINT;
 use core_structures::User;
 use db_worker::listen_notify::ListenNotify;
 use diesel::SqliteConnection;
-use diesel_async::sync_connection_wrapper::SyncConnectionWrapper;
 use futures::{SinkExt, StreamExt};
 use gloo_net::websocket::futures::WebSocket;
 use internal_message::db_internal_message::DBInternalMessage;
@@ -41,7 +41,7 @@ pub struct DBWSWorker {
     subscribers: HashSet<HandlerId>,
     tasks: HashMap<Uuid, HandlerId>,
     user: Option<Rc<User>>,
-    conn: Option<SyncConnectionWrapper<SqliteConnection>>,
+    conn: Option<SqliteConnection>,
     listen_notify: ListenNotify,
     websocket_sender: Option<futures::channel::mpsc::Sender<F2BMessage>>,
 }
@@ -113,7 +113,7 @@ impl Worker for DBWSWorker {
     type Output = DB2CMessage;
 
     fn create(scope: &yew_agent::prelude::WorkerScope<Self>) -> Self {
-        scope.send_message(DBInternalMessage::InstallSAHPool);
+        scope.send_future(sqlite_wasm_rs::export::install_opfs_sahpool(None, true));
         Self {
             subscribers: HashSet::new(),
             tasks: HashMap::new(),
@@ -135,6 +135,9 @@ impl Worker for DBWSWorker {
             }
             InternalMessage::WS(ws_message) => {
                 self.update_websocket(scope, ws_message);
+            }
+            InternalMessage::DBError(err) => {
+                todo!("Handle DB error: {err:?}");
             }
         }
     }

@@ -5,7 +5,7 @@ use rosetta_uuid::Uuid;
 
 use crate::errors::CSVSchemaError;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, serde::Serialize, serde::Deserialize)]
 pub enum DataType {
     Text,
     VarChar(usize),

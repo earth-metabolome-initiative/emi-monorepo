@@ -38,6 +38,7 @@ members = [
   "utils/rosetta-timestamp",
   "utils/iter-utils",
   "data-migrations/init-migration",
+  "web/web_common/sqlite-migration-generator",
 
 ]
 
@@ -81,7 +82,7 @@ criterion = { version = "0.5", features = ["html_reports"] }
 rosetta-uuid = { path = "data-structures/rosetta-uuid" }
 rosetta-timestamp = { path = "utils/rosetta-timestamp" }
 taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
-csqlv = { path = "web/web_common/csqlv" }
+csqlv = { path = "web/web_common/csqlv", default-features = false }
 font_awesome = { path = "utils/font_awesome" }
 testcontainers = { version = "0.23.2" }
 web_common_traits = { path = "web/web_common/web_common_traits" }
@@ -103,6 +104,8 @@ const_format = "0.2.34"
 log = "0.4"
 rustfft = "6.2.0"
 lender = "0.3.1"
+sql_minifier = "0.1.5"
+blake3 = "1.8.2"
 api-path = { path = "web/web_common/api-path" }
 time-requirements = { path = "utils/time-requirements" }
 algebra = { path = "data-structures/algebra" }
@@ -110,6 +113,8 @@ graph = { path = "data-structures/graph" }
 sorted-vec = { path = "data-structures/sorted-vec" }
 pgrx_validation = { path = "web/web_common/pgrx_validation" }
 pgrx_validation_derive = { path = "web/web_common/pgrx_validation_derive" }
+pg2sqlite = { path = "web/web_common/pg2sqlite" }
+sqlite-migration-generator = { path = "web/web_common/sqlite-migration-generator" }
 validation-errors = { path = "web/web_common/validation-errors" }
 backend-request-errors = { path = "web/web_common/backend-request-errors" }
 downloader = { path = "data-retrieval/downloader" }

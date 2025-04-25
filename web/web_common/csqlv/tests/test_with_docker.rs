@@ -1,5 +1,5 @@
 //! Submodule for testing CSV schema creation and deletion with Docker.
-use csqlv::{CSVSchemaBuilder, CSVSchemaError};
+use csqlv::{CSVSchemaBuilder, CSVSchemaError, SQLGenerationOptions};
 use diesel::pg::PgConnection;
 use testcontainers::{
     ContainerAsync, GenericImage, ImageExt,
@@ -53,7 +53,8 @@ fn test_independent_csvs() -> Result<(), CSVSchemaError> {
         .from_dir("./tests/independent_csvs")
         .unwrap();
 
-    schema.connect_and_create::<PgConnection>(DATABASE_URL)?;
+    let sql_generation_options = SQLGenerationOptions::default().include_population();
+    schema.connect_and_create::<PgConnection>(DATABASE_URL, &sql_generation_options)?;
     schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
 
     Ok(())
@@ -66,7 +67,8 @@ fn test_tree_dependent_csvs() -> Result<(), CSVSchemaError> {
         .from_dir("./tests/tree_dependent_csvs")
         .unwrap();
 
-    schema.connect_and_create::<PgConnection>(DATABASE_URL)?;
+    let sql_generation_options = SQLGenerationOptions::default().include_population();
+    schema.connect_and_create::<PgConnection>(DATABASE_URL, &sql_generation_options)?;
     schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
 
     Ok(())
@@ -80,7 +82,8 @@ fn test_dag_dependent_csvs() -> Result<(), CSVSchemaError> {
         .from_dir("./tests/dag_dependent_csvs")
         .unwrap();
 
-    schema.connect_and_create::<PgConnection>(DATABASE_URL)?;
+    let sql_generation_options = SQLGenerationOptions::default().include_population();
+    schema.connect_and_create::<PgConnection>(DATABASE_URL, &sql_generation_options)?;
     schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
 
     Ok(())
@@ -94,14 +97,15 @@ fn test_bands_csvs() -> Result<(), CSVSchemaError> {
         .from_dir("./tests/bands")
         .unwrap();
 
-    schema.connect_and_create::<PgConnection>(DATABASE_URL)?;
+    let sql_generation_options = SQLGenerationOptions::default().include_population();
+    schema.connect_and_create::<PgConnection>(DATABASE_URL, &sql_generation_options)?;
     schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
 
     Ok(())
 }
 
 #[tokio::test]
-async fn test_user_table() {
+async fn test_with_docker() {
     let container = setup_docker().await;
 
     if let Err(err) = test_independent_csvs() {
