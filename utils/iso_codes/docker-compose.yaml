@@ -1,0 +1,18 @@
+services:
+  iso_codes:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        HOST_UID: ${USER_ID}
+        HOST_GID: ${GROUP_ID}
+    environment:
+      - HOST_UID=${USER_ID}
+      - HOST_GID=${GROUP_ID}
+    container_name: iso_codes_builder
+    volumes:
+      - ../..:/workspace  # Mount the entire monorepo
+      - ./extension:/home/appuser/extension # Output directory
+    working_dir: /workspace/utils/iso_codes
+    entrypoint: ["/workspace/utils/iso_codes/build.sh"]
+    user: "${USER_ID}:${GROUP_ID}"

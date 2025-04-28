@@ -38,7 +38,7 @@ members = [
   "utils/rosetta-timestamp",
   "utils/iter-utils",
   "data-migrations/init-migration",
-  "web/web_common/sqlite-migration-generator",
+  "web/web_common/sqlite-migration-generator", "utils/macro-utils", "web/web_common/csqlv-macro", "utils/iso_codes",
 
 ]
 
@@ -57,14 +57,16 @@ tar = "0.4.43"
 infer = "0.19"
 csv = "1.3.1"
 bytes = "1.10.0"
-bincode = "2"
+bincode = { version = "2", features = ["serde"] }
 sqlparser = { git = "https://github.com/apache/datafusion-sqlparser-rs.git", branch = "main" }
 arbitrary = { version = "1", features = ["derive"] }
-diesel = { version = "2.2", features = ["extras"] }
-diesel-async = { version = "0.5" }
+diesel = { git = "https://github.com/LucaCappelletti94/diesel.git", branch = "supports_on_conflict_clause_where", features = [
+  "extras",
+] }
+diesel-async = { git = "https://github.com/LucaCappelletti94/diesel_async", branch = "custom-diesel" }
 diesel_full_text_search = "2.2"
 redis = { version = "0.29", features = ["tokio-comp"] }
-postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel.git", default-features = false, branch = "sqlite" }
+postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel.git", default-features = false, branch = "custom-diesel" }
 chrono = { version = "0.4.39", features = ["serde"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
@@ -72,17 +74,20 @@ strum = { version = "0.27", features = ["derive"] }
 yew = { version = "0.21.0", features = ["csr"] }
 strum_macros = "0.27"
 zip = "2.6"
-pgrx = "0.14"
+pgrx = "0.14.1"
+pgrx-tests = "0.14.1"
 image = "0.25.6"
 rsa = { version = "0.9.8" }
 rand = { version = "0.8" }
 base64ct = { version = "1.6" }
-pgrx-sql-entity-graph = "0.14"
+pgrx-sql-entity-graph = "0.14.1"
+gloo = "0.11.0"
 criterion = { version = "0.5", features = ["html_reports"] }
 rosetta-uuid = { path = "data-structures/rosetta-uuid" }
 rosetta-timestamp = { path = "utils/rosetta-timestamp" }
 taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
 csqlv = { path = "web/web_common/csqlv", default-features = false }
+csqlv-macro = { path = "web/web_common/csqlv-macro" }
 font_awesome = { path = "utils/font_awesome" }
 testcontainers = { version = "0.23.2" }
 web_common_traits = { path = "web/web_common/web_common_traits" }
@@ -118,9 +123,11 @@ sqlite-migration-generator = { path = "web/web_common/sqlite-migration-generator
 validation-errors = { path = "web/web_common/validation-errors" }
 backend-request-errors = { path = "web/web_common/backend-request-errors" }
 downloader = { path = "data-retrieval/downloader" }
-
+macro-utils = { path = "utils/macro-utils" }
+lazy_static = { version = "1.5.0" }
 validator = { version = "0.20", features = ["derive"] }
 web-sys = { version = "0.3.77" }
+cached = "0.55"
 
 [workspace.lints.rust]
 missing_docs = "forbid"
@@ -136,3 +143,6 @@ pedantic = { level = "deny", priority = -1 }
 
 [profile.bench]
 debug = true # Include debug info.
+
+[profile.release]
+debug = true
