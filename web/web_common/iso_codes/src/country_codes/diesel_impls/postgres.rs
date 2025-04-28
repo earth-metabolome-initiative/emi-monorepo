@@ -19,7 +19,7 @@ impl diesel::serialize::ToSql<crate::country_codes::diesel_impls::CountryCode, d
         &'b self,
         out: &mut diesel::serialize::Output<'b, '_, diesel::pg::Pg>,
     ) -> diesel::serialize::Result {
-        <String as diesel::serialize::ToSql<diesel::sql_types::Text, diesel::pg::Pg>>::to_sql(
+        <str as diesel::serialize::ToSql<diesel::sql_types::Text, diesel::pg::Pg>>::to_sql(
             self.as_ref(),
             out,
         )
@@ -27,16 +27,16 @@ impl diesel::serialize::ToSql<crate::country_codes::diesel_impls::CountryCode, d
 }
 
 
-impl diesel::deserialize::FromSql<crate::country_codes::diesel_impls::CountryCode, diesel::pg::Pg>
-    for crate::PGRXCountryCode
+impl diesel::deserialize::FromSql<crate::country_codes::diesel_impls::PGRXCountryCode, diesel::pg::Pg>
+    for crate::CountryCode
 {
     fn from_sql(value: diesel::pg::PgValue<'_>) -> diesel::deserialize::Result<Self> {
-        Ok(bytes.as_bytes().try_into()?)
+        Ok(value.as_bytes().try_into()?)
     }
 }
 
-impl diesel::serialize::ToSql<crate::country_codes::diesel_impls::CountryCode, diesel::pg::Pg>
-    for crate::PGRXCountryCode
+impl diesel::serialize::ToSql<crate::country_codes::diesel_impls::PGRXCountryCode, diesel::pg::Pg>
+    for crate::CountryCode
 {
     fn to_sql<'b>(
         &'b self,
