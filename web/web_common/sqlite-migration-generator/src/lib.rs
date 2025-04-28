@@ -4,6 +4,7 @@ extern crate proc_macro;
 use std::path::Path;
 
 use csqlv::{CSVSchemaBuilder, SQLGenerationOptions};
+use macro_utils::{cached_file_path, file_last_modified_time, most_recent_file};
 use pg2sqlite::prelude::Pg2Sqlite;
 use proc_macro::TokenStream;
 use quote::quote;
@@ -33,14 +34,29 @@ pub fn load_sqlite_from_csvs(csv_directory: TokenStream) -> TokenStream {
     // We check that the provided path is a valid directory
     assert!(csv_directory.is_dir(), "The provided path is not a valid directory.");
 
-    // We convert the path to a string
-    let csv_directory = csv_directory.to_str().expect("Failed to convert path to string");
+    // We get the most recent file in the directory
+    let most_recent_file =
+        most_recent_file(&csv_directory, &[".csv", ".csv.gz", ".tsv", ".tsv.gz"])
+            .expect("The provided directory does not contain any CSV or TSV files.");
+
+    let cached_file = cached_file_path(&csv_directory, "load_sqlite_from_csvs");
+    let cached_file_last_modified = file_last_modified_time(&cached_file).unwrap_or(0);
+    if cached_file_last_modified >= most_recent_file {
+        // If the cached file is up to date, we return it
+        let cached_file_content =
+            std::fs::read_to_string(&cached_file).expect("Failed to read the cached SQL file");
+        return TokenStream::from(quote! {
+            #cached_file_content
+        });
+    }
+
+    let csv_directory_str = csv_directory.to_str().expect("Failed to convert path to string");
 
     // Load the CSV directory using `csqlv`.
     let schema = CSVSchemaBuilder::default()
         .include_gz()
         .singularize()
-        .from_dir(csv_directory)
+        .from_dir(csv_directory_str)
         .expect("Failed to load CSV directory");
 
     let sql_generation_options: SQLGenerationOptions = SQLGenerationOptions::default();
@@ -62,6 +78,9 @@ pub fn load_sqlite_from_csvs(csv_directory: TokenStream) -> TokenStream {
 
     // Minify the SQL content
     let minified_document: String = sql_minifier::minify_sql(&translated_sql);
+
+    // Write the minified SQL content to the cached file
+    std::fs::write(&cached_file, &minified_document).expect("Failed to write the cached SQL file");
 
     // Return the minified SQL content
     TokenStream::from(quote! {
@@ -95,6 +114,21 @@ pub fn load_sqlite_from_migrations(migrations_directory: TokenStream) -> TokenSt
     // We check that the provided path is a valid directory
     assert!(migrations_directory.is_dir(), "The provided path is not a valid directory.");
 
+    // We get the most recent file in the directory
+    let most_recent_file = most_recent_file(&migrations_directory, &[".sql"])
+        .expect("The provided directory does not contain any SQL files.");
+
+    let cached_file = cached_file_path(&migrations_directory, "load_sqlite_from_migrations");
+    let cached_file_last_modified = file_last_modified_time(&cached_file).unwrap_or(0);
+    if cached_file_last_modified >= most_recent_file {
+        // If the cached file is up to date, we return it
+        let cached_file_content =
+            std::fs::read_to_string(&cached_file).expect("Failed to read the cached SQL file");
+        return TokenStream::from(quote! {
+            #cached_file_content
+        });
+    }
+
     // We convert the path to a string
     let migrations_directory =
         migrations_directory.to_str().expect("Failed to convert path to string");
@@ -115,6 +149,9 @@ pub fn load_sqlite_from_migrations(migrations_directory: TokenStream) -> TokenSt
 
     // Minify the SQL content
     let minified_document: String = sql_minifier::minify_sql(&translated_sql);
+
+    // Write the minified SQL content to the cached file
+    std::fs::write(&cached_file, &minified_document).expect("Failed to write the cached SQL file");
 
     // Return the minified SQL content
     TokenStream::from(quote! {
