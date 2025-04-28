@@ -1,6 +1,9 @@
 #![cfg(feature = "diesel")]
 //! Submodule providing the diesel implementations for country codes.
 
+mod sqlite;
+mod postgres;
+
 /// The [`CountryCode`] SQL type.
 ///
 /// # Implementation details
