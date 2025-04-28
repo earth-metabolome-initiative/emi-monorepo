@@ -16,11 +16,11 @@ use pgrx::FromDatum;
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
 #[cfg_attr(feature = "diesel", derive(diesel::FromSqlRow, diesel::AsExpression))]
 #[cfg_attr(
-	all(feature = "diesel", not(feature = "pgrx")),
+	all(feature = "diesel", not(feature = "diesel-pgrx")),
 	diesel(sql_type = crate::country_codes::diesel_impls::CountryCode)
 )]
 #[cfg_attr(
-	all(feature = "pgrx", feature = "diesel"),
+	feature = "diesel-pgrx",
 	diesel(sql_type = crate::country_codes::diesel_impls::PGRXCountryCode)
 )]
 /// Country codes as defined by ISO 3166-1 alpha-2.
