@@ -18,6 +18,13 @@ pub enum CSVSchemaError {
         /// The table name.
         table_name: String,
     },
+    /// Error indicating a primary key column with duplicate values.
+    NonUniquePrimaryKey {
+        /// The column name.
+        column_name: String,
+        /// The table name.
+        table_name: Option<String>,
+    },
     /// Error indicating a duplicate table.
     DuplicateTable(String),
     /// Error indicating a CSV error.
@@ -97,6 +104,9 @@ impl std::fmt::Display for CSVSchemaError {
             CSVSchemaError::InvalidColumnName(e) => write!(f, "Invalid column name: {e}"),
             CSVSchemaError::DuplicateColumn { column_name, table_name } => {
                 write!(f, "Duplicate column: {column_name:?} in table {table_name}")
+            }
+            CSVSchemaError::NonUniquePrimaryKey { column_name, table_name } => {
+                write!(f, "Non-unique primary key: {column_name:?} in table {table_name:?}")
             }
             CSVSchemaError::DuplicateTable(e) => write!(f, "Duplicate table: {e}"),
             CSVSchemaError::CSVError(e) => write!(f, "CSV Error: {e}"),

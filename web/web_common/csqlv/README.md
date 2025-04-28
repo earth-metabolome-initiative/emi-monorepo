@@ -4,6 +4,8 @@ The CSQLV crate allows to easily integrate CSVs files (and also TSVs and SSVs) i
 
 The crate will generate the necessary SQL to create the tables and relationships between them based on the CSVs files found in a given directory, with minimal metadata in the CSVs themselves. The types and their constraints are inferred from the data in the CSVs: for instance, if all the values in a column are integers smaller than 32767, the crate will infer that the column should be of type `SMALLINT`. Similarly, if no value in a column is empty, the crate will infer that the column should be `NOT NULL`. Same thing applies to `UNIQUE` constraints: if all the values in a column are unique, the crate will infer that the column should be `UNIQUE`.
 
+It is possible to flag a column as the `PRIMARY KEY` by prefixing the column name with `pk::`, with TWO columns. If the data in the column is not unique, the crate will raise an error.
+
 Integer columns characterized by a sequence of continous integers starting from 1 will be inferred as `SERIAL` columns, which will automatically generate a sequence and a default value for the column. The crate will automatically determine and dispatch the smallest `SERIAL` type that can hold the values in the column (e.g., `SMALLSERIAL`, `SERIAL`, `BIGSERIAL`).
 
 The documents may also be compressed with `gzip`, in which case the crate will generate the necessary SQL to decompress them before loading them into the database.
@@ -22,7 +24,7 @@ csqlv = "0.1"
 Given a directory containing CSV files, such as `./tests/bands`, you can create the SQL necessary to define the tables and relationships between them as follows:
 
 ```rust
-use csqlv::{CSVSchemaBuilder, CSVSchema};
+use csqlv::{CSVSchemaBuilder, CSVSchema, SQLGenerationOptions};
 
 let schema: CSVSchema = CSVSchemaBuilder::default()
     // To show a loading bar while processing the CSVs
@@ -36,7 +38,8 @@ let schema: CSVSchema = CSVSchemaBuilder::default()
     .from_dir("./tests/bands")
     .unwrap();
 
-let _sql: String = schema.to_sql().unwrap();
+let sql_generation_options = SQLGenerationOptions::default().include_population();
+let _sql: String = schema.to_sql(&sql_generation_options).unwrap();
 ```
 
 See below a detailed breakdown of the syntax used in the CSVs used in the example above.

@@ -74,6 +74,19 @@ impl CSVTableMetadata {
         let mut columns = column_builders
             .into_iter()
             .map(CSVColumnMetadata::try_from)
+            .map(|col| {
+                col.map_err(|err| {
+                    match err {
+                        CSVSchemaError::NonUniquePrimaryKey { column_name, .. } => {
+                            CSVSchemaError::NonUniquePrimaryKey {
+                                column_name,
+                                table_name: Some(name.to_owned()),
+                            }
+                        }
+                        _ => err,
+                    }
+                })
+            })
             .collect::<Result<Vec<_>, _>>()?;
 
         // Check that there are no duplicate column names

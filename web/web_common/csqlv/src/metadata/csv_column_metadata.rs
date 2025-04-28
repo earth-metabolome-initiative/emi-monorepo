@@ -74,6 +74,13 @@ impl TryFrom<CSVColumnMetadataBuilder> for CSVColumnMetadata {
             builder.primary_key = true;
         }
 
+        if builder.primary_key && !builder.unique {
+            return Err(CSVSchemaError::NonUniquePrimaryKey {
+                column_name: builder.column_name.unwrap_or_default(),
+                table_name: None
+            });
+        }
+
         Ok(CSVColumnMetadata {
             name: builder.column_name,
             foreign_table_name: builder.foreign_table_name,
@@ -104,7 +111,7 @@ pub struct CSVColumnMetadataBuilder {
 
 impl CSVColumnMetadataBuilder {
     /// Create a new `CSVColumnMetadataBuilder`.
-    pub fn new(original_name: &str) -> Result<Self, CSVSchemaError> {
+    pub fn new(mut original_name: &str) -> Result<Self, CSVSchemaError> {
         if original_name.is_empty() {
             return Err(CSVSchemaError::InvalidColumnName(
                 "Column name cannot be empty".to_string(),
@@ -122,9 +129,17 @@ impl CSVColumnMetadataBuilder {
         // if there is no foreign key, or "foreign_table_name.foreign_column_name"
         // if the expected column name is '{foreign_table_name}_id'.
 
-        let mut column_name = Some(original_name.to_owned());
         let mut foreign_table_name = None;
         let mut foreign_column_name = None;
+        let mut is_primary_key = false;
+
+        if let Some(stripped_original_name) = original_name.strip_prefix("pk::") {
+            is_primary_key = true;
+            original_name = stripped_original_name;
+        }
+
+        let mut column_name = Some(original_name.to_owned());
+
         if original_name.contains(':') {
             let parts: Vec<&str> = original_name.split(':').collect();
             if parts.len() != 2 {
@@ -159,7 +174,7 @@ impl CSVColumnMetadataBuilder {
             foreign_column_name,
             data_type_counts: HashMap::new(),
             nullable: false,
-            primary_key: false,
+            primary_key: is_primary_key,
             unique: true,
             unique_values: Some(HashSet::new()),
             sequential: true,
