@@ -6,15 +6,9 @@ impl diesel::deserialize::FromSql<crate::country_codes::diesel_impls::CountryCod
     for crate::CountryCode
 {
     fn from_sql(value: diesel::pg::PgValue<'_>) -> diesel::deserialize::Result<Self> {
-        <String as diesel::deserialize::FromSql<diesel::sql_types::Text, diesel::pg::Pg>>::from_sql(
+        Ok(Self::try_from(<String as diesel::deserialize::FromSql<diesel::sql_types::Text, diesel::pg::Pg>>::from_sql(
             value,
-        )
-        .map(Self::try_from)
-        .map_err(|| {
-            diesel::deserialize::Error::Conversion(
-                "Failed to convert PostgreSQL value to CountryCode".into(),
-            )
-        })
+        )?)?)
     }
 }
 
@@ -37,11 +31,7 @@ impl diesel::deserialize::FromSql<crate::country_codes::diesel_impls::CountryCod
     for crate::PGRXCountryCode
 {
     fn from_sql(value: diesel::pg::PgValue<'_>) -> diesel::deserialize::Result<Self> {
-        bytes.as_bytes().try_into().map_err(|_| {
-			diesel::deserialize::Error::Conversion(
-				"Failed to convert PostgreSQL value to PGRXCountryCode".into(),
-			)
-		})
+        Ok(bytes.as_bytes().try_into()?)
     }
 }
 
