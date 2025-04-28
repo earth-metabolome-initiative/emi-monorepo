@@ -39,7 +39,10 @@ pub fn load_sqlite_from_csvs(csv_directory: TokenStream) -> TokenStream {
         most_recent_file(&csv_directory, &[".csv", ".csv.gz", ".tsv", ".tsv.gz"])
             .expect("The provided directory does not contain any CSV or TSV files.");
 
-    let cached_file = cached_file_path(&csv_directory, "load_sqlite_from_csvs");
+    let mut salt: Vec<u8> = Vec::new();
+    salt.extend(csv_directory.to_str().unwrap().as_bytes());
+    salt.extend(b"load_sqlite_from_csvs");
+    let cached_file = cached_file_path(&salt);
     let cached_file_last_modified = file_last_modified_time(&cached_file).unwrap_or(0);
     if cached_file_last_modified >= most_recent_file {
         // If the cached file is up to date, we return it
@@ -118,7 +121,10 @@ pub fn load_sqlite_from_migrations(migrations_directory: TokenStream) -> TokenSt
     let most_recent_file = most_recent_file(&migrations_directory, &[".sql"])
         .expect("The provided directory does not contain any SQL files.");
 
-    let cached_file = cached_file_path(&migrations_directory, "load_sqlite_from_migrations");
+    let mut salt: Vec<u8> = Vec::new();
+    salt.extend(migrations_directory.to_str().unwrap().as_bytes());
+    salt.extend(b"load_sqlite_from_migrations");
+    let cached_file = cached_file_path(&salt);
     let cached_file_last_modified = file_last_modified_time(&cached_file).unwrap_or(0);
     if cached_file_last_modified >= most_recent_file {
         // If the cached file is up to date, we return it

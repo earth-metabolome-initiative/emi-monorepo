@@ -81,7 +81,19 @@ pub fn load_populating_sql_from_csvs(input: TokenStream) -> TokenStream {
         most_recent_file(&csv_directory, &[".csv", ".csv.gz", ".tsv", ".tsv.gz"])
             .expect("The provided directory does not contain any CSV or TSV files.");
 
-    let cached_file = cached_file_path(&csv_directory, "load_sqlite_from_csvs");
+    let mut salt: Vec<u8> = Vec::new();
+    salt.extend(csv_directory.to_str().unwrap().as_bytes());
+    salt.extend(b"load_sqlite_from_csvs");
+    if let Some(container_directory) = &container_directory {
+        salt.extend(container_directory.as_bytes());
+    }
+
+    #[cfg(feature = "iso_codes")]
+    {
+        salt.extend(b"iso_codes");
+    }
+
+    let cached_file = cached_file_path(&salt);
     let cached_file_last_modified = file_last_modified_time(&cached_file).unwrap_or(0);
     if cached_file_last_modified >= most_recent_file {
         // If the cached file is up to date, we return it

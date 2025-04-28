@@ -77,7 +77,7 @@ impl TryFrom<CSVColumnMetadataBuilder> for CSVColumnMetadata {
         if builder.primary_key && !builder.unique {
             return Err(CSVSchemaError::NonUniquePrimaryKey {
                 column_name: builder.column_name.unwrap_or_default(),
-                table_name: None
+                table_name: None,
             });
         }
 

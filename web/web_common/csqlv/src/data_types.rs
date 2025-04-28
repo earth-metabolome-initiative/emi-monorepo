@@ -20,6 +20,8 @@ pub enum DataType {
     Serial,
     BigSerial,
     Boolean,
+    #[cfg(feature = "iso_codes")]
+    CountryCode
 }
 
 impl DataType {
@@ -34,6 +36,8 @@ impl DataType {
             DataType::Double | DataType::BigInt | DataType::BigSerial => 8,
             DataType::Null => 0,
             DataType::Boolean => 1,
+            #[cfg(feature = "iso_codes")]
+            DataType::CountryCode => 2,
         }
     }
 
@@ -47,6 +51,14 @@ impl DataType {
         value = value.trim();
         if value.is_empty() {
             return vec![DataType::Null];
+        }
+
+        #[cfg(feature = "iso_codes")]
+        {
+            use iso_codes::CountryCode;
+            if CountryCode::try_from(value).is_ok() {
+                return vec![DataType::CountryCode, DataType::Text, DataType::VarChar(value.len())];
+            }
         }
 
         if Uuid::from_str(value).is_ok() {
@@ -138,6 +150,8 @@ impl DataType {
             DataType::Serial => "SERIAL".to_owned(),
             DataType::BigSerial => "BIGSERIAL".to_owned(),
             DataType::Boolean => "BOOLEAN".to_owned(),
+            #[cfg(feature = "iso_codes")]
+            DataType::CountryCode => "CountryCode".to_owned(),
         }
     }
 

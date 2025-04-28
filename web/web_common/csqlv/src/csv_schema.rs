@@ -102,6 +102,12 @@ impl CSVSchema {
         sql_generation_options: &SQLGenerationOptions,
     ) -> Result<String, CSVSchemaError> {
         let mut sql = String::new();
+
+        #[cfg(feature = "iso_codes")]
+        {
+            sql.push_str("CREATE EXTENSION IF NOT EXISTS \"iso_codes\";\n");
+        }
+
         for table in self.tables_with_priority().iter().map(|(table, _)| table) {
             sql.push_str(&table.to_sql()?);
             sql.push('\n');
