@@ -4,27 +4,27 @@
 
 use crate::traits::RackFormat;
 use serde::{Deserialize, Serialize};
-use serde_with::{serde_as, DisplayFromStr};
-use std::{fmt::Display, path::Path};
+use serde_with::{serde_as, DeserializeAs, DeserializeFromStr, DisplayFromStr};
+use std::{fmt::Display, path::PathBuf, str::FromStr};
 
 #[serde_as]
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 /// Full row in the Xcalibur injection sequence.
-struct SparseRow<'a> {
+pub struct SparseRow {
     /// Headers of the a full Xcalibur injection sequence file.
     /// Sample Type,File Name,Path,Instrument Method,Process Method,Calibration File,Position,Inj Vol,Level,Sample Wt,Sample Vol,ISTD Amt,Dil Factor,L1 Study,L2 Client,L3 Laboratory,L4 Company,L5 Phone,Comment,Sample Name
     #[serde(rename = "Sample Type")]
-    sample_type: Option<&'a str>,
+    sample_type: Option<String>,
     #[serde(rename = "File Name")]
-    file_name: &'a str,
+    file_name: String,
     #[serde(rename = "Path")]
-    path: &'a Path,
+    path: PathBuf,
     #[serde(rename = "Instrument Method")]
-    instrument_method: &'a Path,
+    instrument_method: PathBuf,
     #[serde(rename = "Process Method")]
-    process_method: Option<&'a Path>,
+    process_method: Option<PathBuf>,
     #[serde(rename = "Calibration File")]
-    calibration_file: Option<&'a Path>,
+    calibration_file: Option<PathBuf>,
     #[serde(rename = "Position")]
     #[serde_as(as = "DisplayFromStr")]
     position: InjectionPosition,
@@ -41,19 +41,19 @@ struct SparseRow<'a> {
     #[serde(rename = "Dil Factor")]
     dil_factor: Option<f32>,
     #[serde(rename = "L1 Study")]
-    l1_study: Option<&'a str>,
+    l1_study: Option<String>,
     #[serde(rename = "L2 Client")]
-    l2_client: Option<&'a str>,
+    l2_client: Option<String>,
     #[serde(rename = "L3 Laboratory")]
-    l3_laboratory: Option<&'a str>,
+    l3_laboratory: Option<String>,
     #[serde(rename = "L4 Company")]
-    l4_company: Option<&'a str>,
+    l4_company: Option<String>,
     #[serde(rename = "L5 Phone")]
-    l5_phone: Option<&'a str>,
+    l5_phone: Option<String>,
     #[serde(rename = "Comment")]
-    comment: Option<&'a str>,
+    comment: Option<String>,
     #[serde(rename = "Sample Name")]
-    sample_name: Option<&'a str>,
+    sample_name: Option<String>,
 }
 
 #[serde_as]
@@ -75,7 +75,7 @@ struct Row {
     inj_vol: f32,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, DeserializeFromStr)]
 /// Struct for the position of the injection.
 struct InjectionPosition {
     /// A struct for the position of the injection.
@@ -94,6 +94,35 @@ impl Display for InjectionPosition {
         write!(f, "{}:{}{}", self.rack_color, self.row_letter, self.column_number)
     }
 }
+
+impl FromStr for InjectionPosition {
+    type Err = crate::errors::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+
+        if s.len() != 4 {
+            return Err(crate::errors::Error::UnknownInjectionPosition(s.to_owned()));
+        }
+
+        let mut chars = s.chars();
+
+        let rack_color = RackColor::try_from(chars.next().ok_or_else(|| crate::errors::Error::UnknownInjectionPosition(s.to_owned()))?)?;
+        if let Some(':') = chars.next() {
+            // skip the ':'
+        } else {
+            return Err(crate::errors::Error::UnknownInjectionPosition(s.to_owned()));
+        }
+        let row_letter = RowLetter::try_from(chars.next().ok_or_else(|| crate::errors::Error::UnknownInjectionPosition(s.to_owned()))?)?;
+        let column_number = ColumnNumber::try_from(chars.next().ok_or_else(|| crate::errors::Error::UnknownInjectionPosition(s.to_owned()))?)?;
+
+        Ok(InjectionPosition {
+            rack_color,
+            row_letter,
+            column_number,
+        })
+    }
+}
+
 
 
 #[derive(Debug, Eq, PartialEq)]
@@ -117,6 +146,20 @@ impl Display for RackColor {
             RackColor::Green => write!(f, "G"),
             RackColor::Red => write!(f, "R"),
         }
+    }
+}
+
+impl TryFrom<char> for RackColor {
+    type Error = crate::errors::Error;
+
+    fn try_from(s: char) -> Result<Self, Self::Error> {
+        Ok(match s {
+            'Y' => RackColor::Yellow,
+            'B' => RackColor::Blue,
+            'G' => RackColor::Green,
+            'R' => RackColor::Red,
+              _ => return Err(crate::errors::Error::UnknownRackColor(s))
+        })
     }
 }
 
@@ -148,6 +191,22 @@ impl Display for RowLetter {
             RowLetter::E => write!(f, "E"),
             RowLetter::F => write!(f, "F"),
         }
+    }
+}
+
+impl TryFrom<char> for RowLetter {
+    type Error = crate::errors::Error;
+
+    fn try_from(s: char) -> Result<Self, Self::Error> {
+        Ok(match s {
+            'A' => RowLetter::A,
+            'B' => RowLetter::B,
+            'C' => RowLetter::C,
+            'D' => RowLetter::D,
+            'E' => RowLetter::E,
+            'F' => RowLetter::F,
+              _ => return Err(crate::errors::Error::UnknownRowLetter(s))
+        })
     }
 }
 
@@ -188,5 +247,24 @@ impl Display for ColumnNumber {
             ColumnNumber::Eight => write!(f, "8"),
             ColumnNumber::Nine => write!(f, "9"),
         }
+    }
+}
+
+impl TryFrom<char> for ColumnNumber {
+    type Error = crate::errors::Error;
+
+    fn try_from(s: char) -> Result<Self, Self::Error> {
+        Ok(match s {
+            '1' => ColumnNumber::One,
+            '2' => ColumnNumber::Two,
+            '3' => ColumnNumber::Three,
+            '4' => ColumnNumber::Four,
+            '5' => ColumnNumber::Five,
+            '6' => ColumnNumber::Six,
+            '7' => ColumnNumber::Seven,
+            '8' => ColumnNumber::Eight,
+            '9' => ColumnNumber::Nine,
+              _ => return Err(crate::errors::Error::UnknownColumnNumber(s))
+        })
     }
 }

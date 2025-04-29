@@ -2,5 +2,6 @@
 
 
 mod impls;
-mod structs;
+pub mod structs;
 mod traits;
+pub mod errors;

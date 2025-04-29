@@ -1,3 +1,5 @@
+//! The module to handle Xcalibur injection sequences
+
 mod row;
 
-use row::*;
+pub use row::SparseRow;

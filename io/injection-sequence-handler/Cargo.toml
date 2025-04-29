@@ -6,7 +6,10 @@ edition = "2021"
 [dependencies]
 serde.workspace = true
 serde_with.workspace = true
-algebra.workspace = true
+
 
 [lints]
 workspace = true
+
+[dev-dependencies]
+csv.workspace = true
