@@ -1,8 +1,8 @@
 #![cfg(feature = "diesel")]
 //! Submodule providing the diesel implementations for country codes.
 
-mod sqlite;
 mod postgres;
+mod sqlite;
 
 /// The [`CountryCode`] SQL type.
 ///
@@ -18,24 +18,13 @@ mod postgres;
 #[derive(
     Debug, Clone, Copy, Default, diesel::query_builder::QueryId, diesel::sql_types::SqlType,
 )]
-#[cfg_attr(feature = "postgres", diesel(postgres_type(oid = 1043, array_oid = 1015)))]
+#[cfg_attr(
+    all(feature = "postgres", not(feature = "diesel-pgrx")),
+    diesel(postgres_type(oid = 1043, array_oid = 1015))
+)]
+#[cfg_attr(
+    all(feature = "postgres", feature = "diesel-pgrx"),
+    diesel(postgres_type(name = "CountryCode"))
+)]
 #[cfg_attr(feature = "sqlite", diesel(sqlite_type(name = "Text")))]
 pub struct CountryCode;
-
-/// The [`PGRXCountryCode`] SQL type.
-///
-/// # Implementation details
-///
-/// This type is distinct from [`CountryCode`] to avoid conflicts with the
-/// actual type used in the backend, which when using the `pgrx` extension in
-/// the database it is a custom type installed by the extension and therefore
-/// the OID is unknown.
-///
-/// In both cases, when using the SQLite backend, the type remains Text, as
-/// SQLite does not support custom types.
-#[derive(
-    Debug, Clone, Copy, Default, diesel::query_builder::QueryId, diesel::sql_types::SqlType,
-)]
-#[cfg_attr(feature = "postgres", diesel(postgres_type(name = "CountryCode")))]
-#[cfg_attr(feature = "sqlite", diesel(sqlite_type(name = "Text")))]
-pub struct PGRXCountryCode;

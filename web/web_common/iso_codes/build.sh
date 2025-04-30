@@ -44,5 +44,3 @@ for line in "${lines_to_check[@]}"; do
 	# Comment the line
 	sed -i "s|${line:2}|$line|" Cargo.toml
 done
-
-echo "Build complete. Shared object (.so) available in $OUTPUT_DIR"
