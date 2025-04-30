@@ -16,7 +16,6 @@ serde.workspace = true
 strum.workspace = true
 strum_macros.workspace = true
 indicatif.workspace = true
-font_awesome.workspace = true
 csv.workspace = true
 flate2.workspace = true
 
