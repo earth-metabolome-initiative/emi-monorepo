@@ -1,5 +1,17 @@
 #![doc = include_str!("../README.md")]
 
+use lazy_static::lazy_static;
+use regex::Regex;
+
+lazy_static! {
+    static ref SPECTRUM_PLURAL: Regex = Regex::new("(?i)(spectr|append)um$").unwrap();
+    static ref SPECTRUM_SINGULAR: Regex = Regex::new("(?i)(spectr|append)a$").unwrap();
+    static ref MATRIX_PLURAL: Regex = Regex::new("(?i)(matr|append)ix$").unwrap();
+    static ref MATRIX_SINGULAR: Regex = Regex::new("(?i)(matr|append)ices$").unwrap();
+    static ref TAXON_PLURAL: Regex = Regex::new("(?i)(tax|append)on$").unwrap();
+    static ref TAXON_SINGULAR: Regex = Regex::new("(?i)(tax|append)a$").unwrap();
+}
+
 #[derive(Debug, Clone, Copy)]
 /// A struct that provides methods to pluralize and singularize words.
 pub struct Inflector {
@@ -8,30 +20,12 @@ pub struct Inflector {
 
 impl Default for Inflector {
     fn default() -> Self {
-        pluralizer::add_plural_rule(
-            regex::Regex::new("(?i)(spectr|append)um$").unwrap(),
-            "$1a".to_string(),
-        );
-        pluralizer::add_singular_rule(
-            regex::Regex::new("(?i)(spectr|append)a$").unwrap(),
-            "$1um".to_string(),
-        );
-        pluralizer::add_plural_rule(
-            regex::Regex::new("(?i)(matr|append)ix$").unwrap(),
-            "$1ices".to_string(),
-        );
-        pluralizer::add_singular_rule(
-            regex::Regex::new("(?i)(matr|append)ices$").unwrap(),
-            "$1ix".to_string(),
-        );
-        pluralizer::add_plural_rule(
-            regex::Regex::new("(?i)(tax|append)on$").unwrap(),
-            "$1a".to_string(),
-        );
-        pluralizer::add_singular_rule(
-            regex::Regex::new("(?i)(tax|append)a$").unwrap(),
-            "$1on".to_string(),
-        );
+        pluralizer::add_plural_rule(SPECTRUM_PLURAL.clone(), "$1a".to_string());
+        pluralizer::add_singular_rule(SPECTRUM_SINGULAR.clone(), "$1um".to_string());
+        pluralizer::add_plural_rule(MATRIX_PLURAL.clone(), "$1ices".to_string());
+        pluralizer::add_singular_rule(MATRIX_SINGULAR.clone(), "$1ix".to_string());
+        pluralizer::add_plural_rule(TAXON_PLURAL.clone(), "$1a".to_string());
+        pluralizer::add_singular_rule(TAXON_SINGULAR.clone(), "$1on".to_string());
 
         Self { _private: () }
     }
