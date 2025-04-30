@@ -18,7 +18,7 @@ members = [
   "data-retrieval/downloader",
   "web/core-structures",
   "web/core-structures/core-structures-builder",
-  "utils/font_awesome",
+  "web/web_common/font_awesome_icons",
   "utils/diesel_migrations_utils",
   "utils/common-traits",
   "utils/inflector",
@@ -89,7 +89,7 @@ taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
 csqlv = { path = "web/web_common/csqlv", default-features = false }
 csqlv-macro = { path = "web/web_common/csqlv-macro" }
 iso_codes = { path = "web/web_common/iso_codes" }
-font_awesome = { path = "utils/font_awesome" }
+font_awesome_icons = { path = "web/web_common/font_awesome_icons", features = ["serde"] }
 testcontainers = { version = "0.23.2" }
 web_common_traits = { path = "web/web_common/web_common_traits" }
 webcodegen = { path = "web/web_common/webcodegen" }
