@@ -3,6 +3,7 @@
 		"actix",
 		"certbot",
 		"chrono",
+		"DBWS",
 		"directus",
 		"honggfuzz",
 		"Hopcroft",
@@ -16,6 +17,7 @@
 		"pgrx",
 		"pychache",
 		"rustc",
-		"Tarjan"
+		"Tarjan",
+		"yewdux"
 	]
 }
