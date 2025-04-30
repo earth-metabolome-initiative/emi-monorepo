@@ -1,8 +1,9 @@
 #![doc = include_str!("../README.md")]
 
-use std::{hash::Hash, path::Path};
-use std::hash::DefaultHasher;
-use std::hash::Hasher;
+use std::{
+    hash::{DefaultHasher, Hash, Hasher},
+    path::Path,
+};
 
 /// Returns the last modified time of a file in seconds since the UNIX epoch.
 ///
