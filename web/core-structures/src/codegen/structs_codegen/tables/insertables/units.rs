@@ -3,7 +3,7 @@
 pub enum InsertableUnitAttributes {
     Name,
     Unit,
-    IconId,
+    Icon,
     ColorId,
 }
 impl core::fmt::Display for InsertableUnitAttributes {
@@ -11,7 +11,7 @@ impl core::fmt::Display for InsertableUnitAttributes {
         match self {
             InsertableUnitAttributes::Name => write!(f, "name"),
             InsertableUnitAttributes::Unit => write!(f, "unit"),
-            InsertableUnitAttributes::IconId => write!(f, "icon_id"),
+            InsertableUnitAttributes::Icon => write!(f, "icon"),
             InsertableUnitAttributes::ColorId => write!(f, "color_id"),
         }
     }
@@ -25,22 +25,10 @@ impl core::fmt::Display for InsertableUnitAttributes {
 pub struct InsertableUnit {
     name: String,
     unit: String,
-    icon_id: i16,
+    icon: font_awesome_icons::FAIcon,
     color_id: i16,
 }
 impl InsertableUnit {
-    #[cfg(feature = "postgres")]
-    pub async fn icon(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::icons::Icon, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::icons::Icon::table()
-            .filter(crate::codegen::diesel_codegen::tables::icons::icons::dsl::id.eq(&self.icon_id))
-            .first::<crate::codegen::structs_codegen::tables::icons::Icon>(conn)
-            .await
-    }
     #[cfg(feature = "postgres")]
     pub async fn color(
         &self,
@@ -60,7 +48,7 @@ impl InsertableUnit {
 pub struct InsertableUnitBuilder {
     name: Option<String>,
     unit: Option<String>,
-    icon_id: Option<i16>,
+    icon: Option<font_awesome_icons::FAIcon>,
     color_id: Option<i16>,
 }
 impl InsertableUnitBuilder {
@@ -78,11 +66,11 @@ impl InsertableUnitBuilder {
         self.unit = Some(unit);
         Ok(self)
     }
-    pub fn icon_id(
+    pub fn icon(
         mut self,
-        icon_id: i16,
+        icon: font_awesome_icons::FAIcon,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.icon_id = Some(icon_id);
+        self.icon = Some(icon);
         Ok(self)
     }
     pub fn color_id(
@@ -105,8 +93,8 @@ impl common_traits::prelude::Builder for InsertableUnitBuilder {
             unit: self.unit.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableUnitAttributes::Unit,
             ))?,
-            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableUnitAttributes::IconId,
+            icon: self.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableUnitAttributes::Icon,
             ))?,
             color_id: self.color_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -122,7 +110,7 @@ impl TryFrom<InsertableUnit> for InsertableUnitBuilder {
         Self::default()
             .name(insertable_variant.name)?
             .unit(insertable_variant.unit)?
-            .icon_id(insertable_variant.icon_id)?
+            .icon(insertable_variant.icon)?
             .color_id(insertable_variant.color_id)
     }
 }

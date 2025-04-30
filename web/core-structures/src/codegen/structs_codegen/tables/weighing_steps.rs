@@ -1,7 +1,13 @@
 #[derive(Debug, Clone, PartialEq, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::weighing_steps::weighing_steps
@@ -14,6 +20,12 @@ pub struct WeighingStep {
     pub kilograms: f32,
     pub created_by: i32,
     pub created_at: rosetta_timestamp::TimestampUTC,
+}
+impl diesel::Identifiable for WeighingStep {
+    type Id = rosetta_uuid::Uuid;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl WeighingStep {
     #[cfg(feature = "postgres")]

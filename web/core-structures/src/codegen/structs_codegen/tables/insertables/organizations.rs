@@ -34,7 +34,7 @@ pub struct InsertableOrganization {
     name: String,
     url: String,
     country: String,
-    alpha_two_code: String,
+    alpha_two_code: iso_codes::CountryCode,
     state_province: Option<String>,
     domain: String,
 }
@@ -44,7 +44,7 @@ pub struct InsertableOrganizationBuilder {
     name: Option<String>,
     url: Option<String>,
     country: Option<String>,
-    alpha_two_code: Option<String>,
+    alpha_two_code: Option<iso_codes::CountryCode>,
     state_province: Option<String>,
     domain: Option<String>,
 }
@@ -72,7 +72,7 @@ impl InsertableOrganizationBuilder {
     }
     pub fn alpha_two_code(
         mut self,
-        alpha_two_code: String,
+        alpha_two_code: iso_codes::CountryCode,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         self.alpha_two_code = Some(alpha_two_code);
         Ok(self)

@@ -1,7 +1,13 @@
-#[derive(Debug, Clone, PartialEq, Copy, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(organism_id, taxon_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa
@@ -11,6 +17,12 @@ pub struct OrganismTaxon {
     pub created_at: rosetta_timestamp::TimestampUTC,
     pub organism_id: rosetta_uuid::Uuid,
     pub taxon_id: i32,
+}
+impl diesel::Identifiable for OrganismTaxon {
+    type Id = (rosetta_uuid::Uuid, i32);
+    fn id(self) -> Self::Id {
+        (self.organism_id, self.taxon_id)
+    }
 }
 impl OrganismTaxon {
     #[cfg(feature = "postgres")]

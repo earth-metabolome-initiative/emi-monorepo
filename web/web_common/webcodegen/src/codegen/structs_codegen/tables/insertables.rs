@@ -11,6 +11,7 @@ use crate::{
     Codegen, Column, Table,
     codegen::{
         CODEGEN_DIRECTORY, CODEGEN_INSERTABLES_PATH, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
+        Syntax,
     },
     errors::{CheckConstraintError, CodeGenerationError, WebCodeGenError},
 };
@@ -136,6 +137,7 @@ impl Codegen<'_> {
         std::fs::create_dir_all(root)?;
 
         let mut insertables_main_module = TokenStream::new();
+        let syntax = Syntax::PostgreSQL;
 
         for table in tables {
             let all_columns = table.columns(conn)?;
@@ -175,7 +177,7 @@ impl Codegen<'_> {
                 })
                 .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
-            let insertable_variant_methods = table.foreign_key_methods(conn, &self.syntax)?;
+            let insertable_variant_methods = table.foreign_key_methods(conn, &syntax)?;
 
             let insertable_builder_attributes = nullable_insertable_columns
                 .iter()

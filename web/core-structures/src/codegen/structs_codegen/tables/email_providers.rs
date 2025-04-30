@@ -1,7 +1,7 @@
-#[derive(Debug, Clone, PartialEq, Copy, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
 #[diesel(primary_key(email_id, login_provider_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::email_providers::email_providers
@@ -9,6 +9,12 @@
 pub struct EmailProvider {
     pub email_id: i32,
     pub login_provider_id: i16,
+}
+impl diesel::Identifiable for EmailProvider {
+    type Id = (i32, i16);
+    fn id(self) -> Self::Id {
+        (self.email_id, self.login_provider_id)
+    }
 }
 impl EmailProvider {
     #[cfg(feature = "postgres")]

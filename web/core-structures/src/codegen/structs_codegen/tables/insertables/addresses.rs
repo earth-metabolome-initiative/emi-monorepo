@@ -1,8 +1,7 @@
 #[derive(Clone, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableAddressAttributes {
-    Iso,
-    CityCode,
+    CityId,
     StreetName,
     StreetNumber,
     PostalCode,
@@ -11,8 +10,7 @@ pub enum InsertableAddressAttributes {
 impl core::fmt::Display for InsertableAddressAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableAddressAttributes::Iso => write!(f, "iso"),
-            InsertableAddressAttributes::CityCode => write!(f, "city_code"),
+            InsertableAddressAttributes::CityId => write!(f, "city_id"),
             InsertableAddressAttributes::StreetName => write!(f, "street_name"),
             InsertableAddressAttributes::StreetNumber => write!(f, "street_number"),
             InsertableAddressAttributes::PostalCode => write!(f, "postal_code"),
@@ -27,8 +25,7 @@ impl core::fmt::Display for InsertableAddressAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableAddress {
-    iso: String,
-    city_code: String,
+    city_id: i32,
     street_name: String,
     street_number: String,
     postal_code: String,
@@ -36,23 +33,7 @@ pub struct InsertableAddress {
 }
 impl InsertableAddress {
     #[cfg(feature = "postgres")]
-    pub async fn iso(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::countries::Country, diesel::result::Error>
-    {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::countries::Country::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::countries::countries::dsl::iso
-                    .eq(&self.iso),
-            )
-            .first::<crate::codegen::structs_codegen::tables::countries::Country>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn city_code(
+    pub async fn city(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<crate::codegen::structs_codegen::tables::cities::City, diesel::result::Error> {
@@ -60,8 +41,7 @@ impl InsertableAddress {
         use diesel_async::RunQueryDsl;
         crate::codegen::structs_codegen::tables::cities::City::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::cities::cities::dsl::code
-                    .eq(&self.city_code),
+                crate::codegen::diesel_codegen::tables::cities::cities::dsl::id.eq(&self.city_id),
             )
             .first::<crate::codegen::structs_codegen::tables::cities::City>(conn)
             .await
@@ -69,26 +49,18 @@ impl InsertableAddress {
 }
 #[derive(Default)]
 pub struct InsertableAddressBuilder {
-    iso: Option<String>,
-    city_code: Option<String>,
+    city_id: Option<i32>,
     street_name: Option<String>,
     street_number: Option<String>,
     postal_code: Option<String>,
     geolocation: Option<postgis_diesel::types::Point>,
 }
 impl InsertableAddressBuilder {
-    pub fn iso(
+    pub fn city_id(
         mut self,
-        iso: String,
+        city_id: i32,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.iso = Some(iso);
-        Ok(self)
-    }
-    pub fn city_code(
-        mut self,
-        city_code: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.city_code = Some(city_code);
+        self.city_id = Some(city_id);
         Ok(self)
     }
     pub fn street_name(
@@ -126,14 +98,9 @@ impl common_traits::prelude::Builder for InsertableAddressBuilder {
     type Attribute = InsertableAddressAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            iso: self.iso.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableAddressAttributes::Iso,
+            city_id: self.city_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableAddressAttributes::CityId,
             ))?,
-            city_code: self.city_code.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableAddressAttributes::CityCode,
-                ),
-            )?,
             street_name: self.street_name.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAddressAttributes::StreetName,
@@ -161,8 +128,7 @@ impl TryFrom<InsertableAddress> for InsertableAddressBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableAddress) -> Result<Self, Self::Error> {
         Self::default()
-            .iso(insertable_variant.iso)?
-            .city_code(insertable_variant.city_code)?
+            .city_id(insertable_variant.city_id)?
             .street_name(insertable_variant.street_name)?
             .street_number(insertable_variant.street_number)?
             .postal_code(insertable_variant.postal_code)?

@@ -1,7 +1,13 @@
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::project_workflow_models::project_workflow_models
@@ -14,6 +20,12 @@ pub struct ProjectWorkflowModel {
     pub updated_at: rosetta_timestamp::TimestampUTC,
     pub created_by: i32,
     pub updated_by: i32,
+}
+impl diesel::Identifiable for ProjectWorkflowModel {
+    type Id = i32;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl ProjectWorkflowModel {
     #[cfg(feature = "postgres")]

@@ -4,7 +4,7 @@
 use core_structures::{Brand as PortalBrand, BrandState as PortalBrandState};
 use diesel_async::AsyncPgConnection;
 use web_common_traits::{
-    database::{Insertable, InsertableVariant, Loadable},
+    database::{AsyncRead, Insertable, InsertableVariant},
     prelude::Builder,
 };
 

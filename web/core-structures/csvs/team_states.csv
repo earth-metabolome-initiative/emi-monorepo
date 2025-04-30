@@ -1,4 +1,4 @@
-name,description,icons.name,colors.name
-Active,The team is currently active.,check,green
-Dissolved,The team has been dissolved,ban,red
-Paused,The team is currently paused.,box-archive,yellow
+name,description,icon,colors.name
+Active,The team is currently active.,Check,green
+Dissolved,The team has been dissolved,Ban,red
+Paused,The team is currently paused.,BoxArchive,yellow

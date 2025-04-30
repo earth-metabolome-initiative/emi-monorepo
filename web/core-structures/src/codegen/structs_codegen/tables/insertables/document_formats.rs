@@ -4,7 +4,7 @@ pub enum InsertableDocumentFormatAttributes {
     Extension,
     MimeType,
     Description,
-    IconId,
+    Icon,
     Color,
 }
 impl core::fmt::Display for InsertableDocumentFormatAttributes {
@@ -13,7 +13,7 @@ impl core::fmt::Display for InsertableDocumentFormatAttributes {
             InsertableDocumentFormatAttributes::Extension => write!(f, "extension"),
             InsertableDocumentFormatAttributes::MimeType => write!(f, "mime_type"),
             InsertableDocumentFormatAttributes::Description => write!(f, "description"),
-            InsertableDocumentFormatAttributes::IconId => write!(f, "icon_id"),
+            InsertableDocumentFormatAttributes::Icon => write!(f, "icon"),
             InsertableDocumentFormatAttributes::Color => write!(f, "color"),
         }
     }
@@ -30,29 +30,16 @@ pub struct InsertableDocumentFormat {
     extension: String,
     mime_type: String,
     description: String,
-    icon_id: i16,
+    icon: String,
     color: String,
 }
-impl InsertableDocumentFormat {
-    #[cfg(feature = "postgres")]
-    pub async fn icon(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::icons::Icon, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::icons::Icon::table()
-            .filter(crate::codegen::diesel_codegen::tables::icons::icons::dsl::id.eq(&self.icon_id))
-            .first::<crate::codegen::structs_codegen::tables::icons::Icon>(conn)
-            .await
-    }
-}
+impl InsertableDocumentFormat {}
 #[derive(Default)]
 pub struct InsertableDocumentFormatBuilder {
     extension: Option<String>,
     mime_type: Option<String>,
     description: Option<String>,
-    icon_id: Option<i16>,
+    icon: Option<String>,
     color: Option<String>,
 }
 impl InsertableDocumentFormatBuilder {
@@ -77,11 +64,11 @@ impl InsertableDocumentFormatBuilder {
         self.description = Some(description);
         Ok(self)
     }
-    pub fn icon_id(
+    pub fn icon(
         mut self,
-        icon_id: i16,
+        icon: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.icon_id = Some(icon_id);
+        self.icon = Some(icon);
         Ok(self)
     }
     pub fn color(
@@ -113,8 +100,8 @@ impl common_traits::prelude::Builder for InsertableDocumentFormatBuilder {
                     InsertableDocumentFormatAttributes::Description,
                 ),
             )?,
-            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableDocumentFormatAttributes::IconId,
+            icon: self.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableDocumentFormatAttributes::Icon,
             ))?,
             color: self.color.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableDocumentFormatAttributes::Color,
@@ -129,7 +116,7 @@ impl TryFrom<InsertableDocumentFormat> for InsertableDocumentFormatBuilder {
             .extension(insertable_variant.extension)?
             .mime_type(insertable_variant.mime_type)?
             .description(insertable_variant.description)?
-            .icon_id(insertable_variant.icon_id)?
+            .icon(insertable_variant.icon)?
             .color(insertable_variant.color)
     }
 }

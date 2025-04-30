@@ -1,7 +1,7 @@
-#[derive(Debug, Clone, PartialEq, Copy, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
 #[diesel(primary_key(user_id, organization_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::user_organizations::user_organizations
@@ -9,6 +9,12 @@
 pub struct UserOrganization {
     pub user_id: i32,
     pub organization_id: i16,
+}
+impl diesel::Identifiable for UserOrganization {
+    type Id = (i32, i16);
+    fn id(self) -> Self::Id {
+        (self.user_id, self.organization_id)
+    }
 }
 impl UserOrganization {
     #[cfg(feature = "postgres")]

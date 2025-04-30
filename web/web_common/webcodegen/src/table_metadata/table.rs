@@ -5,11 +5,9 @@ use diesel::{
     Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper, pg::PgConnection,
     result::Error as DieselError,
 };
-use inflector::Inflector;
 use itertools::Itertools;
 use proc_macro2::TokenStream;
 use quote::quote;
-use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{Ident, Type, parse_str};
 
 use super::PgTrigger;
@@ -91,11 +89,7 @@ impl Table {
     /// A string representing the name of the struct converted from the table
     /// name.
     pub fn struct_name(&self) -> Result<String, WebCodeGenError> {
-        let sanitizer = SnakeCaseSanizer::default()
-            .include_defaults()
-            .remove_leading_underscores()
-            .remove_trailing_underscores();
-        Ok(sanitizer.to_camel_case(self.singular_table_name()?)?)
+        crate::utils::struct_name(&self.table_name)
     }
 
     /// Returns the Rust Ident of the struct converted from the table name.
@@ -122,11 +116,7 @@ impl Table {
     ///
     /// A string representing the sanitized snake case name of the table.
     pub fn snake_case_name(&self) -> Result<String, WebCodeGenError> {
-        let sanitizer = SnakeCaseSanizer::default()
-            .include_defaults()
-            .remove_leading_underscores()
-            .remove_trailing_underscores();
-        Ok(sanitizer.to_snake_case(&self.table_name)?)
+        crate::utils::snake_case_name(&self.table_name)
     }
 
     /// Returns whether the table has a sanitized snake case name.
@@ -167,25 +157,6 @@ impl Table {
         } else {
             Ok(Ident::new(&snake_case_name, proc_macro2::Span::call_site()))
         }
-    }
-
-    /// Returns the singular name of the table.
-    ///
-    /// # Errors
-    /// * If the table name is empty.
-    pub fn singular_table_name(&self) -> Result<String, WebCodeGenError> {
-        // We split the table name by underscores and remove the last element.
-        let mut parts = self
-            .table_name
-            .split('_')
-            .map(std::string::ToString::to_string)
-            .collect::<Vec<String>>();
-        let last_element =
-            parts.pop().ok_or(WebCodeGenError::EmptyTableName(Box::new(self.clone())))?;
-        // We convert to singular form the last element and join the parts back
-        // together.
-        parts.push(Inflector::default().singularize(&last_element));
-        Ok(parts.join("_"))
     }
 
     /// Returns wether a table require authorizations to be viewed
@@ -267,6 +238,11 @@ impl Table {
         let mut derives = Vec::new();
 
         derives.push(parse_str("diesel::Selectable")?);
+        derives.push(parse_str("diesel::Insertable")?);
+
+        if self.has_non_primary_keys(conn)? {
+            derives.push(parse_str("diesel::AsChangeset")?);
+        }
 
         if self.has_primary_keys(conn)? {
             derives.push(parse_str("diesel::Queryable")?);
@@ -625,6 +601,19 @@ impl Table {
         Ok(self.columns(conn)?.iter().all(|column| column.supports_eq(conn).unwrap_or(false)))
     }
 
+    /// Returns whether the table supports the `Ord` trait.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// * If database connection fails.
+    pub fn supports_ord(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(self.columns(conn)?.iter().all(|column| column.supports_ord(conn).unwrap_or(false)))
+    }
+
     /// Returns whether the table supports the `Hash` trait.
     ///
     /// # Arguments
@@ -887,6 +876,19 @@ impl Table {
         self.primary_key_columns(conn).map(|columns| !columns.is_empty())
     }
 
+    /// Returns whether the table has columns that are NOT primary keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// * If the provided database connection is invalid.
+    pub fn has_non_primary_keys(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        self.non_primary_key_columns(conn).map(|columns| !columns.is_empty())
+    }
+
     /// Returns the primary key type for the table.
     ///
     /// # Arguments
@@ -929,6 +931,7 @@ impl Table {
     ///
     /// # Arguments
     ///
+    /// * `include_self` - Whether to include the table self.
     /// * `conn` - The database connection.
     ///
     /// # Returns
@@ -942,6 +945,7 @@ impl Table {
     /// * If the primary key columns cannot be loaded from the database.
     pub fn primary_key_attributes(
         &self,
+        include_self: bool,
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
         let primary_key_columns = self.primary_key_columns(conn)?;
@@ -952,16 +956,47 @@ impl Table {
             // If the primary key is a single column, we can just use the type of that
             // column.
             let primary_key = primary_key_columns[0].snake_case_ident()?;
-            quote! { #primary_key }
+            if include_self {
+                quote! { self.#primary_key }
+            } else {
+                quote! { #primary_key }
+            }
         } else {
             // If the primary key is a composite key, we need to construct a tuple of the
             // types.
-            let primary_key_types = primary_key_columns
+            let primary_key_names = primary_key_columns
                 .iter()
                 .map(Column::snake_case_ident)
                 .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
-            quote! { (#(#primary_key_types),*) }
+            if include_self {
+                quote! { (#(self.#primary_key_names),*) }
+            } else {
+                quote! { (#(#primary_key_names),*) }
+            }
         })
+    }
+
+    /// Returns the columns NOT composing the primary keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Returns
+    ///
+    /// A vector of columns.
+    ///
+    /// # Errors
+    ///
+    /// * If the connection to the database fails.
+    pub fn non_primary_key_columns(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Column>, WebCodeGenError> {
+        let mut columns = self.columns(conn)?;
+        let primary_key_columns = self.primary_key_columns(conn)?;
+        columns.retain(|column| !primary_key_columns.contains(column));
+        Ok(columns)
     }
 
     /// Returns the columns composing the primary keys.

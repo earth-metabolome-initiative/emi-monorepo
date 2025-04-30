@@ -1,7 +1,13 @@
 #[derive(Debug, Clone, PartialEq, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::trackable_locations::trackable_locations
@@ -14,6 +20,12 @@ pub struct TrackableLocation {
     pub inferred: bool,
     pub created_at: rosetta_timestamp::TimestampUTC,
     pub created_by: i32,
+}
+impl diesel::Identifiable for TrackableLocation {
+    type Id = rosetta_uuid::Uuid;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl TrackableLocation {
     #[cfg(feature = "postgres")]

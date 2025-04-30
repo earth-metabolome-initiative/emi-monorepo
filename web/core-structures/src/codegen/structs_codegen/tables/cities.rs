@@ -1,14 +1,25 @@
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::cities::cities)]
 pub struct City {
     pub id: i32,
     pub name: String,
-    pub code: String,
-    pub iso: String,
+    pub iso: iso_codes::CountryCode,
+}
+impl diesel::Identifiable for City {
+    type Id = i32;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl City {
     #[cfg(feature = "postgres")]
@@ -31,28 +42,12 @@ impl City {
     pub async fn from_iso(
         conn: &mut diesel_async::AsyncPgConnection,
         iso: &crate::codegen::structs_codegen::tables::countries::Country,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(crate::codegen::diesel_codegen::tables::cities::cities::dsl::iso.eq(&iso.iso))
-            .first::<Self>(conn)
+            .load::<Self>(conn)
             .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_code(
-        code: &str,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::cities::cities::code,
-                code,
-            ))
-            .first::<Self>(conn)
-            .await
-            .optional()
     }
 }

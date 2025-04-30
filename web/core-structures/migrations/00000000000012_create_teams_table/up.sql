@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS teams (
     name TEXT NOT NULL UNIQUE CHECK (must_not_be_empty(name)),
     -- a description of the team
     description TEXT NOT NULL,
-    icon_id SMALLINT NOT NULL DEFAULT 1387,
+    icon_id FAIcon NOT NULL,
     color_id SMALLINT NOT NULL DEFAULT 15,
     state_id SMALLINT NOT NULL DEFAULT 1,
     parent_team_id INTEGER,
@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS teams (
     updated_by INTEGER NOT NULL,
     -- The date the team was last updated
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (icon_id) REFERENCES icons(id),
     FOREIGN KEY (color_id) REFERENCES colors(id),
     FOREIGN KEY (state_id) REFERENCES team_states(id),
     FOREIGN KEY (parent_team_id) REFERENCES teams(id) ON DELETE CASCADE,

@@ -1,24 +1,23 @@
 //! Home page of the application.
 
-// use crate::router::AppRoute;
-// use crate::stores::user_state::UserState;
 use yew::prelude::*;
-// use yew_router::prelude::*;
-// use yewdux::prelude::*;
 
-#[function_component(Home)]
-pub fn home() -> Html {
-    // let user = use_store_value::<UserState>();
-    // let navigator = use_navigator().unwrap();
+pub struct Home {}
 
-    // if user.has_incomplete_profile() {
-    //     // If the user is logged in, but has yet to complete their profile, we
-    // redirect them to the profile page.     navigator.push(&
-    // AppRoute::Profile); }
+impl Component for Home {
+    type Message = ();
+    type Properties = ();
 
-    html! {
-        <div class="fullscreen_center_app">
-            <h1>{"Home"}</h1>
-        </div>
+    fn create(_ctx: &Context<Self>) -> Self {
+        Home {}
+    }
+
+    fn view(&self, _ctx: &Context<Self>) -> Html {
+        html! {
+            <div class="home">
+                <h1>{ "Welcome to the Home Page!" }</h1>
+                <p>{ "This is the home page of the application." }</p>
+            </div>
+        }
     }
 }

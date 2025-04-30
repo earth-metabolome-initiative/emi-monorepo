@@ -1,6 +1,6 @@
-name,description,icons.name,colors.name
-Active,The sample is currently active.,check,green
-Cancelled,The sample has been cancelled.,ban,red
-Completed,The sample has been completed.,circle-check,blue
-Paused,The sample is currently paused.,box-archive,yellow
-Postponed,The sample has been postponed.,clock,orange
+name,description,icon,colors.name
+Active,The sample is currently active.,Check,green
+Cancelled,The sample has been cancelled.,Ban,red
+Completed,The sample has been completed.,CircleCheck,blue
+Paused,The sample is currently paused.,BoxArchive,yellow
+Postponed,The sample has been postponed.,Clock,orange

@@ -4,7 +4,7 @@ pub enum InsertableBrandStateAttributes {
     Name,
     Description,
     ColorId,
-    IconId,
+    Icon,
 }
 impl core::fmt::Display for InsertableBrandStateAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -12,7 +12,7 @@ impl core::fmt::Display for InsertableBrandStateAttributes {
             InsertableBrandStateAttributes::Name => write!(f, "name"),
             InsertableBrandStateAttributes::Description => write!(f, "description"),
             InsertableBrandStateAttributes::ColorId => write!(f, "color_id"),
-            InsertableBrandStateAttributes::IconId => write!(f, "icon_id"),
+            InsertableBrandStateAttributes::Icon => write!(f, "icon"),
         }
     }
 }
@@ -28,7 +28,7 @@ pub struct InsertableBrandState {
     name: String,
     description: String,
     color_id: i16,
-    icon_id: i16,
+    icon: font_awesome_icons::FAIcon,
 }
 impl InsertableBrandState {
     #[cfg(feature = "postgres")]
@@ -45,25 +45,13 @@ impl InsertableBrandState {
             .first::<crate::codegen::structs_codegen::tables::colors::Color>(conn)
             .await
     }
-    #[cfg(feature = "postgres")]
-    pub async fn icon(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::icons::Icon, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::icons::Icon::table()
-            .filter(crate::codegen::diesel_codegen::tables::icons::icons::dsl::id.eq(&self.icon_id))
-            .first::<crate::codegen::structs_codegen::tables::icons::Icon>(conn)
-            .await
-    }
 }
 #[derive(Default)]
 pub struct InsertableBrandStateBuilder {
     name: Option<String>,
     description: Option<String>,
     color_id: Option<i16>,
-    icon_id: Option<i16>,
+    icon: Option<font_awesome_icons::FAIcon>,
 }
 impl InsertableBrandStateBuilder {
     pub fn name(
@@ -87,11 +75,11 @@ impl InsertableBrandStateBuilder {
         self.color_id = Some(color_id);
         Ok(self)
     }
-    pub fn icon_id(
+    pub fn icon(
         mut self,
-        icon_id: i16,
+        icon: font_awesome_icons::FAIcon,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.icon_id = Some(icon_id);
+        self.icon = Some(icon);
         Ok(self)
     }
 }
@@ -114,8 +102,8 @@ impl common_traits::prelude::Builder for InsertableBrandStateBuilder {
                     InsertableBrandStateAttributes::ColorId,
                 ),
             )?,
-            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableBrandStateAttributes::IconId,
+            icon: self.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableBrandStateAttributes::Icon,
             ))?,
         })
     }
@@ -127,6 +115,6 @@ impl TryFrom<InsertableBrandState> for InsertableBrandStateBuilder {
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
             .color_id(insertable_variant.color_id)?
-            .icon_id(insertable_variant.icon_id)
+            .icon(insertable_variant.icon)
     }
 }

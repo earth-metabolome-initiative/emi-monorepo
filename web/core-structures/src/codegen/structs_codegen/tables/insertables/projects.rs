@@ -5,7 +5,7 @@ pub enum InsertableProjectAttributes {
     Name,
     Description,
     StateId,
-    IconId,
+    Icon,
     ColorId,
     ParentProjectId,
     Budget,
@@ -24,7 +24,7 @@ impl core::fmt::Display for InsertableProjectAttributes {
             InsertableProjectAttributes::Name => write!(f, "name"),
             InsertableProjectAttributes::Description => write!(f, "description"),
             InsertableProjectAttributes::StateId => write!(f, "state_id"),
-            InsertableProjectAttributes::IconId => write!(f, "icon_id"),
+            InsertableProjectAttributes::Icon => write!(f, "icon"),
             InsertableProjectAttributes::ColorId => write!(f, "color_id"),
             InsertableProjectAttributes::ParentProjectId => {
                 write!(f, "parent_project_id")
@@ -53,7 +53,7 @@ pub struct InsertableProject {
     name: String,
     description: String,
     state_id: i16,
-    icon_id: i16,
+    icon: font_awesome_icons::FAIcon,
     color_id: i16,
     parent_project_id: Option<i32>,
     budget: Option<f64>,
@@ -82,18 +82,6 @@ impl InsertableProject {
                     .eq(&self.state_id),
             )
             .first::<crate::codegen::structs_codegen::tables::project_states::ProjectState>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn icon(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::icons::Icon, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::icons::Icon::table()
-            .filter(crate::codegen::diesel_codegen::tables::icons::icons::dsl::id.eq(&self.icon_id))
-            .first::<crate::codegen::structs_codegen::tables::icons::Icon>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -167,7 +155,7 @@ pub struct InsertableProjectBuilder {
     name: Option<String>,
     description: Option<String>,
     state_id: Option<i16>,
-    icon_id: Option<i16>,
+    icon: Option<font_awesome_icons::FAIcon>,
     color_id: Option<i16>,
     parent_project_id: Option<i32>,
     budget: Option<f64>,
@@ -233,11 +221,11 @@ impl InsertableProjectBuilder {
         self.state_id = Some(state_id);
         Ok(self)
     }
-    pub fn icon_id(
+    pub fn icon(
         mut self,
-        icon_id: i16,
+        icon: font_awesome_icons::FAIcon,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.icon_id = Some(icon_id);
+        self.icon = Some(icon);
         Ok(self)
     }
     pub fn color_id(
@@ -341,8 +329,8 @@ impl common_traits::prelude::Builder for InsertableProjectBuilder {
                     InsertableProjectAttributes::StateId,
                 ),
             )?,
-            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableProjectAttributes::IconId,
+            icon: self.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableProjectAttributes::Icon,
             ))?,
             color_id: self.color_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -393,7 +381,7 @@ impl TryFrom<InsertableProject> for InsertableProjectBuilder {
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
             .state_id(insertable_variant.state_id)?
-            .icon_id(insertable_variant.icon_id)?
+            .icon(insertable_variant.icon)?
             .color_id(insertable_variant.color_id)?
             .parent_project_id(insertable_variant.parent_project_id)?
             .budget(insertable_variant.budget)?

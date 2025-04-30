@@ -1,0 +1,21 @@
+# Use the official PostgreSQL image from the Docker Hub
+FROM postgres:17
+
+# Install PostGIS
+RUN apt-get update && \
+    apt-get install -y postgis postgresql-17-postgis-3 postgresql-17-cron tmux
+
+# First, we copy the `pgrx_validation` extension files to the image
+COPY ./web_common/pgrx_validation/extension/usr/lib/postgresql/17/lib/pgrx_validation.so /usr/lib/postgresql/17/lib/pgrx_validation.so
+COPY ./web_common/pgrx_validation/extension/usr/share/postgresql/17/extension/pgrx_validation.control /usr/share/postgresql/17/extension/pgrx_validation.control
+COPY ./web_common/pgrx_validation/extension/usr/share/postgresql/17/extension/pgrx_validation--0.0.0.sql usr/share/postgresql/17/extension/pgrx_validation--0.0.0.sql
+
+# Next, we copy the the `iso_codes` extension files to the image
+COPY ./web_common/iso_codes/extension/usr/lib/postgresql/17/lib/iso_codes.so /usr/lib/postgresql/17/lib/iso_codes.so
+COPY ./web_common/iso_codes/extension/usr/share/postgresql/17/extension/iso_codes.control /usr/share/postgresql/17/extension/iso_codes.control
+COPY ./web_common/iso_codes/extension/usr/share/postgresql/17/extension/iso_codes--0.1.0.sql usr/share/postgresql/17/extension/iso_codes--0.1.0.sql
+
+# Next, we copy the the `font_awesome_icons` extension files to the image
+COPY ./web_common/font_awesome_icons/extension/usr/lib/postgresql/17/lib/font_awesome_icons.so /usr/lib/postgresql/17/lib/font_awesome_icons.so
+COPY ./web_common/font_awesome_icons/extension/usr/share/postgresql/17/extension/font_awesome_icons.control /usr/share/postgresql/17/extension/font_awesome_icons.control
+COPY ./web_common/font_awesome_icons/extension/usr/share/postgresql/17/extension/font_awesome_icons--0.1.0.sql usr/share/postgresql/17/extension/font_awesome_icons--0.1.0.sql

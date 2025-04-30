@@ -13,14 +13,13 @@ pub enum TablePrimaryKey {
     CommercialReagentModel(i32),
     ContainerCategory(i16),
     ContainerModel(i32),
-    Country(i16),
+    Country(iso_codes::CountryCode),
     DocumentFormat(i16),
     EmailProvider((i32, i16)),
     FractioningStepModel(i32),
     FractioningStep(rosetta_uuid::Uuid),
     FreezeDryingStepModel(i32),
     GrindingStepModel(i32),
-    Icon(i16),
     InstrumentCategory(i16),
     InstrumentLocation(i32),
     InstrumentModelCategory(i32),
@@ -94,4 +93,259 @@ pub enum TablePrimaryKey {
     WeighingInstrumentModel(i32),
     WeighingStepModel(i32),
     WeighingStep(rosetta_uuid::Uuid),
+}
+impl web_common_traits::prelude::Tabular for TablePrimaryKey {
+    type TableName = crate::codegen::tables::table_names::TableName;
+    fn table_name(&self) -> Self::TableName {
+        match self {
+            TablePrimaryKey::Address(_) => crate::codegen::tables::table_names::TableName::Address,
+            TablePrimaryKey::AliquotingInstrumentModel(_) => {
+                crate::codegen::tables::table_names::TableName::AliquotingInstrumentModel
+            }
+            TablePrimaryKey::AliquotingStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::AliquotingStepModel
+            }
+            TablePrimaryKey::AliquotingStep(_) => {
+                crate::codegen::tables::table_names::TableName::AliquotingStep
+            }
+            TablePrimaryKey::BrandState(_) => {
+                crate::codegen::tables::table_names::TableName::BrandState
+            }
+            TablePrimaryKey::Brand(_) => crate::codegen::tables::table_names::TableName::Brand,
+            TablePrimaryKey::City(_) => crate::codegen::tables::table_names::TableName::City,
+            TablePrimaryKey::Color(_) => crate::codegen::tables::table_names::TableName::Color,
+            TablePrimaryKey::CommercialProduct(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialProduct
+            }
+            TablePrimaryKey::CommercialReagentModel(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialReagentModel
+            }
+            TablePrimaryKey::ContainerCategory(_) => {
+                crate::codegen::tables::table_names::TableName::ContainerCategory
+            }
+            TablePrimaryKey::ContainerModel(_) => {
+                crate::codegen::tables::table_names::TableName::ContainerModel
+            }
+            TablePrimaryKey::Country(_) => crate::codegen::tables::table_names::TableName::Country,
+            TablePrimaryKey::DocumentFormat(_) => {
+                crate::codegen::tables::table_names::TableName::DocumentFormat
+            }
+            TablePrimaryKey::EmailProvider(_) => {
+                crate::codegen::tables::table_names::TableName::EmailProvider
+            }
+            TablePrimaryKey::FractioningStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::FractioningStepModel
+            }
+            TablePrimaryKey::FractioningStep(_) => {
+                crate::codegen::tables::table_names::TableName::FractioningStep
+            }
+            TablePrimaryKey::FreezeDryingStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::FreezeDryingStepModel
+            }
+            TablePrimaryKey::GrindingStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::GrindingStepModel
+            }
+            TablePrimaryKey::InstrumentCategory(_) => {
+                crate::codegen::tables::table_names::TableName::InstrumentCategory
+            }
+            TablePrimaryKey::InstrumentLocation(_) => {
+                crate::codegen::tables::table_names::TableName::InstrumentLocation
+            }
+            TablePrimaryKey::InstrumentModelCategory(_) => {
+                crate::codegen::tables::table_names::TableName::InstrumentModelCategory
+            }
+            TablePrimaryKey::InstrumentModel(_) => {
+                crate::codegen::tables::table_names::TableName::InstrumentModel
+            }
+            TablePrimaryKey::InstrumentState(_) => {
+                crate::codegen::tables::table_names::TableName::InstrumentState
+            }
+            TablePrimaryKey::Instrument(_) => {
+                crate::codegen::tables::table_names::TableName::Instrument
+            }
+            TablePrimaryKey::LoginProvider(_) => {
+                crate::codegen::tables::table_names::TableName::LoginProvider
+            }
+            TablePrimaryKey::Material(_) => {
+                crate::codegen::tables::table_names::TableName::Material
+            }
+            TablePrimaryKey::NameplateCategory(_) => {
+                crate::codegen::tables::table_names::TableName::NameplateCategory
+            }
+            TablePrimaryKey::NameplateModel(_) => {
+                crate::codegen::tables::table_names::TableName::NameplateModel
+            }
+            TablePrimaryKey::ObservationSubject(_) => {
+                crate::codegen::tables::table_names::TableName::ObservationSubject
+            }
+            TablePrimaryKey::OrganismObservation(_) => {
+                crate::codegen::tables::table_names::TableName::OrganismObservation
+            }
+            TablePrimaryKey::OrganismSamplingStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::OrganismSamplingStepModel
+            }
+            TablePrimaryKey::OrganismTaxon(_) => {
+                crate::codegen::tables::table_names::TableName::OrganismTaxon
+            }
+            TablePrimaryKey::Organism(_) => {
+                crate::codegen::tables::table_names::TableName::Organism
+            }
+            TablePrimaryKey::Organization(_) => {
+                crate::codegen::tables::table_names::TableName::Organization
+            }
+            TablePrimaryKey::PackagingModel(_) => {
+                crate::codegen::tables::table_names::TableName::PackagingModel
+            }
+            TablePrimaryKey::PackagingStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::PackagingStepModel
+            }
+            TablePrimaryKey::PermanenceCategory(_) => {
+                crate::codegen::tables::table_names::TableName::PermanenceCategory
+            }
+            TablePrimaryKey::Photograph(_) => {
+                crate::codegen::tables::table_names::TableName::Photograph
+            }
+            TablePrimaryKey::ProcedureModelContainerCategory(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureModelContainerCategory
+            }
+            TablePrimaryKey::ProcedureModelInstrumentCategory(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureModelInstrumentCategory
+            }
+            TablePrimaryKey::ProcedureModelNameplateCategory(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureModelNameplateCategory
+            }
+            TablePrimaryKey::ProcedureModelToolCategory(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureModelToolCategory
+            }
+            TablePrimaryKey::ProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureModel
+            }
+            TablePrimaryKey::ProcedureStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureStepModel
+            }
+            TablePrimaryKey::Procedure(_) => {
+                crate::codegen::tables::table_names::TableName::Procedure
+            }
+            TablePrimaryKey::Processable(_) => {
+                crate::codegen::tables::table_names::TableName::Processable
+            }
+            TablePrimaryKey::ProcessingStep(_) => {
+                crate::codegen::tables::table_names::TableName::ProcessingStep
+            }
+            TablePrimaryKey::ProjectState(_) => {
+                crate::codegen::tables::table_names::TableName::ProjectState
+            }
+            TablePrimaryKey::ProjectWorkflowModel(_) => {
+                crate::codegen::tables::table_names::TableName::ProjectWorkflowModel
+            }
+            TablePrimaryKey::Project(_) => crate::codegen::tables::table_names::TableName::Project,
+            TablePrimaryKey::Rank(_) => crate::codegen::tables::table_names::TableName::Rank,
+            TablePrimaryKey::Role(_) => crate::codegen::tables::table_names::TableName::Role,
+            TablePrimaryKey::Room(_) => crate::codegen::tables::table_names::TableName::Room,
+            TablePrimaryKey::SampleState(_) => {
+                crate::codegen::tables::table_names::TableName::SampleState
+            }
+            TablePrimaryKey::SamplingStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::SamplingStepModel
+            }
+            TablePrimaryKey::SamplingStep(_) => {
+                crate::codegen::tables::table_names::TableName::SamplingStep
+            }
+            TablePrimaryKey::SpatialRefSy(_) => {
+                crate::codegen::tables::table_names::TableName::SpatialRefSy
+            }
+            TablePrimaryKey::Spectrum(_) => {
+                crate::codegen::tables::table_names::TableName::Spectrum
+            }
+            TablePrimaryKey::SpectraCollection(_) => {
+                crate::codegen::tables::table_names::TableName::SpectraCollection
+            }
+            TablePrimaryKey::StepContainerModel(_) => {
+                crate::codegen::tables::table_names::TableName::StepContainerModel
+            }
+            TablePrimaryKey::StepInstrument(_) => {
+                crate::codegen::tables::table_names::TableName::StepInstrument
+            }
+            TablePrimaryKey::StepModelCategory(_) => {
+                crate::codegen::tables::table_names::TableName::StepModelCategory
+            }
+            TablePrimaryKey::StepModelContainerCategory(_) => {
+                crate::codegen::tables::table_names::TableName::StepModelContainerCategory
+            }
+            TablePrimaryKey::StepModelInstrumentCategory(_) => {
+                crate::codegen::tables::table_names::TableName::StepModelInstrumentCategory
+            }
+            TablePrimaryKey::StepModelInstrumentModel(_) => {
+                crate::codegen::tables::table_names::TableName::StepModelInstrumentModel
+            }
+            TablePrimaryKey::StepModelInstrument(_) => {
+                crate::codegen::tables::table_names::TableName::StepModelInstrument
+            }
+            TablePrimaryKey::StepModelNameplateCategory(_) => {
+                crate::codegen::tables::table_names::TableName::StepModelNameplateCategory
+            }
+            TablePrimaryKey::StepModelToolCategory(_) => {
+                crate::codegen::tables::table_names::TableName::StepModelToolCategory
+            }
+            TablePrimaryKey::StepModel(_) => {
+                crate::codegen::tables::table_names::TableName::StepModel
+            }
+            TablePrimaryKey::StepNameplateModel(_) => {
+                crate::codegen::tables::table_names::TableName::StepNameplateModel
+            }
+            TablePrimaryKey::StepStorageContainer(_) => {
+                crate::codegen::tables::table_names::TableName::StepStorageContainer
+            }
+            TablePrimaryKey::StepToolModel(_) => {
+                crate::codegen::tables::table_names::TableName::StepToolModel
+            }
+            TablePrimaryKey::Step(_) => crate::codegen::tables::table_names::TableName::Step,
+            TablePrimaryKey::StorageContainer(_) => {
+                crate::codegen::tables::table_names::TableName::StorageContainer
+            }
+            TablePrimaryKey::Taxon(_) => crate::codegen::tables::table_names::TableName::Taxon,
+            TablePrimaryKey::TeamMember(_) => {
+                crate::codegen::tables::table_names::TableName::TeamMember
+            }
+            TablePrimaryKey::TeamProject(_) => {
+                crate::codegen::tables::table_names::TableName::TeamProject
+            }
+            TablePrimaryKey::TeamState(_) => {
+                crate::codegen::tables::table_names::TableName::TeamState
+            }
+            TablePrimaryKey::Team(_) => crate::codegen::tables::table_names::TableName::Team,
+            TablePrimaryKey::ToolCategory(_) => {
+                crate::codegen::tables::table_names::TableName::ToolCategory
+            }
+            TablePrimaryKey::ToolModel(_) => {
+                crate::codegen::tables::table_names::TableName::ToolModel
+            }
+            TablePrimaryKey::TrackableLocation(_) => {
+                crate::codegen::tables::table_names::TableName::TrackableLocation
+            }
+            TablePrimaryKey::TrackableState(_) => {
+                crate::codegen::tables::table_names::TableName::TrackableState
+            }
+            TablePrimaryKey::Trackable(_) => {
+                crate::codegen::tables::table_names::TableName::Trackable
+            }
+            TablePrimaryKey::Unit(_) => crate::codegen::tables::table_names::TableName::Unit,
+            TablePrimaryKey::UserEmail(_) => {
+                crate::codegen::tables::table_names::TableName::UserEmail
+            }
+            TablePrimaryKey::UserOrganization(_) => {
+                crate::codegen::tables::table_names::TableName::UserOrganization
+            }
+            TablePrimaryKey::User(_) => crate::codegen::tables::table_names::TableName::User,
+            TablePrimaryKey::WeighingInstrumentModel(_) => {
+                crate::codegen::tables::table_names::TableName::WeighingInstrumentModel
+            }
+            TablePrimaryKey::WeighingStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::WeighingStepModel
+            }
+            TablePrimaryKey::WeighingStep(_) => {
+                crate::codegen::tables::table_names::TableName::WeighingStep
+            }
+        }
+    }
 }

@@ -1,7 +1,13 @@
-#[derive(Debug, Clone, PartialEq, Copy, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::aliquoting_steps::aliquoting_steps
@@ -13,6 +19,12 @@ pub struct AliquotingStep {
     pub instrument_id: i32,
     pub created_by: i32,
     pub created_at: rosetta_timestamp::TimestampUTC,
+}
+impl diesel::Identifiable for AliquotingStep {
+    type Id = rosetta_uuid::Uuid;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl AliquotingStep {
     #[cfg(feature = "postgres")]

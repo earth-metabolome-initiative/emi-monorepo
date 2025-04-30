@@ -3,7 +3,7 @@
 
 use core_structures::InstrumentCategory as PortalInstrumentCategory;
 use diesel_async::AsyncPgConnection;
-use web_common_traits::prelude::Loadable;
+use web_common_traits::prelude::AsyncRead;
 
 use crate::codegen::InstrumentType as DirectusInstrumentCategory;
 

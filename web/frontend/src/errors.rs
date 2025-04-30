@@ -6,6 +6,7 @@ use db_errors::DBError;
 pub(crate) mod db_errors;
 pub(crate) mod device_errors;
 pub(crate) mod geolocation_errors;
+pub(crate) mod ws_errors;
 
 #[allow(dead_code)]
 /// The errors which may occur in the Frontend.
@@ -16,6 +17,8 @@ pub(crate) enum FrontendError {
     Geolocation(geolocation_errors::GeolocationError),
     /// An error related to the database.
     DB(db_errors::DBError),
+    /// An error related to the WebSocket.
+    WSError(ws_errors::WSError),
 }
 
 impl From<device_errors::DeviceError> for FrontendError {
@@ -33,6 +36,12 @@ impl From<geolocation_errors::GeolocationError> for FrontendError {
 impl From<db_errors::DBError> for FrontendError {
     fn from(error: db_errors::DBError) -> Self {
         FrontendError::DB(error)
+    }
+}
+
+impl From<ws_errors::WSError> for FrontendError {
+    fn from(error: ws_errors::WSError) -> Self {
+        FrontendError::WSError(error)
     }
 }
 

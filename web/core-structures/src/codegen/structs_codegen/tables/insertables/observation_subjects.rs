@@ -3,7 +3,7 @@
 pub enum InsertableObservationSubjectAttributes {
     Name,
     Description,
-    IconId,
+    Icon,
     ColorId,
 }
 impl core::fmt::Display for InsertableObservationSubjectAttributes {
@@ -13,7 +13,7 @@ impl core::fmt::Display for InsertableObservationSubjectAttributes {
             InsertableObservationSubjectAttributes::Description => {
                 write!(f, "description")
             }
-            InsertableObservationSubjectAttributes::IconId => write!(f, "icon_id"),
+            InsertableObservationSubjectAttributes::Icon => write!(f, "icon"),
             InsertableObservationSubjectAttributes::ColorId => write!(f, "color_id"),
         }
     }
@@ -29,22 +29,10 @@ impl core::fmt::Display for InsertableObservationSubjectAttributes {
 pub struct InsertableObservationSubject {
     name: String,
     description: String,
-    icon_id: i16,
+    icon: String,
     color_id: i16,
 }
 impl InsertableObservationSubject {
-    #[cfg(feature = "postgres")]
-    pub async fn icon(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::icons::Icon, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::icons::Icon::table()
-            .filter(crate::codegen::diesel_codegen::tables::icons::icons::dsl::id.eq(&self.icon_id))
-            .first::<crate::codegen::structs_codegen::tables::icons::Icon>(conn)
-            .await
-    }
     #[cfg(feature = "postgres")]
     pub async fn color(
         &self,
@@ -64,7 +52,7 @@ impl InsertableObservationSubject {
 pub struct InsertableObservationSubjectBuilder {
     name: Option<String>,
     description: Option<String>,
-    icon_id: Option<i16>,
+    icon: Option<String>,
     color_id: Option<i16>,
 }
 impl InsertableObservationSubjectBuilder {
@@ -82,11 +70,11 @@ impl InsertableObservationSubjectBuilder {
         self.description = Some(description);
         Ok(self)
     }
-    pub fn icon_id(
+    pub fn icon(
         mut self,
-        icon_id: i16,
+        icon: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.icon_id = Some(icon_id);
+        self.icon = Some(icon);
         Ok(self)
     }
     pub fn color_id(
@@ -111,8 +99,8 @@ impl common_traits::prelude::Builder for InsertableObservationSubjectBuilder {
                     InsertableObservationSubjectAttributes::Description,
                 ),
             )?,
-            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableObservationSubjectAttributes::IconId,
+            icon: self.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableObservationSubjectAttributes::Icon,
             ))?,
             color_id: self.color_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -128,7 +116,7 @@ impl TryFrom<InsertableObservationSubject> for InsertableObservationSubjectBuild
         Self::default()
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
-            .icon_id(insertable_variant.icon_id)?
+            .icon(insertable_variant.icon)?
             .color_id(insertable_variant.color_id)
     }
 }

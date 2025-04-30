@@ -1,4 +1,4 @@
-name,description,icons.name,colors.name
-permanent,"A nameplate which is designed to stay for over 50 years",lock,green
-semi-permanent,"A nameplate which is designed to stay for over 10 years",lock-open,yellow
-temporary,"A nameplate which is designed to stay for under 10 years",ghost,grey
+name,description,icon,colors.name
+permanent,"A nameplate which is designed to stay for over 50 years",Lock,green
+semi-permanent,"A nameplate which is designed to stay for over 10 years",LockOpen,yellow
+temporary,"A nameplate which is designed to stay for under 10 years",Ghost,grey

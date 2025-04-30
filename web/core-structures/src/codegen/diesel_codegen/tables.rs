@@ -17,7 +17,6 @@ pub mod fractioning_step_models;
 pub mod fractioning_steps;
 pub mod freeze_drying_step_models;
 pub mod grinding_step_models;
-pub mod icons;
 pub mod instrument_categories;
 pub mod instrument_locations;
 pub mod instrument_model_categories;

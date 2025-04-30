@@ -3,13 +3,13 @@ use std::rc::Rc;
 
 use gloo::timers::callback::Timeout;
 use yew::prelude::*;
-use yew_agent::{prelude::WorkerBridgeHandle, scope_ext::AgentScopeExt};
 use yew_router::prelude::*;
 
 use crate::{
     components::{hamburger::Hamburger, sidebar::Sidebar},
     router::AppRoute,
     stores::app_state::AppState,
+    utils::ConnectorProps,
 };
 
 /// Navigator component for the application.
@@ -39,7 +39,7 @@ pub struct NavigatorProps {}
 
 impl Component for Navigator {
     type Message = NavigatorMessage;
-    type Properties = NavigatorProps;
+    type Properties = ConnectorProps;
 
     fn create(ctx: &Context<Self>) -> Self {
         Self { toggle_timeout: None }

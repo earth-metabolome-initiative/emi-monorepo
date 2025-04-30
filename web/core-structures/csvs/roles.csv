@@ -1,4 +1,4 @@
-name,description,icons.name,colors.name
-Administrator,"An administrator role allows for view, edit & delete operations to this entry.",user-tie,blue
-Editor,"An editor role allows for view & edit access to this entry.",user,green
-Viewer,"A viewer role allows for view access to this entry.",user-secret,black
+name,description,icon,colors.name
+Administrator,"An administrator role allows for view, edit & delete operations to this entry.",UserTie,blue
+Editor,"An editor role allows for view & edit access to this entry.",User,green
+Viewer,"A viewer role allows for view access to this entry.",UserSecret,black

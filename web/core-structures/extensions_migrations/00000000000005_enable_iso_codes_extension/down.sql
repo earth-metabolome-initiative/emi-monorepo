@@ -1,0 +1,1 @@
+DROP EXTENSION IF EXISTS iso_codes;

@@ -20,6 +20,7 @@ rosetta-uuid.workspace = true
 bincode.workspace = true
 futures.workspace = true
 api-path.workspace = true
+init-migration.workspace = true
 backend-request-errors.workspace = true
 postgis_diesel.workspace = true
 rand.workspace = true

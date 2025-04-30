@@ -4,8 +4,15 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-core-structures.workspace = true
-web_common_traits.workspace = true
+core-structures = { workspace = true, features = ["serde"] }
+web_common_traits = { workspace = true }
+gloo.workspace = true
+bincode.workspace = true
+serde.workspace = true
+
+[features]
+frontend = []
+backend = []
 
 [lints]
 workspace = true

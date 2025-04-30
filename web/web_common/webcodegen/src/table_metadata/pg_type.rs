@@ -6,10 +6,9 @@ use diesel::{
 };
 use proc_macro2::TokenStream;
 use quote::quote;
-use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{Ident, Type, parse_str};
 
-use super::{PgAttribute, PgEnum, PgSetting, table::RESERVED_RUST_WORDS};
+use super::{PgAttribute, PgEnum, PgExtension, PgSetting, table::RESERVED_RUST_WORDS};
 use crate::{
     codegen::{
         CODEGEN_DIESEL_MODULE, CODEGEN_DIRECTORY, CODEGEN_STRUCTS_MODULE, CODEGEN_TYPES_PATH,
@@ -31,6 +30,18 @@ pub(crate) const COPY_TYPES: [&str; 8] = [
 
 /// Constant listing types supporting `Eq`.
 pub(crate) const EQ_TYPES: [&str; 8] = [
+    "i32",
+    "i16",
+    "i64",
+    "bool",
+    "String",
+    "chrono::NaiveDateTime",
+    "rosetta_uuid::Uuid",
+    "rosetta_timestamp::TimestampUTC",
+];
+
+/// Constant listing types supporting `Ord`.
+pub(crate) const ORD_TYPES: [&str; 8] = [
     "i32",
     "i16",
     "i64",
@@ -190,6 +201,12 @@ pub fn rust_type_str<S: AsRef<str>>(
         // UUID type
         "uuid" => "rosetta_uuid::Uuid",
 
+        // ISO Codes
+        "countrycode" | "CountryCode" => "iso_codes::CountryCode",
+
+        // FontAwesome Icon
+        "FAIcon" | "faicon" => "font_awesome_icons::FAIcon",
+
         other => return Err(WebCodeGenError::UnknownPostgresRustType(other.to_owned())),
     })
 }
@@ -268,6 +285,12 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<String, WebCod
 
         // Other
         "uuid" => "rosetta_uuid::diesel_impls::Uuid",
+
+        // ISO Codes
+        "countrycode" | "CountryCode" => "iso_codes::country_codes::diesel_impls::CountryCode",
+
+        // FontAwesome Icon
+        "FAIcon" | "faicon" => "font_awesome_icons::diesel_impls::FAIcon",
 
         _ => {
             return Err(WebCodeGenError::UnknownDieselPostgresType(postgres_type.to_owned()));
@@ -400,6 +423,32 @@ impl PgType {
         }
     }
 
+    /// Returns the extension of the `PgType`, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Returns
+    ///
+    /// An option containing the `PgExtension` of the `PgType`,
+    /// or None if the type is not from an extension.
+    pub fn extension(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<PgExtension>, WebCodeGenError> {
+        use diesel::OptionalExtension;
+
+        use crate::schema::{pg_depend, pg_extension};
+        Ok(pg_depend::table
+            .filter(pg_depend::objid.eq(self.oid))
+            .filter(pg_depend::deptype.eq("e"))
+            .inner_join(pg_extension::table.on(pg_extension::oid.eq(pg_depend::refobjid)))
+            .select(PgExtension::as_select())
+            .first::<PgExtension>(conn)
+            .optional()?)
+    }
+
     /// Returns the internal custom types of the `PgType`, if any.
     ///
     /// # Arguments
@@ -463,11 +512,7 @@ impl PgType {
     ///
     /// A string representing the sanitized snake case name of the table.
     pub fn snake_case_name(&self) -> Result<String, WebCodeGenError> {
-        let sanitizer = SnakeCaseSanizer::default()
-            .include_defaults()
-            .remove_leading_underscores()
-            .remove_trailing_underscores();
-        Ok(sanitizer.to_snake_case(&self.typname)?)
+        crate::utils::snake_case_name(&self.typname)
     }
 
     /// Returns the sanitized snake case identifier of the table.
@@ -587,6 +632,30 @@ impl PgType {
                 .try_fold(true, |acc, attribute| attribute.supports_eq(conn).map(|b| acc && b))
         } else {
             Ok(EQ_TYPES.contains(&rust_type_str(&self.typname, conn)?))
+        }
+    }
+
+    /// Returns whether the associated rust type supports `Ord`.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing a boolean indicating whether the associated rust
+    /// type supports `Ord`, or an error if the type is not supported.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
+    pub fn supports_ord(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        if self.is_user_defined(conn)? || self.is_composite() {
+            self.attributes(conn)?
+                .into_iter()
+                .try_fold(true, |acc, attribute| attribute.supports_ord(conn).map(|b| acc && b))
+        } else {
+            Ok(ORD_TYPES.contains(&rust_type_str(&self.typname, conn)?))
         }
     }
 

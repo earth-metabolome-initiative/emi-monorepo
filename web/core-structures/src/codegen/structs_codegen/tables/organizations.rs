@@ -1,7 +1,13 @@
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::organizations::organizations
@@ -10,10 +16,16 @@ pub struct Organization {
     pub name: String,
     pub url: String,
     pub country: String,
-    pub alpha_two_code: String,
+    pub alpha_two_code: iso_codes::CountryCode,
     pub state_province: Option<String>,
     pub domain: String,
     pub id: i16,
+}
+impl diesel::Identifiable for Organization {
+    type Id = i16;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl Organization {
     #[cfg(feature = "postgres")]

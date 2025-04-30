@@ -29,9 +29,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION check_values_different(int1 INT, int2 INT) RETURNS BOOLEAN AS $$
+CREATE OR REPLACE FUNCTION check_values_different(a INT, b INT) RETURNS BOOLEAN AS $$
 BEGIN
-    IF int1 <> int2 THEN
+    IF a <> b THEN
         RETURN TRUE;
     ELSE
         RETURN FALSE;

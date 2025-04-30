@@ -22,7 +22,7 @@ use redis::AsyncCommands;
 use rosetta_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use web_common_traits::database::Loadable;
+use web_common_traits::database::AsyncRead;
 
 use crate::errors::BackendError;
 
@@ -543,7 +543,7 @@ impl FromRequest for UserWrapper {
             }
 
             // If the user doesn't exist, we return an error, otherwise we return the user.
-            let Ok(user) = User::load(&access_token.user_id(), &mut conn).await else {
+            let Ok(user) = User::read_async(access_token.user_id(), &mut conn).await else {
                 return Err(ErrorInternalServerError(
                     json!({"status": "fail", "message": "Internal server error"}),
                 ));

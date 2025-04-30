@@ -1,14 +1,20 @@
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::teams::teams)]
 pub struct Team {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub icon_id: i16,
+    pub icon_id: font_awesome_icons::FAIcon,
     pub color_id: i16,
     pub state_id: i16,
     pub parent_team_id: Option<i32>,
@@ -17,19 +23,13 @@ pub struct Team {
     pub updated_by: i32,
     pub updated_at: rosetta_timestamp::TimestampUTC,
 }
-impl Team {
-    #[cfg(feature = "postgres")]
-    pub async fn icon(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::icons::Icon, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::icons::Icon::table()
-            .filter(crate::codegen::diesel_codegen::tables::icons::icons::dsl::id.eq(&self.icon_id))
-            .first::<crate::codegen::structs_codegen::tables::icons::Icon>(conn)
-            .await
+impl diesel::Identifiable for Team {
+    type Id = i32;
+    fn id(self) -> Self::Id {
+        self.id
     }
+}
+impl Team {
     #[cfg(feature = "postgres")]
     pub async fn color(
         &self,
@@ -107,20 +107,6 @@ impl Team {
                 crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.updated_by),
             )
             .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_icon_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        icon_id: &crate::codegen::structs_codegen::tables::icons::Icon,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::teams::teams::dsl::icon_id.eq(icon_id.id),
-            )
-            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]

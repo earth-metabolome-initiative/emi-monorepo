@@ -3,13 +3,11 @@ use diesel::{
     QueryableByName, RunQueryDsl, Selectable, SelectableHelper, pg::PgConnection,
     result::Error as DieselError,
 };
-use inflector::Inflector;
-use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use syn::{Ident, Type};
 
 use super::{
     check_constraint::CheckConstraint,
-    pg_type::{COPY_TYPES, EQ_TYPES, HASH_TYPES, PgType, rust_type_str},
+    pg_type::{COPY_TYPES, EQ_TYPES, HASH_TYPES, ORD_TYPES, PgType, rust_type_str},
     table::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS},
 };
 use crate::{
@@ -405,11 +403,7 @@ impl Column {
     ///
     /// If an error occurs while sanitizing the column name
     pub fn snake_case_name(&self) -> Result<String, WebCodeGenError> {
-        let sanitizer = SnakeCaseSanizer::default()
-            .include_defaults()
-            .remove_leading_underscores()
-            .remove_trailing_underscores();
-        Ok(sanitizer.to_snake_case(&self.column_name)?)
+        crate::utils::snake_case_name(&self.column_name)
     }
 
     /// Returns the sanitized snake case syn Ident of the table.
@@ -444,11 +438,7 @@ impl Column {
     ///
     /// * If an error occurs while sanitizing the column name
     pub fn camel_case_name(&self) -> Result<String, WebCodeGenError> {
-        let sanitizer = SnakeCaseSanizer::default()
-            .include_defaults()
-            .remove_leading_underscores()
-            .remove_trailing_underscores();
-        Ok(sanitizer.to_camel_case(&self.column_name)?)
+        crate::utils::camel_case_name(&self.column_name)
     }
 
     /// Returns the sanitized camel case syn Ident of the table.
@@ -587,6 +577,31 @@ impl Column {
             Err(error) => {
                 if self.has_custom_type() {
                     Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.supports_eq(conn)?)
+                } else {
+                    Err(error)
+                }
+            }
+        }
+    }
+
+    /// Returns whether the column type supports the `Ord` trait.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn supports_ord(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        if self.geometry(conn).is_ok() || self.geography(conn).is_ok() {
+            return Ok(false);
+        }
+        match rust_type_str(self.data_type_str(conn)?, conn) {
+            Ok(s) => Ok(ORD_TYPES.contains(&s)),
+            Err(error) => {
+                if self.has_custom_type() {
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.supports_ord(conn)?)
                 } else {
                     Err(error)
                 }
@@ -885,23 +900,6 @@ impl Column {
             .select(KeyColumnUsage::as_select())
             .first::<KeyColumnUsage>(conn)
             .is_ok()
-    }
-
-    /// Returns the plural name of the column.
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while sanitizing the column name
-    pub fn plural_column_name(&self) -> Result<String, WebCodeGenError> {
-        // We split the column name by underscores and remove the last element.
-        let mut parts =
-            self.column_name.split('_').map(ToString::to_string).collect::<Vec<String>>();
-        let last_element =
-            parts.pop().ok_or_else(|| WebCodeGenError::EmptyColumnName(Box::from(self.clone())))?;
-        // We convert to singular form the last element and join the parts back
-        // together.
-        parts.push(Inflector::default().pluralize(&last_element));
-        Ok(parts.join("_"))
     }
 
     /// Returns the getter method name for the column.

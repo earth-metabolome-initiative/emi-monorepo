@@ -18,9 +18,13 @@ futures.workspace = true
 backend-request-errors.workspace = true
 time-requirements.workspace = true
 sqlparser.workspace = true
+strum.workspace = true
+strum_macros.workspace = true
+iso_codes.workspace = true
+font_awesome_icons.workspace = true
+cached.workspace = true
 
 [dev-dependencies]
-diesel_migrations = "2.2.0"
 testcontainers.workspace = true
 tokio.workspace = true
 trybuild.workspace = true
@@ -33,7 +37,7 @@ rosetta-timestamp = { workspace = true, features = [
   "serde",
   "postgres",
 ] }
-web_common_traits.workspace = true
+web_common_traits = { workspace = true, features = ["backend"] }
 macaddr = "1.0.1"
 postgis_diesel.workspace = true
 diesel_full_text_search.workspace = true
@@ -41,16 +45,18 @@ diesel-async = { workspace = true, features = ["postgres", "bb8"] }
 validation-errors.workspace = true
 pgrx_validation.workspace = true
 yew.workspace = true
+diesel_migrations_utils.workspace = true
 
 [features]
-default = ["diesel", "serde", "postgres"]
+default = ["serde", "postgres"]
 serde = []
 yew = []
-backend = ["diesel", "web_common_traits/backend", "diesel/postgres"]
-frontend = ["web_common_traits/frontend", "yew", "diesel/sqlite"]
-diesel = ["postgis_diesel/diesel"]
+backend = ["web_common_traits/backend", "postgres"]
+frontend = ["web_common_traits/frontend", "yew", "sqlite"]
+diesel = []
 # Feature used in the context of the tests.
-postgres = ["diesel"]
+postgres = ["diesel", "diesel/postgres", "postgis_diesel/postgres"]
+sqlite = ["diesel", "diesel/sqlite", "postgis_diesel/sqlite"]
 
 [lints]
 workspace = true

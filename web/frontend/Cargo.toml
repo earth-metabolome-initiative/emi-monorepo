@@ -23,20 +23,23 @@ ws-messages.workspace = true
 common-traits.workspace = true
 log.workspace = true
 futures.workspace = true
+font_awesome_icons = {workspace = true, features = ["sqlite"]}
 sqlite-migration-generator.workspace = true
-sqlite-wasm-rs = { git = "https://github.com/LucaCappelletti94/sqlite-wasm-rs.git", default-features = false, features = [
+sqlite-wasm-rs = { version = "0.3.4", default-features = false, features = [
   "precompiled",
 ] }
 web_common_traits = { workspace = true, features = ["frontend"] }
 core-structures = { workspace = true, features = ["frontend"] }
-diesel = { workspace = true, features = ["sqlite"] }
+diesel = { workspace = true, features = [
+  "sqlite",
+  "returning_clauses_for_sqlite_3_35",
+] }
 postgis_diesel = { workspace = true, default-features = false, features = [
   "serde",
   "sqlite",
 ] }
 
-reqwasm = "0.5.0"
-gloo = "0.11.0"
+gloo.workspace = true
 wasm-bindgen = "0.2.100"
 rosetta-uuid.workspace = true
 wasm-bindgen-futures.workspace = true
@@ -45,10 +48,8 @@ yew-router = "0.18.0"
 # The doc-tests feature is required to avoid errors from the Rust Analyzer,
 # but it is not actually used in the code.
 yewdux = "0.11.0"
-gloo-net = "0.6.0"
 gloo-console = "0.3.0"
 wasm-logger = "0.2.0"
-rustrict = "0.7.33"
 js-sys = "0.3.77"
 leaflet = "0.4.1"
 sublime_fuzzy = "0.7.0"

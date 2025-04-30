@@ -8,6 +8,26 @@ use syn::Ident;
 use crate::{Table, errors::WebCodeGenError};
 
 impl Table {
+    fn identifiable_impl(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
+        if !self.has_primary_keys(conn)? {
+            return Ok(TokenStream::new());
+        }
+
+        let struct_name: Ident = self.struct_ident()?;
+        let primary_key = self.primary_key_type(conn)?;
+        let primary_key_attribute = self.primary_key_attributes(true, conn)?;
+
+        Ok(quote! {
+            impl diesel::Identifiable for #struct_name {
+                type Id = #primary_key;
+
+                fn id(self) -> Self::Id {
+                    #primary_key_attribute
+                }
+            }
+        })
+    }
+
     /// Returns the Syn `TokenStream` for the struct definition.
     ///
     /// # Arguments
@@ -50,9 +70,15 @@ impl Table {
         if self.supports_eq(conn)? {
             default_derives.push(quote!(Eq));
         }
+        if self.supports_ord(conn)? {
+            default_derives.push(quote!(PartialOrd));
+            default_derives.push(quote!(Ord));
+        }
         if self.supports_hash(conn)? {
             default_derives.push(quote!(Hash));
         }
+
+        let identifiable_impl = self.identifiable_impl(conn)?;
 
         Ok(quote! {
             #[derive(#(#default_derives),*)]
@@ -64,6 +90,8 @@ impl Table {
             pub struct #struct_name {
                 #(#attributes),*
             }
+
+            #identifiable_impl
         })
     }
 }

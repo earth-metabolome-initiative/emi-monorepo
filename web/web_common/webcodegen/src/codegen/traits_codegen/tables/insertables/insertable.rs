@@ -6,7 +6,7 @@ use std::path::Path;
 
 use proc_macro2::TokenStream;
 
-use crate::{Codegen, Table};
+use crate::{Codegen, Table, codegen::Syntax};
 
 impl Codegen<'_> {
     /// Generates the [`Insertable`](web_common_traits::database::Insertable)
@@ -29,7 +29,8 @@ impl Codegen<'_> {
         std::fs::create_dir_all(root)?;
 
         let mut insertable_main_module = TokenStream::new();
-        let syntax_flag = self.syntax.as_feature_flag();
+        let syntax = Syntax::PostgreSQL;
+        let syntax_flag = syntax.as_feature_flag();
 
         for table in tables {
             // We create a file for each table

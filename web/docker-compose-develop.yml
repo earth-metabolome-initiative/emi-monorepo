@@ -3,19 +3,18 @@ services:
   postgres:
     container_name: ${POSTGRES_DOCKER_NAME}
     build:
-      context: ./core-structures
-      dockerfile: Dockerfile
+      dockerfile: PostgresDockerfile
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ./core-structures:/app
+      - ../:/app
     ports:
       - "${PGPORT}:5432"
     networks:
       - develop_backend
-    restart: on-failure
+    # restart: on-failure
 
   # pgadmin:
   #   image: dpage/pgadmin4:latest

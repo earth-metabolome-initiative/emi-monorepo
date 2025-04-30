@@ -1,8 +1,8 @@
-name,unit,icons.name,colors.name
-Kilogram,kg,scale-balanced,blue
-Gram,g,scale-balanced,blue
-Milligram,mg,scale-balanced,blue
-Microgram,ug,scale-balanced,blue
-Liter,L,flask,red
-Milliliter,ml,flask,red
-Microliter,ul,flask,red
+name,unit,icon,colors.name
+Kilogram,kg,ScaleBalanced,blue
+Gram,g,ScaleBalanced,blue
+Milligram,mg,ScaleBalanced,blue
+Microgram,ug,ScaleBalanced,blue
+Liter,L,Flask,red
+Milliliter,ml,Flask,red
+Microliter,ul,Flask,red

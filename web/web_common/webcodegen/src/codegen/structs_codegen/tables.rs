@@ -6,7 +6,7 @@ use diesel::PgConnection;
 use proc_macro2::TokenStream;
 
 use super::Codegen;
-use crate::Table;
+use crate::{Table, codegen::Syntax};
 
 mod crud;
 mod insertables;
@@ -30,22 +30,23 @@ impl Codegen<'_> {
         // We generate each table in a separate document under the provided root, and we
         // collect all of the imported modules in a public one.
         let mut table_main_module = TokenStream::new();
+        let syntax = Syntax::PostgreSQL;
         for table in tables {
             let table_identifier = table.snake_case_ident()?;
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let table_struct = table.struct_ident()?;
             let table_content = table.to_syn(conn)?;
             let foreign_key_methods = if self.enable_foreign_trait {
-                table.foreign_key_methods(conn, &self.syntax)?
+                table.foreign_key_methods(conn, &syntax)?
             } else {
                 TokenStream::new()
             };
             let from_foreign_key_methods = if self.enable_foreign_trait {
-                table.from_foreign_key_methods(conn, &self.syntax)?
+                table.from_foreign_key_methods(conn, &syntax)?
             } else {
                 TokenStream::new()
             };
-            let from_unique_indices = table.from_unique_indices(conn, &self.syntax)?;
+            let from_unique_indices = table.from_unique_indices(conn, &syntax)?;
 
             std::fs::write(
                 &table_file,
@@ -73,7 +74,7 @@ impl Codegen<'_> {
         }
 
         // If any of the CRUD traits are enabled, we generate the Table names enum.
-        if self.enable_read_trait {
+        if self.should_generate_crud() {
             self.generate_table_names_enumeration(root, tables)?;
             table_main_module.extend(quote::quote! {
                 pub mod table_names;
@@ -83,12 +84,15 @@ impl Codegen<'_> {
             table_main_module.extend(quote::quote! {
                 pub mod table_primary_keys;
             });
-        }
 
-        if self.enable_read_trait {
-            self.generate_read_structs(root.join("read").as_path(), tables)?;
+            self.generate_rows_enumeration(&root.join("rows"), tables, conn)?;
             table_main_module.extend(quote::quote! {
-                pub mod read;
+                pub mod rows;
+            });
+
+            self.generate_row_enumeration(&root.join("row"), tables, conn)?;
+            table_main_module.extend(quote::quote! {
+                pub mod row;
             });
         }
 

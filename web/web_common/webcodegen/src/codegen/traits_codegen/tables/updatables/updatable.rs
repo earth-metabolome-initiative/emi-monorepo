@@ -7,7 +7,7 @@ use std::path::Path;
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 
-use crate::{Codegen, Table, errors::WebCodeGenError};
+use crate::{Codegen, Table, codegen::Syntax, errors::WebCodeGenError};
 
 impl Table {
     /// Returns whether the table allows for the implementation of the
@@ -62,8 +62,9 @@ impl Codegen<'_> {
         std::fs::create_dir_all(root)?;
 
         let mut updatable_main_module = TokenStream::new();
-        let syntax_flag = self.syntax.as_feature_flag();
-        let connection_type = self.syntax.as_connection_type();
+        let syntax = Syntax::PostgreSQL;
+        let syntax_flag = syntax.as_feature_flag();
+        let connection_type = syntax.as_connection_type(true);
         let Some(user) = self.users_table else {
             return Err(crate::errors::CodeGenerationError::UserTableNotProvided.into());
         };

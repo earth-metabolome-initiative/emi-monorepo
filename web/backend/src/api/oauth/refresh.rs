@@ -2,7 +2,7 @@
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use api_path::api::oauth::jwt_cookies::AccessToken;
 use core_structures::User;
-use web_common_traits::database::Loadable;
+use web_common_traits::database::AsyncRead;
 
 use crate::{
     api::oauth::jwt_cookies::{JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME},
@@ -55,7 +55,7 @@ pub(crate) async fn refresh_access_token(
     let mut connection = pool.get().await?;
 
     // If the user doesn't exist, we return an error, otherwise we return the user.
-    let user = User::load(&refresh_token.user_id(), &mut connection)
+    let user = User::read_async(refresh_token.user_id(), &mut connection)
         .await?
         .ok_or(BackendError::Unauthorized)?;
 

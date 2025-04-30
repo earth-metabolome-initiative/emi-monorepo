@@ -7,7 +7,7 @@ use core_structures::{
 };
 use diesel_async::AsyncPgConnection;
 use web_common_traits::{
-    database::{Insertable, InsertableVariant, Loadable},
+    database::{AsyncRead, Insertable, InsertableVariant},
     prelude::Builder,
 };
 

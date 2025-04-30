@@ -54,7 +54,7 @@ impl Table {
         }
 
         let syntax_feature_flag = syntax.as_feature_flag();
-        let connection = syntax.as_connection_type();
+        let connection = syntax.as_connection_type(true);
 
         foreign_keys_and_tables
             .into_iter()
@@ -92,7 +92,7 @@ impl Table {
         syntax: &Syntax,
     ) -> Result<TokenStream, WebCodeGenError> {
         let feature_flag = syntax.as_feature_flag();
-        let connection = syntax.as_connection_type();
+        let connection = syntax.as_connection_type(true);
 
         self
             .foreign_keys(conn)?
@@ -172,7 +172,7 @@ impl Table {
         syntax: &Syntax,
     ) -> Result<TokenStream, WebCodeGenError> {
         let feature_flag = syntax.as_feature_flag();
-        let connection = syntax.as_connection_type();
+        let connection = syntax.as_connection_type(true);
         let current_table_diesel_path = self.import_diesel_path()?;
 
         self

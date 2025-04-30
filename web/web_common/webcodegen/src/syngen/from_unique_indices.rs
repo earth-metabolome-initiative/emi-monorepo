@@ -35,7 +35,7 @@ impl crate::Table {
         let table_name_ident = self.import_diesel_path()?;
         let primary_keys = self.primary_key_columns(conn)?;
         let syntax_flag = syntax.as_feature_flag();
-        let syntax_connection = syntax.as_connection_type();
+        let syntax_connection = syntax.as_connection_type(true);
 
         self.unique_indices(conn)?
             .into_iter()

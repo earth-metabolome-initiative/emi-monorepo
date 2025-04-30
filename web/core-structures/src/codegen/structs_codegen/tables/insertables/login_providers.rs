@@ -2,8 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableLoginProviderAttributes {
     Name,
-    IconId,
-    ColorId,
+    Icon,
     ClientId,
     RedirectUri,
     OauthUrl,
@@ -13,8 +12,7 @@ impl core::fmt::Display for InsertableLoginProviderAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertableLoginProviderAttributes::Name => write!(f, "name"),
-            InsertableLoginProviderAttributes::IconId => write!(f, "icon_id"),
-            InsertableLoginProviderAttributes::ColorId => write!(f, "color_id"),
+            InsertableLoginProviderAttributes::Icon => write!(f, "icon"),
             InsertableLoginProviderAttributes::ClientId => write!(f, "client_id"),
             InsertableLoginProviderAttributes::RedirectUri => write!(f, "redirect_uri"),
             InsertableLoginProviderAttributes::OauthUrl => write!(f, "oauth_url"),
@@ -32,46 +30,17 @@ impl core::fmt::Display for InsertableLoginProviderAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableLoginProvider {
     name: String,
-    icon_id: i16,
-    color_id: i16,
+    icon: font_awesome_icons::FAIcon,
     client_id: String,
     redirect_uri: String,
     oauth_url: String,
     scope: String,
 }
-impl InsertableLoginProvider {
-    #[cfg(feature = "postgres")]
-    pub async fn icon(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::icons::Icon, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::icons::Icon::table()
-            .filter(crate::codegen::diesel_codegen::tables::icons::icons::dsl::id.eq(&self.icon_id))
-            .first::<crate::codegen::structs_codegen::tables::icons::Icon>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn color(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::colors::Color::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::colors::colors::dsl::id.eq(&self.color_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::colors::Color>(conn)
-            .await
-    }
-}
+impl InsertableLoginProvider {}
 #[derive(Default)]
 pub struct InsertableLoginProviderBuilder {
     name: Option<String>,
-    icon_id: Option<i16>,
-    color_id: Option<i16>,
+    icon: Option<font_awesome_icons::FAIcon>,
     client_id: Option<String>,
     redirect_uri: Option<String>,
     oauth_url: Option<String>,
@@ -85,18 +54,11 @@ impl InsertableLoginProviderBuilder {
         self.name = Some(name);
         Ok(self)
     }
-    pub fn icon_id(
+    pub fn icon(
         mut self,
-        icon_id: i16,
+        icon: font_awesome_icons::FAIcon,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.icon_id = Some(icon_id);
-        Ok(self)
-    }
-    pub fn color_id(
-        mut self,
-        color_id: i16,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.color_id = Some(color_id);
+        self.icon = Some(icon);
         Ok(self)
     }
     pub fn client_id(
@@ -137,14 +99,9 @@ impl common_traits::prelude::Builder for InsertableLoginProviderBuilder {
             name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableLoginProviderAttributes::Name,
             ))?,
-            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableLoginProviderAttributes::IconId,
+            icon: self.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableLoginProviderAttributes::Icon,
             ))?,
-            color_id: self.color_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableLoginProviderAttributes::ColorId,
-                ),
-            )?,
             client_id: self.client_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableLoginProviderAttributes::ClientId,
@@ -171,8 +128,7 @@ impl TryFrom<InsertableLoginProvider> for InsertableLoginProviderBuilder {
     fn try_from(insertable_variant: InsertableLoginProvider) -> Result<Self, Self::Error> {
         Self::default()
             .name(insertable_variant.name)?
-            .icon_id(insertable_variant.icon_id)?
-            .color_id(insertable_variant.color_id)?
+            .icon(insertable_variant.icon)?
             .client_id(insertable_variant.client_id)?
             .redirect_uri(insertable_variant.redirect_uri)?
             .oauth_url(insertable_variant.oauth_url)?

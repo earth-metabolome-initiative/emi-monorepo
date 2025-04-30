@@ -8,21 +8,12 @@
 //!
 //! Since it is unclear whether between worker communication is possible, this
 //! worker handles both the database and WebSocket connection to allow for
-//! internal comunication between the two.
-use std::{
-    collections::{HashMap, HashSet},
-    rc::Rc,
-};
+//! internal communication between the two.
 
-use api_path::api::ws::FULL_ENDPOINT;
-use core_structures::User;
 use db_worker::listen_notify::ListenNotify;
 use diesel::SqliteConnection;
-use futures::{SinkExt, StreamExt};
-use gloo_net::websocket::futures::WebSocket;
-use internal_message::db_internal_message::DBInternalMessage;
-use rosetta_uuid::Uuid;
-use ws_messages::F2BMessage;
+use internal_message::ws_internal_message::WSInternalMessage;
+use ws_messages::{F2BMessage, frontend::Unsubscribe};
 use yew_agent::worker::{HandlerId, Worker};
 
 mod c2db_message;
@@ -31,97 +22,28 @@ mod db2c_message;
 pub(crate) use db2c_message::DB2CMessage;
 mod internal_message;
 pub(crate) use internal_message::InternalMessage;
+mod component_message;
 mod db_worker;
 mod ws_worker;
-
-const NOMINAL_CLOSURE_CODE: u16 = 1000;
+pub use component_message::ComponentMessage;
+use futures::channel::mpsc::Sender;
 
 /// Worker for handling WebSocket operations.
 pub struct DBWSWorker {
-    subscribers: HashSet<HandlerId>,
-    tasks: HashMap<Uuid, HandlerId>,
-    user: Option<Rc<User>>,
     conn: Option<SqliteConnection>,
     listen_notify: ListenNotify,
-    websocket_sender: Option<futures::channel::mpsc::Sender<F2BMessage>>,
-}
-
-impl DBWSWorker {
-    fn connect_to_websocket(
-        hostname: &str,
-        scope: &yew_agent::prelude::WorkerScope<Self>,
-    ) -> Result<futures::channel::mpsc::Sender<F2BMessage>, String> {
-        let websocket = WebSocket::open(&format!("wss://{hostname}{FULL_ENDPOINT}"))
-            .map_err(|err| format!("Error opening websocket connection: {:?}", err))?;
-
-        match websocket.state() {
-            gloo_net::websocket::State::Open => {}
-            gloo_net::websocket::State::Connecting => {}
-            _ => {
-                return Err("Websocket connection is not open".to_string());
-            }
-        }
-
-        let (mut write, mut read) = websocket.split();
-
-        let (sender, mut receiver) = futures::channel::mpsc::channel::<F2BMessage>(1000);
-
-        // spawn_local(async move {
-        //     while let Some(frontend_message) = receiver.next().await {
-        //         if write.send(frontend_message.into()).await.is_err() {
-        //             log::error!("Error sending to websocket");
-        //             break;
-        //         }
-        //     }
-        //     log::debug!("Websocket sender closed");
-        // });
-
-        let hostname = hostname.to_owned();
-
-        // {
-        //     let scope = scope.clone();
-        //     spawn_local(async move {
-        //         while let Some(backend_message) = read.next().await {
-        //             match backend_message {
-        //                 Ok(message) => {
-        //                     match message.try_into() {
-        //                         Ok(message) => {
-        //
-        // scope.send_message(InternalMessage::Backend(message));
-        // }                         Err(err) => {
-        //                             log::error!("Error deserializing message: {:?}",
-        // err);                         }
-        //                     }
-        //                 }
-        //                 Err(err) => {
-        //                     log::error!("Error reading from websocket: {:?}", err);
-        //                     break;
-        //                 }
-        //             }
-        //         }
-        //         scope.send_message(InternalMessage::Reconnect(hostname));
-        //     });
-        // }
-
-        Ok(sender)
-    }
+    websocket: Option<Sender<F2BMessage>>,
 }
 
 impl Worker for DBWSWorker {
     type Message = InternalMessage;
-    type Input = C2DBMessage;
+    type Input = ComponentMessage;
     type Output = DB2CMessage;
 
     fn create(scope: &yew_agent::prelude::WorkerScope<Self>) -> Self {
         scope.send_future(sqlite_wasm_rs::export::install_opfs_sahpool(None, true));
-        Self {
-            subscribers: HashSet::new(),
-            tasks: HashMap::new(),
-            user: None,
-            websocket_sender: None,
-            listen_notify: ListenNotify::default(),
-            conn: None,
-        }
+        scope.send_message(WSInternalMessage::Connect);
+        Self { listen_notify: ListenNotify::default(), conn: None, websocket: None }
     }
 
     fn update(
@@ -139,19 +61,19 @@ impl Worker for DBWSWorker {
             InternalMessage::DBError(err) => {
                 todo!("Handle DB error: {err:?}");
             }
+            InternalMessage::WSError(err) => {
+                todo!("Handle WS error: {err:?}");
+            }
         }
     }
 
-    fn connected(
-        &mut self,
-        _scope: &yew_agent::prelude::WorkerScope<Self>,
-        id: yew_agent::worker::HandlerId,
-    ) {
-        self.subscribers.insert(id);
-    }
-
-    fn disconnected(&mut self, _scope: &yew_agent::prelude::WorkerScope<Self>, id: HandlerId) {
-        self.subscribers.remove(&id);
+    fn disconnected(&mut self, scope: &yew_agent::prelude::WorkerScope<Self>, id: HandlerId) {
+        for orphan_table_name in self.listen_notify.remove_table_listener(id) {
+            scope.send_message(Unsubscribe::from(orphan_table_name));
+        }
+        for orphan_primary_key in self.listen_notify.remove_row_listener(id) {
+            scope.send_message(Unsubscribe::from(orphan_primary_key));
+        }
     }
 
     fn received(
@@ -160,6 +82,10 @@ impl Worker for DBWSWorker {
         frontend_message: Self::Input,
         subscriber_id: HandlerId,
     ) {
-        todo!();
+        match frontend_message {
+            ComponentMessage::DB(db_message) => {
+                self.received_query(scope, db_message, subscriber_id);
+            }
+        }
     }
 }

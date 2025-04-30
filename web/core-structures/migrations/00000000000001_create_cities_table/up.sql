@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS cities (
 	id SERIAL PRIMARY KEY,
 	name TEXT NOT NULL,
-	code TEXT NOT NULL UNIQUE,
-	iso TEXT NOT NULL UNIQUE REFERENCES countries(iso)
+	iso CountryCode NOT NULL REFERENCES countries(iso)
 );

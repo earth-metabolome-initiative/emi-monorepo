@@ -2,7 +2,7 @@
 //! to the new database.
 
 use diesel_async::AsyncPgConnection;
-use web_common_traits::database::Loadable;
+use web_common_traits::database::AsyncRead;
 
 use super::get_user;
 use crate::codegen::DirectusUser;

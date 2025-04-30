@@ -8,7 +8,7 @@ use std::{
 };
 
 use diesel::{Connection, PgConnection};
-use diesel_migrations::{EmbeddedMigrations, MigrationHarness, embed_migrations};
+use diesel_migrations_utils::prelude::MigrationDirectory;
 use quote::quote;
 use testcontainers::{
     ContainerAsync, GenericImage, ImageExt, TestcontainersError,
@@ -16,7 +16,6 @@ use testcontainers::{
     runners::AsyncRunner,
 };
 
-const DEFAULT_MIGRATIONS: EmbeddedMigrations = embed_migrations!("./test_migrations");
 const DATABASE_PASSWORD: &str = "password";
 const DATABASE_USER: &str = "user";
 
@@ -174,7 +173,11 @@ async fn setup_docker(
 pub async fn setup_database_with_default_migrations(
     test_name: &str,
 ) -> Result<(ContainerAsync<GenericImage>, PgConnection, String), diesel::ConnectionError> {
-    setup_database_with_migrations(test_name, DEFAULT_MIGRATIONS).await
+    setup_database_with_migrations(
+        test_name,
+        MigrationDirectory::try_from("./test_migrations").unwrap(),
+    )
+    .await
 }
 
 /// Setup a database with a custom migration dir.
@@ -192,13 +195,13 @@ pub async fn setup_database_with_default_migrations(
 /// * If the container cannot be started.
 pub async fn setup_database_with_migrations(
     test_name: &str,
-    migration: EmbeddedMigrations,
+    migrations: MigrationDirectory,
 ) -> Result<(ContainerAsync<GenericImage>, PgConnection, String), diesel::ConnectionError> {
     let port = random_port(test_name);
     let database_name = format!("{test_name}_db");
     let docker = setup_docker(port, &database_name).await.expect("Failed to start container");
     let mut conn = establish_connection_to_postgres(port, &database_name)?;
-    conn.run_pending_migrations(migration).unwrap();
+    migrations.execute_ups::<diesel::PgConnection>(&mut conn).unwrap();
     Ok((docker, conn, database_name))
 }
 

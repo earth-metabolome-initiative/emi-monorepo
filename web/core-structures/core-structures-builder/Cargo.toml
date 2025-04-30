@@ -5,9 +5,8 @@ edition = "2024"
 
 [dependencies]
 taxonomy-fetcher.workspace = true
-csqlv.workspace = true
+csqlv-macro = { workspace = true, features = ["iso_codes", "font_awesome_icons"] }
 tokio.workspace = true
-font_awesome.workspace = true
 webcodegen.workspace = true
 diesel_migrations_utils.workspace = true
 time-requirements.workspace = true

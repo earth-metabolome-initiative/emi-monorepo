@@ -1,13 +1,19 @@
-#[derive(Debug, Clone, PartialEq, Copy, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::processables::processables
 )]
 pub struct Processable {
     pub id: rosetta_uuid::Uuid,
+}
+impl diesel::Identifiable for Processable {
+    type Id = rosetta_uuid::Uuid;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl Processable {
     #[cfg(feature = "postgres")]

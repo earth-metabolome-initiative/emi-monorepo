@@ -44,6 +44,7 @@ members = [
 
 [workspace.dependencies]
 actix-ws = "0.3.0"
+init-migration = { path = "data-migrations/init-migration" }
 syn = { version = "2.0", features = ["full", "visit-mut"] }
 quote = "1.0"
 proc-macro2 = "1.0"

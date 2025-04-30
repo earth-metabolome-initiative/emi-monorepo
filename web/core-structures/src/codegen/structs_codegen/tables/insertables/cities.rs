@@ -2,14 +2,12 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableCityAttributes {
     Name,
-    Code,
     Iso,
 }
 impl core::fmt::Display for InsertableCityAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertableCityAttributes::Name => write!(f, "name"),
-            InsertableCityAttributes::Code => write!(f, "code"),
             InsertableCityAttributes::Iso => write!(f, "iso"),
         }
     }
@@ -22,8 +20,7 @@ impl core::fmt::Display for InsertableCityAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCity {
     name: String,
-    code: String,
-    iso: String,
+    iso: iso_codes::CountryCode,
 }
 impl InsertableCity {
     #[cfg(feature = "postgres")]
@@ -46,8 +43,7 @@ impl InsertableCity {
 #[derive(Default)]
 pub struct InsertableCityBuilder {
     name: Option<String>,
-    code: Option<String>,
-    iso: Option<String>,
+    iso: Option<iso_codes::CountryCode>,
 }
 impl InsertableCityBuilder {
     pub fn name(
@@ -57,16 +53,9 @@ impl InsertableCityBuilder {
         self.name = Some(name);
         Ok(self)
     }
-    pub fn code(
-        mut self,
-        code: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.code = Some(code);
-        Ok(self)
-    }
     pub fn iso(
         mut self,
-        iso: String,
+        iso: iso_codes::CountryCode,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         self.iso = Some(iso);
         Ok(self)
@@ -81,9 +70,6 @@ impl common_traits::prelude::Builder for InsertableCityBuilder {
             name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableCityAttributes::Name,
             ))?,
-            code: self.code.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableCityAttributes::Code,
-            ))?,
             iso: self.iso.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableCityAttributes::Iso,
             ))?,
@@ -93,9 +79,6 @@ impl common_traits::prelude::Builder for InsertableCityBuilder {
 impl TryFrom<InsertableCity> for InsertableCityBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableCity) -> Result<Self, Self::Error> {
-        Self::default()
-            .name(insertable_variant.name)?
-            .code(insertable_variant.code)?
-            .iso(insertable_variant.iso)
+        Self::default().name(insertable_variant.name)?.iso(insertable_variant.iso)
     }
 }

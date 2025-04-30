@@ -1,7 +1,7 @@
-#[derive(Debug, Clone, PartialEq, Copy, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
 #[diesel(primary_key(team_id, member_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::team_members::team_members
@@ -9,6 +9,12 @@
 pub struct TeamMember {
     pub team_id: i32,
     pub member_id: i32,
+}
+impl diesel::Identifiable for TeamMember {
+    type Id = (i32, i32);
+    fn id(self) -> Self::Id {
+        (self.team_id, self.member_id)
+    }
 }
 impl TeamMember {
     #[cfg(feature = "postgres")]

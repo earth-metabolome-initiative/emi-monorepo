@@ -1,5 +1,6 @@
 mod deletable;
 mod foreign;
 mod insertables;
-mod loadable;
+mod tabular;
 mod updatables;
+mod upsertables;

@@ -73,8 +73,6 @@ pub use grinding_step_models::{
     InsertableGrindingStepModel, InsertableGrindingStepModelAttributes,
     InsertableGrindingStepModelBuilder,
 };
-mod icons;
-pub use icons::{InsertableIcon, InsertableIconAttributes, InsertableIconBuilder};
 mod instrument_categories;
 pub use instrument_categories::{
     InsertableInstrumentCategory, InsertableInstrumentCategoryAttributes,

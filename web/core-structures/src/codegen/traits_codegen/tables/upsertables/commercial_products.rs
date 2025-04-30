@@ -1,0 +1,188 @@
+#[cfg(feature = "postgres")]
+impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
+    for crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct
+{
+    fn upsert(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
+        diesel::insert_into(
+                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::table,
+            )
+            .values(self)
+            .on_conflict(
+                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::id,
+            )
+            .do_update()
+            .set(self)
+            .filter(
+                diesel::BoolExpressionMethods::and(
+                    diesel::BoolExpressionMethods::and(
+                        diesel::BoolExpressionMethods::and(
+                            diesel::BoolExpressionMethods::and(
+                                diesel::BoolExpressionMethods::and(
+                                    diesel::BoolExpressionMethods::and(
+                                        diesel::BoolExpressionMethods::and(
+                                            diesel::BoolExpressionMethods::and(
+                                                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::name
+                                                    .ne(
+                                                        diesel::upsert::excluded(
+                                                            crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::name,
+                                                        ),
+                                                    ),
+                                                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::description
+                                                    .ne(
+                                                        diesel::upsert::excluded(
+                                                            crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::description,
+                                                        ),
+                                                    ),
+                                            ),
+                                            crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::photograph_id
+                                                .ne(
+                                                    diesel::upsert::excluded(
+                                                        crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::photograph_id,
+                                                    ),
+                                                ),
+                                        ),
+                                        crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::deprecation_date
+                                            .ne(
+                                                diesel::upsert::excluded(
+                                                    crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::deprecation_date,
+                                                ),
+                                            ),
+                                    ),
+                                    crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::brand_id
+                                        .ne(
+                                            diesel::upsert::excluded(
+                                                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::brand_id,
+                                            ),
+                                        ),
+                                ),
+                                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::created_by
+                                    .ne(
+                                        diesel::upsert::excluded(
+                                            crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::created_by,
+                                        ),
+                                    ),
+                            ),
+                            crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::created_at
+                                .ne(
+                                    diesel::upsert::excluded(
+                                        crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::created_at,
+                                    ),
+                                ),
+                        ),
+                        crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::updated_by
+                            .ne(
+                                diesel::upsert::excluded(
+                                    crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::updated_by,
+                                ),
+                            ),
+                    ),
+                    crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::updated_at
+                        .ne(
+                            diesel::upsert::excluded(
+                                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::updated_at,
+                            ),
+                        ),
+                ),
+            )
+            .get_results(conn)
+            .map(|mut result| { result.pop() })
+    }
+}
+#[cfg(feature = "sqlite")]
+impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
+    for crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct
+{
+    fn upsert(
+        &self,
+        conn: &mut diesel::SqliteConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
+        diesel::insert_into(
+                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::table,
+            )
+            .values(self)
+            .on_conflict(
+                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::id,
+            )
+            .do_update()
+            .set(self)
+            .filter(
+                diesel::BoolExpressionMethods::and(
+                    diesel::BoolExpressionMethods::and(
+                        diesel::BoolExpressionMethods::and(
+                            diesel::BoolExpressionMethods::and(
+                                diesel::BoolExpressionMethods::and(
+                                    diesel::BoolExpressionMethods::and(
+                                        diesel::BoolExpressionMethods::and(
+                                            diesel::BoolExpressionMethods::and(
+                                                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::name
+                                                    .ne(
+                                                        diesel::upsert::excluded(
+                                                            crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::name,
+                                                        ),
+                                                    ),
+                                                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::description
+                                                    .ne(
+                                                        diesel::upsert::excluded(
+                                                            crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::description,
+                                                        ),
+                                                    ),
+                                            ),
+                                            crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::photograph_id
+                                                .ne(
+                                                    diesel::upsert::excluded(
+                                                        crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::photograph_id,
+                                                    ),
+                                                ),
+                                        ),
+                                        crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::deprecation_date
+                                            .ne(
+                                                diesel::upsert::excluded(
+                                                    crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::deprecation_date,
+                                                ),
+                                            ),
+                                    ),
+                                    crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::brand_id
+                                        .ne(
+                                            diesel::upsert::excluded(
+                                                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::brand_id,
+                                            ),
+                                        ),
+                                ),
+                                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::created_by
+                                    .ne(
+                                        diesel::upsert::excluded(
+                                            crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::created_by,
+                                        ),
+                                    ),
+                            ),
+                            crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::created_at
+                                .ne(
+                                    diesel::upsert::excluded(
+                                        crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::created_at,
+                                    ),
+                                ),
+                        ),
+                        crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::updated_by
+                            .ne(
+                                diesel::upsert::excluded(
+                                    crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::updated_by,
+                                ),
+                            ),
+                    ),
+                    crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::updated_at
+                        .ne(
+                            diesel::upsert::excluded(
+                                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::updated_at,
+                            ),
+                        ),
+                ),
+            )
+            .get_results(conn)
+            .map(|mut result| { result.pop() })
+    }
+}

@@ -1,7 +1,13 @@
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::projects::projects)]
 pub struct Project {
@@ -9,7 +15,7 @@ pub struct Project {
     pub name: String,
     pub description: String,
     pub state_id: i16,
-    pub icon_id: i16,
+    pub icon: font_awesome_icons::FAIcon,
     pub color_id: i16,
     pub parent_project_id: Option<i32>,
     pub budget: Option<f64>,
@@ -20,6 +26,12 @@ pub struct Project {
     pub updated_at: rosetta_timestamp::TimestampUTC,
     pub expected_end_date: rosetta_timestamp::TimestampUTC,
     pub end_date: rosetta_timestamp::TimestampUTC,
+}
+impl diesel::Identifiable for Project {
+    type Id = i32;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl Project {
     #[cfg(feature = "postgres")]
@@ -38,18 +50,6 @@ impl Project {
                     .eq(&self.state_id),
             )
             .first::<crate::codegen::structs_codegen::tables::project_states::ProjectState>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn icon(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::icons::Icon, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::icons::Icon::table()
-            .filter(crate::codegen::diesel_codegen::tables::icons::icons::dsl::id.eq(&self.icon_id))
-            .first::<crate::codegen::structs_codegen::tables::icons::Icon>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -127,21 +127,6 @@ impl Project {
             .filter(
                 crate::codegen::diesel_codegen::tables::projects::projects::dsl::state_id
                     .eq(state_id.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_icon_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        icon_id: &crate::codegen::structs_codegen::tables::icons::Icon,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::projects::projects::dsl::icon_id
-                    .eq(icon_id.id),
             )
             .load::<Self>(conn)
             .await

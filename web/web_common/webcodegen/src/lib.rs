@@ -13,6 +13,7 @@ mod schema;
 mod sql_functions;
 mod syngen;
 mod table_metadata;
+mod utils;
 
 pub use codegen::Codegen;
 pub use custom_schema_constraints::{

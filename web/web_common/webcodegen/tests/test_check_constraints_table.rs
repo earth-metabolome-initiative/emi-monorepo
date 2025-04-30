@@ -2,19 +2,16 @@
 
 mod utils;
 
-use diesel_migrations::{EmbeddedMigrations, embed_migrations};
+use diesel_migrations_utils::prelude::MigrationDirectory;
 use utils::*;
 use webcodegen::*;
-
-const CHECK_CONSTRAINT_TEST_MIGRATIONS: EmbeddedMigrations =
-    embed_migrations!("./test_check_constraints_migrations");
 
 #[tokio::test]
 /// Test generation of the check_constraints()
 async fn test_check_constraints_table() {
     let (docker, mut conn, database_name) = setup_database_with_migrations(
         "test_check_constraints_column",
-        CHECK_CONSTRAINT_TEST_MIGRATIONS,
+        MigrationDirectory::try_from("./test_check_constraints_migrations").unwrap(),
     )
     .await
     .unwrap();

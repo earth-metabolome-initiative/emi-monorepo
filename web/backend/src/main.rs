@@ -42,6 +42,13 @@ async fn main() -> std::io::Result<()> {
         .await
         .expect("Error creating database pool");
 
+    // Run init migrations.
+    {
+        let mut connection = pool.get().await.unwrap();
+        init_migration::init_migration(&mut connection)
+            .await
+            .expect("Error running init migration");
+    }
     let redis_client =
         Client::open(std::env::var("REDIS_URL").expect("REDIS_URL must be set").as_str())
             .expect("Error creating redis client");

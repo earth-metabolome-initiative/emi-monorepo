@@ -3,7 +3,7 @@
 pub enum InsertableProjectStateAttributes {
     Name,
     Description,
-    IconId,
+    Icon,
     ColorId,
 }
 impl core::fmt::Display for InsertableProjectStateAttributes {
@@ -11,7 +11,7 @@ impl core::fmt::Display for InsertableProjectStateAttributes {
         match self {
             InsertableProjectStateAttributes::Name => write!(f, "name"),
             InsertableProjectStateAttributes::Description => write!(f, "description"),
-            InsertableProjectStateAttributes::IconId => write!(f, "icon_id"),
+            InsertableProjectStateAttributes::Icon => write!(f, "icon"),
             InsertableProjectStateAttributes::ColorId => write!(f, "color_id"),
         }
     }
@@ -27,22 +27,10 @@ impl core::fmt::Display for InsertableProjectStateAttributes {
 pub struct InsertableProjectState {
     name: String,
     description: String,
-    icon_id: i16,
+    icon: font_awesome_icons::FAIcon,
     color_id: i16,
 }
 impl InsertableProjectState {
-    #[cfg(feature = "postgres")]
-    pub async fn icon(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::icons::Icon, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::icons::Icon::table()
-            .filter(crate::codegen::diesel_codegen::tables::icons::icons::dsl::id.eq(&self.icon_id))
-            .first::<crate::codegen::structs_codegen::tables::icons::Icon>(conn)
-            .await
-    }
     #[cfg(feature = "postgres")]
     pub async fn color(
         &self,
@@ -62,7 +50,7 @@ impl InsertableProjectState {
 pub struct InsertableProjectStateBuilder {
     name: Option<String>,
     description: Option<String>,
-    icon_id: Option<i16>,
+    icon: Option<font_awesome_icons::FAIcon>,
     color_id: Option<i16>,
 }
 impl InsertableProjectStateBuilder {
@@ -80,11 +68,11 @@ impl InsertableProjectStateBuilder {
         self.description = Some(description);
         Ok(self)
     }
-    pub fn icon_id(
+    pub fn icon(
         mut self,
-        icon_id: i16,
+        icon: font_awesome_icons::FAIcon,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.icon_id = Some(icon_id);
+        self.icon = Some(icon);
         Ok(self)
     }
     pub fn color_id(
@@ -109,8 +97,8 @@ impl common_traits::prelude::Builder for InsertableProjectStateBuilder {
                     InsertableProjectStateAttributes::Description,
                 ),
             )?,
-            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableProjectStateAttributes::IconId,
+            icon: self.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableProjectStateAttributes::Icon,
             ))?,
             color_id: self.color_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -126,7 +114,7 @@ impl TryFrom<InsertableProjectState> for InsertableProjectStateBuilder {
         Self::default()
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
-            .icon_id(insertable_variant.icon_id)?
+            .icon(insertable_variant.icon)?
             .color_id(insertable_variant.color_id)
     }
 }

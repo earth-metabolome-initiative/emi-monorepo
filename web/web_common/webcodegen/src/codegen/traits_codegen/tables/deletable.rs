@@ -7,7 +7,7 @@ use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::{Codegen, Table};
+use crate::{Codegen, Table, codegen::Syntax};
 
 impl Codegen<'_> {
     /// Generates the [`Deletable`] traits implementation for the tables
@@ -27,8 +27,9 @@ impl Codegen<'_> {
         // We generate each table in a separate document under the provided root, and we
         // collect all of the imported modules in a public one.
         let mut table_deletable_main_module = TokenStream::new();
-        let feature_flag = self.syntax.as_feature_flag();
-        let connection_type = self.syntax.as_connection_type();
+        let syntax = Syntax::PostgreSQL;
+        let feature_flag = syntax.as_feature_flag();
+        let connection_type = syntax.as_connection_type(true);
         let Some(user_table) = self.users_table else {
             return Err(crate::errors::CodeGenerationError::UserTableNotProvided.into());
         };

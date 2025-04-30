@@ -40,7 +40,7 @@ pub struct InsertableTeam {
     id: i32,
     name: String,
     description: String,
-    icon_id: i16,
+    icon_id: font_awesome_icons::FAIcon,
     color_id: i16,
     state_id: i16,
     parent_team_id: Option<i32>,
@@ -50,18 +50,6 @@ pub struct InsertableTeam {
     updated_at: rosetta_timestamp::TimestampUTC,
 }
 impl InsertableTeam {
-    #[cfg(feature = "postgres")]
-    pub async fn icon(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::icons::Icon, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::icons::Icon::table()
-            .filter(crate::codegen::diesel_codegen::tables::icons::icons::dsl::id.eq(&self.icon_id))
-            .first::<crate::codegen::structs_codegen::tables::icons::Icon>(conn)
-            .await
-    }
     #[cfg(feature = "postgres")]
     pub async fn color(
         &self,
@@ -147,7 +135,7 @@ pub struct InsertableTeamBuilder {
     id: Option<i32>,
     name: Option<String>,
     description: Option<String>,
-    icon_id: Option<i16>,
+    icon_id: Option<font_awesome_icons::FAIcon>,
     color_id: Option<i16>,
     state_id: Option<i16>,
     parent_team_id: Option<i32>,
@@ -187,7 +175,7 @@ impl InsertableTeamBuilder {
     }
     pub fn icon_id(
         mut self,
-        icon_id: i16,
+        icon_id: font_awesome_icons::FAIcon,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         self.icon_id = Some(icon_id);
         Ok(self)

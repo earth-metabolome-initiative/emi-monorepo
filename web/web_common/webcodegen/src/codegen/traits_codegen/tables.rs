@@ -4,8 +4,9 @@ mod attribute_traits;
 mod deletable;
 mod foreign;
 mod insertables;
-mod loadable;
+mod tabular;
 mod updatables;
+mod upsertables;
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
@@ -14,7 +15,10 @@ use time_requirements::prelude::{Task, TimeTracker};
 
 use crate::{
     Codegen, Table,
-    codegen::{CODEGEN_INSERTABLES_PATH, CODEGEN_UPDATABLES_PATH},
+    codegen::{
+        CODEGEN_FOREIGN_PATH, CODEGEN_INSERTABLES_PATH, CODEGEN_TABULAR_PATH,
+        CODEGEN_UPDATABLES_PATH, CODEGEN_UPSERTABLES_PATH,
+    },
 };
 
 impl Codegen<'_> {
@@ -38,6 +42,19 @@ impl Codegen<'_> {
 
         let mut submodule_file_content = TokenStream::new();
 
+        if self.should_generate_crud() {
+            let task = Task::new("Generate CRUD Traits");
+            self.generate_tabular_impls(root.join(CODEGEN_TABULAR_PATH).as_path(), tables, conn)?;
+
+            let tabular_module_ident =
+                Ident::new(CODEGEN_TABULAR_PATH, proc_macro2::Span::call_site());
+
+            submodule_file_content.extend(quote::quote! {
+                mod #tabular_module_ident;
+            });
+            tracker.add_completed_task(task);
+        }
+
         if self.enable_deletable_trait {
             let task = Task::new("Generate Deletable Traits");
             self.generate_deletable_impls(root.join("deletable").as_path(), tables, conn)?;
@@ -50,14 +67,19 @@ impl Codegen<'_> {
             tracker.add_completed_task(task);
         }
 
-        if self.enable_loadable_trait {
-            let task = Task::new("Generate Loadable Traits");
-            self.generate_loadable_impls(root.join("loadable").as_path(), tables, conn)?;
+        if self.enable_upsertable_trait {
+            let task = Task::new("Generate Upsertable Traits");
+            self.generate_upsertables_impls(
+                root.join(CODEGEN_UPSERTABLES_PATH).as_path(),
+                tables,
+                conn,
+            )?;
 
-            let loadable_module_ident = Ident::new("loadable", proc_macro2::Span::call_site());
+            let upsertable_module_ident =
+                Ident::new(CODEGEN_UPSERTABLES_PATH, proc_macro2::Span::call_site());
 
             submodule_file_content.extend(quote::quote! {
-                mod #loadable_module_ident;
+                mod #upsertable_module_ident;
             });
             tracker.add_completed_task(task);
         }
@@ -76,9 +98,10 @@ impl Codegen<'_> {
 
         if self.enable_foreign_trait {
             let task = Task::new("Generate Foreign Traits");
-            self.generate_foreign_impls(root.join("foreign").as_path(), tables, conn)?;
+            self.generate_foreign_impls(root.join(CODEGEN_FOREIGN_PATH).as_path(), tables, conn)?;
 
-            let foreign_module_ident = Ident::new("foreign", proc_macro2::Span::call_site());
+            let foreign_module_ident =
+                Ident::new(CODEGEN_FOREIGN_PATH, proc_macro2::Span::call_site());
 
             submodule_file_content.extend(quote::quote! {
                 mod #foreign_module_ident;

@@ -27,8 +27,12 @@ pub const CODEGEN_TRAITS_MODULE: &str = "traits_codegen";
 pub const CODEGEN_TABLES_PATH: &str = "tables";
 pub const CODEGEN_TYPES_PATH: &str = "types";
 pub const CODEGEN_JOINABLE_PATH: &str = "joinable";
+pub const CODEGEN_UPSERTABLES_PATH: &str = "upsertables";
 pub const CODEGEN_INSERTABLES_PATH: &str = "insertables";
 pub const CODEGEN_INSERTABLE_PATH: &str = "insertable";
+pub const CODEGEN_FOREIGN_KEYS_PATH: &str = "foreign_keys";
+pub const CODEGEN_FOREIGN_PATH: &str = "foreign";
+pub const CODEGEN_TABULAR_PATH: &str = "tabular";
 pub const CODEGEN_INSERTABLE_VARIANT_PATH: &str = "insertable_variant";
 pub const CODEGEN_INSERTABLE_BUILDER_PATH: &str = "insertable_variant_builder";
 pub const CODEGEN_UPDATABLES_PATH: &str = "updatables";
@@ -58,8 +62,6 @@ pub struct Codegen<'a> {
     output_directory: Option<&'a Path>,
     /// Whether to make the code readable.
     beautify: bool,
-    /// The syntax to generate.
-    pub(crate) syntax: syntaxes::Syntax,
     /// Whether to generate the diesel `joinables`.
     pub(super) enable_joinables: bool,
     /// Whether to generate the diesel `allow_tables_to_appear_in_same_query`.
@@ -96,6 +98,10 @@ pub struct Codegen<'a> {
     /// implementations.
     pub(super) enable_updatable_trait: bool,
     /// Whether to enable the
+    /// [`Upsertable`](web_common_traits::database::Upsertable) traits
+    /// implementations.
+    pub(super) enable_upsertable_trait: bool,
+    /// Whether to enable the
     /// [`Read`](web_common_traits::crud::Read) traits
     /// implementations.
     pub(super) enable_read_trait: bool,
@@ -111,7 +117,14 @@ impl<'a> Codegen<'a> {
             || self.enable_loadable_trait
             || self.enable_insertable_trait
             || self.enable_updatable_trait
+            || self.enable_upsertable_trait
             || self.enable_read_trait
+    }
+
+    #[must_use]
+    /// Check wether the `CRUD`-related traits should be generated.
+    pub fn should_generate_crud(&self) -> bool {
+        self.enable_read_trait
     }
 
     #[must_use]
@@ -195,20 +208,6 @@ impl<'a> Codegen<'a> {
     /// Whether to generate the SQL types.
     pub fn enable_sql_types(mut self) -> Self {
         self.enable_sql_types = true;
-        self
-    }
-
-    #[must_use]
-    /// Sets the `SQLite` syntax for the code generation.
-    pub fn sqlite(mut self) -> Self {
-        self.syntax = syntaxes::Syntax::SQLite;
-        self
-    }
-
-    #[must_use]
-    /// Sets the `PostgreSQL` syntax for the code generation.
-    pub fn postgresql(mut self) -> Self {
-        self.syntax = syntaxes::Syntax::PostgreSQL;
         self
     }
 
@@ -330,6 +329,15 @@ impl<'a> Codegen<'a> {
 
     #[must_use]
     /// Whether to enable the generation of the
+    /// [`Upsertable`](web_common_traits::database::Upsertable) traits.
+    pub fn enable_upsertable_trait(mut self) -> Self {
+        self = self.enable_table_structs();
+        self.enable_upsertable_trait = true;
+        self
+    }
+
+    #[must_use]
+    /// Whether to enable the generation of the
     /// [`Insertable`](web_common_traits::database::Insertable) traits.
     ///
     /// # Note
@@ -430,7 +438,7 @@ impl<'a> Codegen<'a> {
         tables: &[Table],
         conn: &mut PgConnection,
     ) -> Result<Vec<PgType>, WebCodeGenError> {
-        let mut types = tables
+        let mut types: Vec<PgType> = tables
             .iter()
             .map(|table| {
                 let custom_types = table
@@ -449,6 +457,7 @@ impl<'a> Codegen<'a> {
             .collect::<Result<Vec<Vec<PgType>>, WebCodeGenError>>()?
             .into_iter()
             .flatten()
+            .filter(|pg_type| pg_type.extension(conn).map_or(false, |ext| ext.is_none()))
             .collect::<Vec<PgType>>();
 
         types.sort_unstable();

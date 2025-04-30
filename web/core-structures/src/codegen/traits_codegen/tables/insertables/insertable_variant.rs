@@ -17,7 +17,6 @@ mod fractioning_step_models;
 mod fractioning_steps;
 mod freeze_drying_step_models;
 mod grinding_step_models;
-mod icons;
 mod instrument_categories;
 mod instrument_locations;
 mod instrument_model_categories;

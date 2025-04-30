@@ -1,8 +1,9 @@
 //! Build the core structures.
 use std::path::Path;
 
-use csqlv::{CSVSchemaBuilder, SQLGenerationOptions};
-use diesel::{Connection, pg::PgConnection, result::DatabaseErrorKind};
+use diesel::{
+    Connection, connection::SimpleConnection, pg::PgConnection, result::DatabaseErrorKind,
+};
 use diesel_migrations_utils::prelude::*;
 use taxonomy_fetcher::{
     Rank, Taxonomy, TaxonomyBuilder,
@@ -15,6 +16,9 @@ mod consistency_constraints;
 use consistency_constraints::execute_consistency_constraint_checks;
 mod constants;
 use constants::{DATABASE_NAME, DATABASE_URL};
+use csqlv_macro::load_populating_sql_from_csvs;
+
+const CSV_SQL: &str = load_populating_sql_from_csvs!(("../csvs", "/app/web/core-structures/csvs"));
 
 #[tokio::main]
 #[allow(clippy::too_many_lines)]
@@ -58,11 +62,6 @@ pub async fn main() {
     }
     time_tracker.add_completed_task(task);
 
-    // First, we create the CSV for the font-awesome icons
-    let task = Task::new("Creating Font Awesome Icons CSV");
-    font_awesome::Icon::to_csv("../csvs/icons.csv").unwrap();
-    time_tracker.add_completed_task(task);
-
     // Next, we create the CSV for the taxonomical ranks
     let task = Task::new("Creating Taxonomical Ranks CSV");
     NCBIRank::to_csv("../csvs/ranks.csv").unwrap();
@@ -81,20 +80,8 @@ pub async fn main() {
     // Next, we build the SQL associated with the CSVs present in the 'csvs'
     // directory
     let task = Task::new("Building Schema from CSVs");
-    let sql_generation_options = SQLGenerationOptions::default().include_population();
-    CSVSchemaBuilder::default()
-        // To show a loading bar while processing the CSVs
-        .verbose()
-        // To include compressed files such as .gz
-        .include_gz()
-        // For supporting running the tests within
-        // containers such as Docker
-        .singularize()
-        .container_directory("/app/csvs")
-        .from_dir("../csvs")
-        .unwrap()
-        .connect_and_create::<diesel::PgConnection>(DATABASE_URL, &sql_generation_options)
-        .unwrap();
+    let mut connection = PgConnection::establish(DATABASE_URL).unwrap();
+    connection.batch_execute(CSV_SQL).unwrap();
 
     time_tracker.add_completed_task(task);
 
@@ -179,6 +166,7 @@ pub async fn main() {
             .enable_insertable_trait()
             .enable_foreign_trait()
             .enable_updatable_trait()
+            .enable_upsertable_trait()
             .enable_crud_operations()
             .beautify()
             .generate(&mut conn, DATABASE_NAME, None)

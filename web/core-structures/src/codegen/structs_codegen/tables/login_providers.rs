@@ -1,7 +1,13 @@
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::login_providers::login_providers
@@ -9,70 +15,19 @@
 pub struct LoginProvider {
     pub id: i16,
     pub name: String,
-    pub icon_id: i16,
-    pub color_id: i16,
+    pub icon: font_awesome_icons::FAIcon,
     pub client_id: String,
     pub redirect_uri: String,
     pub oauth_url: String,
     pub scope: String,
 }
+impl diesel::Identifiable for LoginProvider {
+    type Id = i16;
+    fn id(self) -> Self::Id {
+        self.id
+    }
+}
 impl LoginProvider {
-    #[cfg(feature = "postgres")]
-    pub async fn icon(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::icons::Icon, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::icons::Icon::table()
-            .filter(crate::codegen::diesel_codegen::tables::icons::icons::dsl::id.eq(&self.icon_id))
-            .first::<crate::codegen::structs_codegen::tables::icons::Icon>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn color(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::colors::Color::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::colors::colors::dsl::id.eq(&self.color_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::colors::Color>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_icon_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        icon_id: &crate::codegen::structs_codegen::tables::icons::Icon,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::login_providers::login_providers::dsl::icon_id
-                    .eq(icon_id.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_color_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        color_id: &crate::codegen::structs_codegen::tables::colors::Color,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::login_providers::login_providers::dsl::color_id
-                    .eq(color_id.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
     #[cfg(feature = "postgres")]
     pub async fn from_name(
         name: &str,

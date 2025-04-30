@@ -10,8 +10,8 @@ pub mod login_provider;
 mod logout;
 pub mod navigator;
 // mod search_bar;
+pub mod readable_list;
 pub mod sidebar;
-
 // pub mod basic_list;
 // pub use basic_list::BasicList;
 pub use app::App;
@@ -19,3 +19,6 @@ pub use app::App;
 pub use error_page::ErrorPage;
 pub use footer::Footer;
 pub use navigator::*;
+pub use readable_list::ReadableList;
+pub mod font_awesome_icon;
+pub use font_awesome_icon::FAIcon;

@@ -50,20 +50,28 @@ impl common_traits::prelude::Builder for InsertableIconBuilder {
     type Attribute = InsertableIconAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableIconAttributes::Name,
-            ))?,
-            description: self.description.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableIconAttributes::Description,
-                ),
-            )?,
+            name: self
+                .name
+                .ok_or(
+                    common_traits::prelude::BuilderError::IncompleteBuild(
+                        InsertableIconAttributes::Name,
+                    ),
+                )?,
+            description: self
+                .description
+                .ok_or(
+                    common_traits::prelude::BuilderError::IncompleteBuild(
+                        InsertableIconAttributes::Description,
+                    ),
+                )?,
         })
     }
 }
 impl TryFrom<InsertableIcon> for InsertableIconBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableIcon) -> Result<Self, Self::Error> {
-        Self::default().name(insertable_variant.name)?.description(insertable_variant.description)
+        Self::default()
+            .name(insertable_variant.name)?
+            .description(insertable_variant.description)
     }
 }

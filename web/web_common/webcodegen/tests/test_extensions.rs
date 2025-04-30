@@ -3,20 +3,19 @@
 
 mod utils;
 
-use diesel_migrations::{EmbeddedMigrations, embed_migrations};
+use diesel_migrations_utils::prelude::MigrationDirectory;
 use utils::*;
 use webcodegen::*;
-
-const CHECK_CONSTRAINT_TEST_MIGRATIONS: EmbeddedMigrations =
-    embed_migrations!("./test_extensions_migrations");
 
 #[tokio::test]
 /// Test retrieval of extensions from a column
 async fn test_extensions_column() {
-    let (docker, mut conn, _database_name) =
-        setup_database_with_migrations("test_extensions_column", CHECK_CONSTRAINT_TEST_MIGRATIONS)
-            .await
-            .unwrap();
+    let (docker, mut conn, _database_name) = setup_database_with_migrations(
+        "test_extensions_column",
+        MigrationDirectory::try_from("./test_extensions_migrations").unwrap(),
+    )
+    .await
+    .unwrap();
 
     let uuid_extension = PgExtension::load("uuid-ossp", "public", &mut conn)
         .expect("Unable to query the database")

@@ -7,14 +7,17 @@ edition = "2024"
 rosetta-uuid = { workspace = true, features = ["serde"] }
 serde.workspace = true
 diesel.workspace = true
-diesel-async.workspace = true
+diesel-async = { workspace = true, optional = true }
 common-traits = { workspace = true, features = ["serde"] }
 validation-errors.workspace = true
 backend-request-errors.workspace = true
 
 [features]
-frontend = []
-backend = []
+sqlite = ["diesel/sqlite"]
+diesel-async = ["dep:diesel-async"]
+postgres = ["diesel/postgres", "diesel-async", "diesel-async/postgres"]
+frontend = ["sqlite"]
+backend = ["postgres"]
 
 [lints]
 workspace = true

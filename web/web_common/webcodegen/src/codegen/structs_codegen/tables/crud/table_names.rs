@@ -2,9 +2,23 @@
 
 use std::path::Path;
 
-use crate::{Codegen, Table};
+use proc_macro2::TokenStream;
+use syn::Ident;
+
+use crate::{
+    Codegen, Table,
+    codegen::{CODEGEN_DIRECTORY, CODEGEN_TABLES_PATH},
+};
 
 impl Codegen<'_> {
+    pub(crate) fn table_names_enum_path(&self) -> TokenStream {
+        let codegen_ident = Ident::new(CODEGEN_DIRECTORY, proc_macro2::Span::call_site());
+        let tables_module_ident = Ident::new(CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());
+        quote::quote! {
+            crate::#codegen_ident::#tables_module_ident::table_names::TableName
+        }
+    }
+
     /// Generate implementations of the `TableName` enum for the provided
     /// tables.
     ///
@@ -33,6 +47,16 @@ impl Codegen<'_> {
                 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
                 pub enum TableName {
                     #(#table_idents),*
+                }
+
+                impl core::fmt::Display for TableName {
+                    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                        match self {
+                            #(
+                                TableName::#table_idents => write!(f, stringify!(#table_idents)),
+                            )*
+                        }
+                    }
                 }
             })?,
         )?;

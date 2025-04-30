@@ -1,10 +1,10 @@
-name,description,icons.name
-camera,"Device to capture images or videos",camera
-insect trap,A device used to capture insects for study or control.,mosquito-net
-cutting tool,"A tool used to cut materials, such as scissors, scalpels or knives.",scissors
-wrapper,"Something used to wrap or package items, such as plastic wrap, foil or paper.",sheet-plastic
-precise manipulation tool,"A tool designed for precise manipulation of small objects, such as tweezers or forceps.",spoon
-breaking beads,"Beads employed to facilitate the breaking of a material.",bowling-ball
-gloves,"Protective coverings for hands, often made of latex or nitrile.",hand
-hand cleaning agent,"A chemical agent, often ethanol, used to avoid contamination among samples.",pump-soap
-paper towels,"Absorbent paper used for drying hands or cleaning surfaces.",box-tissue
+name,description,icon
+camera,"Device to capture images or videos",Camera
+insect trap,A device used to capture insects for study or control.,MosquitoNet
+cutting tool,"A tool used to cut materials, such as scissors, scalpels or knives.",Scissors
+wrapper,"Something used to wrap or package items, such as plastic wrap, foil or paper.",SheetPlastic
+precise manipulation tool,"A tool designed for precise manipulation of small objects, such as tweezers or forceps.",Spoon
+breaking beads,"Beads employed to facilitate the breaking of a material.",BowlingBall
+gloves,"Protective coverings for hands, often made of latex or nitrile.",Hand
+hand cleaning agent,"A chemical agent, often ethanol, used to avoid contamination among samples.",PumpSoap
+paper towels,"Absorbent paper used for drying hands or cleaning surfaces.",BoxTissue

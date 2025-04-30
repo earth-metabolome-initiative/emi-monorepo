@@ -37,3 +37,9 @@ impl From<diesel::result::Error> for DBError {
         DBError::QueryFailed
     }
 }
+
+impl From<diesel::ConnectionError> for DBError {
+    fn from(_err: diesel::ConnectionError) -> Self {
+        DBError::Connection
+    }
+}

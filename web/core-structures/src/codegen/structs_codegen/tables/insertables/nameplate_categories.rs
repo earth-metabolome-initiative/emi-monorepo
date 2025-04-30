@@ -4,7 +4,7 @@ pub enum InsertableNameplateCategoryAttributes {
     Name,
     PermanenceCategoryId,
     Description,
-    IconId,
+    Icon,
     ColorId,
 }
 impl core::fmt::Display for InsertableNameplateCategoryAttributes {
@@ -17,7 +17,7 @@ impl core::fmt::Display for InsertableNameplateCategoryAttributes {
             InsertableNameplateCategoryAttributes::Description => {
                 write!(f, "description")
             }
-            InsertableNameplateCategoryAttributes::IconId => write!(f, "icon_id"),
+            InsertableNameplateCategoryAttributes::Icon => write!(f, "icon"),
             InsertableNameplateCategoryAttributes::ColorId => write!(f, "color_id"),
         }
     }
@@ -34,7 +34,7 @@ pub struct InsertableNameplateCategory {
     name: String,
     permanence_category_id: i16,
     description: String,
-    icon_id: i16,
+    icon: font_awesome_icons::FAIcon,
     color_id: i16,
 }
 impl InsertableNameplateCategory {
@@ -59,18 +59,6 @@ impl InsertableNameplateCategory {
             .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn icon(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::icons::Icon, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::icons::Icon::table()
-            .filter(crate::codegen::diesel_codegen::tables::icons::icons::dsl::id.eq(&self.icon_id))
-            .first::<crate::codegen::structs_codegen::tables::icons::Icon>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn color(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -90,7 +78,7 @@ pub struct InsertableNameplateCategoryBuilder {
     name: Option<String>,
     permanence_category_id: Option<i16>,
     description: Option<String>,
-    icon_id: Option<i16>,
+    icon: Option<font_awesome_icons::FAIcon>,
     color_id: Option<i16>,
 }
 impl InsertableNameplateCategoryBuilder {
@@ -115,11 +103,11 @@ impl InsertableNameplateCategoryBuilder {
         self.description = Some(description);
         Ok(self)
     }
-    pub fn icon_id(
+    pub fn icon(
         mut self,
-        icon_id: i16,
+        icon: font_awesome_icons::FAIcon,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.icon_id = Some(icon_id);
+        self.icon = Some(icon);
         Ok(self)
     }
     pub fn color_id(
@@ -149,8 +137,8 @@ impl common_traits::prelude::Builder for InsertableNameplateCategoryBuilder {
                     InsertableNameplateCategoryAttributes::Description,
                 ),
             )?,
-            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableNameplateCategoryAttributes::IconId,
+            icon: self.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableNameplateCategoryAttributes::Icon,
             ))?,
             color_id: self.color_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -167,7 +155,7 @@ impl TryFrom<InsertableNameplateCategory> for InsertableNameplateCategoryBuilder
             .name(insertable_variant.name)?
             .permanence_category_id(insertable_variant.permanence_category_id)?
             .description(insertable_variant.description)?
-            .icon_id(insertable_variant.icon_id)?
+            .icon(insertable_variant.icon)?
             .color_id(insertable_variant.color_id)
     }
 }
