@@ -2,7 +2,7 @@
 use super::FAIcon;
 
 impl FAIcon {
-	#[must_use]
+    #[must_use]
     #[allow(clippy::too_many_lines)]
     /// Returns the Font Awesome class for the icon.
     pub fn class(&self) -> &str {

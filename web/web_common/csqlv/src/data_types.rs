@@ -23,7 +23,7 @@ pub enum DataType {
     #[cfg(feature = "iso_codes")]
     CountryCode,
     #[cfg(feature = "font_awesome_icons")]
-    FAIcon
+    FAIcon,
 }
 
 impl DataType {
@@ -157,6 +157,6 @@ impl DataType {
 
     /// Returns whether the data type may be used as a primary key.
     pub fn is_key_like(&self) -> bool {
-        matches!(self, DataType::SmallInt | DataType::Integer | DataType::BigInt | DataType::Uuid )
+        matches!(self, DataType::SmallInt | DataType::Integer | DataType::BigInt | DataType::Uuid)
     }
 }

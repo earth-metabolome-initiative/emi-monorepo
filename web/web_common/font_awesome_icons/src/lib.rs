@@ -1,10 +1,10 @@
 //! Library providing a Rust Font-Awesome enumeration.
+mod as_ref;
 mod class;
 mod descriptions;
-mod from_str;
 pub mod diesel_impls;
 pub mod errors;
-mod as_ref;
+mod from_str;
 mod try_from;
 
 #[cfg(feature = "pgrx")]

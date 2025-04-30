@@ -21,7 +21,9 @@ impl FAIcon {
             FAIcon::AccessibleIcon => {
                 "An icon of a person in a wheelchair, indicating accessibility."
             }
-            FAIcon::AddressBook => "A book with a person's silhouette, representing a contact list.",
+            FAIcon::AddressBook => {
+                "A book with a person's silhouette, representing a contact list."
+            }
             FAIcon::AddressCard => {
                 "A card with a person's silhouette, indicating contact information."
             }
@@ -88,7 +90,9 @@ impl FAIcon {
             FAIcon::ArrowRightArrowLeft => {
                 "Arrows pointing right and left, representing bidirectional movement."
             }
-            FAIcon::ArrowRightFromBracket => "A right arrow coming from a bracket, indicating exit.",
+            FAIcon::ArrowRightFromBracket => {
+                "A right arrow coming from a bracket, indicating exit."
+            }
             FAIcon::ArrowRightLong => {
                 "A long arrow pointing right, indicating extended forward direction."
             }
@@ -153,7 +157,9 @@ impl FAIcon {
             }
             FAIcon::ArrowsRotate => "Rotating arrows, representing refresh or rotation.",
             FAIcon::ArrowsSpin => "Arrows in a spinning motion, representing rotation or refresh.",
-            FAIcon::ArrowsSplitUpAndLeft => "Arrows splitting up and left, representing divergence.",
+            FAIcon::ArrowsSplitUpAndLeft => {
+                "Arrows splitting up and left, representing divergence."
+            }
             FAIcon::ArrowsToCircle => "Arrows pointing to a circle, representing centralization.",
             FAIcon::ArrowsToDot => "Arrows pointing to a dot, representing convergence or focus.",
             FAIcon::ArrowsToEye => "Arrows pointing to an eye, representing focus or attention.",
@@ -308,7 +314,9 @@ impl FAIcon {
             FAIcon::BuildingColumns => {
                 "A building with columns, representing classical architecture."
             }
-            FAIcon::BuildingFlag => "A building with a flag, representing government or institution.",
+            FAIcon::BuildingFlag => {
+                "A building with a flag, representing government or institution."
+            }
             FAIcon::BuildingLock => "A building with a lock, representing security.",
             FAIcon::BuildingNgo => {
                 "A building with 'NGO', representing a non-governmental organization."
@@ -338,14 +346,20 @@ impl FAIcon {
             FAIcon::CalendarCheck => "A calendar with a check mark, representing a confirmed date.",
             FAIcon::CalendarDay => "A calendar showing a day, representing scheduling.",
             FAIcon::CalendarDays => "A calendar with marked days, indicating a schedule or event.",
-            FAIcon::CalendarMinus => "A calendar with a minus sign, representing removing an event.",
+            FAIcon::CalendarMinus => {
+                "A calendar with a minus sign, representing removing an event."
+            }
             FAIcon::CalendarPlus => "A calendar with a plus sign, representing adding an event.",
             FAIcon::CalendarWeek => "A calendar with a week view, representing weekly schedule.",
             FAIcon::CalendarXmark => "A calendar with an `X`, representing a cancelled date.",
             FAIcon::Camera => "An icon of a camera, representing photography.",
             FAIcon::CameraRetro => "An old-fashioned camera, indicating photography or photos.",
-            FAIcon::CameraRotate => "A camera with a rotation arrow, representing photo orientation.",
-            FAIcon::Campground => "A campground symbol, representing camping or outdoor activities.",
+            FAIcon::CameraRotate => {
+                "A camera with a rotation arrow, representing photo orientation."
+            }
+            FAIcon::Campground => {
+                "A campground symbol, representing camping or outdoor activities."
+            }
             FAIcon::CandyCane => "A candy cane, representing Christmas or sweets.",
             FAIcon::Cannabis => "A cannabis leaf, representing the plant or its products.",
             FAIcon::Capsules => "Two capsules, representing medication or supplements.",
@@ -404,7 +418,9 @@ impl FAIcon {
                 "A chalkboard with a user icon, representing teaching or instruction."
             }
             FAIcon::ChampagneGlasses => "Two champagne glasses clinking, representing celebration.",
-            FAIcon::ChargingStation => "A charging station, representing electric vehicle charging.",
+            FAIcon::ChargingStation => {
+                "A charging station, representing electric vehicle charging."
+            }
             FAIcon::ChartArea => "An area chart, representing data trends.",
             FAIcon::ChartBar => "A bar chart, representing data comparison.",
             FAIcon::ChartColumn => "A column chart, representing data visualization.",
@@ -462,7 +478,9 @@ impl FAIcon {
             FAIcon::CircleChevronUp => {
                 "A circle with a chevron pointing up, indicating upward direction."
             }
-            FAIcon::CircleDollarToSlot => "A circle with a dollar sign and slot, indicating payment.",
+            FAIcon::CircleDollarToSlot => {
+                "A circle with a dollar sign and slot, indicating payment."
+            }
             FAIcon::CircleDot => "A circle with a dot, indicating focus or selection.",
             FAIcon::CircleDown => {
                 "A downward arrow inside a circle, indicating scroll down or download."
@@ -494,12 +512,16 @@ impl FAIcon {
             FAIcon::City => "A skyline of buildings, indicating an urban area or city.",
             FAIcon::Clapperboard => "A clapperboard, representing filmmaking or production.",
             FAIcon::Clipboard => "A clipboard, representing note-taking or data recording.",
-            FAIcon::ClipboardCheck => "A clipboard with a check mark, representing completed tasks.",
+            FAIcon::ClipboardCheck => {
+                "A clipboard with a check mark, representing completed tasks."
+            }
             FAIcon::ClipboardList => "A clipboard with a list, representing tasks or notes.",
             FAIcon::ClipboardQuestion => {
                 "A clipboard with a question mark, representing inquiry or uncertainty."
             }
-            FAIcon::ClipboardUser => "A clipboard with a user icon, representing user data or forms.",
+            FAIcon::ClipboardUser => {
+                "A clipboard with a user icon, representing user data or forms."
+            }
             FAIcon::Clock => "A clock face, indicating time.",
             FAIcon::ClockRotateLeft => {
                 "A clock with an arrow rotating left, representing time reversal."
@@ -588,7 +610,9 @@ impl FAIcon {
             }
             FAIcon::Database => "A stack of disks, representing a database.",
             FAIcon::DeleteLeft => "An arrow pointing left with a line, representing backspace.",
-            FAIcon::Democrat => "The logo of the Democratic Party, representing the political party.",
+            FAIcon::Democrat => {
+                "The logo of the Democratic Party, representing the political party."
+            }
             FAIcon::Desktop => "A desktop computer, indicating computing or work.",
             FAIcon::Dharmachakra => "The dharma wheel, representing Buddhism.",
             FAIcon::DiagramNext => "A diagram showing the next step, representing progression.",
@@ -657,7 +681,9 @@ impl FAIcon {
                 "An envelope with a circled check, representing approved mail."
             }
             FAIcon::EnvelopeOpen => "An open envelope, representing received message.",
-            FAIcon::EnvelopeOpenText => "An open envelope with text, representing received message.",
+            FAIcon::EnvelopeOpenText => {
+                "An open envelope with text, representing received message."
+            }
             FAIcon::EnvelopesBulk => "Multiple envelopes, representing bulk mail.",
             FAIcon::Equals => "An equals sign, representing equality.",
             FAIcon::Eraser => "An eraser, representing correction or deletion.",
@@ -682,7 +708,9 @@ impl FAIcon {
             FAIcon::FaceGrimace => "A grimacing face, representing discomfort.",
             FAIcon::FaceGrin => "A grinning face, representing happiness.",
             FAIcon::FaceGrinBeam => "A grinning face with beams, representing joy.",
-            FAIcon::FaceGrinBeamSweat => "A grinning face with beam and sweat, representing relief.",
+            FAIcon::FaceGrinBeamSweat => {
+                "A grinning face with beam and sweat, representing relief."
+            }
             FAIcon::FaceGrinHearts => "A grinning face with hearts, representing love.",
             FAIcon::FaceGrinSquint => "A grinning face with squinted eyes, representing humor.",
             FAIcon::FaceGrinSquintTears => {
@@ -763,7 +791,9 @@ impl FAIcon {
             FAIcon::FileMedical => "A file with a medical symbol, representing medical records.",
             FAIcon::FilePdf => "A file with a PDF symbol, representing a document.",
             FAIcon::FilePen => "A file with a pen, representing editable documents.",
-            FAIcon::FilePowerpoint => "A file with a PowerPoint symbol, representing presentations.",
+            FAIcon::FilePowerpoint => {
+                "A file with a PowerPoint symbol, representing presentations."
+            }
             FAIcon::FilePrescription => {
                 "A file with a prescription symbol, representing medical records."
             }
@@ -825,7 +855,9 @@ impl FAIcon {
             FAIcon::Gauge => "A speedometer or gauge, representing measurement or speed.",
             FAIcon::GaugeHigh => "A high gauge, representing high level or measurement.",
             FAIcon::GaugeSimple => "A simple gauge, representing measurement.",
-            FAIcon::GaugeSimpleHigh => "A gauge with a high reading, representing high measurement.",
+            FAIcon::GaugeSimpleHigh => {
+                "A gauge with a high reading, representing high measurement."
+            }
             FAIcon::Gavel => "A gavel, representing law or auctions.",
             FAIcon::Gear => "A gear, representing settings or machinery.",
             FAIcon::Gears => "Multiple gears, representing settings or machinery.",
@@ -950,7 +982,9 @@ impl FAIcon {
             FAIcon::HeartCirclePlus => {
                 "A heart inside a circle with a plus sign, representing health or medical support."
             }
-            FAIcon::HeartCircleXmark => "A heart with a circled `X`, representing rejection or loss.",
+            FAIcon::HeartCircleXmark => {
+                "A heart with a circled `X`, representing rejection or loss."
+            }
             FAIcon::HeartCrack => "A broken heart, representing heartbreak or sadness.",
             FAIcon::HeartPulse => "A heart with a pulse line, representing health or cardiology.",
             FAIcon::Helicopter => "A helicopter, representing aviation.",
@@ -998,9 +1032,13 @@ impl FAIcon {
             FAIcon::HouseFloodWaterCircleArrowRight => {
                 "A house with water and an arrow, representing flood direction."
             }
-            FAIcon::HouseLaptop => "A house with a laptop, representing remote work or home office.",
+            FAIcon::HouseLaptop => {
+                "A house with a laptop, representing remote work or home office."
+            }
             FAIcon::HouseLock => "A house with a lock, representing home security.",
-            FAIcon::HouseMedical => "A house with a medical symbol, representing a medical facility.",
+            FAIcon::HouseMedical => {
+                "A house with a medical symbol, representing a medical facility."
+            }
             FAIcon::HouseMedicalCircleCheck => {
                 "A house with a medical symbol and a check mark, representing an approved medical facility."
             }
@@ -1013,7 +1051,9 @@ impl FAIcon {
             FAIcon::HouseMedicalFlag => {
                 "A house with a medical flag, representing a medical facility."
             }
-            FAIcon::HouseSignal => "A house with a signal, representing smart home or connectivity.",
+            FAIcon::HouseSignal => {
+                "A house with a signal, representing smart home or connectivity."
+            }
             FAIcon::HouseTsunami => "A house with a tsunami wave, representing natural disaster.",
             FAIcon::HouseUser => "A house with a user inside, representing home or resident.",
             FAIcon::HryvniaSign => "The symbol for the Ukrainian hryvnia, indicating currency.",
@@ -1043,7 +1083,9 @@ impl FAIcon {
             FAIcon::J => "A capital letter 'J', representing the letter.",
             FAIcon::Jar => "A simple jar, representing containers or storage.",
             FAIcon::JarWheat => "A jar with wheat, representing food storage.",
-            FAIcon::Jedi => "The symbol for the Jedi Order, representing Star Wars or spirituality.",
+            FAIcon::Jedi => {
+                "The symbol for the Jedi Order, representing Star Wars or spirituality."
+            }
             FAIcon::JediOrder => "The logo of Jedi Order, representing the Star Wars faction.",
             FAIcon::JetFighter => "A jet fighter, representing aviation or military.",
             FAIcon::JetFighterUp => "A jet fighter pointing up, representing aviation or military.",
@@ -1195,13 +1237,17 @@ impl FAIcon {
             }
             FAIcon::MobileRetro => "A retro mobile phone, representing old technology.",
             FAIcon::MobileScreen => "A mobile phone, representing mobile device.",
-            FAIcon::MobileScreenButton => "A mobile phone with a button, representing mobile device.",
+            FAIcon::MobileScreenButton => {
+                "A mobile phone with a button, representing mobile device."
+            }
             FAIcon::MoneyBill => "A paper bill, representing money or currency.",
             FAIcon::MoneyBill1 => "A money bill, representing payment or currency.",
             FAIcon::MoneyBill1Wave => {
                 "A money bill with a wave, representing payment or transaction."
             }
-            FAIcon::MoneyBillTransfer => "A money bill with an arrow, indicating financial transfer.",
+            FAIcon::MoneyBillTransfer => {
+                "A money bill with an arrow, indicating financial transfer."
+            }
             FAIcon::MoneyBillTrendUp => {
                 "A money bill with an upward trend, representing financial growth."
             }
@@ -1372,7 +1418,9 @@ impl FAIcon {
             FAIcon::PersonWalkingArrowLoopLeft => {
                 "A person walking with a looping arrow to the left, indicating return or reverse."
             }
-            FAIcon::PersonWalkingArrowRight => "A person walking with an arrow, indicating movement.",
+            FAIcon::PersonWalkingArrowRight => {
+                "A person walking with an arrow, indicating movement."
+            }
             FAIcon::PersonWalkingDashedLineArrowRight => {
                 "A person walking with a dashed line and arrow, indicating a guided path."
             }
@@ -1452,7 +1500,9 @@ impl FAIcon {
             FAIcon::Receipt => "A receipt, representing a transaction record.",
             FAIcon::RecordVinyl => "A vinyl record, representing music or audio.",
             FAIcon::RectangleAd => "A rectangle with 'AD' inside, indicating advertisement.",
-            FAIcon::RectangleList => "A rectangle with a list inside, representing menu or options.",
+            FAIcon::RectangleList => {
+                "A rectangle with a list inside, representing menu or options."
+            }
             FAIcon::RectangleXmark => "A rectangle with an `X`, indicating deletion or closure.",
             FAIcon::Recycle => "Three arrows forming a triangle, indicating recycling.",
             FAIcon::Registered => "A circled 'R', indicating a registered trademark.",
@@ -1496,7 +1546,9 @@ impl FAIcon {
             FAIcon::RubleSign => "The symbol for the Russian ruble, indicating currency.",
             FAIcon::Rug => "A rug, representing home decor or carpeting.",
             FAIcon::Ruler => "A ruler, representing measurement.",
-            FAIcon::RulerCombined => "A ruler combined with another tool, representing measurement.",
+            FAIcon::RulerCombined => {
+                "A ruler combined with another tool, representing measurement."
+            }
             FAIcon::RulerHorizontal => "A horizontal ruler, representing measurement.",
             FAIcon::RulerVertical => "A vertical ruler, representing measurement.",
             FAIcon::RupeeSign => "The symbol for the Indian rupee, indicating currency in letters",
@@ -1607,7 +1659,9 @@ impl FAIcon {
             FAIcon::Spoon => "A spoon, representing dining or kitchen utensils.",
             FAIcon::Spotify => "The logo of Spotify, a music streaming service.",
             FAIcon::SprayCan => "A spray can, representing painting or spraying.",
-            FAIcon::SprayCanSparkles => "A spray can emitting sparkles, representing spray effects.",
+            FAIcon::SprayCanSparkles => {
+                "A spray can emitting sparkles, representing spray effects."
+            }
             FAIcon::Square => "A simple square, representing shape or stop.",
             FAIcon::SquareArrowUpRight => {
                 "A square with an arrow pointing up and right, indicating expansion or exit."
@@ -1657,7 +1711,9 @@ impl FAIcon {
             FAIcon::SquareShareNodes => {
                 "A square with nodes connected by lines, indicating sharing or networking."
             }
-            FAIcon::SquareSteam => "A square with the Steam logo, representing the gaming platform.",
+            FAIcon::SquareSteam => {
+                "A square with the Steam logo, representing the gaming platform."
+            }
             FAIcon::SquareUpRight => {
                 "A square with a bold arrow pointing up and right, indicating expansion or exit."
             }
@@ -1702,7 +1758,9 @@ impl FAIcon {
             FAIcon::SuitcaseMedical => "A medical suitcase, representing emergency medical kit.",
             FAIcon::SuitcaseRolling => "A suitcase with wheels, representing travel.",
             FAIcon::Sun => "A sun, representing daytime or brightness.",
-            FAIcon::SunPlantWilt => "A sun with a wilted plant, indicating drought or plant stress.",
+            FAIcon::SunPlantWilt => {
+                "A sun with a wilted plant, indicating drought or plant stress."
+            }
             FAIcon::Superscript => "A superscript 'A', indicating superscript text.",
             FAIcon::Swatchbook => "A swatchbook, representing color samples or design.",
             FAIcon::Synagogue => "A synagogue, representing a place of worship for Jews.",
@@ -1741,7 +1799,9 @@ impl FAIcon {
             }
             FAIcon::TemperatureEmpty => "A thermometer empty, representing no temperature reading.",
             FAIcon::TemperatureFull => "A thermometer full, representing very high temperature.",
-            FAIcon::TemperatureHalf => "A thermometer half full, representing moderate temperature.",
+            FAIcon::TemperatureHalf => {
+                "A thermometer half full, representing moderate temperature."
+            }
             FAIcon::TemperatureHigh => {
                 "A thermometer with high reading, indicating high temperature."
             }
@@ -1816,7 +1876,9 @@ impl FAIcon {
             FAIcon::Trowel => "A trowel, representing construction or gardening.",
             FAIcon::TrowelBricks => "A trowel with bricks, representing construction or masonry.",
             FAIcon::Truck => "An icon of a truck, indicating transportation or delivery.",
-            FAIcon::TruckArrowRight => "A truck with an arrow pointing right, representing delivery.",
+            FAIcon::TruckArrowRight => {
+                "A truck with an arrow pointing right, representing delivery."
+            }
             FAIcon::TruckDroplet => "A truck with a droplet, representing liquid transport.",
             FAIcon::TruckFast => "A fast-moving truck, indicating quick delivery or shipment.",
             FAIcon::TruckField => "A truck in a field, indicating agricultural transport.",
@@ -1843,7 +1905,9 @@ impl FAIcon {
             FAIcon::Underline => "A line below text, indicating underline or emphasis.",
             FAIcon::UniversalAccess => "A circle with a person inside, representing accessibility.",
             FAIcon::Unlock => "An open padlock, indicating access or security.",
-            FAIcon::UnlockKeyhole => "An open padlock with a keyhole, indicating access or security.",
+            FAIcon::UnlockKeyhole => {
+                "An open padlock with a keyhole, indicating access or security."
+            }
             FAIcon::Unsplash => "The logo of Unsplash, representing the photo sharing platform.",
             FAIcon::UpDown => {
                 "An arrow pointing up and another pointing down, indicating vertical movement."
@@ -1872,7 +1936,9 @@ impl FAIcon {
             FAIcon::UserDoctor => {
                 "A user icon with a stethoscope, representing a doctor or healthcare professional."
             }
-            FAIcon::UserGear => "A user icon with a gear, representing user settings or management.",
+            FAIcon::UserGear => {
+                "A user icon with a gear, representing user settings or management."
+            }
             FAIcon::UserGraduate => {
                 "A user wearing a graduation cap, indicating education or graduation."
             }
@@ -1910,7 +1976,9 @@ impl FAIcon {
             FAIcon::UsersRectangle => {
                 "Multiple user icons inside a rectangle, representing a group or community."
             }
-            FAIcon::UsersSlash => "Multiple user icons with a slash, indicating no users or blocked.",
+            FAIcon::UsersSlash => {
+                "Multiple user icons with a slash, indicating no users or blocked."
+            }
             FAIcon::UsersViewfinder => {
                 "A user icon inside a viewfinder, representing focus on users."
             }

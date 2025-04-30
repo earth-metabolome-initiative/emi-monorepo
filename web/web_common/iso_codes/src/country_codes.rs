@@ -6,8 +6,8 @@ mod display;
 mod emoji;
 mod from;
 mod name;
-mod unicode;
 mod try_from;
+mod unicode;
 
 #[cfg(feature = "pgrx")]
 use pgrx::FromDatum;
