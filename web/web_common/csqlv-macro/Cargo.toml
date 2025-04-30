@@ -18,3 +18,4 @@ workspace = true
 
 [features]
 iso_codes = ["csqlv/iso_codes"]
+font_awesome_icons = ["csqlv/font_awesome_icons"]

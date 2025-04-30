@@ -21,7 +21,9 @@ pub enum DataType {
     BigSerial,
     Boolean,
     #[cfg(feature = "iso_codes")]
-    CountryCode
+    CountryCode,
+    #[cfg(feature = "font_awesome_icons")]
+    FAIcon
 }
 
 impl DataType {
@@ -38,6 +40,8 @@ impl DataType {
             DataType::Boolean => 1,
             #[cfg(feature = "iso_codes")]
             DataType::CountryCode => 2,
+            #[cfg(feature = "font_awesome_icons")]
+            DataType::FAIcon => 2,
         }
     }
 
@@ -53,61 +57,55 @@ impl DataType {
             return vec![DataType::Null];
         }
 
+        let mut candidate_types = vec![DataType::Text, DataType::VarChar(value.len())];
+
         #[cfg(feature = "iso_codes")]
         {
             use iso_codes::CountryCode;
             if CountryCode::try_from(value).is_ok() {
-                return vec![DataType::CountryCode, DataType::Text, DataType::VarChar(value.len())];
+                candidate_types.push(DataType::CountryCode);
+            }
+        }
+
+        #[cfg(feature = "font_awesome_icons")]
+        {
+            use font_awesome_icons::FAIcon;
+            if FAIcon::from_str(value).is_ok() {
+                candidate_types.push(DataType::FAIcon);
             }
         }
 
         if Uuid::from_str(value).is_ok() {
-            return vec![DataType::Uuid, DataType::Text, DataType::VarChar(value.len())];
+            candidate_types.push(DataType::Uuid);
         }
 
         if value.parse::<i16>().is_ok() {
-            return vec![
-                DataType::SmallInt,
-                DataType::Integer,
-                DataType::BigInt,
-                DataType::Text,
-                DataType::VarChar(value.len()),
-            ];
+            candidate_types.push(DataType::SmallInt);
         }
 
         if value.parse::<i32>().is_ok() {
-            return vec![
-                DataType::Integer,
-                DataType::BigInt,
-                DataType::Text,
-                DataType::VarChar(value.len()),
-            ];
+            candidate_types.push(DataType::Integer);
         }
 
         if value.parse::<i64>().is_ok() {
-            return vec![DataType::BigInt, DataType::Text, DataType::VarChar(value.len())];
+            candidate_types.push(DataType::BigInt);
         }
 
         if value.parse::<f32>().is_ok() {
-            return vec![
-                DataType::Real,
-                DataType::Double,
-                DataType::Text,
-                DataType::VarChar(value.len()),
-            ];
+            candidate_types.push(DataType::Real);
         }
 
         if value.parse::<f64>().is_ok() {
-            return vec![DataType::Double, DataType::Text, DataType::VarChar(value.len())];
+            candidate_types.push(DataType::Double);
         }
 
         if value.to_ascii_lowercase().eq_ignore_ascii_case("true")
             || value.to_ascii_lowercase().eq_ignore_ascii_case("false")
         {
-            return vec![DataType::Boolean, DataType::Text, DataType::VarChar(value.len())];
+            candidate_types.push(DataType::Boolean);
         }
 
-        vec![DataType::Text, DataType::VarChar(value.len())]
+        candidate_types
     }
 
     /// Converts into the serial variant of the data type.
@@ -152,11 +150,13 @@ impl DataType {
             DataType::Boolean => "BOOLEAN".to_owned(),
             #[cfg(feature = "iso_codes")]
             DataType::CountryCode => "CountryCode".to_owned(),
+            #[cfg(feature = "font_awesome_icons")]
+            DataType::FAIcon => "FAIcon".to_owned(),
         }
     }
 
     /// Returns whether the data type may be used as a primary key.
     pub fn is_key_like(&self) -> bool {
-        matches!(self, DataType::SmallInt | DataType::Integer | DataType::BigInt | DataType::Uuid)
+        matches!(self, DataType::SmallInt | DataType::Integer | DataType::BigInt | DataType::Uuid )
     }
 }

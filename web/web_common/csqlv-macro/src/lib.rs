@@ -92,6 +92,10 @@ pub fn load_populating_sql_from_csvs(input: TokenStream) -> TokenStream {
     {
         salt.extend(b"iso_codes");
     }
+    #[cfg(feature = "font_awesome_icons")]
+    {
+        salt.extend(b"font_awesome_icons");
+    }
 
     let cached_file = cached_file_path(&salt);
     let cached_file_last_modified = file_last_modified_time(&cached_file).unwrap_or(0);
@@ -117,7 +121,7 @@ pub fn load_populating_sql_from_csvs(input: TokenStream) -> TokenStream {
     let schema = schema_builder.from_dir(csv_directory_str).expect("Failed to load CSV directory");
 
     let sql_generation_options: SQLGenerationOptions =
-        SQLGenerationOptions::default().include_population();
+        SQLGenerationOptions::default().include_population().include_extensions();
     let sql = schema.to_sql(&sql_generation_options).expect("Failed to generate SQL");
 
     // Minify the SQL content

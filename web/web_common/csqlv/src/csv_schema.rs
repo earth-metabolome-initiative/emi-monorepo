@@ -7,6 +7,7 @@ use indicatif::ProgressIterator;
 use crate::{
     SQLGenerationOptions,
     csv_table::CSVTable,
+    data_types::DataType,
     errors::CSVSchemaError,
     extensions::{has_compression_extension, has_supported_extension},
     metadata::CSVTableMetadata,
@@ -88,6 +89,13 @@ impl CSVSchema {
         Ok(CSVTable { schema: self, table_metadata })
     }
 
+    /// Returns whether any column of any table has a given type.
+    pub fn has_column_type(&self, column_type: DataType) -> bool {
+        self.table_metadata
+            .iter()
+            .any(|table| table.columns.iter().any(|column| column.data_type == column_type))
+    }
+
     /// Returns the SQL to generate the schema in `PostgreSQL`.
     ///
     /// # Arguments
@@ -103,9 +111,19 @@ impl CSVSchema {
     ) -> Result<String, CSVSchemaError> {
         let mut sql = String::new();
 
-        #[cfg(feature = "iso_codes")]
-        {
-            sql.push_str("CREATE EXTENSION IF NOT EXISTS \"iso_codes\";\n");
+        if sql_generation_options.include_extensions {
+            #[cfg(feature = "iso_codes")]
+            {
+                if self.has_column_type(DataType::CountryCode) {
+                    sql.push_str("CREATE EXTENSION IF NOT EXISTS \"iso_codes\";\n");
+                }
+            }
+            #[cfg(feature = "font_awesome_icons")]
+            {
+                if self.has_column_type(DataType::FAIcon) {
+                    sql.push_str("CREATE EXTENSION IF NOT EXISTS \"font_awesome_icons\";\n");
+                }
+            }
         }
 
         for table in self.tables_with_priority().iter().map(|(table, _)| table) {
