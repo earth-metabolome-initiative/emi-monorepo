@@ -13,6 +13,8 @@ pub struct Migration {
     name: String,
     /// The number of the migration.
     number: u64,
+    /// The number of digits in the original padded migration number.
+    number_of_digits: usize,
 }
 
 impl PartialOrd for Migration {
@@ -37,9 +39,13 @@ impl<'a> TryFrom<&'a Path> for Migration {
         let name =
             name.to_str().ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
         let mut fragmented_name = name.split('_');
-        let number = fragmented_name
+        let unparsed_number = fragmented_name
             .next()
-            .ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?
+            .ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
+
+        let number_of_digits = unparsed_number.len();
+
+        let number = unparsed_number
             .parse::<u64>()
             .map_err(|_| Error::InvalidMigration(path.to_string_lossy().to_string()))?;
 
@@ -79,7 +85,7 @@ impl<'a> TryFrom<&'a Path> for Migration {
             ));
         }
 
-        Ok(Migration { name: name.to_string(), number })
+        Ok(Migration { name: name.to_string(), number, number_of_digits })
     }
 }
 
@@ -126,7 +132,8 @@ impl Migration {
     #[must_use]
     /// Returns the name of the directory containing the migration.
     pub fn directory(&self) -> String {
-        format!("{:014}_{}", self.number, self.name)
+        let number_of_digits = self.number_of_digits;
+        format!("{:0number_of_digits$}_{}", self.number, self.name)
     }
 
     /// Returns an iterator over all of the tables created in the up migration.
@@ -209,11 +216,11 @@ impl Migration {
     /// * `Error::ReadingMigrationFailed` - If the migration cannot be read.
     pub fn up(&self, parent: &Path) -> Result<String, Error> {
         let path = parent.join(self.directory()).join("up.sql");
-        std::fs::read_to_string(path).map_err(|error| {
+        std::fs::read_to_string(&path).map_err(|error| {
             Error::ReadingMigrationFailed(
                 self.number,
                 crate::prelude::MigrationKind::Up,
-                error.to_string(),
+                format!("{}: {}", error, path.to_string_lossy()),
             )
         })
     }
@@ -247,11 +254,11 @@ impl Migration {
     /// * `Error::ReadingMigrationFailed` - If the migration cannot be read.
     pub fn down(&self, parent: &Path) -> Result<String, Error> {
         let path = parent.join(self.directory()).join("down.sql");
-        std::fs::read_to_string(path).map_err(|error| {
+        std::fs::read_to_string(&path).map_err(|error| {
             Error::ReadingMigrationFailed(
                 self.number,
                 crate::prelude::MigrationKind::Down,
-                error.to_string(),
+                format!("{}: {}", error, path.to_string_lossy()),
             )
         })
     }
@@ -271,7 +278,8 @@ impl Migration {
     /// * `parent` - The parent path of the migration.
     pub(crate) fn move_to(self, number: u64, parent: &Path) -> Result<Self, Error> {
         let current_migration_directory = parent.join(self.directory());
-        let updated_migration = Migration { name: self.name.clone(), number };
+        let updated_migration =
+            Migration { name: self.name.clone(), number, number_of_digits: self.number_of_digits };
         let updated_migration_directory = parent.join(updated_migration.directory());
         std::fs::rename(&current_migration_directory, &updated_migration_directory).map_err(
             |_| {
