@@ -1,6 +1,13 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::instruments::instruments)]
 pub struct Instrument {
@@ -15,6 +22,12 @@ pub struct Instrument {
     pub instrument_model: i32,
     pub instrument_location: i32,
     pub grams: Option<f32>,
+}
+impl diesel::Identifiable for Instrument {
+    type Id = i32;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl Instrument {
     #[cfg(feature = "postgres")]

@@ -1,6 +1,13 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::si_units::si_units)]
 pub struct SiUnit {
@@ -14,6 +21,12 @@ pub struct SiUnit {
     pub symbol: String,
     pub base_unit: String,
     pub multiplication_factor: f32,
+}
+impl diesel::Identifiable for SiUnit {
+    type Id = i32;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl SiUnit {
     #[cfg(feature = "postgres")]

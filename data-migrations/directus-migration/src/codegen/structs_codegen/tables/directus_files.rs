@@ -1,6 +1,13 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::directus_files::directus_files
@@ -32,6 +39,12 @@ pub struct DirectusFile {
     pub tus_id: Option<String>,
     pub tus_data: Option<serde_json::Value>,
     pub uploaded_on: Option<rosetta_timestamp::TimestampUTC>,
+}
+impl diesel::Identifiable for DirectusFile {
+    type Id = rosetta_uuid::Uuid;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl DirectusFile {
     #[cfg(feature = "postgres")]

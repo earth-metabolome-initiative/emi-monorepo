@@ -1,6 +1,13 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::directus_settings::directus_settings
@@ -39,6 +46,12 @@ pub struct DirectusSetting {
     pub public_registration_verify_email: bool,
     pub public_registration_role: Option<rosetta_uuid::Uuid>,
     pub public_registration_email_filter: Option<serde_json::Value>,
+}
+impl diesel::Identifiable for DirectusSetting {
+    type Id = i32;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl DirectusSetting {
     #[cfg(feature = "postgres")]

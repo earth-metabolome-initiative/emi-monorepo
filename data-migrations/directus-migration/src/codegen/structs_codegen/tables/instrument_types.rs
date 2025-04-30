@@ -1,6 +1,13 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::instrument_types::instrument_types
@@ -13,6 +20,12 @@ pub struct InstrumentType {
     pub user_updated: Option<rosetta_uuid::Uuid>,
     pub date_updated: Option<rosetta_timestamp::TimestampUTC>,
     pub instrument_type: Option<String>,
+}
+impl diesel::Identifiable for InstrumentType {
+    type Id = i32;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl InstrumentType {
     #[cfg(feature = "postgres")]

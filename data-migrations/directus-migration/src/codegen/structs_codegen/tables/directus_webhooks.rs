@@ -1,6 +1,13 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks
@@ -17,6 +24,12 @@ pub struct DirectusWebhook {
     pub headers: Option<serde_json::Value>,
     pub was_active_before_deprecation: bool,
     pub migrated_flow: Option<rosetta_uuid::Uuid>,
+}
+impl diesel::Identifiable for DirectusWebhook {
+    type Id = i32;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl DirectusWebhook {
     #[cfg(feature = "postgres")]

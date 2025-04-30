@@ -1,6 +1,13 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::directus_versions::directus_versions
@@ -17,6 +24,12 @@ pub struct DirectusVersion {
     pub user_created: Option<rosetta_uuid::Uuid>,
     pub user_updated: Option<rosetta_uuid::Uuid>,
     pub delta: Option<serde_json::Value>,
+}
+impl diesel::Identifiable for DirectusVersion {
+    type Id = rosetta_uuid::Uuid;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl DirectusVersion {
     #[cfg(feature = "postgres")]

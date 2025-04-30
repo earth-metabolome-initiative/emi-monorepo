@@ -1,6 +1,13 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(token))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions
@@ -14,6 +21,12 @@ pub struct DirectusSession {
     pub share: Option<rosetta_uuid::Uuid>,
     pub origin: Option<String>,
     pub next_token: Option<String>,
+}
+impl diesel::Identifiable for DirectusSession {
+    type Id = String;
+    fn id(self) -> Self::Id {
+        self.token
+    }
 }
 impl DirectusSession {
     #[cfg(feature = "postgres")]

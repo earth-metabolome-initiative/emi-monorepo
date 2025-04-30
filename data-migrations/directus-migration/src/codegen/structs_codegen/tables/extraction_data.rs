@@ -1,6 +1,13 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::extraction_data::extraction_data
@@ -23,6 +30,12 @@ pub struct ExtractionDatum {
     pub parent_container: Option<i32>,
     pub parent_sample_container: i32,
     pub extraction_container: Option<i32>,
+}
+impl diesel::Identifiable for ExtractionDatum {
+    type Id = i32;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl ExtractionDatum {
     #[cfg(feature = "postgres")]

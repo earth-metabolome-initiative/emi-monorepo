@@ -1,6 +1,13 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::rooms::rooms)]
 pub struct Room {
@@ -16,6 +23,12 @@ pub struct Room {
     pub address: i32,
     pub geolocation: postgis_diesel::types::GeometryContainer<postgis_diesel::types::Point>,
     pub qr_code: rosetta_uuid::Uuid,
+}
+impl diesel::Identifiable for Room {
+    type Id = i32;
+    fn id(self) -> Self::Id {
+        self.id
+    }
 }
 impl Room {
     #[cfg(feature = "postgres")]

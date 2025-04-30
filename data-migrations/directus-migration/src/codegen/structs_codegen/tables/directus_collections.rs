@@ -1,6 +1,13 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Queryable, diesel::Identifiable)]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[diesel(primary_key(collection))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::directus_collections::directus_collections
@@ -26,6 +33,12 @@ pub struct DirectusCollection {
     pub collapse: String,
     pub preview_url: Option<String>,
     pub versioning: bool,
+}
+impl diesel::Identifiable for DirectusCollection {
+    type Id = String;
+    fn id(self) -> Self::Id {
+        self.collection
+    }
 }
 impl DirectusCollection {
     #[cfg(feature = "postgres")]

@@ -11,6 +11,7 @@ mod directus_shares;
 mod directus_versions;
 mod dried_samples_data;
 mod extraction_data;
+mod foreign_keys;
 mod instrument_models;
 mod instruments;
 mod ms_data;
