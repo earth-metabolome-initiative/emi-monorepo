@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use diesel_async::AsyncPgConnection;
+
 use super::ConstraintError;
 use crate::{Column, custom_schema_constraints::CustomColumnConstraint, errors::WebCodeGenError};
 

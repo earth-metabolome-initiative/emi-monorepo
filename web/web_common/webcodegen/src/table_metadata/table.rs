@@ -186,7 +186,8 @@ impl Table {
         &self,
         conn: &mut AsyncPgConnection,
     ) -> Result<Vec<Ident>, WebCodeGenError> {
-        self.primary_key_columns(conn).await?
+        self.primary_key_columns(conn)
+            .await?
             .into_iter()
             .map(|column| column.snake_case_ident())
             .collect::<Result<Vec<Ident>, WebCodeGenError>>()
@@ -634,7 +635,10 @@ impl Table {
     /// # Errors
     ///
     /// * If database connection fails.
-    pub async fn supports_copy(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+    pub async fn supports_copy(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         for column in self.columns(conn).await? {
             if !column.supports_copy(conn).await? {
                 return Ok(false);
@@ -670,7 +674,10 @@ impl Table {
     /// # Errors
     ///
     /// * If database connection fails.
-    pub async fn supports_ord(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+    pub async fn supports_ord(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         for column in self.columns(conn).await? {
             if !column.supports_ord(conn).await? {
                 return Ok(false);
@@ -688,7 +695,10 @@ impl Table {
     /// # Errors
     ///
     /// * If database connection fails.
-    pub async fn supports_hash(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+    pub async fn supports_hash(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         for column in self.columns(conn).await? {
             if !column.supports_hash(conn).await? {
                 return Ok(false);
@@ -789,7 +799,8 @@ impl Table {
             .filter(tables::table_name.eq(table_name))
             .filter(tables::table_schema.eq(table_schema))
             .filter(tables::table_catalog.eq(table_catalog))
-            .first::<Table>(conn).await
+            .first::<Table>(conn)
+            .await
     }
 
     /// Returns the columns of the table.
@@ -843,7 +854,8 @@ impl Table {
             .filter(columns::table_schema.eq(&self.table_schema))
             .filter(columns::table_catalog.eq(&self.table_catalog))
             .filter(columns::column_name.eq(column_name))
-            .first::<Column>(conn).await
+            .first::<Column>(conn)
+            .await
     }
 
     /// Returns the groups of columns defining unique constraints.
@@ -921,7 +933,8 @@ impl Table {
             .filter(table_constraints::constraint_type.eq("UNIQUE"))
             .order_by(table_constraints::constraint_name)
             .select((TableConstraint::as_select(), Column::as_select()))
-            .load::<(TableConstraint, Column)>(conn).await
+            .load::<(TableConstraint, Column)>(conn)
+            .await
             .map(|rows| {
                 rows.into_iter()
                     .chunk_by(|(constraint, _)| constraint.constraint_name.clone())
@@ -946,7 +959,10 @@ impl Table {
     /// # Errors
     ///
     /// * If the primary key columns cannot be loaded from the database.
-    pub async fn has_primary_keys(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+    pub async fn has_primary_keys(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         self.primary_key_columns(conn).await.map(|columns| !columns.is_empty())
     }
 
@@ -980,7 +996,10 @@ impl Table {
     ///
     /// * If the table does not have primary keys.
     /// * If the primary key columns cannot be loaded from the database.
-    pub async fn primary_key_type(&self, conn: &mut AsyncPgConnection) -> Result<Type, WebCodeGenError> {
+    pub async fn primary_key_type(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Type, WebCodeGenError> {
         let primary_key_columns = self.primary_key_columns(conn).await?;
 
         if primary_key_columns.is_empty() {
@@ -1153,7 +1172,8 @@ impl Table {
             .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
             .filter(table_constraints::constraint_type.eq("PRIMARY KEY"))
             .select(Column::as_select())
-            .load::<Column>(conn).await?)
+            .load::<Column>(conn)
+            .await?)
     }
 
     /// Returns the check constraints for the table.
@@ -1192,7 +1212,8 @@ impl Table {
             .filter(table_constraints::table_schema.eq(&self.table_schema))
             .filter(table_constraints::table_catalog.eq(&self.table_catalog))
             .select(CheckConstraint::as_select())
-            .load::<CheckConstraint>(conn).await
+            .load::<CheckConstraint>(conn)
+            .await
     }
 
     /// Returns the list of Triggers associates to the current table.
@@ -1208,7 +1229,10 @@ impl Table {
     /// # Errors
     ///
     /// * If the triggers cannot be loaded from the database.
-    pub async fn triggers(&self, conn: &mut AsyncPgConnection) -> Result<Vec<PgTrigger>, DieselError> {
+    pub async fn triggers(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<PgTrigger>, DieselError> {
         use crate::schema::{pg_class, pg_namespace, pg_trigger};
         pg_trigger::table
             .inner_join(pg_class::table.on(pg_trigger::tgrelid.eq(pg_class::oid)))
@@ -1216,7 +1240,8 @@ impl Table {
             .filter(pg_class::relname.eq(&self.table_name))
             .filter(pg_namespace::nspname.eq(&self.table_schema))
             .select(PgTrigger::as_select())
-            .load::<PgTrigger>(conn).await
+            .load::<PgTrigger>(conn)
+            .await
     }
 
     /// Returns a the path to the diesel table module.

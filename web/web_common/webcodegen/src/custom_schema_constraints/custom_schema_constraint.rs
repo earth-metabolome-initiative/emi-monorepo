@@ -1,5 +1,5 @@
-use diesel_async::AsyncPgConnection;
 use async_trait::async_trait;
+use diesel_async::AsyncPgConnection;
 
 use crate::{Column, Table, errors::WebCodeGenError};
 

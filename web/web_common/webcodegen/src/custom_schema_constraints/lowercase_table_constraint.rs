@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use diesel_async::AsyncPgConnection;
+
 use crate::{
     Table,
     custom_schema_constraints::{ConstraintError, CustomTableConstraint},

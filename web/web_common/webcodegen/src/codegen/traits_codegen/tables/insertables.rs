@@ -45,7 +45,8 @@ impl Codegen<'_> {
             &root.join(CODEGEN_INSERTABLE_VARIANT_PATH),
             tables,
             conn,
-        ).await?;
+        )
+        .await?;
         self.generate_insertable_builder_impls(
             &root.join(CODEGEN_INSERTABLE_BUILDER_PATH),
             tables,

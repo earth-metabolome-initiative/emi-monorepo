@@ -40,7 +40,8 @@ impl Codegen<'_> {
             for foreign_key in table.foreign_keys(conn).await? {
                 // For each table we retrieve the foreign key(s).
                 // First we fetch the foreign table (and its primary key)
-                let Some((foreign_table, _foreign_table_pk)) = foreign_key.foreign_table(conn).await?
+                let Some((foreign_table, _foreign_table_pk)) =
+                    foreign_key.foreign_table(conn).await?
                 else {
                     continue;
                 };

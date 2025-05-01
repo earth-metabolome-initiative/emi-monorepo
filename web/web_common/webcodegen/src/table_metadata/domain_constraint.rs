@@ -1,6 +1,4 @@
-use diesel::{
-    ExpressionMethods, QueryDsl, Queryable, QueryableByName,
-};
+use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
 use crate::errors::WebCodeGenError;
@@ -52,7 +50,10 @@ impl DomainConstraint {
         conn: &mut AsyncPgConnection,
     ) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::domain_constraints;
-        domain_constraints::table.load::<DomainConstraint>(conn).await.map_err(WebCodeGenError::from)
+        domain_constraints::table
+            .load::<DomainConstraint>(conn)
+            .await
+            .map_err(WebCodeGenError::from)
     }
 
     /// Load all the domain constraints from the database
@@ -86,7 +87,8 @@ impl DomainConstraint {
             .filter(domain_constraints::constraint_name.eq(constraint_name))
             .filter(domain_constraints::constraint_schema.eq(constraint_schema))
             .filter(domain_constraints::constraint_catalog.eq(constraint_catalog))
-            .load::<DomainConstraint>(conn).await
+            .load::<DomainConstraint>(conn)
+            .await
             .map_err(WebCodeGenError::from)
     }
 }

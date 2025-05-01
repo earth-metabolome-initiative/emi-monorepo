@@ -2,8 +2,8 @@
 //! table.
 
 use diesel::{
-    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl,
-    Queryable, QueryableByName, Selectable, SelectableHelper,
+    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, Queryable,
+    QueryableByName, Selectable, SelectableHelper,
 };
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
@@ -76,7 +76,8 @@ impl PgExtension {
             .inner_join(pg_namespace::table.on(pg_extension::extnamespace.eq(pg_namespace::oid)))
             .filter(pg_extension::extname.eq(name).and(pg_namespace::nspname.eq(namespace)))
             .select(PgExtension::as_select())
-            .first(conn).await
+            .first(conn)
+            .await
             .optional()
             .map_err(WebCodeGenError::from)
     }
@@ -90,13 +91,17 @@ impl PgExtension {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub async  fn functions(&self, conn: &mut AsyncPgConnection) -> Result<Vec<PgProc>, WebCodeGenError> {
+    pub async fn functions(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<PgProc>, WebCodeGenError> {
         use crate::schema::{pg_depend, pg_proc};
         pg_depend::table
             .inner_join(pg_proc::table.on(pg_depend::objid.eq(pg_proc::oid)))
             .filter(pg_depend::refobjid.eq(self.oid))
             .select(PgProc::as_select())
-            .load(conn).await
+            .load(conn)
+            .await
             .map_err(WebCodeGenError::from)
     }
 

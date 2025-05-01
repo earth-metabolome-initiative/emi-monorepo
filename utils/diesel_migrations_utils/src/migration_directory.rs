@@ -205,7 +205,10 @@ impl MigrationDirectory {
     /// # Errors
     ///
     /// * If the execution of the migrations fails
-    pub async fn execute_ups<C: diesel_async::AsyncConnection>(&self, conn: &mut C) -> Result<(), Error> {
+    pub async fn execute_ups<C: diesel_async::AsyncConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<(), Error> {
         for (migration_number, migration) in self.ups().enumerate() {
             conn.batch_execute(&migration?).await.map_err(|error| {
                 Error::ExecutingMigrationFailed(migration_number as u64, MigrationKind::Up, error)
@@ -228,7 +231,10 @@ impl MigrationDirectory {
     ///
     /// * If the connection to the database fails
     /// * If the execution of the migrations fails
-    pub async fn connect_and_execute_ups<C: diesel_async::AsyncConnection>(&self, url: &str) -> Result<(), Error> {
+    pub async fn connect_and_execute_ups<C: diesel_async::AsyncConnection>(
+        &self,
+        url: &str,
+    ) -> Result<(), Error> {
         let mut attempts = 0;
         loop {
             match C::establish(url).await {

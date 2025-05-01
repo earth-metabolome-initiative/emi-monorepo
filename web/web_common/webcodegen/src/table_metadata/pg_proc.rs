@@ -1,8 +1,8 @@
 //! Submodule providing a struct [`PgProc`] representing the `pg_proc` table.
 
 use diesel::{
-    ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, Queryable,
-    QueryableByName, Selectable, SelectableHelper,
+    ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, Queryable, QueryableByName,
+    Selectable, SelectableHelper,
 };
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use syn::punctuated::Punctuated;
@@ -86,7 +86,10 @@ impl PgProc {
     /// # Errors
     ///
     /// * If the return type does not exist.
-    pub async fn returns_result(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+    pub async fn returns_result(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         if self.proname.starts_with("must_be_") || self.proname.starts_with("must_not_be_") {
             Ok(self.return_type(conn).await?.is_boolean(conn).await?)
         } else {
@@ -125,7 +128,10 @@ impl PgProc {
     /// # Errors
     ///
     /// * If the return type does not exist.
-    pub async fn return_type(&self, conn: &mut AsyncPgConnection) -> Result<PgType, diesel::result::Error> {
+    pub async fn return_type(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<PgType, diesel::result::Error> {
         PgType::from_oid(self.prorettype, conn).await
     }
 
@@ -154,7 +160,8 @@ impl PgProc {
             )
             .filter(crate::schema::pg_namespace::nspname.eq(namespace))
             .select(PgProc::as_select())
-            .first::<PgProc>(conn).await
+            .first::<PgProc>(conn)
+            .await
             .optional()
     }
 
@@ -177,7 +184,8 @@ impl PgProc {
             .inner_join(pg_depend::table.on(pg_extension::oid.eq(pg_depend::refobjid)))
             .filter(pg_depend::objid.eq(self.oid))
             .select(PgExtension::as_select())
-            .first::<PgExtension>(conn).await
+            .first::<PgExtension>(conn)
+            .await
             .optional()
     }
 
@@ -192,7 +200,10 @@ impl PgProc {
     ///
     /// * If the database connection is invalid.
     /// * If the function is not contained in an extension.
-    pub async fn path(&self, conn: &mut AsyncPgConnection) -> Result<syn::Path, diesel::result::Error> {
+    pub async fn path(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<syn::Path, diesel::result::Error> {
         let extension = self.extension(conn).await?;
         let extension = extension.map(|ext| ext.ident());
         let ident = syn::Ident::new(&self.proname, proc_macro2::Span::call_site());

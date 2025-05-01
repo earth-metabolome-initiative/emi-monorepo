@@ -52,15 +52,15 @@ impl Codegen<'_> {
 
             let mut parent_check = TokenStream::new();
 
-            for parent_key in table
-                .parent_keys(conn).await? {
-                    let parent_key_method = parent_key.getter_ident()?;
-                    let (parent_table, _) = parent_key.foreign_table(conn).await?.expect("Parent table not found");
-                    if !parent_table.allows_updatable(conn).await? {
-                        continue;
-                    }
+            for parent_key in table.parent_keys(conn).await? {
+                let parent_key_method = parent_key.getter_ident()?;
+                let (parent_table, _) =
+                    parent_key.foreign_table(conn).await?.expect("Parent table not found");
+                if !parent_table.allows_updatable(conn).await? {
+                    continue;
+                }
 
-                    parent_check.extend(if parent_key.is_nullable() {
+                parent_check.extend(if parent_key.is_nullable() {
                         quote::quote! {
                             if let Some(parent) = self.#parent_key_method(conn).await? {
                                 if !parent.can_update(user_id, conn).await? {
@@ -75,7 +75,7 @@ impl Codegen<'_> {
                             }
                         }
                     });
-                }
+            }
 
             let (user_id, additional_imports) = if parent_check.is_empty() {
                 (quote::quote! { _user_id }, TokenStream::new())

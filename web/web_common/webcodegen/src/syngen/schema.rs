@@ -26,7 +26,10 @@ impl Table {
     /// * If the diesel type for a column cannot be loaded.
     /// * If the primary key columns cannot be loaded from the database.
     /// * If the diesel feature flag name cannot be generated.
-    pub async fn to_schema(&self, conn: &mut AsyncPgConnection) -> Result<TokenStream, WebCodeGenError> {
+    pub async fn to_schema(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<TokenStream, WebCodeGenError> {
         let table_schema = Ident::new(&self.table_schema, proc_macro2::Span::call_site());
         let original_table_name = &self.table_name;
         let sanitized_table_name_ident =
@@ -49,7 +52,8 @@ impl Table {
             })
         }
         let primary_key_names = self
-            .primary_key_columns(conn).await?
+            .primary_key_columns(conn)
+            .await?
             .into_iter()
             .map(|column| Ident::new(&column.column_name, proc_macro2::Span::call_site()))
             .collect::<Vec<Ident>>();

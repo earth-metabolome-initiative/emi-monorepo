@@ -1,7 +1,5 @@
 //! Submodule providing the struct `PgAttribute` and associated methods.
-use diesel::{
-    ExpressionMethods, QueryDsl, Queryable, QueryableByName, Selectable,
-};
+use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, Selectable};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
 use crate::{PgType, errors::WebCodeGenError};
@@ -78,7 +76,8 @@ impl PgAttribute {
         use crate::schema::pg_type;
         pg_type::table
             .filter(pg_type::oid.eq(self.atttypid))
-            .first(conn).await
+            .first(conn)
+            .await
             .map_err(WebCodeGenError::from)
     }
 
@@ -87,7 +86,10 @@ impl PgAttribute {
     /// # Errors
     ///
     /// Returns an error if the provided database connection fails.
-    pub async fn supports_copy(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+    pub async fn supports_copy(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         Box::pin(self.pg_type(conn).await?.supports_copy(conn)).await
     }
 
@@ -96,7 +98,10 @@ impl PgAttribute {
     /// # Errors
     ///
     /// Returns an error if the provided database connection fails.
-    pub async fn supports_hash(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+    pub async fn supports_hash(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         Box::pin(self.pg_type(conn).await?.supports_hash(conn)).await
     }
 
@@ -114,7 +119,10 @@ impl PgAttribute {
     /// # Errors
     ///
     /// Returns an error if the provided database connection fails.
-    pub async fn supports_ord(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+    pub async fn supports_ord(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         Box::pin(self.pg_type(conn).await?.supports_ord(conn)).await
     }
 }

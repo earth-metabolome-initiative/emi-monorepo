@@ -43,7 +43,8 @@ impl Codegen<'_> {
                 root.join(crate::codegen::CODEGEN_TABLES_PATH).as_path(),
                 tables,
                 conn,
-            ).await?;
+            )
+            .await?;
             time_tracker.add_completed_task(task);
 
             let tables_ident =
@@ -59,7 +60,8 @@ impl Codegen<'_> {
                 root.join(crate::codegen::CODEGEN_TYPES_PATH).as_path(),
                 tables,
                 conn,
-            ).await?;
+            )
+            .await?;
             time_tracker.add_completed_task(task);
 
             let types_ident =
@@ -75,7 +77,8 @@ impl Codegen<'_> {
                 root.join(crate::codegen::CODEGEN_JOINABLE_PATH).as_path(),
                 tables,
                 conn,
-            ).await?;
+            )
+            .await?;
             time_tracker.add_completed_task(task);
 
             let joinable_ident =
@@ -91,7 +94,8 @@ impl Codegen<'_> {
                 root.join("allow_tables_to_appear_in_same_query").as_path(),
                 tables,
                 conn,
-            ).await?;
+            )
+            .await?;
             time_tracker.add_completed_task(task);
 
             submodule_file_content.extend(quote::quote! {

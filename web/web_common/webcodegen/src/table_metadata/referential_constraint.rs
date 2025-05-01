@@ -1,6 +1,4 @@
-use diesel::{
-    ExpressionMethods, QueryDsl, Queryable, QueryableByName,
-};
+use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
 use crate::errors::WebCodeGenError;
@@ -49,7 +47,8 @@ impl ReferentialConstraint {
     ) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::referential_constraints;
         referential_constraints::table
-            .load::<ReferentialConstraint>(conn).await
+            .load::<ReferentialConstraint>(conn)
+            .await
             .map_err(WebCodeGenError::from)
     }
 
@@ -84,7 +83,8 @@ impl ReferentialConstraint {
             .filter(referential_constraints::constraint_name.eq(constraint_name))
             .filter(referential_constraints::constraint_schema.eq(constraint_schema))
             .filter(referential_constraints::constraint_catalog.eq(constraint_catalog))
-            .load::<ReferentialConstraint>(conn).await
+            .load::<ReferentialConstraint>(conn)
+            .await
             .map_err(WebCodeGenError::from)
     }
 }

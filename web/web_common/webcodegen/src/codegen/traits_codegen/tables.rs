@@ -44,7 +44,8 @@ impl Codegen<'_> {
 
         if self.should_generate_crud() {
             let task = Task::new("Generate CRUD Traits");
-            self.generate_tabular_impls(root.join(CODEGEN_TABULAR_PATH).as_path(), tables, conn).await?;
+            self.generate_tabular_impls(root.join(CODEGEN_TABULAR_PATH).as_path(), tables, conn)
+                .await?;
 
             let tabular_module_ident =
                 Ident::new(CODEGEN_TABULAR_PATH, proc_macro2::Span::call_site());
@@ -73,7 +74,8 @@ impl Codegen<'_> {
                 root.join(CODEGEN_UPSERTABLES_PATH).as_path(),
                 tables,
                 conn,
-            ).await?;
+            )
+            .await?;
 
             let upsertable_module_ident =
                 Ident::new(CODEGEN_UPSERTABLES_PATH, proc_macro2::Span::call_site());
@@ -98,7 +100,8 @@ impl Codegen<'_> {
 
         if self.enable_foreign_trait {
             let task = Task::new("Generate Foreign Traits");
-            self.generate_foreign_impls(root.join(CODEGEN_FOREIGN_PATH).as_path(), tables, conn).await?;
+            self.generate_foreign_impls(root.join(CODEGEN_FOREIGN_PATH).as_path(), tables, conn)
+                .await?;
 
             let foreign_module_ident =
                 Ident::new(CODEGEN_FOREIGN_PATH, proc_macro2::Span::call_site());
@@ -111,7 +114,8 @@ impl Codegen<'_> {
 
         if self.enable_insertable_trait {
             let task = Task::new("Generate Insertable Traits");
-            self.generate_insertables_impls(&root.join(CODEGEN_INSERTABLES_PATH), tables, conn).await?;
+            self.generate_insertables_impls(&root.join(CODEGEN_INSERTABLES_PATH), tables, conn)
+                .await?;
 
             let insertable_module_ident =
                 Ident::new(CODEGEN_INSERTABLES_PATH, proc_macro2::Span::call_site());
@@ -124,7 +128,8 @@ impl Codegen<'_> {
 
         if self.enable_updatable_trait {
             let task = Task::new("Generate Updatable Traits");
-            self.generate_updatables_impls(&root.join(CODEGEN_UPDATABLES_PATH), tables, conn).await?;
+            self.generate_updatables_impls(&root.join(CODEGEN_UPDATABLES_PATH), tables, conn)
+                .await?;
 
             let updatable_module_ident =
                 Ident::new(CODEGEN_UPDATABLES_PATH, proc_macro2::Span::call_site());

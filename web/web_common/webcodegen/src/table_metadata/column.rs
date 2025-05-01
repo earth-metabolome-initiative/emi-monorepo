@@ -150,7 +150,8 @@ impl Column {
                 ),
             )
             .select(CheckConstraint::as_select())
-            .load(conn).await?)
+            .load(conn)
+            .await?)
     }
 
     /// Returns the associated geometry column if the column is a geometry
@@ -173,7 +174,8 @@ impl Column {
             .filter(geometry_columns::f_table_name.eq(&self.table_name))
             .filter(geometry_columns::f_table_schema.eq(&self.table_schema))
             .filter(geometry_columns::f_geometry_column.eq(&self.column_name))
-            .first::<crate::GeometryColumn>(conn).await?)
+            .first::<crate::GeometryColumn>(conn)
+            .await?)
     }
 
     /// Returns the associated geography column if the column is a geography
@@ -196,7 +198,8 @@ impl Column {
             .filter(geography_columns::f_table_name.eq(&self.table_name))
             .filter(geography_columns::f_table_schema.eq(&self.table_schema))
             .filter(geography_columns::f_geography_column.eq(&self.column_name))
-            .first::<crate::GeographyColumn>(conn).await?)
+            .first::<crate::GeographyColumn>(conn)
+            .await?)
     }
 
     /// Returns the data type associated with the column as repo
@@ -239,7 +242,10 @@ impl Column {
     /// # Errors
     ///
     /// If an error occurs while querying the database
-    pub async fn pg_type(&self, conn: &mut AsyncPgConnection) -> Result<PgType, diesel::result::Error> {
+    pub async fn pg_type(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<PgType, diesel::result::Error> {
         use crate::schema::{pg_attribute, pg_class, pg_namespace, pg_type};
 
         pg_type::table
@@ -250,7 +256,8 @@ impl Column {
             .filter(pg_namespace::nspname.eq(&self.table_schema))
             .filter(pg_attribute::attname.eq(&self.column_name))
             .select(PgType::as_select())
-            .first::<PgType>(conn).await
+            .first::<PgType>(conn)
+            .await
     }
 
     /// Returns the string data type
@@ -316,7 +323,10 @@ impl Column {
     /// # Errors
     ///
     /// If an error occurs while querying the database
-    pub async fn rust_data_type(&self, conn: &mut AsyncPgConnection) -> Result<Type, WebCodeGenError> {
+    pub async fn rust_data_type(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Type, WebCodeGenError> {
         if let Ok(geometry) = self.geometry(conn).await {
             return geometry.rust_type(self.is_nullable());
         }
@@ -333,8 +343,10 @@ impl Column {
             }
             Err(error) => {
                 if self.has_custom_type() {
-                    Ok(PgType::from_name(self.data_type_str(conn)?, conn).await?
-                        .rust_type(self.is_nullable(), conn).await?)
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)
+                        .await?
+                        .rust_type(self.is_nullable(), conn)
+                        .await?)
                 } else {
                     Err(error)
                 }
@@ -465,7 +477,8 @@ impl Column {
             .filter(tables::table_name.eq(&self.table_name))
             .filter(tables::table_schema.eq(&self.table_schema))
             .filter(tables::table_catalog.eq(&self.table_catalog))
-            .first::<Table>(conn).await
+            .first::<Table>(conn)
+            .await
             .map_err(WebCodeGenError::from)
     }
 
@@ -502,7 +515,10 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub async fn supports_copy(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+    pub async fn supports_copy(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         if let Ok(geometry) = self.geometry(conn).await {
             return Ok(geometry.supports_copy());
         }
@@ -513,7 +529,10 @@ impl Column {
             Ok(s) => Ok(COPY_TYPES.contains(&s)),
             Err(error) => {
                 if self.has_custom_type() {
-                    Ok(PgType::from_name(self.data_type_str(conn)?, conn).await?.supports_copy(conn).await?)
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)
+                        .await?
+                        .supports_copy(conn)
+                        .await?)
                 } else {
                     Err(error)
                 }
@@ -530,7 +549,10 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub async fn supports_hash(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+    pub async fn supports_hash(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         if self.geometry(conn).await.is_ok() || self.geography(conn).await.is_ok() {
             return Ok(false);
         }
@@ -538,7 +560,10 @@ impl Column {
             Ok(s) => Ok(HASH_TYPES.contains(&s)),
             Err(error) => {
                 if self.has_custom_type() {
-                    Ok(PgType::from_name(self.data_type_str(conn)?, conn).await?.supports_hash(conn).await?)
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)
+                        .await?
+                        .supports_hash(conn)
+                        .await?)
                 } else {
                     Err(error)
                 }
@@ -563,7 +588,10 @@ impl Column {
             Ok(s) => Ok(EQ_TYPES.contains(&s)),
             Err(error) => {
                 if self.has_custom_type() {
-                    Ok(PgType::from_name(self.data_type_str(conn)?, conn).await?.supports_eq(conn).await?)
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)
+                        .await?
+                        .supports_eq(conn)
+                        .await?)
                 } else {
                     Err(error)
                 }
@@ -580,7 +608,10 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub async fn supports_ord(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+    pub async fn supports_ord(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         if self.geometry(conn).await.is_ok() || self.geography(conn).await.is_ok() {
             return Ok(false);
         }
@@ -588,7 +619,10 @@ impl Column {
             Ok(s) => Ok(ORD_TYPES.contains(&s)),
             Err(error) => {
                 if self.has_custom_type() {
-                    Ok(PgType::from_name(self.data_type_str(conn)?, conn).await?.supports_ord(conn).await?)
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)
+                        .await?
+                        .supports_ord(conn)
+                        .await?)
                 } else {
                     Err(error)
                 }
@@ -616,8 +650,10 @@ impl Column {
             Ok(t) => Ok(t),
             Err(e) => {
                 if self.has_custom_type() {
-                    PgType::from_name(self.data_type_str(conn)?, conn).await?
-                        .diesel_type(self.is_nullable(), conn).await
+                    PgType::from_name(self.data_type_str(conn)?, conn)
+                        .await?
+                        .diesel_type(self.is_nullable(), conn)
+                        .await
                 } else {
                     Err(e)
                 }
@@ -751,7 +787,8 @@ impl Column {
                         .and(columns::table_catalog.eq(table_catalog)),
                 ),
             )
-            .first(conn).await
+            .first(conn)
+            .await
             .optional()?)
     }
 
@@ -780,7 +817,8 @@ impl Column {
             .filter(key_column_usage::table_schema.eq(&self.table_schema))
             .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
             .select(KeyColumnUsage::as_select())
-            .first::<KeyColumnUsage>(conn).await
+            .first::<KeyColumnUsage>(conn)
+            .await
             .is_ok()
     }
 
@@ -845,7 +883,8 @@ impl Column {
             .filter(table_constraints::table_catalog.eq(&self.table_catalog))
             .filter(key_column_usage::column_name.eq(&self.column_name))
             .select((Table::as_select(), Column::as_select()))
-            .first::<(Table, Column)>(conn).await
+            .first::<(Table, Column)>(conn)
+            .await
             .optional()
     }
 
@@ -885,7 +924,8 @@ impl Column {
             .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
             .filter(referential_constraints::delete_rule.eq("CASCADE"))
             .select(KeyColumnUsage::as_select())
-            .first::<KeyColumnUsage>(conn).await
+            .first::<KeyColumnUsage>(conn)
+            .await
             .is_ok()
     }
 

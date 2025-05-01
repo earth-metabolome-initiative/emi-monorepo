@@ -46,7 +46,8 @@ impl Codegen<'_> {
             let diesel_table_path = table.import_diesel_path()?;
 
             let primary_key_columns: Vec<TokenStream> = table
-                .primary_key_columns(conn).await?
+                .primary_key_columns(conn)
+                .await?
                 .into_iter()
                 .map(|primary_key| {
                     let snake_case_column_ident = primary_key.snake_case_ident()?;

@@ -17,7 +17,8 @@ async fn test_codegen_tables_loadable_traits() {
         .set_output_directory("tests/codegen_tables_loadable_traits".as_ref())
         .enable_loadable_trait()
         .beautify()
-        .generate(&mut conn, &database_name, None).await;
+        .generate(&mut conn, &database_name, None)
+        .await;
     docker.stop().await.unwrap();
     outcome.unwrap();
 

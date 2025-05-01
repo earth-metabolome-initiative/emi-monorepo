@@ -67,7 +67,8 @@ impl Codegen<'_> {
         }
 
         if self.enable_insertable_trait {
-            self.generate_insertable_structs(root.join("insertables").as_path(), tables, conn).await?;
+            self.generate_insertable_structs(root.join("insertables").as_path(), tables, conn)
+                .await?;
             table_main_module.extend(quote::quote! {
                 pub mod insertables;
             });

@@ -180,7 +180,8 @@ impl TableConstraint {
             .filter(table_constraints::table_name.eq(table_name))
             .filter(table_constraints::table_schema.eq(table_schema))
             .filter(table_constraints::table_catalog.eq(table_catalog))
-            .load::<TableConstraint>(conn).await
+            .load::<TableConstraint>(conn)
+            .await
             .map_err(WebCodeGenError::from)
     }
 

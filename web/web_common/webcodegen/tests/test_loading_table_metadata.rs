@@ -67,7 +67,8 @@ async fn test_user_table() {
     let primary_key_columns = primary_key_columns.unwrap();
     assert_eq!(primary_key_columns.len(), 1);
 
-    let unique_columns: Result<Vec<Vec<Column>>, WebCodeGenError> = users.unique_columns(&mut conn).await;
+    let unique_columns: Result<Vec<Vec<Column>>, WebCodeGenError> =
+        users.unique_columns(&mut conn).await;
 
     assert!(unique_columns.is_ok());
     let unique_columns = unique_columns.unwrap();
@@ -77,7 +78,8 @@ async fn test_user_table() {
     assert_eq!(unique_columns[1].len(), 2);
     assert_eq!(unique_columns[2].len(), 1);
 
-    let composite_users = Table::load(&mut conn, "composite_users", None, &database_name).await.unwrap();
+    let composite_users =
+        Table::load(&mut conn, "composite_users", None, &database_name).await.unwrap();
 
     let columns: Result<Vec<Column>, WebCodeGenError> = composite_users.columns(&mut conn).await;
     let primary_key_columns: Result<Vec<Column>, WebCodeGenError> =
@@ -100,7 +102,8 @@ async fn test_user_table() {
     assert_eq!(foreign_table, users);
     assert_eq!(user_id_column, original_user_id_column);
 
-    let secondary_id_column = composite_users.column_by_name(&mut conn, "secondary_id").await.unwrap();
+    let secondary_id_column =
+        composite_users.column_by_name(&mut conn, "secondary_id").await.unwrap();
     assert_eq!(secondary_id_column.column_name, "secondary_id");
     assert!(secondary_id_column.is_foreign_key(&mut conn).await);
 

@@ -78,7 +78,10 @@ impl PgIndex {
     /// # Errors
     ///
     /// If an error occurs while loading the columns from the database
-    pub async fn columns(&self, conn: &mut AsyncPgConnection) -> Result<Vec<Column>, WebCodeGenError> {
+    pub async fn columns(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<Column>, WebCodeGenError> {
         use crate::schema::{columns, pg_attribute, pg_class, pg_index};
 
         Ok(pg_index::table
@@ -95,7 +98,8 @@ impl PgIndex {
                     .and(pg_attribute::attnum.eq_any(&self.indkey)),
             )
             .select(Column::as_select())
-            .load::<Column>(conn).await?)
+            .load::<Column>(conn)
+            .await?)
     }
 
     #[must_use]

@@ -7,8 +7,7 @@ use std::{
     path::Path,
 };
 
-use diesel_async::AsyncPgConnection;
-use diesel_async::AsyncConnection;
+use diesel_async::{AsyncConnection, AsyncPgConnection};
 use diesel_migrations_utils::prelude::MigrationDirectory;
 use quote::quote;
 use testcontainers::{

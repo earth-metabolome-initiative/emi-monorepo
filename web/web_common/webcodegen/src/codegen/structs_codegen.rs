@@ -41,7 +41,8 @@ impl Codegen<'_> {
                 root.join(crate::codegen::CODEGEN_TYPES_PATH).as_path(),
                 tables,
                 conn,
-            ).await?;
+            )
+            .await?;
 
             let types_ident =
                 Ident::new(crate::codegen::CODEGEN_TYPES_PATH, proc_macro2::Span::call_site());
@@ -58,7 +59,8 @@ impl Codegen<'_> {
                 root.join(crate::codegen::CODEGEN_TABLES_PATH).as_path(),
                 tables,
                 conn,
-            ).await?;
+            )
+            .await?;
 
             let tables_ident =
                 Ident::new(crate::codegen::CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());

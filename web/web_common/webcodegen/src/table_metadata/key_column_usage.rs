@@ -1,6 +1,4 @@
-use diesel::{
-    ExpressionMethods, QueryDsl, Queryable, QueryableByName, Selectable,
-};
+use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, Selectable};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
 use crate::errors::WebCodeGenError;
@@ -84,7 +82,8 @@ impl KeyColumnUsage {
             .filter(key_column_usage::table_name.eq(table_name))
             .filter(key_column_usage::table_schema.eq(table_schema))
             .filter(key_column_usage::table_catalog.eq(table_catalog))
-            .load::<KeyColumnUsage>(conn).await
+            .load::<KeyColumnUsage>(conn)
+            .await
             .map_err(WebCodeGenError::from)
     }
 }

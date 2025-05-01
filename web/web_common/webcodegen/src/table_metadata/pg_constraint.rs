@@ -105,7 +105,8 @@ impl PgConstraint {
             .filter(pg_constraint::oid.eq(self.oid))
             // Select all columns from pg_proc.
             .select(PgProc::as_select())
-            .load::<PgProc>(conn).await
+            .load::<PgProc>(conn)
+            .await
     }
 
     /// Returns the vector of [`PgOperator`] functions that are used in the
@@ -132,6 +133,7 @@ impl PgConstraint {
             .filter(pg_constraint::oid.eq(self.oid))
             // Select all columns from pg_operator.
             .select(PgOperator::as_select())
-            .load::<PgOperator>(conn).await
+            .load::<PgOperator>(conn)
+            .await
     }
 }

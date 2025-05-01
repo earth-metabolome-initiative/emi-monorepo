@@ -53,7 +53,8 @@ impl Codegen<'_> {
 
         if self.should_generate_crud() {
             // We dispatch a call to generate the `ForeignKeys` trait
-            self.generate_foreign_keys_impls(&root.join(CODEGEN_FOREIGN_KEYS_PATH), tables, conn).await?;
+            self.generate_foreign_keys_impls(&root.join(CODEGEN_FOREIGN_KEYS_PATH), tables, conn)
+                .await?;
             let foreign_keys_module =
                 Ident::new(CODEGEN_FOREIGN_KEYS_PATH, proc_macro2::Span::call_site());
             table_foreign_main_module.extend(quote::quote! {

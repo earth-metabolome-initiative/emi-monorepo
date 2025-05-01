@@ -117,7 +117,10 @@ impl ReturningType {
         }
     }
 
-    async fn try_from_pg_type(ty: PgType, conn: &mut AsyncPgConnection) -> Result<Self, WebCodeGenError> {
+    async fn try_from_pg_type(
+        ty: PgType,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Self, WebCodeGenError> {
         if ty.is_boolean(conn).await? {
             Ok(ReturningType::Boolean)
         } else if ty.is_i16(conn).await? {
@@ -211,7 +214,9 @@ where
             quote::quote! { self.#column_ident }
         };
 
-        if (unpacking || !argument_column.is_nullable()) && !argument_column.supports_copy(conn).await? {
+        if (unpacking || !argument_column.is_nullable())
+            && !argument_column.supports_copy(conn).await?
+        {
             column_ident = quote::quote! { #column_ident.as_ref() };
         }
 
@@ -555,7 +560,8 @@ where
                 Ok((
                     self.formatted_column(involved_column, false, conn).await?,
                     vec![involved_column],
-                    ReturningType::try_from_pg_type(involved_column.pg_type(conn).await?, conn).await?,
+                    ReturningType::try_from_pg_type(involved_column.pg_type(conn).await?, conn)
+                        .await?,
                 ))
             }
             Expr::BinaryOp { left, op, right } => {
@@ -663,9 +669,9 @@ where
                     | BinaryOperator::Divide
                     | BinaryOperator::Modulo => {
                         let (left, _, left_returning_type) =
-                        Box::pin(self.parse(left, type_hint, conn)).await?;
+                            Box::pin(self.parse(left, type_hint, conn)).await?;
                         let (right, _, right_returning_type) =
-                        Box::pin(self.parse(right, type_hint, conn)).await?;
+                            Box::pin(self.parse(right, type_hint, conn)).await?;
                         if left_returning_type != right_returning_type {
                             unimplemented!(
                                 "Binary operation between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}",

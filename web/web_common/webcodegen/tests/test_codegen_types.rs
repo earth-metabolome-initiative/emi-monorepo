@@ -15,7 +15,8 @@ async fn test_codegen_types() {
         .set_output_directory("tests/codegen_types".as_ref())
         .enable_sql_types()
         .beautify()
-        .generate(&mut conn, &database_name, None).await
+        .generate(&mut conn, &database_name, None)
+        .await
         .unwrap();
 
     docker.stop().await.unwrap();

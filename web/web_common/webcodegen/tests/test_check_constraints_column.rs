@@ -20,7 +20,8 @@ async fn test_check_constraints_column() {
         [("fortune", 1, 0), ("id", 0, 0), ("email", 1, 1), ("age", 2, 2), ("created_at", 0, 0)]
     {
         let column =
-            Column::load(column_name, "constrained_users", "public", &database_name, &mut conn).await
+            Column::load(column_name, "constrained_users", "public", &database_name, &mut conn)
+                .await
                 .unwrap_or_else(|_| panic!("Failed to query database `{database_name}`"))
                 .unwrap_or_else(|| panic!("Failed to retrieve column `{column_name}`"));
 

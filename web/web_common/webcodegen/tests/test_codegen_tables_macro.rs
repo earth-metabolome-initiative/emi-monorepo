@@ -15,7 +15,8 @@ async fn test_codegen_tables_macro() {
         .set_output_directory("tests/codegen_tables_macro".as_ref())
         .enable_tables_schema()
         .beautify()
-        .generate(&mut conn, &database_name, None).await;
+        .generate(&mut conn, &database_name, None)
+        .await;
 
     docker.stop().await.unwrap();
     outcome.unwrap();
