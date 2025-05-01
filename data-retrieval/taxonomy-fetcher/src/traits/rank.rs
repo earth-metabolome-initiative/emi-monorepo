@@ -28,7 +28,10 @@ pub trait Rank:
     /// # Errors
     ///
     /// * If an `IOError` occurs while writing out the taxonomy.
-    fn to_csv(path: &str) -> Result<(), std::io::Error> {
+    fn to_csv<P>(path: P) -> Result<(), std::io::Error>
+    where
+        P: AsRef<std::path::Path>,
+    {
         let mut writer = csv::Writer::from_path(path)?;
         for rank in Self::iter() {
             writer.serialize(RankRow {

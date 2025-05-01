@@ -57,10 +57,13 @@ pub trait Taxonomy {
     /// # Errors
     ///
     /// * If an `IOError` occurs while writing out the taxonomy.
-    fn to_csv(
+    fn to_csv<P>(
         &self,
-        path: &str,
-    ) -> Result<(), TaxonomyError<<Self::TaxonEntry as super::TaxonEntry>::Id>> {
+        path: P,
+    ) -> Result<(), TaxonomyError<<Self::TaxonEntry as super::TaxonEntry>::Id>>
+    where
+        P: AsRef<std::path::Path>,
+    {
         let mut writer = csv::Writer::from_path(path)?;
 
         for taxon in self.taxons() {
