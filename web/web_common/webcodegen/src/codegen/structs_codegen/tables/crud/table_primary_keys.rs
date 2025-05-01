@@ -2,7 +2,7 @@
 
 use std::path::Path;
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 use syn::Ident;
 
@@ -32,26 +32,25 @@ impl Codegen<'_> {
     ///
     /// * If the database connection fails.
     /// * If the file system fails.
-    pub(crate) fn generate_table_primary_keys_enumeration(
+    pub(crate) async fn generate_table_primary_keys_enumeration(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
         let table_name_enum_path = self.table_names_enum_path();
 
-        let table_idents = tables
-            .iter()
-            .map(|table| {
-                let struct_ident = table.struct_ident()?;
-                let primary_key = table.primary_key_type(conn)?;
+        let mut table_idents = Vec::new();
 
-                Ok(quote::quote! {
-                    #struct_ident(#primary_key)
-                })
+        for table in tables {
+            let struct_ident = table.struct_ident()?;
+            let primary_key = table.primary_key_type(conn).await?;
+
+            table_idents.push(quote::quote! {
+                #struct_ident(#primary_key)
             })
-            .collect::<Result<Vec<_>, crate::errors::WebCodeGenError>>()?;
+        }
 
         let table_name_impls: Vec<TokenStream> = tables
             .iter()

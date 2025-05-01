@@ -3,7 +3,7 @@
 
 use std::path::Path;
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 use syn::Ident;
 
@@ -128,11 +128,11 @@ impl Codegen<'_> {
     ///
     /// * If the database connection fails.
     /// * If the file system fails.
-    pub(super) fn generate_insertable_structs(
+    pub(super) async fn generate_insertable_structs(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
 
@@ -140,7 +140,7 @@ impl Codegen<'_> {
         let syntax = Syntax::PostgreSQL;
 
         for table in tables {
-            let all_columns = table.columns(conn)?;
+            let all_columns = table.columns(conn).await?;
             let insertable_columns = all_columns
                 .iter()
                 .filter(|column| !column.is_always_automatically_generated())
@@ -166,29 +166,27 @@ impl Codegen<'_> {
                 })
                 .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
-            let insertable_attributes = insertable_columns
-                .iter()
-                .map(|column| {
-                    let column_name = column.snake_case_ident()?;
-                    let column_type = column.rust_data_type(conn)?;
-                    Ok(quote::quote! {
-                        #column_name: #column_type
-                    })
-                })
-                .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+            let mut insertable_attributes = Vec::new();
 
-            let insertable_variant_methods = table.foreign_key_methods(conn, &syntax)?;
-
-            let insertable_builder_attributes = nullable_insertable_columns
-                .iter()
-                .map(|column| {
-                    let column_name = column.snake_case_ident()?;
-                    let column_type = column.rust_data_type(conn)?;
-                    Ok(quote::quote! {
-                        #column_name: #column_type
-                    })
+            for column in &insertable_columns {
+                let column_name = column.snake_case_ident()?;
+                let column_type = column.rust_data_type(conn).await?;
+                insertable_attributes.push(quote::quote! {
+                    #column_name: #column_type
                 })
-                .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+            }
+
+            let insertable_variant_methods = table.foreign_key_methods(conn, &syntax).await?;
+
+            let mut insertable_builder_attributes = Vec::new();
+
+            for column in &nullable_insertable_columns {
+                let column_name = column.snake_case_ident()?;
+                let column_type = column.rust_data_type(conn).await?;
+                insertable_builder_attributes.push(quote::quote! {
+                    #column_name: #column_type
+                })
+            }
             let populating_product = insertable_columns.iter().map(|column| {
                     let column_ident = column.snake_case_ident()?;
                     Ok(if column.is_nullable() {
@@ -202,47 +200,63 @@ impl Codegen<'_> {
                         }
                     })
                 }).collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
-            let insertable_builder_methods = insertable_columns
-                    .iter()
-                    .map(|column| {
-                        let column_name = column.snake_case_ident()?;
-                        let column_type = column.rust_data_type(conn)?;
+            let mut insertable_builder_methods: Vec<TokenStream> = Vec::new();
 
-                        let check_constraints = column.check_constraints(conn)?.into_iter().map(|constraint| {
-                            if constraint.is_postgis_constraint() {
-                                return Ok(TokenStream::new());
-                            }
+            for column in &insertable_columns {
+                let column_name = column.snake_case_ident()?;
+                let column_type = column.rust_data_type(conn).await?;
 
-                            let outcome = constraint.to_syn(&[column], &nullable_insertable_columns, self.check_constraints_extensions.as_slice(), &insertable_enum, conn);
-                            if let Err(WebCodeGenError::CodeGenerationError(CodeGenerationError::CheckConstraintError(CheckConstraintError::NoInvolvedColumns(unknown_column, _)))) = &outcome {
-                                if all_columns.contains(unknown_column.as_ref()) && !insertable_columns.contains(&unknown_column.as_ref()) {
-                                    return Ok(TokenStream::new());
-                                }
-                            }
-                            outcome
-                        }).collect::<Result<TokenStream, WebCodeGenError>>()?;
+                let mut check_constraints = TokenStream::new();
 
-                        // TODO! Add `async` check for UNIQUE constraint when generating the code.
-                        // Such check should only be active when the user is online.
+                for constraint in column.check_constraints(conn).await? {
+                    if constraint.is_postgis_constraint() {
+                        continue;
+                    }
 
-                        let column_assignment = if column.is_nullable() {
-                            quote::quote! {
-                                self.#column_name = #column_name;
-                            }
-                        } else {
-                            quote::quote! {
-                                self.#column_name = Some(#column_name);
-                            }
-                        };
-                        Ok(quote::quote! {
-                            pub fn #column_name(mut self, #column_name: #column_type) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-                                #check_constraints
-                                #column_assignment
-                                Ok(self)
-                            }
-                        })
-                    })
-                    .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+                    let outcome = constraint
+                        .to_syn(
+                            &[column],
+                            &nullable_insertable_columns,
+                            self.check_constraints_extensions.as_slice(),
+                            &insertable_enum,
+                            conn,
+                        )
+                        .await;
+                    if let Err(WebCodeGenError::CodeGenerationError(
+                        CodeGenerationError::CheckConstraintError(
+                            CheckConstraintError::NoInvolvedColumns(unknown_column, _),
+                        ),
+                    )) = &outcome
+                    {
+                        if all_columns.contains(unknown_column.as_ref())
+                            && !insertable_columns.contains(&unknown_column.as_ref())
+                        {
+                            continue;
+                        }
+                    }
+                    check_constraints.extend(outcome?);
+                }
+
+                // TODO! Add `async` check for UNIQUE constraint when generating the code.
+                // Such check should only be active when the user is online.
+
+                let column_assignment = if column.is_nullable() {
+                    quote::quote! {
+                        self.#column_name = #column_name;
+                    }
+                } else {
+                    quote::quote! {
+                        self.#column_name = Some(#column_name);
+                    }
+                };
+                insertable_builder_methods.push(quote::quote! {
+                    pub fn #column_name(mut self, #column_name: #column_type) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+                        #check_constraints
+                        #column_assignment
+                        Ok(self)
+                    }
+                });
+            }
 
             let table_diesel_ident = table.import_diesel_path()?;
 

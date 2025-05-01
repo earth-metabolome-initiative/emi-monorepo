@@ -2,7 +2,7 @@
 
 use std::path::Path;
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 use syn::Ident;
 
@@ -22,11 +22,11 @@ impl Codegen<'_> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(crate) fn generate_structs_code(
+    pub(crate) async fn generate_structs_code(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<TimeTracker, crate::errors::WebCodeGenError> {
         let submodule_file = root.with_extension("rs");
         let mut time_tracker = TimeTracker::new("Generate Structs");
@@ -41,7 +41,7 @@ impl Codegen<'_> {
                 root.join(crate::codegen::CODEGEN_TYPES_PATH).as_path(),
                 tables,
                 conn,
-            )?;
+            ).await?;
 
             let types_ident =
                 Ident::new(crate::codegen::CODEGEN_TYPES_PATH, proc_macro2::Span::call_site());
@@ -58,7 +58,7 @@ impl Codegen<'_> {
                 root.join(crate::codegen::CODEGEN_TABLES_PATH).as_path(),
                 tables,
                 conn,
-            )?;
+            ).await?;
 
             let tables_ident =
                 Ident::new(crate::codegen::CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());

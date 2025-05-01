@@ -2,7 +2,7 @@
 
 use std::path::Path;
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 
 use super::Codegen;
@@ -20,11 +20,11 @@ impl Codegen<'_> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(crate) fn generate_table_structs(
+    pub(crate) async fn generate_table_structs(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
         // We generate each table in a separate document under the provided root, and we
@@ -35,18 +35,18 @@ impl Codegen<'_> {
             let table_identifier = table.snake_case_ident()?;
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let table_struct = table.struct_ident()?;
-            let table_content = table.to_syn(conn)?;
+            let table_content = table.to_syn(conn).await?;
             let foreign_key_methods = if self.enable_foreign_trait {
-                table.foreign_key_methods(conn, &syntax)?
+                table.foreign_key_methods(conn, &syntax).await?
             } else {
                 TokenStream::new()
             };
             let from_foreign_key_methods = if self.enable_foreign_trait {
-                table.from_foreign_key_methods(conn, &syntax)?
+                table.from_foreign_key_methods(conn, &syntax).await?
             } else {
                 TokenStream::new()
             };
-            let from_unique_indices = table.from_unique_indices(conn, &syntax)?;
+            let from_unique_indices = table.from_unique_indices(conn, &syntax).await?;
 
             std::fs::write(
                 &table_file,
@@ -67,7 +67,7 @@ impl Codegen<'_> {
         }
 
         if self.enable_insertable_trait {
-            self.generate_insertable_structs(root.join("insertables").as_path(), tables, conn)?;
+            self.generate_insertable_structs(root.join("insertables").as_path(), tables, conn).await?;
             table_main_module.extend(quote::quote! {
                 pub mod insertables;
             });
@@ -80,17 +80,17 @@ impl Codegen<'_> {
                 pub mod table_names;
             });
 
-            self.generate_table_primary_keys_enumeration(root, tables, conn)?;
+            self.generate_table_primary_keys_enumeration(root, tables, conn).await?;
             table_main_module.extend(quote::quote! {
                 pub mod table_primary_keys;
             });
 
-            self.generate_rows_enumeration(&root.join("rows"), tables, conn)?;
+            self.generate_rows_enumeration(&root.join("rows"), tables, conn).await?;
             table_main_module.extend(quote::quote! {
                 pub mod rows;
             });
 
-            self.generate_row_enumeration(&root.join("row"), tables, conn)?;
+            self.generate_row_enumeration(&root.join("row"), tables, conn).await?;
             table_main_module.extend(quote::quote! {
                 pub mod row;
             });

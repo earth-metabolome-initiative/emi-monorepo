@@ -3,7 +3,7 @@
 
 use std::path::Path;
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 
@@ -17,11 +17,11 @@ impl Codegen<'_> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(super) fn generate_deletable_impls(
+    pub(super) async fn generate_deletable_impls(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
         // We generate each table in a separate document under the provided root, and we
@@ -33,10 +33,10 @@ impl Codegen<'_> {
         let Some(user_table) = self.users_table else {
             return Err(crate::errors::CodeGenerationError::UserTableNotProvided.into());
         };
-        let user_table_id = user_table.primary_key_type(conn)?;
+        let user_table_id = user_table.primary_key_type(conn).await?;
         for table in tables {
             // First we need to check wether the table has a PK
-            if !table.allows_updatable(conn)? {
+            if !table.allows_updatable(conn).await? {
                 continue;
             }
 

@@ -1,6 +1,7 @@
 use diesel::{
-    ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, pg::PgConnection,
+    ExpressionMethods, QueryDsl, Queryable, QueryableByName,
 };
+use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
 use crate::errors::WebCodeGenError;
 
@@ -43,12 +44,12 @@ impl ReferentialConstraint {
     /// # Errors
     ///
     /// If an error occurs while loading the constraints from the database
-    pub fn load_all_referential_constraints(
-        conn: &mut PgConnection,
+    pub async fn load_all_referential_constraints(
+        conn: &mut AsyncPgConnection,
     ) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::referential_constraints;
         referential_constraints::table
-            .load::<ReferentialConstraint>(conn)
+            .load::<ReferentialConstraint>(conn).await
             .map_err(WebCodeGenError::from)
     }
 
@@ -71,8 +72,8 @@ impl ReferentialConstraint {
     /// # Errors
     ///
     /// If an error occurs while loading the constraints from the database
-    pub fn load_referential_constraints(
-        conn: &mut PgConnection,
+    pub async fn load_referential_constraints(
+        conn: &mut AsyncPgConnection,
         constraint_name: &str,
         constraint_schema: Option<&str>,
         constraint_catalog: &str,
@@ -83,7 +84,7 @@ impl ReferentialConstraint {
             .filter(referential_constraints::constraint_name.eq(constraint_name))
             .filter(referential_constraints::constraint_schema.eq(constraint_schema))
             .filter(referential_constraints::constraint_catalog.eq(constraint_catalog))
-            .load::<ReferentialConstraint>(conn)
+            .load::<ReferentialConstraint>(conn).await
             .map_err(WebCodeGenError::from)
     }
 }

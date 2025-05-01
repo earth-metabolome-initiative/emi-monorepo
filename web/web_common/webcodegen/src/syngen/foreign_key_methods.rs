@@ -1,7 +1,7 @@
 //! This module contains the implementation of the `Table` struct's
 //! `foreign_key_methods` method, which implements the foreign key methods for a
 //! table.
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
@@ -20,19 +20,19 @@ impl Table {
     ///
     /// * If the connection to the database fails.
     /// * If the foreign key traits cannot be generated.
-    pub fn foreign_key_traits(
+    pub async fn foreign_key_traits(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
         syntax: &Syntax,
     ) -> Result<TokenStream, WebCodeGenError> {
         let struct_path = self.import_struct_path()?;
-        let foreign_keys = self.foreign_keys(conn)?;
+        let foreign_keys = self.foreign_keys(conn).await?;
 
         // We only want to write the trait for foreign keys for tables
         // that appear ONCE, as otherwise the column of the trait would be ambiguous.
         let mut foreign_keys_and_tables = Vec::new();
         for foreign_key in foreign_keys {
-            let Some((foreign_key_table, _)) = foreign_key.foreign_table(conn)? else {
+            let Some((foreign_key_table, _)) = foreign_key.foreign_table(conn).await? else {
                 continue;
             };
 
@@ -86,59 +86,62 @@ impl Table {
     ///
     /// * If the connection to the database fails.
     /// * If the foreign key methods cannot be generated.
-    pub fn foreign_key_methods(
+    pub async fn foreign_key_methods(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
         syntax: &Syntax,
     ) -> Result<TokenStream, WebCodeGenError> {
         let feature_flag = syntax.as_feature_flag();
         let connection = syntax.as_connection_type(true);
 
-        self
-            .foreign_keys(conn)?
-            .into_iter()
-            .map(|column| {
-                let Some((foreign_key_table, foreign_key_column)) = column.foreign_table(conn)? else {
-                    return Ok(TokenStream::new());
-                };
-                let method_ident: Ident = column.getter_ident()?;
+        let mut foreign_key_methods = TokenStream::new();
 
-                let current_column_ident: Ident = column.snake_case_ident()?;
-                let foreign_key_column_ident: Ident = foreign_key_column.snake_case_ident()?;
-                let foreign_key_struct_path = foreign_key_table.import_struct_path()?;
-                let foreign_key_diesel_path = foreign_key_table.import_diesel_path()?;
+        for column in self.foreign_keys(conn).await? {
+            let Some((foreign_key_table, foreign_key_column)) = column.foreign_table(conn).await?
+            else {
+                return Ok(TokenStream::new());
+            };
+            let method_ident: Ident = column.getter_ident()?;
 
-                let optional = if column.is_nullable() {
-                    quote! { .map(Some) }
-                } else {
-                    TokenStream::new()
-                };
+            let current_column_ident: Ident = column.snake_case_ident()?;
+            let foreign_key_column_ident: Ident = foreign_key_column.snake_case_ident()?;
+            let foreign_key_struct_path = foreign_key_table.import_struct_path()?;
+            let foreign_key_diesel_path = foreign_key_table.import_diesel_path()?;
 
-                let return_statement: syn::Type = if column.is_nullable() {
-                    syn::parse_quote! { Option<#foreign_key_struct_path> }
-                } else {
-                    foreign_key_struct_path.clone()
-                };
+            let optional = if column.is_nullable() {
+                quote! { .map(Some) }
+            } else {
+                TokenStream::new()
+            };
 
-                // Analogously, we check before executing the query whether the current column is None.
-                // If so, we return None as well.
+            let return_statement: syn::Type = if column.is_nullable() {
+                syn::parse_quote! { Option<#foreign_key_struct_path> }
+            } else {
+                foreign_key_struct_path.clone()
+            };
 
-                let (column_value_retrieval, column_attribute) = if column.is_nullable() {
-                    (quote! {
+            // Analogously, we check before executing the query whether the current column
+            // is None. If so, we return None as well.
+
+            let (column_value_retrieval, column_attribute) = if column.is_nullable() {
+                (
+                    quote! {
                         let Some(#current_column_ident) = self.#current_column_ident.as_ref() else {
                             return Ok(None);
                         };
-                    }, quote! { #current_column_ident })
-                } else {
-                    (TokenStream::new(), quote! { &self.#current_column_ident })
-                };
+                    },
+                    quote! { #current_column_ident },
+                )
+            } else {
+                (TokenStream::new(), quote! { &self.#current_column_ident })
+            };
 
-                // We build the where statement to filter for the `from_method_ident`
-                let self_where_statement = quote!{
-                    #foreign_key_diesel_path::dsl::#foreign_key_column_ident.eq(#column_attribute)
-                };
+            // We build the where statement to filter for the `from_method_ident`
+            let self_where_statement = quote! {
+                #foreign_key_diesel_path::dsl::#foreign_key_column_ident.eq(#column_attribute)
+            };
 
-                Ok(quote! {
+            foreign_key_methods.extend(quote! {
                     #feature_flag
                     pub async fn #method_ident(&self, conn: &mut #connection) -> Result<#return_statement, diesel::result::Error> {
                         use diesel_async::RunQueryDsl;
@@ -152,7 +155,9 @@ impl Table {
                             #optional
                     }
                 })
-            }).collect::<Result<TokenStream, WebCodeGenError>>()
+        }
+
+        Ok(foreign_key_methods)
     }
 
     /// Returns the Syn `TokenStream` for the from foreign key methods.
@@ -166,68 +171,71 @@ impl Table {
     ///
     /// * If the connection to the database fails.
     /// * If the foreign key methods cannot be generated.
-    pub fn from_foreign_key_methods(
+    pub async fn from_foreign_key_methods(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
         syntax: &Syntax,
     ) -> Result<TokenStream, WebCodeGenError> {
         let feature_flag = syntax.as_feature_flag();
         let connection = syntax.as_connection_type(true);
         let current_table_diesel_path = self.import_diesel_path()?;
+        let mut foreign_key_methods = TokenStream::new();
 
-        self
-            .foreign_keys(conn)?
-            .into_iter()
-            .map(|column| {
-                let Some((foreign_key_table, foreign_key_column)) = column.foreign_table(conn)? else {
-                    return Ok(TokenStream::new());
-                };
-                let from_method_ident: Ident = Ident::new(&format!("from_{}", column.column_name), proc_macro2::Span::call_site());
+        for column in self.foreign_keys(conn).await? {
+            let Some((foreign_key_table, foreign_key_column)) = column.foreign_table(conn).await?
+            else {
+                return Ok(TokenStream::new());
+            };
+            let from_method_ident: Ident =
+                Ident::new(&format!("from_{}", column.column_name), proc_macro2::Span::call_site());
 
-                let current_column_ident: Ident = column.snake_case_ident()?;
-                let foreign_key_column_ident: Ident = foreign_key_column.snake_case_ident()?;
-                let foreign_key_struct_path = foreign_key_table.import_struct_path()?;
+            let current_column_ident: Ident = column.snake_case_ident()?;
+            let foreign_key_column_ident: Ident = foreign_key_column.snake_case_ident()?;
+            let foreign_key_struct_path = foreign_key_table.import_struct_path()?;
 
-                // We build the where statement to filter for the `from_method_ident`
-                let where_statement = if foreign_key_column.supports_copy(conn)? {
-                    quote!{
-                        #current_table_diesel_path::dsl::#current_column_ident.eq(#current_column_ident.#foreign_key_column_ident)
-                    }
-                } else {
-                    quote!{
-                        #current_table_diesel_path::dsl::#current_column_ident.eq(&#current_column_ident.#foreign_key_column_ident)
-                    }
-                };
+            // We build the where statement to filter for the `from_method_ident`
+            let where_statement = if foreign_key_column.supports_copy(conn).await? {
+                quote! {
+                    #current_table_diesel_path::dsl::#current_column_ident.eq(#current_column_ident.#foreign_key_column_ident)
+                }
+            } else {
+                quote! {
+                    #current_table_diesel_path::dsl::#current_column_ident.eq(&#current_column_ident.#foreign_key_column_ident)
+                }
+            };
 
-                // Depending on whether the column represents a unique constraint (or a primary key)
-                // or something which does not have a 1-1 relationship, we need to return either a
-                // `Self` (when it is not optional and it is unique) or an `Option<Self>` (when it is
-                // optional and unique) or yet again a `Vec<Self>` (when it is not unique).
+            // Depending on whether the column represents a unique constraint (or a primary
+            // key) or something which does not have a 1-1 relationship, we need
+            // to return either a `Self` (when it is not optional and it is
+            // unique) or an `Option<Self>` (when it is optional and unique) or
+            // yet again a `Vec<Self>` (when it is not unique).
 
-                let (use_statement, return_type, loading_statement) = match (column.is_nullable(), column.is_unique(conn)?) {
+            let (use_statement, return_type, loading_statement) =
+                match (column.is_nullable(), column.is_unique(conn).await?) {
                     (true, true) => {
                         (
                             quote! { use diesel::{QueryDsl, ExpressionMethods, OptionalExtension};},
                             quote! { Option<Self> },
-                            quote! { .first::<Self>(conn).await.optional() }
+                            quote! { .first::<Self>(conn).await.optional() },
                         )
                     }
                     (false, true) => {
                         (
                             quote! { use diesel::{QueryDsl, ExpressionMethods};},
-                            quote! { Self }, quote! { .first::<Self>(conn).await }
+                            quote! { Self },
+                            quote! { .first::<Self>(conn).await },
                         )
                     }
                     (_, false) => {
                         (
                             quote! { use diesel::{QueryDsl, ExpressionMethods};},
                             quote! { Vec<Self> },
-                            quote! { .load::<Self>(conn).await }
+                            quote! { .load::<Self>(conn).await },
                         )
                     }
                 };
 
-                Ok(quote! {
+            foreign_key_methods.extend(quote! {
                     #feature_flag
                     pub async fn #from_method_ident(conn: &mut #connection, #current_column_ident: &#foreign_key_struct_path) -> Result<#return_type, diesel::result::Error> {
                         use diesel_async::RunQueryDsl;
@@ -238,6 +246,8 @@ impl Table {
                             #loading_statement
                     }
                 })
-            }).collect::<Result<TokenStream, WebCodeGenError>>()
+        }
+
+        Ok(foreign_key_methods)
     }
 }

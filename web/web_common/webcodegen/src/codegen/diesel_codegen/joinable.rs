@@ -2,7 +2,7 @@
 
 use std::{collections::HashMap, path::Path};
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 use syn::Ident;
 
@@ -17,11 +17,11 @@ impl Codegen<'_> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(crate) fn generate_joinable_macro(
+    pub(crate) async fn generate_joinable_macro(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         // As a first step, we create a directory for the generated code.
         std::fs::create_dir_all(root)?;
@@ -37,10 +37,10 @@ impl Codegen<'_> {
 
             let mut table_hashmap: HashMap<&Table, Option<TokenStream>> = HashMap::new();
 
-            for foreign_key in table.foreign_keys(conn)? {
+            for foreign_key in table.foreign_keys(conn).await? {
                 // For each table we retrieve the foreign key(s).
                 // First we fetch the foreign table (and its primary key)
-                let Some((foreign_table, _foreign_table_pk)) = foreign_key.foreign_table(conn)?
+                let Some((foreign_table, _foreign_table_pk)) = foreign_key.foreign_table(conn).await?
                 else {
                     continue;
                 };

@@ -1,7 +1,7 @@
 use diesel::{
-    ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
-    pg::PgConnection,
+    ExpressionMethods, QueryDsl, Queryable, QueryableByName, Selectable,
 };
+use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
 use crate::errors::WebCodeGenError;
 
@@ -46,11 +46,11 @@ impl KeyColumnUsage {
     ///
     /// # Errors
     /// If an error occurs while loading the key column usages from the database
-    pub fn load_all_key_column_usages(
-        conn: &mut PgConnection,
+    pub async fn load_all_key_column_usages(
+        conn: &mut AsyncPgConnection,
     ) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::key_column_usage;
-        key_column_usage::table.load::<KeyColumnUsage>(conn).map_err(WebCodeGenError::from)
+        key_column_usage::table.load::<KeyColumnUsage>(conn).await.map_err(WebCodeGenError::from)
     }
 
     /// Load all the key column usages from the database
@@ -72,8 +72,8 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// If an error occurs while loading the key column usages from the database
-    pub fn load_key_column_usages(
-        conn: &mut PgConnection,
+    pub async fn load_key_column_usages(
+        conn: &mut AsyncPgConnection,
         table_name: &str,
         table_schema: Option<&str>,
         table_catalog: &str,
@@ -84,7 +84,7 @@ impl KeyColumnUsage {
             .filter(key_column_usage::table_name.eq(table_name))
             .filter(key_column_usage::table_schema.eq(table_schema))
             .filter(key_column_usage::table_catalog.eq(table_catalog))
-            .load::<KeyColumnUsage>(conn)
+            .load::<KeyColumnUsage>(conn).await
             .map_err(WebCodeGenError::from)
     }
 }

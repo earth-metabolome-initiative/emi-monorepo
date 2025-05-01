@@ -5,7 +5,7 @@ mod updatable;
 
 use std::path::Path;
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use quote::quote;
 use syn::Ident;
 
@@ -25,15 +25,15 @@ impl Codegen<'_> {
     ///
     /// * If the database connection fails.
     /// * If the file system fails.
-    pub(super) fn generate_updatables_impls(
+    pub(super) async fn generate_updatables_impls(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
 
-        self.generate_updatable_impls(&root.join(CODEGEN_UPDATABLE_PATH), tables, conn)?;
+        self.generate_updatable_impls(&root.join(CODEGEN_UPDATABLE_PATH), tables, conn).await?;
 
         let updatable_module = Ident::new(CODEGEN_UPDATABLE_PATH, proc_macro2::Span::call_site());
 

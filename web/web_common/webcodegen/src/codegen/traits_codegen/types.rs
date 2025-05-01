@@ -3,7 +3,7 @@
 
 use std::path::Path;
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 
 use super::Codegen;
@@ -17,15 +17,15 @@ impl Codegen<'_> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(crate) fn generate_types_traits(
+    pub(crate) async fn generate_types_traits(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
 
-        let types = Self::required_types(tables, conn)?;
+        let types = Self::required_types(tables, conn).await?;
 
         // We generate each table in a separate document under the provided root, and we
         // collect all of the imported modules in a public one.
@@ -35,7 +35,7 @@ impl Codegen<'_> {
             let type_name = r#type.snake_case_name()?;
             let type_ident = r#type.snake_case_identifier()?;
             let type_file = root.join(format!("{type_name}.rs"));
-            std::fs::write(&type_file, self.beautify_code(&r#type.to_diesel_impls(conn)?)?)?;
+            std::fs::write(&type_file, self.beautify_code(&r#type.to_diesel_impls(conn).await?)?)?;
 
             types_main_module.extend(quote::quote! {
                 mod #type_ident;

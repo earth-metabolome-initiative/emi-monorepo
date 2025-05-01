@@ -2,7 +2,7 @@
 
 use std::path::Path;
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 use syn::Ident;
 
@@ -24,11 +24,11 @@ impl Codegen<'_> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(crate) fn generate_diesel_code(
+    pub(crate) async fn generate_diesel_code(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<TimeTracker, crate::errors::WebCodeGenError> {
         let submodule_file = root.with_extension("rs");
         let mut time_tracker = TimeTracker::new("Generating Diesel code");
@@ -43,7 +43,7 @@ impl Codegen<'_> {
                 root.join(crate::codegen::CODEGEN_TABLES_PATH).as_path(),
                 tables,
                 conn,
-            )?;
+            ).await?;
             time_tracker.add_completed_task(task);
 
             let tables_ident =
@@ -59,7 +59,7 @@ impl Codegen<'_> {
                 root.join(crate::codegen::CODEGEN_TYPES_PATH).as_path(),
                 tables,
                 conn,
-            )?;
+            ).await?;
             time_tracker.add_completed_task(task);
 
             let types_ident =
@@ -75,7 +75,7 @@ impl Codegen<'_> {
                 root.join(crate::codegen::CODEGEN_JOINABLE_PATH).as_path(),
                 tables,
                 conn,
-            )?;
+            ).await?;
             time_tracker.add_completed_task(task);
 
             let joinable_ident =
@@ -91,7 +91,7 @@ impl Codegen<'_> {
                 root.join("allow_tables_to_appear_in_same_query").as_path(),
                 tables,
                 conn,
-            )?;
+            ).await?;
             time_tracker.add_completed_task(task);
 
             submodule_file_content.extend(quote::quote! {

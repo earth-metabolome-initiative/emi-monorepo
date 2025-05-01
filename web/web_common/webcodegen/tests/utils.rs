@@ -7,7 +7,8 @@ use std::{
     path::Path,
 };
 
-use diesel::{Connection, PgConnection};
+use diesel_async::AsyncPgConnection;
+use diesel_async::AsyncConnection;
 use diesel_migrations_utils::prelude::MigrationDirectory;
 use quote::quote;
 use testcontainers::{
@@ -83,17 +84,17 @@ pub fn add_main_to_file(file_path: &str) {
 /// # Errors
 ///
 /// * If the connection cannot be established.
-pub fn establish_connection_to_postgres(
+pub async fn establish_connection_to_postgres(
     database_port: u16,
     database_name: &str,
-) -> Result<PgConnection, diesel::ConnectionError> {
+) -> Result<AsyncPgConnection, diesel::ConnectionError> {
     let database_url = format!(
         "postgres://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:{database_port}/{database_name}",
     );
 
     let mut number_of_attempts = 0;
 
-    while let Err(e) = PgConnection::establish(&database_url) {
+    while let Err(e) = AsyncPgConnection::establish(&database_url).await {
         eprintln!("Failed to establish connection: {e:?}");
         std::thread::sleep(std::time::Duration::from_secs(1));
         if number_of_attempts > 10 {
@@ -103,7 +104,7 @@ pub fn establish_connection_to_postgres(
         number_of_attempts += 1;
     }
 
-    PgConnection::establish(&database_url)
+    AsyncPgConnection::establish(&database_url).await
 }
 
 /// Setup a docker container with a postgres database.
@@ -172,7 +173,7 @@ async fn setup_docker(
 /// * If the container cannot be started.
 pub async fn setup_database_with_default_migrations(
     test_name: &str,
-) -> Result<(ContainerAsync<GenericImage>, PgConnection, String), diesel::ConnectionError> {
+) -> Result<(ContainerAsync<GenericImage>, AsyncPgConnection, String), diesel::ConnectionError> {
     setup_database_with_migrations(
         test_name,
         MigrationDirectory::try_from("./test_migrations").unwrap(),
@@ -196,12 +197,12 @@ pub async fn setup_database_with_default_migrations(
 pub async fn setup_database_with_migrations(
     test_name: &str,
     migrations: MigrationDirectory,
-) -> Result<(ContainerAsync<GenericImage>, PgConnection, String), diesel::ConnectionError> {
+) -> Result<(ContainerAsync<GenericImage>, AsyncPgConnection, String), diesel::ConnectionError> {
     let port = random_port(test_name);
     let database_name = format!("{test_name}_db");
     let docker = setup_docker(port, &database_name).await.expect("Failed to start container");
-    let mut conn = establish_connection_to_postgres(port, &database_name)?;
-    migrations.execute_ups::<diesel::PgConnection>(&mut conn).unwrap();
+    let mut conn = establish_connection_to_postgres(port, &database_name).await?;
+    migrations.execute_ups::<diesel_async::AsyncPgConnection>(&mut conn).await.unwrap();
     Ok((docker, conn, database_name))
 }
 

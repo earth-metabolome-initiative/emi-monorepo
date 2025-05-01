@@ -1,6 +1,7 @@
 //! Submodule implementing a `from_{x}` and `from_{x}_and_{y}` methods for each
 //! Unique index associated to the Table structs.
 
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 
@@ -26,48 +27,48 @@ impl crate::Table {
     ///
     /// * If building the table name fails.
     /// * If querying the database for the unique indices fails.
-    pub fn from_unique_indices(
+    pub async fn from_unique_indices(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut AsyncPgConnection,
         syntax: &crate::codegen::Syntax,
     ) -> Result<TokenStream, WebCodeGenError> {
         let struct_name = self.struct_ident()?;
         let table_name_ident = self.import_diesel_path()?;
-        let primary_keys = self.primary_key_columns(conn)?;
+        let primary_keys = self.primary_key_columns(conn).await?;
         let syntax_flag = syntax.as_feature_flag();
         let syntax_connection = syntax.as_connection_type(true);
+        let mut unique_indices = TokenStream::new();
 
-        self.unique_indices(conn)?
-            .into_iter()
-            .map(|index| {
-                let columns = index.columns(conn)?;
+        for index in self.unique_indices(conn).await? {
+            let columns = index.columns(conn).await?;
 
-                if columns.iter().all(|c| c.is_foreign_key(conn)) {
-                    return Ok(quote! {});
+            let mut all_columns_are_foreign_keys = true;
+            for column in &columns {
+                if !column.is_foreign_key(conn).await {
+                    all_columns_are_foreign_keys = false;
+                    break;
                 }
+            }
+            if all_columns_are_foreign_keys {
+                return Ok(quote! {});
+            }
 
-                if columns.iter().all(|c| primary_keys.contains(c)) {
-                    return Ok(quote! {});
-                }
+            if columns.iter().all(|c| primary_keys.contains(c)) {
+                return Ok(quote! {});
+            }
 
-                let method_name = format!(
-                    "from_{}",
-                    columns
-                        .iter()
-                        .map(|c| c.column_name.as_str())
-                        .collect::<Vec<&str>>()
-                        .join("_and_")
-                );
-                let method_ident = syn::Ident::new(&method_name, struct_name.span());
-                let method_arguments = columns
-                    .iter()
-                    .map(|column| {
-                        let column_name = column.snake_case_ident()?;
-                        let column_type = column.rust_ref_data_type(conn)?;
-                        Ok(quote! { #column_name: #column_type })
-                    })
-                    .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
-                let filter = columns
+            let method_name = format!(
+                "from_{}",
+                columns.iter().map(|c| c.column_name.as_str()).collect::<Vec<&str>>().join("_and_")
+            );
+            let method_ident = syn::Ident::new(&method_name, struct_name.span());
+            let mut method_arguments = Vec::new();
+            for column in &columns {
+                let column_name = column.snake_case_ident()?;
+                let column_type = column.rust_ref_data_type(conn).await?;
+                method_arguments.push(quote! { #column_name: #column_type })
+            }
+            let filter = columns
                     .iter()
                     .map(|column| {
                         let column_name = column.snake_case_ident()?;
@@ -82,23 +83,24 @@ impl crate::Table {
                         })
                     })?;
 
-                Ok(quote! {
-                    #syntax_flag
-                    pub async fn #method_ident(
-                        #(#method_arguments),*,
-                        conn: &mut #syntax_connection
-                    ) -> Result<Option<Self>, diesel::result::Error> {
-                        use diesel_async::RunQueryDsl;
-                        use diesel::associations::HasTable;
-                        use diesel::{QueryDsl, OptionalExtension};
-                        Self::table()
-                            .filter(#filter)
-                            .first::<Self>(conn)
-                            .await
-                            .optional()
-                    }
-                })
+            unique_indices.extend(quote! {
+                #syntax_flag
+                pub async fn #method_ident(
+                    #(#method_arguments),*,
+                    conn: &mut #syntax_connection
+                ) -> Result<Option<Self>, diesel::result::Error> {
+                    use diesel_async::RunQueryDsl;
+                    use diesel::associations::HasTable;
+                    use diesel::{QueryDsl, OptionalExtension};
+                    Self::table()
+                        .filter(#filter)
+                        .first::<Self>(conn)
+                        .await
+                        .optional()
+                }
             })
-            .collect::<Result<TokenStream, WebCodeGenError>>()
+        }
+
+        Ok(unique_indices)
     }
 }

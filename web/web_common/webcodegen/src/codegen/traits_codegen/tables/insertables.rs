@@ -7,7 +7,7 @@ mod insertable_variant;
 
 use std::path::Path;
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use quote::quote;
 use syn::Ident;
 
@@ -32,11 +32,11 @@ impl Codegen<'_> {
     ///
     /// * If the database connection fails.
     /// * If the file system fails.
-    pub(super) fn generate_insertables_impls(
+    pub(super) async fn generate_insertables_impls(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
 
@@ -45,7 +45,7 @@ impl Codegen<'_> {
             &root.join(CODEGEN_INSERTABLE_VARIANT_PATH),
             tables,
             conn,
-        )?;
+        ).await?;
         self.generate_insertable_builder_impls(
             &root.join(CODEGEN_INSERTABLE_BUILDER_PATH),
             tables,

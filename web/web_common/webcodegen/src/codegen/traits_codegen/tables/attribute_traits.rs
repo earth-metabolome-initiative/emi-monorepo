@@ -3,7 +3,7 @@
 
 use std::path::Path;
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
@@ -20,18 +20,18 @@ impl Codegen<'_> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(super) fn generate_attribute_impls(
+    pub(super) async fn generate_attribute_impls(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
         // We generate each table in a separate document under the provided root, and we
         // collect all of the imported modules in a public one.
         let mut table_deletable_main_module = TokenStream::new();
         for table in tables {
-            let columns = table.columns(conn)?;
+            let columns = table.columns(conn).await?;
             let struct_ident = table.import_struct_path()?;
             let table_file = root.join(format!("{}.rs", table.snake_case_ident()?));
             let table_snake_case_ident = table.snake_case_ident()?;
@@ -43,7 +43,7 @@ impl Codegen<'_> {
                 else {
                     continue;
                 };
-                let reference_type = column.rust_ref_data_type(conn)?;
+                let reference_type = column.rust_ref_data_type(conn).await?;
                 let trait_ident = Ident::new(trait_name, proc_macro2::Span::call_site());
                 let method_name = Ident::new(attribute_name, proc_macro2::Span::call_site());
                 attribute_traits.extend(quote! {

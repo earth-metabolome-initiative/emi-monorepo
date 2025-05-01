@@ -1,6 +1,6 @@
 //! Submodule providing methods to write out the schema of a table.
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
@@ -26,32 +26,30 @@ impl Table {
     /// * If the diesel type for a column cannot be loaded.
     /// * If the primary key columns cannot be loaded from the database.
     /// * If the diesel feature flag name cannot be generated.
-    pub fn to_schema(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
+    pub async fn to_schema(&self, conn: &mut AsyncPgConnection) -> Result<TokenStream, WebCodeGenError> {
         let table_schema = Ident::new(&self.table_schema, proc_macro2::Span::call_site());
         let original_table_name = &self.table_name;
         let sanitized_table_name_ident =
             Ident::new(&self.snake_case_name()?, proc_macro2::Span::call_site());
-        let columns = self
-            .columns(conn)?
-            .into_iter()
-            .map(|column| {
-                let original_column_name = &column.column_name;
-                let column_attribute: Ident = column.snake_case_ident()?;
-                let column_type = column.diesel_type(conn)?;
-                Ok(if original_column_name == &column_attribute.to_string() {
-                    quote! {
-                        #column_attribute -> #column_type
-                    }
-                } else {
-                    quote! {
-                        #[sql_name = #original_column_name]
-                        #column_attribute -> #column_type
-                    }
-                })
+
+        let mut columns = Vec::new();
+        for column in self.columns(conn).await? {
+            let original_column_name = &column.column_name;
+            let column_attribute: Ident = column.snake_case_ident()?;
+            let column_type = column.diesel_type(conn).await?;
+            columns.push(if original_column_name == &column_attribute.to_string() {
+                quote! {
+                    #column_attribute -> #column_type
+                }
+            } else {
+                quote! {
+                    #[sql_name = #original_column_name]
+                    #column_attribute -> #column_type
+                }
             })
-            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+        }
         let primary_key_names = self
-            .primary_key_columns(conn)?
+            .primary_key_columns(conn).await?
             .into_iter()
             .map(|column| Ident::new(&column.column_name, proc_macro2::Span::call_site()))
             .collect::<Vec<Ident>>();

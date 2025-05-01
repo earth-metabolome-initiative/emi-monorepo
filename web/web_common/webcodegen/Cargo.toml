@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 diesel = { workspace = true, features = ["postgres", "chrono", "uuid"] }
+diesel-async = { workspace = true, features = ["postgres"] }
 itertools = "0.13.0"
 serde.workspace = true
 syn.workspace = true
@@ -23,6 +24,7 @@ strum_macros.workspace = true
 iso_codes.workspace = true
 font_awesome_icons.workspace = true
 cached.workspace = true
+async-trait.workspace = true
 
 [dev-dependencies]
 testcontainers.workspace = true

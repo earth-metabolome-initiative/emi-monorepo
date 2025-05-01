@@ -2,8 +2,9 @@ use std::fmt::Debug;
 
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
-    RunQueryDsl, Selectable, SelectableHelper, pg::PgConnection,
+    Selectable, SelectableHelper,
 };
+use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use proc_macro2::TokenStream;
 use sqlparser::{
     ast::{
@@ -116,26 +117,26 @@ impl ReturningType {
         }
     }
 
-    fn try_from_pg_type(ty: PgType, conn: &mut PgConnection) -> Result<Self, WebCodeGenError> {
-        if ty.is_boolean(conn)? {
+    async fn try_from_pg_type(ty: PgType, conn: &mut AsyncPgConnection) -> Result<Self, WebCodeGenError> {
+        if ty.is_boolean(conn).await? {
             Ok(ReturningType::Boolean)
-        } else if ty.is_i16(conn)? {
+        } else if ty.is_i16(conn).await? {
             Ok(ReturningType::I16)
-        } else if ty.is_i32(conn)? {
+        } else if ty.is_i32(conn).await? {
             Ok(ReturningType::I32)
-        } else if ty.is_i64(conn)? {
+        } else if ty.is_i64(conn).await? {
             Ok(ReturningType::I64)
-        } else if ty.is_u16(conn)? {
+        } else if ty.is_u16(conn).await? {
             Ok(ReturningType::U16)
-        } else if ty.is_u32(conn)? {
+        } else if ty.is_u32(conn).await? {
             Ok(ReturningType::U32)
-        } else if ty.is_u64(conn)? {
+        } else if ty.is_u64(conn).await? {
             Ok(ReturningType::U64)
-        } else if ty.is_f32(conn)? {
+        } else if ty.is_f32(conn).await? {
             Ok(ReturningType::F32)
-        } else if ty.is_f64(conn)? {
+        } else if ty.is_f64(conn).await? {
             Ok(ReturningType::F64)
-        } else if ty.is_text(conn)? {
+        } else if ty.is_text(conn).await? {
             Ok(ReturningType::Textual)
         } else {
             Ok(ReturningType::Custom(Box::from(ty)))
@@ -196,11 +197,11 @@ where
     /// # Errors
     ///
     /// * If the column does not exist
-    fn formatted_column(
+    async fn formatted_column(
         &self,
         column: &Column,
         unpacking: bool,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<proc_macro2::TokenStream, WebCodeGenError> {
         let (argument_column, is_contextual) = self.get_column(column)?;
         let column_ident = argument_column.snake_case_ident()?;
@@ -210,7 +211,7 @@ where
             quote::quote! { self.#column_ident }
         };
 
-        if (unpacking || !argument_column.is_nullable()) && !argument_column.supports_copy(conn)? {
+        if (unpacking || !argument_column.is_nullable()) && !argument_column.supports_copy(conn).await? {
             column_ident = quote::quote! { #column_ident.as_ref() };
         }
 
@@ -264,16 +265,16 @@ where
 
     /// Translates the provided function argument to a
     /// [`TokenStream`](proc_macro2::TokenStream)
-    fn parse_function_argument_expr(
+    async fn parse_function_argument_expr(
         &self,
         arg: &FunctionArgExpr,
         arg_type: &ReturningType,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(proc_macro2::TokenStream, Option<&'_ Column>), WebCodeGenError> {
         match arg {
             FunctionArgExpr::Expr(expr) => {
-                let (token_stream, scoped_columns, _returning_type) =
-                    self.parse(expr, Some(arg_type), conn)?;
+                let (token_stream, scoped_columns, _returning_type): (_, Vec<&Column>, _) =
+                    self.parse(expr, Some(arg_type), conn).await?;
                 if scoped_columns.len() > 1 {
                     return Err(CheckConstraintError::UnsupportedSyntax(
                         Box::new(self.check_constraint.clone()),
@@ -283,7 +284,7 @@ where
                     )
                     .into());
                 }
-                Ok((token_stream, scoped_columns.first().copied()))
+                Ok((token_stream, scoped_columns.get(0).copied()))
             }
             FunctionArgExpr::QualifiedWildcard(_) => {
                 unimplemented!("QualifiedWildcard not supported");
@@ -296,11 +297,11 @@ where
 
     /// Translates the provided function argument to a
     /// [`TokenStream`](proc_macro2::TokenStream)
-    fn parse_function_argument(
+    async fn parse_function_argument(
         &self,
         arg: &FunctionArg,
         arg_type: &ReturningType,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(proc_macro2::TokenStream, Option<&'_ Column>), WebCodeGenError> {
         match arg {
             FunctionArg::Named { .. } => {
@@ -309,28 +310,26 @@ where
             FunctionArg::ExprNamed { .. } => {
                 unimplemented!("ExprNamed arguments not supported");
             }
-            FunctionArg::Unnamed(arg) => self.parse_function_argument_expr(arg, arg_type, conn),
+            FunctionArg::Unnamed(arg) => {
+                self.parse_function_argument_expr(arg, arg_type, conn).await
+            }
         }
     }
 
     /// Translates the provided list of function arguments to a
     /// [`TokenStream`](proc_macro2::TokenStream)
-    fn parse_function_argument_list(
+    async fn parse_function_argument_list(
         &self,
         args: &FunctionArgumentList,
         argument_types: &[ReturningType],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(Vec<proc_macro2::TokenStream>, Vec<&'_ Column>), WebCodeGenError> {
         let mut token_stream = Vec::with_capacity(args.args.len());
         let mut columns = Vec::new();
         assert_eq!(args.args.len(), argument_types.len());
-        for entry in args
-            .args
-            .iter()
-            .zip(argument_types.iter())
-            .map(|(arg, arg_type)| self.parse_function_argument(arg, arg_type, conn))
-        {
-            let (column_token_stream, column) = entry?;
+        for (arg, arg_type) in args.args.iter().zip(argument_types.iter()) {
+            let (column_token_stream, column) =
+                self.parse_function_argument(arg, arg_type, conn).await?;
             token_stream.push(column_token_stream);
             columns.extend(column);
         }
@@ -339,11 +338,11 @@ where
 
     /// Translates the provided function arguments to a
     /// [`TokenStream`](proc_macro2::TokenStream)
-    fn parse_function_arguments(
+    async fn parse_function_arguments(
         &self,
         args: &FunctionArguments,
         argument_types: &[ReturningType],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(Vec<proc_macro2::TokenStream>, Vec<&'_ Column>), WebCodeGenError> {
         match args {
             FunctionArguments::None => Ok((Vec::new(), Vec::new())),
@@ -351,14 +350,14 @@ where
                 unimplemented!("Subquery arguments not supported");
             }
             FunctionArguments::List(args) => {
-                self.parse_function_argument_list(args, argument_types, conn)
+                self.parse_function_argument_list(args, argument_types, conn).await
             }
         }
     }
 
     /// Translates the provided SQL function call to a
     /// [`TokenStream`](proc_macro2::TokenStream)
-    fn parse_function(
+    async fn parse_function(
         &self,
         sqlparser::ast::Function {
             name,
@@ -370,7 +369,7 @@ where
             over,
             within_group,
         }: &sqlparser::ast::Function,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(proc_macro2::TokenStream, ReturningType), WebCodeGenError> {
         if !within_group.is_empty() {
             unimplemented!("WithinGroup not supported");
@@ -391,15 +390,17 @@ where
             unimplemented!("ODBC syntax not supported");
         }
         let function = self.get_function_by_name(&name.to_string())?;
-        let argument_types = function
-            .argument_types(conn)?
-            .into_iter()
-            .map(|pg_type| ReturningType::try_from_pg_type(pg_type, conn))
-            .collect::<Result<Vec<_>, WebCodeGenError>>()?;
-        let (args, scoped_columns) = self.parse_function_arguments(args, &argument_types, conn)?;
-        let function_path = function.path(conn)?;
 
-        let map_err = if function.returns_result(conn)? {
+        let mut argument_types = Vec::new();
+        for argument_type in function.argument_types(conn).await? {
+            argument_types.push(ReturningType::try_from_pg_type(argument_type, conn).await?);
+        }
+
+        let (args, scoped_columns) =
+            self.parse_function_arguments(args, &argument_types, conn).await?;
+        let function_path = function.path(conn).await?;
+
+        let map_err = if function.returns_result(conn).await? {
             let attributes_enumeration = self.attributes_enumeration;
 
             let attributes = scoped_columns
@@ -440,10 +441,10 @@ where
             quote::quote! {
                 #function_path(#(#args),*)#map_err
             },
-            if function.returns_result(conn)? {
+            if function.returns_result(conn).await? {
                 ReturningType::Result
             } else {
-                ReturningType::try_from_pg_type(function.return_type(conn)?, conn)?
+                ReturningType::try_from_pg_type(function.return_type(conn).await?, conn).await?
             },
         ))
     }
@@ -529,15 +530,16 @@ where
     #[allow(clippy::too_many_lines)]
     /// Translates the provided expression to a
     /// [`TokenStream`](proc_macro2::TokenStream)
-    fn parse(
+    async fn parse(
         &self,
         expr: &Expr,
         type_hint: Option<&ReturningType>,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(proc_macro2::TokenStream, Vec<&'_ Column>, ReturningType), WebCodeGenError> {
         match expr {
             Expr::Function(function) => {
-                let (token_stream, returning_type) = self.parse_function(function, conn)?;
+                let (token_stream, returning_type) =
+                    Box::pin(self.parse_function(function, conn)).await?;
                 Ok((token_stream, Vec::new(), returning_type))
             }
             Expr::Cast { kind, expr, data_type: _, format } => {
@@ -545,24 +547,24 @@ where
                 if format.is_some() {
                     unimplemented!("Format not supported");
                 }
-                self.parse(expr, type_hint, conn)
+                Box::pin(self.parse(expr, type_hint, conn)).await
             }
-            Expr::Nested(expr) => self.parse(expr, type_hint, conn),
+            Expr::Nested(expr) => Box::pin(self.parse(expr, type_hint, conn)).await,
             Expr::Identifier(ident) => {
                 let involved_column = self.get_involved_column_by_name(&ident.value)?;
                 Ok((
-                    self.formatted_column(involved_column, false, conn)?,
+                    self.formatted_column(involved_column, false, conn).await?,
                     vec![involved_column],
-                    ReturningType::try_from_pg_type(involved_column.pg_type(conn)?, conn)?,
+                    ReturningType::try_from_pg_type(involved_column.pg_type(conn).await?, conn).await?,
                 ))
             }
             Expr::BinaryOp { left, op, right } => {
                 match op {
                     BinaryOperator::And => {
                         let (left, left_scoped_columns, left_returning_type) =
-                            self.parse(left, None, conn)?;
+                            Box::pin(self.parse(left, None, conn)).await?;
                         let (right, right_scoped_columns, right_returning_type) =
-                            self.parse(right, None, conn)?;
+                            Box::pin(self.parse(right, None, conn)).await?;
                         if !left_scoped_columns.is_empty() || !right_scoped_columns.is_empty() {
                             unimplemented!("Scoped columns not supported");
                         }
@@ -592,9 +594,9 @@ where
                     }
                     BinaryOperator::Or => {
                         let (left, left_scoped_columns, left_returning_type) =
-                            self.parse(left, None, conn)?;
+                            Box::pin(self.parse(left, None, conn)).await?;
                         let (right, right_scoped_columns, right_returning_type) =
-                            self.parse(right, None, conn)?;
+                            Box::pin(self.parse(right, None, conn)).await?;
                         if !left_scoped_columns.is_empty() || !right_scoped_columns.is_empty() {
                             unimplemented!("Scoped columns not supported");
                         }
@@ -628,9 +630,10 @@ where
                     | BinaryOperator::Lt
                     | BinaryOperator::GtEq
                     | BinaryOperator::LtEq => {
-                        let (left, _, left_returning_type) = self.parse(left, None, conn)?;
+                        let (left, _, left_returning_type) =
+                            Box::pin(self.parse(left, None, conn)).await?;
                         let (right, _, right_returning_type) =
-                            self.parse(right, Some(&left_returning_type), conn)?;
+                            Box::pin(self.parse(right, Some(&left_returning_type), conn)).await?;
                         if left_returning_type != right_returning_type {
                             unimplemented!(
                                 "Equality between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}",
@@ -659,9 +662,10 @@ where
                     | BinaryOperator::Multiply
                     | BinaryOperator::Divide
                     | BinaryOperator::Modulo => {
-                        let (left, _, left_returning_type) = self.parse(left, type_hint, conn)?;
+                        let (left, _, left_returning_type) =
+                        Box::pin(self.parse(left, type_hint, conn)).await?;
                         let (right, _, right_returning_type) =
-                            self.parse(right, type_hint, conn)?;
+                        Box::pin(self.parse(right, type_hint, conn)).await?;
                         if left_returning_type != right_returning_type {
                             unimplemented!(
                                 "Binary operation between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}",
@@ -756,21 +760,25 @@ impl CheckConstraint {
     /// # Panics
     ///
     /// * If the parser check clause cannot be parsed
-    pub fn to_syn<E: AsRef<PgExtension>, C1: AsRef<Column> + Debug, C2: AsRef<Column> + Debug>(
+    pub async fn to_syn<
+        E: AsRef<PgExtension>,
+        C1: AsRef<Column> + Debug,
+        C2: AsRef<Column> + Debug,
+    >(
         &self,
         contextual_columns: &[C1],
         self_columns: &[C2],
         extensions: &[E],
         attributes_enumeration: &syn::Ident,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<proc_macro2::TokenStream, WebCodeGenError> {
-        let functions = self.functions(conn)?;
-        let operators = self.operators(conn)?;
+        let functions = self.functions(conn).await?;
+        let operators = self.operators(conn).await?;
 
         // If any of the functions are not from the provided extensions,
         // then it is not possible to generate the check clause.
         for f in &functions {
-            let Some(extension) = f.extension(conn)? else {
+            let Some(extension) = f.extension(conn).await? else {
                 return Err(CheckConstraintError::FunctionNotFromProvidedExtensions(
                     Box::new(f.clone()),
                     Box::new(self.clone()),
@@ -798,7 +806,7 @@ impl CheckConstraint {
             .parse_expr()
             .expect("Failed to parse check clause");
 
-        let involved_columns = self.columns(conn)?;
+        let involved_columns = self.columns(conn).await?;
         let translator = TranslateExpression {
             check_constraint: self,
             contextual_columns,
@@ -809,7 +817,7 @@ impl CheckConstraint {
         };
 
         let (mut translated_check_clause, scoped_columns, returning_type) =
-            translator.parse(&parsed_check_clause, None, conn)?;
+            translator.parse(&parsed_check_clause, None, conn).await?;
 
         if !scoped_columns.is_empty() {
             return Err(CheckConstraintError::UnsupportedSyntax(
@@ -840,7 +848,7 @@ impl CheckConstraint {
             for optional_involved_column in optional_involved_columns {
                 let column_ident = optional_involved_column.snake_case_ident()?;
                 let formatted_column =
-                    translator.formatted_column(optional_involved_column, true, conn)?;
+                    translator.formatted_column(optional_involved_column, true, conn).await?;
                 left_assignment.push(quote::quote! { Some(#column_ident) });
                 right_assignment.push(formatted_column);
             }
@@ -874,8 +882,11 @@ impl CheckConstraint {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, WebCodeGenError> {
-        Ok(self.pg_constraint(conn)?.functions(conn)?)
+    pub async fn functions(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<PgProc>, WebCodeGenError> {
+        Ok(self.pg_constraint(conn).await?.functions(conn).await?)
     }
 
     /// Returns the vector of [`PgOperator`] operators that are used in the
@@ -888,8 +899,11 @@ impl CheckConstraint {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn operators(&self, conn: &mut PgConnection) -> Result<Vec<PgOperator>, WebCodeGenError> {
-        Ok(self.pg_constraint(conn)?.operators(conn)?)
+    pub async fn operators(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<PgOperator>, WebCodeGenError> {
+        Ok(self.pg_constraint(conn).await?.operators(conn).await?)
     }
 
     /// Returns the [`PgConstraint`] that corresponds to this check constraint
@@ -901,7 +915,10 @@ impl CheckConstraint {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn pg_constraint(&self, conn: &mut PgConnection) -> Result<PgConstraint, WebCodeGenError> {
+    pub async fn pg_constraint(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<PgConstraint, WebCodeGenError> {
         use crate::schema::{pg_constraint, pg_namespace};
         pg_constraint::table
             .inner_join(pg_namespace::table.on(pg_constraint::connamespace.eq(pg_namespace::oid)))
@@ -913,6 +930,7 @@ impl CheckConstraint {
             .filter(pg_namespace::nspname.eq(&self.constraint_schema))
             .select(PgConstraint::as_select())
             .first(conn)
+            .await
             .map_err(WebCodeGenError::from)
     }
 
@@ -925,7 +943,10 @@ impl CheckConstraint {
     /// # Errors
     ///
     /// * If their is an error while querying the database.
-    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
+    pub async fn columns(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<Column>, WebCodeGenError> {
         use crate::schema::{columns, constraint_column_usage};
         Ok(columns::table
             .inner_join(constraint_column_usage::table.on(
@@ -945,38 +966,7 @@ impl CheckConstraint {
                 ),
             )
             .select(Column::as_select())
-            .load(conn)?)
-    }
-
-    /// Returns whether the check constraint is associated to a single column.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If their is an error while querying the database.
-    pub fn is_single_column_constraint(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<bool, WebCodeGenError> {
-        self.columns(conn).map(|columns| columns.len() == 1)
-    }
-
-    /// Returns whether the check is associated to multiple columns.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If their is an error while querying the database.
-    pub fn is_multi_column_constraint(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<bool, WebCodeGenError> {
-        self.columns(conn).map(|columns| columns.len() > 1)
+            .load(conn)
+            .await?)
     }
 }

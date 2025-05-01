@@ -2,9 +2,10 @@
 //! `pg_constraint` table.
 
 use diesel::{
-    ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
+    ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName, Selectable,
     SelectableHelper,
 };
+use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
 use super::{PgOperator, PgProc};
 
@@ -90,9 +91,9 @@ impl PgConstraint {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn functions(
+    pub async fn functions(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<Vec<PgProc>, diesel::result::Error> {
         use crate::schema::{pg_constraint, pg_depend, pg_proc};
         pg_constraint::table
@@ -104,7 +105,7 @@ impl PgConstraint {
             .filter(pg_constraint::oid.eq(self.oid))
             // Select all columns from pg_proc.
             .select(PgProc::as_select())
-            .load::<PgProc>(conn)
+            .load::<PgProc>(conn).await
     }
 
     /// Returns the vector of [`PgOperator`] functions that are used in the
@@ -117,9 +118,9 @@ impl PgConstraint {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn operators(
+    pub async fn operators(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<Vec<PgOperator>, diesel::result::Error> {
         use crate::schema::{pg_constraint, pg_depend, pg_operator};
         pg_constraint::table
@@ -131,6 +132,6 @@ impl PgConstraint {
             .filter(pg_constraint::oid.eq(self.oid))
             // Select all columns from pg_operator.
             .select(PgOperator::as_select())
-            .load::<PgOperator>(conn)
+            .load::<PgOperator>(conn).await
     }
 }

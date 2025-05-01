@@ -2,8 +2,7 @@
 
 use std::path::Path;
 
-use diesel::PgConnection;
-use itertools::Itertools;
+use diesel_async::AsyncPgConnection;
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
 use syn::File;
@@ -434,32 +433,32 @@ impl<'a> Codegen<'a> {
     /// # Errors
     ///
     /// * Returns an error if the connection to the database fails.
-    pub(super) fn required_types(
+    pub(super) async fn required_types(
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<Vec<PgType>, WebCodeGenError> {
-        let mut types: Vec<PgType> = tables
-            .iter()
-            .map(|table| {
-                let custom_types = table
-                    .columns(conn)?
-                    .into_iter()
-                    .filter(Column::has_custom_type)
-                    .map(|column| PgType::from_name(column.data_type_str(conn)?, conn))
-                    .filter_ok(|pg_type| pg_type.is_enum() || pg_type.is_composite())
-                    .collect::<Result<Vec<PgType>, WebCodeGenError>>()?;
-                let mut additional_custom_types = custom_types.clone();
-                for custom_type in custom_types {
-                    additional_custom_types.extend(custom_type.internal_custom_types(conn)?);
-                }
-                Ok(additional_custom_types)
-            })
-            .collect::<Result<Vec<Vec<PgType>>, WebCodeGenError>>()?
-            .into_iter()
-            .flatten()
-            .filter(|pg_type| pg_type.extension(conn).map_or(false, |ext| ext.is_none()))
-            .collect::<Vec<PgType>>();
+        let mut types: Vec<PgType> = Vec::new();
 
+        for table in tables {
+            let mut custom_types = Vec::new();
+
+            for column in table.columns(conn).await?.into_iter().filter(Column::has_custom_type) {
+                let column_type = PgType::from_name(column.data_type_str(conn)?, conn).await?;
+                if column_type.is_enum() || column_type.is_composite() {
+                    custom_types.push(column_type);
+                }
+            }
+            let mut additional_custom_types = custom_types.clone();
+            for custom_type in custom_types {
+                additional_custom_types.extend(custom_type.internal_custom_types(conn).await?);
+            }
+
+            for pg_type in additional_custom_types {
+                if pg_type.extension(conn).await?.is_none() {
+                    types.push(pg_type);
+                }
+            }
+        }
         types.sort_unstable();
         types.dedup();
 
@@ -484,16 +483,17 @@ impl<'a> Codegen<'a> {
     /// * Returns an error if the user defined types cannot be converted to syn.
     /// * Returns an error if the generated code cannot be written to the output
     ///   file.
-    pub fn generate(
+    pub async fn generate(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
         table_catalog: &str,
         table_schema: Option<&str>,
     ) -> Result<TimeTracker, WebCodeGenError> {
         let mut time_tracker = TimeTracker::new("Code generation");
 
         let task = Task::new("Retrieving tables");
-        let mut tables = Table::load_all(conn, table_catalog, table_schema)?
+        let mut tables = Table::load_all(conn, table_catalog, table_schema)
+            .await?
             .into_iter()
             .filter(|table| !(table.is_temporary() || table.is_view()))
             .filter(|table| !self.tables_deny_list.contains(&table))
@@ -506,23 +506,32 @@ impl<'a> Codegen<'a> {
         std::fs::create_dir_all(&codegen_directory)?;
         let codegen_module = codegen_directory.with_extension("rs");
 
-        time_tracker.extend(self.generate_diesel_code(
-            codegen_directory.as_path().join(CODEGEN_DIESEL_MODULE).as_path(),
-            &tables,
-            conn,
-        )?);
+        time_tracker.extend(
+            self.generate_diesel_code(
+                codegen_directory.as_path().join(CODEGEN_DIESEL_MODULE).as_path(),
+                &tables,
+                conn,
+            )
+            .await?,
+        );
 
-        time_tracker.extend(self.generate_structs_code(
-            codegen_directory.as_path().join(CODEGEN_STRUCTS_MODULE).as_path(),
-            &tables,
-            conn,
-        )?);
+        time_tracker.extend(
+            self.generate_structs_code(
+                codegen_directory.as_path().join(CODEGEN_STRUCTS_MODULE).as_path(),
+                &tables,
+                conn,
+            )
+            .await?,
+        );
 
-        time_tracker.extend(self.generate_web_common_traits_implementations(
-            codegen_directory.as_path().join(CODEGEN_TRAITS_MODULE).as_path(),
-            &tables,
-            conn,
-        )?);
+        time_tracker.extend(
+            self.generate_web_common_traits_implementations(
+                codegen_directory.as_path().join(CODEGEN_TRAITS_MODULE).as_path(),
+                &tables,
+                conn,
+            )
+            .await?,
+        );
 
         let diesel_codegen_ident =
             syn::Ident::new(CODEGEN_DIESEL_MODULE, proc_macro2::Span::call_site());

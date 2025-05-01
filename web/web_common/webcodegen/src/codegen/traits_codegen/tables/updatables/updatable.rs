@@ -4,10 +4,10 @@
 
 use std::path::Path;
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 
-use crate::{Codegen, Table, codegen::Syntax, errors::WebCodeGenError};
+use crate::{Codegen, Table, codegen::Syntax};
 
 impl Table {
     /// Returns whether the table allows for the implementation of the
@@ -25,16 +25,22 @@ impl Table {
     /// # Errors
     ///
     /// * If the database connection fails.
-    pub fn allows_updatable(
+    pub async fn allows_updatable(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<bool, crate::errors::WebCodeGenError> {
-        Ok(self.has_updated_by_column(conn)? && self.has_created_by_column(conn)?
-            || self.has_parents(conn)?
-                && self
-                    .parent_tables(conn)?
-                    .iter()
-                    .all(|parent| parent.allows_updatable(conn).unwrap_or(false)))
+        if self.has_updated_by_column(conn).await? && self.has_created_by_column(conn).await? {
+            return Ok(true);
+        }
+        if !self.has_parents(conn).await? {
+            return Ok(false);
+        }
+        for parent in self.parent_tables(conn).await? {
+            if !Box::pin(parent.allows_updatable(conn)).await? {
+                return Ok(false);
+            }
+        }
+        Ok(true)
     }
 }
 
@@ -53,11 +59,11 @@ impl Codegen<'_> {
     ///
     /// * If the database connection fails.
     /// * If the file system fails.
-    pub(super) fn generate_updatable_impls(
+    pub(super) async fn generate_updatable_impls(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
 
@@ -77,12 +83,12 @@ impl Codegen<'_> {
         let Some(team_projects) = self.team_projects_table else {
             return Err(crate::errors::CodeGenerationError::TeamProjectsTableNotProvided.into());
         };
-        let user_id_type = user.primary_key_type(conn)?;
+        let user_id_type = user.primary_key_type(conn).await?;
         let team_member_table = team_members.import_diesel_path()?;
         let team_project_table = team_projects.import_diesel_path()?;
 
         for table in tables {
-            if !table.allows_updatable(conn)? && table != user {
+            if !table.allows_updatable(conn).await? && table != user {
                 continue;
             }
 
@@ -115,52 +121,50 @@ impl Codegen<'_> {
                 TokenStream::new()
             };
 
-            let parent_check = table
-                .parent_keys(conn)?
-                .iter()
-                .map(|parent_key| {
-                    let Some((parent_table, _)) = parent_key.foreign_table(conn)? else {
-                        return Ok(TokenStream::new());
-                    };
+            let mut parent_check = TokenStream::new();
 
-                    if !parent_table.allows_updatable(conn)? {
-                        return Ok(TokenStream::new());
+            for parent_key in table.parent_keys(conn).await? {
+                let Some((parent_table, _)) = parent_key.foreign_table(conn).await? else {
+                    continue;
+                };
+
+                if !parent_table.allows_updatable(conn).await? {
+                    continue;
+                }
+
+                let method_ident = parent_key.getter_ident()?;
+                let parent_table_ident = parent_table.snake_case_ident()?;
+
+                let mut recursive_call = if parent_key.is_nullable() {
+                    quote::quote! {#parent_table_ident.can_update(user_id, conn)}
+                } else {
+                    quote::quote! {
+                        self.#method_ident(conn).await?.can_update(user_id, conn)
                     }
+                };
 
-                    let method_ident = parent_key.getter_ident()?;
-                    let parent_table_ident = parent_table.snake_case_ident()?;
-
-                    let mut recursive_call = if parent_key.is_nullable() {
-                        quote::quote! {#parent_table_ident.can_update(user_id, conn)}
-                    } else {
-                        quote::quote! {
-                            self.#method_ident(conn).await?.can_update(user_id, conn)
-                        }
+                if &parent_table == table {
+                    recursive_call = quote::quote! {
+                        std::boxed::Box::pin(#recursive_call)
                     };
+                }
 
-                    if &parent_table == table {
-                        recursive_call = quote::quote! {
-                            std::boxed::Box::pin(#recursive_call)
-                        };
-                    }
-
-                    Ok(if parent_key.is_nullable() {
-                        quote::quote! {
-                            if let Some(#parent_table_ident) = self.#method_ident(conn).await? {
-                                if !#recursive_call.await? {
-                                    return Ok(false);
-                                }
-                            }
-                        }
-                    } else {
-                        quote::quote! {
+                parent_check.extend(if parent_key.is_nullable() {
+                    quote::quote! {
+                        if let Some(#parent_table_ident) = self.#method_ident(conn).await? {
                             if !#recursive_call.await? {
                                 return Ok(false);
                             }
                         }
-                    })
-                })
-                .collect::<Result<TokenStream, WebCodeGenError>>()?;
+                    }
+                } else {
+                    quote::quote! {
+                        if !#recursive_call.await? {
+                            return Ok(false);
+                        }
+                    }
+                });
+            }
 
             let mut imports = Vec::new();
 
@@ -189,7 +193,7 @@ impl Codegen<'_> {
                 TokenStream::new()
             };
 
-            let created_by_check = if table.has_created_by_column(conn)? {
+            let created_by_check = if table.has_created_by_column(conn).await? {
                 quote::quote! {
                     // If the user is the creator of the record, they can update it
                     if *user_id == self.created_by {
@@ -200,7 +204,7 @@ impl Codegen<'_> {
                 TokenStream::new()
             };
 
-            let updated_by_check = if table.has_updated_by_column(conn)? {
+            let updated_by_check = if table.has_updated_by_column(conn).await? {
                 quote::quote! {
                     // If the user is the last updator of the record, they can update it
                     if *user_id == self.updated_by {

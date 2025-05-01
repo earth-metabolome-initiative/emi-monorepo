@@ -4,7 +4,7 @@
 
 use std::path::Path;
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 use strum::IntoEnumIterator;
@@ -25,11 +25,11 @@ impl Codegen<'_> {
     ///
     /// * If the database connection fails.
     /// * If the file system fails.
-    pub(super) fn generate_upsertables_impls(
+    pub(super) async fn generate_upsertables_impls(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
 
@@ -46,7 +46,7 @@ impl Codegen<'_> {
             let diesel_table_path = table.import_diesel_path()?;
 
             let primary_key_columns: Vec<TokenStream> = table
-                .primary_key_columns(conn)?
+                .primary_key_columns(conn).await?
                 .into_iter()
                 .map(|primary_key| {
                     let snake_case_column_ident = primary_key.snake_case_ident()?;
@@ -66,7 +66,7 @@ impl Codegen<'_> {
                 }
             };
 
-            let non_primary_key_columns = table.non_primary_key_columns(conn)?;
+            let non_primary_key_columns = table.non_primary_key_columns(conn).await?;
 
             let conflict_clause: TokenStream = if non_primary_key_columns.is_empty() {
                 quote! {

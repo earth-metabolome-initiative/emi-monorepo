@@ -1,7 +1,9 @@
-use diesel::pg::PgConnection;
+use diesel_async::AsyncPgConnection;
+use async_trait::async_trait;
 
 use crate::{Column, Table, errors::WebCodeGenError};
 
+#[async_trait]
 /// A trait for custom table constraints
 pub trait CustomTableConstraint {
     /// Check the table constraint
@@ -15,9 +17,9 @@ pub trait CustomTableConstraint {
     ///
     /// * If the constraint check fails
     /// * If the database query fails
-    fn check_constraint(
+    async fn check_constraint(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
         table: &Table,
     ) -> Result<(), WebCodeGenError>;
 
@@ -33,19 +35,20 @@ pub trait CustomTableConstraint {
     ///
     /// * If loading the tables from the database fails
     /// * If checking the constraint fails
-    fn check_all(
+    async fn check_all(
         &self,
         table_catalog: &str,
         table_schema: Option<&str>,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(), WebCodeGenError> {
-        for table in Table::load_all(conn, table_catalog, table_schema)? {
-            self.check_constraint(conn, &table)?;
+        for table in Table::load_all(conn, table_catalog, table_schema).await? {
+            self.check_constraint(conn, &table).await?;
         }
         Ok(())
     }
 }
 
+#[async_trait]
 /// A trait for custom column constraints
 pub trait CustomColumnConstraint {
     /// Check the column constraint
@@ -59,9 +62,9 @@ pub trait CustomColumnConstraint {
     ///
     /// * If the constraint check fails
     /// * If the database query fails
-    fn check_constraint(
+    async fn check_constraint(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
         column: &Column,
     ) -> Result<(), WebCodeGenError>;
 
@@ -78,15 +81,15 @@ pub trait CustomColumnConstraint {
     /// * If loading the tables from the database fails
     /// * If loading the columns from the database fails
     /// * If checking the constraint fails
-    fn check_all(
+    async fn check_all(
         &self,
         table_catalog: &str,
         table_schema: Option<&str>,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(), WebCodeGenError> {
-        for table in Table::load_all(conn, table_catalog, table_schema)? {
-            for column in table.columns(conn)? {
-                self.check_constraint(conn, &column)?;
+        for table in Table::load_all(conn, table_catalog, table_schema).await? {
+            for column in table.columns(conn).await? {
+                self.check_constraint(conn, &column).await?;
             }
         }
         Ok(())

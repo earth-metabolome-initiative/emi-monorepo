@@ -67,6 +67,8 @@ pub enum WebCodeGenError {
     UnsupportedTypeCasting(String, Box<PgType>),
 }
 
+unsafe impl Send for WebCodeGenError {}
+
 #[derive(Debug)]
 /// Error type for code generation.
 pub enum CodeGenerationError {

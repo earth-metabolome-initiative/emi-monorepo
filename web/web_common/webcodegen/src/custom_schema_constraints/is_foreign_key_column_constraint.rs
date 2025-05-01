@@ -1,5 +1,5 @@
-use diesel::pg::PgConnection;
-
+use async_trait::async_trait;
+use diesel_async::AsyncPgConnection;
 use super::ConstraintError;
 use crate::{Column, custom_schema_constraints::CustomColumnConstraint, errors::WebCodeGenError};
 
@@ -20,15 +20,16 @@ impl IsForeignKeyConstraint {
     }
 }
 
+#[async_trait]
 impl CustomColumnConstraint for IsForeignKeyConstraint {
-    fn check_constraint(
+    async fn check_constraint(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
         column: &Column,
     ) -> Result<(), WebCodeGenError> {
         if column.column_name == self.column_name
             && column
-                .foreign_table(conn)?
+                .foreign_table(conn).await?
                 .is_none_or(|(table, _)| table.table_name != self.table_name)
         {
             return Err(WebCodeGenError::ConstraintError(ConstraintError::NotForeignKeyColumn {

@@ -1,7 +1,8 @@
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
-    RunQueryDsl, Selectable, SelectableHelper, pg::PgConnection,
+    Selectable, SelectableHelper,
 };
+use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
 use super::Column;
 use crate::errors::WebCodeGenError;
@@ -77,7 +78,7 @@ impl PgIndex {
     /// # Errors
     ///
     /// If an error occurs while loading the columns from the database
-    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
+    pub async fn columns(&self, conn: &mut AsyncPgConnection) -> Result<Vec<Column>, WebCodeGenError> {
         use crate::schema::{columns, pg_attribute, pg_class, pg_index};
 
         Ok(pg_index::table
@@ -94,7 +95,7 @@ impl PgIndex {
                     .and(pg_attribute::attnum.eq_any(&self.indkey)),
             )
             .select(Column::as_select())
-            .load::<Column>(conn)?)
+            .load::<Column>(conn).await?)
     }
 
     #[must_use]

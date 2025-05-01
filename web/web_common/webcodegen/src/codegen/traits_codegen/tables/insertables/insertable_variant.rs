@@ -3,7 +3,7 @@
 
 use std::path::Path;
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 
 use crate::{Codegen, Table, codegen::Syntax};
@@ -22,11 +22,11 @@ impl Codegen<'_> {
     ///
     /// * If the database connection fails.
     /// * If the file system fails.
-    pub(super) fn generate_insertable_variant_impls(
+    pub(super) async fn generate_insertable_variant_impls(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
 
@@ -37,7 +37,7 @@ impl Codegen<'_> {
         let Some(user_table) = self.users_table else {
             return Err(crate::errors::CodeGenerationError::UserTableNotProvided.into());
         };
-        let user_id_type = user_table.primary_key_type(conn)?;
+        let user_id_type = user_table.primary_key_type(conn).await?;
 
         for table in tables {
             // We create a file for each table
@@ -49,17 +49,18 @@ impl Codegen<'_> {
 
             // We build a check to see whether the user is authorized to update
             // the parent tables.
-            let parent_check = table
-                .parent_keys(conn)?
-                .iter()
-                .map(|parent_key| {
+
+            let mut parent_check = TokenStream::new();
+
+            for parent_key in table
+                .parent_keys(conn).await? {
                     let parent_key_method = parent_key.getter_ident()?;
-                    let (parent_table, _) = parent_key.foreign_table(conn)?.expect("Parent table not found");
-                    if !parent_table.allows_updatable(conn)? {
-                        return Ok(TokenStream::new());
+                    let (parent_table, _) = parent_key.foreign_table(conn).await?.expect("Parent table not found");
+                    if !parent_table.allows_updatable(conn).await? {
+                        continue;
                     }
 
-                    Ok(if parent_key.is_nullable() {
+                    parent_check.extend(if parent_key.is_nullable() {
                         quote::quote! {
                             if let Some(parent) = self.#parent_key_method(conn).await? {
                                 if !parent.can_update(user_id, conn).await? {
@@ -73,9 +74,8 @@ impl Codegen<'_> {
                                 return Err(backend_request_errors::BackendRequestError::Unauthorized.into());
                             }
                         }
-                    })
-                })
-                .collect::<Result<TokenStream, crate::errors::WebCodeGenError>>()?;
+                    });
+                }
 
             let (user_id, additional_imports) = if parent_check.is_empty() {
                 (quote::quote! { _user_id }, TokenStream::new())

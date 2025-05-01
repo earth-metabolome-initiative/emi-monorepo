@@ -1,5 +1,5 @@
-use diesel::pg::PgConnection;
-
+use async_trait::async_trait;
+use diesel_async::AsyncPgConnection;
 use crate::{
     Column,
     custom_schema_constraints::{ConstraintError, CustomColumnConstraint},
@@ -10,10 +10,11 @@ use crate::{
 /// Constraint to enforce that all column names are lower case.
 pub struct LowercaseColumnConstraint;
 
+#[async_trait]
 impl CustomColumnConstraint for LowercaseColumnConstraint {
-    fn check_constraint(
+    async fn check_constraint(
         &self,
-        _conn: &mut PgConnection,
+        _conn: &mut AsyncPgConnection,
         column: &Column,
     ) -> Result<(), WebCodeGenError> {
         if column.column_name.chars().any(char::is_uppercase) {

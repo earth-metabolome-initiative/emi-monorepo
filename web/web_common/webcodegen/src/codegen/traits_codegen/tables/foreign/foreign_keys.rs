@@ -3,7 +3,7 @@
 
 use std::{collections::HashSet, path::Path};
 
-use diesel::PgConnection;
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 use syn::Ident;
 
@@ -28,11 +28,11 @@ impl Codegen<'_> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(super) fn generate_foreign_keys_impls(
+    pub(super) async fn generate_foreign_keys_impls(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
         let mut table_foreign_main_module = TokenStream::new();
@@ -42,7 +42,7 @@ impl Codegen<'_> {
             let table_path = table.import_struct_path()?;
             let foreign_keys_trait_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let snake_case_ident = table.snake_case_ident()?;
-            let foreign_keys = table.foreign_keys(conn)?;
+            let foreign_keys = table.foreign_keys(conn).await?;
 
             if foreign_keys.is_empty() {
                 continue;
@@ -52,10 +52,12 @@ impl Codegen<'_> {
                 mod #snake_case_ident;
             });
 
-            let foreign_tables = foreign_keys
-                .iter()
-                .map(|foreign_key| Ok(foreign_key.foreign_table(conn)?.unwrap().0))
-                .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+            let mut foreign_tables = Vec::new();
+
+            for foreign_key in &foreign_keys {
+                let foreign_table = foreign_key.foreign_table(conn).await?.unwrap().0;
+                foreign_tables.push(foreign_table);
+            }
             let foreign_keys_struct_ident = self.foreign_keys_struct_ident(table)?;
             let attributes = foreign_keys
                 .iter()
@@ -145,31 +147,33 @@ impl Codegen<'_> {
                 .collect::<Result<TokenStream, WebCodeGenError>>()?;
 
             let unique_table_types = foreign_tables.iter().collect::<HashSet<_>>();
-            let update_impls: Vec<TokenStream> = unique_table_types.into_iter()
-                .map(|unique_foreign_table| {
-                    let grouped_columns: Vec<(&Column, Column)> = foreign_keys.iter().filter_map(|foreign_key| {
-                        let (foreign_table, column_in_foreign_table) = foreign_key.foreign_table(conn).ok().flatten()?;
-                        if &foreign_table == unique_foreign_table {
-                            Some((foreign_key, column_in_foreign_table))
-                        } else {
-                            None
-                        }
-                    }).collect();
+            let mut update_impls: Vec<TokenStream> = Vec::new();
 
-                    let foreign_table_snake_case_ident = unique_foreign_table.snake_case_ident()?;
-                    let foreign_table_struct_ident = unique_foreign_table.struct_ident()?;
+            for unique_foreign_table in unique_table_types {
+                let mut grouped_columns: Vec<(&Column, Column)> = Vec::new();
 
-                    let maybe_cloned = if grouped_columns.len() > 1 {
-                        quote::quote! {
-                            #foreign_table_snake_case_ident.clone()
-                        }
-                    } else {
-                        quote::quote! {
-                            #foreign_table_snake_case_ident
-                        }
-                    };
+                for foreign_key in &foreign_keys {
+                    let (foreign_table, column_in_foreign_table) =
+                        foreign_key.foreign_table(conn).await?.unwrap();
+                    if &foreign_table == unique_foreign_table {
+                        grouped_columns.push((foreign_key, column_in_foreign_table));
+                    }
+                }
 
-                    let upsert_foreign_keys_dispatch = grouped_columns.iter()
+                let foreign_table_snake_case_ident = unique_foreign_table.snake_case_ident()?;
+                let foreign_table_struct_ident = unique_foreign_table.struct_ident()?;
+
+                let maybe_cloned = if grouped_columns.len() > 1 {
+                    quote::quote! {
+                        #foreign_table_snake_case_ident.clone()
+                    }
+                } else {
+                    quote::quote! {
+                        #foreign_table_snake_case_ident
+                    }
+                };
+
+                let upsert_foreign_keys_dispatch = grouped_columns.iter()
                         .map(|(column, column_in_foreign_table)| {
                             let column_snake_case_ident = column.snake_case_ident()?;
                             let column_in_foreign_table_snake_case_ident = column_in_foreign_table.snake_case_ident()?;
@@ -211,7 +215,7 @@ impl Codegen<'_> {
                         })
                         .collect::<Result<TokenStream, WebCodeGenError>>()?;
 
-                        let delete_foreign_keys_dispatch = grouped_columns.iter()
+                let delete_foreign_keys_dispatch = grouped_columns.iter()
                         .map(|(column, column_in_foreign_table)| {
                             let column_snake_case_ident = column.snake_case_ident()?;
                             let column_in_foreign_table_snake_case_ident = column_in_foreign_table.snake_case_ident()?;
@@ -253,7 +257,7 @@ impl Codegen<'_> {
                         })
                         .collect::<Result<TokenStream, WebCodeGenError>>()?;
 
-                    Ok(quote::quote! {
+                update_impls.push(quote::quote! {
                         (#row_enum_path::#foreign_table_struct_ident(#foreign_table_snake_case_ident), web_common_traits::crud::CRUD::Read | web_common_traits::crud::CRUD::Create | web_common_traits::crud::CRUD::Update) => {
                             #upsert_foreign_keys_dispatch
                         }
@@ -261,8 +265,7 @@ impl Codegen<'_> {
                             #delete_foreign_keys_dispatch
                         }
                     })
-                })
-                .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+            }
 
             let mut derives = vec![
                 quote::quote! {
@@ -279,22 +282,40 @@ impl Codegen<'_> {
                 },
             ];
 
-            if foreign_tables
-                .iter()
-                .all(|foreign_table| foreign_table.supports_eq(conn).unwrap_or(false))
-            {
+            let mut supports_eq = true;
+
+            for foreign_table in &foreign_tables {
+                if !foreign_table.supports_eq(conn).await? {
+                    supports_eq = false;
+                    break;
+                }
+            }
+
+            if supports_eq {
                 derives.push(quote::quote! {Eq});
             }
-            if foreign_tables
-                .iter()
-                .all(|foreign_table| foreign_table.supports_hash(conn).unwrap_or(false))
-            {
+
+            let mut supports_hash = true;
+            for foreign_table in &foreign_tables {
+                if !foreign_table.supports_hash(conn).await? {
+                    supports_hash = false;
+                    break;
+                }
+            }
+            if supports_hash {
                 derives.push(quote::quote! {Hash});
             }
-            if foreign_tables
-                .iter()
-                .all(|foreign_table| foreign_table.supports_ord(conn).unwrap_or(false))
-            {
+
+            let mut supports_ord = true;
+
+            for foreign_table in &foreign_tables {
+                if !foreign_table.supports_ord(conn).await? {
+                    supports_ord = false;
+                    break;
+                }
+            }
+
+            if supports_ord {
                 derives.push(quote::quote! {PartialOrd});
                 derives.push(quote::quote! {Ord});
             }

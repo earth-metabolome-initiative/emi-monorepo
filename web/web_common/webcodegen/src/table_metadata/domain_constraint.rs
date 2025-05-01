@@ -1,6 +1,7 @@
 use diesel::{
-    ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, pg::PgConnection,
+    ExpressionMethods, QueryDsl, Queryable, QueryableByName,
 };
+use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
 use crate::errors::WebCodeGenError;
 
@@ -47,11 +48,11 @@ impl DomainConstraint {
     /// # Errors
     ///
     /// If an error occurs while loading the constraints from the database
-    pub fn load_all_domain_constraints(
-        conn: &mut PgConnection,
+    pub async fn load_all_domain_constraints(
+        conn: &mut AsyncPgConnection,
     ) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::domain_constraints;
-        domain_constraints::table.load::<DomainConstraint>(conn).map_err(WebCodeGenError::from)
+        domain_constraints::table.load::<DomainConstraint>(conn).await.map_err(WebCodeGenError::from)
     }
 
     /// Load all the domain constraints from the database
@@ -73,8 +74,8 @@ impl DomainConstraint {
     /// # Errors
     ///
     /// If an error occurs while loading the constraints from the database
-    pub fn load_domain_constraints(
-        conn: &mut PgConnection,
+    pub async fn load_domain_constraints(
+        conn: &mut AsyncPgConnection,
         constraint_name: &str,
         constraint_schema: Option<&str>,
         constraint_catalog: &str,
@@ -85,7 +86,7 @@ impl DomainConstraint {
             .filter(domain_constraints::constraint_name.eq(constraint_name))
             .filter(domain_constraints::constraint_schema.eq(constraint_schema))
             .filter(domain_constraints::constraint_catalog.eq(constraint_catalog))
-            .load::<DomainConstraint>(conn)
+            .load::<DomainConstraint>(conn).await
             .map_err(WebCodeGenError::from)
     }
 }

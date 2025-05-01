@@ -15,7 +15,7 @@ async fn test_codegen_tables_structs() {
         .set_output_directory("tests/codegen_tables_structs".as_ref())
         .enable_table_structs()
         .beautify()
-        .generate(&mut conn, &database_name, None);
+        .generate(&mut conn, &database_name, None).await;
     docker.stop().await.unwrap();
     outcome.unwrap();
 

@@ -2,9 +2,9 @@ use std::collections::{HashMap, HashSet};
 
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, NullableExpressionMethods, QueryDsl,
-    Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper, pg::PgConnection,
-    result::Error as DieselError,
+    Queryable, QueryableByName, Selectable, SelectableHelper, result::Error as DieselError,
 };
+use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use itertools::Itertools;
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -160,12 +160,12 @@ impl Table {
     }
 
     /// Returns wether a table require authorizations to be viewed
-    pub fn require_view_authorizations(&self, _conn: &mut PgConnection) -> bool {
+    pub fn require_view_authorizations(&self, _conn: &mut AsyncPgConnection) -> bool {
         false
     }
 
     /// Returns wether a table require authorizations to be modified
-    pub fn require_modify_authorizations(&self, _conn: &mut PgConnection) -> bool {
+    pub fn require_modify_authorizations(&self, _conn: &mut AsyncPgConnection) -> bool {
         false
     }
 
@@ -182,11 +182,11 @@ impl Table {
     /// # Errors
     ///
     /// * If the primary key columns cannot be loaded from the database.
-    pub fn primary_key_identifiers(
+    pub async fn primary_key_identifiers(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<Vec<Ident>, WebCodeGenError> {
-        self.primary_key_columns(conn)?
+        self.primary_key_columns(conn).await?
             .into_iter()
             .map(|column| column.snake_case_ident())
             .collect::<Result<Vec<Ident>, WebCodeGenError>>()
@@ -205,14 +205,14 @@ impl Table {
     /// # Errors
     ///
     /// * If the primary key columns cannot be loaded from the database.
-    pub fn primary_key_decorator(
+    pub async fn primary_key_decorator(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
         // In some cases, the table will not have a primary key. In which case, we
         // cannot specify the primary key decorator on the struct.
-        Ok(if self.has_primary_keys(conn)? {
-            let primary_key_identifiers = self.primary_key_identifiers(conn)?;
+        Ok(if self.has_primary_keys(conn).await? {
+            let primary_key_identifiers = self.primary_key_identifiers(conn).await?;
             quote! {
                 #[diesel(primary_key(#(#primary_key_identifiers),*))]
             }
@@ -234,17 +234,20 @@ impl Table {
     /// # Errors
     ///
     /// * If the primary key columns cannot be loaded from the database.
-    pub fn diesel_derives(&self, conn: &mut PgConnection) -> Result<Vec<Type>, WebCodeGenError> {
+    pub async fn diesel_derives(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<Type>, WebCodeGenError> {
         let mut derives = Vec::new();
 
         derives.push(parse_str("diesel::Selectable")?);
         derives.push(parse_str("diesel::Insertable")?);
 
-        if self.has_non_primary_keys(conn)? {
+        if self.has_non_primary_keys(conn).await? {
             derives.push(parse_str("diesel::AsChangeset")?);
         }
 
-        if self.has_primary_keys(conn)? {
+        if self.has_primary_keys(conn).await? {
             derives.push(parse_str("diesel::Queryable")?);
             derives.push(parse_str("diesel::Identifiable")?);
         }
@@ -265,11 +268,11 @@ impl Table {
     /// # Errors
     ///
     /// * If the diesel derives cannot be loaded.
-    pub fn diesel_derives_decorator(
+    pub async fn diesel_derives_decorator(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
-        let diesel_derives = self.diesel_derives(conn)?;
+        let diesel_derives = self.diesel_derives(conn).await?;
         Ok(if diesel_derives.is_empty() {
             TokenStream::new()
         } else {
@@ -292,12 +295,18 @@ impl Table {
     /// # Errors
     ///
     /// * If the foreign keys cannot be loaded from the database.
-    pub fn foreign_keys(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
-        Ok(self
-            .columns(conn)?
-            .into_iter()
-            .filter(|column| column.is_foreign_key(conn))
-            .collect::<Vec<Column>>())
+    pub async fn foreign_keys(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<Column>, WebCodeGenError> {
+        let columns = self.columns(conn).await?;
+        let mut foreign_keys = Vec::new();
+        for column in columns {
+            if column.is_foreign_key(conn).await {
+                foreign_keys.push(column);
+            }
+        }
+        Ok(foreign_keys)
     }
 
     /// Returns the parent keys of the table.
@@ -313,12 +322,17 @@ impl Table {
     /// # Errors
     ///
     /// * If the foreign keys cannot be loaded from the database.
-    pub fn parent_keys(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
-        Ok(self
-            .columns(conn)?
-            .into_iter()
-            .filter(|column| column.is_foreign_key_on_delete_cascade(conn))
-            .collect::<Vec<Column>>())
+    pub async fn parent_keys(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<Column>, WebCodeGenError> {
+        let mut columns = Vec::new();
+        for column in self.columns(conn).await? {
+            if column.is_foreign_key_on_delete_cascade(conn).await {
+                columns.push(column);
+            }
+        }
+        Ok(columns)
     }
 
     /// Returns the parent tables of the table.
@@ -334,10 +348,13 @@ impl Table {
     /// # Errors
     ///
     /// * If the parent tables cannot be loaded from the database.
-    pub fn parent_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
+    pub async fn parent_tables(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<Table>, WebCodeGenError> {
         let mut tables = Vec::new();
-        for column in self.parent_keys(conn)? {
-            if let Some((foreign_table, _)) = column.foreign_table(conn)? {
+        for column in self.parent_keys(conn).await? {
+            if let Some((foreign_table, _)) = column.foreign_table(conn).await? {
                 if !tables.contains(&foreign_table) {
                     tables.push(foreign_table);
                 }
@@ -359,8 +376,8 @@ impl Table {
     /// # Errors
     ///
     /// * If the foreign keys cannot be loaded from the database.
-    pub fn has_parents(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(!self.parent_keys(conn)?.is_empty())
+    pub async fn has_parents(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(!self.parent_keys(conn).await?.is_empty())
     }
 
     /// Returns the set of foreign tables of the table.
@@ -377,10 +394,13 @@ impl Table {
     /// # Errors
     ///
     /// * If the foreign tables cannot be loaded from the database.
-    pub fn foreign_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
+    pub async fn foreign_tables(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<Table>, WebCodeGenError> {
         let mut tables = HashSet::new();
-        for column in self.foreign_keys(conn)? {
-            if let Some((foreign_table, _)) = column.foreign_table(conn)? {
+        for column in self.foreign_keys(conn).await? {
+            if let Some((foreign_table, _)) = column.foreign_table(conn).await? {
                 tables.insert(foreign_table);
             }
         }
@@ -400,9 +420,9 @@ impl Table {
     /// # Errors
     ///
     /// * If the children tables cannot be loaded from the database.
-    pub fn children_tables(
+    pub async fn children_tables(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<Vec<Table>, diesel::result::Error> {
         use crate::schema::{key_column_usage, referential_constraints, table_constraints, tables};
         tables::table
@@ -445,6 +465,7 @@ impl Table {
             .select(tables::all_columns)
             .distinct()
             .load(conn)
+            .await
     }
 
     /// Returns the set of sibling tables of the table.
@@ -460,10 +481,13 @@ impl Table {
     /// # Errors
     ///
     /// * If the sibling tables cannot be loaded from the database.
-    pub fn sibling_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
+    pub async fn sibling_tables(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<Table>, WebCodeGenError> {
         let mut tables = HashSet::new();
-        for parent_table in self.parent_tables(conn)? {
-            for child_table in parent_table.children_tables(conn)? {
+        for parent_table in self.parent_tables(conn).await? {
+            for child_table in parent_table.children_tables(conn).await? {
                 if child_table != *self {
                     tables.insert(child_table);
                 }
@@ -485,11 +509,16 @@ impl Table {
     /// # Errors
     ///
     /// * If the columns cannot be loaded from the database.
-    pub fn has_session_user_generated_columns(
+    pub async fn has_session_user_generated_columns(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<bool, WebCodeGenError> {
-        Ok(self.columns(conn)?.iter().any(|column| column.is_session_user_generated(conn)))
+        for column in self.columns(conn).await? {
+            if column.is_session_user_generated(conn).await {
+                return Ok(true);
+            }
+        }
+        Ok(false)
     }
 
     /// Returns whether the table has an `created_by` column.
@@ -501,8 +530,16 @@ impl Table {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection is invalid.
-    pub fn has_created_by_column(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(self.columns(conn)?.iter().any(|column| column.is_created_by(conn)))
+    pub async fn has_created_by_column(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        for column in self.columns(conn).await? {
+            if column.is_created_by(conn).await {
+                return Ok(true);
+            }
+        }
+        Ok(false)
     }
 
     /// Returns whether the table has an `updated_by` column.
@@ -514,8 +551,16 @@ impl Table {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection is invalid.
-    pub fn has_updated_by_column(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(self.columns(conn)?.iter().any(|column| column.is_updated_by(conn)))
+    pub async fn has_updated_by_column(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        for column in self.columns(conn).await? {
+            if column.is_updated_by(conn).await {
+                return Ok(true);
+            }
+        }
+        Ok(false)
     }
 
     /// Returns the UNIQUE constraint indices for the table.
@@ -531,7 +576,10 @@ impl Table {
     /// # Errors
     ///
     /// * If the indices cannot be loaded from the database.
-    pub fn unique_indices(&self, conn: &mut PgConnection) -> Result<Vec<PgIndex>, DieselError> {
+    pub async fn unique_indices(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<PgIndex>, DieselError> {
         use crate::schema::{pg_class, pg_index};
 
         let (pg_class1, pg_class2) = diesel::alias!(pg_class as pg_class1, pg_class as pg_class2);
@@ -545,6 +593,7 @@ impl Table {
             .filter(pg_index::indisunique.eq(true))
             .select(PgIndex::as_select())
             .load::<PgIndex>(conn)
+            .await
     }
 
     /// Returns all tables in the database.
@@ -562,8 +611,8 @@ impl Table {
     /// # Errors
     ///
     /// * If the tables cannot be loaded from the database.
-    pub fn load_all(
-        conn: &mut PgConnection,
+    pub async fn load_all(
+        conn: &mut AsyncPgConnection,
         table_catalog: &str,
         table_schema: Option<&str>,
     ) -> Result<Vec<Self>, DieselError> {
@@ -573,6 +622,7 @@ impl Table {
             .filter(tables::table_schema.eq(table_schema.unwrap_or("public")))
             .filter(tables::table_name.ne("__diesel_schema_migrations"))
             .load::<Table>(conn)
+            .await
     }
 
     /// Returns whether the table supports the `Copy` trait.
@@ -584,8 +634,13 @@ impl Table {
     /// # Errors
     ///
     /// * If database connection fails.
-    pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(self.columns(conn)?.iter().all(|column| column.supports_copy(conn).unwrap_or(false)))
+    pub async fn supports_copy(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+        for column in self.columns(conn).await? {
+            if !column.supports_copy(conn).await? {
+                return Ok(false);
+            }
+        }
+        Ok(true)
     }
 
     /// Returns whether the table supports the `Eq` trait.
@@ -597,8 +652,13 @@ impl Table {
     /// # Errors
     ///
     /// * If database connection fails.
-    pub fn supports_eq(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(self.columns(conn)?.iter().all(|column| column.supports_eq(conn).unwrap_or(false)))
+    pub async fn supports_eq(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+        for column in self.columns(conn).await? {
+            if !column.supports_eq(conn).await? {
+                return Ok(false);
+            }
+        }
+        Ok(true)
     }
 
     /// Returns whether the table supports the `Ord` trait.
@@ -610,8 +670,13 @@ impl Table {
     /// # Errors
     ///
     /// * If database connection fails.
-    pub fn supports_ord(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(self.columns(conn)?.iter().all(|column| column.supports_ord(conn).unwrap_or(false)))
+    pub async fn supports_ord(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+        for column in self.columns(conn).await? {
+            if !column.supports_ord(conn).await? {
+                return Ok(false);
+            }
+        }
+        Ok(true)
     }
 
     /// Returns whether the table supports the `Hash` trait.
@@ -623,8 +688,13 @@ impl Table {
     /// # Errors
     ///
     /// * If database connection fails.
-    pub fn supports_hash(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(self.columns(conn)?.iter().all(|column| column.supports_hash(conn).unwrap_or(false)))
+    pub async fn supports_hash(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+        for column in self.columns(conn).await? {
+            if !column.supports_hash(conn).await? {
+                return Ok(false);
+            }
+        }
+        Ok(true)
     }
 
     /// Returns all tables in the database sorted topologically.
@@ -644,12 +714,12 @@ impl Table {
     /// # Errors
     ///
     /// * If the tables cannot be loaded from the database.
-    pub fn load_all_topologically(
-        conn: &mut PgConnection,
+    pub async fn load_all_topologically(
+        conn: &mut AsyncPgConnection,
         table_catalog: &str,
         table_schema: Option<&str>,
     ) -> Result<Vec<Self>, WebCodeGenError> {
-        let mut tables = Self::load_all(conn, table_catalog, table_schema)?;
+        let mut tables = Self::load_all(conn, table_catalog, table_schema).await?;
 
         let mut table_priority: HashMap<Table, usize> = HashMap::new();
 
@@ -658,8 +728,8 @@ impl Table {
         loop {
             let mut changed = false;
             for table in &tables {
-                for column in table.columns(conn)? {
-                    if let Some((foreign_table, _)) = column.foreign_table(conn)? {
+                for column in table.columns(conn).await? {
+                    if let Some((foreign_table, _)) = column.foreign_table(conn).await? {
                         if foreign_table == *table {
                             continue;
                         }
@@ -707,8 +777,8 @@ impl Table {
     /// # Errors
     ///
     /// * If the table cannot be loaded from the database.
-    pub fn load(
-        conn: &mut PgConnection,
+    pub async fn load(
+        conn: &mut AsyncPgConnection,
         table_name: &str,
         table_schema: Option<&str>,
         table_catalog: &str,
@@ -719,7 +789,7 @@ impl Table {
             .filter(tables::table_name.eq(table_name))
             .filter(tables::table_schema.eq(table_schema))
             .filter(tables::table_catalog.eq(table_catalog))
-            .first::<Table>(conn)
+            .first::<Table>(conn).await
     }
 
     /// Returns the columns of the table.
@@ -735,13 +805,17 @@ impl Table {
     /// # Errors
     ///
     /// * If the columns cannot be loaded from the database.
-    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
+    pub async fn columns(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<Column>, WebCodeGenError> {
         use crate::schema::columns;
         Ok(columns::table
             .filter(columns::table_name.eq(&self.table_name))
             .filter(columns::table_schema.eq(&self.table_schema))
             .filter(columns::table_catalog.eq(&self.table_catalog))
-            .load::<Column>(conn)?)
+            .load::<Column>(conn)
+            .await?)
     }
 
     /// Returns the column by name.
@@ -758,9 +832,9 @@ impl Table {
     /// # Errors
     ///
     /// * If the column cannot be loaded from the database.
-    pub fn column_by_name(
+    pub async fn column_by_name(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
         column_name: &str,
     ) -> Result<Column, DieselError> {
         use crate::schema::columns;
@@ -769,7 +843,7 @@ impl Table {
             .filter(columns::table_schema.eq(&self.table_schema))
             .filter(columns::table_catalog.eq(&self.table_catalog))
             .filter(columns::column_name.eq(column_name))
-            .first::<Column>(conn)
+            .first::<Column>(conn).await
     }
 
     /// Returns the groups of columns defining unique constraints.
@@ -785,9 +859,9 @@ impl Table {
     /// # Errors
     ///
     /// * If the provided database connection is invalid.
-    pub fn unique_columns(
+    pub async fn unique_columns(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<Vec<Vec<Column>>, WebCodeGenError> {
         use crate::schema::{columns, key_column_usage, table_constraints};
         Ok(key_column_usage::table
@@ -847,7 +921,7 @@ impl Table {
             .filter(table_constraints::constraint_type.eq("UNIQUE"))
             .order_by(table_constraints::constraint_name)
             .select((TableConstraint::as_select(), Column::as_select()))
-            .load::<(TableConstraint, Column)>(conn)
+            .load::<(TableConstraint, Column)>(conn).await
             .map(|rows| {
                 rows.into_iter()
                     .chunk_by(|(constraint, _)| constraint.constraint_name.clone())
@@ -872,8 +946,8 @@ impl Table {
     /// # Errors
     ///
     /// * If the primary key columns cannot be loaded from the database.
-    pub fn has_primary_keys(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        self.primary_key_columns(conn).map(|columns| !columns.is_empty())
+    pub async fn has_primary_keys(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+        self.primary_key_columns(conn).await.map(|columns| !columns.is_empty())
     }
 
     /// Returns whether the table has columns that are NOT primary keys.
@@ -885,8 +959,11 @@ impl Table {
     /// # Errors
     ///
     /// * If the provided database connection is invalid.
-    pub fn has_non_primary_keys(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        self.non_primary_key_columns(conn).map(|columns| !columns.is_empty())
+    pub async fn has_non_primary_keys(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        self.non_primary_key_columns(conn).await.map(|columns| !columns.is_empty())
     }
 
     /// Returns the primary key type for the table.
@@ -903,8 +980,8 @@ impl Table {
     ///
     /// * If the table does not have primary keys.
     /// * If the primary key columns cannot be loaded from the database.
-    pub fn primary_key_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
-        let primary_key_columns = self.primary_key_columns(conn)?;
+    pub async fn primary_key_type(&self, conn: &mut AsyncPgConnection) -> Result<Type, WebCodeGenError> {
+        let primary_key_columns = self.primary_key_columns(conn).await?;
 
         if primary_key_columns.is_empty() {
             return Err(WebCodeGenError::NoPrimaryKeyColumn(Box::new(self.clone())));
@@ -915,14 +992,17 @@ impl Table {
         Ok(if primary_key_columns.len() == 1 {
             // If the primary key is a single column, we can just use the type of that
             // column.
-            primary_key_columns[0].rust_data_type(conn)?
+            primary_key_columns[0].rust_data_type(conn).await?
         } else {
             // If the primary key is a composite key, we need to construct a tuple of the
             // types.
-            let primary_key_types = primary_key_columns
-                .iter()
-                .map(|column| column.rust_data_type(conn))
-                .collect::<Result<Vec<Type>, WebCodeGenError>>()?;
+            let mut primary_key_types = Vec::new();
+
+            for column in primary_key_columns {
+                let column_type = column.rust_data_type(conn).await?;
+                primary_key_types.push(column_type);
+            }
+
             syn::parse_quote! { (#(#primary_key_types),*) }
         })
     }
@@ -943,12 +1023,12 @@ impl Table {
     ///
     /// * If the table does not have primary keys.
     /// * If the primary key columns cannot be loaded from the database.
-    pub fn primary_key_attributes(
+    pub async fn primary_key_attributes(
         &self,
         include_self: bool,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
-        let primary_key_columns = self.primary_key_columns(conn)?;
+        let primary_key_columns = self.primary_key_columns(conn).await?;
 
         // We construct the rust type or tuple of rust types that represent the primary
         // key.
@@ -989,12 +1069,12 @@ impl Table {
     /// # Errors
     ///
     /// * If the connection to the database fails.
-    pub fn non_primary_key_columns(
+    pub async fn non_primary_key_columns(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<Vec<Column>, WebCodeGenError> {
-        let mut columns = self.columns(conn)?;
-        let primary_key_columns = self.primary_key_columns(conn)?;
+        let mut columns = self.columns(conn).await?;
+        let primary_key_columns = self.primary_key_columns(conn).await?;
         columns.retain(|column| !primary_key_columns.contains(column));
         Ok(columns)
     }
@@ -1012,9 +1092,9 @@ impl Table {
     /// # Errors
     ///
     /// * If the primary key columns cannot be loaded from the database.
-    pub fn primary_key_columns(
+    pub async fn primary_key_columns(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<Vec<Column>, WebCodeGenError> {
         use crate::schema::{columns, key_column_usage, table_constraints};
         Ok(key_column_usage::table
@@ -1073,7 +1153,7 @@ impl Table {
             .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
             .filter(table_constraints::constraint_type.eq("PRIMARY KEY"))
             .select(Column::as_select())
-            .load::<Column>(conn)?)
+            .load::<Column>(conn).await?)
     }
 
     /// Returns the check constraints for the table.
@@ -1089,9 +1169,9 @@ impl Table {
     /// # Errors
     ///
     /// * If the check constraints cannot be loaded from the database.
-    pub fn check_constraints(
+    pub async fn check_constraints(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<Vec<CheckConstraint>, DieselError> {
         use crate::schema::{check_constraints, table_constraints};
 
@@ -1112,30 +1192,7 @@ impl Table {
             .filter(table_constraints::table_schema.eq(&self.table_schema))
             .filter(table_constraints::table_catalog.eq(&self.table_catalog))
             .select(CheckConstraint::as_select())
-            .load::<CheckConstraint>(conn)
-    }
-
-    /// Returns all multi column check constraints associated to the current
-    /// table.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If their is an error while querying the database.
-    pub fn multi_column_check_constraints(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<CheckConstraint>, WebCodeGenError> {
-        let mut multi_column_check_constraints = vec![];
-        for check_constraint in self.check_constraints(conn)? {
-            if check_constraint.is_multi_column_constraint(conn)? {
-                multi_column_check_constraints.push(check_constraint);
-            }
-        }
-        Ok(multi_column_check_constraints)
+            .load::<CheckConstraint>(conn).await
     }
 
     /// Returns the list of Triggers associates to the current table.
@@ -1151,7 +1208,7 @@ impl Table {
     /// # Errors
     ///
     /// * If the triggers cannot be loaded from the database.
-    pub fn triggers(&self, conn: &mut PgConnection) -> Result<Vec<PgTrigger>, DieselError> {
+    pub async fn triggers(&self, conn: &mut AsyncPgConnection) -> Result<Vec<PgTrigger>, DieselError> {
         use crate::schema::{pg_class, pg_namespace, pg_trigger};
         pg_trigger::table
             .inner_join(pg_class::table.on(pg_trigger::tgrelid.eq(pg_class::oid)))
@@ -1159,7 +1216,7 @@ impl Table {
             .filter(pg_class::relname.eq(&self.table_name))
             .filter(pg_namespace::nspname.eq(&self.table_schema))
             .select(PgTrigger::as_select())
-            .load::<PgTrigger>(conn)
+            .load::<PgTrigger>(conn).await
     }
 
     /// Returns a the path to the diesel table module.

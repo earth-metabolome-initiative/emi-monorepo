@@ -7,7 +7,6 @@ extern crate syn;
 mod codegen;
 mod custom_schema_constraints;
 pub mod errors;
-mod meta_sql;
 mod postgis;
 mod schema;
 mod sql_functions;

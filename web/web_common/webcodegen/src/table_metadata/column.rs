@@ -1,8 +1,8 @@
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, Queryable,
-    QueryableByName, RunQueryDsl, Selectable, SelectableHelper, pg::PgConnection,
-    result::Error as DieselError,
+    QueryableByName, Selectable, SelectableHelper, result::Error as DieselError,
 };
+use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use syn::{Ident, Type};
 
 use super::{
@@ -105,8 +105,8 @@ impl Column {
     }
 
     /// Returns whether the column contains `PostGIS` geometry data
-    pub fn is_geometry(&self, conn: &mut PgConnection) -> bool {
-        self.geometry(conn).is_ok()
+    pub async fn is_geometry(&self, conn: &mut AsyncPgConnection) -> bool {
+        self.geometry(conn).await.is_ok()
     }
 
     /// Returns all the check constraint associated to the current column.
@@ -122,9 +122,9 @@ impl Column {
     /// # Returns
     ///
     /// * A `Vec` of all the [`CheckConstraint`]
-    pub fn check_constraints(
+    pub async fn check_constraints(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<Vec<CheckConstraint>, WebCodeGenError> {
         use crate::schema::{check_constraints, constraint_column_usage};
         Ok(check_constraints::table
@@ -150,30 +150,7 @@ impl Column {
                 ),
             )
             .select(CheckConstraint::as_select())
-            .load(conn)?)
-    }
-
-    /// Returns all single column check constraints associated to the current
-    /// column.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If their is an error while querying the database.
-    pub fn single_column_check_constraints(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<CheckConstraint>, WebCodeGenError> {
-        let mut single_column_check_constraints = vec![];
-        for check_constraint in self.check_constraints(conn)? {
-            if check_constraint.is_single_column_constraint(conn)? {
-                single_column_check_constraints.push(check_constraint);
-            }
-        }
-        Ok(single_column_check_constraints)
+            .load(conn).await?)
     }
 
     /// Returns the associated geometry column if the column is a geometry
@@ -186,9 +163,9 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn geometry(
+    pub async fn geometry(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<crate::GeometryColumn, WebCodeGenError> {
         use crate::schema::geometry_columns;
 
@@ -196,7 +173,7 @@ impl Column {
             .filter(geometry_columns::f_table_name.eq(&self.table_name))
             .filter(geometry_columns::f_table_schema.eq(&self.table_schema))
             .filter(geometry_columns::f_geometry_column.eq(&self.column_name))
-            .first::<crate::GeometryColumn>(conn)?)
+            .first::<crate::GeometryColumn>(conn).await?)
     }
 
     /// Returns the associated geography column if the column is a geography
@@ -209,9 +186,9 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn geography(
+    pub async fn geography(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<crate::GeographyColumn, WebCodeGenError> {
         use crate::schema::geography_columns;
 
@@ -219,7 +196,7 @@ impl Column {
             .filter(geography_columns::f_table_name.eq(&self.table_name))
             .filter(geography_columns::f_table_schema.eq(&self.table_schema))
             .filter(geography_columns::f_geography_column.eq(&self.column_name))
-            .first::<crate::GeographyColumn>(conn)?)
+            .first::<crate::GeographyColumn>(conn).await?)
     }
 
     /// Returns the data type associated with the column as repo
@@ -236,7 +213,7 @@ impl Column {
     /// # Errors
     ///
     /// If an error occurs while querying the database
-    pub fn data_type_str(&self, _conn: &mut PgConnection) -> Result<&str, WebCodeGenError> {
+    pub fn data_type_str(&self, _conn: &mut AsyncPgConnection) -> Result<&str, WebCodeGenError> {
         Ok(if self.has_custom_type() {
             if let Some(udt_name) = &self.udt_name {
                 udt_name
@@ -262,7 +239,7 @@ impl Column {
     /// # Errors
     ///
     /// If an error occurs while querying the database
-    pub fn pg_type(&self, conn: &mut PgConnection) -> Result<PgType, diesel::result::Error> {
+    pub async fn pg_type(&self, conn: &mut AsyncPgConnection) -> Result<PgType, diesel::result::Error> {
         use crate::schema::{pg_attribute, pg_class, pg_namespace, pg_type};
 
         pg_type::table
@@ -273,7 +250,7 @@ impl Column {
             .filter(pg_namespace::nspname.eq(&self.table_schema))
             .filter(pg_attribute::attname.eq(&self.column_name))
             .select(PgType::as_select())
-            .first::<PgType>(conn)
+            .first::<PgType>(conn).await
     }
 
     /// Returns the string data type
@@ -285,18 +262,21 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn str_rust_data_type(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
-        if let Ok(geometry) = self.geometry(conn) {
+    pub async fn str_rust_data_type(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<String, WebCodeGenError> {
+        if let Ok(geometry) = self.geometry(conn).await {
             return Ok(geometry.str_rust_type().to_owned());
         }
-        if let Ok(geography) = self.geography(conn) {
+        if let Ok(geography) = self.geography(conn).await {
             return Ok(geography.str_rust_type().to_owned());
         }
-        match rust_type_str(self.data_type_str(conn)?, conn) {
+        match rust_type_str(self.data_type_str(conn)?, conn).await {
             Ok(s) => Ok(s.to_string()),
             Err(error) => {
                 if self.has_custom_type() {
-                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.camelcased_name())
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn).await?.camelcased_name())
                 } else {
                     Err(error)
                 }
@@ -315,12 +295,12 @@ impl Column {
     ///
     /// * If an error occurs while querying the database
     /// * If the underlying data type of the column is not compatible
-    pub fn has_compatible_data_type(
+    pub async fn has_compatible_data_type(
         &self,
         column: &Column,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<bool, WebCodeGenError> {
-        Ok(self.str_rust_data_type(conn)? == column.str_rust_data_type(conn)?)
+        Ok(self.str_rust_data_type(conn).await? == column.str_rust_data_type(conn).await?)
     }
 
     /// Returns the rust type of the column
@@ -336,14 +316,14 @@ impl Column {
     /// # Errors
     ///
     /// If an error occurs while querying the database
-    pub fn rust_data_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
-        if let Ok(geometry) = self.geometry(conn) {
+    pub async fn rust_data_type(&self, conn: &mut AsyncPgConnection) -> Result<Type, WebCodeGenError> {
+        if let Ok(geometry) = self.geometry(conn).await {
             return geometry.rust_type(self.is_nullable());
         }
-        if let Ok(geography) = self.geography(conn) {
+        if let Ok(geography) = self.geography(conn).await {
             return geography.rust_type(self.is_nullable());
         }
-        match rust_type_str(self.data_type_str(conn)?, conn) {
+        match rust_type_str(self.data_type_str(conn)?, conn).await {
             Ok(s) => {
                 if self.is_nullable() {
                     Ok(syn::parse_str(&format!("Option<{s}>"))?)
@@ -353,8 +333,8 @@ impl Column {
             }
             Err(error) => {
                 if self.has_custom_type() {
-                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?
-                        .rust_type(self.is_nullable(), conn)?)
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn).await?
+                        .rust_type(self.is_nullable(), conn).await?)
                 } else {
                     Err(error)
                 }
@@ -375,8 +355,11 @@ impl Column {
     /// # Errors
     ///
     /// If an error occurs while querying the database
-    pub fn rust_ref_data_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
-        let rust_type = match self.str_rust_data_type(conn)?.as_str() {
+    pub async fn rust_ref_data_type(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Type, WebCodeGenError> {
+        let rust_type = match self.str_rust_data_type(conn).await?.as_str() {
             "String" => "&str".to_owned(),
             "Vec<u8>" => "&[u8]".to_owned(),
             other => format!("&{other}"),
@@ -476,13 +459,13 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn table(&self, conn: &mut PgConnection) -> Result<Table, WebCodeGenError> {
+    pub async fn table(&self, conn: &mut AsyncPgConnection) -> Result<Table, WebCodeGenError> {
         use crate::schema::tables;
         tables::table
             .filter(tables::table_name.eq(&self.table_name))
             .filter(tables::table_schema.eq(&self.table_schema))
             .filter(tables::table_catalog.eq(&self.table_catalog))
-            .first::<Table>(conn)
+            .first::<Table>(conn).await
             .map_err(WebCodeGenError::from)
     }
 
@@ -495,15 +478,19 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn is_unique(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        let table = self.table(conn)?;
-        let pg_indices = table.unique_indices(conn)?;
-        Ok(pg_indices.iter().any(|index| {
-            let Ok(columns) = index.columns(conn) else {
-                return false;
+    pub async fn is_unique(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+        let table = self.table(conn).await?;
+        let pg_indices = table.unique_indices(conn).await?;
+
+        for index in pg_indices {
+            let Ok(columns) = index.columns(conn).await else {
+                return Ok(false);
             };
-            columns.len() == 1 && columns[0].column_name == self.column_name
-        }))
+            if columns.len() == 1 && columns[0].column_name == self.column_name {
+                return Ok(true);
+            }
+        }
+        Ok(false)
     }
 
     /// Returns whether the column type implements copy.
@@ -515,18 +502,18 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        if let Ok(geometry) = self.geometry(conn) {
+    pub async fn supports_copy(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+        if let Ok(geometry) = self.geometry(conn).await {
             return Ok(geometry.supports_copy());
         }
-        if let Ok(geography) = self.geography(conn) {
+        if let Ok(geography) = self.geography(conn).await {
             return Ok(geography.supports_copy());
         }
-        match rust_type_str(self.data_type_str(conn)?, conn) {
+        match rust_type_str(self.data_type_str(conn)?, conn).await {
             Ok(s) => Ok(COPY_TYPES.contains(&s)),
             Err(error) => {
                 if self.has_custom_type() {
-                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.supports_copy(conn)?)
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn).await?.supports_copy(conn).await?)
                 } else {
                     Err(error)
                 }
@@ -543,15 +530,15 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn supports_hash(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        if self.geometry(conn).is_ok() || self.geography(conn).is_ok() {
+    pub async fn supports_hash(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+        if self.geometry(conn).await.is_ok() || self.geography(conn).await.is_ok() {
             return Ok(false);
         }
-        match rust_type_str(self.data_type_str(conn)?, conn) {
+        match rust_type_str(self.data_type_str(conn)?, conn).await {
             Ok(s) => Ok(HASH_TYPES.contains(&s)),
             Err(error) => {
                 if self.has_custom_type() {
-                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.supports_hash(conn)?)
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn).await?.supports_hash(conn).await?)
                 } else {
                     Err(error)
                 }
@@ -568,15 +555,15 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn supports_eq(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        if self.geometry(conn).is_ok() || self.geography(conn).is_ok() {
+    pub async fn supports_eq(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+        if self.geometry(conn).await.is_ok() || self.geography(conn).await.is_ok() {
             return Ok(false);
         }
-        match rust_type_str(self.data_type_str(conn)?, conn) {
+        match rust_type_str(self.data_type_str(conn)?, conn).await {
             Ok(s) => Ok(EQ_TYPES.contains(&s)),
             Err(error) => {
                 if self.has_custom_type() {
-                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.supports_eq(conn)?)
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn).await?.supports_eq(conn).await?)
                 } else {
                     Err(error)
                 }
@@ -593,15 +580,15 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn supports_ord(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        if self.geometry(conn).is_ok() || self.geography(conn).is_ok() {
+    pub async fn supports_ord(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
+        if self.geometry(conn).await.is_ok() || self.geography(conn).await.is_ok() {
             return Ok(false);
         }
-        match rust_type_str(self.data_type_str(conn)?, conn) {
+        match rust_type_str(self.data_type_str(conn)?, conn).await {
             Ok(s) => Ok(ORD_TYPES.contains(&s)),
             Err(error) => {
                 if self.has_custom_type() {
-                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.supports_ord(conn)?)
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn).await?.supports_ord(conn).await?)
                 } else {
                     Err(error)
                 }
@@ -623,14 +610,14 @@ impl Column {
     /// # Errors
     ///
     /// If an error occurs while querying the database
-    pub fn diesel_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
+    pub async fn diesel_type(&self, conn: &mut AsyncPgConnection) -> Result<Type, WebCodeGenError> {
         let tentative_type = postgres_type_to_diesel(self.data_type_str(conn)?, self.is_nullable());
         match tentative_type {
             Ok(t) => Ok(t),
             Err(e) => {
                 if self.has_custom_type() {
-                    PgType::from_name(self.data_type_str(conn)?, conn)?
-                        .diesel_type(self.is_nullable(), conn)
+                    PgType::from_name(self.data_type_str(conn)?, conn).await?
+                        .diesel_type(self.is_nullable(), conn).await
                 } else {
                     Err(e)
                 }
@@ -670,9 +657,9 @@ impl Column {
 
     /// Returns whether the column contains the update user and is defined by
     /// the SESSION user
-    pub fn is_updated_by(&self, conn: &mut PgConnection) -> bool {
+    pub async fn is_updated_by(&self, conn: &mut AsyncPgConnection) -> bool {
         self.column_name == "updated_by"
-            && self.foreign_table(conn).is_ok_and(|table_and_column| {
+            && self.foreign_table(conn).await.is_ok_and(|table_and_column| {
                 table_and_column.is_some_and(|(table, column)| {
                     table.table_name == "users" && column.column_name == "id"
                 })
@@ -681,9 +668,9 @@ impl Column {
 
     /// Returns whether the column contains the creation user and is defined by
     /// the SESSION user
-    pub fn is_created_by(&self, conn: &mut PgConnection) -> bool {
+    pub async fn is_created_by(&self, conn: &mut AsyncPgConnection) -> bool {
         self.column_name == "created_by"
-            && self.foreign_table(conn).is_ok_and(|table_and_column| {
+            && self.foreign_table(conn).await.is_ok_and(|table_and_column| {
                 table_and_column.is_some_and(|(table, column)| {
                     table.table_name == "users" && column.column_name == "id"
                 })
@@ -705,8 +692,8 @@ impl Column {
     }
 
     /// Returns whether the column is a session user generated column
-    pub fn is_session_user_generated(&self, conn: &mut PgConnection) -> bool {
-        self.is_updated_by(conn) || self.is_created_by(conn)
+    pub async fn is_session_user_generated(&self, conn: &mut AsyncPgConnection) -> bool {
+        self.is_updated_by(conn).await || self.is_created_by(conn).await
     }
 
     /// Load all columns from the database
@@ -723,9 +710,9 @@ impl Column {
     /// # Errors
     ///
     /// If an error occurs while querying the database
-    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
+    pub async fn load_all(conn: &mut AsyncPgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::columns;
-        columns::table.load::<Column>(conn).map_err(WebCodeGenError::from)
+        columns::table.load::<Column>(conn).await.map_err(WebCodeGenError::from)
     }
 
     /// Load a column with a given name fom a given table
@@ -746,12 +733,12 @@ impl Column {
     /// # Errors
     ///
     /// If an error occurs while querying the database
-    pub fn load(
+    pub async fn load(
         column_name: &str,
         table_name: &str,
         table_schema: &str,
         table_catalog: &str,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<Option<Self>, WebCodeGenError> {
         use crate::schema::columns;
 
@@ -764,7 +751,7 @@ impl Column {
                         .and(columns::table_catalog.eq(table_catalog)),
                 ),
             )
-            .first(conn)
+            .first(conn).await
             .optional()?)
     }
 
@@ -773,7 +760,7 @@ impl Column {
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    pub fn is_foreign_key(&self, conn: &mut PgConnection) -> bool {
+    pub async fn is_foreign_key(&self, conn: &mut AsyncPgConnection) -> bool {
         use crate::schema::{key_column_usage, referential_constraints};
         key_column_usage::table
             .inner_join(
@@ -793,7 +780,7 @@ impl Column {
             .filter(key_column_usage::table_schema.eq(&self.table_schema))
             .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
             .select(KeyColumnUsage::as_select())
-            .first::<KeyColumnUsage>(conn)
+            .first::<KeyColumnUsage>(conn).await
             .is_ok()
     }
 
@@ -813,9 +800,9 @@ impl Column {
     /// # Errors
     ///
     /// If an error occurs while querying the database
-    pub fn foreign_table(
+    pub async fn foreign_table(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut AsyncPgConnection,
     ) -> Result<Option<(Table, Column)>, DieselError> {
         use crate::schema::{
             columns, constraint_column_usage, key_column_usage, table_constraints, tables,
@@ -858,7 +845,7 @@ impl Column {
             .filter(table_constraints::table_catalog.eq(&self.table_catalog))
             .filter(key_column_usage::column_name.eq(&self.column_name))
             .select((Table::as_select(), Column::as_select()))
-            .first::<(Table, Column)>(conn)
+            .first::<(Table, Column)>(conn).await
             .optional()
     }
 
@@ -877,7 +864,7 @@ impl Column {
     ///
     /// A `bool` indicating whether the column is a foreign key with `ON DELETE
     /// CASCADE` constraint
-    pub fn is_foreign_key_on_delete_cascade(&self, conn: &mut PgConnection) -> bool {
+    pub async fn is_foreign_key_on_delete_cascade(&self, conn: &mut AsyncPgConnection) -> bool {
         use crate::schema::{key_column_usage, referential_constraints};
         key_column_usage::table
             .inner_join(
@@ -898,7 +885,7 @@ impl Column {
             .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
             .filter(referential_constraints::delete_rule.eq("CASCADE"))
             .select(KeyColumnUsage::as_select())
-            .first::<KeyColumnUsage>(conn)
+            .first::<KeyColumnUsage>(conn).await
             .is_ok()
     }
 

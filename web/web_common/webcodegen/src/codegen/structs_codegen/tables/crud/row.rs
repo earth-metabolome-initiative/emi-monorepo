@@ -34,11 +34,11 @@ impl Codegen<'_> {
     ///
     /// * If the database connection fails.
     /// * If the file system fails.
-    pub(crate) fn generate_row_enumeration(
+    pub(crate) async fn generate_row_enumeration(
         &self,
         root: &Path,
         tables: &[Table],
-        _conn: &mut diesel::PgConnection,
+        _conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
         let table_name_enum_path = self.table_names_enum_path();
