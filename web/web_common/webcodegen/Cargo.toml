@@ -27,6 +27,7 @@ cached.workspace = true
 async-trait.workspace = true
 
 [dev-dependencies]
+reference-docker.workspace = true
 testcontainers.workspace = true
 tokio.workspace = true
 trybuild.workspace = true

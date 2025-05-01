@@ -18,6 +18,7 @@
 		"pychache",
 		"rustc",
 		"Tarjan",
+		"trybuild",
 		"yewdux"
 	]
 }

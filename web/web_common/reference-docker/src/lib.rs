@@ -76,8 +76,9 @@ where
 /// Returns all the pgrx_extensions in the given directory.
 fn find_pgrx_extensions<P>(directory: P) -> Result<Vec<PathBuf>, std::io::Error>
 where
-    P: AsRef<std::path::Path>,
+    P: AsRef<std::path::Path> + Debug,
 {
+    println!("Searching for pgrx extensions in {directory:?}");
     let mut pgrx_extensions = Vec::new();
     for entry in std::fs::read_dir(directory)? {
         let entry = entry?;
@@ -106,7 +107,7 @@ async fn reference_docker(
     database_name: &str,
 ) -> Result<ContainerAsync<GenericImage>, TestcontainersError> {
     let pgrx_extensions =
-        find_pgrx_extensions(&PathBuf::from(format!("../{}", env!("CARGO_MANIFEST_DIR"))))
+        find_pgrx_extensions(&PathBuf::from(format!("{}/../", env!("CARGO_MANIFEST_DIR"))))
             .unwrap_or_default();
 
     // We check whether the extension directory exists, or we raise an adequate
@@ -128,7 +129,8 @@ async fn reference_docker(
         .with_env_var("POSTGRES_DB", database_name)
         .with_mapped_port(database_port, 5432_u16.tcp());
 
-    let postgres_extension = PathBuf::from("/usr/share/postgresql/17/extension/");
+    let share_postgres_extension = PathBuf::from("/usr/share/postgresql/17/extension");
+    let lib_postgres_extension = PathBuf::from("/usr/lib/postgresql/17/lib");
 
     for extension in &pgrx_extensions {
         // We get the name of the extension by the last part of the path
@@ -143,15 +145,15 @@ async fn reference_docker(
 
         container_builder = container_builder
             .with_copy_to(
-                postgres_extension.join(control_path.file_name().unwrap()).to_str().unwrap(),
+                share_postgres_extension.join(control_path.file_name().unwrap()).to_str().unwrap(),
                 control_path,
             )
             .with_copy_to(
-                postgres_extension.join(sql_path.file_name().unwrap()).to_str().unwrap(),
+                share_postgres_extension.join(sql_path.file_name().unwrap()).to_str().unwrap(),
                 sql_path,
             )
             .with_copy_to(
-                postgres_extension.join(so_path.file_name().unwrap()).to_str().unwrap(),
+                lib_postgres_extension.join(so_path.file_name().unwrap()).to_str().unwrap(),
                 so_path,
             );
     }
