@@ -38,7 +38,7 @@ members = [
   "utils/rosetta-timestamp",
   "utils/iter-utils",
   "data-migrations/init-migration",
-  "web/web_common/sqlite-migration-generator", "utils/macro-utils", "web/web_common/iso_codes", "web/web_common/rosetta-url", "data-migrations/init-db",
+  "web/web_common/sqlite-migration-generator", "utils/macro-utils", "web/web_common/iso_codes", "web/web_common/rosetta-url", "data-migrations/init-db", "web/web_common/reference-docker",
 
 ]
 
@@ -76,6 +76,7 @@ strum = { version = "0.27", features = ["derive"] }
 yew = { version = "0.21.0", features = ["csr"] }
 strum_macros = "0.27"
 zip = "2.6"
+reference-docker = { path = "web/web_common/reference-docker" }
 async-trait = "0.1.88"
 pgrx = "0.14.1"
 pgrx-tests = "0.14.1"
