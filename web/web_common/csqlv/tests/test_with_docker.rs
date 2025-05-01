@@ -1,6 +1,8 @@
 //! Submodule for testing CSV schema creation and deletion with Docker.
+use std::path::PathBuf;
+
 use csqlv::{CSVSchemaBuilder, CSVSchemaError, SQLGenerationOptions};
-use diesel::pg::PgConnection;
+use diesel_async::AsyncPgConnection;
 use testcontainers::{
     ContainerAsync, GenericImage, ImageExt,
     core::{IntoContainerPort, Mount, WaitFor},
@@ -46,60 +48,60 @@ async fn setup_docker() -> ContainerAsync<GenericImage> {
     container.unwrap()
 }
 
-fn test_independent_csvs() -> Result<(), CSVSchemaError> {
+async fn test_independent_csvs() -> Result<(), CSVSchemaError> {
     let schema = CSVSchemaBuilder::default()
-        .container_directory("/app/csvs/independent_csvs")
+        .container_directory(PathBuf::from("/app/csvs/independent_csvs"))
         .singularize()
         .from_dir("./tests/independent_csvs")
         .unwrap();
 
     let sql_generation_options = SQLGenerationOptions::default().include_population();
-    schema.connect_and_create::<PgConnection>(DATABASE_URL, &sql_generation_options)?;
-    schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
+    schema.connect_and_create::<AsyncPgConnection>(DATABASE_URL, &sql_generation_options).await?;
+    schema.connect_and_delete::<AsyncPgConnection>(DATABASE_URL).await?;
 
     Ok(())
 }
 
-fn test_tree_dependent_csvs() -> Result<(), CSVSchemaError> {
+async fn test_tree_dependent_csvs() -> Result<(), CSVSchemaError> {
     let schema = CSVSchemaBuilder::default()
-        .container_directory("/app/csvs/tree_dependent_csvs")
+        .container_directory(PathBuf::from("/app/csvs/tree_dependent_csvs"))
         .singularize()
         .from_dir("./tests/tree_dependent_csvs")
         .unwrap();
 
     let sql_generation_options = SQLGenerationOptions::default().include_population();
-    schema.connect_and_create::<PgConnection>(DATABASE_URL, &sql_generation_options)?;
-    schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
+    schema.connect_and_create::<AsyncPgConnection>(DATABASE_URL, &sql_generation_options).await?;
+    schema.connect_and_delete::<AsyncPgConnection>(DATABASE_URL).await?;
 
     Ok(())
 }
 
-fn test_dag_dependent_csvs() -> Result<(), CSVSchemaError> {
+async fn test_dag_dependent_csvs() -> Result<(), CSVSchemaError> {
     let schema = CSVSchemaBuilder::default()
-        .container_directory("/app/csvs/dag_dependent_csvs")
+        .container_directory(PathBuf::from("/app/csvs/dag_dependent_csvs"))
         .include_gz()
         .singularize()
         .from_dir("./tests/dag_dependent_csvs")
         .unwrap();
 
     let sql_generation_options = SQLGenerationOptions::default().include_population();
-    schema.connect_and_create::<PgConnection>(DATABASE_URL, &sql_generation_options)?;
-    schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
+    schema.connect_and_create::<AsyncPgConnection>(DATABASE_URL, &sql_generation_options).await?;
+    schema.connect_and_delete::<AsyncPgConnection>(DATABASE_URL).await?;
 
     Ok(())
 }
 
-fn test_bands_csvs() -> Result<(), CSVSchemaError> {
+async fn test_bands_csvs() -> Result<(), CSVSchemaError> {
     let schema = CSVSchemaBuilder::default()
         .include_gz()
         .singularize()
-        .container_directory("/app/csvs/bands")
+        .container_directory(PathBuf::from("/app/csvs/bands"))
         .from_dir("./tests/bands")
         .unwrap();
 
     let sql_generation_options = SQLGenerationOptions::default().include_population();
-    schema.connect_and_create::<PgConnection>(DATABASE_URL, &sql_generation_options)?;
-    schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
+    schema.connect_and_create::<AsyncPgConnection>(DATABASE_URL, &sql_generation_options).await?;
+    schema.connect_and_delete::<AsyncPgConnection>(DATABASE_URL).await?;
 
     Ok(())
 }
@@ -108,19 +110,19 @@ fn test_bands_csvs() -> Result<(), CSVSchemaError> {
 async fn test_with_docker() {
     let container = setup_docker().await;
 
-    if let Err(err) = test_independent_csvs() {
+    if let Err(err) = test_independent_csvs().await {
         container.stop().await.expect("Failed to stop container.");
         panic!("Failed to test independent CSVs: {err:?}");
     }
-    if let Err(err) = test_tree_dependent_csvs() {
+    if let Err(err) = test_tree_dependent_csvs().await {
         container.stop().await.expect("Failed to stop container.");
         panic!("Failed to test tree dependent CSVs: {err:?}");
     }
-    if let Err(err) = test_dag_dependent_csvs() {
+    if let Err(err) = test_dag_dependent_csvs().await {
         container.stop().await.expect("Failed to stop container.");
         panic!("Failed to test DAG dependent CSVs: {err:?}");
     }
-    if let Err(err) = test_bands_csvs() {
+    if let Err(err) = test_bands_csvs().await {
         container.stop().await.expect("Failed to stop container.");
         panic!("Failed to test bands CSVs: {err:?}");
     }

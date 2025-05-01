@@ -119,14 +119,20 @@ impl CSVTableMetadata {
 
     /// Create a new `CSVTableMetadata` from a CSV file.
     pub fn from_csv(
-        root: &str,
+        root: &Path,
         path: &Path,
-        docker_root: &str,
+        docker_root: &Path,
         singularize: bool,
     ) -> Result<Self, CSVSchemaError> {
         // We determine the internal path of the file, by replacing the root
         // portion of the path with the docker root
-        let docker_path = path.to_string_lossy().to_string().replace(root, docker_root);
+        let docker_path = path
+            .strip_prefix(root)
+            .map(|p| docker_root.join(p))
+            .map_err(|_| CSVSchemaError::InvalidPath(path.to_string_lossy().to_string()))?
+            .to_path_buf()
+            .to_string_lossy()
+            .to_string();
 
         // We check that the provided path ends with .csv or .csv.gz
         let (Some(table_name), Some(delimiter)) =

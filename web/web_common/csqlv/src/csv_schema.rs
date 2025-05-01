@@ -1,6 +1,6 @@
 //! Submodule providing the CSV Schema struct, which loads a CSV directory and
 //! processes it into a complete SQL database schema.
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use indicatif::ProgressIterator;
 
@@ -149,14 +149,14 @@ impl CSVSchema {
     /// # Errors
     ///
     /// * If the connection to the database fails.
-    pub fn connect_and_create<C: diesel::Connection>(
+    pub async fn connect_and_create<C: diesel_async::AsyncConnection>(
         &self,
         url: &str,
         sql_generation_options: &SQLGenerationOptions,
     ) -> Result<(), CSVSchemaError> {
         let mut attempts = 0;
         loop {
-            match C::establish(url) {
+            match C::establish(url).await {
                 Err(err) => {
                     if attempts >= 10 {
                         return Err(err.into());
@@ -164,7 +164,7 @@ impl CSVSchema {
                     std::thread::sleep(std::time::Duration::from_secs(1));
                     attempts += 1;
                 }
-                Ok(mut conn) => return self.create(&mut conn, sql_generation_options),
+                Ok(mut conn) => return self.create(&mut conn, sql_generation_options).await,
             }
         }
     }
@@ -181,13 +181,13 @@ impl CSVSchema {
     ///
     /// * If the connection to the database fails.
     /// * If the SQL execution fails.
-    pub fn create<C: diesel::Connection>(
+    pub async fn create<C: diesel_async::AsyncConnection>(
         &self,
         conn: &mut C,
         sql_generation_options: &SQLGenerationOptions,
     ) -> Result<(), CSVSchemaError> {
         let sql = self.to_sql(sql_generation_options)?;
-        Ok(conn.batch_execute(&sql)?)
+        Ok(conn.batch_execute(&sql).await?)
     }
 
     #[must_use]
@@ -215,13 +215,13 @@ impl CSVSchema {
     /// # Errors
     ///
     /// * If the connection to the database fails.
-    pub fn connect_and_delete<C: diesel::Connection>(
+    pub async fn connect_and_delete<C: diesel_async::AsyncConnection>(
         &self,
         url: &str,
     ) -> Result<(), CSVSchemaError> {
         let mut attempts = 0;
         loop {
-            match C::establish(url) {
+            match C::establish(url).await {
                 Err(err) => {
                     if attempts >= 10 {
                         return Err(err.into());
@@ -229,7 +229,7 @@ impl CSVSchema {
                     std::thread::sleep(std::time::Duration::from_secs(1));
                     attempts += 1;
                 }
-                Ok(mut conn) => return self.delete(&mut conn),
+                Ok(mut conn) => return self.delete(&mut conn).await,
             }
         }
     }
@@ -245,9 +245,12 @@ impl CSVSchema {
     ///
     /// * If the connection to the database fails.
     /// * If the SQL execution fails.
-    pub fn delete<C: diesel::Connection>(&self, conn: &mut C) -> Result<(), CSVSchemaError> {
+    pub async fn delete<C: diesel_async::AsyncConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<(), CSVSchemaError> {
         let sql = self.to_sql_delete();
-        Ok(conn.batch_execute(&sql)?)
+        Ok(conn.batch_execute(&sql).await?)
     }
 }
 
@@ -255,7 +258,7 @@ impl CSVSchema {
 /// Builder for the CSV schema.
 pub struct CSVSchemaBuilder {
     include_gz: bool,
-    container_directory: Option<String>,
+    container_directory: Option<PathBuf>,
     singularize: bool,
     verbose: bool,
 }
@@ -276,8 +279,8 @@ impl CSVSchemaBuilder {
 
     #[must_use]
     /// Set the container directory.
-    pub fn container_directory(mut self, container_directory: &str) -> Self {
-        self.container_directory = Some(container_directory.to_owned());
+    pub fn container_directory(mut self, container_directory: PathBuf) -> Self {
+        self.container_directory = Some(container_directory);
         self
     }
 
@@ -307,17 +310,21 @@ impl CSVSchemaBuilder {
     ///
     /// # Panics
     /// * If the schema contains foreign keys that do not exist.
-    pub fn from_dir(self, dir: &str) -> Result<CSVSchema, CSVSchemaError> {
+    pub fn from_dir<P>(self, dir: P) -> Result<CSVSchema, CSVSchemaError>
+    where
+        P: AsRef<Path>,
+    {
         // If the container directory is set, we need to prepend it to the directory.
-        let container_directory = if let Some(container_directory) = self.container_directory {
-            container_directory
-        } else {
-            dir.to_owned()
-        };
+        let container_directory =
+            if let Some(container_directory) = self.container_directory.as_ref() {
+                container_directory.as_ref()
+            } else {
+                dir.as_ref()
+            };
 
         // We iterate across the files in the directory and create a list
         // of the documents we want to parse.
-        let paths = std::fs::read_dir(dir)?
+        let paths = std::fs::read_dir(dir.as_ref())?
             .map(|res| res.map(|e| e.path()))
             .collect::<Result<Vec<_>, std::io::Error>>()?;
 
@@ -345,7 +352,7 @@ impl CSVSchemaBuilder {
             })
             .map(|path| {
                 CSVTableMetadata::from_csv(
-                    dir,
+                    dir.as_ref(),
                     path.as_ref(),
                     &container_directory,
                     self.singularize,

@@ -38,13 +38,14 @@ members = [
   "utils/rosetta-timestamp",
   "utils/iter-utils",
   "data-migrations/init-migration",
-  "web/web_common/sqlite-migration-generator", "utils/macro-utils", "web/web_common/csqlv-macro", "web/web_common/iso_codes",
+  "web/web_common/sqlite-migration-generator", "utils/macro-utils", "web/web_common/iso_codes", "web/web_common/rosetta-url", "data-migrations/init-db",
 
 ]
 
 [workspace.dependencies]
 actix-ws = "0.3.0"
 init-migration = { path = "data-migrations/init-migration" }
+init-db = { path = "data-migrations/init-db" }
 syn = { version = "2.0", features = ["full", "visit-mut"] }
 quote = "1.0"
 proc-macro2 = "1.0"
@@ -75,6 +76,7 @@ strum = { version = "0.27", features = ["derive"] }
 yew = { version = "0.21.0", features = ["csr"] }
 strum_macros = "0.27"
 zip = "2.6"
+async-trait = "0.1.88"
 pgrx = "0.14.1"
 pgrx-tests = "0.14.1"
 image = "0.25.6"
@@ -88,7 +90,6 @@ rosetta-uuid = { path = "data-structures/rosetta-uuid" }
 rosetta-timestamp = { path = "utils/rosetta-timestamp" }
 taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
 csqlv = { path = "web/web_common/csqlv", default-features = false }
-csqlv-macro = { path = "web/web_common/csqlv-macro" }
 iso_codes = { path = "web/web_common/iso_codes" }
 font_awesome_icons = { path = "web/web_common/font_awesome_icons", features = ["serde"] }
 testcontainers = { version = "0.23.2" }
