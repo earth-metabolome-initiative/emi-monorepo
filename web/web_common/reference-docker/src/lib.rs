@@ -4,10 +4,12 @@ use std::{fmt::Debug, path::PathBuf};
 
 use diesel_async::AsyncConnection;
 use testcontainers::{
-    ContainerAsync, GenericImage, ImageExt, TestcontainersError,
+    ContainerAsync, GenericImage, ImageExt,
     core::{IntoContainerPort, WaitFor},
     runners::AsyncRunner,
 };
+
+pub mod errors;
 
 /// The default database user.
 pub const DATABASE_USER: &str = "user";
@@ -78,7 +80,6 @@ fn find_pgrx_extensions<P>(directory: P) -> Result<Vec<PathBuf>, std::io::Error>
 where
     P: AsRef<std::path::Path> + Debug,
 {
-    println!("Searching for pgrx extensions in {directory:?}");
     let mut pgrx_extensions = Vec::new();
     for entry in std::fs::read_dir(directory)? {
         let entry = entry?;
@@ -105,7 +106,7 @@ where
 async fn reference_docker(
     database_port: u16,
     database_name: &str,
-) -> Result<ContainerAsync<GenericImage>, TestcontainersError> {
+) -> Result<ContainerAsync<GenericImage>, crate::errors::Error> {
     let pgrx_extensions =
         find_pgrx_extensions(&PathBuf::from(format!("{}/../", env!("CARGO_MANIFEST_DIR"))))
             .unwrap_or_default();
@@ -120,7 +121,7 @@ async fn reference_docker(
         );
     }
 
-    let mut container_builder = GenericImage::new("postgres", "17-bookworm")
+    let mut container_builder = GenericImage::new("mycustom/postgres-postgis", "17.4")
         .with_wait_for(WaitFor::message_on_stderr("database system is ready to accept connections"))
         .with_network("bridge")
         .with_env_var("DEBUG", "1")
@@ -158,7 +159,7 @@ async fn reference_docker(
             );
     }
 
-    container_builder.start().await
+    Ok(container_builder.start().await?)
 }
 
 /// Establish a connection to a postgres database.
@@ -185,8 +186,7 @@ async fn establish_connection_to_postgres<C: AsyncConnection>(
         eprintln!("Failed to establish connection: {e:?}");
         std::thread::sleep(std::time::Duration::from_secs(1));
         if number_of_attempts > 10 {
-            eprintln!("Failed to establish connection after 10 attempts");
-            std::process::exit(1);
+            return Err(e);
         }
         number_of_attempts += 1;
     }
@@ -221,8 +221,8 @@ async fn establish_connection_to_postgres<C: AsyncConnection>(
 pub async fn reference_docker_with_connection<C: AsyncConnection>(
     database_name: &str,
     port: u16,
-) -> Result<(ContainerAsync<GenericImage>, C), diesel::ConnectionError> {
-    let docker = reference_docker(port, &database_name).await.expect("Failed to start container");
+) -> Result<(ContainerAsync<GenericImage>, C), crate::errors::Error> {
+    let docker = reference_docker(port, &database_name).await?;
     let conn = establish_connection_to_postgres(port, &database_name).await?;
     Ok((docker, conn))
 }

@@ -3,6 +3,7 @@ use diesel_async::{AsyncConnection, AsyncPgConnection};
 
 mod error;
 mod login_providers;
+
 use login_providers::init_login_providers;
 
 #[allow(clippy::unused_async)]

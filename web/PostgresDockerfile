@@ -14,8 +14,3 @@ COPY ./web_common/pgrx_validation/extension/usr/share/postgresql/17/extension/pg
 COPY ./web_common/iso_codes/extension/usr/lib/postgresql/17/lib/iso_codes.so /usr/lib/postgresql/17/lib/iso_codes.so
 COPY ./web_common/iso_codes/extension/usr/share/postgresql/17/extension/iso_codes.control /usr/share/postgresql/17/extension/iso_codes.control
 COPY ./web_common/iso_codes/extension/usr/share/postgresql/17/extension/iso_codes--0.1.0.sql usr/share/postgresql/17/extension/iso_codes--0.1.0.sql
-
-# Next, we copy the the `font_awesome_icons` extension files to the image
-COPY ./web_common/font_awesome_icons/extension/usr/lib/postgresql/17/lib/font_awesome_icons.so /usr/lib/postgresql/17/lib/font_awesome_icons.so
-COPY ./web_common/font_awesome_icons/extension/usr/share/postgresql/17/extension/font_awesome_icons.control /usr/share/postgresql/17/extension/font_awesome_icons.control
-COPY ./web_common/font_awesome_icons/extension/usr/share/postgresql/17/extension/font_awesome_icons--0.1.0.sql usr/share/postgresql/17/extension/font_awesome_icons--0.1.0.sql

@@ -3,7 +3,7 @@
 
 use core_structures::InstrumentCategory as PortalInstrumentCategory;
 use diesel_async::AsyncPgConnection;
-use web_common_traits::prelude::AsyncRead;
+use web_common_traits::prelude::AsyncBoundedRead;
 
 use crate::codegen::InstrumentType as DirectusInstrumentCategory;
 
@@ -25,7 +25,7 @@ pub async fn ensure_instrument_categories_compatibility(
     directus_conn: &mut AsyncPgConnection,
     portal_conn: &mut AsyncPgConnection,
 ) -> Result<(), crate::error::Error> {
-    let instrument_types = DirectusInstrumentCategory::load_all(directus_conn).await?;
+    let instrument_types = DirectusInstrumentCategory::read_all_async(directus_conn).await?;
 
     for instrument_type in instrument_types {
         let portal_instrument_type = PortalInstrumentCategory::from_name(

@@ -18,7 +18,6 @@ members = [
   "data-retrieval/downloader",
   "web/core-structures",
   "web/core-structures/core-structures-builder",
-  "web/web_common/font_awesome_icons",
   "utils/diesel_migrations_utils",
   "utils/common-traits",
   "utils/inflector",
@@ -38,11 +37,17 @@ members = [
   "utils/rosetta-timestamp",
   "utils/iter-utils",
   "data-migrations/init-migration",
-  "web/web_common/sqlite-migration-generator", "utils/macro-utils", "web/web_common/iso_codes", "web/web_common/rosetta-url", "data-migrations/init-db", "web/web_common/reference-docker",
+  "web/web_common/sqlite-migration-generator",
+  "utils/macro-utils",
+  "web/web_common/iso_codes",
+  "web/web_common/rosetta-url",
+  "data-migrations/init-db",
+  "web/web_common/reference-docker",
 
 ]
 
 [workspace.dependencies]
+actix-web = { version = "4.10", features = ["cookies", "openssl"] }
 actix-ws = "0.3.0"
 init-migration = { path = "data-migrations/init-migration" }
 init-db = { path = "data-migrations/init-db" }
@@ -52,8 +57,7 @@ proc-macro2 = "1.0"
 url = "2.5.4"
 indicatif = "0.17.11"
 reqwest = { version = "0.12.12", features = ["stream", "json"] }
-futures-util = "0.3.31"
-tokio = { version = "1.43.0", features = ["full"] }
+tokio = { version = "1.43.0", features = ["rt", "time", "macros"] }
 flate2 = "1.0.35"
 tar = "0.4.43"
 infer = "0.19"
@@ -73,7 +77,13 @@ chrono = { version = "0.4.39", features = ["serde"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
 strum = { version = "0.27", features = ["derive"] }
-yew = { version = "0.21.0", features = ["csr"] }
+yew = { git = "https://github.com/LucaCappelletti94/yew.git", features = [
+  "csr",
+], branch = "string-properties" }
+yew-router = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "string-properties" }
+yewdux = { git = "https://github.com/LucaCappelletti94/yewdux", branch = "custom-yew" }
+yew-agent = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "string-properties" }
+
 strum_macros = "0.27"
 zip = "2.6"
 reference-docker = { path = "web/web_common/reference-docker" }
@@ -92,7 +102,6 @@ rosetta-timestamp = { path = "utils/rosetta-timestamp" }
 taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
 csqlv = { path = "web/web_common/csqlv", default-features = false }
 iso_codes = { path = "web/web_common/iso_codes" }
-font_awesome_icons = { path = "web/web_common/font_awesome_icons", features = ["serde"] }
 testcontainers = { version = "0.23.2" }
 web_common_traits = { path = "web/web_common/web_common_traits" }
 webcodegen = { path = "web/web_common/webcodegen" }
@@ -107,6 +116,7 @@ iter-utils = { path = "utils/iter-utils" }
 regex = "1.11"
 plotters = "0.3.7"
 futures = "0.3.31"
+futures-util = "0.3.31"
 wasm-bindgen-futures = "0.4.50"
 trybuild = "1"
 const_format = "0.2.34"
@@ -115,6 +125,7 @@ rustfft = "6.2.0"
 lender = "0.3.1"
 sql_minifier = "0.1.5"
 blake3 = "1.8.2"
+phf = { version = "0.11.3", features = ["macros"] }
 api-path = { path = "web/web_common/api-path" }
 time-requirements = { path = "utils/time-requirements" }
 algebra = { path = "data-structures/algebra" }
@@ -132,6 +143,7 @@ lazy_static = { version = "1.5.0" }
 validator = { version = "0.20", features = ["derive"] }
 web-sys = { version = "0.3.77" }
 cached = "0.55"
+dotenvy = "0.15.7"
 
 [workspace.lints.rust]
 missing_docs = "forbid"
@@ -139,6 +151,7 @@ unused_macro_rules = "forbid"
 unconditional_recursion = "forbid"
 unreachable_patterns = "forbid"
 unused_import_braces = "forbid"
+unused_must_use = "forbid"
 
 [workspace.lints.clippy]
 missing_panics_doc = "allow"

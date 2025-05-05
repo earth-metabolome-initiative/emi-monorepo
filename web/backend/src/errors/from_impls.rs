@@ -3,9 +3,10 @@
 use actix_web::HttpResponse;
 use backend_request_errors::BackendRequestError;
 use diesel_async::pooled_connection::{PoolError, bb8::RunError};
+use tokio::sync::{mpsc::error::SendError, oneshot::error::RecvError};
 
 use super::BackendError;
-use crate::api::oauth::jwt_cookies::eliminate_cookies;
+use crate::{LNCommand, api::oauth::jwt_cookies::eliminate_cookies};
 
 impl From<diesel::result::Error> for BackendError {
     fn from(error: diesel::result::Error) -> Self {
@@ -88,6 +89,7 @@ impl From<BackendError> for BackendRequestError {
             | BackendError::Base64DecodeError(_)
             | BackendError::JWTError(_)
             | BackendError::UnknownLoginProvider(_)
+            | BackendError::ListenNotify
             | BackendError::RequestError(_) => BackendRequestError::InternalServerError,
             BackendError::Unauthorized => BackendRequestError::Unauthorized,
         }
@@ -127,5 +129,17 @@ impl From<BackendError> for actix_web::error::Error {
                 )
             }
         }
+    }
+}
+
+impl From<SendError<LNCommand>> for BackendError {
+    fn from(_error: SendError<LNCommand>) -> Self {
+        Self::ListenNotify
+    }
+}
+
+impl From<RecvError> for BackendError {
+    fn from(_error: RecvError) -> Self {
+        Self::ListenNotify
     }
 }

@@ -1,15 +1,11 @@
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StepModelNameplateCategoryForeignKeys {
-    pub step_model:
-        Option<std::rc::Rc<crate::codegen::structs_codegen::tables::step_models::StepModel>>,
-    pub nameplate_category: Option<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-        >,
-    >,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
-    pub updated_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub step_model: Option<crate::codegen::structs_codegen::tables::step_models::StepModel>,
+    pub nameplate_category:
+        Option<crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
 for crate::codegen::structs_codegen::tables::step_model_nameplate_categories::StepModelNameplateCategory {
@@ -85,30 +81,6 @@ for crate::codegen::structs_codegen::tables::step_model_nameplate_categories::St
                 }
             }
             (
-                crate::codegen::tables::row::Row::NameplateCategory(
-                    nameplate_categories,
-                ),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if nameplate_categories.id == self.nameplate_category_id {
-                    foreign_keys.nameplate_category = Some(nameplate_categories);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::NameplateCategory(
-                    nameplate_categories,
-                ),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if nameplate_categories.id == self.nameplate_category_id {
-                    foreign_keys.nameplate_category = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -133,6 +105,30 @@ for crate::codegen::structs_codegen::tables::step_model_nameplate_categories::St
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::NameplateCategory(
+                    nameplate_categories,
+                ),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if nameplate_categories.id == self.nameplate_category_id {
+                    foreign_keys.nameplate_category = Some(nameplate_categories);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::NameplateCategory(
+                    nameplate_categories,
+                ),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if nameplate_categories.id == self.nameplate_category_id {
+                    foreign_keys.nameplate_category = None;
                     updated = true;
                 }
             }

@@ -1,13 +1,12 @@
 //! A submodule providing a list component which can be read from the database.
 
-use std::rc::Rc;
-
 use core_structures::tables::rows::Rows;
 use web_common_traits::{
     crud::{CRUD, CrudTableOperation},
     database::{DeleteFromVec, UpsertVec},
     prelude::StaticTabular,
 };
+use ws_messages::DBMessage;
 use yew::{Component, Context, Properties, html};
 use yewdux::Dispatch;
 
@@ -15,7 +14,6 @@ use crate::{
     stores::app_state::AppState,
     traits::AssignedComponent,
     utils::{Connector, ConnectorMessage, DispatchableProperties},
-    workers::dbws_worker::DB2CMessage,
 };
 
 #[derive(Debug, Clone, PartialEq, Properties)]
@@ -23,10 +21,10 @@ use crate::{
 pub struct ReadableListProps {
     #[prop_or(0)]
     /// The offset for the list of items to be read from the database.
-    pub offset: u64,
+    pub offset: u16,
     #[prop_or(256)]
     /// The limit for the list of items to be read from the database.
-    pub limit: u64,
+    pub limit: u16,
     /// The dispatch function for the application state.
     pub dispatch: Dispatch<AppState>,
 }
@@ -42,10 +40,10 @@ impl From<&ReadableListProps> for Dispatch<AppState> {
 pub struct PartialReadableListProps {
     #[prop_or(0)]
     /// The offset for the list of items to be read from the database.
-    pub offset: u64,
+    pub offset: u16,
     #[prop_or(256)]
     /// The limit for the list of items to be read from the database.
-    pub limit: u64,
+    pub limit: u16,
 }
 
 impl DispatchableProperties for ReadableListProps {
@@ -61,7 +59,7 @@ impl DispatchableProperties for ReadableListProps {
 
 /// Submodule providing a list component which can be read from the database.
 pub struct ReadableList<C: AssignedComponent> {
-    items: Vec<Rc<C::Row>>,
+    items: Vec<C::Row>,
     connector: Connector,
     _component: std::marker::PhantomData<C>,
 }
@@ -69,7 +67,7 @@ pub struct ReadableList<C: AssignedComponent> {
 impl<C> Component for ReadableList<C>
 where
     C: AssignedComponent,
-    Rc<Vec<Rc<C::Row>>>: TryFrom<Rows, Error = std::convert::Infallible>,
+    Vec<C::Row>: TryFrom<Rows, Error = std::convert::Infallible>,
 {
     type Message = ConnectorMessage;
     type Properties = ReadableListProps;
@@ -86,17 +84,17 @@ where
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            ConnectorMessage::Worker(DB2CMessage::Rows(updated_rows, operation)) => {
+            ConnectorMessage::Worker(DBMessage::Rows(updated_rows, operation)) => {
                 if updated_rows.is_empty() {
                     false
                 } else {
-                    let updated_rows: Rc<Vec<Rc<C::Row>>> = updated_rows.try_into().unwrap();
+                    let updated_rows: Vec<C::Row> = updated_rows.try_into().unwrap();
                     match operation {
                         CRUD::Read | CRUD::Create | CRUD::Update => {
-                            self.items.upsert_sorted_vec(updated_rows.iter().cloned()).into()
+                            self.items.upsert_sorted_vec(updated_rows).into()
                         }
                         CRUD::Delete => {
-                            self.items.delete_from_sorted_vec(updated_rows.iter().cloned()) > 0
+                            self.items.delete_from_sorted_vec(updated_rows) > 0
                         }
                     }
                 }

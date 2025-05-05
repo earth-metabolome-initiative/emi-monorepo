@@ -4,7 +4,7 @@
 use core_structures::{Brand as PortalBrand, BrandState as PortalBrandState};
 use diesel_async::AsyncPgConnection;
 use web_common_traits::{
-    database::{AsyncRead, Insertable, InsertableVariant},
+    database::{AsyncBoundedRead, Insertable, InsertableVariant},
     prelude::Builder,
 };
 
@@ -25,7 +25,7 @@ pub async fn insert_missing_brands(
     directus_conn: &mut AsyncPgConnection,
     portal_conn: &mut AsyncPgConnection,
 ) -> Result<(), crate::error::Error> {
-    let directus_brands = DirectusBrand::load_all(directus_conn).await?;
+    let directus_brands = DirectusBrand::read_all_async(directus_conn).await?;
 
     for directus_brand in directus_brands {
         if PortalBrand::from_name(&directus_brand.brand, portal_conn).await?.is_some() {

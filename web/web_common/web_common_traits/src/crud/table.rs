@@ -14,9 +14,9 @@ pub enum CrudTableOperation<R: Rows> {
         /// The table name for the read operation.
         table_name: R::TableName,
         /// The offset from which to start reading.
-        offset: u64,
+        offset: u16,
         /// The limit on the number of rows to read.
-        limit: u64,
+        limit: u16,
     },
 }
 

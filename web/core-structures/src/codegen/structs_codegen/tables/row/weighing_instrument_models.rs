@@ -4,26 +4,12 @@ impl From<
     fn from(
         value: crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
     ) -> Self {
-        super::Row::WeighingInstrumentModel(std::rc::Rc::from(value))
-    }
-}
-impl From<
-    std::rc::Rc<
-        crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
-    >,
-> for super::Row {
-    fn from(
-        value: std::rc::Rc<
-            crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
-        >,
-    ) -> Self {
-        super::Row::WeighingInstrumentModel(std::rc::Rc::from(value))
+        super::Row::WeighingInstrumentModel(value)
     }
 }
 impl TryFrom<super::Row>
-for std::rc::Rc<
-    crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
-> {
+    for crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel
+{
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

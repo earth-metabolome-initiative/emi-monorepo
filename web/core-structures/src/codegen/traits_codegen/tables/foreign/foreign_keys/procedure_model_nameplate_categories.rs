@@ -1,16 +1,12 @@
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProcedureModelNameplateCategoryForeignKeys {
-    pub procedure_model: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
-    >,
-    pub nameplate_category: Option<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-        >,
-    >,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
-    pub updated_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub procedure_model:
+        Option<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
+    pub nameplate_category:
+        Option<crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
 for crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory {

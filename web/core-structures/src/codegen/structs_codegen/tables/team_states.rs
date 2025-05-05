@@ -1,6 +1,5 @@
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[derive(
     diesel::Selectable,
     diesel::Insertable,
@@ -8,12 +7,13 @@
     diesel::Queryable,
     diesel::Identifiable,
 )]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::team_states::team_states)]
 pub struct TeamState {
     pub name: String,
     pub description: String,
-    pub icon: font_awesome_icons::FAIcon,
+    pub icon: String,
     pub color_id: i16,
     pub id: i16,
 }
@@ -87,7 +87,7 @@ impl TeamState {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_icon(
-        icon: &font_awesome_icons::FAIcon,
+        icon: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
         use diesel::{OptionalExtension, QueryDsl, associations::HasTable};

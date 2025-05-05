@@ -3,8 +3,6 @@
 
 use std::fmt::Display;
 
-use sqlite_wasm_rs::export::OpfsSAHError;
-
 #[derive(Debug, Clone, PartialEq, Hash, PartialOrd, Eq, Ord)]
 /// An enum representing various device errors.
 pub enum DBError {
@@ -26,8 +24,8 @@ impl Display for DBError {
     }
 }
 
-impl From<OpfsSAHError> for DBError {
-    fn from(_err: OpfsSAHError) -> Self {
+impl From<sqlite_wasm_rs::export::OpfsSAHError> for DBError {
+    fn from(_err: sqlite_wasm_rs::export::OpfsSAHError) -> Self {
         DBError::InstallSAHPool
     }
 }

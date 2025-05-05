@@ -50,11 +50,11 @@ impl crate::Table {
                 }
             }
             if all_columns_are_foreign_keys {
-                return Ok(quote! {});
+                continue;
             }
 
             if columns.iter().all(|c| primary_keys.contains(c)) {
-                return Ok(quote! {});
+                continue;
             }
 
             let method_name = format!(

@@ -1,15 +1,11 @@
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ToolModelForeignKeys {
-    pub id: Option<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-        >,
-    >,
+    pub id: Option<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct>,
     pub tool_category:
-        Option<std::rc::Rc<crate::codegen::structs_codegen::tables::tool_categories::ToolCategory>>,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
-    pub updated_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+        Option<crate::codegen::structs_codegen::tables::tool_categories::ToolCategory>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::tool_models::ToolModel

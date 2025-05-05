@@ -1,13 +1,9 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialReagentModelForeignKeys {
-    pub id: Option<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-        >,
-    >,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
-    pub updated_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub id: Option<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::commercial_reagent_models::CommercialReagentModel
@@ -42,26 +38,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::CommercialProduct(commercial_products),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if commercial_products.id == self.id {
-                    foreign_keys.id = Some(commercial_products);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::CommercialProduct(commercial_products),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if commercial_products.id == self.id {
-                    foreign_keys.id = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -86,6 +62,26 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::CommercialProduct(commercial_products),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if commercial_products.id == self.id {
+                    foreign_keys.id = Some(commercial_products);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::CommercialProduct(commercial_products),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if commercial_products.id == self.id {
+                    foreign_keys.id = None;
                     updated = true;
                 }
             }

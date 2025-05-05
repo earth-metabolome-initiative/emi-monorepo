@@ -1,12 +1,10 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TrackableLocationForeignKeys {
-    pub trackable:
-        Option<std::rc::Rc<crate::codegen::structs_codegen::tables::trackables::Trackable>>,
-    pub storage_container: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::storage_containers::StorageContainer>,
-    >,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub trackable: Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
+    pub storage_container:
+        Option<crate::codegen::structs_codegen::tables::storage_containers::StorageContainer>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::trackable_locations::TrackableLocation
@@ -46,6 +44,26 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
+            (
+                crate::codegen::tables::row::Row::Trackable(trackables),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if trackables.id == self.trackable_id {
+                    foreign_keys.trackable = Some(trackables);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Trackable(trackables),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if trackables.id == self.trackable_id {
+                    foreign_keys.trackable = None;
+                    updated = true;
+                }
+            }
             (
                 crate::codegen::tables::row::Row::StorageContainer(storage_containers),
                 web_common_traits::crud::CRUD::Read
@@ -87,26 +105,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if users.id == self.created_by {
                     foreign_keys.created_by = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Trackable(trackables),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if trackables.id == self.trackable_id {
-                    foreign_keys.trackable = Some(trackables);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Trackable(trackables),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if trackables.id == self.trackable_id {
-                    foreign_keys.trackable = None;
                     updated = true;
                 }
             }

@@ -115,7 +115,10 @@ pub enum InsertError<FieldName> {
     ServerError(BackendRequestError),
 }
 
-impl<FieldName: core::fmt::Display> core::error::Error for InsertError<FieldName> {}
+impl<FieldName: core::fmt::Debug + core::fmt::Display> core::error::Error
+    for InsertError<FieldName>
+{
+}
 
 impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -136,9 +139,22 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName
     }
 }
 
-impl<FieldName: core::fmt::Display> core::fmt::Debug for InsertError<FieldName> {
+impl<FieldName: core::fmt::Debug> core::fmt::Debug for InsertError<FieldName> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
-        <InsertError<FieldName> as core::fmt::Display>::fmt(self, f)
+        match self {
+            InsertError::BuilderError(error) => {
+                <BuilderError<FieldName> as core::fmt::Debug>::fmt(error, f)
+            }
+            InsertError::ValidationError(error) => {
+                <validation_errors::Error<FieldName> as core::fmt::Debug>::fmt(error, f)
+            }
+            InsertError::DieselError(error) => {
+                <diesel::result::Error as core::fmt::Debug>::fmt(error, f)
+            }
+            InsertError::ServerError(error) => {
+                <BackendRequestError as core::fmt::Debug>::fmt(error, f)
+            }
+        }
     }
 }
 

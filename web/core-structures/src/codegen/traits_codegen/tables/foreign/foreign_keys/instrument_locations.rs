@@ -1,10 +1,9 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InstrumentLocationForeignKeys {
-    pub instrument:
-        Option<std::rc::Rc<crate::codegen::structs_codegen::tables::instruments::Instrument>>,
-    pub room: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::rooms::Room>>,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub instrument: Option<crate::codegen::structs_codegen::tables::instruments::Instrument>,
+    pub room: Option<crate::codegen::structs_codegen::tables::rooms::Room>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::instrument_locations::InstrumentLocation
@@ -61,26 +60,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = Some(users);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::Room(rooms),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -97,6 +76,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if rooms.id == self.room_id {
                     foreign_keys.room = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if users.id == self.created_by {
+                    foreign_keys.created_by = Some(users);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if users.id == self.created_by {
+                    foreign_keys.created_by = None;
                     updated = true;
                 }
             }

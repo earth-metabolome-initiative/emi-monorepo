@@ -33,7 +33,8 @@ impl<'a> TryFrom<&'a Path> for MigrationDirectory {
 
         // We iterate on the subdirectories within the directory.
         let mut migrations =
-            path.read_dir()?
+            path.read_dir()
+                .map_err(|_| Error::InvalidMigration(None, None, path.to_path_buf()))?
                 .filter_map(|entry| {
                     entry.ok().and_then(|entry| {
                         if entry.path().is_dir() { Some(entry.path()) } else { None }

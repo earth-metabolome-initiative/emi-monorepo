@@ -1,1 +1,0 @@
-DROP EXTENSION IF EXISTS font_awesome_icons;

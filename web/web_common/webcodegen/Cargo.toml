@@ -22,7 +22,6 @@ sqlparser.workspace = true
 strum.workspace = true
 strum_macros.workspace = true
 iso_codes.workspace = true
-font_awesome_icons.workspace = true
 cached.workspace = true
 async-trait.workspace = true
 

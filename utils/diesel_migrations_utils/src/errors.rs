@@ -1,6 +1,6 @@
 //! Submodule providing errors for the migrations utility.
 
-use std::fmt::Display;
+use std::{fmt::Display, path::PathBuf};
 
 use sqlparser::parser::ParserError;
 
@@ -10,7 +10,7 @@ use crate::prelude::MigrationKind;
 /// Enumeration of errors that may occur with the migrations utility.
 pub enum Error {
     /// Error raised when the directory is not a valid migration.
-    InvalidMigration(String),
+    InvalidMigration(Option<u64>, Option<MigrationKind>, PathBuf),
     /// Missing up migration.
     MissingUpMigration(u64),
     /// Missing down migration.
@@ -40,12 +40,6 @@ pub enum Error {
     CircularDependency(Vec<(u64, String)>),
 }
 
-impl From<std::io::Error> for Error {
-    fn from(error: std::io::Error) -> Self {
-        Error::InvalidMigration(error.to_string())
-    }
-}
-
 impl From<diesel::ConnectionError> for Error {
     fn from(error: diesel::ConnectionError) -> Self {
         Error::ConnectionFailed(error)
@@ -55,7 +49,9 @@ impl From<diesel::ConnectionError> for Error {
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::InvalidMigration(msg) => write!(f, "Invalid migration: {msg}"),
+            Error::InvalidMigration(num, kind, path) => {
+                write!(f, "Invalid migration {num:?} (kind: {kind:?}) in {path:?}")
+            }
             Error::MissingUpMigration(num) => write!(f, "Missing up migration: {num}"),
             Error::MissingDownMigration(num) => write!(f, "Missing down migration: {num}"),
             Error::DuplicateMigrationNumber(num) => {

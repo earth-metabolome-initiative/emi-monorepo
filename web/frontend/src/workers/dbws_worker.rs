@@ -13,13 +13,11 @@
 use db_worker::listen_notify::ListenNotify;
 use diesel::SqliteConnection;
 use internal_message::ws_internal_message::WSInternalMessage;
-use ws_messages::{F2BMessage, frontend::Unsubscribe};
+use ws_messages::{DBMessage, F2BMessage, frontend::Subscription};
 use yew_agent::worker::{HandlerId, Worker};
 
 mod c2db_message;
 pub(crate) use c2db_message::C2DBMessage;
-mod db2c_message;
-pub(crate) use db2c_message::DB2CMessage;
 mod internal_message;
 pub(crate) use internal_message::InternalMessage;
 mod component_message;
@@ -38,12 +36,12 @@ pub struct DBWSWorker {
 impl Worker for DBWSWorker {
     type Message = InternalMessage;
     type Input = ComponentMessage;
-    type Output = DB2CMessage;
+    type Output = DBMessage;
 
     fn create(scope: &yew_agent::prelude::WorkerScope<Self>) -> Self {
         scope.send_future(sqlite_wasm_rs::export::install_opfs_sahpool(None, true));
         scope.send_message(WSInternalMessage::Connect);
-        Self { listen_notify: ListenNotify::default(), conn: None, websocket: None }
+        Self { websocket: None, conn: None, listen_notify: ListenNotify::default() }
     }
 
     fn update(
@@ -69,10 +67,10 @@ impl Worker for DBWSWorker {
 
     fn disconnected(&mut self, scope: &yew_agent::prelude::WorkerScope<Self>, id: HandlerId) {
         for orphan_table_name in self.listen_notify.remove_table_listener(id) {
-            scope.send_message(Unsubscribe::from(orphan_table_name));
+            scope.send_message(Subscription::from(orphan_table_name));
         }
         for orphan_primary_key in self.listen_notify.remove_row_listener(id) {
-            scope.send_message(Unsubscribe::from(orphan_primary_key));
+            scope.send_message(Subscription::from(orphan_primary_key));
         }
     }
 

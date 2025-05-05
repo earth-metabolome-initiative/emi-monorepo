@@ -1,10 +1,9 @@
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BrandForeignKeys {
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
-    pub updated_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
-    pub brand_state:
-        Option<std::rc::Rc<crate::codegen::structs_codegen::tables::brand_states::BrandState>>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub brand_state: Option<crate::codegen::structs_codegen::tables::brand_states::BrandState>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::brands::Brand
@@ -41,26 +40,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::BrandState(brand_states),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if brand_states.id == self.brand_state_id {
-                    foreign_keys.brand_state = Some(brand_states);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::BrandState(brand_states),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if brand_states.id == self.brand_state_id {
-                    foreign_keys.brand_state = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -85,6 +64,26 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::BrandState(brand_states),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if brand_states.id == self.brand_state_id {
+                    foreign_keys.brand_state = Some(brand_states);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::BrandState(brand_states),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if brand_states.id == self.brand_state_id {
+                    foreign_keys.brand_state = None;
                     updated = true;
                 }
             }

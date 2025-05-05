@@ -13,6 +13,8 @@ pub enum WebCodeGenError {
     DieselError(DieselError),
     /// The table is missing.
     MissingTable(String),
+    /// The extension is missing.
+    MissingExtension(String),
     /// A table should not exist.
     IllegalTable(String),
     /// A table should not have an associated roles table.

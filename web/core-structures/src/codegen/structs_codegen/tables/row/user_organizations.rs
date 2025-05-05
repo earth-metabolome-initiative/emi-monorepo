@@ -4,23 +4,11 @@ impl From<crate::codegen::structs_codegen::tables::user_organizations::UserOrgan
     fn from(
         value: crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
     ) -> Self {
-        super::Row::UserOrganization(std::rc::Rc::from(value))
-    }
-}
-impl
-    From<std::rc::Rc<crate::codegen::structs_codegen::tables::user_organizations::UserOrganization>>
-    for super::Row
-{
-    fn from(
-        value: std::rc::Rc<
-            crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
-        >,
-    ) -> Self {
-        super::Row::UserOrganization(std::rc::Rc::from(value))
+        super::Row::UserOrganization(value)
     }
 }
 impl TryFrom<super::Row>
-    for std::rc::Rc<crate::codegen::structs_codegen::tables::user_organizations::UserOrganization>
+    for crate::codegen::structs_codegen::tables::user_organizations::UserOrganization
 {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {

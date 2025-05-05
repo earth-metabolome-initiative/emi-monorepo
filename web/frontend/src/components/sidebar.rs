@@ -2,7 +2,7 @@
 //!
 //! This file contains the sidebar for the frontend.
 use yew::prelude::*;
-use yew_hooks::use_click_away;
+// use yew_hooks::use_click_away;
 use yew_router::prelude::*;
 use yewdux::use_store;
 
@@ -26,11 +26,11 @@ pub fn sidebar(props: &SidebarProps) -> Html {
     let node = use_node_ref();
     let onclose = props.onclose.clone();
     let visible = props.visible;
-    use_click_away(node.clone(), move |_: Event| {
-        if visible {
-            onclose.emit(!visible);
-        }
-    });
+    // use_click_away(node.clone(), move |_: Event| {
+    //     if visible {
+    //         onclose.emit(!visible);
+    //     }
+    // });
 
     let sidebar_class = if props.visible { "sidebar" } else { "sidebar hidden" };
     let on_click_close = {

@@ -3,8 +3,8 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
     type TableName = crate::codegen::tables::table_names::TableName;
     fn bounded_read(
         table_name: Self::TableName,
-        offset: u64,
-        limit: u64,
+        offset: u16,
+        limit: u16,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Self, diesel::result::Error> {
         match table_name {

@@ -1,10 +1,9 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StepToolModelForeignKeys {
-    pub step: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::steps::Step>>,
-    pub tool_model:
-        Option<std::rc::Rc<crate::codegen::structs_codegen::tables::tool_models::ToolModel>>,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub step: Option<crate::codegen::structs_codegen::tables::steps::Step>,
+    pub tool_model: Option<crate::codegen::structs_codegen::tables::tool_models::ToolModel>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::step_tool_models::StepToolModel
@@ -40,26 +39,6 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
-            (
-                crate::codegen::tables::row::Row::Step(steps),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if steps.id == self.step_id {
-                    foreign_keys.step = Some(steps);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Step(steps),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if steps.id == self.step_id {
-                    foreign_keys.step = None;
-                    updated = true;
-                }
-            }
             (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
@@ -97,6 +76,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if tool_models.id == self.tool_model_id {
                     foreign_keys.tool_model = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Step(steps),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if steps.id == self.step_id {
+                    foreign_keys.step = Some(steps);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Step(steps),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if steps.id == self.step_id {
+                    foreign_keys.step = None;
                     updated = true;
                 }
             }

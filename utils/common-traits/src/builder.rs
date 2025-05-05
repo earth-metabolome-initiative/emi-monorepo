@@ -37,9 +37,13 @@ impl<A: core::fmt::Display> core::fmt::Display for BuilderError<A> {
     }
 }
 
-impl<A: core::fmt::Display> core::fmt::Debug for BuilderError<A> {
+impl<A: core::fmt::Debug> core::fmt::Debug for BuilderError<A> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
-        <BuilderError<A> as core::fmt::Display>::fmt(self, f)
+        match self {
+            Self::IncompleteBuild(missing_attribute) => {
+                write!(f, "Incomplete build: missing attribute: {missing_attribute:?}")
+            }
+        }
     }
 }
 

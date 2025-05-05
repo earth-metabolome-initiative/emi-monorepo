@@ -1,0 +1,21 @@
+[package]
+name = "init-db"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+taxonomy-fetcher.workspace = true
+diesel = { workspace = true, features = ["postgres"] }
+diesel-async = { workspace = true, features = ["postgres"] }
+csqlv = { workspace = true, features = ["diesel-async", "iso_codes"] }
+diesel_migrations_utils.workspace = true
+const_format.workspace = true
+webcodegen.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true
+reference-docker.workspace = true
+webcodegen.workspace = true
+
+[lints]
+workspace = true

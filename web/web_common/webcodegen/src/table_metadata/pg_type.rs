@@ -205,9 +205,6 @@ pub async fn rust_type_str<S: AsRef<str>>(
         // ISO Codes
         "countrycode" | "CountryCode" => "iso_codes::CountryCode",
 
-        // FontAwesome Icon
-        "FAIcon" | "faicon" => "font_awesome_icons::FAIcon",
-
         other => return Err(WebCodeGenError::UnknownPostgresRustType(other.to_owned())),
     })
 }
@@ -289,9 +286,6 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<String, WebCod
 
         // ISO Codes
         "countrycode" | "CountryCode" => "iso_codes::country_codes::diesel_impls::CountryCode",
-
-        // FontAwesome Icon
-        "FAIcon" | "faicon" => "font_awesome_icons::diesel_impls::FAIcon",
 
         _ => {
             return Err(WebCodeGenError::UnknownDieselPostgresType(postgres_type.to_owned()));

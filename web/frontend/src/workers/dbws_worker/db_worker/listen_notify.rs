@@ -12,9 +12,10 @@ use web_common_traits::{
     crud::CRUD,
     prelude::{Row, Rows, Tabular},
 };
+use ws_messages::DBMessage;
 use yew_agent::worker::HandlerId;
 
-use crate::workers::{DBWSWorker, dbws_worker::DB2CMessage};
+use crate::workers::DBWSWorker;
 
 #[derive(Debug, Clone, Default)]
 /// Struct handling the Listen/Notify emulation for the `SQLite` database
@@ -85,7 +86,7 @@ impl ListenNotify {
         scope: &yew_agent::prelude::WorkerScope<DBWSWorker>,
     ) where
         T: Tabular<TableName = TableName> + Clone,
-        DB2CMessage: From<(T, CRUD)>,
+        DBMessage: From<(T, CRUD)>,
     {
         let table_name = tabular.table_name();
         if let Some(listeners) = self.table_listeners.get(&table_name) {
@@ -104,7 +105,7 @@ impl ListenNotify {
         scope: &yew_agent::prelude::WorkerScope<DBWSWorker>,
     ) where
         R: Rows<TableName = TableName, PrimaryKey = TablePrimaryKey> + Clone,
-        DB2CMessage: From<(R, CRUD)>,
+        DBMessage: From<(R, CRUD)>,
     {
         self.notify_table_listeners(rows, crud, scope);
 
@@ -126,7 +127,7 @@ impl ListenNotify {
         scope: &yew_agent::prelude::WorkerScope<DBWSWorker>,
     ) where
         R: Row<TableName = TableName, PrimaryKey = TablePrimaryKey> + Clone,
-        DB2CMessage: From<(R, CRUD)>,
+        DBMessage: From<(R, CRUD)>,
     {
         self.notify_table_listeners(row, crud, scope);
 

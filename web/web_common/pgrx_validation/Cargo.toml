@@ -23,6 +23,7 @@ pgrx_validation_derive.workspace = true
 validation-errors.workspace = true
 validator.workspace = true
 rosetta-uuid.workspace = true
+phf.workspace = true
 rosetta-timestamp.workspace = true
 
 [features]

@@ -1,12 +1,10 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProcessingStepForeignKeys {
-    pub id: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::steps::Step>>,
-    pub processable:
-        Option<std::rc::Rc<crate::codegen::structs_codegen::tables::processables::Processable>>,
-    pub instrument:
-        Option<std::rc::Rc<crate::codegen::structs_codegen::tables::instruments::Instrument>>,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub id: Option<crate::codegen::structs_codegen::tables::steps::Step>,
+    pub processable: Option<crate::codegen::structs_codegen::tables::processables::Processable>,
+    pub instrument: Option<crate::codegen::structs_codegen::tables::instruments::Instrument>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::processing_steps::ProcessingStep
@@ -49,6 +47,46 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
+                crate::codegen::tables::row::Row::Instrument(instruments),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if instruments.id == self.instrument_id {
+                    foreign_keys.instrument = Some(instruments);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Instrument(instruments),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if instruments.id == self.instrument_id {
+                    foreign_keys.instrument = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Processable(processables),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if processables.id == self.processable_id {
+                    foreign_keys.processable = Some(processables);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Processable(processables),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if processables.id == self.processable_id {
+                    foreign_keys.processable = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -85,46 +123,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if steps.id == self.id {
                     foreign_keys.id = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Processable(processables),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if processables.id == self.processable_id {
-                    foreign_keys.processable = Some(processables);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Processable(processables),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if processables.id == self.processable_id {
-                    foreign_keys.processable = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Instrument(instruments),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if instruments.id == self.instrument_id {
-                    foreign_keys.instrument = Some(instruments);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Instrument(instruments),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if instruments.id == self.instrument_id {
-                    foreign_keys.instrument = None;
                     updated = true;
                 }
             }

@@ -61,7 +61,9 @@ impl TryFrom<CSVColumnMetadataBuilder> for CSVColumnMetadata {
             .data_type_counts
             .into_iter()
             .filter(|(data_type, _)| !data_type.is_null())
-            .max_by_key(|(data_type, count)| (*count, Reverse(data_type.min_dimension())))
+            .max_by_key(|(data_type, count)| {
+                (*count, Reverse(data_type.min_dimension() * data_type.specificity()))
+            })
             .map(|(data_type, _)| data_type)
         else {
             return Err(CSVSchemaError::EmptyColumn);

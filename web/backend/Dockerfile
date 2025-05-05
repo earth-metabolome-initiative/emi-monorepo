@@ -9,7 +9,7 @@ ARG HOST_GID
 EXPOSE $ACTIX_PORT
 
 # We need to install postgresql-dev to build the diesel-cli
-RUN apt update && apt install -y libpq-dev tmux libnss3-tools build-essential procps curl file git wget mkcert pkg-config
+RUN apt update && apt install -y libpq-dev tmux libnss3-tools build-essential procps curl file git wget mkcert pkg-config libfontconfig-dev
 
 # Create non-root user
 RUN groupadd -g ${HOST_GID} appgroup && \

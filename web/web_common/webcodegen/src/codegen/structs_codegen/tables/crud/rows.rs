@@ -44,6 +44,7 @@ impl Codegen<'_> {
         std::fs::create_dir_all(root)?;
         let table_name_enum_path = self.table_names_enum_path();
         let table_primary_keys_path = self.table_primary_keys_enum_path();
+        let row_enum_path = self.row_enum_path();
         let sqlite_upsert: Vec<TokenStream> = tables
             .iter()
             .map(|table| {
@@ -86,7 +87,7 @@ impl Codegen<'_> {
                 let struct_ident = table.struct_ident()?;
                 let struct_path = table.import_struct_path()?;
                 Ok(quote::quote! {
-                    #struct_ident(std::rc::Rc<Vec<std::rc::Rc<#struct_path>>>)
+                    #struct_ident(Vec<#struct_path>)
                 })
             })
             .collect::<Result<Vec<_>, crate::errors::WebCodeGenError>>()?;
@@ -135,35 +136,15 @@ impl Codegen<'_> {
                 self.beautify_code(&quote! {
                     impl From<#struct_path> for super::Rows {
                         fn from(value: #struct_path) -> Self {
-                            Self::from(std::rc::Rc::new(value))
-                        }
-                    }
-                    impl From<std::rc::Rc<#struct_path>> for super::Rows {
-                        fn from(value: std::rc::Rc<#struct_path>) -> Self {
                             Self::from(vec![value])
                         }
                     }
                     impl From<Vec<#struct_path>> for super::Rows {
                         fn from(value: Vec<#struct_path>) -> Self {
-                            Self::from(value.into_iter().map(std::rc::Rc::new).collect::<Vec<_>>())
-                        }
-                    }
-                    impl From<Vec<std::rc::Rc<#struct_path>>> for super::Rows {
-                        fn from(value: Vec<std::rc::Rc<#struct_path>>) -> Self {
-                            Self::from(std::rc::Rc::new(value))
-                        }
-                    }
-                    impl From<std::rc::Rc<Vec<#struct_path>>> for super::Rows {
-                        fn from(value: std::rc::Rc<Vec<#struct_path>>) -> Self {
-                            Self::from(std::rc::Rc::new(value.iter().cloned().map(std::rc::Rc::new).collect::<Vec<_>>()))
-                        }
-                    }
-                    impl From<std::rc::Rc<Vec<std::rc::Rc<#struct_path>>>> for super::Rows {
-                        fn from(value: std::rc::Rc<Vec<std::rc::Rc<#struct_path>>>) -> Self {
                             super::Rows::#struct_ident(value)
                         }
                     }
-                    impl TryFrom<super::Rows> for std::rc::Rc<Vec<std::rc::Rc<#struct_path>>> {
+                    impl TryFrom<super::Rows> for Vec<#struct_path> {
                         type Error = std::convert::Infallible;
                         fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
                             match value {
@@ -243,6 +224,44 @@ impl Codegen<'_> {
             },
         ));
 
+        let from_rows_to_row_vec_impls: Vec<TokenStream> = tables
+            .iter()
+            .map(|table| {
+                let struct_ident = table.struct_ident()?;
+                Ok(quote::quote! {
+                    super::Rows::#struct_ident(rows) => {
+                        rows.iter()
+                            .cloned()
+                            .map(|row| #row_enum_path::#struct_ident(row))
+                            .collect::<Vec<_>>()
+                    }
+                })
+            })
+            .collect::<Result<Vec<_>, crate::errors::WebCodeGenError>>()?;
+
+        trait_modules.push((
+            "into_iter",
+            quote::quote! {
+                impl From<super::Rows> for Vec<#row_enum_path> {
+                    fn from(rows: super::Rows) -> Self {
+                        match rows {
+                            #(#from_rows_to_row_vec_impls)*
+                        }
+                    }
+                }
+
+                impl IntoIterator for super::Rows {
+                    type Item = #row_enum_path;
+                    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+                    fn into_iter(self) -> Self::IntoIter {
+                        let row_vec: Vec<#row_enum_path> = self.into();
+                        row_vec.into_iter()
+                    }
+                }
+            },
+        ));
+
         Syntax::iter()
             .try_for_each(|syntax| {
                 let feature_flag = syntax.as_feature_flag();
@@ -273,8 +292,8 @@ impl Codegen<'_> {
 
                             fn bounded_read(
                                 table_name: Self::TableName,
-                                offset: u64,
-                                limit: u64,
+                                offset: u16,
+                                limit: u16,
                                 conn: &mut #sync_connection,
                             ) -> Result<Self, diesel::result::Error> {
                                 match table_name {
@@ -309,8 +328,8 @@ impl Codegen<'_> {
 
                             async fn bounded_read(
                                 table_name: Self::TableName,
-                                offset: u64,
-                                limit: u64,
+                                offset: u16,
+                                limit: u16,
                                 conn: &mut #async_connection,
                             ) -> Result<Self, diesel::result::Error> {
                                 match table_name {

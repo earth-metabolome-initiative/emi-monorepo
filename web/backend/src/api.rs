@@ -4,8 +4,8 @@ mod auth;
 mod healthchecker;
 pub(crate) mod oauth;
 mod ws;
-
 use healthchecker::health_checker_handler;
+pub use ws::{LNCommand, ListenNotifyHandle, ListenNotifyServer};
 
 pub fn configure(conf: &mut web::ServiceConfig) {
     conf.service(

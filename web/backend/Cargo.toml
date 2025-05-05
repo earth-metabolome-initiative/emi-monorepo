@@ -20,25 +20,28 @@ rosetta-uuid.workspace = true
 bincode.workspace = true
 futures.workspace = true
 api-path.workspace = true
-init-migration.workspace = true
 backend-request-errors.workspace = true
 postgis_diesel.workspace = true
 rand.workspace = true
 rsa.workspace = true
 base64ct.workspace = true
+init-db.workspace = true
+init-migration.workspace = true
+tokio.workspace = true
 core-structures = { workspace = true, features = ["backend"] }
 web_common_traits = { workspace = true, features = ["backend"] }
 openssl = { version = "0.10" }
 actix = "0.13"
 actix-cors = "0.7.1"
-actix-rt = "2.10.0"
-actix-web = { version = "4.10", features = ["cookies", "openssl"] }
+actix-web.workspace = true
 actix-web-httpauth = "0.8.2"
 actix-service = "2.0.3"
 actix-http = "3.10.0"
 actix-files = "0.6.6"
 actix-ws.workspace = true
+ws-messages = { workspace = true, features = ["backend"] }
 log.workspace = true
+futures-util.workspace = true
 env_logger = "0.11"
 rust-argon2 = "2.1"
 time = "0.3"

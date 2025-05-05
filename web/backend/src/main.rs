@@ -7,6 +7,7 @@ use actix_files::NamedFile;
 use actix_web::{
     App, HttpRequest, HttpServer, Responder, get, http::header, middleware::Logger, web,
 };
+use backend::ListenNotifyServer;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use redis::Client;
 
@@ -28,7 +29,7 @@ async fn frontend_static_files(req: HttpRequest) -> impl Responder {
     }
 }
 
-#[actix_rt::main]
+#[tokio::main(flavor = "current_thread")]
 async fn main() -> std::io::Result<()> {
     env_logger::init();
     let database_url =
@@ -45,13 +46,22 @@ async fn main() -> std::io::Result<()> {
     // Run init migrations.
     {
         let mut connection = pool.get().await.unwrap();
+        let database_name = std::env::var("POSTGRES_DB").expect("POSTGRES_DB must be set");
+        init_db::init_database(&database_name, &mut connection)
+            .await
+            .expect("Error creating database");
         init_migration::init_migration(&mut connection)
             .await
             .expect("Error running init migration");
     }
+
     let redis_client =
         Client::open(std::env::var("REDIS_URL").expect("REDIS_URL must be set").as_str())
             .expect("Error creating redis client");
+
+    let (listen_notify_server, listen_notify_server_handle) = ListenNotifyServer::new();
+
+    let listen_notify_server = tokio::task::spawn(listen_notify_server.run());
 
     let domain = std::env::var("DOMAIN").expect("DOMAIN is not available.");
 
@@ -68,7 +78,7 @@ async fn main() -> std::io::Result<()> {
         .unwrap();
 
     // Start http server
-    HttpServer::new(move || {
+    let http_server = HttpServer::new(move || {
         let cors = Cors::default()
             .allowed_origin(&format!("https://{domain}"))
             .allowed_methods(vec!["GET", "POST", "PATCH", "DELETE"])
@@ -79,8 +89,10 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(pool.clone()))
             // pass in the redis client to all routes
             .app_data(web::Data::new(redis_client.clone()))
-            // We register the API handlers
+            // Register the API handlers
             .configure(backend::api::configure)
+            // We register the listen-notify server
+            .app_data(web::Data::new(listen_notify_server_handle.clone()))
             // We serve the frontend as static files
             .route("/", web::get().to(index))
             .route("/login", web::get().to(index))
@@ -98,6 +110,9 @@ async fn main() -> std::io::Result<()> {
         builder,
     )?
     .workers(4)
-    .run()
-    .await
+    .run();
+
+    tokio::try_join!(http_server, async move { listen_notify_server.await.unwrap() })?;
+
+    Ok(())
 }

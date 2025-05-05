@@ -7,7 +7,7 @@ The ordering of items is not stable, it is driven by a dependency graph.
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/iso_codes/src/country_codes.rs:16
+-- web/web_common/iso_codes/src/country_codes.rs:17
 -- iso_codes::country_codes::CountryCode
 CREATE TYPE CountryCode AS ENUM (
 	'AD',

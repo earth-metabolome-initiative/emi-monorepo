@@ -1,12 +1,9 @@
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OrganismForeignKeys {
-    pub id: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::trackables::Trackable>>,
-    pub nameplate_category: Option<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-        >,
-    >,
+    pub id: Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
+    pub nameplate_category:
+        Option<crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::organisms::Organism

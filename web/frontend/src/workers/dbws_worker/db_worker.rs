@@ -7,6 +7,7 @@ use web_common_traits::{
     crud::{CRUD, ExecuteCrudOperation},
     database::{Row, Tabular},
 };
+use ws_messages::DBMessage;
 use yew_agent::worker::HandlerId;
 
 use super::{C2DBMessage, DBWSWorker, internal_message::db_internal_message::DBInternalMessage};
@@ -14,9 +15,10 @@ use super::{C2DBMessage, DBWSWorker, internal_message::db_internal_message::DBIn
 pub mod listen_notify;
 
 const CSV_MIGRATIONS: &str =
-    sqlite_migration_generator::load_sqlite_from_csvs!("../core-structures/csvs");
-const MIGRATIONS: &str =
-    sqlite_migration_generator::load_sqlite_from_migrations!("../core-structures/migrations");
+    sqlite_migration_generator::load_sqlite_from_csvs!("../../data-migrations/init-db/csvs");
+const MIGRATIONS: &str = sqlite_migration_generator::load_sqlite_from_migrations!(
+    "../../data-migrations/init-db/migrations"
+);
 
 impl DBWSWorker {
     pub(super) fn update_database(
@@ -25,7 +27,7 @@ impl DBWSWorker {
         db_message: DBInternalMessage,
     ) {
         match db_message {
-            DBInternalMessage::Row(row, crud) => {
+            DBInternalMessage::DB(DBMessage::Row(row, crud)) => {
                 // We received a message with information regarding a table read,
                 // which we need to integrate into the SQLite database and then
                 // notify the components that are listening to this table.
@@ -49,7 +51,7 @@ impl DBWSWorker {
                     }
                 }
             }
-            DBInternalMessage::Rows(rows, crud) => {
+            DBInternalMessage::DB(DBMessage::Rows(rows, crud)) => {
                 // We received a message with information regarding a table read,
                 // which we need to integrate into the SQLite database and then
                 // notify the components that are listening to this table.

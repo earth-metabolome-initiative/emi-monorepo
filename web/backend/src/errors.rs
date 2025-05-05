@@ -6,7 +6,7 @@ mod from_impls;
 #[derive(Debug)]
 #[allow(dead_code)]
 /// High-level errors that may occur in the Server.
-pub(crate) enum BackendError {
+pub enum BackendError {
     /// An error that occurred while trying to access the redis database.
     RedisError(redis::RedisError),
     /// An error that occurred while trying to connect to the Postgres database.
@@ -32,4 +32,6 @@ pub(crate) enum BackendError {
     JWTError(jsonwebtoken::errors::Error),
     /// When a login provider is not found in the database.
     UnknownLoginProvider(String),
+    /// When there is a failure in the ListenNotify server.
+    ListenNotify,
 }

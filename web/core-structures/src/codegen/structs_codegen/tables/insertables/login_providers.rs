@@ -30,7 +30,7 @@ impl core::fmt::Display for InsertableLoginProviderAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableLoginProvider {
     name: String,
-    icon: font_awesome_icons::FAIcon,
+    icon: String,
     client_id: String,
     redirect_uri: String,
     oauth_url: String,
@@ -40,7 +40,7 @@ impl InsertableLoginProvider {}
 #[derive(Default)]
 pub struct InsertableLoginProviderBuilder {
     name: Option<String>,
-    icon: Option<font_awesome_icons::FAIcon>,
+    icon: Option<String>,
     client_id: Option<String>,
     redirect_uri: Option<String>,
     oauth_url: Option<String>,
@@ -51,13 +51,17 @@ impl InsertableLoginProviderBuilder {
         mut self,
         name: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        pgrx_validation::must_not_be_empty(name.as_ref())
+            .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::Name))?;
         self.name = Some(name);
         Ok(self)
     }
     pub fn icon(
         mut self,
-        icon: font_awesome_icons::FAIcon,
+        icon: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        pgrx_validation::must_be_font_awesome_class(icon.as_ref())
+            .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::Icon))?;
         self.icon = Some(icon);
         Ok(self)
     }
@@ -65,6 +69,8 @@ impl InsertableLoginProviderBuilder {
         mut self,
         client_id: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        pgrx_validation::must_not_be_empty(client_id.as_ref())
+            .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::ClientId))?;
         self.client_id = Some(client_id);
         Ok(self)
     }
@@ -86,6 +92,8 @@ impl InsertableLoginProviderBuilder {
         mut self,
         scope: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        pgrx_validation::must_not_be_empty(scope.as_ref())
+            .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::Scope))?;
         self.scope = Some(scope);
         Ok(self)
     }

@@ -35,10 +35,10 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                                                             ),
                                                         ),
                                                 ),
-                                                crate::codegen::diesel_codegen::tables::teams::teams::icon_id
+                                                crate::codegen::diesel_codegen::tables::teams::teams::icon
                                                     .ne(
                                                         diesel::upsert::excluded(
-                                                            crate::codegen::diesel_codegen::tables::teams::teams::icon_id,
+                                                            crate::codegen::diesel_codegen::tables::teams::teams::icon,
                                                         ),
                                                     ),
                                             ),
@@ -133,10 +133,10 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                                                             ),
                                                         ),
                                                 ),
-                                                crate::codegen::diesel_codegen::tables::teams::teams::icon_id
+                                                crate::codegen::diesel_codegen::tables::teams::teams::icon
                                                     .ne(
                                                         diesel::upsert::excluded(
-                                                            crate::codegen::diesel_codegen::tables::teams::teams::icon_id,
+                                                            crate::codegen::diesel_codegen::tables::teams::teams::icon,
                                                         ),
                                                     ),
                                             ),

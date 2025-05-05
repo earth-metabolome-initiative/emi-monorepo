@@ -7,9 +7,7 @@ use gloo::net::websocket::futures::WebSocket;
 use ws_messages::{B2FMessage, F2BMessage};
 use yew::platform::spawn_local;
 
-use super::internal_message::{
-    db_internal_message::DBInternalMessage, ws_internal_message::WSInternalMessage,
-};
+use super::internal_message::ws_internal_message::WSInternalMessage;
 
 const DOMAIN: Option<&str> = option_env!("DOMAIN");
 
@@ -24,14 +22,8 @@ impl super::DBWSWorker {
         match ws_message.into() {
             WSInternalMessage::B2F(message) => {
                 match message {
-                    B2FMessage::Pong => {
-                        // Handle Pong message
-                    }
-                    B2FMessage::Rows(rows, crud) => {
-                        scope.send_message(DBInternalMessage::Rows(rows, crud));
-                    }
-                    B2FMessage::Row(row, crud) => {
-                        scope.send_message(DBInternalMessage::Row(row, crud));
+                    B2FMessage::DB(db_message) => {
+                        scope.send_message(db_message);
                     }
                 }
             }

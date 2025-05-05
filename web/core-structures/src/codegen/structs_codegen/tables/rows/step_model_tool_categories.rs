@@ -5,19 +5,6 @@ impl
     fn from(
         value: crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
     ) -> Self {
-        Self::from(std::rc::Rc::new(value))
-    }
-}
-impl From<
-    std::rc::Rc<
-        crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
-    >,
-> for super::Rows {
-    fn from(
-        value: std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
-        >,
-    ) -> Self {
         Self::from(vec![value])
     }
 }
@@ -31,76 +18,14 @@ impl From<
             crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
         >,
     ) -> Self {
-        Self::from(value.into_iter().map(std::rc::Rc::new).collect::<Vec<_>>())
-    }
-}
-impl From<
-    Vec<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
-        >,
-    >,
-> for super::Rows {
-    fn from(
-        value: Vec<
-            std::rc::Rc<
-                crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
-            >,
-        >,
-    ) -> Self {
-        Self::from(std::rc::Rc::new(value))
-    }
-}
-impl From<
-    std::rc::Rc<
-        Vec<
-            crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
-        >,
-    >,
-> for super::Rows {
-    fn from(
-        value: std::rc::Rc<
-            Vec<
-                crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
-            >,
-        >,
-    ) -> Self {
-        Self::from(
-            std::rc::Rc::new(
-                value.iter().cloned().map(std::rc::Rc::new).collect::<Vec<_>>(),
-            ),
-        )
-    }
-}
-impl From<
-    std::rc::Rc<
-        Vec<
-            std::rc::Rc<
-                crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
-            >,
-        >,
-    >,
-> for super::Rows {
-    fn from(
-        value: std::rc::Rc<
-            Vec<
-                std::rc::Rc<
-                    crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
-                >,
-            >,
-        >,
-    ) -> Self {
         super::Rows::StepModelToolCategory(value)
     }
 }
 impl TryFrom<super::Rows>
-for std::rc::Rc<
-    Vec<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
-        >,
-    >,
-> {
+    for Vec<
+        crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
+    >
+{
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

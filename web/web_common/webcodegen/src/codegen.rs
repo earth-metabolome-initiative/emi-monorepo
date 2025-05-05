@@ -85,10 +85,6 @@ pub struct Codegen<'a> {
     /// traits implementations.
     pub(super) enable_foreign_trait: bool,
     /// Whether to enable the
-    /// [`Loadable`](web_common_traits::database::Loadable) traits
-    /// implementations.
-    pub(super) enable_loadable_trait: bool,
-    /// Whether to enable the
     /// [`Insertable`](web_common_traits::database::Insertable) traits
     /// implementations.
     pub(super) enable_insertable_trait: bool,
@@ -104,6 +100,8 @@ pub struct Codegen<'a> {
     /// [`Read`](web_common_traits::crud::Read) traits
     /// implementations.
     pub(super) enable_read_trait: bool,
+    /// Whether to derive traits relative to the `yew` framework.
+    pub(super) enable_yew: bool,
 }
 
 impl<'a> Codegen<'a> {
@@ -113,7 +111,6 @@ impl<'a> Codegen<'a> {
         self.enable_deletable_trait
             || self.enable_attribute_trait
             || self.enable_foreign_trait
-            || self.enable_loadable_trait
             || self.enable_insertable_trait
             || self.enable_updatable_trait
             || self.enable_upsertable_trait
@@ -124,6 +121,13 @@ impl<'a> Codegen<'a> {
     /// Check wether the `CRUD`-related traits should be generated.
     pub fn should_generate_crud(&self) -> bool {
         self.enable_read_trait
+    }
+
+    #[must_use]
+    /// Sets to generate the derive traits for the `yew` framework.
+    pub fn enable_yew(mut self) -> Self {
+        self.enable_yew = true;
+        self
     }
 
     #[must_use]
@@ -307,22 +311,6 @@ impl<'a> Codegen<'a> {
     pub fn enable_foreign_trait(mut self) -> Self {
         self = self.enable_table_structs();
         self.enable_foreign_trait = true;
-        self
-    }
-
-    #[must_use]
-    /// Whether to enable the generation of the
-    /// [`Loadable`](web_common_traits::database::Loadable) traits.
-    ///
-    /// # Note
-    ///
-    /// Since the [`Loadable`](web_common_traits::database::Loadable) traits
-    /// require the tables structs, enabling the generation of the
-    /// [`Loadable`](web_common_traits::database::Loadable) traits automatically
-    /// enables the generation of the tables structs.
-    pub fn enable_loadable_trait(mut self) -> Self {
-        self = self.enable_table_structs();
-        self.enable_loadable_trait = true;
         self
     }
 

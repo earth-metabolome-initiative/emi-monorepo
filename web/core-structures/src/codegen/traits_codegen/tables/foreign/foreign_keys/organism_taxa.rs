@@ -1,9 +1,9 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OrganismTaxonForeignKeys {
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
-    pub organism: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::organisms::Organism>>,
-    pub taxon: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::taxa::Taxon>>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub organism: Option<crate::codegen::structs_codegen::tables::organisms::Organism>,
+    pub taxon: Option<crate::codegen::structs_codegen::tables::taxa::Taxon>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon
@@ -37,6 +37,26 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if users.id == self.created_by {
+                    foreign_keys.created_by = Some(users);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if users.id == self.created_by {
+                    foreign_keys.created_by = None;
+                    updated = true;
+                }
+            }
             (
                 crate::codegen::tables::row::Row::Organism(organisms),
                 web_common_traits::crud::CRUD::Read
@@ -74,26 +94,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if taxa.id == self.taxon_id {
                     foreign_keys.taxon = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = Some(users);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = None;
                     updated = true;
                 }
             }

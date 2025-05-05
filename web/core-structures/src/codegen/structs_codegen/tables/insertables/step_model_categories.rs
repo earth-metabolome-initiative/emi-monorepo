@@ -27,14 +27,14 @@ impl core::fmt::Display for InsertableStepModelCategoryAttributes {
 pub struct InsertableStepModelCategory {
     name: String,
     description: String,
-    icon: font_awesome_icons::FAIcon,
+    icon: String,
 }
 impl InsertableStepModelCategory {}
 #[derive(Default)]
 pub struct InsertableStepModelCategoryBuilder {
     name: Option<String>,
     description: Option<String>,
-    icon: Option<font_awesome_icons::FAIcon>,
+    icon: Option<String>,
 }
 impl InsertableStepModelCategoryBuilder {
     pub fn name(
@@ -53,7 +53,7 @@ impl InsertableStepModelCategoryBuilder {
     }
     pub fn icon(
         mut self,
-        icon: font_awesome_icons::FAIcon,
+        icon: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         self.icon = Some(icon);
         Ok(self)

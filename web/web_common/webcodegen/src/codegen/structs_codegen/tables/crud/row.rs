@@ -85,7 +85,7 @@ impl Codegen<'_> {
                 let struct_ident = table.struct_ident()?;
                 let struct_path = table.import_struct_path()?;
                 Ok(quote::quote! {
-                    #struct_ident(std::rc::Rc<#struct_path>)
+                    #struct_ident(#struct_path)
                 })
             })
             .collect::<Result<Vec<_>, crate::errors::WebCodeGenError>>()?;
@@ -147,15 +147,10 @@ impl Codegen<'_> {
                 self.beautify_code(&quote! {
                     impl From<#struct_path> for super::Row {
                         fn from(value: #struct_path) -> Self {
-                            super::Row::#struct_ident(std::rc::Rc::from(value))
+                            super::Row::#struct_ident(value)
                         }
                     }
-                    impl From<std::rc::Rc<#struct_path>> for super::Row {
-                        fn from(value: std::rc::Rc<#struct_path>) -> Self {
-                            super::Row::#struct_ident(std::rc::Rc::from(value))
-                        }
-                    }
-                    impl TryFrom<super::Row> for std::rc::Rc<#struct_path> {
+                    impl TryFrom<super::Row> for #struct_path {
                         type Error = std::convert::Infallible;
                         fn try_from(value: super::Row) -> Result<Self, Self::Error> {
                             match value {

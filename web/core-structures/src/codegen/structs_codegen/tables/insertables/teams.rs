@@ -4,7 +4,7 @@ pub enum InsertableTeamAttributes {
     Id,
     Name,
     Description,
-    IconId,
+    Icon,
     ColorId,
     StateId,
     ParentTeamId,
@@ -19,7 +19,7 @@ impl core::fmt::Display for InsertableTeamAttributes {
             InsertableTeamAttributes::Id => write!(f, "id"),
             InsertableTeamAttributes::Name => write!(f, "name"),
             InsertableTeamAttributes::Description => write!(f, "description"),
-            InsertableTeamAttributes::IconId => write!(f, "icon_id"),
+            InsertableTeamAttributes::Icon => write!(f, "icon"),
             InsertableTeamAttributes::ColorId => write!(f, "color_id"),
             InsertableTeamAttributes::StateId => write!(f, "state_id"),
             InsertableTeamAttributes::ParentTeamId => write!(f, "parent_team_id"),
@@ -40,7 +40,7 @@ pub struct InsertableTeam {
     id: i32,
     name: String,
     description: String,
-    icon_id: font_awesome_icons::FAIcon,
+    icon: String,
     color_id: i16,
     state_id: i16,
     parent_team_id: Option<i32>,
@@ -135,7 +135,7 @@ pub struct InsertableTeamBuilder {
     id: Option<i32>,
     name: Option<String>,
     description: Option<String>,
-    icon_id: Option<font_awesome_icons::FAIcon>,
+    icon: Option<String>,
     color_id: Option<i16>,
     state_id: Option<i16>,
     parent_team_id: Option<i32>,
@@ -173,11 +173,13 @@ impl InsertableTeamBuilder {
         self.description = Some(description);
         Ok(self)
     }
-    pub fn icon_id(
+    pub fn icon(
         mut self,
-        icon_id: font_awesome_icons::FAIcon,
+        icon: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.icon_id = Some(icon_id);
+        pgrx_validation::must_be_font_awesome_class(icon.as_ref())
+            .map_err(|e| e.rename_field(InsertableTeamAttributes::Icon))?;
+        self.icon = Some(icon);
         Ok(self)
     }
     pub fn color_id(
@@ -255,8 +257,8 @@ impl common_traits::prelude::Builder for InsertableTeamBuilder {
                     InsertableTeamAttributes::Description,
                 ),
             )?,
-            icon_id: self.icon_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableTeamAttributes::IconId,
+            icon: self.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableTeamAttributes::Icon,
             ))?,
             color_id: self.color_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -299,7 +301,7 @@ impl TryFrom<InsertableTeam> for InsertableTeamBuilder {
             .id(insertable_variant.id)?
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
-            .icon_id(insertable_variant.icon_id)?
+            .icon(insertable_variant.icon)?
             .color_id(insertable_variant.color_id)?
             .state_id(insertable_variant.state_id)?
             .parent_team_id(insertable_variant.parent_team_id)?

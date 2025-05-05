@@ -4,21 +4,6 @@ impl From<crate::codegen::structs_codegen::tables::fractioning_step_models::Frac
     fn from(
         value: crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
     ) -> Self {
-        Self::from(std::rc::Rc::new(value))
-    }
-}
-impl
-    From<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-        >,
-    > for super::Rows
-{
-    fn from(
-        value: std::rc::Rc<
-            crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-        >,
-    ) -> Self {
         Self::from(vec![value])
     }
 }
@@ -32,76 +17,12 @@ impl
             crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
         >,
     ) -> Self {
-        Self::from(value.into_iter().map(std::rc::Rc::new).collect::<Vec<_>>())
-    }
-}
-impl From<
-    Vec<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-        >,
-    >,
-> for super::Rows {
-    fn from(
-        value: Vec<
-            std::rc::Rc<
-                crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-            >,
-        >,
-    ) -> Self {
-        Self::from(std::rc::Rc::new(value))
-    }
-}
-impl From<
-    std::rc::Rc<
-        Vec<
-            crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-        >,
-    >,
-> for super::Rows {
-    fn from(
-        value: std::rc::Rc<
-            Vec<
-                crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-            >,
-        >,
-    ) -> Self {
-        Self::from(
-            std::rc::Rc::new(
-                value.iter().cloned().map(std::rc::Rc::new).collect::<Vec<_>>(),
-            ),
-        )
-    }
-}
-impl From<
-    std::rc::Rc<
-        Vec<
-            std::rc::Rc<
-                crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-            >,
-        >,
-    >,
-> for super::Rows {
-    fn from(
-        value: std::rc::Rc<
-            Vec<
-                std::rc::Rc<
-                    crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-                >,
-            >,
-        >,
-    ) -> Self {
         super::Rows::FractioningStepModel(value)
     }
 }
 impl TryFrom<super::Rows>
-for std::rc::Rc<
-    Vec<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-        >,
-    >,
-> {
+    for Vec<crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel>
+{
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

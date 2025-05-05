@@ -67,7 +67,7 @@ impl Codegen<'_> {
                     let foreign_table_struct_type = foreign_table.import_struct_path()?;
 
                     Ok(quote::quote! {
-                        pub #getter_ident: Option<std::rc::Rc<#foreign_table_struct_type>>
+                        pub #getter_ident: Option<#foreign_table_struct_type>
                     })
                 })
                 .collect::<Result<Vec<_>, WebCodeGenError>>()?;

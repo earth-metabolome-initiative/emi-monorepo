@@ -4,28 +4,11 @@ impl From<crate::codegen::structs_codegen::tables::aliquoting_step_models::Aliqu
     fn from(
         value: crate::codegen::structs_codegen::tables::aliquoting_step_models::AliquotingStepModel,
     ) -> Self {
-        super::Row::AliquotingStepModel(std::rc::Rc::from(value))
-    }
-}
-impl
-    From<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::aliquoting_step_models::AliquotingStepModel,
-        >,
-    > for super::Row
-{
-    fn from(
-        value: std::rc::Rc<
-            crate::codegen::structs_codegen::tables::aliquoting_step_models::AliquotingStepModel,
-        >,
-    ) -> Self {
-        super::Row::AliquotingStepModel(std::rc::Rc::from(value))
+        super::Row::AliquotingStepModel(value)
     }
 }
 impl TryFrom<super::Row>
-    for std::rc::Rc<
-        crate::codegen::structs_codegen::tables::aliquoting_step_models::AliquotingStepModel,
-    >
+    for crate::codegen::structs_codegen::tables::aliquoting_step_models::AliquotingStepModel
 {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {

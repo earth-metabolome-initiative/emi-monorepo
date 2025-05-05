@@ -34,7 +34,7 @@ pub struct InsertableNameplateCategory {
     name: String,
     permanence_category_id: i16,
     description: String,
-    icon: font_awesome_icons::FAIcon,
+    icon: String,
     color_id: i16,
 }
 impl InsertableNameplateCategory {
@@ -78,7 +78,7 @@ pub struct InsertableNameplateCategoryBuilder {
     name: Option<String>,
     permanence_category_id: Option<i16>,
     description: Option<String>,
-    icon: Option<font_awesome_icons::FAIcon>,
+    icon: Option<String>,
     color_id: Option<i16>,
 }
 impl InsertableNameplateCategoryBuilder {
@@ -105,7 +105,7 @@ impl InsertableNameplateCategoryBuilder {
     }
     pub fn icon(
         mut self,
-        icon: font_awesome_icons::FAIcon,
+        icon: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         self.icon = Some(icon);
         Ok(self)

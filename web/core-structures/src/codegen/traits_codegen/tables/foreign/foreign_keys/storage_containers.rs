@@ -1,10 +1,9 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StorageContainerForeignKeys {
-    pub container_model: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
-    >,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub container_model:
+        Option<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::storage_containers::StorageContainer

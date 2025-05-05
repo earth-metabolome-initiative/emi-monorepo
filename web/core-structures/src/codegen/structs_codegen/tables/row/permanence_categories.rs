@@ -4,28 +4,11 @@ impl From<crate::codegen::structs_codegen::tables::permanence_categories::Perman
     fn from(
         value: crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
     ) -> Self {
-        super::Row::PermanenceCategory(std::rc::Rc::from(value))
-    }
-}
-impl
-    From<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
-        >,
-    > for super::Row
-{
-    fn from(
-        value: std::rc::Rc<
-            crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
-        >,
-    ) -> Self {
-        super::Row::PermanenceCategory(std::rc::Rc::from(value))
+        super::Row::PermanenceCategory(value)
     }
 }
 impl TryFrom<super::Row>
-    for std::rc::Rc<
-        crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
-    >
+    for crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory
 {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {

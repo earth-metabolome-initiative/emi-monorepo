@@ -3,7 +3,7 @@
 
 use core_structures::tables::{row::Row, rows::Rows};
 use web_common_traits::crud::{CrudPrimaryKeyOperation, CrudTableOperation};
-use ws_messages::{B2FMessage, F2BMessage, frontend::Unsubscribe};
+use ws_messages::{B2FMessage, DBMessage, F2BMessage, Subscription};
 
 use crate::workers::dbws_worker::C2DBMessage;
 
@@ -21,6 +21,12 @@ pub enum WSInternalMessage {
 impl From<B2FMessage> for WSInternalMessage {
     fn from(value: B2FMessage) -> Self {
         Self::B2F(value)
+    }
+}
+
+impl From<DBMessage> for WSInternalMessage {
+    fn from(value: DBMessage) -> Self {
+        Self::B2F(value.into())
     }
 }
 
@@ -42,8 +48,8 @@ impl From<CrudTableOperation<Rows>> for WSInternalMessage {
     }
 }
 
-impl From<Unsubscribe> for WSInternalMessage {
-    fn from(value: Unsubscribe) -> Self {
+impl From<Subscription> for WSInternalMessage {
+    fn from(value: Subscription) -> Self {
         Self::F2B(value.into())
     }
 }

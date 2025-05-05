@@ -43,6 +43,7 @@ impl Table {
     /// * If the number of columns exceeds 128.
     pub async fn to_syn(
         &self,
+        enable_yew: bool,
         conn: &mut AsyncPgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
         if self.columns(conn).await?.len() > 128 {
@@ -64,7 +65,7 @@ impl Table {
                 pub #column_attribute: #column_type
             });
         }
-        let diesel_derives_decorator = self.diesel_derives_decorator(conn).await?;
+        let mut diesel_derives_decorator = self.diesel_derives_decorator(conn).await?;
         let primary_key_decorator = self.primary_key_decorator(conn).await?;
         let mut default_derives = vec![quote!(Debug), quote!(Clone), quote!(PartialEq)];
         if self.supports_copy(conn).await? {
@@ -83,10 +84,15 @@ impl Table {
 
         let identifiable_impl = self.identifiable_impl(conn).await?;
 
+        if enable_yew {
+            diesel_derives_decorator.extend(quote! {
+                #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+            });
+        }
+
         Ok(quote! {
             #[derive(#(#default_derives),*)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-            #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
             #diesel_derives_decorator
             #primary_key_decorator
             #[diesel(table_name = #table_path)]

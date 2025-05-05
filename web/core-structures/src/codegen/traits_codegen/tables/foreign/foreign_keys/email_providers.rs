@@ -1,10 +1,9 @@
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EmailProviderForeignKeys {
-    pub email: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::user_emails::UserEmail>>,
-    pub login_provider: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::login_providers::LoginProvider>,
-    >,
+    pub email: Option<crate::codegen::structs_codegen::tables::user_emails::UserEmail>,
+    pub login_provider:
+        Option<crate::codegen::structs_codegen::tables::login_providers::LoginProvider>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::email_providers::EmailProvider

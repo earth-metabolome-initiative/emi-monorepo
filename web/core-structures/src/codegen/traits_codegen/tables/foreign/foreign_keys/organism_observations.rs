@@ -1,15 +1,12 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OrganismObservationForeignKeys {
-    pub project: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::projects::Project>>,
-    pub organism: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::organisms::Organism>>,
-    pub subject: Option<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
-        >,
-    >,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
-    pub updated_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub project: Option<crate::codegen::structs_codegen::tables::projects::Project>,
+    pub organism: Option<crate::codegen::structs_codegen::tables::organisms::Organism>,
+    pub subject:
+        Option<crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::organism_observations::OrganismObservation
@@ -54,26 +51,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::ObservationSubject(observation_subjects),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if observation_subjects.id == self.subject_id {
-                    foreign_keys.subject = Some(observation_subjects);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ObservationSubject(observation_subjects),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if observation_subjects.id == self.subject_id {
-                    foreign_keys.subject = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::Project(projects),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -110,6 +87,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if organisms.id == self.organism_id {
                     foreign_keys.organism = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ObservationSubject(observation_subjects),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if observation_subjects.id == self.subject_id {
+                    foreign_keys.subject = Some(observation_subjects);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ObservationSubject(observation_subjects),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if observation_subjects.id == self.subject_id {
+                    foreign_keys.subject = None;
                     updated = true;
                 }
             }

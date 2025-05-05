@@ -27,14 +27,14 @@ impl core::fmt::Display for InsertableContainerCategoryAttributes {
 pub struct InsertableContainerCategory {
     name: String,
     description: String,
-    icon: font_awesome_icons::FAIcon,
+    icon: String,
 }
 impl InsertableContainerCategory {}
 #[derive(Default)]
 pub struct InsertableContainerCategoryBuilder {
     name: Option<String>,
     description: Option<String>,
-    icon: Option<font_awesome_icons::FAIcon>,
+    icon: Option<String>,
 }
 impl InsertableContainerCategoryBuilder {
     pub fn name(
@@ -53,7 +53,7 @@ impl InsertableContainerCategoryBuilder {
     }
     pub fn icon(
         mut self,
-        icon: font_awesome_icons::FAIcon,
+        icon: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         self.icon = Some(icon);
         Ok(self)

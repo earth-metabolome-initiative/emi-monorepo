@@ -4,6 +4,7 @@ use std::rc::Rc;
 
 use core_structures::tables::{row::Row, rows::Rows};
 use web_common_traits::crud::{CrudPrimaryKeyOperation, CrudTableOperation};
+use ws_messages::DBMessage;
 use yew::{Callback, Component, Context, Properties};
 use yew_agent::{prelude::WorkerBridgeHandle, scope_ext::AgentScopeExt, worker::Worker};
 use yewdux::Dispatch;
@@ -11,10 +12,7 @@ use yewdux::Dispatch;
 use super::dispatcher::DispatchableProperties;
 use crate::{
     stores::app_state::AppState,
-    workers::{
-        DBWSWorker,
-        dbws_worker::{ComponentMessage, DB2CMessage},
-    },
+    workers::{DBWSWorker, dbws_worker::ComponentMessage},
 };
 
 #[derive(Properties, PartialEq)]
@@ -43,7 +41,7 @@ where
     /// The application state connector.
     pub dispatch: Dispatch<AppState>,
     /// The component row type.
-    pub row: Rc<Row>,
+    pub row: Row,
 }
 
 impl DispatchableProperties for ConnectorProps {
@@ -83,7 +81,7 @@ where
     Row: PartialEq,
 {
     fn as_ref(&self) -> &Row {
-        self.row.as_ref()
+        &self.row
     }
 }
 
@@ -98,7 +96,7 @@ pub enum ConnectorMessage {
     /// When the application state changes.
     State(Rc<AppState>),
     /// When the WebSocket worker sends a message.
-    Worker(DB2CMessage),
+    Worker(DBMessage),
     /// When the component sends a message to the worker.
     Component(ComponentMessage),
 }

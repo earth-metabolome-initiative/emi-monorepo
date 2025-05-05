@@ -1,9 +1,8 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UserOrganizationForeignKeys {
-    pub user: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
-    pub organization:
-        Option<std::rc::Rc<crate::codegen::structs_codegen::tables::organizations::Organization>>,
+    pub user: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub organization: Option<crate::codegen::structs_codegen::tables::organizations::Organization>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::user_organizations::UserOrganization
@@ -35,26 +34,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if users.id == self.user_id {
-                    foreign_keys.user = Some(users);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if users.id == self.user_id {
-                    foreign_keys.user = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::Organization(organizations),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -71,6 +50,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if organizations.id == self.organization_id {
                     foreign_keys.organization = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if users.id == self.user_id {
+                    foreign_keys.user = Some(users);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if users.id == self.user_id {
+                    foreign_keys.user = None;
                     updated = true;
                 }
             }

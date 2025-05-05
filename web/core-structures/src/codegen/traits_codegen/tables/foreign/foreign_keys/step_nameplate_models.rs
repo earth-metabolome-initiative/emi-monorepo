@@ -1,11 +1,10 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StepNameplateModelForeignKeys {
-    pub step: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::steps::Step>>,
-    pub nameplate_model: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::nameplate_models::NameplateModel>,
-    >,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub step: Option<crate::codegen::structs_codegen::tables::steps::Step>,
+    pub nameplate_model:
+        Option<crate::codegen::structs_codegen::tables::nameplate_models::NameplateModel>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::step_nameplate_models::StepNameplateModel
@@ -41,6 +40,26 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if users.id == self.created_by {
+                    foreign_keys.created_by = Some(users);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if users.id == self.created_by {
+                    foreign_keys.created_by = None;
+                    updated = true;
+                }
+            }
             (
                 crate::codegen::tables::row::Row::Step(steps),
                 web_common_traits::crud::CRUD::Read
@@ -78,26 +97,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if nameplate_models.id == self.nameplate_model_id {
                     foreign_keys.nameplate_model = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = Some(users);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = None;
                     updated = true;
                 }
             }

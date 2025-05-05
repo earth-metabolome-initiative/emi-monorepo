@@ -35,8 +35,8 @@ where
         for<'a> LoadQuery<'a, SqliteConnection, T>,
 {
     fn bounded_read(
-        offset: u64,
-        limit: u64,
+        offset: u16,
+        limit: u16,
         conn: &mut SqliteConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         RunQueryDsl::load(

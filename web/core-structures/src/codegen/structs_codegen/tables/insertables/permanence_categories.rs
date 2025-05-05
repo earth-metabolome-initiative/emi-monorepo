@@ -29,7 +29,7 @@ impl core::fmt::Display for InsertablePermanenceCategoryAttributes {
 pub struct InsertablePermanenceCategory {
     name: String,
     description: String,
-    icon: font_awesome_icons::FAIcon,
+    icon: String,
     color_id: i16,
 }
 impl InsertablePermanenceCategory {
@@ -52,7 +52,7 @@ impl InsertablePermanenceCategory {
 pub struct InsertablePermanenceCategoryBuilder {
     name: Option<String>,
     description: Option<String>,
-    icon: Option<font_awesome_icons::FAIcon>,
+    icon: Option<String>,
     color_id: Option<i16>,
 }
 impl InsertablePermanenceCategoryBuilder {
@@ -72,7 +72,7 @@ impl InsertablePermanenceCategoryBuilder {
     }
     pub fn icon(
         mut self,
-        icon: font_awesome_icons::FAIcon,
+        icon: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         self.icon = Some(icon);
         Ok(self)

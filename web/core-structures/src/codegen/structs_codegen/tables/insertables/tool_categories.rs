@@ -25,14 +25,14 @@ impl core::fmt::Display for InsertableToolCategoryAttributes {
 pub struct InsertableToolCategory {
     name: String,
     description: String,
-    icon: font_awesome_icons::FAIcon,
+    icon: String,
 }
 impl InsertableToolCategory {}
 #[derive(Default)]
 pub struct InsertableToolCategoryBuilder {
     name: Option<String>,
     description: Option<String>,
-    icon: Option<font_awesome_icons::FAIcon>,
+    icon: Option<String>,
 }
 impl InsertableToolCategoryBuilder {
     pub fn name(
@@ -51,7 +51,7 @@ impl InsertableToolCategoryBuilder {
     }
     pub fn icon(
         mut self,
-        icon: font_awesome_icons::FAIcon,
+        icon: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         self.icon = Some(icon);
         Ok(self)

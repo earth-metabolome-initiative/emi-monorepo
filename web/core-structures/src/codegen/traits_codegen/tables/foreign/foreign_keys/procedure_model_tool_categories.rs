@@ -1,13 +1,12 @@
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProcedureModelToolCategoryForeignKeys {
-    pub procedure_model: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
-    >,
+    pub procedure_model:
+        Option<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
     pub tool_category:
-        Option<std::rc::Rc<crate::codegen::structs_codegen::tables::tool_categories::ToolCategory>>,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
-    pub updated_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+        Option<crate::codegen::structs_codegen::tables::tool_categories::ToolCategory>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
 for crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory {
@@ -83,26 +82,6 @@ for crate::codegen::structs_codegen::tables::procedure_model_tool_categories::Pr
                 }
             }
             (
-                crate::codegen::tables::row::Row::ToolCategory(tool_categories),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if tool_categories.id == self.tool_category_id {
-                    foreign_keys.tool_category = Some(tool_categories);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ToolCategory(tool_categories),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if tool_categories.id == self.tool_category_id {
-                    foreign_keys.tool_category = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -127,6 +106,26 @@ for crate::codegen::structs_codegen::tables::procedure_model_tool_categories::Pr
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ToolCategory(tool_categories),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if tool_categories.id == self.tool_category_id {
+                    foreign_keys.tool_category = Some(tool_categories);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ToolCategory(tool_categories),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if tool_categories.id == self.tool_category_id {
+                    foreign_keys.tool_category = None;
                     updated = true;
                 }
             }

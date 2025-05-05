@@ -25,7 +25,7 @@ impl core::fmt::Display for InsertableMaterialAttributes {
 pub struct InsertableMaterial {
     name: String,
     description: String,
-    icon: font_awesome_icons::FAIcon,
+    icon: String,
     color_id: i16,
 }
 impl InsertableMaterial {
@@ -48,7 +48,7 @@ impl InsertableMaterial {
 pub struct InsertableMaterialBuilder {
     name: Option<String>,
     description: Option<String>,
-    icon: Option<font_awesome_icons::FAIcon>,
+    icon: Option<String>,
     color_id: Option<i16>,
 }
 impl InsertableMaterialBuilder {
@@ -68,7 +68,7 @@ impl InsertableMaterialBuilder {
     }
     pub fn icon(
         mut self,
-        icon: font_awesome_icons::FAIcon,
+        icon: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         self.icon = Some(icon);
         Ok(self)

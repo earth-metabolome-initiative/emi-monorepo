@@ -4,21 +4,6 @@ impl From<crate::codegen::structs_codegen::tables::observation_subjects::Observa
     fn from(
         value: crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
     ) -> Self {
-        Self::from(std::rc::Rc::new(value))
-    }
-}
-impl
-    From<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
-        >,
-    > for super::Rows
-{
-    fn from(
-        value: std::rc::Rc<
-            crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
-        >,
-    ) -> Self {
         Self::from(vec![value])
     }
 }
@@ -30,74 +15,11 @@ impl From<Vec<crate::codegen::structs_codegen::tables::observation_subjects::Obs
             crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
         >,
     ) -> Self {
-        Self::from(value.into_iter().map(std::rc::Rc::new).collect::<Vec<_>>())
-    }
-}
-impl
-    From<
-        Vec<
-            std::rc::Rc<
-                crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
-            >,
-        >,
-    > for super::Rows
-{
-    fn from(
-        value: Vec<
-            std::rc::Rc<
-                crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
-            >,
-        >,
-    ) -> Self {
-        Self::from(std::rc::Rc::new(value))
-    }
-}
-impl
-    From<
-        std::rc::Rc<
-            Vec<crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject>,
-        >,
-    > for super::Rows
-{
-    fn from(
-        value: std::rc::Rc<
-            Vec<crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject>,
-        >,
-    ) -> Self {
-        Self::from(std::rc::Rc::new(
-            value.iter().cloned().map(std::rc::Rc::new).collect::<Vec<_>>(),
-        ))
-    }
-}
-impl From<
-    std::rc::Rc<
-        Vec<
-            std::rc::Rc<
-                crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
-            >,
-        >,
-    >,
-> for super::Rows {
-    fn from(
-        value: std::rc::Rc<
-            Vec<
-                std::rc::Rc<
-                    crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
-                >,
-            >,
-        >,
-    ) -> Self {
         super::Rows::ObservationSubject(value)
     }
 }
 impl TryFrom<super::Rows>
-    for std::rc::Rc<
-        Vec<
-            std::rc::Rc<
-                crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
-            >,
-        >,
-    >
+    for Vec<crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject>
 {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {

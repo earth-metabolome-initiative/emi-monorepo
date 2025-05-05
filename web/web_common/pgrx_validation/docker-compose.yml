@@ -2,7 +2,7 @@ services:
   pgrx_builder:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ../../../shared_docker_files/Dockerfile
       args:
         HOST_UID: ${USER_ID}
         HOST_GID: ${GROUP_ID}

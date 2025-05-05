@@ -2,19 +2,13 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StepModelInstrumentForeignKeys {
     pub id: Option<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_model_instrument_models::StepModelInstrumentModel,
-        >,
+        crate::codegen::structs_codegen::tables::step_model_instrument_models::StepModelInstrumentModel,
     >,
     pub instrument: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::instruments::Instrument>,
+        crate::codegen::structs_codegen::tables::instruments::Instrument,
     >,
-    pub created_by: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>,
-    >,
-    pub updated_by: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>,
-    >,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::step_model_instruments::StepModelInstrument
@@ -57,22 +51,26 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Instrument(instruments),
+                crate::codegen::tables::row::Row::StepModelInstrumentModel(
+                    step_model_instrument_models,
+                ),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if instruments.id == self.instrument_id {
-                    foreign_keys.instrument = Some(instruments);
+                if step_model_instrument_models.id == self.id {
+                    foreign_keys.id = Some(step_model_instrument_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::Instrument(instruments),
+                crate::codegen::tables::row::Row::StepModelInstrumentModel(
+                    step_model_instrument_models,
+                ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if instruments.id == self.instrument_id {
-                    foreign_keys.instrument = None;
+                if step_model_instrument_models.id == self.id {
+                    foreign_keys.id = None;
                     updated = true;
                 }
             }
@@ -105,26 +103,22 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::StepModelInstrumentModel(
-                    step_model_instrument_models,
-                ),
+                crate::codegen::tables::row::Row::Instrument(instruments),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if step_model_instrument_models.id == self.id {
-                    foreign_keys.id = Some(step_model_instrument_models);
+                if instruments.id == self.instrument_id {
+                    foreign_keys.instrument = Some(instruments);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::StepModelInstrumentModel(
-                    step_model_instrument_models,
-                ),
+                crate::codegen::tables::row::Row::Instrument(instruments),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if step_model_instrument_models.id == self.id {
-                    foreign_keys.id = None;
+                if instruments.id == self.instrument_id {
+                    foreign_keys.instrument = None;
                     updated = true;
                 }
             }

@@ -16,7 +16,6 @@ common-traits.workspace = true
 backend-request-errors.workspace = true
 pgrx_validation.workspace = true
 iso_codes.workspace = true
-font_awesome_icons.workspace = true
 validation-errors.workspace = true
 yew = { workspace = true, optional = true }
 
@@ -28,7 +27,6 @@ serde = [
   "rosetta-uuid/serde",
   "rosetta-timestamp/serde",
   "iso_codes/serde",
-  "font_awesome_icons/serde",
 ]
 yew = ["dep:yew"]
 postgres = [
@@ -39,8 +37,6 @@ postgres = [
   "rosetta-timestamp/postgres",
   "iso_codes/postgres",
   "iso_codes/diesel-pgrx",
-  "font_awesome_icons/postgres",
-  "font_awesome_icons/diesel-pgrx",
 ]
 sqlite = [
   "diesel/sqlite",
@@ -50,8 +46,6 @@ sqlite = [
   "rosetta-timestamp/sqlite",
   "iso_codes/sqlite",
   "iso_codes/diesel-pgrx",
-  "font_awesome_icons/sqlite",
-  "font_awesome_icons/diesel-pgrx",
 ]
 backend = ["postgres", "web_common_traits/backend"]
 frontend = ["sqlite", "yew", "web_common_traits/frontend"]

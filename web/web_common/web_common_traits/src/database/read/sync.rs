@@ -34,8 +34,8 @@ pub trait BoundedRead<C>: Sized {
     ///
     /// * Returns an error if loading the row fails.
     fn bounded_read(
-        offset: u64,
-        limit: u64,
+        offset: u16,
+        limit: u16,
         conn: &mut C,
     ) -> Result<Vec<Self>, diesel::result::Error>;
 }

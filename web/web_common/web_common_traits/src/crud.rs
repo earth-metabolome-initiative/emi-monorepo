@@ -38,6 +38,14 @@ impl Display for CRUD {
 pub trait CrudOperation: AsRef<CRUD> {
     /// The type of the expected answer payload.
     type Payload;
+
+    /// Returns whether the operation requires a subscription.
+    fn requires_subscription(&self) -> bool {
+        match self.as_ref() {
+            CRUD::Create | CRUD::Update | CRUD::Delete => true,
+            CRUD::Read => false,
+        }
+    }
 }
 
 /// Trait representing an executable CRUD operation.

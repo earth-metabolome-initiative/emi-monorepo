@@ -118,12 +118,6 @@ impl CSVSchema {
                     sql.push_str("CREATE EXTENSION IF NOT EXISTS \"iso_codes\";\n");
                 }
             }
-            #[cfg(feature = "font_awesome_icons")]
-            {
-                if self.has_column_type(DataType::FAIcon) {
-                    sql.push_str("CREATE EXTENSION IF NOT EXISTS \"font_awesome_icons\";\n");
-                }
-            }
         }
 
         for table in self.tables_with_priority().iter().map(|(table, _)| table) {

@@ -22,8 +22,6 @@ pub enum DataType {
     Boolean,
     #[cfg(feature = "iso_codes")]
     CountryCode,
-    #[cfg(feature = "font_awesome_icons")]
-    FAIcon,
 }
 
 impl DataType {
@@ -40,8 +38,25 @@ impl DataType {
             DataType::Boolean => 1,
             #[cfg(feature = "iso_codes")]
             DataType::CountryCode => 2,
-            #[cfg(feature = "font_awesome_icons")]
-            DataType::FAIcon => 2,
+        }
+    }
+
+    /// Returns how specific the data type is - the lower the number, the more
+    /// specific the data type is.
+    pub fn specificity(&self) -> u64 {
+        match self {
+            #[cfg(feature = "iso_codes")]
+            DataType::CountryCode => 1,
+            DataType::Uuid => 1,
+            DataType::Boolean => 1,
+            DataType::SmallInt | DataType::SmallSerial => 2,
+            DataType::Integer | DataType::Serial => 3,
+            DataType::BigInt | DataType::BigSerial => 4,
+            DataType::Real => 5,
+            DataType::Double => 6,
+            DataType::VarChar(_) => 7,
+            DataType::Text => 8,
+            DataType::Null => 1_000,
         }
     }
 
@@ -64,14 +79,6 @@ impl DataType {
             use iso_codes::CountryCode;
             if CountryCode::try_from(value).is_ok() {
                 candidate_types.push(DataType::CountryCode);
-            }
-        }
-
-        #[cfg(feature = "font_awesome_icons")]
-        {
-            use font_awesome_icons::FAIcon;
-            if FAIcon::from_str(value).is_ok() {
-                candidate_types.push(DataType::FAIcon);
             }
         }
 
@@ -150,8 +157,6 @@ impl DataType {
             DataType::Boolean => "BOOLEAN".to_owned(),
             #[cfg(feature = "iso_codes")]
             DataType::CountryCode => "CountryCode".to_owned(),
-            #[cfg(feature = "font_awesome_icons")]
-            DataType::FAIcon => "FAIcon".to_owned(),
         }
     }
 

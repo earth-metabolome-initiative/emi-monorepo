@@ -1,6 +1,5 @@
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[derive(
     diesel::Selectable,
     diesel::Insertable,
@@ -8,13 +7,14 @@
     diesel::Queryable,
     diesel::Identifiable,
 )]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::teams::teams)]
 pub struct Team {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub icon_id: font_awesome_icons::FAIcon,
+    pub icon: String,
     pub color_id: i16,
     pub state_id: i16,
     pub parent_team_id: Option<i32>,

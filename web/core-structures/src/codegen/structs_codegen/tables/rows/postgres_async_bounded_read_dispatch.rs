@@ -5,8 +5,8 @@ impl web_common_traits::prelude::AsyncBoundedReadDispatch<diesel_async::AsyncPgC
     type TableName = crate::codegen::tables::table_names::TableName;
     async fn bounded_read(
         table_name: Self::TableName,
-        offset: u64,
-        limit: u64,
+        offset: u16,
+        limit: u16,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Self, diesel::result::Error> {
         match table_name {

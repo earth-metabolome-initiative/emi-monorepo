@@ -94,7 +94,7 @@ impl PgExtension {
     pub async fn functions(
         &self,
         conn: &mut AsyncPgConnection,
-    ) -> Result<Vec<PgProc>, WebCodeGenError> {
+    ) -> Result<Vec<PgProc>, diesel::result::Error> {
         use crate::schema::{pg_depend, pg_proc};
         pg_depend::table
             .inner_join(pg_proc::table.on(pg_depend::objid.eq(pg_proc::oid)))
@@ -102,7 +102,54 @@ impl PgExtension {
             .select(PgProc::as_select())
             .load(conn)
             .await
-            .map_err(WebCodeGenError::from)
+    }
+
+    /// Returns all [`PgType`](crate::PgType) types associated with this
+    /// extension.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub async fn types(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<crate::PgType>, diesel::result::Error> {
+        use crate::schema::{pg_depend, pg_type};
+        pg_depend::table
+            .inner_join(pg_type::table.on(pg_depend::objid.eq(pg_type::oid)))
+            .filter(pg_depend::refobjid.eq(self.oid))
+            .select(crate::PgType::as_select())
+            .load(conn)
+            .await
+    }
+
+    /// Returns all [`PgEnum`](crate::PgEnum) enums associated with this
+    /// extension.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub async fn enums(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<Vec<crate::PgEnum>, diesel::result::Error> {
+        use crate::schema::{pg_depend, pg_enum, pg_type};
+
+        pg_enum::table
+            .inner_join(pg_type::table.on(pg_enum::enumtypid.eq(pg_type::oid)))
+            .inner_join(pg_depend::table.on(pg_depend::objid.eq(pg_type::oid)))
+            .filter(pg_depend::refobjid.eq(self.oid))
+            .select(crate::PgEnum::as_select())
+            .load(conn)
+            .await
     }
 
     #[must_use]

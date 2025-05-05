@@ -30,6 +30,8 @@ pub enum SingleFieldError<FieldName = ()> {
     EmptyText(FieldName),
     /// The provided mail address is invalid.
     InvalidMail(FieldName),
+    /// The provided text is not a valid font awesome class.
+    InvalidFontAwesomeClass(FieldName),
     /// The float is not strictly positive (0.0, ...]
     UnexpectedNegativeOrZeroValue(FieldName),
     /// The float is not strictly greater than the expected amount.
@@ -44,6 +46,9 @@ impl SingleFieldError {
         match self {
             SingleFieldError::EmptyText(_) => SingleFieldError::EmptyText(field_name),
             SingleFieldError::InvalidMail(_) => SingleFieldError::InvalidMail(field_name),
+            SingleFieldError::InvalidFontAwesomeClass(_) => {
+                SingleFieldError::InvalidFontAwesomeClass(field_name)
+            }
             SingleFieldError::UnexpectedNegativeOrZeroValue(_) => {
                 SingleFieldError::UnexpectedNegativeOrZeroValue(field_name)
             }
@@ -75,6 +80,7 @@ impl SingleFieldError {
                 DoubleFieldError::MustBeGreaterThan(left, right)
             }
             SingleFieldError::EmptyText(_)
+            | SingleFieldError::InvalidFontAwesomeClass(_)
             | SingleFieldError::InvalidMail(_)
             | SingleFieldError::UnexpectedNegativeOrZeroValue(_) => {
                 unimplemented!("Cannot convert the variant error into a double field error.")
@@ -115,6 +121,12 @@ impl<A: core::fmt::Display> core::fmt::Display for SingleFieldError<A> {
                 write!(
                     f,
                     "The {field_name} field contains an invalid email address. Please check and try again."
+                )
+            }
+            SingleFieldError::InvalidFontAwesomeClass(field_name) => {
+                write!(
+                    f,
+                    "The {field_name} field contains an invalid Font Awesome class. Please check and try again."
                 )
             }
             SingleFieldError::UnexpectedNegativeOrZeroValue(field_name) => {

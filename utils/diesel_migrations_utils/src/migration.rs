@@ -35,19 +35,20 @@ impl<'a> TryFrom<&'a Path> for Migration {
     fn try_from(path: &'a Path) -> Result<Self, Self::Error> {
         // We get the name of the migration.
         let name =
-            path.file_name().ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
-        let name =
-            name.to_str().ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
+            path.file_name().ok_or(Error::InvalidMigration(None, None, path.to_path_buf()))?;
+        let name = name.to_str().ok_or(Error::InvalidMigration(None, None, path.to_path_buf()))?;
         let mut fragmented_name = name.split('_');
-        let unparsed_number = fragmented_name
-            .next()
-            .ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
+        let unparsed_number = fragmented_name.next().ok_or(Error::InvalidMigration(
+            None,
+            None,
+            path.to_path_buf(),
+        ))?;
 
         let number_of_digits = unparsed_number.len();
 
         let number = unparsed_number
             .parse::<u64>()
-            .map_err(|_| Error::InvalidMigration(path.to_string_lossy().to_string()))?;
+            .map_err(|_| Error::InvalidMigration(None, None, path.to_path_buf()))?;
 
         let name = fragmented_name.collect::<Vec<&str>>().join("_");
 
@@ -62,7 +63,13 @@ impl<'a> TryFrom<&'a Path> for Migration {
         }
 
         // We check whether the syntax of the `up.sql` document is correct.
-        let up = std::fs::read_to_string(up)?;
+        let up = std::fs::read_to_string(up).map_err(|_| {
+            Error::InvalidMigration(
+                Some(number),
+                Some(crate::prelude::MigrationKind::Up),
+                path.to_path_buf(),
+            )
+        })?;
         if let Err(up_error) = sqlparser::parser::Parser::parse_sql(
             &sqlparser::dialect::PostgreSqlDialect {},
             up.as_str(),
@@ -73,7 +80,13 @@ impl<'a> TryFrom<&'a Path> for Migration {
                 up_error.to_string(),
             ));
         }
-        let down = std::fs::read_to_string(down)?;
+        let down = std::fs::read_to_string(down).map_err(|_| {
+            Error::InvalidMigration(
+                Some(number),
+                Some(crate::prelude::MigrationKind::Down),
+                path.to_path_buf(),
+            )
+        })?;
         if let Err(down_error) = sqlparser::parser::Parser::parse_sql(
             &sqlparser::dialect::PostgreSqlDialect {},
             down.as_str(),

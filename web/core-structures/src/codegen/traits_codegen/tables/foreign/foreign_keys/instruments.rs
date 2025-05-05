@@ -1,14 +1,12 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InstrumentForeignKeys {
-    pub instrument_model: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel>,
-    >,
-    pub instrument_state: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::instrument_states::InstrumentState>,
-    >,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
-    pub updated_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub instrument_model:
+        Option<crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel>,
+    pub instrument_state:
+        Option<crate::codegen::structs_codegen::tables::instrument_states::InstrumentState>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::instruments::Instrument
@@ -71,6 +69,26 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
+                crate::codegen::tables::row::Row::InstrumentState(instrument_states),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if instrument_states.id == self.instrument_state_id {
+                    foreign_keys.instrument_state = Some(instrument_states);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::InstrumentState(instrument_states),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if instrument_states.id == self.instrument_state_id {
+                    foreign_keys.instrument_state = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -95,26 +113,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::InstrumentState(instrument_states),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if instrument_states.id == self.instrument_state_id {
-                    foreign_keys.instrument_state = Some(instrument_states);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::InstrumentState(instrument_states),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if instrument_states.id == self.instrument_state_id {
-                    foreign_keys.instrument_state = None;
                     updated = true;
                 }
             }

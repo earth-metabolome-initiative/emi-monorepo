@@ -17,7 +17,6 @@ sqlparser.workspace = true
 serde_json.workspace = true
 serde.workspace = true
 iso_codes = { workspace = true, optional = true }
-font_awesome_icons = { workspace = true, optional = true }
 
 [dev-dependencies]
 testcontainers.workspace = true
@@ -37,4 +36,3 @@ default = ["diesel", "diesel-async"]
 diesel = ["dep:diesel"]
 diesel-async = ["dep:diesel-async", "diesel"]
 iso_codes = ["dep:iso_codes"]
-font_awesome_icons = ["dep:font_awesome_icons"]

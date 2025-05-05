@@ -1,7 +1,7 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MaterialForeignKeys {
-    pub color: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::colors::Color>>,
+    pub color: Option<crate::codegen::structs_codegen::tables::colors::Color>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::materials::Material

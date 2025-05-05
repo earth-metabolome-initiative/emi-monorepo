@@ -505,6 +505,7 @@ allow_tables_to_appear_in_same_query!(
     pg_constraint,
     pg_depend,
     pg_proc,
+    pg_enum,
     pg_extension,
     pg_type,
     tables

@@ -1,11 +1,10 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PackagingStepModelForeignKeys {
-    pub packaging_model: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel>,
-    >,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
-    pub updated_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub packaging_model:
+        Option<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::packaging_step_models::PackagingStepModel

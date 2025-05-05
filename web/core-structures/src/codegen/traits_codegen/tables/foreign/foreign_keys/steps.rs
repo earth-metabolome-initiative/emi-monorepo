@@ -1,11 +1,9 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StepForeignKeys {
-    pub procedure:
-        Option<std::rc::Rc<crate::codegen::structs_codegen::tables::procedures::Procedure>>,
-    pub step_model:
-        Option<std::rc::Rc<crate::codegen::structs_codegen::tables::step_models::StepModel>>,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub procedure: Option<crate::codegen::structs_codegen::tables::procedures::Procedure>,
+    pub step_model: Option<crate::codegen::structs_codegen::tables::step_models::StepModel>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::steps::Step
@@ -44,26 +42,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::StepModel(step_models),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if step_models.id == self.step_model_id {
-                    foreign_keys.step_model = Some(step_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::StepModel(step_models),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if step_models.id == self.step_model_id {
-                    foreign_keys.step_model = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -100,6 +78,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if procedures.id == self.procedure_id {
                     foreign_keys.procedure = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::StepModel(step_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if step_models.id == self.step_model_id {
+                    foreign_keys.step_model = Some(step_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::StepModel(step_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if step_models.id == self.step_model_id {
+                    foreign_keys.step_model = None;
                     updated = true;
                 }
             }

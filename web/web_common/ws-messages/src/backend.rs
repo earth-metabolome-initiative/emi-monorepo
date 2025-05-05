@@ -4,26 +4,30 @@
 use core_structures::tables::{row::Row, rows::Rows};
 use web_common_traits::crud::CRUD;
 
+use crate::DBMessage;
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 /// Websocket messages from the backend to the frontend.
 pub enum B2FMessage {
-    /// Health check message reply.
-    Pong,
-    /// A a reply to a request involving several rows.
-    Rows(Rows, CRUD),
-    /// A row-wise operation result.
-    Row(Row, CRUD),
+    /// A reply to a request involving the DB.
+    DB(DBMessage),
 }
 
 impl From<(Rows, CRUD)> for B2FMessage {
     fn from(msg: (Rows, CRUD)) -> Self {
-        B2FMessage::Rows(msg.0, msg.1)
+        B2FMessage::DB(msg.into())
     }
 }
 
 impl From<(Row, CRUD)> for B2FMessage {
     fn from(msg: (Row, CRUD)) -> Self {
-        B2FMessage::Row(msg.0, msg.1)
+        B2FMessage::DB(msg.into())
+    }
+}
+
+impl From<DBMessage> for B2FMessage {
+    fn from(msg: DBMessage) -> Self {
+        B2FMessage::DB(msg)
     }
 }
 
@@ -46,5 +50,14 @@ impl TryFrom<gloo::net::websocket::Message> for B2FMessage {
                 Ok(message)
             }
         }
+    }
+}
+
+#[cfg(feature = "backend")]
+impl From<B2FMessage> for actix_web::web::Bytes {
+    fn from(message: B2FMessage) -> Self {
+        actix_web::web::Bytes::from(
+            bincode::serde::encode_to_vec(&message, bincode::config::standard()).unwrap(),
+        )
     }
 }

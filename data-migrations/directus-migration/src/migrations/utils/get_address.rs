@@ -18,49 +18,48 @@ pub(crate) async fn get_address(
         .await?
         .ok_or_else(|| crate::error::Error::UnknownCountry(directus_address.country.clone()))?;
 
-    let city = if let Some(city) =
-        PortalCity::from_code(&directus_address.city_code, portal_conn).await?
-    {
-        city
-    } else {
-        // We need to insert the city
-        PortalCity::new()
-            .name(directus_address.city.clone())?
-            .code(directus_address.city_code.clone())?
-            .iso(country.iso.clone())?
-            .build()?
-            .backend_insert(portal_conn)
-            .await?
-    };
+    todo!("Find a way to get the city from the Directus address");
+    // let city = if let Some(city) =
+    //     PortalCity::from_code(&directus_address.city_code,
+    // portal_conn).await? {
+    //     city
+    // } else {
+    //     // We need to insert the city
+    //     PortalCity::new()
+    //         .name(directus_address.city.clone())?
+    //         .iso(country.iso.clone())?
+    //         .build()?
+    //         .backend_insert(portal_conn)
+    //         .await?
+    // };
 
-    if let Some(address) = PortalAddress::from_iso_and_city_code_and_street_name_and_street_number(
-        &country.iso,
-        &city.code,
-        &directus_address.street,
-        &directus_address.street_number,
-        portal_conn,
-    )
-    .await?
-    {
-        Ok(address)
-    } else {
-        // Otherwise we need to insert the address
-        Ok(PortalAddress::new()
-            .iso(country.iso.clone())?
-            .city_code(directus_address.city_code.clone())?
-            .street_name(directus_address.street.clone())?
-            .street_number(directus_address.street_number.clone())?
-            .postal_code(directus_address.postal_code.clone())?
-            .geolocation(match directus_address.geolocation.clone() {
-                postgis_diesel::types::GeometryContainer::Point(geolocation) => geolocation,
-                _ => {
-                    return Err(crate::error::Error::InvalidGeolocation(
-                        directus_address.geolocation.clone(),
-                    ));
-                }
-            })?
-            .build()?
-            .backend_insert(portal_conn)
-            .await?)
-    }
+    // if let Some(address) =
+    // PortalAddress::from_city_id_and_street_name_and_street_number(
+    //     &city.id,
+    //     &directus_address.street,
+    //     &directus_address.street_number,
+    //     portal_conn,
+    // )
+    // .await?
+    // {
+    //     Ok(address)
+    // } else {
+    //     // Otherwise we need to insert the address
+    //     Ok(PortalAddress::new()
+    //         .city_id(city.id)?
+    //         .street_name(directus_address.street.clone())?
+    //         .street_number(directus_address.street_number.clone())?
+    //         .postal_code(directus_address.postal_code.clone())?
+    //         .geolocation(match directus_address.geolocation.clone() {
+    //             postgis_diesel::types::GeometryContainer::Point(geolocation)
+    // => geolocation,             _ => {
+    //                 return Err(crate::error::Error::InvalidGeolocation(
+    //                     directus_address.geolocation.clone(),
+    //                 ));
+    //             }
+    //         })?
+    //         .build()?
+    //         .backend_insert(portal_conn)
+    //         .await?)
+    // }
 }

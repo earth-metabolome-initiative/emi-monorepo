@@ -23,7 +23,6 @@ ws-messages.workspace = true
 common-traits.workspace = true
 log.workspace = true
 futures.workspace = true
-font_awesome_icons = {workspace = true, features = ["sqlite"]}
 sqlite-migration-generator.workspace = true
 sqlite-wasm-rs = { version = "0.3.4", default-features = false, features = [
   "precompiled",
@@ -43,11 +42,11 @@ gloo.workspace = true
 wasm-bindgen = "0.2.100"
 rosetta-uuid.workspace = true
 wasm-bindgen-futures.workspace = true
-yew = { version = "0.21.0", features = ["csr"] }
-yew-router = "0.18.0"
-# The doc-tests feature is required to avoid errors from the Rust Analyzer,
-# but it is not actually used in the code.
-yewdux = "0.11.0"
+yew.workspace = true
+yew-router.workspace = true
+yewdux.workspace = true
+# yew-hooks.workspace = true
+yew-agent.workspace = true
 gloo-console = "0.3.0"
 wasm-logger = "0.2.0"
 js-sys = "0.3.77"
@@ -59,10 +58,8 @@ base64 = "0.22.1"
 rxing = { version = "0.7", features = [
   "wasm_support",
 ], default-features = false }
-yew-hooks = "0.3.3"
 postcard = "1.1.1"
 serde-wasm-bindgen = "0.6.5"
-yew-agent = "0.3.0"
 rustfft.workspace = true
 strsim = "0.11.1"
 

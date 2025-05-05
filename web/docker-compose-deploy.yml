@@ -51,6 +51,7 @@ services:
       args:
         ACTIX_PORT: ${ACTIX_PORT}
     environment:
+      POSTGRES_DB: ${POSTGRES_DB}
       DOCKER_DATABASE_URL: ${DOCKER_DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
       RUST_BACKTRACE: ${RUST_BACKTRACE}

@@ -4,28 +4,11 @@ impl From<crate::codegen::structs_codegen::tables::project_workflow_models::Proj
     fn from(
         value: crate::codegen::structs_codegen::tables::project_workflow_models::ProjectWorkflowModel,
     ) -> Self {
-        super::Row::ProjectWorkflowModel(std::rc::Rc::from(value))
-    }
-}
-impl
-    From<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::project_workflow_models::ProjectWorkflowModel,
-        >,
-    > for super::Row
-{
-    fn from(
-        value: std::rc::Rc<
-            crate::codegen::structs_codegen::tables::project_workflow_models::ProjectWorkflowModel,
-        >,
-    ) -> Self {
-        super::Row::ProjectWorkflowModel(std::rc::Rc::from(value))
+        super::Row::ProjectWorkflowModel(value)
     }
 }
 impl TryFrom<super::Row>
-    for std::rc::Rc<
-        crate::codegen::structs_codegen::tables::project_workflow_models::ProjectWorkflowModel,
-    >
+    for crate::codegen::structs_codegen::tables::project_workflow_models::ProjectWorkflowModel
 {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {

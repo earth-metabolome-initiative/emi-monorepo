@@ -5,6 +5,8 @@
 
 use pgrx_validation_derive::validation;
 use validator::ValidateEmail;
+mod font_awesome_icons;
+pub use font_awesome_icons::must_be_font_awesome_class;
 
 pub const EXTENSION_NAME: &str = "pgrx_validation";
 

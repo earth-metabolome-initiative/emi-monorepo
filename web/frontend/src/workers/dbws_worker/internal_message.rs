@@ -3,8 +3,7 @@
 
 use futures::channel::mpsc::TrySendError;
 use gloo::net::websocket::WebSocketError;
-use sqlite_wasm_rs::export::{OpfsSAHError, OpfsSAHPoolUtil};
-use ws_messages::{B2FMessage, F2BMessage, frontend::Unsubscribe};
+use ws_messages::{B2FMessage, DBMessage, F2BMessage, frontend::Subscription};
 
 use crate::errors::{db_errors::DBError, ws_errors::WSError};
 
@@ -23,8 +22,15 @@ pub enum InternalMessage {
     WSError(WSError),
 }
 
-impl From<Result<OpfsSAHPoolUtil, OpfsSAHError>> for InternalMessage {
-    fn from(value: Result<OpfsSAHPoolUtil, OpfsSAHError>) -> Self {
+impl From<Result<sqlite_wasm_rs::export::OpfsSAHPoolUtil, sqlite_wasm_rs::export::OpfsSAHError>>
+    for InternalMessage
+{
+    fn from(
+        value: Result<
+            sqlite_wasm_rs::export::OpfsSAHPoolUtil,
+            sqlite_wasm_rs::export::OpfsSAHError,
+        >,
+    ) -> Self {
         match value {
             Ok(_) => Self::DB(db_internal_message::DBInternalMessage::Connect),
             Err(err) => Self::DBError(err.into()),
@@ -62,6 +68,12 @@ impl From<WSError> for InternalMessage {
     }
 }
 
+impl From<DBMessage> for InternalMessage {
+    fn from(value: DBMessage) -> Self {
+        Self::WS(value.into())
+    }
+}
+
 impl From<WebSocketError> for InternalMessage {
     fn from(value: WebSocketError) -> Self {
         Self::WSError(value.into())
@@ -92,8 +104,8 @@ impl From<F2BMessage> for InternalMessage {
     }
 }
 
-impl From<Unsubscribe> for InternalMessage {
-    fn from(value: Unsubscribe) -> Self {
+impl From<Subscription> for InternalMessage {
+    fn from(value: Subscription) -> Self {
         Self::WS(value.into())
     }
 }

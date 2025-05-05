@@ -98,370 +98,208 @@ mod weighing_steps;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Row {
-    Address(std::rc::Rc<crate::codegen::structs_codegen::tables::addresses::Address>),
+    Address(crate::codegen::structs_codegen::tables::addresses::Address),
     AliquotingInstrumentModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::aliquoting_instrument_models::AliquotingInstrumentModel,
-        >,
+        crate::codegen::structs_codegen::tables::aliquoting_instrument_models::AliquotingInstrumentModel,
     ),
     AliquotingStepModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::aliquoting_step_models::AliquotingStepModel,
-        >,
+        crate::codegen::structs_codegen::tables::aliquoting_step_models::AliquotingStepModel,
     ),
     AliquotingStep(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::aliquoting_steps::AliquotingStep,
-        >,
+        crate::codegen::structs_codegen::tables::aliquoting_steps::AliquotingStep,
     ),
-    BrandState(
-        std::rc::Rc<crate::codegen::structs_codegen::tables::brand_states::BrandState>,
-    ),
-    Brand(std::rc::Rc<crate::codegen::structs_codegen::tables::brands::Brand>),
-    City(std::rc::Rc<crate::codegen::structs_codegen::tables::cities::City>),
-    Color(std::rc::Rc<crate::codegen::structs_codegen::tables::colors::Color>),
+    BrandState(crate::codegen::structs_codegen::tables::brand_states::BrandState),
+    Brand(crate::codegen::structs_codegen::tables::brands::Brand),
+    City(crate::codegen::structs_codegen::tables::cities::City),
+    Color(crate::codegen::structs_codegen::tables::colors::Color),
     CommercialProduct(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-        >,
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
     ),
     CommercialReagentModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::commercial_reagent_models::CommercialReagentModel,
-        >,
+        crate::codegen::structs_codegen::tables::commercial_reagent_models::CommercialReagentModel,
     ),
     ContainerCategory(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::container_categories::ContainerCategory,
-        >,
+        crate::codegen::structs_codegen::tables::container_categories::ContainerCategory,
     ),
     ContainerModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-        >,
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
     ),
-    Country(std::rc::Rc<crate::codegen::structs_codegen::tables::countries::Country>),
+    Country(crate::codegen::structs_codegen::tables::countries::Country),
     DocumentFormat(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::document_formats::DocumentFormat,
-        >,
+        crate::codegen::structs_codegen::tables::document_formats::DocumentFormat,
     ),
     EmailProvider(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::email_providers::EmailProvider,
-        >,
+        crate::codegen::structs_codegen::tables::email_providers::EmailProvider,
     ),
     FractioningStepModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-        >,
+        crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
     ),
     FractioningStep(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::fractioning_steps::FractioningStep,
-        >,
+        crate::codegen::structs_codegen::tables::fractioning_steps::FractioningStep,
     ),
     FreezeDryingStepModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::freeze_drying_step_models::FreezeDryingStepModel,
-        >,
+        crate::codegen::structs_codegen::tables::freeze_drying_step_models::FreezeDryingStepModel,
     ),
     GrindingStepModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::grinding_step_models::GrindingStepModel,
-        >,
+        crate::codegen::structs_codegen::tables::grinding_step_models::GrindingStepModel,
     ),
     InstrumentCategory(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::instrument_categories::InstrumentCategory,
-        >,
+        crate::codegen::structs_codegen::tables::instrument_categories::InstrumentCategory,
     ),
     InstrumentLocation(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::instrument_locations::InstrumentLocation,
-        >,
+        crate::codegen::structs_codegen::tables::instrument_locations::InstrumentLocation,
     ),
     InstrumentModelCategory(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::instrument_model_categories::InstrumentModelCategory,
-        >,
+        crate::codegen::structs_codegen::tables::instrument_model_categories::InstrumentModelCategory,
     ),
     InstrumentModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
-        >,
+        crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
     ),
     InstrumentState(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::instrument_states::InstrumentState,
-        >,
+        crate::codegen::structs_codegen::tables::instrument_states::InstrumentState,
     ),
-    Instrument(
-        std::rc::Rc<crate::codegen::structs_codegen::tables::instruments::Instrument>,
-    ),
+    Instrument(crate::codegen::structs_codegen::tables::instruments::Instrument),
     LoginProvider(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
-        >,
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
     ),
-    Material(std::rc::Rc<crate::codegen::structs_codegen::tables::materials::Material>),
+    Material(crate::codegen::structs_codegen::tables::materials::Material),
     NameplateCategory(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-        >,
+        crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
     ),
     NameplateModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::nameplate_models::NameplateModel,
-        >,
+        crate::codegen::structs_codegen::tables::nameplate_models::NameplateModel,
     ),
     ObservationSubject(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
-        >,
+        crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
     ),
     OrganismObservation(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::organism_observations::OrganismObservation,
-        >,
+        crate::codegen::structs_codegen::tables::organism_observations::OrganismObservation,
     ),
     OrganismSamplingStepModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::organism_sampling_step_models::OrganismSamplingStepModel,
-        >,
+        crate::codegen::structs_codegen::tables::organism_sampling_step_models::OrganismSamplingStepModel,
     ),
-    OrganismTaxon(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon,
-        >,
-    ),
-    Organism(std::rc::Rc<crate::codegen::structs_codegen::tables::organisms::Organism>),
-    Organization(
-        std::rc::Rc<crate::codegen::structs_codegen::tables::organizations::Organization>,
-    ),
+    OrganismTaxon(crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon),
+    Organism(crate::codegen::structs_codegen::tables::organisms::Organism),
+    Organization(crate::codegen::structs_codegen::tables::organizations::Organization),
     PackagingModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
-        >,
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
     ),
     PackagingStepModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::packaging_step_models::PackagingStepModel,
-        >,
+        crate::codegen::structs_codegen::tables::packaging_step_models::PackagingStepModel,
     ),
     PermanenceCategory(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
-        >,
+        crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
     ),
-    Photograph(
-        std::rc::Rc<crate::codegen::structs_codegen::tables::photographs::Photograph>,
-    ),
+    Photograph(crate::codegen::structs_codegen::tables::photographs::Photograph),
     ProcedureModelContainerCategory(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::procedure_model_container_categories::ProcedureModelContainerCategory,
-        >,
+        crate::codegen::structs_codegen::tables::procedure_model_container_categories::ProcedureModelContainerCategory,
     ),
     ProcedureModelInstrumentCategory(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::procedure_model_instrument_categories::ProcedureModelInstrumentCategory,
-        >,
+        crate::codegen::structs_codegen::tables::procedure_model_instrument_categories::ProcedureModelInstrumentCategory,
     ),
     ProcedureModelNameplateCategory(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory,
-        >,
+        crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory,
     ),
     ProcedureModelToolCategory(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory,
-        >,
+        crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory,
     ),
     ProcedureModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
-        >,
+        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     ),
     ProcedureStepModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::procedure_step_models::ProcedureStepModel,
-        >,
+        crate::codegen::structs_codegen::tables::procedure_step_models::ProcedureStepModel,
     ),
-    Procedure(
-        std::rc::Rc<crate::codegen::structs_codegen::tables::procedures::Procedure>,
-    ),
-    Processable(
-        std::rc::Rc<crate::codegen::structs_codegen::tables::processables::Processable>,
-    ),
+    Procedure(crate::codegen::structs_codegen::tables::procedures::Procedure),
+    Processable(crate::codegen::structs_codegen::tables::processables::Processable),
     ProcessingStep(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::processing_steps::ProcessingStep,
-        >,
+        crate::codegen::structs_codegen::tables::processing_steps::ProcessingStep,
     ),
-    ProjectState(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::project_states::ProjectState,
-        >,
-    ),
+    ProjectState(crate::codegen::structs_codegen::tables::project_states::ProjectState),
     ProjectWorkflowModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::project_workflow_models::ProjectWorkflowModel,
-        >,
+        crate::codegen::structs_codegen::tables::project_workflow_models::ProjectWorkflowModel,
     ),
-    Project(std::rc::Rc<crate::codegen::structs_codegen::tables::projects::Project>),
-    Rank(std::rc::Rc<crate::codegen::structs_codegen::tables::ranks::Rank>),
-    Role(std::rc::Rc<crate::codegen::structs_codegen::tables::roles::Role>),
-    Room(std::rc::Rc<crate::codegen::structs_codegen::tables::rooms::Room>),
-    SampleState(
-        std::rc::Rc<crate::codegen::structs_codegen::tables::sample_states::SampleState>,
-    ),
+    Project(crate::codegen::structs_codegen::tables::projects::Project),
+    Rank(crate::codegen::structs_codegen::tables::ranks::Rank),
+    Role(crate::codegen::structs_codegen::tables::roles::Role),
+    Room(crate::codegen::structs_codegen::tables::rooms::Room),
+    SampleState(crate::codegen::structs_codegen::tables::sample_states::SampleState),
     SamplingStepModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::sampling_step_models::SamplingStepModel,
-        >,
+        crate::codegen::structs_codegen::tables::sampling_step_models::SamplingStepModel,
     ),
-    SamplingStep(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::sampling_steps::SamplingStep,
-        >,
-    ),
-    SpatialRefSy(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy,
-        >,
-    ),
-    Spectrum(std::rc::Rc<crate::codegen::structs_codegen::tables::spectra::Spectrum>),
+    SamplingStep(crate::codegen::structs_codegen::tables::sampling_steps::SamplingStep),
+    SpatialRefSy(crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy),
+    Spectrum(crate::codegen::structs_codegen::tables::spectra::Spectrum),
     SpectraCollection(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
-        >,
+        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
     ),
     StepContainerModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_container_models::StepContainerModel,
-        >,
+        crate::codegen::structs_codegen::tables::step_container_models::StepContainerModel,
     ),
     StepInstrument(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_instruments::StepInstrument,
-        >,
+        crate::codegen::structs_codegen::tables::step_instruments::StepInstrument,
     ),
     StepModelCategory(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_model_categories::StepModelCategory,
-        >,
+        crate::codegen::structs_codegen::tables::step_model_categories::StepModelCategory,
     ),
     StepModelContainerCategory(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_model_container_categories::StepModelContainerCategory,
-        >,
+        crate::codegen::structs_codegen::tables::step_model_container_categories::StepModelContainerCategory,
     ),
     StepModelInstrumentCategory(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
-        >,
+        crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
     ),
     StepModelInstrumentModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_model_instrument_models::StepModelInstrumentModel,
-        >,
+        crate::codegen::structs_codegen::tables::step_model_instrument_models::StepModelInstrumentModel,
     ),
     StepModelInstrument(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_model_instruments::StepModelInstrument,
-        >,
+        crate::codegen::structs_codegen::tables::step_model_instruments::StepModelInstrument,
     ),
     StepModelNameplateCategory(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_model_nameplate_categories::StepModelNameplateCategory,
-        >,
+        crate::codegen::structs_codegen::tables::step_model_nameplate_categories::StepModelNameplateCategory,
     ),
     StepModelToolCategory(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
-        >,
+        crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
     ),
-    StepModel(
-        std::rc::Rc<crate::codegen::structs_codegen::tables::step_models::StepModel>,
-    ),
+    StepModel(crate::codegen::structs_codegen::tables::step_models::StepModel),
     StepNameplateModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_nameplate_models::StepNameplateModel,
-        >,
+        crate::codegen::structs_codegen::tables::step_nameplate_models::StepNameplateModel,
     ),
     StepStorageContainer(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_storage_containers::StepStorageContainer,
-        >,
+        crate::codegen::structs_codegen::tables::step_storage_containers::StepStorageContainer,
     ),
     StepToolModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_tool_models::StepToolModel,
-        >,
+        crate::codegen::structs_codegen::tables::step_tool_models::StepToolModel,
     ),
-    Step(std::rc::Rc<crate::codegen::structs_codegen::tables::steps::Step>),
+    Step(crate::codegen::structs_codegen::tables::steps::Step),
     StorageContainer(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::storage_containers::StorageContainer,
-        >,
+        crate::codegen::structs_codegen::tables::storage_containers::StorageContainer,
     ),
-    Taxon(std::rc::Rc<crate::codegen::structs_codegen::tables::taxa::Taxon>),
-    TeamMember(
-        std::rc::Rc<crate::codegen::structs_codegen::tables::team_members::TeamMember>,
-    ),
-    TeamProject(
-        std::rc::Rc<crate::codegen::structs_codegen::tables::team_projects::TeamProject>,
-    ),
-    TeamState(
-        std::rc::Rc<crate::codegen::structs_codegen::tables::team_states::TeamState>,
-    ),
-    Team(std::rc::Rc<crate::codegen::structs_codegen::tables::teams::Team>),
-    ToolCategory(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::tool_categories::ToolCategory,
-        >,
-    ),
-    ToolModel(
-        std::rc::Rc<crate::codegen::structs_codegen::tables::tool_models::ToolModel>,
-    ),
+    Taxon(crate::codegen::structs_codegen::tables::taxa::Taxon),
+    TeamMember(crate::codegen::structs_codegen::tables::team_members::TeamMember),
+    TeamProject(crate::codegen::structs_codegen::tables::team_projects::TeamProject),
+    TeamState(crate::codegen::structs_codegen::tables::team_states::TeamState),
+    Team(crate::codegen::structs_codegen::tables::teams::Team),
+    ToolCategory(crate::codegen::structs_codegen::tables::tool_categories::ToolCategory),
+    ToolModel(crate::codegen::structs_codegen::tables::tool_models::ToolModel),
     TrackableLocation(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::trackable_locations::TrackableLocation,
-        >,
+        crate::codegen::structs_codegen::tables::trackable_locations::TrackableLocation,
     ),
     TrackableState(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::trackable_states::TrackableState,
-        >,
+        crate::codegen::structs_codegen::tables::trackable_states::TrackableState,
     ),
-    Trackable(
-        std::rc::Rc<crate::codegen::structs_codegen::tables::trackables::Trackable>,
-    ),
-    Unit(std::rc::Rc<crate::codegen::structs_codegen::tables::units::Unit>),
-    UserEmail(
-        std::rc::Rc<crate::codegen::structs_codegen::tables::user_emails::UserEmail>,
-    ),
+    Trackable(crate::codegen::structs_codegen::tables::trackables::Trackable),
+    Unit(crate::codegen::structs_codegen::tables::units::Unit),
+    UserEmail(crate::codegen::structs_codegen::tables::user_emails::UserEmail),
     UserOrganization(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
-        >,
+        crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
     ),
-    User(std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>),
+    User(crate::codegen::structs_codegen::tables::users::User),
     WeighingInstrumentModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
-        >,
+        crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
     ),
     WeighingStepModel(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::weighing_step_models::WeighingStepModel,
-        >,
+        crate::codegen::structs_codegen::tables::weighing_step_models::WeighingStepModel,
     ),
-    WeighingStep(
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::weighing_steps::WeighingStep,
-        >,
-    ),
+    WeighingStep(crate::codegen::structs_codegen::tables::weighing_steps::WeighingStep),
 }
 impl Row {
     #[cfg(feature = "sqlite")]

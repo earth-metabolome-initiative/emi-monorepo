@@ -9,6 +9,13 @@ const_format.workspace = true
 diesel-async.workspace = true
 diesel.workspace = true
 tokio.workspace = true
+web_common_traits = { workspace = true, features = ["backend"] }
+
+[dev-dependencies]
+tokio.workspace = true
+init-db.workspace = true
+reference-docker.workspace = true
+dotenvy.workspace = true
 
 [lints]
 workspace = true

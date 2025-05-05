@@ -94,7 +94,6 @@ where
     where
         I: IntoIterator<Item = Self::Row>,
     {
-        let mut deleted = 0;
         let mut new_vector_length = 0;
 
         for sorted_row in sorted_rows {
@@ -102,10 +101,10 @@ where
             while self[new_vector_length].primary_key() < sorted_row_primary_key {
                 new_vector_length += 1;
             }
-            if self[new_vector_length].primary_key() == sorted_row_primary_key {
-                deleted += 1;
-            }
         }
+
+        let deleted = self.len() - new_vector_length;
+        self.truncate(new_vector_length);
 
         deleted
     }

@@ -37,12 +37,12 @@ where
         Send + for<'a> LoadQuery<'a, AsyncPgConnection, T>,
 {
     async fn bounded_read_async(
-        offset: u64,
-        limit: u64,
+        offset: u16,
+        limit: u16,
         conn: &mut AsyncPgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         RunQueryDsl::load(
-            LimitDsl::limit(OffsetDsl::offset(T::table(), offset as i64), limit as i64),
+            LimitDsl::limit(OffsetDsl::offset(T::table(), i64::from(offset)), i64::from(limit)),
             conn,
         )
         .await

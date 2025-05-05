@@ -2,21 +2,13 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AliquotingStepModelForeignKeys {
     pub id: Option<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::sampling_step_models::SamplingStepModel,
-        >,
+        crate::codegen::structs_codegen::tables::sampling_step_models::SamplingStepModel,
     >,
     pub step_model_instrument_category: Option<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
-        >,
+        crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
     >,
-    pub created_by: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>,
-    >,
-    pub updated_by: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>,
-    >,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::aliquoting_step_models::AliquotingStepModel

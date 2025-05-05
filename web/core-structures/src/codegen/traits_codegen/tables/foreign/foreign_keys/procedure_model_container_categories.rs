@@ -1,16 +1,12 @@
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProcedureModelContainerCategoryForeignKeys {
-    pub procedure_model: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
-    >,
-    pub container_category: Option<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::container_categories::ContainerCategory,
-        >,
-    >,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
-    pub updated_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub procedure_model:
+        Option<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
+    pub container_category:
+        Option<crate::codegen::structs_codegen::tables::container_categories::ContainerCategory>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
 for crate::codegen::structs_codegen::tables::procedure_model_container_categories::ProcedureModelContainerCategory {
@@ -67,30 +63,26 @@ for crate::codegen::structs_codegen::tables::procedure_model_container_categorie
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::User(users),
+                crate::codegen::tables::row::Row::ContainerCategory(
+                    container_categories,
+                ),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = Some(users.clone());
-                    updated = true;
-                }
-                if users.id == self.updated_by {
-                    foreign_keys.updated_by = Some(users.clone());
+                if container_categories.id == self.container_category_id {
+                    foreign_keys.container_category = Some(container_categories);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::User(users),
+                crate::codegen::tables::row::Row::ContainerCategory(
+                    container_categories,
+                ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = None;
-                    updated = true;
-                }
-                if users.id == self.updated_by {
-                    foreign_keys.updated_by = None;
+                if container_categories.id == self.container_category_id {
+                    foreign_keys.container_category = None;
                     updated = true;
                 }
             }
@@ -115,26 +107,30 @@ for crate::codegen::structs_codegen::tables::procedure_model_container_categorie
                 }
             }
             (
-                crate::codegen::tables::row::Row::ContainerCategory(
-                    container_categories,
-                ),
+                crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if container_categories.id == self.container_category_id {
-                    foreign_keys.container_category = Some(container_categories);
+                if users.id == self.created_by {
+                    foreign_keys.created_by = Some(users.clone());
+                    updated = true;
+                }
+                if users.id == self.updated_by {
+                    foreign_keys.updated_by = Some(users.clone());
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ContainerCategory(
-                    container_categories,
-                ),
+                crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if container_categories.id == self.container_category_id {
-                    foreign_keys.container_category = None;
+                if users.id == self.created_by {
+                    foreign_keys.created_by = None;
+                    updated = true;
+                }
+                if users.id == self.updated_by {
+                    foreign_keys.updated_by = None;
                     updated = true;
                 }
             }

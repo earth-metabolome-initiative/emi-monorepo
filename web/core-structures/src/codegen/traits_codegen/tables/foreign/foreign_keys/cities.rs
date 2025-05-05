@@ -1,7 +1,7 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CityForeignKeys {
-    pub iso: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::countries::Country>>,
+    pub iso: Option<crate::codegen::structs_codegen::tables::countries::Country>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::cities::City

@@ -40,8 +40,8 @@ pub trait BoundedReadDispatch<C>: Sized {
     /// * Returns an error if loading the row fails.
     fn bounded_read(
         table_name: Self::TableName,
-        offset: u64,
-        limit: u64,
+        offset: u16,
+        limit: u16,
         conn: &mut C,
     ) -> Result<Self, diesel::result::Error>;
 }

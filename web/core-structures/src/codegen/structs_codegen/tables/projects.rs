@@ -1,6 +1,5 @@
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[derive(
     diesel::Selectable,
     diesel::Insertable,
@@ -8,6 +7,7 @@
     diesel::Queryable,
     diesel::Identifiable,
 )]
+#[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::projects::projects)]
 pub struct Project {
@@ -15,7 +15,7 @@ pub struct Project {
     pub name: String,
     pub description: String,
     pub state_id: i16,
-    pub icon: font_awesome_icons::FAIcon,
+    pub icon: String,
     pub color_id: i16,
     pub parent_project_id: Option<i32>,
     pub budget: Option<f64>,

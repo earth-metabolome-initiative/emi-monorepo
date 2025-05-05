@@ -28,7 +28,7 @@ pub struct InsertableBrandState {
     name: String,
     description: String,
     color_id: i16,
-    icon: font_awesome_icons::FAIcon,
+    icon: String,
 }
 impl InsertableBrandState {
     #[cfg(feature = "postgres")]
@@ -51,7 +51,7 @@ pub struct InsertableBrandStateBuilder {
     name: Option<String>,
     description: Option<String>,
     color_id: Option<i16>,
-    icon: Option<font_awesome_icons::FAIcon>,
+    icon: Option<String>,
 }
 impl InsertableBrandStateBuilder {
     pub fn name(
@@ -77,7 +77,7 @@ impl InsertableBrandStateBuilder {
     }
     pub fn icon(
         mut self,
-        icon: font_awesome_icons::FAIcon,
+        icon: String,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         self.icon = Some(icon);
         Ok(self)

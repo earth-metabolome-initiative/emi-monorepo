@@ -1,15 +1,13 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TrackableForeignKeys {
-    pub container_model: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
-    >,
-    pub project: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::projects::Project>>,
-    pub trackable_state: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::trackable_states::TrackableState>,
-    >,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
-    pub updated_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub container_model:
+        Option<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
+    pub project: Option<crate::codegen::structs_codegen::tables::projects::Project>,
+    pub trackable_state:
+        Option<crate::codegen::structs_codegen::tables::trackable_states::TrackableState>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::trackables::Trackable
@@ -56,22 +54,22 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Project(projects),
+                crate::codegen::tables::row::Row::ContainerModel(container_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if projects.id == self.project_id {
-                    foreign_keys.project = Some(projects);
+                if container_models.id == self.container_model_id {
+                    foreign_keys.container_model = Some(container_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::Project(projects),
+                crate::codegen::tables::row::Row::ContainerModel(container_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if projects.id == self.project_id {
-                    foreign_keys.project = None;
+                if container_models.id == self.container_model_id {
+                    foreign_keys.container_model = None;
                     updated = true;
                 }
             }
@@ -92,26 +90,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if trackable_states.id == self.trackable_state_id {
                     foreign_keys.trackable_state = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ContainerModel(container_models),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if container_models.id == self.container_model_id {
-                    foreign_keys.container_model = Some(container_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ContainerModel(container_models),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if container_models.id == self.container_model_id {
-                    foreign_keys.container_model = None;
                     updated = true;
                 }
             }
@@ -140,6 +118,26 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Project(projects),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if projects.id == self.project_id {
+                    foreign_keys.project = Some(projects);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Project(projects),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if projects.id == self.project_id {
+                    foreign_keys.project = None;
                     updated = true;
                 }
             }

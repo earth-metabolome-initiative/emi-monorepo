@@ -7,7 +7,7 @@ use core_structures::{
 };
 use diesel_async::AsyncPgConnection;
 use web_common_traits::{
-    database::{AsyncRead, Insertable, InsertableVariant},
+    database::{AsyncBoundedRead, Insertable, InsertableVariant},
     prelude::Builder,
 };
 
@@ -28,7 +28,7 @@ pub(crate) async fn insert_missing_instrument_models(
     directus_conn: &mut AsyncPgConnection,
     portal_conn: &mut AsyncPgConnection,
 ) -> Result<(), crate::error::Error> {
-    let directus_instrument_models = DirectusInstrumentModel::load_all(directus_conn).await?;
+    let directus_instrument_models = DirectusInstrumentModel::read_all_async(directus_conn).await?;
     for directus_instrument_model in directus_instrument_models {
         let portal_product: PortalCommercialProduct = if let Some(portal_product) =
             PortalCommercialProduct::from_name(

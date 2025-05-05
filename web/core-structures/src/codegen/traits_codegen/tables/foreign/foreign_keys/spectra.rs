@@ -1,11 +1,8 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SpectrumForeignKeys {
-    pub spectra_collection: Option<
-        std::rc::Rc<
-            crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
-        >,
-    >,
+    pub spectra_collection:
+        Option<crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::spectra::Spectrum

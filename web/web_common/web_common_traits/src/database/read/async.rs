@@ -39,8 +39,23 @@ pub trait AsyncBoundedRead<C: AsyncConnection>: Sized {
     ///
     /// * Returns an error if loading the row fails.
     fn bounded_read_async(
-        offset: u64,
-        limit: u64,
+        offset: u16,
+        limit: u16,
         conn: &mut C,
     ) -> impl Future<Output = Result<Vec<Self>, diesel::result::Error>>;
+
+    /// Loads all the rows in the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to an asynchronous connection.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if loading the rows fails.
+    fn read_all_async(
+        conn: &mut C,
+    ) -> impl Future<Output = Result<Vec<Self>, diesel::result::Error>> {
+        Self::bounded_read_async(0u16, u16::MAX, conn)
+    }
 }

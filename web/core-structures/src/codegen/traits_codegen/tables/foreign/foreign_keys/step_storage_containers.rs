@@ -1,11 +1,10 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StepStorageContainerForeignKeys {
-    pub step: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::steps::Step>>,
-    pub storage_container: Option<
-        std::rc::Rc<crate::codegen::structs_codegen::tables::storage_containers::StorageContainer>,
-    >,
-    pub created_by: Option<std::rc::Rc<crate::codegen::structs_codegen::tables::users::User>>,
+    pub step: Option<crate::codegen::structs_codegen::tables::steps::Step>,
+    pub storage_container:
+        Option<crate::codegen::structs_codegen::tables::storage_containers::StorageContainer>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::step_storage_containers::StepStorageContainer
@@ -41,26 +40,6 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
-            (
-                crate::codegen::tables::row::Row::Step(steps),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if steps.id == self.step_id {
-                    foreign_keys.step = Some(steps);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Step(steps),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if steps.id == self.step_id {
-                    foreign_keys.step = None;
-                    updated = true;
-                }
-            }
             (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
@@ -98,6 +77,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if storage_containers.id == self.storage_container_id {
                     foreign_keys.storage_container = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Step(steps),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if steps.id == self.step_id {
+                    foreign_keys.step = Some(steps);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Step(steps),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if steps.id == self.step_id {
+                    foreign_keys.step = None;
                     updated = true;
                 }
             }
