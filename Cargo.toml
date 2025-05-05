@@ -71,7 +71,7 @@ diesel = { git = "https://github.com/LucaCappelletti94/diesel.git", branch = "su
 ] }
 diesel-async = { git = "https://github.com/LucaCappelletti94/diesel_async", branch = "custom-diesel" }
 diesel_full_text_search = "2.2"
-redis = { version = "0.29", features = ["tokio-comp"] }
+redis = { version = "0.30", features = ["tokio-comp"] }
 postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel.git", default-features = false, branch = "custom-diesel" }
 chrono = { version = "0.4.39", features = ["serde"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
@@ -93,7 +93,6 @@ pgrx-tests = "0.14.1"
 image = "0.25.6"
 rsa = { version = "0.9.8" }
 rand = { version = "0.8" }
-base64ct = { version = "1.6" }
 pgrx-sql-entity-graph = "0.14.1"
 gloo = "0.11.0"
 criterion = { version = "0.5", features = ["html_reports"] }
@@ -102,7 +101,7 @@ rosetta-timestamp = { path = "utils/rosetta-timestamp" }
 taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
 csqlv = { path = "web/web_common/csqlv", default-features = false }
 iso_codes = { path = "web/web_common/iso_codes" }
-testcontainers = { version = "0.23.2" }
+testcontainers = { version = "0.24.0" }
 web_common_traits = { path = "web/web_common/web_common_traits" }
 webcodegen = { path = "web/web_common/webcodegen" }
 diesel_migrations_utils = { path = "utils/diesel_migrations_utils" }
@@ -118,6 +117,7 @@ plotters = "0.3.7"
 futures = "0.3.31"
 futures-util = "0.3.31"
 wasm-bindgen-futures = "0.4.50"
+wasm-bindgen = "0.2.100"
 trybuild = "1"
 const_format = "0.2.34"
 log = "0.4"
