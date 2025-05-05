@@ -24,4 +24,3 @@ impl From<(Row, CRUD)> for DBMessage {
         DBMessage::Row(row, crud)
     }
 }
-

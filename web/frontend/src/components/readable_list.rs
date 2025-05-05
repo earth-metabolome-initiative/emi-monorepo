@@ -93,9 +93,7 @@ where
                         CRUD::Read | CRUD::Create | CRUD::Update => {
                             self.items.upsert_sorted_vec(updated_rows).into()
                         }
-                        CRUD::Delete => {
-                            self.items.delete_from_sorted_vec(updated_rows) > 0
-                        }
+                        CRUD::Delete => self.items.delete_from_sorted_vec(updated_rows) > 0,
                     }
                 }
             }
