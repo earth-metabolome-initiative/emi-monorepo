@@ -39,7 +39,7 @@ postgis_diesel = { workspace = true, default-features = false, features = [
 ] }
 
 gloo.workspace = true
-wasm-bindgen = "0.2.100"
+wasm-bindgen.workspace = true
 rosetta-uuid.workspace = true
 wasm-bindgen-futures.workspace = true
 yew.workspace = true
@@ -55,11 +55,10 @@ sublime_fuzzy = "0.7.0"
 implicit-clone = "0.6"
 image.workspace = true
 base64 = "0.22.1"
-rxing = { version = "0.7", features = [
+rxing = { version = "0.7.1", features = [
   "wasm_support",
 ], default-features = false }
 postcard = "1.1.1"
-serde-wasm-bindgen = "0.6.5"
 rustfft.workspace = true
 strsim = "0.11.1"
 
