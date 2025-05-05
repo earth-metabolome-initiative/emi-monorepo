@@ -77,7 +77,7 @@ Afterwards, recall to restart the browser!
 To start the deployment version of the platform, you need to run the following command:
 
 ```bash
-docker compose -f docker-compose-deploy.yml --env-file .env_deploy up -d --build -V
+USER_ID=$(id -u) GROUP_ID=$(id -g) docker compose -f docker-compose-deploy.yml --env-file .env_deploy up -d --build -V
 ```
 
 ### Starting the NGINX Switch
