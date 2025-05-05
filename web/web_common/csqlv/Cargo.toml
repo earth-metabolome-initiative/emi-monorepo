@@ -9,7 +9,6 @@ diesel = { workspace = true, optional = true }
 diesel-async = { workspace = true, optional = true }
 flate2 = "1.0.35"
 indicatif = "0.17.11"
-quote = "1.0.38"
 rosetta-uuid.workspace = true
 inflector.workspace = true
 const_format.workspace = true
@@ -21,11 +20,8 @@ iso_codes = { workspace = true, optional = true }
 [dev-dependencies]
 testcontainers.workspace = true
 tokio.workspace = true
-trybuild.workspace = true
 chrono.workspace = true
 ipnetwork = "0.20.0"
-macaddr = "1.0.1"
-postgis_diesel.workspace = true
 diesel-async = { workspace = true, features = ["postgres"] }
 
 [lints]

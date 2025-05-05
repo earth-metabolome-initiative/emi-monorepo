@@ -7,7 +7,6 @@ edition = "2024"
 tokio.workspace = true
 time-requirements.workspace = true
 quote.workspace = true
-const_format.workspace = true
 webcodegen.workspace = true
 reference-docker.workspace = true
 init-db.workspace = true

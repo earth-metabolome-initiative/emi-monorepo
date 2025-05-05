@@ -10,7 +10,6 @@ proc-macro = true
 pg2sqlite.workspace = true
 quote.workspace = true
 syn.workspace = true
-chrono.workspace = true
 sql_minifier.workspace = true
 csqlv = { workspace = true, default-features = false }
 sqlparser.workspace = true

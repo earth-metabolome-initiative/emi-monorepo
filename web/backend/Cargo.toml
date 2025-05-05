@@ -23,15 +23,12 @@ api-path.workspace = true
 backend-request-errors.workspace = true
 postgis_diesel.workspace = true
 rand.workspace = true
-rsa.workspace = true
-base64ct.workspace = true
 init-db.workspace = true
 init-migration.workspace = true
 tokio.workspace = true
 core-structures = { workspace = true, features = ["backend"] }
 web_common_traits = { workspace = true, features = ["backend"] }
 openssl = { version = "0.10" }
-actix = "0.13"
 actix-cors = "0.7.1"
 actix-web.workspace = true
 actix-web-httpauth = "0.8.2"
@@ -43,13 +40,9 @@ ws-messages = { workspace = true, features = ["backend"] }
 log.workspace = true
 futures-util.workspace = true
 env_logger = "0.11"
-rust-argon2 = "2.1"
 time = "0.3"
 jsonwebtoken = "9.3.1"
 reqwest.workspace = true
-email_address = "0.2.9"
 redis.workspace = true
 base64 = "0.22"
 image.workspace = true
-identicon-rs = "6"
-strsim = "0.11.1"

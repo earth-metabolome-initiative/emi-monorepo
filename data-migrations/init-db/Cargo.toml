@@ -9,7 +9,6 @@ diesel = { workspace = true, features = ["postgres"] }
 diesel-async = { workspace = true, features = ["postgres"] }
 csqlv = { workspace = true, features = ["diesel-async", "iso_codes"] }
 diesel_migrations_utils.workspace = true
-const_format.workspace = true
 webcodegen.workspace = true
 
 [dev-dependencies]

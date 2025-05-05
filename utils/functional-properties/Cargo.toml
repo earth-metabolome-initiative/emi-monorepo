@@ -3,8 +3,5 @@ name = "functional-properties"
 version = "0.1.0"
 edition = "2024"
 
-[dependencies]
-algebra.workspace = true
-
 [lints]
 workspace = true
