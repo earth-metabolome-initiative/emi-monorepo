@@ -7,6 +7,7 @@ use web_common_traits::{
     crud::{CRUD, ExecuteCrudOperation},
     database::{Row, Tabular},
 };
+use web_sys::console;
 use ws_messages::DBMessage;
 use yew_agent::worker::HandlerId;
 
@@ -52,6 +53,7 @@ impl DBWSWorker {
                 }
             }
             DBInternalMessage::DB(DBMessage::Rows(rows, crud)) => {
+                console::log_1(&format!("Received rows: {rows:?} for crud: {crud}").into());
                 // We received a message with information regarding a table read,
                 // which we need to integrate into the SQLite database and then
                 // notify the components that are listening to this table.
@@ -68,8 +70,10 @@ impl DBWSWorker {
                 self.listen_notify.notify_rows_listeners(&updated_rows, crud, scope);
             }
             DBInternalMessage::Connect => {
-                match SqliteConnection::establish("file:emi.db?vfs=opfs-sahpool") {
+                console::log_1(&"Connecting to SQLite database".into());
+                match SqliteConnection::establish("file:emi.db?vfs=relaxed-idb") {
                     Ok(mut conn) => {
+                        console::log_1(&"Connected to SQLite database".into());
                         if let Err(err) = conn.batch_execute(CSV_MIGRATIONS) {
                             scope.send_message(err);
                             return;

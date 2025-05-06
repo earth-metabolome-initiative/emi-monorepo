@@ -10,6 +10,7 @@ use crate::errors::{db_errors::DBError, ws_errors::WSError};
 pub mod db_internal_message;
 pub mod ws_internal_message;
 
+#[derive(Debug, Clone)]
 /// Enumeration of internal messages used in the DB/WebSocket worker.
 pub enum InternalMessage {
     /// Message related to the database operations.
@@ -29,6 +30,27 @@ impl From<Result<sqlite_wasm_rs::export::OpfsSAHPoolUtil, sqlite_wasm_rs::export
         value: Result<
             sqlite_wasm_rs::export::OpfsSAHPoolUtil,
             sqlite_wasm_rs::export::OpfsSAHError,
+        >,
+    ) -> Self {
+        match value {
+            Ok(_) => Self::DB(db_internal_message::DBInternalMessage::Connect),
+            Err(err) => Self::DBError(err.into()),
+        }
+    }
+}
+
+impl
+    From<
+        Result<
+            sqlite_wasm_rs::relaxed_idb_vfs::RelaxedIdbUtil,
+            sqlite_wasm_rs::relaxed_idb_vfs::RelaxedIdbError,
+        >,
+    > for InternalMessage
+{
+    fn from(
+        value: Result<
+            sqlite_wasm_rs::relaxed_idb_vfs::RelaxedIdbUtil,
+            sqlite_wasm_rs::relaxed_idb_vfs::RelaxedIdbError,
         >,
     ) -> Self {
         match value {

@@ -7,6 +7,7 @@ use ws_messages::{B2FMessage, DBMessage, F2BMessage, Subscription};
 
 use crate::workers::dbws_worker::C2DBMessage;
 
+#[derive(Debug, Clone)]
 /// Enumeration of internal messages used for the WS portion of the DB/WebSocket
 /// worker.
 pub enum WSInternalMessage {
