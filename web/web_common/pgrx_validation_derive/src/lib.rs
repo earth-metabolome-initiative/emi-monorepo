@@ -14,10 +14,10 @@ impl VisitMut for MethodRenamer {
             if let Some(ident) = path.get_ident() {
                 if let Some(ident) = ident.to_string().strip_prefix("must_be_") {
                     path.segments[0].ident =
-                        syn::Ident::new(&format!("__inner_must_be_{}", ident), path.span());
+                        syn::Ident::new(&format!("__inner_must_be_{ident}"), path.span());
                 } else if let Some(ident) = ident.to_string().strip_prefix("must_not_be_") {
                     path.segments[0].ident =
-                        syn::Ident::new(&format!("__inner_must_not_be_{}", ident), path.span());
+                        syn::Ident::new(&format!("__inner_must_not_be_{ident}"), path.span());
                 }
             }
         }
@@ -144,7 +144,7 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
         });
 
         // Create a new identifier for the inner (renamed) function.
-        let inner_fn_name = syn::Ident::new(&format!("__inner_{}", fn_name), fn_name.span());
+        let inner_fn_name = syn::Ident::new(&format!("__inner_{fn_name}"), fn_name.span());
         let mut inner_fn = input_fn.clone();
         inner_fn.sig.ident = inner_fn_name.clone();
 

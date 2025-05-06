@@ -12,7 +12,7 @@ impl std::fmt::Display for UnknownNameplateCategory {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             UnknownNameplateCategory::UnknownString(code) => {
-                write!(f, "Unknown nameplate category string: {}", code)
+                write!(f, "Unknown nameplate category string: {code}")
             }
         }
     }

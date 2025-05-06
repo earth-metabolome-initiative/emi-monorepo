@@ -1,6 +1,6 @@
 #![cfg(feature = "postgres")]
 //! Blanked implementations of the `Read` and `BoundedRead` traits for
-//! PostgreSQL.
+//! `PostgreSQL`.
 
 use diesel::{
     Identifiable, OptionalExtension, PgConnection, QueryDsl, RunQueryDsl,
@@ -39,7 +39,7 @@ where
         conn: &mut PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         RunQueryDsl::load(
-            LimitDsl::limit(OffsetDsl::offset(T::table(), offset as i64), limit as i64),
+            LimitDsl::limit(OffsetDsl::offset(T::table(), i64::from(offset)), i64::from(limit)),
             conn,
         )
     }

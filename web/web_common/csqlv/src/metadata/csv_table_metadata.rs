@@ -130,7 +130,6 @@ impl CSVTableMetadata {
             .strip_prefix(root)
             .map(|p| docker_root.join(p))
             .map_err(|_| CSVSchemaError::InvalidPath(path.to_string_lossy().to_string()))?
-            .to_path_buf()
             .to_string_lossy()
             .to_string();
 

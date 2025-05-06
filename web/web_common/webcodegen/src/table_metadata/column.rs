@@ -695,7 +695,15 @@ impl Column {
         self.column_default.is_some()
     }
 
-    /// Returns the rust TokenStream to create the default value of the column
+    /// Returns the rust `TokenStream` to create the default value of the column
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
     pub async fn rust_default_value(
         &self,
         conn: &mut AsyncPgConnection,

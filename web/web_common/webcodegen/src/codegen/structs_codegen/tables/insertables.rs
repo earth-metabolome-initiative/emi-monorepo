@@ -173,7 +173,7 @@ impl Codegen<'_> {
                 let column_type = column.rust_data_type(conn).await?;
                 insertable_attributes.push(quote::quote! {
                     #column_name: #column_type
-                })
+                });
             }
 
             let insertable_variant_methods = table.foreign_key_methods(conn, &syntax).await?;
@@ -185,7 +185,7 @@ impl Codegen<'_> {
                 let column_type = column.rust_data_type(conn).await?;
                 insertable_builder_attributes.push(quote::quote! {
                     #column_name: #column_type
-                })
+                });
             }
             let populating_product = insertable_columns.iter().map(|column| {
                     let column_ident = column.snake_case_ident()?;

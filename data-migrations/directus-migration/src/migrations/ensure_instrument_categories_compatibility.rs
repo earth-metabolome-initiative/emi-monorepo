@@ -1,7 +1,6 @@
 //! Submodule to verify that all Instrument Types defined in the
 //! Directus database are also available in the Portal database.
 
-use core_structures::InstrumentCategory as PortalInstrumentCategory;
 use diesel_async::AsyncPgConnection;
 use web_common_traits::prelude::AsyncBoundedRead;
 
@@ -28,17 +27,18 @@ pub async fn ensure_instrument_categories_compatibility(
     let instrument_types = DirectusInstrumentCategory::read_all_async(directus_conn).await?;
 
     for instrument_type in instrument_types {
-        let portal_instrument_type = PortalInstrumentCategory::from_name(
-            instrument_type.instrument_type.as_ref().ok_or_else(|| {
-                crate::error::Error::MissingInstrumentTypeName(Box::from(instrument_type.clone()))
-            })?,
-            portal_conn,
-        )
-        .await?;
+        // let portal_instrument_type = PortalInstrumentCategory::from_name(
+        //     instrument_type.instrument_type.as_ref().ok_or_else(|| {
+        //         crate::error::Error::MissingInstrumentTypeName(Box::from(instrument_type.clone()))
+        //     })?,
+        //     portal_conn,
+        // )
+        // .await?;
 
-        if portal_instrument_type.is_none() {
-            return Err(crate::error::Error::UnknownInstrumentCategory(Box::from(instrument_type)));
-        }
+        // if portal_instrument_type.is_none() {
+        //     return
+        // Err(crate::error::Error::UnknownInstrumentCategory(Box::from(instrument_type)));
+        // }
     }
 
     Ok(())

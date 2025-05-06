@@ -57,7 +57,6 @@ mod projects;
 mod ranks;
 mod roles;
 mod rooms;
-mod rows;
 mod sample_states;
 mod sampling_step_models;
 mod sampling_steps;
@@ -1103,5 +1102,154 @@ impl Rows {
                     .into()
             }
         })
+    }
+}
+impl web_common_traits::prelude::Rows for Rows {
+    type PrimaryKey = crate::codegen::tables::table_primary_keys::TablePrimaryKey;
+    fn primary_keys(&self) -> Vec<Self::PrimaryKey> {
+        match self {
+            Rows::Address(addresses) => addresses.primary_keys(),
+            Rows::AliquotingInstrumentModel(aliquoting_instrument_models) => {
+                aliquoting_instrument_models.primary_keys()
+            }
+            Rows::AliquotingStepModel(aliquoting_step_models) => {
+                aliquoting_step_models.primary_keys()
+            }
+            Rows::AliquotingStep(aliquoting_steps) => aliquoting_steps.primary_keys(),
+            Rows::BallMillStepModel(ball_mill_step_models) => ball_mill_step_models.primary_keys(),
+            Rows::BallMillStep(ball_mill_steps) => ball_mill_steps.primary_keys(),
+            Rows::Brand(brands) => brands.primary_keys(),
+            Rows::CentrifugeStepModel(centrifuge_step_models) => {
+                centrifuge_step_models.primary_keys()
+            }
+            Rows::CentrifugeStep(centrifuge_steps) => centrifuge_steps.primary_keys(),
+            Rows::City(cities) => cities.primary_keys(),
+            Rows::Color(colors) => colors.primary_keys(),
+            Rows::CommercialProductLot(commercial_product_lots) => {
+                commercial_product_lots.primary_keys()
+            }
+            Rows::CommercialProduct(commercial_products) => commercial_products.primary_keys(),
+            Rows::CommercialReagent(commercial_reagents) => commercial_reagents.primary_keys(),
+            Rows::ContainerModel(container_models) => container_models.primary_keys(),
+            Rows::Country(countries) => countries.primary_keys(),
+            Rows::DisposalStepModel(disposal_step_models) => disposal_step_models.primary_keys(),
+            Rows::DisposalStep(disposal_steps) => disposal_steps.primary_keys(),
+            Rows::DocumentFormat(document_formats) => document_formats.primary_keys(),
+            Rows::EmailProvider(email_providers) => email_providers.primary_keys(),
+            Rows::FractioningStepModel(fractioning_step_models) => {
+                fractioning_step_models.primary_keys()
+            }
+            Rows::FractioningStep(fractioning_steps) => fractioning_steps.primary_keys(),
+            Rows::FreezeDryingStepModel(freeze_drying_step_models) => {
+                freeze_drying_step_models.primary_keys()
+            }
+            Rows::InstrumentLocation(instrument_locations) => instrument_locations.primary_keys(),
+            Rows::InstrumentModelCategory(instrument_model_categories) => {
+                instrument_model_categories.primary_keys()
+            }
+            Rows::InstrumentModel(instrument_models) => instrument_models.primary_keys(),
+            Rows::InstrumentState(instrument_states) => instrument_states.primary_keys(),
+            Rows::Instrument(instruments) => instruments.primary_keys(),
+            Rows::LoginProvider(login_providers) => login_providers.primary_keys(),
+            Rows::Material(materials) => materials.primary_keys(),
+            Rows::NameplateModel(nameplate_models) => nameplate_models.primary_keys(),
+            Rows::ObservationSubject(observation_subjects) => observation_subjects.primary_keys(),
+            Rows::OrganismObservation(organism_observations) => {
+                organism_observations.primary_keys()
+            }
+            Rows::OrganismSamplingStepModel(organism_sampling_step_models) => {
+                organism_sampling_step_models.primary_keys()
+            }
+            Rows::OrganismTaxon(organism_taxa) => organism_taxa.primary_keys(),
+            Rows::Organism(organisms) => organisms.primary_keys(),
+            Rows::Organization(organizations) => organizations.primary_keys(),
+            Rows::PackagingModel(packaging_models) => packaging_models.primary_keys(),
+            Rows::PackagingStepModel(packaging_step_models) => packaging_step_models.primary_keys(),
+            Rows::PermanenceCategory(permanence_categories) => permanence_categories.primary_keys(),
+            Rows::Photograph(photographs) => photographs.primary_keys(),
+            Rows::ProcedureModelContainerCategory(procedure_model_container_categories) => {
+                procedure_model_container_categories.primary_keys()
+            }
+            Rows::ProcedureModelInstrumentCategory(procedure_model_instrument_categories) => {
+                procedure_model_instrument_categories.primary_keys()
+            }
+            Rows::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
+                procedure_model_nameplate_categories.primary_keys()
+            }
+            Rows::ProcedureModelToolCategory(procedure_model_tool_categories) => {
+                procedure_model_tool_categories.primary_keys()
+            }
+            Rows::ProcedureModel(procedure_models) => procedure_models.primary_keys(),
+            Rows::ProcedureStepModel(procedure_step_models) => procedure_step_models.primary_keys(),
+            Rows::Procedure(procedures) => procedures.primary_keys(),
+            Rows::Processable(processables) => processables.primary_keys(),
+            Rows::ProcessingStep(processing_steps) => processing_steps.primary_keys(),
+            Rows::ProjectState(project_states) => project_states.primary_keys(),
+            Rows::ProjectWorkflowModel(project_workflow_models) => {
+                project_workflow_models.primary_keys()
+            }
+            Rows::Project(projects) => projects.primary_keys(),
+            Rows::Rank(ranks) => ranks.primary_keys(),
+            Rows::Role(roles) => roles.primary_keys(),
+            Rows::Room(rooms) => rooms.primary_keys(),
+            Rows::SampleState(sample_states) => sample_states.primary_keys(),
+            Rows::SamplingStepModel(sampling_step_models) => sampling_step_models.primary_keys(),
+            Rows::SamplingStep(sampling_steps) => sampling_steps.primary_keys(),
+            Rows::ShakingStepModel(shaking_step_models) => shaking_step_models.primary_keys(),
+            Rows::ShakingStep(shaking_steps) => shaking_steps.primary_keys(),
+            Rows::SpatialRefSy(spatial_ref_sys) => spatial_ref_sys.primary_keys(),
+            Rows::Spectrum(spectra) => spectra.primary_keys(),
+            Rows::SpectraCollection(spectra_collections) => spectra_collections.primary_keys(),
+            Rows::StepContainerModel(step_container_models) => step_container_models.primary_keys(),
+            Rows::StepInstrument(step_instruments) => step_instruments.primary_keys(),
+            Rows::StepModelCategory(step_model_categories) => step_model_categories.primary_keys(),
+            Rows::StepModelContainerCategory(step_model_container_categories) => {
+                step_model_container_categories.primary_keys()
+            }
+            Rows::StepModelInstrumentCategory(step_model_instrument_categories) => {
+                step_model_instrument_categories.primary_keys()
+            }
+            Rows::StepModelInstrumentModel(step_model_instrument_models) => {
+                step_model_instrument_models.primary_keys()
+            }
+            Rows::StepModelInstrument(step_model_instruments) => {
+                step_model_instruments.primary_keys()
+            }
+            Rows::StepModelNameplateCategory(step_model_nameplate_categories) => {
+                step_model_nameplate_categories.primary_keys()
+            }
+            Rows::StepModelToolCategory(step_model_tool_categories) => {
+                step_model_tool_categories.primary_keys()
+            }
+            Rows::StepModel(step_models) => step_models.primary_keys(),
+            Rows::StepNameplateModel(step_nameplate_models) => step_nameplate_models.primary_keys(),
+            Rows::StepStorageContainer(step_storage_containers) => {
+                step_storage_containers.primary_keys()
+            }
+            Rows::StepToolModel(step_tool_models) => step_tool_models.primary_keys(),
+            Rows::Step(steps) => steps.primary_keys(),
+            Rows::StorageContainer(storage_containers) => storage_containers.primary_keys(),
+            Rows::Taxon(taxa) => taxa.primary_keys(),
+            Rows::TeamMember(team_members) => team_members.primary_keys(),
+            Rows::TeamProject(team_projects) => team_projects.primary_keys(),
+            Rows::TeamState(team_states) => team_states.primary_keys(),
+            Rows::Team(teams) => teams.primary_keys(),
+            Rows::ToolModel(tool_models) => tool_models.primary_keys(),
+            Rows::TrackableLocation(trackable_locations) => trackable_locations.primary_keys(),
+            Rows::TrackableState(trackable_states) => trackable_states.primary_keys(),
+            Rows::Trackable(trackables) => trackables.primary_keys(),
+            Rows::Unit(units) => units.primary_keys(),
+            Rows::UserEmail(user_emails) => user_emails.primary_keys(),
+            Rows::UserOrganization(user_organizations) => user_organizations.primary_keys(),
+            Rows::User(users) => users.primary_keys(),
+            Rows::VolumetricProcessable(volumetric_processables) => {
+                volumetric_processables.primary_keys()
+            }
+            Rows::WeighingInstrumentModel(weighing_instrument_models) => {
+                weighing_instrument_models.primary_keys()
+            }
+            Rows::WeighingStepModel(weighing_step_models) => weighing_step_models.primary_keys(),
+            Rows::WeighingStep(weighing_steps) => weighing_steps.primary_keys(),
+        }
     }
 }

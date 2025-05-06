@@ -65,6 +65,26 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
+                crate::codegen::tables::row::Row::Brand(brands),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if brands.id == self.brand_id {
+                    foreign_keys.brand = Some(brands);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Brand(brands),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if brands.id == self.brand_id {
+                    foreign_keys.brand = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -89,26 +109,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Brand(brands),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if brands.id == self.brand_id {
-                    foreign_keys.brand = Some(brands);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Brand(brands),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if brands.id == self.brand_id {
-                    foreign_keys.brand = None;
                     updated = true;
                 }
             }

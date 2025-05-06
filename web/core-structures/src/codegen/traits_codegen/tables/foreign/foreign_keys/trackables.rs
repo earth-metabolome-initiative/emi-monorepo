@@ -54,22 +54,30 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::ContainerModel(container_models),
+                crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if container_models.id == self.container_model_id {
-                    foreign_keys.container_model = Some(container_models);
+                if users.id == self.created_by {
+                    foreign_keys.created_by = Some(users.clone());
+                    updated = true;
+                }
+                if users.id == self.updated_by {
+                    foreign_keys.updated_by = Some(users.clone());
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ContainerModel(container_models),
+                crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if container_models.id == self.container_model_id {
-                    foreign_keys.container_model = None;
+                if users.id == self.created_by {
+                    foreign_keys.created_by = None;
+                    updated = true;
+                }
+                if users.id == self.updated_by {
+                    foreign_keys.updated_by = None;
                     updated = true;
                 }
             }
@@ -114,30 +122,22 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::User(users),
+                crate::codegen::tables::row::Row::ContainerModel(container_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = Some(users.clone());
-                    updated = true;
-                }
-                if users.id == self.updated_by {
-                    foreign_keys.updated_by = Some(users.clone());
+                if container_models.id == self.container_model_id {
+                    foreign_keys.container_model = Some(container_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::User(users),
+                crate::codegen::tables::row::Row::ContainerModel(container_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = None;
-                    updated = true;
-                }
-                if users.id == self.updated_by {
-                    foreign_keys.updated_by = None;
+                if container_models.id == self.container_model_id {
+                    foreign_keys.container_model = None;
                     updated = true;
                 }
             }

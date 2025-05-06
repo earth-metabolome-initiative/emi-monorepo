@@ -49,30 +49,22 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::User(users),
+                crate::codegen::tables::row::Row::InstrumentState(instrument_states),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = Some(users.clone());
-                    updated = true;
-                }
-                if users.id == self.updated_by {
-                    foreign_keys.updated_by = Some(users.clone());
+                if instrument_states.id == self.instrument_state_id {
+                    foreign_keys.instrument_state = Some(instrument_states);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::User(users),
+                crate::codegen::tables::row::Row::InstrumentState(instrument_states),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = None;
-                    updated = true;
-                }
-                if users.id == self.updated_by {
-                    foreign_keys.updated_by = None;
+                if instrument_states.id == self.instrument_state_id {
+                    foreign_keys.instrument_state = None;
                     updated = true;
                 }
             }
@@ -97,22 +89,30 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::InstrumentState(instrument_states),
+                crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if instrument_states.id == self.instrument_state_id {
-                    foreign_keys.instrument_state = Some(instrument_states);
+                if users.id == self.created_by {
+                    foreign_keys.created_by = Some(users.clone());
+                    updated = true;
+                }
+                if users.id == self.updated_by {
+                    foreign_keys.updated_by = Some(users.clone());
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::InstrumentState(instrument_states),
+                crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if instrument_states.id == self.instrument_state_id {
-                    foreign_keys.instrument_state = None;
+                if users.id == self.created_by {
+                    foreign_keys.created_by = None;
+                    updated = true;
+                }
+                if users.id == self.updated_by {
+                    foreign_keys.updated_by = None;
                     updated = true;
                 }
             }

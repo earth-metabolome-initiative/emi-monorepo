@@ -71,26 +71,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::ObservationSubject(observation_subjects),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if observation_subjects.id == self.subject_id {
-                    foreign_keys.subject = Some(observation_subjects);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ObservationSubject(observation_subjects),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if observation_subjects.id == self.subject_id {
-                    foreign_keys.subject = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -135,6 +115,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if projects.id == self.project_id {
                     foreign_keys.project = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ObservationSubject(observation_subjects),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if observation_subjects.id == self.subject_id {
+                    foreign_keys.subject = Some(observation_subjects);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ObservationSubject(observation_subjects),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if observation_subjects.id == self.subject_id {
+                    foreign_keys.subject = None;
                     updated = true;
                 }
             }

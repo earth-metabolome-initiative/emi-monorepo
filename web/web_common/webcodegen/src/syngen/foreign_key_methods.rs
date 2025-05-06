@@ -154,7 +154,7 @@ impl Table {
                             .await
                             #optional
                     }
-                })
+                });
         }
 
         Ok(foreign_key_methods)
@@ -245,7 +245,7 @@ impl Table {
                             .filter(#where_statement)
                             #loading_statement
                     }
-                })
+                });
         }
 
         Ok(foreign_key_methods)

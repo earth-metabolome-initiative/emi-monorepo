@@ -49,7 +49,7 @@ impl Table {
                     #[sql_name = #original_column_name]
                     #column_attribute -> #column_type
                 }
-            })
+            });
         }
         let primary_key_names = self
             .primary_key_columns(conn)

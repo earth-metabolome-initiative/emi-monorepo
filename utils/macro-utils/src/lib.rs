@@ -5,6 +5,7 @@ use std::{
     path::Path,
 };
 
+#[must_use]
 /// Returns the last modified time of a file in seconds since the UNIX epoch.
 ///
 /// # Arguments
@@ -32,6 +33,7 @@ pub fn file_last_modified_time(file_path: &Path) -> Option<u64> {
     Some(modified.as_secs())
 }
 
+#[must_use]
 /// Returns the most recent file in a directory with a specific extension.
 /// If the directory contains subdirectories, it will recursively check them.
 ///

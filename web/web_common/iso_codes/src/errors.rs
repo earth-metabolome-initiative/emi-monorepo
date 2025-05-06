@@ -16,13 +16,13 @@ impl std::fmt::Display for UnknownCountryCode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             UnknownCountryCode::UnknownArray(code) => {
-                write!(f, "Unknown country code array: {:?}", code)
+                write!(f, "Unknown country code array: {code:?}")
             }
             UnknownCountryCode::UnknownString(code) => {
-                write!(f, "Unknown country code string: {}", code)
+                write!(f, "Unknown country code string: {code}")
             }
             UnknownCountryCode::UnknownCharArray(code) => {
-                write!(f, "Unknown country code char array: {:?}", code)
+                write!(f, "Unknown country code char array: {code:?}")
             }
         }
     }

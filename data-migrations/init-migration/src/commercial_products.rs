@@ -15,7 +15,7 @@ pub(crate) async fn init_commercial_products(
         .name("Ethanol, 99.8%")?
         .description("Ethanol, 99.8%, Analytical reagent grade")?
         .created_by(darwin.id)?
-        .brand_id(brand_id)?
+        // .brand_id(brand_id)?
         .build()?
         .backend_insert(portal_conn)
         .await?;

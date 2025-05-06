@@ -86,12 +86,12 @@ impl Codegen<'_> {
                 pub mod table_primary_keys;
             });
 
-            self.generate_rows_enumeration(&root.join("rows"), tables, conn).await?;
+            self.generate_rows_enumeration(&root.join("rows"), tables, conn)?;
             table_main_module.extend(quote::quote! {
                 pub mod rows;
             });
 
-            self.generate_row_enumeration(&root.join("row"), tables, conn).await?;
+            self.generate_row_enumeration(&root.join("row"), tables, conn)?;
             table_main_module.extend(quote::quote! {
                 pub mod row;
             });

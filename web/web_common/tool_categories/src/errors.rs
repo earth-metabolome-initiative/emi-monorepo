@@ -12,7 +12,7 @@ impl std::fmt::Display for UnknownToolCategory {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             UnknownToolCategory::UnknownString(code) => {
-                write!(f, "Unknown tool category string: {}", code)
+                write!(f, "Unknown tool category string: {code}")
             }
         }
     }

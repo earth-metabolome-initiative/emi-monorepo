@@ -32,26 +32,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Team(teams),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if teams.id == self.team_id {
-                    foreign_keys.team = Some(teams);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Team(teams),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if teams.id == self.team_id {
-                    foreign_keys.team = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -68,6 +48,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if users.id == self.member_id {
                     foreign_keys.member = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Team(teams),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if teams.id == self.team_id {
+                    foreign_keys.team = Some(teams);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Team(teams),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if teams.id == self.team_id {
+                    foreign_keys.team = None;
                     updated = true;
                 }
             }

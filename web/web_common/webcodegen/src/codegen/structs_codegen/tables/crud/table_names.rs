@@ -11,7 +11,7 @@ use crate::{
 };
 
 impl Codegen<'_> {
-    pub(crate) fn table_names_enum_path(&self) -> TokenStream {
+    pub(crate) fn table_names_enum_path() -> TokenStream {
         let codegen_ident = Ident::new(CODEGEN_DIRECTORY, proc_macro2::Span::call_site());
         let tables_module_ident = Ident::new(CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());
         quote::quote! {

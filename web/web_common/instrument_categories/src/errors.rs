@@ -12,7 +12,7 @@ impl std::fmt::Display for UnknownInstrumentCategory {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             UnknownInstrumentCategory::UnknownString(code) => {
-                write!(f, "Unknown instrument category string: {}", code)
+                write!(f, "Unknown instrument category string: {code}")
             }
         }
     }

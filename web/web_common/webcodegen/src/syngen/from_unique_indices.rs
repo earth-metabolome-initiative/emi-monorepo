@@ -66,7 +66,7 @@ impl crate::Table {
             for column in &columns {
                 let column_name = column.snake_case_ident()?;
                 let column_type = column.rust_ref_data_type(conn).await?;
-                method_arguments.push(quote! { #column_name: #column_type })
+                method_arguments.push(quote! { #column_name: #column_type });
             }
             let filter = columns
                     .iter()
@@ -98,7 +98,7 @@ impl crate::Table {
                         .await
                         .optional()
                 }
-            })
+            });
         }
 
         Ok(unique_indices)

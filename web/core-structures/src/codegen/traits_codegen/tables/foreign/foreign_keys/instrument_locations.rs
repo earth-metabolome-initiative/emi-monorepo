@@ -40,22 +40,22 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Room(rooms),
+                crate::codegen::tables::row::Row::Instrument(instruments),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if rooms.id == self.room_id {
-                    foreign_keys.room = Some(rooms);
+                if instruments.id == self.instrument_id {
+                    foreign_keys.instrument = Some(instruments);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::Room(rooms),
+                crate::codegen::tables::row::Row::Instrument(instruments),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if rooms.id == self.room_id {
-                    foreign_keys.room = None;
+                if instruments.id == self.instrument_id {
+                    foreign_keys.instrument = None;
                     updated = true;
                 }
             }
@@ -80,22 +80,22 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::Instrument(instruments),
+                crate::codegen::tables::row::Row::Room(rooms),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if instruments.id == self.instrument_id {
-                    foreign_keys.instrument = Some(instruments);
+                if rooms.id == self.room_id {
+                    foreign_keys.room = Some(rooms);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::Instrument(instruments),
+                crate::codegen::tables::row::Row::Room(rooms),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if instruments.id == self.instrument_id {
-                    foreign_keys.instrument = None;
+                if rooms.id == self.room_id {
+                    foreign_keys.room = None;
                     updated = true;
                 }
             }

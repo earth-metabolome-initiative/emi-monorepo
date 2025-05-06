@@ -466,6 +466,10 @@ impl PgType {
     ///
     /// An option containing the `PgExtension` of the `PgType`,
     /// or None if the type is not from an extension.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
     pub async fn extension(
         &self,
         conn: &mut AsyncPgConnection,
