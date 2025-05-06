@@ -18,6 +18,12 @@ mod pgrx_impls;
 /// A wrapper around the `chrono` crate's `DateTime<Utc>` type.
 pub struct TimestampUTC(chrono::DateTime<chrono::Utc>);
 
+impl Default for TimestampUTC {
+    fn default() -> Self {
+        Self(chrono::Utc::now())
+    }
+}
+
 impl From<chrono::DateTime<chrono::Utc>> for TimestampUTC {
     fn from(value: chrono::DateTime<chrono::Utc>) -> Self {
         Self(value)

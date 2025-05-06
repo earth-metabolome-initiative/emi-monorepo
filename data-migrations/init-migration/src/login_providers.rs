@@ -23,14 +23,12 @@ async fn init_github_login_provider(
 ) -> Result<(), crate::error::Error> {
     if LoginProvider::from_name("GitHub", portal_conn).await?.is_none() {
         let _provider = LoginProvider::new()
-            .icon("github".to_owned())?
-            .name("GitHub".to_owned())?
-            .oauth_url("https://github.com/login/oauth/authorize".to_owned())?
-            .client_id(std::env::var("GITHUB_CLIENT_ID").expect("GITHUB_CLIENT_ID").to_owned())?
-            .redirect_uri(
-                std::env::var("GITHUB_REDIRECT_URI").expect("GITHUB_REDIRECT_URI").to_owned(),
-            )?
-            .scope("read:user,user:email".to_owned())?
+            .icon("github")?
+            .name("GitHub")?
+            .oauth_url("https://github.com/login/oauth/authorize")?
+            .client_id(std::env::var("GITHUB_CLIENT_ID").expect("GITHUB_CLIENT_ID"))?
+            .redirect_uri(std::env::var("GITHUB_REDIRECT_URI").expect("GITHUB_REDIRECT_URI"))?
+            .scope("read:user,user:email")?
             .build()?
             .backend_insert(portal_conn)
             .await?;

@@ -87,7 +87,6 @@ impl InsertableStep {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableStepBuilder {
     id: Option<rosetta_uuid::Uuid>,
     procedure_id: Option<i32>,
@@ -97,53 +96,73 @@ pub struct InsertableStepBuilder {
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableStepBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            procedure_id: None,
+            step_model_id: None,
+            begun_at: None,
+            finished_at: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableStepBuilder {
-    pub fn id(
+    pub fn id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        id: rosetta_uuid::Uuid,
+        id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         self.id = Some(id);
         Ok(self)
     }
-    pub fn procedure_id(
+    pub fn procedure_id<P: Into<i32>>(
         mut self,
-        procedure_id: i32,
+        procedure_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let procedure_id = procedure_id.into();
         self.procedure_id = Some(procedure_id);
         Ok(self)
     }
-    pub fn step_model_id(
+    pub fn step_model_id<P: Into<i32>>(
         mut self,
-        step_model_id: i32,
+        step_model_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let step_model_id = step_model_id.into();
         self.step_model_id = Some(step_model_id);
         Ok(self)
     }
-    pub fn begun_at(
+    pub fn begun_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        begun_at: rosetta_timestamp::TimestampUTC,
+        begun_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let begun_at = begun_at.into();
         self.begun_at = Some(begun_at);
         Ok(self)
     }
-    pub fn finished_at(
+    pub fn finished_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        finished_at: rosetta_timestamp::TimestampUTC,
+        finished_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let finished_at = finished_at.into();
         self.finished_at = Some(finished_at);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }

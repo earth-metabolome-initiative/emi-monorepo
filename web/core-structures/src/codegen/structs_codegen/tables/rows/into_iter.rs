@@ -25,16 +25,34 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(|row| crate::codegen::tables::row::Row::AliquotingStep(row))
                     .collect::<Vec<_>>()
             }
-            super::Rows::BrandState(rows) => {
+            super::Rows::BallMillStepModel(rows) => {
                 rows.iter()
                     .cloned()
-                    .map(|row| crate::codegen::tables::row::Row::BrandState(row))
+                    .map(|row| crate::codegen::tables::row::Row::BallMillStepModel(row))
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::BallMillStep(rows) => {
+                rows.iter()
+                    .cloned()
+                    .map(|row| crate::codegen::tables::row::Row::BallMillStep(row))
                     .collect::<Vec<_>>()
             }
             super::Rows::Brand(rows) => {
                 rows.iter()
                     .cloned()
                     .map(|row| crate::codegen::tables::row::Row::Brand(row))
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::CentrifugeStepModel(rows) => {
+                rows.iter()
+                    .cloned()
+                    .map(|row| crate::codegen::tables::row::Row::CentrifugeStepModel(row))
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::CentrifugeStep(rows) => {
+                rows.iter()
+                    .cloned()
+                    .map(|row| crate::codegen::tables::row::Row::CentrifugeStep(row))
                     .collect::<Vec<_>>()
             }
             super::Rows::City(rows) => {
@@ -49,22 +67,22 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(|row| crate::codegen::tables::row::Row::Color(row))
                     .collect::<Vec<_>>()
             }
+            super::Rows::CommercialProductLot(rows) => {
+                rows.iter()
+                    .cloned()
+                    .map(|row| crate::codegen::tables::row::Row::CommercialProductLot(row))
+                    .collect::<Vec<_>>()
+            }
             super::Rows::CommercialProduct(rows) => {
                 rows.iter()
                     .cloned()
                     .map(|row| crate::codegen::tables::row::Row::CommercialProduct(row))
                     .collect::<Vec<_>>()
             }
-            super::Rows::CommercialReagentModel(rows) => {
+            super::Rows::CommercialReagent(rows) => {
                 rows.iter()
                     .cloned()
-                    .map(|row| crate::codegen::tables::row::Row::CommercialReagentModel(row))
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::ContainerCategory(rows) => {
-                rows.iter()
-                    .cloned()
-                    .map(|row| crate::codegen::tables::row::Row::ContainerCategory(row))
+                    .map(|row| crate::codegen::tables::row::Row::CommercialReagent(row))
                     .collect::<Vec<_>>()
             }
             super::Rows::ContainerModel(rows) => {
@@ -77,6 +95,18 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                 rows.iter()
                     .cloned()
                     .map(|row| crate::codegen::tables::row::Row::Country(row))
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::DisposalStepModel(rows) => {
+                rows.iter()
+                    .cloned()
+                    .map(|row| crate::codegen::tables::row::Row::DisposalStepModel(row))
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::DisposalStep(rows) => {
+                rows.iter()
+                    .cloned()
+                    .map(|row| crate::codegen::tables::row::Row::DisposalStep(row))
                     .collect::<Vec<_>>()
             }
             super::Rows::DocumentFormat(rows) => {
@@ -107,18 +137,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                 rows.iter()
                     .cloned()
                     .map(|row| crate::codegen::tables::row::Row::FreezeDryingStepModel(row))
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::GrindingStepModel(rows) => {
-                rows.iter()
-                    .cloned()
-                    .map(|row| crate::codegen::tables::row::Row::GrindingStepModel(row))
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::InstrumentCategory(rows) => {
-                rows.iter()
-                    .cloned()
-                    .map(|row| crate::codegen::tables::row::Row::InstrumentCategory(row))
                     .collect::<Vec<_>>()
             }
             super::Rows::InstrumentLocation(rows) => {
@@ -161,12 +179,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                 rows.iter()
                     .cloned()
                     .map(|row| crate::codegen::tables::row::Row::Material(row))
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::NameplateCategory(rows) => {
-                rows.iter()
-                    .cloned()
-                    .map(|row| crate::codegen::tables::row::Row::NameplateCategory(row))
                     .collect::<Vec<_>>()
             }
             super::Rows::NameplateModel(rows) => {
@@ -349,6 +361,18 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(|row| crate::codegen::tables::row::Row::SamplingStep(row))
                     .collect::<Vec<_>>()
             }
+            super::Rows::ShakingStepModel(rows) => {
+                rows.iter()
+                    .cloned()
+                    .map(|row| crate::codegen::tables::row::Row::ShakingStepModel(row))
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::ShakingStep(rows) => {
+                rows.iter()
+                    .cloned()
+                    .map(|row| crate::codegen::tables::row::Row::ShakingStep(row))
+                    .collect::<Vec<_>>()
+            }
             super::Rows::SpatialRefSy(rows) => {
                 rows.iter()
                     .cloned()
@@ -487,12 +511,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(|row| crate::codegen::tables::row::Row::Team(row))
                     .collect::<Vec<_>>()
             }
-            super::Rows::ToolCategory(rows) => {
-                rows.iter()
-                    .cloned()
-                    .map(|row| crate::codegen::tables::row::Row::ToolCategory(row))
-                    .collect::<Vec<_>>()
-            }
             super::Rows::ToolModel(rows) => {
                 rows.iter()
                     .cloned()
@@ -539,6 +557,12 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                 rows.iter()
                     .cloned()
                     .map(|row| crate::codegen::tables::row::Row::User(row))
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::VolumetricProcessable(rows) => {
+                rows.iter()
+                    .cloned()
+                    .map(|row| crate::codegen::tables::row::Row::VolumetricProcessable(row))
                     .collect::<Vec<_>>()
             }
             super::Rows::WeighingInstrumentModel(rows) => {

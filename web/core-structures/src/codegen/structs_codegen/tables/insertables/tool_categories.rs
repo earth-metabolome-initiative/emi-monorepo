@@ -35,24 +35,27 @@ pub struct InsertableToolCategoryBuilder {
     icon: Option<String>,
 }
 impl InsertableToolCategoryBuilder {
-    pub fn name(
+    pub fn name<P: Into<String>>(
         mut self,
-        name: String,
+        name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let name = name.into();
         self.name = Some(name);
         Ok(self)
     }
-    pub fn description(
+    pub fn description<P: Into<String>>(
         mut self,
-        description: String,
+        description: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let description = description.into();
         self.description = Some(description);
         Ok(self)
     }
-    pub fn icon(
+    pub fn icon<P: Into<String>>(
         mut self,
-        icon: String,
+        icon: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let icon = icon.into();
         self.icon = Some(icon);
         Ok(self)
     }

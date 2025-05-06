@@ -22,16 +22,24 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                         diesel::BoolExpressionMethods::and(
                             diesel::BoolExpressionMethods::and(
                                 diesel::BoolExpressionMethods::and(
-                                    crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::name
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::name,
+                                    diesel::BoolExpressionMethods::and(
+                                        crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::name
+                                            .ne(
+                                                diesel::upsert::excluded(
+                                                    crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::name,
+                                                ),
                                             ),
-                                        ),
-                                    crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::description
+                                        crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::description
+                                            .ne(
+                                                diesel::upsert::excluded(
+                                                    crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::description,
+                                                ),
+                                            ),
+                                    ),
+                                    crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::icon
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::description,
+                                                crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::icon,
                                             ),
                                         ),
                                 ),
@@ -92,16 +100,24 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                         diesel::BoolExpressionMethods::and(
                             diesel::BoolExpressionMethods::and(
                                 diesel::BoolExpressionMethods::and(
-                                    crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::name
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::name,
+                                    diesel::BoolExpressionMethods::and(
+                                        crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::name
+                                            .ne(
+                                                diesel::upsert::excluded(
+                                                    crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::name,
+                                                ),
                                             ),
-                                        ),
-                                    crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::description
+                                        crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::description
+                                            .ne(
+                                                diesel::upsert::excluded(
+                                                    crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::description,
+                                                ),
+                                            ),
+                                    ),
+                                    crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::icon
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::description,
+                                                crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::icon,
                                             ),
                                         ),
                                 ),

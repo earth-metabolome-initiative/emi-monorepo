@@ -20,20 +20,12 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                 diesel::BoolExpressionMethods::and(
                     diesel::BoolExpressionMethods::and(
                         diesel::BoolExpressionMethods::and(
-                            diesel::BoolExpressionMethods::and(
-                                crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::step_model_instrument_category_id
-                                    .ne(
-                                        diesel::upsert::excluded(
-                                            crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::step_model_instrument_category_id,
-                                        ),
+                            crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::created_by
+                                .ne(
+                                    diesel::upsert::excluded(
+                                        crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::created_by,
                                     ),
-                                crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::created_by
-                                    .ne(
-                                        diesel::upsert::excluded(
-                                            crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::created_by,
-                                        ),
-                                    ),
-                            ),
+                                ),
                             crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::created_at
                                 .ne(
                                     diesel::upsert::excluded(
@@ -82,20 +74,12 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                 diesel::BoolExpressionMethods::and(
                     diesel::BoolExpressionMethods::and(
                         diesel::BoolExpressionMethods::and(
-                            diesel::BoolExpressionMethods::and(
-                                crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::step_model_instrument_category_id
-                                    .ne(
-                                        diesel::upsert::excluded(
-                                            crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::step_model_instrument_category_id,
-                                        ),
+                            crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::created_by
+                                .ne(
+                                    diesel::upsert::excluded(
+                                        crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::created_by,
                                     ),
-                                crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::created_by
-                                    .ne(
-                                        diesel::upsert::excluded(
-                                            crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::created_by,
-                                        ),
-                                    ),
-                            ),
+                                ),
                             crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::created_at
                                 .ne(
                                     diesel::upsert::excluded(

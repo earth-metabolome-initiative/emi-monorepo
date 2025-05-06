@@ -2,11 +2,13 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableProcessableAttributes {
     Id,
+    Kilograms,
 }
 impl core::fmt::Display for InsertableProcessableAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertableProcessableAttributes::Id => write!(f, "id"),
+            InsertableProcessableAttributes::Kilograms => write!(f, "kilograms"),
         }
     }
 }
@@ -20,6 +22,7 @@ impl core::fmt::Display for InsertableProcessableAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcessable {
     id: rosetta_uuid::Uuid,
+    kilograms: f32,
 }
 impl InsertableProcessable {
     #[cfg(feature = "postgres")]
@@ -42,13 +45,25 @@ impl InsertableProcessable {
 #[derive(Default)]
 pub struct InsertableProcessableBuilder {
     id: Option<rosetta_uuid::Uuid>,
+    kilograms: Option<f32>,
 }
 impl InsertableProcessableBuilder {
-    pub fn id(
+    pub fn id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        id: rosetta_uuid::Uuid,
+        id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         self.id = Some(id);
+        Ok(self)
+    }
+    pub fn kilograms<P: Into<f32>>(
+        mut self,
+        kilograms: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let kilograms = kilograms.into();
+        pgrx_validation::must_be_strictly_positive_f32(kilograms)
+            .map_err(|e| e.rename_field(InsertableProcessableAttributes::Kilograms))?;
+        self.kilograms = Some(kilograms);
         Ok(self)
     }
 }
@@ -61,12 +76,17 @@ impl common_traits::prelude::Builder for InsertableProcessableBuilder {
             id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableProcessableAttributes::Id,
             ))?,
+            kilograms: self.kilograms.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableProcessableAttributes::Kilograms,
+                ),
+            )?,
         })
     }
 }
 impl TryFrom<InsertableProcessable> for InsertableProcessableBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableProcessable) -> Result<Self, Self::Error> {
-        Self::default().id(insertable_variant.id)
+        Self::default().id(insertable_variant.id)?.kilograms(insertable_variant.kilograms)
     }
 }

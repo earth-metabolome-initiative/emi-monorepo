@@ -49,45 +49,51 @@ pub struct InsertableOrganizationBuilder {
     domain: Option<String>,
 }
 impl InsertableOrganizationBuilder {
-    pub fn name(
+    pub fn name<P: Into<String>>(
         mut self,
-        name: String,
+        name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let name = name.into();
         self.name = Some(name);
         Ok(self)
     }
-    pub fn url(
+    pub fn url<P: Into<String>>(
         mut self,
-        url: String,
+        url: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let url = url.into();
         self.url = Some(url);
         Ok(self)
     }
-    pub fn country(
+    pub fn country<P: Into<String>>(
         mut self,
-        country: String,
+        country: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let country = country.into();
         self.country = Some(country);
         Ok(self)
     }
-    pub fn alpha_two_code(
+    pub fn alpha_two_code<P: Into<iso_codes::CountryCode>>(
         mut self,
-        alpha_two_code: iso_codes::CountryCode,
+        alpha_two_code: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let alpha_two_code = alpha_two_code.into();
         self.alpha_two_code = Some(alpha_two_code);
         Ok(self)
     }
-    pub fn state_province(
+    pub fn state_province<P: Into<Option<String>>>(
         mut self,
-        state_province: Option<String>,
+        state_province: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let state_province = state_province.into();
         self.state_province = state_province;
         Ok(self)
     }
-    pub fn domain(
+    pub fn domain<P: Into<String>>(
         mut self,
-        domain: String,
+        domain: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let domain = domain.into();
         self.domain = Some(domain);
         Ok(self)
     }

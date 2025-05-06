@@ -132,7 +132,6 @@ impl InsertableOrganismObservation {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableOrganismObservationBuilder {
     id: Option<rosetta_uuid::Uuid>,
     wild: Option<bool>,
@@ -145,74 +144,101 @@ pub struct InsertableOrganismObservationBuilder {
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableOrganismObservationBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            wild: Some(true),
+            project_id: None,
+            organism_id: None,
+            subject_id: None,
+            picture: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableOrganismObservationBuilder {
-    pub fn id(
+    pub fn id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        id: rosetta_uuid::Uuid,
+        id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         self.id = Some(id);
         Ok(self)
     }
-    pub fn wild(
+    pub fn wild<P: Into<bool>>(
         mut self,
-        wild: bool,
+        wild: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let wild = wild.into();
         self.wild = Some(wild);
         Ok(self)
     }
-    pub fn project_id(
+    pub fn project_id<P: Into<i32>>(
         mut self,
-        project_id: i32,
+        project_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let project_id = project_id.into();
         self.project_id = Some(project_id);
         Ok(self)
     }
-    pub fn organism_id(
+    pub fn organism_id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        organism_id: rosetta_uuid::Uuid,
+        organism_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let organism_id = organism_id.into();
         self.organism_id = Some(organism_id);
         Ok(self)
     }
-    pub fn subject_id(
+    pub fn subject_id<P: Into<i16>>(
         mut self,
-        subject_id: i16,
+        subject_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let subject_id = subject_id.into();
         self.subject_id = Some(subject_id);
         Ok(self)
     }
-    pub fn picture(
+    pub fn picture<P: Into<Vec<u8>>>(
         mut self,
-        picture: Vec<u8>,
+        picture: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let picture = picture.into();
         self.picture = Some(picture);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P: Into<i32>>(
         mut self,
-        updated_by: i32,
+        updated_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_by = updated_by.into();
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
+        updated_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_at = updated_at.into();
         self.updated_at = Some(updated_at);
         Ok(self)
     }

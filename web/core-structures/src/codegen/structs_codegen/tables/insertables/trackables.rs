@@ -130,7 +130,6 @@ impl InsertableTrackable {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableTrackableBuilder {
     id: Option<rosetta_uuid::Uuid>,
     container_model_id: Option<i32>,
@@ -141,60 +140,83 @@ pub struct InsertableTrackableBuilder {
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableTrackableBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            container_model_id: None,
+            project_id: None,
+            trackable_state_id: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableTrackableBuilder {
-    pub fn id(
+    pub fn id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        id: rosetta_uuid::Uuid,
+        id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         self.id = Some(id);
         Ok(self)
     }
-    pub fn container_model_id(
+    pub fn container_model_id<P: Into<i32>>(
         mut self,
-        container_model_id: i32,
+        container_model_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let container_model_id = container_model_id.into();
         self.container_model_id = Some(container_model_id);
         Ok(self)
     }
-    pub fn project_id(
+    pub fn project_id<P: Into<i32>>(
         mut self,
-        project_id: i32,
+        project_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let project_id = project_id.into();
         self.project_id = Some(project_id);
         Ok(self)
     }
-    pub fn trackable_state_id(
+    pub fn trackable_state_id<P: Into<i16>>(
         mut self,
-        trackable_state_id: i16,
+        trackable_state_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let trackable_state_id = trackable_state_id.into();
         self.trackable_state_id = Some(trackable_state_id);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P: Into<i32>>(
         mut self,
-        updated_by: i32,
+        updated_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_by = updated_by.into();
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
+        updated_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_at = updated_at.into();
         self.updated_at = Some(updated_at);
         Ok(self)
     }

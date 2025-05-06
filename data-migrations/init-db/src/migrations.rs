@@ -28,7 +28,11 @@ pub(crate) async fn init_migrations(
     if !migrations.is_topologically_sorted()? {
         migrations = migrations.topologically_sort()?;
     }
-    assert!(migrations.is_topologically_sorted()?, "The migrations are not topologically sorted.",);
+    assert!(
+        migrations.is_topologically_sorted()?,
+        "The migrations are not topologically sorted: {:?}",
+        migrations.not_topologically_sorted()?
+    );
 
     if !migrations.is_dense() {
         migrations = migrations.redensify()?;

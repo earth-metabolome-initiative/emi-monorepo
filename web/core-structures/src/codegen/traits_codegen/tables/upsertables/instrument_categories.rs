@@ -6,7 +6,9 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
+        use diesel::ExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::query_dsl::methods::FilterDsl;
         diesel::insert_into(
                 crate::codegen::diesel_codegen::tables::instrument_categories::instrument_categories::table,
             )
@@ -52,7 +54,9 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
+        use diesel::ExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::query_dsl::methods::FilterDsl;
         diesel::insert_into(
                 crate::codegen::diesel_codegen::tables::instrument_categories::instrument_categories::table,
             )

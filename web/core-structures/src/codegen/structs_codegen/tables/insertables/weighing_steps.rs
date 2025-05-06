@@ -127,7 +127,6 @@ impl InsertableWeighingStep {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableWeighingStepBuilder {
     id: Option<rosetta_uuid::Uuid>,
     processable_id: Option<rosetta_uuid::Uuid>,
@@ -137,55 +136,75 @@ pub struct InsertableWeighingStepBuilder {
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableWeighingStepBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            processable_id: None,
+            weighing_step_model_id: None,
+            instrument_id: None,
+            kilograms: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableWeighingStepBuilder {
-    pub fn id(
+    pub fn id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        id: rosetta_uuid::Uuid,
+        id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         self.id = Some(id);
         Ok(self)
     }
-    pub fn processable_id(
+    pub fn processable_id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        processable_id: rosetta_uuid::Uuid,
+        processable_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let processable_id = processable_id.into();
         self.processable_id = Some(processable_id);
         Ok(self)
     }
-    pub fn weighing_step_model_id(
+    pub fn weighing_step_model_id<P: Into<i32>>(
         mut self,
-        weighing_step_model_id: i32,
+        weighing_step_model_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let weighing_step_model_id = weighing_step_model_id.into();
         self.weighing_step_model_id = Some(weighing_step_model_id);
         Ok(self)
     }
-    pub fn instrument_id(
+    pub fn instrument_id<P: Into<i32>>(
         mut self,
-        instrument_id: i32,
+        instrument_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let instrument_id = instrument_id.into();
         self.instrument_id = Some(instrument_id);
         Ok(self)
     }
-    pub fn kilograms(
+    pub fn kilograms<P: Into<f32>>(
         mut self,
-        kilograms: f32,
+        kilograms: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let kilograms = kilograms.into();
         pgrx_validation::must_be_strictly_positive_f32(kilograms)
             .map_err(|e| e.rename_field(InsertableWeighingStepAttributes::Kilograms))?;
         self.kilograms = Some(kilograms);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }

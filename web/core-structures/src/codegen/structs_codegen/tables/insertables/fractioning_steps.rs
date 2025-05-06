@@ -4,7 +4,6 @@ pub enum InsertableFractioningStepAttributes {
     Id,
     SourceProcessableId,
     DestinationProcessableId,
-    FractioningStepModelId,
     InstrumentId,
     Kilograms,
     CreatedBy,
@@ -19,9 +18,6 @@ impl core::fmt::Display for InsertableFractioningStepAttributes {
             }
             InsertableFractioningStepAttributes::DestinationProcessableId => {
                 write!(f, "destination_processable_id")
-            }
-            InsertableFractioningStepAttributes::FractioningStepModelId => {
-                write!(f, "fractioning_step_model_id")
             }
             InsertableFractioningStepAttributes::InstrumentId => {
                 write!(f, "instrument_id")
@@ -44,7 +40,6 @@ pub struct InsertableFractioningStep {
     id: rosetta_uuid::Uuid,
     source_processable_id: rosetta_uuid::Uuid,
     destination_processable_id: rosetta_uuid::Uuid,
-    fractioning_step_model_id: i32,
     instrument_id: i32,
     kilograms: f32,
     created_by: i32,
@@ -100,26 +95,6 @@ impl InsertableFractioningStep {
             .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn fractioning_step_model(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::dsl::id
-                    .eq(&self.fractioning_step_model_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-            >(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn instrument(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -152,73 +127,84 @@ impl InsertableFractioningStep {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableFractioningStepBuilder {
     id: Option<rosetta_uuid::Uuid>,
     source_processable_id: Option<rosetta_uuid::Uuid>,
     destination_processable_id: Option<rosetta_uuid::Uuid>,
-    fractioning_step_model_id: Option<i32>,
     instrument_id: Option<i32>,
     kilograms: Option<f32>,
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableFractioningStepBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            source_processable_id: None,
+            destination_processable_id: None,
+            instrument_id: None,
+            kilograms: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableFractioningStepBuilder {
-    pub fn id(
+    pub fn id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        id: rosetta_uuid::Uuid,
+        id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         self.id = Some(id);
         Ok(self)
     }
-    pub fn source_processable_id(
+    pub fn source_processable_id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        source_processable_id: rosetta_uuid::Uuid,
+        source_processable_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let source_processable_id = source_processable_id.into();
         self.source_processable_id = Some(source_processable_id);
         Ok(self)
     }
-    pub fn destination_processable_id(
+    pub fn destination_processable_id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        destination_processable_id: rosetta_uuid::Uuid,
+        destination_processable_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let destination_processable_id = destination_processable_id.into();
         self.destination_processable_id = Some(destination_processable_id);
         Ok(self)
     }
-    pub fn fractioning_step_model_id(
+    pub fn instrument_id<P: Into<i32>>(
         mut self,
-        fractioning_step_model_id: i32,
+        instrument_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.fractioning_step_model_id = Some(fractioning_step_model_id);
-        Ok(self)
-    }
-    pub fn instrument_id(
-        mut self,
-        instrument_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let instrument_id = instrument_id.into();
         self.instrument_id = Some(instrument_id);
         Ok(self)
     }
-    pub fn kilograms(
+    pub fn kilograms<P: Into<f32>>(
         mut self,
-        kilograms: f32,
+        kilograms: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let kilograms = kilograms.into();
         pgrx_validation::must_be_strictly_positive_f32(kilograms)
             .map_err(|e| e.rename_field(InsertableFractioningStepAttributes::Kilograms))?;
         self.kilograms = Some(kilograms);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
@@ -240,11 +226,6 @@ impl common_traits::prelude::Builder for InsertableFractioningStepBuilder {
             destination_processable_id: self.destination_processable_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepAttributes::DestinationProcessableId,
-                ),
-            )?,
-            fractioning_step_model_id: self.fractioning_step_model_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableFractioningStepAttributes::FractioningStepModelId,
                 ),
             )?,
             instrument_id: self.instrument_id.ok_or(
@@ -277,7 +258,6 @@ impl TryFrom<InsertableFractioningStep> for InsertableFractioningStepBuilder {
             .id(insertable_variant.id)?
             .source_processable_id(insertable_variant.source_processable_id)?
             .destination_processable_id(insertable_variant.destination_processable_id)?
-            .fractioning_step_model_id(insertable_variant.fractioning_step_model_id)?
             .instrument_id(insertable_variant.instrument_id)?
             .kilograms(insertable_variant.kilograms)?
             .created_by(insertable_variant.created_by)?

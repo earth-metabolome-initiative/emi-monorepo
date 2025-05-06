@@ -47,51 +47,57 @@ pub struct InsertableLoginProviderBuilder {
     scope: Option<String>,
 }
 impl InsertableLoginProviderBuilder {
-    pub fn name(
+    pub fn name<P: Into<String>>(
         mut self,
-        name: String,
+        name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let name = name.into();
         pgrx_validation::must_not_be_empty(name.as_ref())
             .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::Name))?;
         self.name = Some(name);
         Ok(self)
     }
-    pub fn icon(
+    pub fn icon<P: Into<String>>(
         mut self,
-        icon: String,
+        icon: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let icon = icon.into();
         pgrx_validation::must_be_font_awesome_class(icon.as_ref())
             .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::Icon))?;
         self.icon = Some(icon);
         Ok(self)
     }
-    pub fn client_id(
+    pub fn client_id<P: Into<String>>(
         mut self,
-        client_id: String,
+        client_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let client_id = client_id.into();
         pgrx_validation::must_not_be_empty(client_id.as_ref())
             .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::ClientId))?;
         self.client_id = Some(client_id);
         Ok(self)
     }
-    pub fn redirect_uri(
+    pub fn redirect_uri<P: Into<String>>(
         mut self,
-        redirect_uri: String,
+        redirect_uri: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let redirect_uri = redirect_uri.into();
         self.redirect_uri = Some(redirect_uri);
         Ok(self)
     }
-    pub fn oauth_url(
+    pub fn oauth_url<P: Into<String>>(
         mut self,
-        oauth_url: String,
+        oauth_url: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let oauth_url = oauth_url.into();
         self.oauth_url = Some(oauth_url);
         Ok(self)
     }
-    pub fn scope(
+    pub fn scope<P: Into<String>>(
         mut self,
-        scope: String,
+        scope: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let scope = scope.into();
         pgrx_validation::must_not_be_empty(scope.as_ref())
             .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::Scope))?;
         self.scope = Some(scope);

@@ -14,7 +14,7 @@
 )]
 pub struct NameplateModel {
     pub id: i32,
-    pub nameplate_category_id: i16,
+    pub nameplate_category: nameplate_categories::NameplateCategory,
     pub created_by: i32,
     pub created_at: rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,
@@ -44,26 +44,6 @@ impl NameplateModel {
             )
             .first::<
                 crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-            >(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn nameplate_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::nameplate_categories::nameplate_categories::dsl::id
-                    .eq(&self.nameplate_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
             >(conn)
             .await
     }
@@ -108,21 +88,6 @@ impl NameplateModel {
                     .eq(id.id),
             )
             .first::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_nameplate_category_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        nameplate_category_id: &crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::nameplate_models::nameplate_models::dsl::nameplate_category_id
-                    .eq(nameplate_category_id.id),
-            )
-            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]

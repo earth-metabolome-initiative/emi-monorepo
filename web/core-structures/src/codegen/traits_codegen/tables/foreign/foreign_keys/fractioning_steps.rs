@@ -6,9 +6,6 @@ pub struct FractioningStepForeignKeys {
         Option<crate::codegen::structs_codegen::tables::processables::Processable>,
     pub destination_processable:
         Option<crate::codegen::structs_codegen::tables::processables::Processable>,
-    pub fractioning_step_model: Option<
-        crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-    >,
     pub instrument: Option<crate::codegen::structs_codegen::tables::instruments::Instrument>,
     pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
@@ -35,11 +32,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::FractioningStepModel(
-                self.fractioning_step_model_id,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Instrument(
                 self.instrument_id,
             ),
@@ -52,7 +44,6 @@ impl web_common_traits::prelude::HasForeignKeys
         foreign_keys.id.is_some()
             && foreign_keys.source_processable.is_some()
             && foreign_keys.destination_processable.is_some()
-            && foreign_keys.fractioning_step_model.is_some()
             && foreign_keys.instrument.is_some()
             && foreign_keys.created_by.is_some()
     }
@@ -64,6 +55,46 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
+            (
+                crate::codegen::tables::row::Row::Step(steps),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if steps.id == self.id {
+                    foreign_keys.id = Some(steps);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Step(steps),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if steps.id == self.id {
+                    foreign_keys.id = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if users.id == self.created_by {
+                    foreign_keys.created_by = Some(users);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if users.id == self.created_by {
+                    foreign_keys.created_by = None;
+                    updated = true;
+                }
+            }
             (
                 crate::codegen::tables::row::Row::Instrument(instruments),
                 web_common_traits::crud::CRUD::Read
@@ -81,26 +112,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if instruments.id == self.instrument_id {
                     foreign_keys.instrument = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::FractioningStepModel(fractioning_step_models),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if fractioning_step_models.id == self.fractioning_step_model_id {
-                    foreign_keys.fractioning_step_model = Some(fractioning_step_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::FractioningStepModel(fractioning_step_models),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if fractioning_step_models.id == self.fractioning_step_model_id {
-                    foreign_keys.fractioning_step_model = None;
                     updated = true;
                 }
             }
@@ -129,46 +140,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if processables.id == self.destination_processable_id {
                     foreign_keys.destination_processable = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = Some(users);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Step(steps),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if steps.id == self.id {
-                    foreign_keys.id = Some(steps);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Step(steps),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if steps.id == self.id {
-                    foreign_keys.id = None;
                     updated = true;
                 }
             }

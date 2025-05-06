@@ -2,7 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableProcedureModelNameplateCategoryAttributes {
     ProcedureModelId,
-    NameplateCategoryId,
+    NameplateCategory,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -14,8 +14,8 @@ impl core::fmt::Display for InsertableProcedureModelNameplateCategoryAttributes 
             InsertableProcedureModelNameplateCategoryAttributes::ProcedureModelId => {
                 write!(f, "procedure_model_id")
             }
-            InsertableProcedureModelNameplateCategoryAttributes::NameplateCategoryId => {
-                write!(f, "nameplate_category_id")
+            InsertableProcedureModelNameplateCategoryAttributes::NameplateCategory => {
+                write!(f, "nameplate_category")
             }
             InsertableProcedureModelNameplateCategoryAttributes::CreatedBy => {
                 write!(f, "created_by")
@@ -42,7 +42,7 @@ impl core::fmt::Display for InsertableProcedureModelNameplateCategoryAttributes 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureModelNameplateCategory {
     procedure_model_id: i32,
-    nameplate_category_id: i16,
+    nameplate_category: nameplate_categories::NameplateCategory,
     created_by: i32,
     created_at: rosetta_timestamp::TimestampUTC,
     updated_by: i32,
@@ -67,26 +67,6 @@ impl InsertableProcedureModelNameplateCategory {
             .first::<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>(
                 conn,
             )
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn nameplate_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::nameplate_categories::nameplate_categories::dsl::id
-                    .eq(&self.nameplate_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -118,55 +98,73 @@ impl InsertableProcedureModelNameplateCategory {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableProcedureModelNameplateCategoryBuilder {
     procedure_model_id: Option<i32>,
-    nameplate_category_id: Option<i16>,
+    nameplate_category: Option<nameplate_categories::NameplateCategory>,
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableProcedureModelNameplateCategoryBuilder {
+    fn default() -> Self {
+        Self {
+            procedure_model_id: None,
+            nameplate_category: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableProcedureModelNameplateCategoryBuilder {
-    pub fn procedure_model_id(
+    pub fn procedure_model_id<P: Into<i32>>(
         mut self,
-        procedure_model_id: i32,
+        procedure_model_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let procedure_model_id = procedure_model_id.into();
         self.procedure_model_id = Some(procedure_model_id);
         Ok(self)
     }
-    pub fn nameplate_category_id(
+    pub fn nameplate_category<P: Into<nameplate_categories::NameplateCategory>>(
         mut self,
-        nameplate_category_id: i16,
+        nameplate_category: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.nameplate_category_id = Some(nameplate_category_id);
+        let nameplate_category = nameplate_category.into();
+        self.nameplate_category = Some(nameplate_category);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P: Into<i32>>(
         mut self,
-        updated_by: i32,
+        updated_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_by = updated_by.into();
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
+        updated_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_at = updated_at.into();
         self.updated_at = Some(updated_at);
         Ok(self)
     }
@@ -184,9 +182,9 @@ impl common_traits::prelude::Builder for InsertableProcedureModelNameplateCatego
                     InsertableProcedureModelNameplateCategoryAttributes::ProcedureModelId,
                 ),
             )?,
-            nameplate_category_id: self.nameplate_category_id.ok_or(
+            nameplate_category: self.nameplate_category.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureModelNameplateCategoryAttributes::NameplateCategoryId,
+                    InsertableProcedureModelNameplateCategoryAttributes::NameplateCategory,
                 ),
             )?,
             created_by: self.created_by.ok_or(
@@ -221,7 +219,7 @@ impl TryFrom<InsertableProcedureModelNameplateCategory>
     ) -> Result<Self, Self::Error> {
         Self::default()
             .procedure_model_id(insertable_variant.procedure_model_id)?
-            .nameplate_category_id(insertable_variant.nameplate_category_id)?
+            .nameplate_category(insertable_variant.nameplate_category)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?

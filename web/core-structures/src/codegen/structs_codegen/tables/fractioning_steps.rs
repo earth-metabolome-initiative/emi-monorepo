@@ -16,7 +16,6 @@ pub struct FractioningStep {
     pub id: rosetta_uuid::Uuid,
     pub source_processable_id: rosetta_uuid::Uuid,
     pub destination_processable_id: rosetta_uuid::Uuid,
-    pub fractioning_step_model_id: i32,
     pub instrument_id: i32,
     pub kilograms: f32,
     pub created_by: i32,
@@ -75,26 +74,6 @@ impl FractioningStep {
                     .eq(&self.destination_processable_id),
             )
             .first::<crate::codegen::structs_codegen::tables::processables::Processable>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn fractioning_step_model(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::dsl::id
-                    .eq(&self.fractioning_step_model_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -170,21 +149,6 @@ impl FractioningStep {
             .filter(
                 crate::codegen::diesel_codegen::tables::fractioning_steps::fractioning_steps::dsl::destination_processable_id
                     .eq(destination_processable_id.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_fractioning_step_model_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        fractioning_step_model_id: &crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::fractioning_steps::fractioning_steps::dsl::fractioning_step_model_id
-                    .eq(fractioning_step_model_id.id),
             )
             .load::<Self>(conn)
             .await

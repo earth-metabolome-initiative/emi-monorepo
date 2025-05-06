@@ -30,7 +30,8 @@ impl ToolCategory {
         name: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{OptionalExtension, QueryDsl};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(diesel::ExpressionMethods::eq(
@@ -46,7 +47,8 @@ impl ToolCategory {
         description: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{OptionalExtension, QueryDsl};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(
@@ -64,7 +66,8 @@ impl ToolCategory {
         icon: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{OptionalExtension, QueryDsl};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(diesel::ExpressionMethods::eq(

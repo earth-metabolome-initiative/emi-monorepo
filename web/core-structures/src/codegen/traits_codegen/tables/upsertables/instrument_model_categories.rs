@@ -29,10 +29,10 @@ for crate::codegen::structs_codegen::tables::instrument_model_categories::Instru
                                                 crate::codegen::diesel_codegen::tables::instrument_model_categories::instrument_model_categories::instrument_model_id,
                                             ),
                                         ),
-                                    crate::codegen::diesel_codegen::tables::instrument_model_categories::instrument_model_categories::instrument_category_id
+                                    crate::codegen::diesel_codegen::tables::instrument_model_categories::instrument_model_categories::instrument_category
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::instrument_model_categories::instrument_model_categories::instrument_category_id,
+                                                crate::codegen::diesel_codegen::tables::instrument_model_categories::instrument_model_categories::instrument_category,
                                             ),
                                         ),
                                 ),
@@ -100,10 +100,10 @@ for crate::codegen::structs_codegen::tables::instrument_model_categories::Instru
                                                 crate::codegen::diesel_codegen::tables::instrument_model_categories::instrument_model_categories::instrument_model_id,
                                             ),
                                         ),
-                                    crate::codegen::diesel_codegen::tables::instrument_model_categories::instrument_model_categories::instrument_category_id
+                                    crate::codegen::diesel_codegen::tables::instrument_model_categories::instrument_model_categories::instrument_category
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::instrument_model_categories::instrument_model_categories::instrument_category_id,
+                                                crate::codegen::diesel_codegen::tables::instrument_model_categories::instrument_model_categories::instrument_category,
                                             ),
                                         ),
                                 ),

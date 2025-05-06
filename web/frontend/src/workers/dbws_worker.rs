@@ -13,9 +13,9 @@
 use db_worker::listen_notify::ListenNotify;
 use diesel::SqliteConnection;
 use internal_message::ws_internal_message::WSInternalMessage;
+use web_sys::console;
 use ws_messages::{DBMessage, F2BMessage, frontend::Subscription};
 use yew_agent::worker::{HandlerId, Worker};
-use web_sys::console;
 
 mod c2db_message;
 pub(crate) use c2db_message::C2DBMessage;

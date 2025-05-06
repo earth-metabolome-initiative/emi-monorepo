@@ -3,15 +3,15 @@
 pub enum InsertableOrganismAttributes {
     Id,
     Name,
-    NameplateCategoryId,
+    NameplateCategory,
 }
 impl core::fmt::Display for InsertableOrganismAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertableOrganismAttributes::Id => write!(f, "id"),
             InsertableOrganismAttributes::Name => write!(f, "name"),
-            InsertableOrganismAttributes::NameplateCategoryId => {
-                write!(f, "nameplate_category_id")
+            InsertableOrganismAttributes::NameplateCategory => {
+                write!(f, "nameplate_category")
             }
         }
     }
@@ -25,7 +25,7 @@ impl core::fmt::Display for InsertableOrganismAttributes {
 pub struct InsertableOrganism {
     id: rosetta_uuid::Uuid,
     name: Option<String>,
-    nameplate_category_id: i16,
+    nameplate_category: nameplate_categories::NameplateCategory,
 }
 impl InsertableOrganism {
     #[cfg(feature = "postgres")]
@@ -44,45 +44,27 @@ impl InsertableOrganism {
             .first::<crate::codegen::structs_codegen::tables::trackables::Trackable>(conn)
             .await
     }
-    #[cfg(feature = "postgres")]
-    pub async fn nameplate_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::nameplate_categories::nameplate_categories::dsl::id
-                    .eq(&self.nameplate_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-            >(conn)
-            .await
-    }
 }
 #[derive(Default)]
 pub struct InsertableOrganismBuilder {
     id: Option<rosetta_uuid::Uuid>,
     name: Option<String>,
-    nameplate_category_id: Option<i16>,
+    nameplate_category: Option<nameplate_categories::NameplateCategory>,
 }
 impl InsertableOrganismBuilder {
-    pub fn id(
+    pub fn id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        id: rosetta_uuid::Uuid,
+        id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         self.id = Some(id);
         Ok(self)
     }
-    pub fn name(
+    pub fn name<P: Into<Option<String>>>(
         mut self,
-        name: Option<String>,
+        name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let name = name.into();
         if let Some(name) = name.as_ref() {
             pgrx_validation::must_not_be_empty(name)
                 .map_err(|e| e.rename_field(InsertableOrganismAttributes::Name))?;
@@ -90,11 +72,12 @@ impl InsertableOrganismBuilder {
         self.name = name;
         Ok(self)
     }
-    pub fn nameplate_category_id(
+    pub fn nameplate_category<P: Into<nameplate_categories::NameplateCategory>>(
         mut self,
-        nameplate_category_id: i16,
+        nameplate_category: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.nameplate_category_id = Some(nameplate_category_id);
+        let nameplate_category = nameplate_category.into();
+        self.nameplate_category = Some(nameplate_category);
         Ok(self)
     }
 }
@@ -108,9 +91,9 @@ impl common_traits::prelude::Builder for InsertableOrganismBuilder {
                 InsertableOrganismAttributes::Id,
             ))?,
             name: self.name,
-            nameplate_category_id: self.nameplate_category_id.ok_or(
+            nameplate_category: self.nameplate_category.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganismAttributes::NameplateCategoryId,
+                    InsertableOrganismAttributes::NameplateCategory,
                 ),
             )?,
         })
@@ -122,6 +105,6 @@ impl TryFrom<InsertableOrganism> for InsertableOrganismBuilder {
         Self::default()
             .id(insertable_variant.id)?
             .name(insertable_variant.name)?
-            .nameplate_category_id(insertable_variant.nameplate_category_id)
+            .nameplate_category(insertable_variant.nameplate_category)
     }
 }

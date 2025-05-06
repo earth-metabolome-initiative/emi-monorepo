@@ -43,38 +43,43 @@ pub struct InsertableSpatialRefSyBuilder {
     proj4text: Option<String>,
 }
 impl InsertableSpatialRefSyBuilder {
-    pub fn srid(
+    pub fn srid<P: Into<i32>>(
         mut self,
-        srid: i32,
+        srid: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let srid = srid.into();
         self.srid = Some(srid);
         Ok(self)
     }
-    pub fn auth_name(
+    pub fn auth_name<P: Into<Option<String>>>(
         mut self,
-        auth_name: Option<String>,
+        auth_name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let auth_name = auth_name.into();
         self.auth_name = auth_name;
         Ok(self)
     }
-    pub fn auth_srid(
+    pub fn auth_srid<P: Into<Option<i32>>>(
         mut self,
-        auth_srid: Option<i32>,
+        auth_srid: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let auth_srid = auth_srid.into();
         self.auth_srid = auth_srid;
         Ok(self)
     }
-    pub fn srtext(
+    pub fn srtext<P: Into<Option<String>>>(
         mut self,
-        srtext: Option<String>,
+        srtext: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let srtext = srtext.into();
         self.srtext = srtext;
         Ok(self)
     }
-    pub fn proj4text(
+    pub fn proj4text<P: Into<Option<String>>>(
         mut self,
-        proj4text: Option<String>,
+        proj4text: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let proj4text = proj4text.into();
         self.proj4text = proj4text;
         Ok(self)
     }

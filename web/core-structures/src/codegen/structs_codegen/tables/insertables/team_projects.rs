@@ -60,17 +60,19 @@ pub struct InsertableTeamProjectBuilder {
     project_id: Option<i32>,
 }
 impl InsertableTeamProjectBuilder {
-    pub fn team_id(
+    pub fn team_id<P: Into<i32>>(
         mut self,
-        team_id: i32,
+        team_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let team_id = team_id.into();
         self.team_id = Some(team_id);
         Ok(self)
     }
-    pub fn project_id(
+    pub fn project_id<P: Into<i32>>(
         mut self,
-        project_id: i32,
+        project_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let project_id = project_id.into();
         self.project_id = Some(project_id);
         Ok(self)
     }

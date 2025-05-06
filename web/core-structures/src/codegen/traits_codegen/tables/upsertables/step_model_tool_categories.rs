@@ -28,10 +28,10 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                                                 crate::codegen::diesel_codegen::tables::step_model_tool_categories::step_model_tool_categories::step_model_id,
                                             ),
                                         ),
-                                    crate::codegen::diesel_codegen::tables::step_model_tool_categories::step_model_tool_categories::tool_category_id
+                                    crate::codegen::diesel_codegen::tables::step_model_tool_categories::step_model_tool_categories::tool_category
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::step_model_tool_categories::step_model_tool_categories::tool_category_id,
+                                                crate::codegen::diesel_codegen::tables::step_model_tool_categories::step_model_tool_categories::tool_category,
                                             ),
                                         ),
                                 ),
@@ -98,10 +98,10 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                                                 crate::codegen::diesel_codegen::tables::step_model_tool_categories::step_model_tool_categories::step_model_id,
                                             ),
                                         ),
-                                    crate::codegen::diesel_codegen::tables::step_model_tool_categories::step_model_tool_categories::tool_category_id
+                                    crate::codegen::diesel_codegen::tables::step_model_tool_categories::step_model_tool_categories::tool_category
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::step_model_tool_categories::step_model_tool_categories::tool_category_id,
+                                                crate::codegen::diesel_codegen::tables::step_model_tool_categories::step_model_tool_categories::tool_category,
                                             ),
                                         ),
                                 ),

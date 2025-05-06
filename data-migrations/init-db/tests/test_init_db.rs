@@ -21,7 +21,7 @@ async fn test_init_db() {
         panic!("Failed to initialize the database: {err:?}");
     }
 
-    for extension in ["pgrx_validation", "iso_codes"] {
+    for extension in ["pgrx_validation", "iso_codes", "tool_categories", "instrument_categories"] {
         if PgExtension::load(extension, "public", &mut conn).await.unwrap().is_none() {
             docker.stop().await.expect("Failed to stop the docker container");
             panic!(

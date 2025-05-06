@@ -31,7 +31,8 @@ impl BrandState {
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
         crate::codegen::structs_codegen::tables::colors::Color::table()
             .filter(
@@ -45,7 +46,8 @@ impl BrandState {
         conn: &mut diesel_async::AsyncPgConnection,
         color_id: &crate::codegen::structs_codegen::tables::colors::Color,
     ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(
@@ -60,7 +62,8 @@ impl BrandState {
         name: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{OptionalExtension, QueryDsl};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(diesel::ExpressionMethods::eq(
@@ -76,7 +79,8 @@ impl BrandState {
         description: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{OptionalExtension, QueryDsl};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(diesel::ExpressionMethods::eq(
@@ -92,7 +96,8 @@ impl BrandState {
         icon: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{OptionalExtension, QueryDsl};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(diesel::ExpressionMethods::eq(

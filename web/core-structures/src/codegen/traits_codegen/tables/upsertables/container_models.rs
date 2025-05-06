@@ -28,10 +28,10 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                                                 crate::codegen::diesel_codegen::tables::container_models::container_models::liters,
                                             ),
                                         ),
-                                    crate::codegen::diesel_codegen::tables::container_models::container_models::container_category_id
+                                    crate::codegen::diesel_codegen::tables::container_models::container_models::container_category
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::container_models::container_models::container_category_id,
+                                                crate::codegen::diesel_codegen::tables::container_models::container_models::container_category,
                                             ),
                                         ),
                                 ),
@@ -98,10 +98,10 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                                                 crate::codegen::diesel_codegen::tables::container_models::container_models::liters,
                                             ),
                                         ),
-                                    crate::codegen::diesel_codegen::tables::container_models::container_models::container_category_id
+                                    crate::codegen::diesel_codegen::tables::container_models::container_models::container_category
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::container_models::container_models::container_category_id,
+                                                crate::codegen::diesel_codegen::tables::container_models::container_models::container_category,
                                             ),
                                         ),
                                 ),

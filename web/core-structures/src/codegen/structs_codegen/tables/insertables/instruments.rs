@@ -111,7 +111,6 @@ impl InsertableInstrument {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableInstrumentBuilder {
     instrument_model_id: Option<i32>,
     instrument_state_id: Option<i16>,
@@ -121,53 +120,74 @@ pub struct InsertableInstrumentBuilder {
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableInstrumentBuilder {
+    fn default() -> Self {
+        Self {
+            instrument_model_id: None,
+            instrument_state_id: Some(1i16),
+            qrcode: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableInstrumentBuilder {
-    pub fn instrument_model_id(
+    pub fn instrument_model_id<P: Into<i32>>(
         mut self,
-        instrument_model_id: i32,
+        instrument_model_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let instrument_model_id = instrument_model_id.into();
         self.instrument_model_id = Some(instrument_model_id);
         Ok(self)
     }
-    pub fn instrument_state_id(
+    pub fn instrument_state_id<P: Into<i16>>(
         mut self,
-        instrument_state_id: i16,
+        instrument_state_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let instrument_state_id = instrument_state_id.into();
         self.instrument_state_id = Some(instrument_state_id);
         Ok(self)
     }
-    pub fn qrcode(
+    pub fn qrcode<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        qrcode: rosetta_uuid::Uuid,
+        qrcode: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let qrcode = qrcode.into();
         self.qrcode = Some(qrcode);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P: Into<i32>>(
         mut self,
-        updated_by: i32,
+        updated_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_by = updated_by.into();
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
+        updated_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_at = updated_at.into();
         self.updated_at = Some(updated_at);
         Ok(self)
     }

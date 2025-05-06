@@ -64,17 +64,19 @@ pub struct InsertableUserOrganizationBuilder {
     organization_id: Option<i16>,
 }
 impl InsertableUserOrganizationBuilder {
-    pub fn user_id(
+    pub fn user_id<P: Into<i32>>(
         mut self,
-        user_id: i32,
+        user_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let user_id = user_id.into();
         self.user_id = Some(user_id);
         Ok(self)
     }
-    pub fn organization_id(
+    pub fn organization_id<P: Into<i16>>(
         mut self,
-        organization_id: i16,
+        organization_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let organization_id = organization_id.into();
         self.organization_id = Some(organization_id);
         Ok(self)
     }

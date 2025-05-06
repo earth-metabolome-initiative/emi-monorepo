@@ -70,17 +70,19 @@ pub struct InsertableEmailProviderBuilder {
     login_provider_id: Option<i16>,
 }
 impl InsertableEmailProviderBuilder {
-    pub fn email_id(
+    pub fn email_id<P: Into<i32>>(
         mut self,
-        email_id: i32,
+        email_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let email_id = email_id.into();
         self.email_id = Some(email_id);
         Ok(self)
     }
-    pub fn login_provider_id(
+    pub fn login_provider_id<P: Into<i16>>(
         mut self,
-        login_provider_id: i16,
+        login_provider_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let login_provider_id = login_provider_id.into();
         self.login_provider_id = Some(login_provider_id);
         Ok(self)
     }

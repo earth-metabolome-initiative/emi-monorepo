@@ -149,7 +149,6 @@ impl InsertableProject {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableProjectBuilder {
     id: Option<i32>,
     name: Option<String>,
@@ -167,8 +166,33 @@ pub struct InsertableProjectBuilder {
     expected_end_date: Option<rosetta_timestamp::TimestampUTC>,
     end_date: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableProjectBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            name: None,
+            description: None,
+            state_id: Some(1i16),
+            icon: None,
+            color_id: Some(1i16),
+            parent_project_id: None,
+            budget: None,
+            expenses: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            expected_end_date: None,
+            end_date: None,
+        }
+    }
+}
 impl InsertableProjectBuilder {
-    pub fn id(mut self, id: i32) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P: Into<i32>>(
+        mut self,
+        id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         if let Some(parent_project_id) = self.parent_project_id {
             pgrx_validation::must_be_distinct_i32(parent_project_id, id).map_err(|e| {
                 e.rename_fields(
@@ -180,10 +204,11 @@ impl InsertableProjectBuilder {
         self.id = Some(id);
         Ok(self)
     }
-    pub fn name(
+    pub fn name<P: Into<String>>(
         mut self,
-        name: String,
+        name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let name = name.into();
         if let Some(description) = self.description.as_ref() {
             pgrx_validation::must_be_distinct(name.as_ref(), description).map_err(|e| {
                 e.rename_fields(
@@ -197,10 +222,11 @@ impl InsertableProjectBuilder {
         self.name = Some(name);
         Ok(self)
     }
-    pub fn description(
+    pub fn description<P: Into<String>>(
         mut self,
-        description: String,
+        description: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let description = description.into();
         if let Some(name) = self.name.as_ref() {
             pgrx_validation::must_be_distinct(name, description.as_ref()).map_err(|e| {
                 e.rename_fields(
@@ -214,33 +240,37 @@ impl InsertableProjectBuilder {
         self.description = Some(description);
         Ok(self)
     }
-    pub fn state_id(
+    pub fn state_id<P: Into<i16>>(
         mut self,
-        state_id: i16,
+        state_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let state_id = state_id.into();
         self.state_id = Some(state_id);
         Ok(self)
     }
-    pub fn icon(
+    pub fn icon<P: Into<String>>(
         mut self,
-        icon: String,
+        icon: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let icon = icon.into();
         pgrx_validation::must_be_font_awesome_class(icon.as_ref())
             .map_err(|e| e.rename_field(InsertableProjectAttributes::Icon))?;
         self.icon = Some(icon);
         Ok(self)
     }
-    pub fn color_id(
+    pub fn color_id<P: Into<i16>>(
         mut self,
-        color_id: i16,
+        color_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let color_id = color_id.into();
         self.color_id = Some(color_id);
         Ok(self)
     }
-    pub fn parent_project_id(
+    pub fn parent_project_id<P: Into<Option<i32>>>(
         mut self,
-        parent_project_id: Option<i32>,
+        parent_project_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let parent_project_id = parent_project_id.into();
         if let (Some(id), Some(parent_project_id)) = (self.id, parent_project_id) {
             pgrx_validation::must_be_distinct_i32(parent_project_id, id).map_err(|e| {
                 e.rename_fields(
@@ -252,59 +282,68 @@ impl InsertableProjectBuilder {
         self.parent_project_id = parent_project_id;
         Ok(self)
     }
-    pub fn budget(
+    pub fn budget<P: Into<Option<f64>>>(
         mut self,
-        budget: Option<f64>,
+        budget: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let budget = budget.into();
         self.budget = budget;
         Ok(self)
     }
-    pub fn expenses(
+    pub fn expenses<P: Into<Option<f64>>>(
         mut self,
-        expenses: Option<f64>,
+        expenses: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let expenses = expenses.into();
         self.expenses = expenses;
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P: Into<i32>>(
         mut self,
-        updated_by: i32,
+        updated_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_by = updated_by.into();
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
+        updated_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_at = updated_at.into();
         self.updated_at = Some(updated_at);
         Ok(self)
     }
-    pub fn expected_end_date(
+    pub fn expected_end_date<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        expected_end_date: rosetta_timestamp::TimestampUTC,
+        expected_end_date: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let expected_end_date = expected_end_date.into();
         self.expected_end_date = Some(expected_end_date);
         Ok(self)
     }
-    pub fn end_date(
+    pub fn end_date<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        end_date: rosetta_timestamp::TimestampUTC,
+        end_date: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let end_date = end_date.into();
         self.end_date = Some(end_date);
         Ok(self)
     }

@@ -46,7 +46,8 @@ impl InsertableNameplateCategory {
         crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
         crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory::table()
             .filter(
@@ -63,7 +64,8 @@ impl InsertableNameplateCategory {
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
         crate::codegen::structs_codegen::tables::colors::Color::table()
             .filter(
@@ -82,38 +84,43 @@ pub struct InsertableNameplateCategoryBuilder {
     color_id: Option<i16>,
 }
 impl InsertableNameplateCategoryBuilder {
-    pub fn name(
+    pub fn name<P: Into<String>>(
         mut self,
-        name: String,
+        name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let name = name.into();
         self.name = Some(name);
         Ok(self)
     }
-    pub fn permanence_category_id(
+    pub fn permanence_category_id<P: Into<i16>>(
         mut self,
-        permanence_category_id: i16,
+        permanence_category_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let permanence_category_id = permanence_category_id.into();
         self.permanence_category_id = Some(permanence_category_id);
         Ok(self)
     }
-    pub fn description(
+    pub fn description<P: Into<String>>(
         mut self,
-        description: String,
+        description: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let description = description.into();
         self.description = Some(description);
         Ok(self)
     }
-    pub fn icon(
+    pub fn icon<P: Into<String>>(
         mut self,
-        icon: String,
+        icon: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let icon = icon.into();
         self.icon = Some(icon);
         Ok(self)
     }
-    pub fn color_id(
+    pub fn color_id<P: Into<i16>>(
         mut self,
-        color_id: i16,
+        color_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let color_id = color_id.into();
         self.color_id = Some(color_id);
         Ok(self)
     }

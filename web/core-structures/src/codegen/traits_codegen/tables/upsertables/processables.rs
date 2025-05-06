@@ -6,13 +6,19 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
+        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
         diesel::insert_into(
             crate::codegen::diesel_codegen::tables::processables::processables::table,
         )
         .values(self)
         .on_conflict(crate::codegen::diesel_codegen::tables::processables::processables::id)
-        .do_nothing()
+        .do_update()
+        .set(self)
+        .filter(crate::codegen::diesel_codegen::tables::processables::processables::kilograms.ne(
+            diesel::upsert::excluded(
+                crate::codegen::diesel_codegen::tables::processables::processables::kilograms,
+            ),
+        ))
         .get_results(conn)
         .map(|mut result| result.pop())
     }
@@ -25,13 +31,19 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
+        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
         diesel::insert_into(
             crate::codegen::diesel_codegen::tables::processables::processables::table,
         )
         .values(self)
         .on_conflict(crate::codegen::diesel_codegen::tables::processables::processables::id)
-        .do_nothing()
+        .do_update()
+        .set(self)
+        .filter(crate::codegen::diesel_codegen::tables::processables::processables::kilograms.ne(
+            diesel::upsert::excluded(
+                crate::codegen::diesel_codegen::tables::processables::processables::kilograms,
+            ),
+        ))
         .get_results(conn)
         .map(|mut result| result.pop())
     }

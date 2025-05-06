@@ -15,7 +15,7 @@
 pub struct StepModelInstrumentCategory {
     pub id: i32,
     pub step_model_id: i32,
-    pub instrument_category_id: i16,
+    pub instrument_category: instrument_categories::InstrumentCategory,
     pub created_by: i32,
     pub created_at: rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,
@@ -44,26 +44,6 @@ impl StepModelInstrumentCategory {
                     .eq(&self.step_model_id),
             )
             .first::<crate::codegen::structs_codegen::tables::step_models::StepModel>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn instrument_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::instrument_categories::InstrumentCategory,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::instrument_categories::InstrumentCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::instrument_categories::instrument_categories::dsl::id
-                    .eq(&self.instrument_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::instrument_categories::InstrumentCategory,
-            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -105,21 +85,6 @@ impl StepModelInstrumentCategory {
             .filter(
                 crate::codegen::diesel_codegen::tables::step_model_instrument_categories::step_model_instrument_categories::dsl::step_model_id
                     .eq(step_model_id.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_instrument_category_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        instrument_category_id: &crate::codegen::structs_codegen::tables::instrument_categories::InstrumentCategory,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::step_model_instrument_categories::step_model_instrument_categories::dsl::instrument_category_id
-                    .eq(instrument_category_id.id),
             )
             .load::<Self>(conn)
             .await

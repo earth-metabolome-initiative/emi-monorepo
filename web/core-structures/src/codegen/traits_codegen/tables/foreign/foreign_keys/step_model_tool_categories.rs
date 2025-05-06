@@ -2,8 +2,6 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StepModelToolCategoryForeignKeys {
     pub step_model: Option<crate::codegen::structs_codegen::tables::step_models::StepModel>,
-    pub tool_category:
-        Option<crate::codegen::structs_codegen::tables::tool_categories::ToolCategory>,
     pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
     pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
@@ -22,11 +20,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ToolCategory(
-                self.tool_category_id,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -35,7 +28,6 @@ impl web_common_traits::prelude::HasForeignKeys
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.step_model.is_some()
-            && foreign_keys.tool_category.is_some()
             && foreign_keys.created_by.is_some()
             && foreign_keys.updated_by.is_some()
     }
@@ -47,6 +39,26 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
+            (
+                crate::codegen::tables::row::Row::StepModel(step_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if step_models.id == self.step_model_id {
+                    foreign_keys.step_model = Some(step_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::StepModel(step_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if step_models.id == self.step_model_id {
+                    foreign_keys.step_model = None;
+                    updated = true;
+                }
+            }
             (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
@@ -72,46 +84,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::StepModel(step_models),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if step_models.id == self.step_model_id {
-                    foreign_keys.step_model = Some(step_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::StepModel(step_models),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if step_models.id == self.step_model_id {
-                    foreign_keys.step_model = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ToolCategory(tool_categories),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if tool_categories.id == self.tool_category_id {
-                    foreign_keys.tool_category = Some(tool_categories);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ToolCategory(tool_categories),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if tool_categories.id == self.tool_category_id {
-                    foreign_keys.tool_category = None;
                     updated = true;
                 }
             }

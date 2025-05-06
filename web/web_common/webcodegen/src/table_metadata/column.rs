@@ -3,7 +3,11 @@ use diesel::{
     QueryableByName, Selectable, SelectableHelper, result::Error as DieselError,
 };
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
+use proc_macro2::TokenStream;
 use syn::{Ident, Type};
+
+mod default_types;
+pub use default_types::DefaultTypes;
 
 use super::{
     check_constraint::CheckConstraint,
@@ -689,6 +693,63 @@ impl Column {
     /// Returns whether the current column has a DEFAULT value
     pub fn has_default(&self) -> bool {
         self.column_default.is_some()
+    }
+
+    /// Returns the rust TokenStream to create the default value of the column
+    pub async fn rust_default_value(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<TokenStream, WebCodeGenError> {
+        let Some(column_default) = &self.column_default else {
+            return Err(WebCodeGenError::ColumnDoesNotHaveDefaultValue(Box::new(self.clone())));
+        };
+        let rust_str_data_type = self.str_rust_data_type(conn).await?;
+        let default = DefaultTypes::new(&rust_str_data_type, column_default)?;
+        Ok(match (rust_str_data_type.as_str(), default) {
+            ("chrono::NaiveDateTime", DefaultTypes::CurrentTimestamp) => {
+                quote::quote! {
+                    chrono::Local::now().naive_local()
+                }
+            }
+            ("rosetta_timestamp::TimestampUTC", DefaultTypes::CurrentTimestamp) => {
+                quote::quote! {
+                    rosetta_timestamp::TimestampUTC::default()
+                }
+            }
+            ("i16", DefaultTypes::I16(value)) => {
+                quote::quote! {
+                    #value
+                }
+            }
+            ("i32", DefaultTypes::I32(value)) => {
+                quote::quote! {
+                    #value
+                }
+            }
+            ("i64", DefaultTypes::I64(value)) => {
+                quote::quote! {
+                    #value
+                }
+            }
+            ("bool", DefaultTypes::Bool(value)) => {
+                quote::quote! {
+                    #value
+                }
+            }
+            ("String", DefaultTypes::String(value)) => {
+                quote::quote! {
+                    #value.to_owned()
+                }
+            }
+            (r#type, default) => {
+                unimplemented!(
+                    "Default value `{default}` for column \"{}\".\"{}\" of type `{}` is not implemented!",
+                    self.table_name,
+                    self.column_name,
+                    r#type
+                )
+            }
+        })
     }
 
     /// Returns whether the column contains the update user and is defined by

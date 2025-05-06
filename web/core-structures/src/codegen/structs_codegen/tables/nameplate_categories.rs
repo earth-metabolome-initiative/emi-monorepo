@@ -35,7 +35,8 @@ impl NameplateCategory {
         crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
         crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory::table()
             .filter(
@@ -52,7 +53,8 @@ impl NameplateCategory {
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
         crate::codegen::structs_codegen::tables::colors::Color::table()
             .filter(
@@ -66,7 +68,8 @@ impl NameplateCategory {
         conn: &mut diesel_async::AsyncPgConnection,
         permanence_category_id: &crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
     ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(
@@ -81,7 +84,8 @@ impl NameplateCategory {
         conn: &mut diesel_async::AsyncPgConnection,
         color_id: &crate::codegen::structs_codegen::tables::colors::Color,
     ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(
@@ -96,7 +100,8 @@ impl NameplateCategory {
         name: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{OptionalExtension, QueryDsl};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(
@@ -114,7 +119,8 @@ impl NameplateCategory {
         description: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{OptionalExtension, QueryDsl};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(
@@ -132,7 +138,8 @@ impl NameplateCategory {
         icon: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{OptionalExtension, QueryDsl};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(

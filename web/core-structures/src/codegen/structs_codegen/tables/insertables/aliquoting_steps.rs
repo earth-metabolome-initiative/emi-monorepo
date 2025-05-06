@@ -60,17 +60,19 @@ impl InsertableAliquotingStep {
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::processables::Processable,
+        crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
         diesel::result::Error,
     > {
         use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::processables::Processable::table()
+        crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::processables::processables::dsl::id
+                crate::codegen::diesel_codegen::tables::volumetric_processables::volumetric_processables::dsl::id
                     .eq(&self.source_processable_id),
             )
-            .first::<crate::codegen::structs_codegen::tables::processables::Processable>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
+            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -78,17 +80,19 @@ impl InsertableAliquotingStep {
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::processables::Processable,
+        crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
         diesel::result::Error,
     > {
         use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::processables::Processable::table()
+        crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::processables::processables::dsl::id
+                crate::codegen::diesel_codegen::tables::volumetric_processables::volumetric_processables::dsl::id
                     .eq(&self.destination_processable_id),
             )
-            .first::<crate::codegen::structs_codegen::tables::processables::Processable>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
+            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -124,7 +128,6 @@ impl InsertableAliquotingStep {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableAliquotingStepBuilder {
     id: Option<rosetta_uuid::Uuid>,
     source_processable_id: Option<rosetta_uuid::Uuid>,
@@ -133,46 +136,64 @@ pub struct InsertableAliquotingStepBuilder {
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableAliquotingStepBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            source_processable_id: None,
+            destination_processable_id: None,
+            instrument_id: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableAliquotingStepBuilder {
-    pub fn id(
+    pub fn id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        id: rosetta_uuid::Uuid,
+        id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         self.id = Some(id);
         Ok(self)
     }
-    pub fn source_processable_id(
+    pub fn source_processable_id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        source_processable_id: rosetta_uuid::Uuid,
+        source_processable_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let source_processable_id = source_processable_id.into();
         self.source_processable_id = Some(source_processable_id);
         Ok(self)
     }
-    pub fn destination_processable_id(
+    pub fn destination_processable_id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        destination_processable_id: rosetta_uuid::Uuid,
+        destination_processable_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let destination_processable_id = destination_processable_id.into();
         self.destination_processable_id = Some(destination_processable_id);
         Ok(self)
     }
-    pub fn instrument_id(
+    pub fn instrument_id<P: Into<i32>>(
         mut self,
-        instrument_id: i32,
+        instrument_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let instrument_id = instrument_id.into();
         self.instrument_id = Some(instrument_id);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }

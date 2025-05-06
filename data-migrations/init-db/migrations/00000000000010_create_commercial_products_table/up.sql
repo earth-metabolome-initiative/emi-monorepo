@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS aliquoting_instrument_models (
 CREATE TABLE IF NOT EXISTS instrument_model_categories (
 	id SERIAL PRIMARY KEY,
 	instrument_model_id INTEGER NOT NULL REFERENCES instrument_models(id),
-	instrument_category_id SMALLINT NOT NULL REFERENCES instrument_categories(id),
+	instrument_category InstrumentCategory NOT NULL,
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INTEGER NOT NULL REFERENCES users(id),
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS instrument_model_categories (
 CREATE TABLE IF NOT EXISTS container_models (
 	id INTEGER PRIMARY KEY REFERENCES commercial_products(id),
 	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters)),
-	container_category_id SMALLINT NOT NULL REFERENCES container_categories(id),
+	container_category ContainerCategory NOT NULL,
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INTEGER NOT NULL REFERENCES users(id),
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS packaging_models (
 
 CREATE TABLE IF NOT EXISTS tool_models (
 	id INTEGER PRIMARY KEY REFERENCES commercial_products(id),
-	tool_category_id SMALLINT NOT NULL REFERENCES tool_categories(id),
+	tool_category ToolCategory NOT NULL,
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INTEGER NOT NULL REFERENCES users(id),
@@ -85,15 +85,7 @@ CREATE TABLE IF NOT EXISTS tool_models (
 
 CREATE TABLE IF NOT EXISTS nameplate_models (
 	id INTEGER PRIMARY KEY REFERENCES commercial_products(id),
-	nameplate_category_id SMALLINT NOT NULL REFERENCES nameplate_categories(id),
-	created_by INTEGER NOT NULL REFERENCES users(id),
-	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	updated_by INTEGER NOT NULL REFERENCES users(id),
-	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS commercial_reagent_models (
-	id INTEGER PRIMARY KEY REFERENCES commercial_products(id),
+	nameplate_category NameplateCategory NOT NULL,
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INTEGER NOT NULL REFERENCES users(id),

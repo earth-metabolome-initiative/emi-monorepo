@@ -106,7 +106,6 @@ impl InsertableAliquotingInstrumentModel {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableAliquotingInstrumentModelBuilder {
     id: Option<i32>,
     error_liters: Option<f32>,
@@ -117,15 +116,34 @@ pub struct InsertableAliquotingInstrumentModelBuilder {
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableAliquotingInstrumentModelBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            error_liters: None,
+            minimum_measurable_liters: None,
+            maximum_measurable_liters: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableAliquotingInstrumentModelBuilder {
-    pub fn id(mut self, id: i32) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P: Into<i32>>(
+        mut self,
+        id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         self.id = Some(id);
         Ok(self)
     }
-    pub fn error_liters(
+    pub fn error_liters<P: Into<f32>>(
         mut self,
-        error_liters: f32,
+        error_liters: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let error_liters = error_liters.into();
         if let Some(minimum_measurable_liters) = self.minimum_measurable_liters {
             pgrx_validation::must_be_strictly_smaller_than_f32(
                 error_liters,
@@ -144,10 +162,11 @@ impl InsertableAliquotingInstrumentModelBuilder {
         self.error_liters = Some(error_liters);
         Ok(self)
     }
-    pub fn minimum_measurable_liters(
+    pub fn minimum_measurable_liters<P: Into<f32>>(
         mut self,
-        minimum_measurable_liters: f32,
+        minimum_measurable_liters: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let minimum_measurable_liters = minimum_measurable_liters.into();
         if let Some(error_liters) = self.error_liters {
             pgrx_validation::must_be_strictly_smaller_than_f32(
                 error_liters,
@@ -178,10 +197,11 @@ impl InsertableAliquotingInstrumentModelBuilder {
         self.minimum_measurable_liters = Some(minimum_measurable_liters);
         Ok(self)
     }
-    pub fn maximum_measurable_liters(
+    pub fn maximum_measurable_liters<P: Into<f32>>(
         mut self,
-        maximum_measurable_liters: f32,
+        maximum_measurable_liters: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let maximum_measurable_liters = maximum_measurable_liters.into();
         if let Some(minimum_measurable_liters) = self.minimum_measurable_liters {
             pgrx_validation::must_be_strictly_smaller_than_f32(
                 minimum_measurable_liters,
@@ -200,31 +220,36 @@ impl InsertableAliquotingInstrumentModelBuilder {
         self.maximum_measurable_liters = Some(maximum_measurable_liters);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P: Into<i32>>(
         mut self,
-        updated_by: i32,
+        updated_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_by = updated_by.into();
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
+        updated_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_at = updated_at.into();
         self.updated_at = Some(updated_at);
         Ok(self)
     }

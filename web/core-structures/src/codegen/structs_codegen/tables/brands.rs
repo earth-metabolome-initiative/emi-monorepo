@@ -17,7 +17,6 @@ pub struct Brand {
     pub created_at: rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,
     pub updated_at: rosetta_timestamp::TimestampUTC,
-    pub brand_state_id: i16,
 }
 impl diesel::Identifiable for Brand {
     type Id = i32;
@@ -55,24 +54,6 @@ impl Brand {
             .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn brand_state(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::brand_states::BrandState,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::brand_states::BrandState::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::brand_states::brand_states::dsl::id
-                    .eq(&self.brand_state_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::brand_states::BrandState>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn from_created_by(
         conn: &mut diesel_async::AsyncPgConnection,
         created_by: &crate::codegen::structs_codegen::tables::users::User,
@@ -98,21 +79,6 @@ impl Brand {
             .filter(
                 crate::codegen::diesel_codegen::tables::brands::brands::dsl::updated_by
                     .eq(updated_by.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_brand_state_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        brand_state_id: &crate::codegen::structs_codegen::tables::brand_states::BrandState,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::brands::brands::dsl::brand_state_id
-                    .eq(brand_state_id.id),
             )
             .load::<Self>(conn)
             .await

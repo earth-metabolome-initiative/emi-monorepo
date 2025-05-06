@@ -29,17 +29,19 @@ pub struct InsertableCountryBuilder {
     name: Option<String>,
 }
 impl InsertableCountryBuilder {
-    pub fn iso(
+    pub fn iso<P: Into<iso_codes::CountryCode>>(
         mut self,
-        iso: iso_codes::CountryCode,
+        iso: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let iso = iso.into();
         self.iso = Some(iso);
         Ok(self)
     }
-    pub fn name(
+    pub fn name<P: Into<String>>(
         mut self,
-        name: String,
+        name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let name = name.into();
         self.name = Some(name);
         Ok(self)
     }

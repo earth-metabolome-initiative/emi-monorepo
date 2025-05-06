@@ -79,7 +79,6 @@ impl InsertableStepToolModel {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableStepToolModelBuilder {
     id: Option<rosetta_uuid::Uuid>,
     step_id: Option<rosetta_uuid::Uuid>,
@@ -87,39 +86,55 @@ pub struct InsertableStepToolModelBuilder {
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableStepToolModelBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            step_id: None,
+            tool_model_id: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableStepToolModelBuilder {
-    pub fn id(
+    pub fn id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        id: rosetta_uuid::Uuid,
+        id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         self.id = Some(id);
         Ok(self)
     }
-    pub fn step_id(
+    pub fn step_id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        step_id: rosetta_uuid::Uuid,
+        step_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let step_id = step_id.into();
         self.step_id = Some(step_id);
         Ok(self)
     }
-    pub fn tool_model_id(
+    pub fn tool_model_id<P: Into<i32>>(
         mut self,
-        tool_model_id: i32,
+        tool_model_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let tool_model_id = tool_model_id.into();
         self.tool_model_id = Some(tool_model_id);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }

@@ -74,39 +74,52 @@ impl InsertableOrganismTaxon {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableOrganismTaxonBuilder {
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     organism_id: Option<rosetta_uuid::Uuid>,
     taxon_id: Option<i32>,
 }
+impl Default for InsertableOrganismTaxonBuilder {
+    fn default() -> Self {
+        Self {
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            organism_id: None,
+            taxon_id: None,
+        }
+    }
+}
 impl InsertableOrganismTaxonBuilder {
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn organism_id(
+    pub fn organism_id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        organism_id: rosetta_uuid::Uuid,
+        organism_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let organism_id = organism_id.into();
         self.organism_id = Some(organism_id);
         Ok(self)
     }
-    pub fn taxon_id(
+    pub fn taxon_id<P: Into<i32>>(
         mut self,
-        taxon_id: i32,
+        taxon_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let taxon_id = taxon_id.into();
         self.taxon_id = Some(taxon_id);
         Ok(self)
     }

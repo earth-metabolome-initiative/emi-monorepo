@@ -22,20 +22,12 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                         diesel::BoolExpressionMethods::and(
                             diesel::BoolExpressionMethods::and(
                                 diesel::BoolExpressionMethods::and(
-                                    diesel::BoolExpressionMethods::and(
-                                        crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::step_model_instrument_category_id
-                                            .ne(
-                                                diesel::upsert::excluded(
-                                                    crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::step_model_instrument_category_id,
-                                                ),
+                                    crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::expected_kilograms
+                                        .ne(
+                                            diesel::upsert::excluded(
+                                                crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::expected_kilograms,
                                             ),
-                                        crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::expected_kilograms
-                                            .ne(
-                                                diesel::upsert::excluded(
-                                                    crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::expected_kilograms,
-                                                ),
-                                            ),
-                                    ),
+                                        ),
                                     crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::tolerance_kilograms
                                         .ne(
                                             diesel::upsert::excluded(
@@ -100,20 +92,12 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                         diesel::BoolExpressionMethods::and(
                             diesel::BoolExpressionMethods::and(
                                 diesel::BoolExpressionMethods::and(
-                                    diesel::BoolExpressionMethods::and(
-                                        crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::step_model_instrument_category_id
-                                            .ne(
-                                                diesel::upsert::excluded(
-                                                    crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::step_model_instrument_category_id,
-                                                ),
+                                    crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::expected_kilograms
+                                        .ne(
+                                            diesel::upsert::excluded(
+                                                crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::expected_kilograms,
                                             ),
-                                        crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::expected_kilograms
-                                            .ne(
-                                                diesel::upsert::excluded(
-                                                    crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::expected_kilograms,
-                                                ),
-                                            ),
-                                    ),
+                                        ),
                                     crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::tolerance_kilograms
                                         .ne(
                                             diesel::upsert::excluded(

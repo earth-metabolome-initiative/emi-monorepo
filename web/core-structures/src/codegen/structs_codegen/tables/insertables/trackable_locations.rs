@@ -101,7 +101,6 @@ impl InsertableTrackableLocation {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableTrackableLocationBuilder {
     id: Option<rosetta_uuid::Uuid>,
     trackable_id: Option<rosetta_uuid::Uuid>,
@@ -111,53 +110,73 @@ pub struct InsertableTrackableLocationBuilder {
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     created_by: Option<i32>,
 }
+impl Default for InsertableTrackableLocationBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            trackable_id: None,
+            storage_container_id: None,
+            geolocation: None,
+            inferred: Some(false),
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            created_by: None,
+        }
+    }
+}
 impl InsertableTrackableLocationBuilder {
-    pub fn id(
+    pub fn id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        id: rosetta_uuid::Uuid,
+        id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         self.id = Some(id);
         Ok(self)
     }
-    pub fn trackable_id(
+    pub fn trackable_id<P: Into<rosetta_uuid::Uuid>>(
         mut self,
-        trackable_id: rosetta_uuid::Uuid,
+        trackable_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let trackable_id = trackable_id.into();
         self.trackable_id = Some(trackable_id);
         Ok(self)
     }
-    pub fn storage_container_id(
+    pub fn storage_container_id<P: Into<Option<rosetta_uuid::Uuid>>>(
         mut self,
-        storage_container_id: Option<rosetta_uuid::Uuid>,
+        storage_container_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let storage_container_id = storage_container_id.into();
         self.storage_container_id = storage_container_id;
         Ok(self)
     }
-    pub fn geolocation(
+    pub fn geolocation<P: Into<postgis_diesel::types::Point>>(
         mut self,
-        geolocation: postgis_diesel::types::Point,
+        geolocation: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let geolocation = geolocation.into();
         self.geolocation = Some(geolocation);
         Ok(self)
     }
-    pub fn inferred(
+    pub fn inferred<P: Into<bool>>(
         mut self,
-        inferred: bool,
+        inferred: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let inferred = inferred.into();
         self.inferred = Some(inferred);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
         Ok(self)
     }

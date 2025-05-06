@@ -52,14 +52,19 @@ pub struct InsertableSpectrumBuilder {
     spectra_collection_id: Option<i32>,
 }
 impl InsertableSpectrumBuilder {
-    pub fn id(mut self, id: i32) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P: Into<i32>>(
+        mut self,
+        id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         self.id = Some(id);
         Ok(self)
     }
-    pub fn spectra_collection_id(
+    pub fn spectra_collection_id<P: Into<i32>>(
         mut self,
-        spectra_collection_id: i32,
+        spectra_collection_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let spectra_collection_id = spectra_collection_id.into();
         self.spectra_collection_id = Some(spectra_collection_id);
         Ok(self)
     }

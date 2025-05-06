@@ -37,10 +37,10 @@ for crate::codegen::structs_codegen::tables::procedure_model_tool_categories::Pr
                                                 ),
                                             ),
                                     ),
-                                    crate::codegen::diesel_codegen::tables::procedure_model_tool_categories::procedure_model_tool_categories::tool_category_id
+                                    crate::codegen::diesel_codegen::tables::procedure_model_tool_categories::procedure_model_tool_categories::tool_category
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::procedure_model_tool_categories::procedure_model_tool_categories::tool_category_id,
+                                                crate::codegen::diesel_codegen::tables::procedure_model_tool_categories::procedure_model_tool_categories::tool_category,
                                             ),
                                         ),
                                 ),
@@ -116,10 +116,10 @@ for crate::codegen::structs_codegen::tables::procedure_model_tool_categories::Pr
                                                 ),
                                             ),
                                     ),
-                                    crate::codegen::diesel_codegen::tables::procedure_model_tool_categories::procedure_model_tool_categories::tool_category_id
+                                    crate::codegen::diesel_codegen::tables::procedure_model_tool_categories::procedure_model_tool_categories::tool_category
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::procedure_model_tool_categories::procedure_model_tool_categories::tool_category_id,
+                                                crate::codegen::diesel_codegen::tables::procedure_model_tool_categories::procedure_model_tool_categories::tool_category,
                                             ),
                                         ),
                                 ),

@@ -2,7 +2,6 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableFractioningStepModelAttributes {
     Id,
-    StepModelInstrumentCategoryId,
     ExpectedKilograms,
     ToleranceKilograms,
     CreatedBy,
@@ -14,9 +13,6 @@ impl core::fmt::Display for InsertableFractioningStepModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertableFractioningStepModelAttributes::Id => write!(f, "id"),
-            InsertableFractioningStepModelAttributes::StepModelInstrumentCategoryId => {
-                write!(f, "step_model_instrument_category_id")
-            }
             InsertableFractioningStepModelAttributes::ExpectedKilograms => {
                 write!(f, "expected_kilograms")
             }
@@ -48,7 +44,6 @@ impl core::fmt::Display for InsertableFractioningStepModelAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableFractioningStepModel {
     id: i32,
-    step_model_instrument_category_id: i32,
     expected_kilograms: f32,
     tolerance_kilograms: f32,
     created_by: i32,
@@ -73,26 +68,6 @@ impl InsertableFractioningStepModel {
                     .eq(&self.id),
             )
             .first::<crate::codegen::structs_codegen::tables::step_models::StepModel>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn step_model_instrument_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
-        diesel::result::Error,
-    >{
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::step_model_instrument_categories::step_model_instrument_categories::dsl::id
-                    .eq(&self.step_model_instrument_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
-            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -124,10 +99,8 @@ impl InsertableFractioningStepModel {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableFractioningStepModelBuilder {
     id: Option<i32>,
-    step_model_instrument_category_id: Option<i32>,
     expected_kilograms: Option<f32>,
     tolerance_kilograms: Option<f32>,
     created_by: Option<i32>,
@@ -135,22 +108,33 @@ pub struct InsertableFractioningStepModelBuilder {
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableFractioningStepModelBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            expected_kilograms: None,
+            tolerance_kilograms: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableFractioningStepModelBuilder {
-    pub fn id(mut self, id: i32) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P: Into<i32>>(
+        mut self,
+        id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         self.id = Some(id);
         Ok(self)
     }
-    pub fn step_model_instrument_category_id(
+    pub fn expected_kilograms<P: Into<f32>>(
         mut self,
-        step_model_instrument_category_id: i32,
+        expected_kilograms: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.step_model_instrument_category_id = Some(step_model_instrument_category_id);
-        Ok(self)
-    }
-    pub fn expected_kilograms(
-        mut self,
-        expected_kilograms: f32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let expected_kilograms = expected_kilograms.into();
         if let Some(tolerance_kilograms) = self.tolerance_kilograms {
             pgrx_validation::must_be_strictly_smaller_than_f32(
                 tolerance_kilograms,
@@ -169,10 +153,11 @@ impl InsertableFractioningStepModelBuilder {
         self.expected_kilograms = Some(expected_kilograms);
         Ok(self)
     }
-    pub fn tolerance_kilograms(
+    pub fn tolerance_kilograms<P: Into<f32>>(
         mut self,
-        tolerance_kilograms: f32,
+        tolerance_kilograms: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let tolerance_kilograms = tolerance_kilograms.into();
         if let Some(expected_kilograms) = self.expected_kilograms {
             pgrx_validation::must_be_strictly_smaller_than_f32(
                 tolerance_kilograms,
@@ -191,31 +176,36 @@ impl InsertableFractioningStepModelBuilder {
         self.tolerance_kilograms = Some(tolerance_kilograms);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P: Into<i32>>(
         mut self,
-        updated_by: i32,
+        updated_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_by = updated_by.into();
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
+        updated_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_at = updated_at.into();
         self.updated_at = Some(updated_at);
         Ok(self)
     }
@@ -229,11 +219,6 @@ impl common_traits::prelude::Builder for InsertableFractioningStepModelBuilder {
             id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableFractioningStepModelAttributes::Id,
             ))?,
-            step_model_instrument_category_id: self.step_model_instrument_category_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableFractioningStepModelAttributes::StepModelInstrumentCategoryId,
-                ),
-            )?,
             expected_kilograms: self.expected_kilograms.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepModelAttributes::ExpectedKilograms,
@@ -272,9 +257,6 @@ impl TryFrom<InsertableFractioningStepModel> for InsertableFractioningStepModelB
     fn try_from(insertable_variant: InsertableFractioningStepModel) -> Result<Self, Self::Error> {
         Self::default()
             .id(insertable_variant.id)?
-            .step_model_instrument_category_id(
-                insertable_variant.step_model_instrument_category_id,
-            )?
             .expected_kilograms(insertable_variant.expected_kilograms)?
             .tolerance_kilograms(insertable_variant.tolerance_kilograms)?
             .created_by(insertable_variant.created_by)?

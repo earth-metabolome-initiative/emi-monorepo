@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(
     diesel::Selectable,
@@ -46,7 +46,7 @@ impl City {
         use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
-            .filter(crate::codegen::diesel_codegen::tables::cities::cities::dsl::iso.eq(&iso.iso))
+            .filter(crate::codegen::diesel_codegen::tables::cities::cities::dsl::iso.eq(iso.iso))
             .load::<Self>(conn)
             .await
     }

@@ -10,19 +10,28 @@ impl web_common_traits::prelude::Row for super::Row {
                 aliquoting_step_models.primary_key()
             }
             super::Row::AliquotingStep(aliquoting_steps) => aliquoting_steps.primary_key(),
-            super::Row::BrandState(brand_states) => brand_states.primary_key(),
+            super::Row::BallMillStepModel(ball_mill_step_models) => {
+                ball_mill_step_models.primary_key()
+            }
+            super::Row::BallMillStep(ball_mill_steps) => ball_mill_steps.primary_key(),
             super::Row::Brand(brands) => brands.primary_key(),
+            super::Row::CentrifugeStepModel(centrifuge_step_models) => {
+                centrifuge_step_models.primary_key()
+            }
+            super::Row::CentrifugeStep(centrifuge_steps) => centrifuge_steps.primary_key(),
             super::Row::City(cities) => cities.primary_key(),
             super::Row::Color(colors) => colors.primary_key(),
+            super::Row::CommercialProductLot(commercial_product_lots) => {
+                commercial_product_lots.primary_key()
+            }
             super::Row::CommercialProduct(commercial_products) => commercial_products.primary_key(),
-            super::Row::CommercialReagentModel(commercial_reagent_models) => {
-                commercial_reagent_models.primary_key()
-            }
-            super::Row::ContainerCategory(container_categories) => {
-                container_categories.primary_key()
-            }
+            super::Row::CommercialReagent(commercial_reagents) => commercial_reagents.primary_key(),
             super::Row::ContainerModel(container_models) => container_models.primary_key(),
             super::Row::Country(countries) => countries.primary_key(),
+            super::Row::DisposalStepModel(disposal_step_models) => {
+                disposal_step_models.primary_key()
+            }
+            super::Row::DisposalStep(disposal_steps) => disposal_steps.primary_key(),
             super::Row::DocumentFormat(document_formats) => document_formats.primary_key(),
             super::Row::EmailProvider(email_providers) => email_providers.primary_key(),
             super::Row::FractioningStepModel(fractioning_step_models) => {
@@ -31,12 +40,6 @@ impl web_common_traits::prelude::Row for super::Row {
             super::Row::FractioningStep(fractioning_steps) => fractioning_steps.primary_key(),
             super::Row::FreezeDryingStepModel(freeze_drying_step_models) => {
                 freeze_drying_step_models.primary_key()
-            }
-            super::Row::GrindingStepModel(grinding_step_models) => {
-                grinding_step_models.primary_key()
-            }
-            super::Row::InstrumentCategory(instrument_categories) => {
-                instrument_categories.primary_key()
             }
             super::Row::InstrumentLocation(instrument_locations) => {
                 instrument_locations.primary_key()
@@ -49,9 +52,6 @@ impl web_common_traits::prelude::Row for super::Row {
             super::Row::Instrument(instruments) => instruments.primary_key(),
             super::Row::LoginProvider(login_providers) => login_providers.primary_key(),
             super::Row::Material(materials) => materials.primary_key(),
-            super::Row::NameplateCategory(nameplate_categories) => {
-                nameplate_categories.primary_key()
-            }
             super::Row::NameplateModel(nameplate_models) => nameplate_models.primary_key(),
             super::Row::ObservationSubject(observation_subjects) => {
                 observation_subjects.primary_key()
@@ -105,6 +105,8 @@ impl web_common_traits::prelude::Row for super::Row {
                 sampling_step_models.primary_key()
             }
             super::Row::SamplingStep(sampling_steps) => sampling_steps.primary_key(),
+            super::Row::ShakingStepModel(shaking_step_models) => shaking_step_models.primary_key(),
+            super::Row::ShakingStep(shaking_steps) => shaking_steps.primary_key(),
             super::Row::SpatialRefSy(spatial_ref_sys) => spatial_ref_sys.primary_key(),
             super::Row::Spectrum(spectra) => spectra.primary_key(),
             super::Row::SpectraCollection(spectra_collections) => spectra_collections.primary_key(),
@@ -148,7 +150,6 @@ impl web_common_traits::prelude::Row for super::Row {
             super::Row::TeamProject(team_projects) => team_projects.primary_key(),
             super::Row::TeamState(team_states) => team_states.primary_key(),
             super::Row::Team(teams) => teams.primary_key(),
-            super::Row::ToolCategory(tool_categories) => tool_categories.primary_key(),
             super::Row::ToolModel(tool_models) => tool_models.primary_key(),
             super::Row::TrackableLocation(trackable_locations) => trackable_locations.primary_key(),
             super::Row::TrackableState(trackable_states) => trackable_states.primary_key(),
@@ -157,6 +158,9 @@ impl web_common_traits::prelude::Row for super::Row {
             super::Row::UserEmail(user_emails) => user_emails.primary_key(),
             super::Row::UserOrganization(user_organizations) => user_organizations.primary_key(),
             super::Row::User(users) => users.primary_key(),
+            super::Row::VolumetricProcessable(volumetric_processables) => {
+                volumetric_processables.primary_key()
+            }
             super::Row::WeighingInstrumentModel(weighing_instrument_models) => {
                 weighing_instrument_models.primary_key()
             }

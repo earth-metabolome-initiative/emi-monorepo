@@ -2,7 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableStepModelContainerCategoryAttributes {
     StepModelId,
-    ContainerCategoryId,
+    ContainerCategory,
     ExpectedKelvin,
     ToleranceKelvin,
     CreatedBy,
@@ -16,8 +16,8 @@ impl core::fmt::Display for InsertableStepModelContainerCategoryAttributes {
             InsertableStepModelContainerCategoryAttributes::StepModelId => {
                 write!(f, "step_model_id")
             }
-            InsertableStepModelContainerCategoryAttributes::ContainerCategoryId => {
-                write!(f, "container_category_id")
+            InsertableStepModelContainerCategoryAttributes::ContainerCategory => {
+                write!(f, "container_category")
             }
             InsertableStepModelContainerCategoryAttributes::ExpectedKelvin => {
                 write!(f, "expected_kelvin")
@@ -50,7 +50,7 @@ impl core::fmt::Display for InsertableStepModelContainerCategoryAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableStepModelContainerCategory {
     step_model_id: i32,
-    container_category_id: i16,
+    container_category: container_categories::ContainerCategory,
     expected_kelvin: f32,
     tolerance_kelvin: f32,
     created_by: i32,
@@ -75,26 +75,6 @@ impl InsertableStepModelContainerCategory {
                     .eq(&self.step_model_id),
             )
             .first::<crate::codegen::structs_codegen::tables::step_models::StepModel>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn container_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::container_categories::ContainerCategory,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::container_categories::ContainerCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::container_categories::container_categories::dsl::id
-                    .eq(&self.container_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::container_categories::ContainerCategory,
-            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -126,10 +106,9 @@ impl InsertableStepModelContainerCategory {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableStepModelContainerCategoryBuilder {
     step_model_id: Option<i32>,
-    container_category_id: Option<i16>,
+    container_category: Option<container_categories::ContainerCategory>,
     expected_kelvin: Option<f32>,
     tolerance_kelvin: Option<f32>,
     created_by: Option<i32>,
@@ -137,25 +116,42 @@ pub struct InsertableStepModelContainerCategoryBuilder {
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableStepModelContainerCategoryBuilder {
+    fn default() -> Self {
+        Self {
+            step_model_id: None,
+            container_category: None,
+            expected_kelvin: None,
+            tolerance_kelvin: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableStepModelContainerCategoryBuilder {
-    pub fn step_model_id(
+    pub fn step_model_id<P: Into<i32>>(
         mut self,
-        step_model_id: i32,
+        step_model_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let step_model_id = step_model_id.into();
         self.step_model_id = Some(step_model_id);
         Ok(self)
     }
-    pub fn container_category_id(
+    pub fn container_category<P: Into<container_categories::ContainerCategory>>(
         mut self,
-        container_category_id: i16,
+        container_category: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.container_category_id = Some(container_category_id);
+        let container_category = container_category.into();
+        self.container_category = Some(container_category);
         Ok(self)
     }
-    pub fn expected_kelvin(
+    pub fn expected_kelvin<P: Into<f32>>(
         mut self,
-        expected_kelvin: f32,
+        expected_kelvin: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let expected_kelvin = expected_kelvin.into();
         if let Some(tolerance_kelvin) = self.tolerance_kelvin {
             pgrx_validation::must_be_strictly_smaller_than_f32(tolerance_kelvin, expected_kelvin)
                 .map_err(|e| {
@@ -171,10 +167,11 @@ impl InsertableStepModelContainerCategoryBuilder {
         self.expected_kelvin = Some(expected_kelvin);
         Ok(self)
     }
-    pub fn tolerance_kelvin(
+    pub fn tolerance_kelvin<P: Into<f32>>(
         mut self,
-        tolerance_kelvin: f32,
+        tolerance_kelvin: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let tolerance_kelvin = tolerance_kelvin.into();
         if let Some(expected_kelvin) = self.expected_kelvin {
             pgrx_validation::must_be_strictly_smaller_than_f32(tolerance_kelvin, expected_kelvin)
                 .map_err(|e| {
@@ -190,31 +187,36 @@ impl InsertableStepModelContainerCategoryBuilder {
         self.tolerance_kelvin = Some(tolerance_kelvin);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P: Into<i32>>(
         mut self,
-        updated_by: i32,
+        updated_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_by = updated_by.into();
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
+        updated_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_at = updated_at.into();
         self.updated_at = Some(updated_at);
         Ok(self)
     }
@@ -231,9 +233,9 @@ impl common_traits::prelude::Builder for InsertableStepModelContainerCategoryBui
                     InsertableStepModelContainerCategoryAttributes::StepModelId,
                 ),
             )?,
-            container_category_id: self.container_category_id.ok_or(
+            container_category: self.container_category.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepModelContainerCategoryAttributes::ContainerCategoryId,
+                    InsertableStepModelContainerCategoryAttributes::ContainerCategory,
                 ),
             )?,
             expected_kelvin: self.expected_kelvin.ok_or(
@@ -276,7 +278,7 @@ impl TryFrom<InsertableStepModelContainerCategory> for InsertableStepModelContai
     ) -> Result<Self, Self::Error> {
         Self::default()
             .step_model_id(insertable_variant.step_model_id)?
-            .container_category_id(insertable_variant.container_category_id)?
+            .container_category(insertable_variant.container_category)?
             .expected_kelvin(insertable_variant.expected_kelvin)?
             .tolerance_kelvin(insertable_variant.tolerance_kelvin)?
             .created_by(insertable_variant.created_by)?

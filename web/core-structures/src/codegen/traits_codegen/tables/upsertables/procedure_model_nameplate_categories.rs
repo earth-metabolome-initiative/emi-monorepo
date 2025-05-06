@@ -29,10 +29,10 @@ for crate::codegen::structs_codegen::tables::procedure_model_nameplate_categorie
                                                 crate::codegen::diesel_codegen::tables::procedure_model_nameplate_categories::procedure_model_nameplate_categories::procedure_model_id,
                                             ),
                                         ),
-                                    crate::codegen::diesel_codegen::tables::procedure_model_nameplate_categories::procedure_model_nameplate_categories::nameplate_category_id
+                                    crate::codegen::diesel_codegen::tables::procedure_model_nameplate_categories::procedure_model_nameplate_categories::nameplate_category
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::procedure_model_nameplate_categories::procedure_model_nameplate_categories::nameplate_category_id,
+                                                crate::codegen::diesel_codegen::tables::procedure_model_nameplate_categories::procedure_model_nameplate_categories::nameplate_category,
                                             ),
                                         ),
                                 ),
@@ -100,10 +100,10 @@ for crate::codegen::structs_codegen::tables::procedure_model_nameplate_categorie
                                                 crate::codegen::diesel_codegen::tables::procedure_model_nameplate_categories::procedure_model_nameplate_categories::procedure_model_id,
                                             ),
                                         ),
-                                    crate::codegen::diesel_codegen::tables::procedure_model_nameplate_categories::procedure_model_nameplate_categories::nameplate_category_id
+                                    crate::codegen::diesel_codegen::tables::procedure_model_nameplate_categories::procedure_model_nameplate_categories::nameplate_category
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::procedure_model_nameplate_categories::procedure_model_nameplate_categories::nameplate_category_id,
+                                                crate::codegen::diesel_codegen::tables::procedure_model_nameplate_categories::procedure_model_nameplate_categories::nameplate_category,
                                             ),
                                         ),
                                 ),

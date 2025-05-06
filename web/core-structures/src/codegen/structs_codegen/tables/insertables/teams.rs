@@ -130,7 +130,6 @@ impl InsertableTeam {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableTeamBuilder {
     id: Option<i32>,
     name: Option<String>,
@@ -144,8 +143,29 @@ pub struct InsertableTeamBuilder {
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableTeamBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            name: None,
+            description: None,
+            icon: None,
+            color_id: Some(15i16),
+            state_id: Some(1i16),
+            parent_team_id: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableTeamBuilder {
-    pub fn id(mut self, id: i32) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P: Into<i32>>(
+        mut self,
+        id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         if let Some(parent_team_id) = self.parent_team_id {
             pgrx_validation::must_be_distinct_i32(parent_team_id, id).map_err(|e| {
                 e.rename_fields(
@@ -157,49 +177,55 @@ impl InsertableTeamBuilder {
         self.id = Some(id);
         Ok(self)
     }
-    pub fn name(
+    pub fn name<P: Into<String>>(
         mut self,
-        name: String,
+        name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let name = name.into();
         pgrx_validation::must_not_be_empty(name.as_ref())
             .map_err(|e| e.rename_field(InsertableTeamAttributes::Name))?;
         self.name = Some(name);
         Ok(self)
     }
-    pub fn description(
+    pub fn description<P: Into<String>>(
         mut self,
-        description: String,
+        description: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let description = description.into();
         self.description = Some(description);
         Ok(self)
     }
-    pub fn icon(
+    pub fn icon<P: Into<String>>(
         mut self,
-        icon: String,
+        icon: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let icon = icon.into();
         pgrx_validation::must_be_font_awesome_class(icon.as_ref())
             .map_err(|e| e.rename_field(InsertableTeamAttributes::Icon))?;
         self.icon = Some(icon);
         Ok(self)
     }
-    pub fn color_id(
+    pub fn color_id<P: Into<i16>>(
         mut self,
-        color_id: i16,
+        color_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let color_id = color_id.into();
         self.color_id = Some(color_id);
         Ok(self)
     }
-    pub fn state_id(
+    pub fn state_id<P: Into<i16>>(
         mut self,
-        state_id: i16,
+        state_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let state_id = state_id.into();
         self.state_id = Some(state_id);
         Ok(self)
     }
-    pub fn parent_team_id(
+    pub fn parent_team_id<P: Into<Option<i32>>>(
         mut self,
-        parent_team_id: Option<i32>,
+        parent_team_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let parent_team_id = parent_team_id.into();
         if let (Some(id), Some(parent_team_id)) = (self.id, parent_team_id) {
             pgrx_validation::must_be_distinct_i32(parent_team_id, id).map_err(|e| {
                 e.rename_fields(
@@ -211,31 +237,36 @@ impl InsertableTeamBuilder {
         self.parent_team_id = parent_team_id;
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P: Into<i32>>(
         mut self,
-        updated_by: i32,
+        updated_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_by = updated_by.into();
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
+        updated_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_at = updated_at.into();
         self.updated_at = Some(updated_at);
         Ok(self)
     }

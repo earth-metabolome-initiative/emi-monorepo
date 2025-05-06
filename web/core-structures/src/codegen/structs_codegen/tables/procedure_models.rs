@@ -16,6 +16,7 @@ pub struct ProcedureModel {
     pub id: i32,
     pub name: String,
     pub description: String,
+    pub icon: String,
     pub created_by: i32,
     pub created_at: rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,
@@ -85,5 +86,21 @@ impl ProcedureModel {
             )
             .load::<Self>(conn)
             .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_name(
+        name: &str,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        Self::table()
+            .filter(diesel::ExpressionMethods::eq(
+                crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::name,
+                name,
+            ))
+            .first::<Self>(conn)
+            .await
+            .optional()
     }
 }

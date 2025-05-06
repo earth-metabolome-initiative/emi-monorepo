@@ -2,7 +2,6 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableFreezeDryingStepModelAttributes {
     Id,
-    StepModelInstrumentCategoryId,
     ExpectedKelvin,
     ExpectedPascal,
     ExpectedSeconds,
@@ -15,9 +14,6 @@ impl core::fmt::Display for InsertableFreezeDryingStepModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertableFreezeDryingStepModelAttributes::Id => write!(f, "id"),
-            InsertableFreezeDryingStepModelAttributes::StepModelInstrumentCategoryId => {
-                write!(f, "step_model_instrument_category_id")
-            }
             InsertableFreezeDryingStepModelAttributes::ExpectedKelvin => {
                 write!(f, "expected_kelvin")
             }
@@ -52,7 +48,6 @@ impl core::fmt::Display for InsertableFreezeDryingStepModelAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableFreezeDryingStepModel {
     id: i32,
-    step_model_instrument_category_id: i32,
     expected_kelvin: f32,
     expected_pascal: f32,
     expected_seconds: f32,
@@ -78,26 +73,6 @@ impl InsertableFreezeDryingStepModel {
                     .eq(&self.id),
             )
             .first::<crate::codegen::structs_codegen::tables::step_models::StepModel>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn step_model_instrument_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
-        diesel::result::Error,
-    >{
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::step_model_instrument_categories::step_model_instrument_categories::dsl::id
-                    .eq(&self.step_model_instrument_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
-            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -129,10 +104,8 @@ impl InsertableFreezeDryingStepModel {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableFreezeDryingStepModelBuilder {
     id: Option<i32>,
-    step_model_instrument_category_id: Option<i32>,
     expected_kelvin: Option<f32>,
     expected_pascal: Option<f32>,
     expected_seconds: Option<f32>,
@@ -141,22 +114,34 @@ pub struct InsertableFreezeDryingStepModelBuilder {
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableFreezeDryingStepModelBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            expected_kelvin: None,
+            expected_pascal: None,
+            expected_seconds: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableFreezeDryingStepModelBuilder {
-    pub fn id(mut self, id: i32) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P: Into<i32>>(
+        mut self,
+        id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         self.id = Some(id);
         Ok(self)
     }
-    pub fn step_model_instrument_category_id(
+    pub fn expected_kelvin<P: Into<f32>>(
         mut self,
-        step_model_instrument_category_id: i32,
+        expected_kelvin: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.step_model_instrument_category_id = Some(step_model_instrument_category_id);
-        Ok(self)
-    }
-    pub fn expected_kelvin(
-        mut self,
-        expected_kelvin: f32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let expected_kelvin = expected_kelvin.into();
         pgrx_validation::must_be_strictly_positive_f32(expected_kelvin).map_err(|e| {
             e.rename_field(InsertableFreezeDryingStepModelAttributes::ExpectedKelvin)
         })?;
@@ -166,10 +151,11 @@ impl InsertableFreezeDryingStepModelBuilder {
         self.expected_kelvin = Some(expected_kelvin);
         Ok(self)
     }
-    pub fn expected_pascal(
+    pub fn expected_pascal<P: Into<f32>>(
         mut self,
-        expected_pascal: f32,
+        expected_pascal: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let expected_pascal = expected_pascal.into();
         pgrx_validation::must_be_strictly_positive_f32(expected_pascal).map_err(|e| {
             e.rename_field(InsertableFreezeDryingStepModelAttributes::ExpectedPascal)
         })?;
@@ -179,10 +165,11 @@ impl InsertableFreezeDryingStepModelBuilder {
         self.expected_pascal = Some(expected_pascal);
         Ok(self)
     }
-    pub fn expected_seconds(
+    pub fn expected_seconds<P: Into<f32>>(
         mut self,
-        expected_seconds: f32,
+        expected_seconds: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let expected_seconds = expected_seconds.into();
         pgrx_validation::must_be_strictly_positive_f32(expected_seconds).map_err(|e| {
             e.rename_field(InsertableFreezeDryingStepModelAttributes::ExpectedSeconds)
         })?;
@@ -195,31 +182,36 @@ impl InsertableFreezeDryingStepModelBuilder {
         self.expected_seconds = Some(expected_seconds);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P: Into<i32>>(
         mut self,
-        updated_by: i32,
+        updated_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_by = updated_by.into();
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
+        updated_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_at = updated_at.into();
         self.updated_at = Some(updated_at);
         Ok(self)
     }
@@ -234,11 +226,6 @@ impl common_traits::prelude::Builder for InsertableFreezeDryingStepModelBuilder 
             id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableFreezeDryingStepModelAttributes::Id,
             ))?,
-            step_model_instrument_category_id: self.step_model_instrument_category_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableFreezeDryingStepModelAttributes::StepModelInstrumentCategoryId,
-                ),
-            )?,
             expected_kelvin: self.expected_kelvin.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFreezeDryingStepModelAttributes::ExpectedKelvin,
@@ -282,9 +269,6 @@ impl TryFrom<InsertableFreezeDryingStepModel> for InsertableFreezeDryingStepMode
     fn try_from(insertable_variant: InsertableFreezeDryingStepModel) -> Result<Self, Self::Error> {
         Self::default()
             .id(insertable_variant.id)?
-            .step_model_instrument_category_id(
-                insertable_variant.step_model_instrument_category_id,
-            )?
             .expected_kelvin(insertable_variant.expected_kelvin)?
             .expected_pascal(insertable_variant.expected_pascal)?
             .expected_seconds(insertable_variant.expected_seconds)?

@@ -29,10 +29,10 @@ for crate::codegen::structs_codegen::tables::procedure_model_container_categorie
                                                 crate::codegen::diesel_codegen::tables::procedure_model_container_categories::procedure_model_container_categories::procedure_model_id,
                                             ),
                                         ),
-                                    crate::codegen::diesel_codegen::tables::procedure_model_container_categories::procedure_model_container_categories::container_category_id
+                                    crate::codegen::diesel_codegen::tables::procedure_model_container_categories::procedure_model_container_categories::container_category
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::procedure_model_container_categories::procedure_model_container_categories::container_category_id,
+                                                crate::codegen::diesel_codegen::tables::procedure_model_container_categories::procedure_model_container_categories::container_category,
                                             ),
                                         ),
                                 ),
@@ -100,10 +100,10 @@ for crate::codegen::structs_codegen::tables::procedure_model_container_categorie
                                                 crate::codegen::diesel_codegen::tables::procedure_model_container_categories::procedure_model_container_categories::procedure_model_id,
                                             ),
                                         ),
-                                    crate::codegen::diesel_codegen::tables::procedure_model_container_categories::procedure_model_container_categories::container_category_id
+                                    crate::codegen::diesel_codegen::tables::procedure_model_container_categories::procedure_model_container_categories::container_category
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::procedure_model_container_categories::procedure_model_container_categories::container_category_id,
+                                                crate::codegen::diesel_codegen::tables::procedure_model_container_categories::procedure_model_container_categories::container_category,
                                             ),
                                         ),
                                 ),

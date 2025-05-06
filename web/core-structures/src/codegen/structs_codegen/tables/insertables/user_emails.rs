@@ -44,39 +44,52 @@ impl InsertableUserEmail {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableUserEmailBuilder {
     email: Option<String>,
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     primary_email: Option<bool>,
 }
+impl Default for InsertableUserEmailBuilder {
+    fn default() -> Self {
+        Self {
+            email: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            primary_email: Some(true),
+        }
+    }
+}
 impl InsertableUserEmailBuilder {
-    pub fn email(
+    pub fn email<P: Into<String>>(
         mut self,
-        email: String,
+        email: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let email = email.into();
         self.email = Some(email);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn primary_email(
+    pub fn primary_email<P: Into<bool>>(
         mut self,
-        primary_email: bool,
+        primary_email: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let primary_email = primary_email.into();
         self.primary_email = Some(primary_email);
         Ok(self)
     }

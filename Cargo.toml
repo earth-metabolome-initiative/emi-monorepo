@@ -43,7 +43,10 @@ members = [
   "web/web_common/rosetta-url",
   "data-migrations/init-db",
   "web/web_common/reference-docker",
-
+  "web/web_common/tool_categories",
+  "web/web_common/instrument_categories",
+  "web/web_common/container_categories",
+  "web/web_common/nameplate_categories",
 ]
 
 [workspace.dependencies]
@@ -101,6 +104,10 @@ rosetta-timestamp = { path = "utils/rosetta-timestamp" }
 taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
 csqlv = { path = "web/web_common/csqlv", default-features = false }
 iso_codes = { path = "web/web_common/iso_codes" }
+tool_categories = { path = "web/web_common/tool_categories" }
+instrument_categories = { path = "web/web_common/instrument_categories" }
+nameplate_categories = { path = "web/web_common/nameplate_categories" }
+container_categories = { path = "web/web_common/container_categories" }
 testcontainers = { version = "0.24.0" }
 web_common_traits = { path = "web/web_common/web_common_traits" }
 webcodegen = { path = "web/web_common/webcodegen" }

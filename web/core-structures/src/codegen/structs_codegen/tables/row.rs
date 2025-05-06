@@ -2,23 +2,26 @@ mod addresses;
 mod aliquoting_instrument_models;
 mod aliquoting_step_models;
 mod aliquoting_steps;
-mod brand_states;
+mod ball_mill_step_models;
+mod ball_mill_steps;
 mod brands;
+mod centrifuge_step_models;
+mod centrifuge_steps;
 mod cities;
 mod colors;
+mod commercial_product_lots;
 mod commercial_products;
-mod commercial_reagent_models;
-mod container_categories;
+mod commercial_reagents;
 mod container_models;
 mod countries;
+mod disposal_step_models;
+mod disposal_steps;
 mod document_formats;
 mod email_providers;
 mod fractioning_step_models;
 mod fractioning_steps;
 mod freeze_drying_step_models;
 mod from_row;
-mod grinding_step_models;
-mod instrument_categories;
 mod instrument_locations;
 mod instrument_model_categories;
 mod instrument_models;
@@ -26,7 +29,6 @@ mod instrument_states;
 mod instruments;
 mod login_providers;
 mod materials;
-mod nameplate_categories;
 mod nameplate_models;
 mod observation_subjects;
 mod organism_observations;
@@ -58,6 +60,8 @@ mod row;
 mod sample_states;
 mod sampling_step_models;
 mod sampling_steps;
+mod shaking_step_models;
+mod shaking_steps;
 mod spatial_ref_sys;
 mod spectra;
 mod spectra_collections;
@@ -83,7 +87,6 @@ mod team_members;
 mod team_projects;
 mod team_states;
 mod teams;
-mod tool_categories;
 mod tool_models;
 mod trackable_locations;
 mod trackable_states;
@@ -92,6 +95,7 @@ mod units;
 mod user_emails;
 mod user_organizations;
 mod users;
+mod volumetric_processables;
 mod weighing_instrument_models;
 mod weighing_step_models;
 mod weighing_steps;
@@ -108,23 +112,36 @@ pub enum Row {
     AliquotingStep(
         crate::codegen::structs_codegen::tables::aliquoting_steps::AliquotingStep,
     ),
-    BrandState(crate::codegen::structs_codegen::tables::brand_states::BrandState),
+    BallMillStepModel(
+        crate::codegen::structs_codegen::tables::ball_mill_step_models::BallMillStepModel,
+    ),
+    BallMillStep(crate::codegen::structs_codegen::tables::ball_mill_steps::BallMillStep),
     Brand(crate::codegen::structs_codegen::tables::brands::Brand),
+    CentrifugeStepModel(
+        crate::codegen::structs_codegen::tables::centrifuge_step_models::CentrifugeStepModel,
+    ),
+    CentrifugeStep(
+        crate::codegen::structs_codegen::tables::centrifuge_steps::CentrifugeStep,
+    ),
     City(crate::codegen::structs_codegen::tables::cities::City),
     Color(crate::codegen::structs_codegen::tables::colors::Color),
+    CommercialProductLot(
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+    ),
     CommercialProduct(
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
     ),
-    CommercialReagentModel(
-        crate::codegen::structs_codegen::tables::commercial_reagent_models::CommercialReagentModel,
-    ),
-    ContainerCategory(
-        crate::codegen::structs_codegen::tables::container_categories::ContainerCategory,
+    CommercialReagent(
+        crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent,
     ),
     ContainerModel(
         crate::codegen::structs_codegen::tables::container_models::ContainerModel,
     ),
     Country(crate::codegen::structs_codegen::tables::countries::Country),
+    DisposalStepModel(
+        crate::codegen::structs_codegen::tables::disposal_step_models::DisposalStepModel,
+    ),
+    DisposalStep(crate::codegen::structs_codegen::tables::disposal_steps::DisposalStep),
     DocumentFormat(
         crate::codegen::structs_codegen::tables::document_formats::DocumentFormat,
     ),
@@ -139,12 +156,6 @@ pub enum Row {
     ),
     FreezeDryingStepModel(
         crate::codegen::structs_codegen::tables::freeze_drying_step_models::FreezeDryingStepModel,
-    ),
-    GrindingStepModel(
-        crate::codegen::structs_codegen::tables::grinding_step_models::GrindingStepModel,
-    ),
-    InstrumentCategory(
-        crate::codegen::structs_codegen::tables::instrument_categories::InstrumentCategory,
     ),
     InstrumentLocation(
         crate::codegen::structs_codegen::tables::instrument_locations::InstrumentLocation,
@@ -163,9 +174,6 @@ pub enum Row {
         crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
     ),
     Material(crate::codegen::structs_codegen::tables::materials::Material),
-    NameplateCategory(
-        crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-    ),
     NameplateModel(
         crate::codegen::structs_codegen::tables::nameplate_models::NameplateModel,
     ),
@@ -227,6 +235,10 @@ pub enum Row {
         crate::codegen::structs_codegen::tables::sampling_step_models::SamplingStepModel,
     ),
     SamplingStep(crate::codegen::structs_codegen::tables::sampling_steps::SamplingStep),
+    ShakingStepModel(
+        crate::codegen::structs_codegen::tables::shaking_step_models::ShakingStepModel,
+    ),
+    ShakingStep(crate::codegen::structs_codegen::tables::shaking_steps::ShakingStep),
     SpatialRefSy(crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy),
     Spectrum(crate::codegen::structs_codegen::tables::spectra::Spectrum),
     SpectraCollection(
@@ -278,7 +290,6 @@ pub enum Row {
     TeamProject(crate::codegen::structs_codegen::tables::team_projects::TeamProject),
     TeamState(crate::codegen::structs_codegen::tables::team_states::TeamState),
     Team(crate::codegen::structs_codegen::tables::teams::Team),
-    ToolCategory(crate::codegen::structs_codegen::tables::tool_categories::ToolCategory),
     ToolModel(crate::codegen::structs_codegen::tables::tool_models::ToolModel),
     TrackableLocation(
         crate::codegen::structs_codegen::tables::trackable_locations::TrackableLocation,
@@ -293,6 +304,9 @@ pub enum Row {
         crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
     ),
     User(crate::codegen::structs_codegen::tables::users::User),
+    VolumetricProcessable(
+        crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
+    ),
     WeighingInstrumentModel(
         crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
     ),
@@ -318,21 +332,32 @@ impl Row {
                 aliquoting_step_models.upsert(conn)?.map(Row::from)
             }
             Row::AliquotingStep(aliquoting_steps) => aliquoting_steps.upsert(conn)?.map(Row::from),
-            Row::BrandState(brand_states) => brand_states.upsert(conn)?.map(Row::from),
+            Row::BallMillStepModel(ball_mill_step_models) => {
+                ball_mill_step_models.upsert(conn)?.map(Row::from)
+            }
+            Row::BallMillStep(ball_mill_steps) => ball_mill_steps.upsert(conn)?.map(Row::from),
             Row::Brand(brands) => brands.upsert(conn)?.map(Row::from),
+            Row::CentrifugeStepModel(centrifuge_step_models) => {
+                centrifuge_step_models.upsert(conn)?.map(Row::from)
+            }
+            Row::CentrifugeStep(centrifuge_steps) => centrifuge_steps.upsert(conn)?.map(Row::from),
             Row::City(cities) => cities.upsert(conn)?.map(Row::from),
             Row::Color(colors) => colors.upsert(conn)?.map(Row::from),
+            Row::CommercialProductLot(commercial_product_lots) => {
+                commercial_product_lots.upsert(conn)?.map(Row::from)
+            }
             Row::CommercialProduct(commercial_products) => {
                 commercial_products.upsert(conn)?.map(Row::from)
             }
-            Row::CommercialReagentModel(commercial_reagent_models) => {
-                commercial_reagent_models.upsert(conn)?.map(Row::from)
-            }
-            Row::ContainerCategory(container_categories) => {
-                container_categories.upsert(conn)?.map(Row::from)
+            Row::CommercialReagent(commercial_reagents) => {
+                commercial_reagents.upsert(conn)?.map(Row::from)
             }
             Row::ContainerModel(container_models) => container_models.upsert(conn)?.map(Row::from),
             Row::Country(countries) => countries.upsert(conn)?.map(Row::from),
+            Row::DisposalStepModel(disposal_step_models) => {
+                disposal_step_models.upsert(conn)?.map(Row::from)
+            }
+            Row::DisposalStep(disposal_steps) => disposal_steps.upsert(conn)?.map(Row::from),
             Row::DocumentFormat(document_formats) => document_formats.upsert(conn)?.map(Row::from),
             Row::EmailProvider(email_providers) => email_providers.upsert(conn)?.map(Row::from),
             Row::FractioningStepModel(fractioning_step_models) => {
@@ -343,12 +368,6 @@ impl Row {
             }
             Row::FreezeDryingStepModel(freeze_drying_step_models) => {
                 freeze_drying_step_models.upsert(conn)?.map(Row::from)
-            }
-            Row::GrindingStepModel(grinding_step_models) => {
-                grinding_step_models.upsert(conn)?.map(Row::from)
-            }
-            Row::InstrumentCategory(instrument_categories) => {
-                instrument_categories.upsert(conn)?.map(Row::from)
             }
             Row::InstrumentLocation(instrument_locations) => {
                 instrument_locations.upsert(conn)?.map(Row::from)
@@ -365,9 +384,6 @@ impl Row {
             Row::Instrument(instruments) => instruments.upsert(conn)?.map(Row::from),
             Row::LoginProvider(login_providers) => login_providers.upsert(conn)?.map(Row::from),
             Row::Material(materials) => materials.upsert(conn)?.map(Row::from),
-            Row::NameplateCategory(nameplate_categories) => {
-                nameplate_categories.upsert(conn)?.map(Row::from)
-            }
             Row::NameplateModel(nameplate_models) => nameplate_models.upsert(conn)?.map(Row::from),
             Row::ObservationSubject(observation_subjects) => {
                 observation_subjects.upsert(conn)?.map(Row::from)
@@ -421,6 +437,10 @@ impl Row {
                 sampling_step_models.upsert(conn)?.map(Row::from)
             }
             Row::SamplingStep(sampling_steps) => sampling_steps.upsert(conn)?.map(Row::from),
+            Row::ShakingStepModel(shaking_step_models) => {
+                shaking_step_models.upsert(conn)?.map(Row::from)
+            }
+            Row::ShakingStep(shaking_steps) => shaking_steps.upsert(conn)?.map(Row::from),
             Row::SpatialRefSy(spatial_ref_sys) => spatial_ref_sys.upsert(conn)?.map(Row::from),
             Row::Spectrum(spectra) => spectra.upsert(conn)?.map(Row::from),
             Row::SpectraCollection(spectra_collections) => {
@@ -468,7 +488,6 @@ impl Row {
             Row::TeamProject(team_projects) => team_projects.upsert(conn)?.map(Row::from),
             Row::TeamState(team_states) => team_states.upsert(conn)?.map(Row::from),
             Row::Team(teams) => teams.upsert(conn)?.map(Row::from),
-            Row::ToolCategory(tool_categories) => tool_categories.upsert(conn)?.map(Row::from),
             Row::ToolModel(tool_models) => tool_models.upsert(conn)?.map(Row::from),
             Row::TrackableLocation(trackable_locations) => {
                 trackable_locations.upsert(conn)?.map(Row::from)
@@ -481,6 +500,9 @@ impl Row {
                 user_organizations.upsert(conn)?.map(Row::from)
             }
             Row::User(users) => users.upsert(conn)?.map(Row::from),
+            Row::VolumetricProcessable(volumetric_processables) => {
+                volumetric_processables.upsert(conn)?.map(Row::from)
+            }
             Row::WeighingInstrumentModel(weighing_instrument_models) => {
                 weighing_instrument_models.upsert(conn)?.map(Row::from)
             }

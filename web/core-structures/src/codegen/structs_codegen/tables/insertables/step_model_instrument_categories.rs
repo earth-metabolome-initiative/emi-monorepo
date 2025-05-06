@@ -2,7 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableStepModelInstrumentCategoryAttributes {
     StepModelId,
-    InstrumentCategoryId,
+    InstrumentCategory,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -14,8 +14,8 @@ impl core::fmt::Display for InsertableStepModelInstrumentCategoryAttributes {
             InsertableStepModelInstrumentCategoryAttributes::StepModelId => {
                 write!(f, "step_model_id")
             }
-            InsertableStepModelInstrumentCategoryAttributes::InstrumentCategoryId => {
-                write!(f, "instrument_category_id")
+            InsertableStepModelInstrumentCategoryAttributes::InstrumentCategory => {
+                write!(f, "instrument_category")
             }
             InsertableStepModelInstrumentCategoryAttributes::CreatedBy => {
                 write!(f, "created_by")
@@ -42,7 +42,7 @@ impl core::fmt::Display for InsertableStepModelInstrumentCategoryAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableStepModelInstrumentCategory {
     step_model_id: i32,
-    instrument_category_id: i16,
+    instrument_category: instrument_categories::InstrumentCategory,
     created_by: i32,
     created_at: rosetta_timestamp::TimestampUTC,
     updated_by: i32,
@@ -65,26 +65,6 @@ impl InsertableStepModelInstrumentCategory {
                     .eq(&self.step_model_id),
             )
             .first::<crate::codegen::structs_codegen::tables::step_models::StepModel>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn instrument_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::instrument_categories::InstrumentCategory,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::instrument_categories::InstrumentCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::instrument_categories::instrument_categories::dsl::id
-                    .eq(&self.instrument_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::instrument_categories::InstrumentCategory,
-            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -116,55 +96,73 @@ impl InsertableStepModelInstrumentCategory {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableStepModelInstrumentCategoryBuilder {
     step_model_id: Option<i32>,
-    instrument_category_id: Option<i16>,
+    instrument_category: Option<instrument_categories::InstrumentCategory>,
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableStepModelInstrumentCategoryBuilder {
+    fn default() -> Self {
+        Self {
+            step_model_id: None,
+            instrument_category: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableStepModelInstrumentCategoryBuilder {
-    pub fn step_model_id(
+    pub fn step_model_id<P: Into<i32>>(
         mut self,
-        step_model_id: i32,
+        step_model_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let step_model_id = step_model_id.into();
         self.step_model_id = Some(step_model_id);
         Ok(self)
     }
-    pub fn instrument_category_id(
+    pub fn instrument_category<P: Into<instrument_categories::InstrumentCategory>>(
         mut self,
-        instrument_category_id: i16,
+        instrument_category: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.instrument_category_id = Some(instrument_category_id);
+        let instrument_category = instrument_category.into();
+        self.instrument_category = Some(instrument_category);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P: Into<i32>>(
         mut self,
-        updated_by: i32,
+        updated_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_by = updated_by.into();
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
+        updated_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_at = updated_at.into();
         self.updated_at = Some(updated_at);
         Ok(self)
     }
@@ -181,9 +179,9 @@ impl common_traits::prelude::Builder for InsertableStepModelInstrumentCategoryBu
                     InsertableStepModelInstrumentCategoryAttributes::StepModelId,
                 ),
             )?,
-            instrument_category_id: self.instrument_category_id.ok_or(
+            instrument_category: self.instrument_category.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepModelInstrumentCategoryAttributes::InstrumentCategoryId,
+                    InsertableStepModelInstrumentCategoryAttributes::InstrumentCategory,
                 ),
             )?,
             created_by: self.created_by.ok_or(
@@ -218,7 +216,7 @@ impl TryFrom<InsertableStepModelInstrumentCategory>
     ) -> Result<Self, Self::Error> {
         Self::default()
             .step_model_id(insertable_variant.step_model_id)?
-            .instrument_category_id(insertable_variant.instrument_category_id)?
+            .instrument_category(insertable_variant.instrument_category)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?

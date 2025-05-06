@@ -56,38 +56,43 @@ pub struct InsertableAddressBuilder {
     geolocation: Option<postgis_diesel::types::Point>,
 }
 impl InsertableAddressBuilder {
-    pub fn city_id(
+    pub fn city_id<P: Into<i32>>(
         mut self,
-        city_id: i32,
+        city_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let city_id = city_id.into();
         self.city_id = Some(city_id);
         Ok(self)
     }
-    pub fn street_name(
+    pub fn street_name<P: Into<String>>(
         mut self,
-        street_name: String,
+        street_name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let street_name = street_name.into();
         self.street_name = Some(street_name);
         Ok(self)
     }
-    pub fn street_number(
+    pub fn street_number<P: Into<String>>(
         mut self,
-        street_number: String,
+        street_number: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let street_number = street_number.into();
         self.street_number = Some(street_number);
         Ok(self)
     }
-    pub fn postal_code(
+    pub fn postal_code<P: Into<String>>(
         mut self,
-        postal_code: String,
+        postal_code: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let postal_code = postal_code.into();
         self.postal_code = Some(postal_code);
         Ok(self)
     }
-    pub fn geolocation(
+    pub fn geolocation<P: Into<postgis_diesel::types::Point>>(
         mut self,
-        geolocation: postgis_diesel::types::Point,
+        geolocation: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let geolocation = geolocation.into();
         self.geolocation = Some(geolocation);
         Ok(self)
     }

@@ -2,22 +2,25 @@ mod addresses;
 mod aliquoting_instrument_models;
 mod aliquoting_step_models;
 mod aliquoting_steps;
-mod brand_states;
+mod ball_mill_step_models;
+mod ball_mill_steps;
 mod brands;
+mod centrifuge_step_models;
+mod centrifuge_steps;
 mod cities;
 mod colors;
+mod commercial_product_lots;
 mod commercial_products;
-mod commercial_reagent_models;
-mod container_categories;
+mod commercial_reagents;
 mod container_models;
 mod countries;
+mod disposal_step_models;
+mod disposal_steps;
 mod document_formats;
 mod email_providers;
 mod fractioning_step_models;
 mod fractioning_steps;
 mod freeze_drying_step_models;
-mod grinding_step_models;
-mod instrument_categories;
 mod instrument_locations;
 mod instrument_model_categories;
 mod instrument_models;
@@ -27,7 +30,6 @@ mod into_iter;
 mod len;
 mod login_providers;
 mod materials;
-mod nameplate_categories;
 mod nameplate_models;
 mod observation_subjects;
 mod organism_observations;
@@ -59,6 +61,8 @@ mod rows;
 mod sample_states;
 mod sampling_step_models;
 mod sampling_steps;
+mod shaking_step_models;
+mod shaking_steps;
 mod spatial_ref_sys;
 mod spectra;
 mod spectra_collections;
@@ -84,7 +88,6 @@ mod team_members;
 mod team_projects;
 mod team_states;
 mod teams;
-mod tool_categories;
 mod tool_models;
 mod trackable_locations;
 mod trackable_states;
@@ -93,6 +96,7 @@ mod units;
 mod user_emails;
 mod user_organizations;
 mod users;
+mod volumetric_processables;
 mod weighing_instrument_models;
 mod weighing_step_models;
 mod weighing_steps;
@@ -113,29 +117,52 @@ pub enum Rows {
     AliquotingStep(
         Vec<crate::codegen::structs_codegen::tables::aliquoting_steps::AliquotingStep>,
     ),
-    BrandState(Vec<crate::codegen::structs_codegen::tables::brand_states::BrandState>),
+    BallMillStepModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::ball_mill_step_models::BallMillStepModel,
+        >,
+    ),
+    BallMillStep(
+        Vec<crate::codegen::structs_codegen::tables::ball_mill_steps::BallMillStep>,
+    ),
     Brand(Vec<crate::codegen::structs_codegen::tables::brands::Brand>),
+    CentrifugeStepModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::centrifuge_step_models::CentrifugeStepModel,
+        >,
+    ),
+    CentrifugeStep(
+        Vec<crate::codegen::structs_codegen::tables::centrifuge_steps::CentrifugeStep>,
+    ),
     City(Vec<crate::codegen::structs_codegen::tables::cities::City>),
     Color(Vec<crate::codegen::structs_codegen::tables::colors::Color>),
+    CommercialProductLot(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+        >,
+    ),
     CommercialProduct(
         Vec<
             crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
         >,
     ),
-    CommercialReagentModel(
+    CommercialReagent(
         Vec<
-            crate::codegen::structs_codegen::tables::commercial_reagent_models::CommercialReagentModel,
-        >,
-    ),
-    ContainerCategory(
-        Vec<
-            crate::codegen::structs_codegen::tables::container_categories::ContainerCategory,
+            crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent,
         >,
     ),
     ContainerModel(
         Vec<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
     ),
     Country(Vec<crate::codegen::structs_codegen::tables::countries::Country>),
+    DisposalStepModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::disposal_step_models::DisposalStepModel,
+        >,
+    ),
+    DisposalStep(
+        Vec<crate::codegen::structs_codegen::tables::disposal_steps::DisposalStep>,
+    ),
     DocumentFormat(
         Vec<crate::codegen::structs_codegen::tables::document_formats::DocumentFormat>,
     ),
@@ -153,16 +180,6 @@ pub enum Rows {
     FreezeDryingStepModel(
         Vec<
             crate::codegen::structs_codegen::tables::freeze_drying_step_models::FreezeDryingStepModel,
-        >,
-    ),
-    GrindingStepModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::grinding_step_models::GrindingStepModel,
-        >,
-    ),
-    InstrumentCategory(
-        Vec<
-            crate::codegen::structs_codegen::tables::instrument_categories::InstrumentCategory,
         >,
     ),
     InstrumentLocation(
@@ -186,11 +203,6 @@ pub enum Rows {
         Vec<crate::codegen::structs_codegen::tables::login_providers::LoginProvider>,
     ),
     Material(Vec<crate::codegen::structs_codegen::tables::materials::Material>),
-    NameplateCategory(
-        Vec<
-            crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-        >,
-    ),
     NameplateModel(
         Vec<crate::codegen::structs_codegen::tables::nameplate_models::NameplateModel>,
     ),
@@ -286,6 +298,14 @@ pub enum Rows {
     SamplingStep(
         Vec<crate::codegen::structs_codegen::tables::sampling_steps::SamplingStep>,
     ),
+    ShakingStepModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::shaking_step_models::ShakingStepModel,
+        >,
+    ),
+    ShakingStep(
+        Vec<crate::codegen::structs_codegen::tables::shaking_steps::ShakingStep>,
+    ),
     SpatialRefSy(
         Vec<crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy>,
     ),
@@ -365,9 +385,6 @@ pub enum Rows {
     ),
     TeamState(Vec<crate::codegen::structs_codegen::tables::team_states::TeamState>),
     Team(Vec<crate::codegen::structs_codegen::tables::teams::Team>),
-    ToolCategory(
-        Vec<crate::codegen::structs_codegen::tables::tool_categories::ToolCategory>,
-    ),
     ToolModel(Vec<crate::codegen::structs_codegen::tables::tool_models::ToolModel>),
     TrackableLocation(
         Vec<
@@ -386,6 +403,11 @@ pub enum Rows {
         >,
     ),
     User(Vec<crate::codegen::structs_codegen::tables::users::User>),
+    VolumetricProcessable(
+        Vec<
+            crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
+        >,
+    ),
     WeighingInstrumentModel(
         Vec<
             crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
@@ -437,8 +459,15 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::BrandState(brand_states) => {
-                brand_states
+            Rows::BallMillStepModel(ball_mill_step_models) => {
+                ball_mill_step_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::BallMillStep(ball_mill_steps) => {
+                ball_mill_steps
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -446,6 +475,20 @@ impl Rows {
             }
             Rows::Brand(brands) => {
                 brands
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CentrifugeStepModel(centrifuge_step_models) => {
+                centrifuge_step_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CentrifugeStep(centrifuge_steps) => {
+                centrifuge_steps
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -465,6 +508,13 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::CommercialProductLot(commercial_product_lots) => {
+                commercial_product_lots
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::CommercialProduct(commercial_products) => {
                 commercial_products
                     .iter()
@@ -472,15 +522,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::CommercialReagentModel(commercial_reagent_models) => {
-                commercial_reagent_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ContainerCategory(container_categories) => {
-                container_categories
+            Rows::CommercialReagent(commercial_reagents) => {
+                commercial_reagents
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -495,6 +538,20 @@ impl Rows {
             }
             Rows::Country(countries) => {
                 countries
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::DisposalStepModel(disposal_step_models) => {
+                disposal_step_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::DisposalStep(disposal_steps) => {
+                disposal_steps
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -530,20 +587,6 @@ impl Rows {
             }
             Rows::FreezeDryingStepModel(freeze_drying_step_models) => {
                 freeze_drying_step_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::GrindingStepModel(grinding_step_models) => {
-                grinding_step_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::InstrumentCategory(instrument_categories) => {
-                instrument_categories
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -593,13 +636,6 @@ impl Rows {
             }
             Rows::Material(materials) => {
                 materials
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::NameplateCategory(nameplate_categories) => {
-                nameplate_categories
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -808,6 +844,20 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::ShakingStepModel(shaking_step_models) => {
+                shaking_step_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::ShakingStep(shaking_steps) => {
+                shaking_steps
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::SpatialRefSy(spatial_ref_sys) => {
                 spatial_ref_sys
                     .iter()
@@ -968,13 +1018,6 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::ToolCategory(tool_categories) => {
-                tool_categories
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
             Rows::ToolModel(tool_models) => {
                 tool_models
                     .iter()
@@ -1026,6 +1069,13 @@ impl Rows {
             }
             Rows::User(users) => {
                 users
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::VolumetricProcessable(volumetric_processables) => {
+                volumetric_processables
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?

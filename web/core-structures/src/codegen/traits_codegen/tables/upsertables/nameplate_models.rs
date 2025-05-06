@@ -21,10 +21,10 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                     diesel::BoolExpressionMethods::and(
                         diesel::BoolExpressionMethods::and(
                             diesel::BoolExpressionMethods::and(
-                                crate::codegen::diesel_codegen::tables::nameplate_models::nameplate_models::nameplate_category_id
+                                crate::codegen::diesel_codegen::tables::nameplate_models::nameplate_models::nameplate_category
                                     .ne(
                                         diesel::upsert::excluded(
-                                            crate::codegen::diesel_codegen::tables::nameplate_models::nameplate_models::nameplate_category_id,
+                                            crate::codegen::diesel_codegen::tables::nameplate_models::nameplate_models::nameplate_category,
                                         ),
                                     ),
                                 crate::codegen::diesel_codegen::tables::nameplate_models::nameplate_models::created_by
@@ -83,10 +83,10 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                     diesel::BoolExpressionMethods::and(
                         diesel::BoolExpressionMethods::and(
                             diesel::BoolExpressionMethods::and(
-                                crate::codegen::diesel_codegen::tables::nameplate_models::nameplate_models::nameplate_category_id
+                                crate::codegen::diesel_codegen::tables::nameplate_models::nameplate_models::nameplate_category
                                     .ne(
                                         diesel::upsert::excluded(
-                                            crate::codegen::diesel_codegen::tables::nameplate_models::nameplate_models::nameplate_category_id,
+                                            crate::codegen::diesel_codegen::tables::nameplate_models::nameplate_models::nameplate_category,
                                         ),
                                     ),
                                 crate::codegen::diesel_codegen::tables::nameplate_models::nameplate_models::created_by

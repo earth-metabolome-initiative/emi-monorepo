@@ -14,3 +14,23 @@ COPY ./web_common/pgrx_validation/extension/usr/share/postgresql/17/extension/pg
 COPY ./web_common/iso_codes/extension/usr/lib/postgresql/17/lib/iso_codes.so /usr/lib/postgresql/17/lib/iso_codes.so
 COPY ./web_common/iso_codes/extension/usr/share/postgresql/17/extension/iso_codes.control /usr/share/postgresql/17/extension/iso_codes.control
 COPY ./web_common/iso_codes/extension/usr/share/postgresql/17/extension/iso_codes--0.1.0.sql usr/share/postgresql/17/extension/iso_codes--0.1.0.sql
+
+# Next, we copy the the `tool_categories` extension files to the image
+COPY ./web_common/tool_categories/extension/usr/lib/postgresql/17/lib/tool_categories.so /usr/lib/postgresql/17/lib/tool_categories.so
+COPY ./web_common/tool_categories/extension/usr/share/postgresql/17/extension/tool_categories.control /usr/share/postgresql/17/extension/tool_categories.control
+COPY ./web_common/tool_categories/extension/usr/share/postgresql/17/extension/tool_categories--0.1.0.sql usr/share/postgresql/17/extension/tool_categories--0.1.0.sql
+
+# Next, we copy the the `instrument_categories` extension files to the image
+COPY ./web_common/instrument_categories/extension/usr/lib/postgresql/17/lib/instrument_categories.so /usr/lib/postgresql/17/lib/instrument_categories.so
+COPY ./web_common/instrument_categories/extension/usr/share/postgresql/17/extension/instrument_categories.control /usr/share/postgresql/17/extension/instrument_categories.control
+COPY ./web_common/instrument_categories/extension/usr/share/postgresql/17/extension/instrument_categories--0.1.0.sql usr/share/postgresql/17/extension/instrument_categories--0.1.0.sql
+
+# Next, we copy the the `nameplate_categories` extension files to the image
+COPY ./web_common/nameplate_categories/extension/usr/lib/postgresql/17/lib/nameplate_categories.so /usr/lib/postgresql/17/lib/nameplate_categories.so
+COPY ./web_common/nameplate_categories/extension/usr/share/postgresql/17/extension/nameplate_categories.control /usr/share/postgresql/17/extension/nameplate_categories.control
+COPY ./web_common/nameplate_categories/extension/usr/share/postgresql/17/extension/nameplate_categories--0.1.0.sql usr/share/postgresql/17/extension/nameplate_categories--0.1.0.sql
+
+# Next, we copy the the `container_categories` extension files to the image
+COPY ./web_common/container_categories/extension/usr/lib/postgresql/17/lib/container_categories.so /usr/lib/postgresql/17/lib/container_categories.so
+COPY ./web_common/container_categories/extension/usr/share/postgresql/17/extension/container_categories.control /usr/share/postgresql/17/extension/container_categories.control
+COPY ./web_common/container_categories/extension/usr/share/postgresql/17/extension/container_categories--0.1.0.sql usr/share/postgresql/17/extension/container_categories--0.1.0.sql

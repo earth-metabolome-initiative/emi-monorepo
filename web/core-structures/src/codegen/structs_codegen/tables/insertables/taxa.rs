@@ -50,28 +50,35 @@ pub struct InsertableTaxonBuilder {
     rank_id: Option<i16>,
 }
 impl InsertableTaxonBuilder {
-    pub fn id(mut self, id: i32) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P: Into<i32>>(
+        mut self,
+        id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let id = id.into();
         self.id = Some(id);
         Ok(self)
     }
-    pub fn name(
+    pub fn name<P: Into<String>>(
         mut self,
-        name: String,
+        name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let name = name.into();
         self.name = Some(name);
         Ok(self)
     }
-    pub fn parent_id(
+    pub fn parent_id<P: Into<Option<i32>>>(
         mut self,
-        parent_id: Option<i32>,
+        parent_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let parent_id = parent_id.into();
         self.parent_id = parent_id;
         Ok(self)
     }
-    pub fn rank_id(
+    pub fn rank_id<P: Into<i16>>(
         mut self,
-        rank_id: i16,
+        rank_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let rank_id = rank_id.into();
         self.rank_id = Some(rank_id);
         Ok(self)
     }

@@ -85,7 +85,6 @@ impl InsertablePackagingStepModel {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertablePackagingStepModelBuilder {
     packaging_model_id: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
@@ -93,39 +92,56 @@ pub struct InsertablePackagingStepModelBuilder {
     created_by: Option<i32>,
     updated_by: Option<i32>,
 }
+impl Default for InsertablePackagingStepModelBuilder {
+    fn default() -> Self {
+        Self {
+            packaging_model_id: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            created_by: None,
+            updated_by: None,
+        }
+    }
+}
 impl InsertablePackagingStepModelBuilder {
-    pub fn packaging_model_id(
+    pub fn packaging_model_id<P: Into<i32>>(
         mut self,
-        packaging_model_id: i32,
+        packaging_model_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let packaging_model_id = packaging_model_id.into();
         self.packaging_model_id = Some(packaging_model_id);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
+        updated_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_at = updated_at.into();
         self.updated_at = Some(updated_at);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P: Into<i32>>(
         mut self,
-        updated_by: i32,
+        updated_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_by = updated_by.into();
         self.updated_by = Some(updated_by);
         Ok(self)
     }

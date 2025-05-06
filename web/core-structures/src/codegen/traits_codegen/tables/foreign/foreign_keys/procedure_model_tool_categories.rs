@@ -3,8 +3,6 @@
 pub struct ProcedureModelToolCategoryForeignKeys {
     pub procedure_model:
         Option<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
-    pub tool_category:
-        Option<crate::codegen::structs_codegen::tables::tool_categories::ToolCategory>,
     pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
     pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
@@ -27,14 +25,6 @@ for crate::codegen::structs_codegen::tables::procedure_model_tool_categories::Pr
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ToolCategory(
-                        self.tool_category_id,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(
                         self.created_by,
                     ),
@@ -50,8 +40,8 @@ for crate::codegen::structs_codegen::tables::procedure_model_tool_categories::Pr
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure_model.is_some() && foreign_keys.tool_category.is_some()
-            && foreign_keys.created_by.is_some() && foreign_keys.updated_by.is_some()
+        foreign_keys.procedure_model.is_some() && foreign_keys.created_by.is_some()
+            && foreign_keys.updated_by.is_some()
     }
     fn update(
         &self,
@@ -61,26 +51,6 @@ for crate::codegen::structs_codegen::tables::procedure_model_tool_categories::Pr
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
-            (
-                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if procedure_models.id == self.procedure_model_id {
-                    foreign_keys.procedure_model = Some(procedure_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if procedure_models.id == self.procedure_model_id {
-                    foreign_keys.procedure_model = None;
-                    updated = true;
-                }
-            }
             (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
@@ -110,22 +80,22 @@ for crate::codegen::structs_codegen::tables::procedure_model_tool_categories::Pr
                 }
             }
             (
-                crate::codegen::tables::row::Row::ToolCategory(tool_categories),
+                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if tool_categories.id == self.tool_category_id {
-                    foreign_keys.tool_category = Some(tool_categories);
+                if procedure_models.id == self.procedure_model_id {
+                    foreign_keys.procedure_model = Some(procedure_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ToolCategory(tool_categories),
+                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if tool_categories.id == self.tool_category_id {
-                    foreign_keys.tool_category = None;
+                if procedure_models.id == self.procedure_model_id {
+                    foreign_keys.procedure_model = None;
                     updated = true;
                 }
             }

@@ -1,0 +1,19 @@
+//! Submodule providing implementations of the `AsRef` trait for the
+//! [`ToolCategory`] enumeration.
+
+impl AsRef<str> for crate::ToolCategory {
+    fn as_ref(&self) -> &str {
+        match self {
+            Self::Camera => "Camera",
+            Self::InsectTrap => "InsectTrap",
+            Self::CuttingTool => "CuttingTool",
+            Self::Wrapper => "Wrapper",
+            Self::PreciseManipulationTool => "PreciseManipulationTool",
+            Self::BreakingBeads => "BreakingBeads",
+            Self::Gloves => "Gloves",
+            Self::HandCleaningAgent => "HandCleaningAgent",
+            Self::PaperTowels => "PaperTowels",
+            Self::VolumeMeasuringTool => "VolumeMeasuringTool",
+        }
+    }
+}

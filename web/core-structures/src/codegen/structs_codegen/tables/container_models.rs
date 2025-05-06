@@ -15,7 +15,7 @@
 pub struct ContainerModel {
     pub id: i32,
     pub liters: f32,
-    pub container_category_id: i16,
+    pub container_category: container_categories::ContainerCategory,
     pub created_by: i32,
     pub created_at: rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,
@@ -45,26 +45,6 @@ impl ContainerModel {
             )
             .first::<
                 crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-            >(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn container_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::container_categories::ContainerCategory,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::container_categories::ContainerCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::container_categories::container_categories::dsl::id
-                    .eq(&self.container_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::container_categories::ContainerCategory,
             >(conn)
             .await
     }
@@ -109,21 +89,6 @@ impl ContainerModel {
                     .eq(id.id),
             )
             .first::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_container_category_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        container_category_id: &crate::codegen::structs_codegen::tables::container_categories::ContainerCategory,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::container_category_id
-                    .eq(container_category_id.id),
-            )
-            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]

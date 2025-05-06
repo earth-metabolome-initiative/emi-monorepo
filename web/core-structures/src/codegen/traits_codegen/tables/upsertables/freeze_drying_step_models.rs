@@ -23,20 +23,12 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                             diesel::BoolExpressionMethods::and(
                                 diesel::BoolExpressionMethods::and(
                                     diesel::BoolExpressionMethods::and(
-                                        diesel::BoolExpressionMethods::and(
-                                            crate::codegen::diesel_codegen::tables::freeze_drying_step_models::freeze_drying_step_models::step_model_instrument_category_id
-                                                .ne(
-                                                    diesel::upsert::excluded(
-                                                        crate::codegen::diesel_codegen::tables::freeze_drying_step_models::freeze_drying_step_models::step_model_instrument_category_id,
-                                                    ),
+                                        crate::codegen::diesel_codegen::tables::freeze_drying_step_models::freeze_drying_step_models::expected_kelvin
+                                            .ne(
+                                                diesel::upsert::excluded(
+                                                    crate::codegen::diesel_codegen::tables::freeze_drying_step_models::freeze_drying_step_models::expected_kelvin,
                                                 ),
-                                            crate::codegen::diesel_codegen::tables::freeze_drying_step_models::freeze_drying_step_models::expected_kelvin
-                                                .ne(
-                                                    diesel::upsert::excluded(
-                                                        crate::codegen::diesel_codegen::tables::freeze_drying_step_models::freeze_drying_step_models::expected_kelvin,
-                                                    ),
-                                                ),
-                                        ),
+                                            ),
                                         crate::codegen::diesel_codegen::tables::freeze_drying_step_models::freeze_drying_step_models::expected_pascal
                                             .ne(
                                                 diesel::upsert::excluded(
@@ -109,20 +101,12 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                             diesel::BoolExpressionMethods::and(
                                 diesel::BoolExpressionMethods::and(
                                     diesel::BoolExpressionMethods::and(
-                                        diesel::BoolExpressionMethods::and(
-                                            crate::codegen::diesel_codegen::tables::freeze_drying_step_models::freeze_drying_step_models::step_model_instrument_category_id
-                                                .ne(
-                                                    diesel::upsert::excluded(
-                                                        crate::codegen::diesel_codegen::tables::freeze_drying_step_models::freeze_drying_step_models::step_model_instrument_category_id,
-                                                    ),
+                                        crate::codegen::diesel_codegen::tables::freeze_drying_step_models::freeze_drying_step_models::expected_kelvin
+                                            .ne(
+                                                diesel::upsert::excluded(
+                                                    crate::codegen::diesel_codegen::tables::freeze_drying_step_models::freeze_drying_step_models::expected_kelvin,
                                                 ),
-                                            crate::codegen::diesel_codegen::tables::freeze_drying_step_models::freeze_drying_step_models::expected_kelvin
-                                                .ne(
-                                                    diesel::upsert::excluded(
-                                                        crate::codegen::diesel_codegen::tables::freeze_drying_step_models::freeze_drying_step_models::expected_kelvin,
-                                                    ),
-                                                ),
-                                        ),
+                                            ),
                                         crate::codegen::diesel_codegen::tables::freeze_drying_step_models::freeze_drying_step_models::expected_pascal
                                             .ne(
                                                 diesel::upsert::excluded(

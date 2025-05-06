@@ -76,7 +76,6 @@ impl InsertableProjectWorkflowModel {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableProjectWorkflowModelBuilder {
     name: Option<String>,
     description: Option<String>,
@@ -85,50 +84,69 @@ pub struct InsertableProjectWorkflowModelBuilder {
     created_by: Option<i32>,
     updated_by: Option<i32>,
 }
+impl Default for InsertableProjectWorkflowModelBuilder {
+    fn default() -> Self {
+        Self {
+            name: None,
+            description: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            created_by: None,
+            updated_by: None,
+        }
+    }
+}
 impl InsertableProjectWorkflowModelBuilder {
-    pub fn name(
+    pub fn name<P: Into<String>>(
         mut self,
-        name: String,
+        name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let name = name.into();
         pgrx_validation::must_not_be_empty(name.as_ref())
             .map_err(|e| e.rename_field(InsertableProjectWorkflowModelAttributes::Name))?;
         self.name = Some(name);
         Ok(self)
     }
-    pub fn description(
+    pub fn description<P: Into<String>>(
         mut self,
-        description: String,
+        description: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let description = description.into();
         pgrx_validation::must_not_be_empty(description.as_ref())
             .map_err(|e| e.rename_field(InsertableProjectWorkflowModelAttributes::Description))?;
         self.description = Some(description);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
+        updated_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_at = updated_at.into();
         self.updated_at = Some(updated_at);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P: Into<i32>>(
         mut self,
-        updated_by: i32,
+        updated_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_by = updated_by.into();
         self.updated_by = Some(updated_by);
         Ok(self)
     }

@@ -29,39 +29,52 @@ pub struct InsertableUser {
     updated_at: rosetta_timestamp::TimestampUTC,
 }
 impl InsertableUser {}
-#[derive(Default)]
 pub struct InsertableUserBuilder {
     first_name: Option<String>,
     last_name: Option<String>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableUserBuilder {
+    fn default() -> Self {
+        Self {
+            first_name: None,
+            last_name: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableUserBuilder {
-    pub fn first_name(
+    pub fn first_name<P: Into<String>>(
         mut self,
-        first_name: String,
+        first_name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let first_name = first_name.into();
         self.first_name = Some(first_name);
         Ok(self)
     }
-    pub fn last_name(
+    pub fn last_name<P: Into<String>>(
         mut self,
-        last_name: String,
+        last_name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let last_name = last_name.into();
         self.last_name = Some(last_name);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
+        updated_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let updated_at = updated_at.into();
         self.updated_at = Some(updated_at);
         Ok(self)
     }

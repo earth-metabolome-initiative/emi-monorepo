@@ -14,7 +14,6 @@
 )]
 pub struct AliquotingStepModel {
     pub id: i32,
-    pub step_model_instrument_category_id: i32,
     pub liters: f32,
     pub created_by: i32,
     pub created_at: rosetta_timestamp::TimestampUTC,
@@ -45,26 +44,6 @@ impl AliquotingStepModel {
             )
             .first::<
                 crate::codegen::structs_codegen::tables::sampling_step_models::SamplingStepModel,
-            >(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn step_model_instrument_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
-        diesel::result::Error,
-    >{
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::step_model_instrument_categories::step_model_instrument_categories::dsl::id
-                    .eq(&self.step_model_instrument_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
             >(conn)
             .await
     }
@@ -109,21 +88,6 @@ impl AliquotingStepModel {
                     .eq(id.id),
             )
             .first::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_step_model_instrument_category_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        step_model_instrument_category_id: &crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::aliquoting_step_models::aliquoting_step_models::dsl::step_model_instrument_category_id
-                    .eq(step_model_instrument_category_id.id),
-            )
-            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]

@@ -67,6 +67,8 @@ pub enum WebCodeGenError {
     ParseBoolError(core::str::ParseBoolError),
     /// An unsupported type casting operation.
     UnsupportedTypeCasting(String, Box<PgType>),
+    /// The column does not have a default value.
+    ColumnDoesNotHaveDefaultValue(Box<Column>),
 }
 
 unsafe impl Send for WebCodeGenError {}

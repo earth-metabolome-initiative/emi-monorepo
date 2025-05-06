@@ -78,39 +78,52 @@ impl InsertableInstrumentLocation {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableInstrumentLocationBuilder {
     instrument_id: Option<i32>,
     room_id: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     created_by: Option<i32>,
 }
+impl Default for InsertableInstrumentLocationBuilder {
+    fn default() -> Self {
+        Self {
+            instrument_id: None,
+            room_id: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            created_by: None,
+        }
+    }
+}
 impl InsertableInstrumentLocationBuilder {
-    pub fn instrument_id(
+    pub fn instrument_id<P: Into<i32>>(
         mut self,
-        instrument_id: i32,
+        instrument_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let instrument_id = instrument_id.into();
         self.instrument_id = Some(instrument_id);
         Ok(self)
     }
-    pub fn room_id(
+    pub fn room_id<P: Into<i32>>(
         mut self,
-        room_id: i32,
+        room_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let room_id = room_id.into();
         self.room_id = Some(room_id);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
+        created_at: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_at = created_at.into();
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P: Into<i32>>(
         mut self,
-        created_by: i32,
+        created_by: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let created_by = created_by.into();
         self.created_by = Some(created_by);
         Ok(self)
     }

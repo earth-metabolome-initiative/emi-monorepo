@@ -54,6 +54,18 @@ AS 'MODULE_PATHNAME', 'must_be_font_awesome_class_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
+-- web/web_common/pgrx_validation/src/lib.rs:170
+-- pgrx_validation::must_be_greater_than_f32
+CREATE  FUNCTION "must_be_greater_than_f32"(
+	"value" real, /* f32 */
+	"lower_bound" real /* f32 */
+) RETURNS bool /* bool */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'must_be_greater_than_f32_wrapper';
+/* </end connected objects> */
+
+/* <begin connected objects> */
 -- web/web_common/pgrx_validation/src/lib.rs:96
 -- pgrx_validation::must_be_mail
 CREATE  FUNCTION "must_be_mail"(
@@ -65,7 +77,19 @@ AS 'MODULE_PATHNAME', 'must_be_mail_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:170
+-- web/web_common/pgrx_validation/src/lib.rs:193
+-- pgrx_validation::must_be_smaller_than_f32
+CREATE  FUNCTION "must_be_smaller_than_f32"(
+	"value" real, /* f32 */
+	"lower_bound" real /* f32 */
+) RETURNS bool /* bool */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'must_be_smaller_than_f32_wrapper';
+/* </end connected objects> */
+
+/* <begin connected objects> */
+-- web/web_common/pgrx_validation/src/lib.rs:216
 -- pgrx_validation::must_be_strictly_greater_than_f32
 CREATE  FUNCTION "must_be_strictly_greater_than_f32"(
 	"value" real, /* f32 */
@@ -77,7 +101,7 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_greater_than_f32_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:216
+-- web/web_common/pgrx_validation/src/lib.rs:262
 -- pgrx_validation::must_be_strictly_greater_than_f64
 CREATE  FUNCTION "must_be_strictly_greater_than_f64"(
 	"value" double precision, /* f64 */
@@ -122,7 +146,7 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_positive_i32_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:193
+-- web/web_common/pgrx_validation/src/lib.rs:239
 -- pgrx_validation::must_be_strictly_smaller_than_f32
 CREATE  FUNCTION "must_be_strictly_smaller_than_f32"(
 	"value" real, /* f32 */
@@ -134,7 +158,7 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_smaller_than_f32_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:239
+-- web/web_common/pgrx_validation/src/lib.rs:285
 -- pgrx_validation::must_be_strictly_smaller_than_f64
 CREATE  FUNCTION "must_be_strictly_smaller_than_f64"(
 	"value" double precision, /* f64 */

@@ -58,17 +58,19 @@ pub struct InsertableTeamMemberBuilder {
     member_id: Option<i32>,
 }
 impl InsertableTeamMemberBuilder {
-    pub fn team_id(
+    pub fn team_id<P: Into<i32>>(
         mut self,
-        team_id: i32,
+        team_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let team_id = team_id.into();
         self.team_id = Some(team_id);
         Ok(self)
     }
-    pub fn member_id(
+    pub fn member_id<P: Into<i32>>(
         mut self,
-        member_id: i32,
+        member_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let member_id = member_id.into();
         self.member_id = Some(member_id);
         Ok(self)
     }

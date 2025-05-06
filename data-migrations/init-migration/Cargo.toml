@@ -8,6 +8,11 @@ core-structures = { workspace = true, features = ["backend"] }
 diesel-async.workspace = true
 diesel.workspace = true
 tokio.workspace = true
+chrono.workspace = true
+tool_categories = { workspace = true, features = ["postgres"] }
+instrument_categories = { workspace = true, features = ["postgres"] }
+container_categories = { workspace = true, features = ["postgres"] }
+nameplate_categories = { workspace = true, features = ["postgres"] }
 web_common_traits = { workspace = true, features = ["backend"] }
 
 [dev-dependencies]
