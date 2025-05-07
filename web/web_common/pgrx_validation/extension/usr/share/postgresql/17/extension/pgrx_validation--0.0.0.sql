@@ -7,8 +7,8 @@ The ordering of items is not stable, it is driven by a dependency graph.
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:27
--- pgrx_validation::must_be_distinct
+-- web/web_common/pgrx_validation/src/str.rs:40
+-- pgrx_validation::str::must_be_distinct
 CREATE  FUNCTION "must_be_distinct"(
 	"left" TEXT, /* &str */
 	"right" TEXT /* &str */
@@ -19,8 +19,8 @@ AS 'MODULE_PATHNAME', 'must_be_distinct_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:50
--- pgrx_validation::must_be_distinct_i32
+-- web/web_common/pgrx_validation/src/int.rs:5
+-- pgrx_validation::int::must_be_distinct_i32
 CREATE  FUNCTION "must_be_distinct_i32"(
 	"left" INT, /* i32 */
 	"right" INT /* i32 */
@@ -31,8 +31,8 @@ AS 'MODULE_PATHNAME', 'must_be_distinct_i32_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:73
--- pgrx_validation::must_be_distinct_uuid
+-- web/web_common/pgrx_validation/src/uuid.rs:5
+-- pgrx_validation::uuid::must_be_distinct_uuid
 CREATE  FUNCTION "must_be_distinct_uuid"(
 	"left" uuid, /* rosetta_uuid::Uuid */
 	"right" uuid /* rosetta_uuid::Uuid */
@@ -54,8 +54,8 @@ AS 'MODULE_PATHNAME', 'must_be_font_awesome_class_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:170
--- pgrx_validation::must_be_greater_than_f32
+-- web/web_common/pgrx_validation/src/float.rs:38
+-- pgrx_validation::float::must_be_greater_than_f32
 CREATE  FUNCTION "must_be_greater_than_f32"(
 	"value" real, /* f32 */
 	"lower_bound" real /* f32 */
@@ -66,8 +66,8 @@ AS 'MODULE_PATHNAME', 'must_be_greater_than_f32_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:96
--- pgrx_validation::must_be_mail
+-- web/web_common/pgrx_validation/src/str.rs:6
+-- pgrx_validation::str::must_be_mail
 CREATE  FUNCTION "must_be_mail"(
 	"value" TEXT /* &str */
 ) RETURNS bool /* bool */
@@ -77,8 +77,19 @@ AS 'MODULE_PATHNAME', 'must_be_mail_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:193
--- pgrx_validation::must_be_smaller_than_f32
+-- web/web_common/pgrx_validation/src/str.rs:124
+-- pgrx_validation::str::must_be_paragraph
+CREATE  FUNCTION "must_be_paragraph"(
+	"value" TEXT /* &str */
+) RETURNS bool /* bool */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'must_be_paragraph_wrapper';
+/* </end connected objects> */
+
+/* <begin connected objects> */
+-- web/web_common/pgrx_validation/src/float.rs:61
+-- pgrx_validation::float::must_be_smaller_than_f32
 CREATE  FUNCTION "must_be_smaller_than_f32"(
 	"value" real, /* f32 */
 	"lower_bound" real /* f32 */
@@ -89,8 +100,8 @@ AS 'MODULE_PATHNAME', 'must_be_smaller_than_f32_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:216
--- pgrx_validation::must_be_strictly_greater_than_f32
+-- web/web_common/pgrx_validation/src/float.rs:84
+-- pgrx_validation::float::must_be_strictly_greater_than_f32
 CREATE  FUNCTION "must_be_strictly_greater_than_f32"(
 	"value" real, /* f32 */
 	"lower_bound" real /* f32 */
@@ -101,8 +112,8 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_greater_than_f32_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:262
--- pgrx_validation::must_be_strictly_greater_than_f64
+-- web/web_common/pgrx_validation/src/float.rs:130
+-- pgrx_validation::float::must_be_strictly_greater_than_f64
 CREATE  FUNCTION "must_be_strictly_greater_than_f64"(
 	"value" double precision, /* f64 */
 	"lower_bound" double precision /* f64 */
@@ -113,8 +124,8 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_greater_than_f64_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:158
--- pgrx_validation::must_be_strictly_positive_f32
+-- web/web_common/pgrx_validation/src/float.rs:5
+-- pgrx_validation::float::must_be_strictly_positive_f32
 CREATE  FUNCTION "must_be_strictly_positive_f32"(
 	"value" real /* f32 */
 ) RETURNS bool /* bool */
@@ -124,8 +135,8 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_positive_f32_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:137
--- pgrx_validation::must_be_strictly_positive_f64
+-- web/web_common/pgrx_validation/src/float.rs:17
+-- pgrx_validation::float::must_be_strictly_positive_f64
 CREATE  FUNCTION "must_be_strictly_positive_f64"(
 	"value" double precision /* f64 */
 ) RETURNS bool /* bool */
@@ -135,8 +146,8 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_positive_f64_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:116
--- pgrx_validation::must_be_strictly_positive_i32
+-- web/web_common/pgrx_validation/src/int.rs:29
+-- pgrx_validation::int::must_be_strictly_positive_i32
 CREATE  FUNCTION "must_be_strictly_positive_i32"(
 	"value" INT /* i32 */
 ) RETURNS bool /* bool */
@@ -146,8 +157,8 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_positive_i32_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:239
--- pgrx_validation::must_be_strictly_smaller_than_f32
+-- web/web_common/pgrx_validation/src/float.rs:107
+-- pgrx_validation::float::must_be_strictly_smaller_than_f32
 CREATE  FUNCTION "must_be_strictly_smaller_than_f32"(
 	"value" real, /* f32 */
 	"lower_bound" real /* f32 */
@@ -158,8 +169,8 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_smaller_than_f32_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:285
--- pgrx_validation::must_be_strictly_smaller_than_f64
+-- web/web_common/pgrx_validation/src/float.rs:153
+-- pgrx_validation::float::must_be_strictly_smaller_than_f64
 CREATE  FUNCTION "must_be_strictly_smaller_than_f64"(
 	"value" double precision, /* f64 */
 	"lower_bound" double precision /* f64 */
@@ -170,13 +181,46 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_smaller_than_f64_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/lib.rs:13
--- pgrx_validation::must_not_be_empty
+-- web/web_common/pgrx_validation/src/str.rs:26
+-- pgrx_validation::str::must_not_be_empty
 CREATE  FUNCTION "must_not_be_empty"(
 	"value" TEXT /* &str */
 ) RETURNS bool /* bool */
 STRICT
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'must_not_be_empty_wrapper';
+/* </end connected objects> */
+
+/* <begin connected objects> */
+-- web/web_common/pgrx_validation/src/str.rs:63
+-- pgrx_validation::str::must_not_be_padded
+CREATE  FUNCTION "must_not_be_padded"(
+	"value" TEXT /* &str */
+) RETURNS bool /* bool */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'must_not_be_padded_wrapper';
+/* </end connected objects> */
+
+/* <begin connected objects> */
+-- web/web_common/pgrx_validation/src/str.rs:82
+-- pgrx_validation::str::must_not_contain_consecutive_whitespace
+CREATE  FUNCTION "must_not_contain_consecutive_whitespace"(
+	"value" TEXT /* &str */
+) RETURNS bool /* bool */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'must_not_contain_consecutive_whitespace_wrapper';
+/* </end connected objects> */
+
+/* <begin connected objects> */
+-- web/web_common/pgrx_validation/src/str.rs:103
+-- pgrx_validation::str::must_not_contain_control_characters
+CREATE  FUNCTION "must_not_contain_control_characters"(
+	"value" TEXT /* &str */
+) RETURNS bool /* bool */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'must_not_contain_control_characters_wrapper';
 /* </end connected objects> */
 

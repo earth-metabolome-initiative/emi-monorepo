@@ -146,10 +146,7 @@ impl<A: core::fmt::Display> core::fmt::Display for SingleFieldError<A> {
                 )
             }
             SingleFieldError::ControlCharacters(field_name) => {
-                write!(
-                    f,
-                    "The {field_name} field contains control characters. Please remove them."
-                )
+                write!(f, "The {field_name} field contains control characters. Please remove them.")
             }
             SingleFieldError::InvalidMail(field_name) => {
                 write!(

@@ -17,9 +17,8 @@ pub use float::{
 pub use font_awesome_icons::must_be_font_awesome_class;
 pub use int::{must_be_distinct_i32, must_be_strictly_positive_i32};
 pub use str::{
-    must_be_distinct, must_be_mail, must_not_be_empty, must_not_be_padded,
+    must_be_distinct, must_be_mail, must_be_paragraph, must_not_be_empty, must_not_be_padded,
     must_not_contain_consecutive_whitespace, must_not_contain_control_characters,
-    must_be_paragraph
 };
 pub use uuid::must_be_distinct_uuid;
 

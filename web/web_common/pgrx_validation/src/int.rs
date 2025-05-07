@@ -25,7 +25,6 @@ pub fn must_be_distinct_i32(
     }
 }
 
-
 #[validation]
 /// Control that the i32 is strictly positive (0, ...].
 ///
@@ -46,7 +45,6 @@ pub fn must_be_strictly_positive_i32(
         Err(validation_errors::SingleFieldError::UnexpectedNegativeOrZeroValue(()))
     }
 }
-
 
 #[cfg(not(feature = "pgrx"))]
 #[cfg(test)]
