@@ -28,6 +28,12 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for Error<FieldName> {
 pub enum SingleFieldError<FieldName = ()> {
     /// The provided text is empty.
     EmptyText(FieldName),
+    /// The provided text is padded with spaces.
+    PaddedText(FieldName),
+    /// The provided text contains control characters.
+    ControlCharacters(FieldName),
+    /// The provided text contains consecutive whitespace characters.
+    ConsecutiveWhitespace(FieldName),
     /// The provided mail address is invalid.
     InvalidMail(FieldName),
     /// The provided text is not a valid font awesome class.
@@ -45,6 +51,13 @@ impl SingleFieldError {
     pub fn rename_field<FieldName>(self, field_name: FieldName) -> SingleFieldError<FieldName> {
         match self {
             SingleFieldError::EmptyText(_) => SingleFieldError::EmptyText(field_name),
+            SingleFieldError::PaddedText(_) => SingleFieldError::PaddedText(field_name),
+            SingleFieldError::ConsecutiveWhitespace(_) => {
+                SingleFieldError::ConsecutiveWhitespace(field_name)
+            }
+            SingleFieldError::ControlCharacters(_) => {
+                SingleFieldError::ControlCharacters(field_name)
+            }
             SingleFieldError::InvalidMail(_) => SingleFieldError::InvalidMail(field_name),
             SingleFieldError::InvalidFontAwesomeClass(_) => {
                 SingleFieldError::InvalidFontAwesomeClass(field_name)
@@ -80,6 +93,9 @@ impl SingleFieldError {
                 DoubleFieldError::MustBeGreaterThan(left, right)
             }
             SingleFieldError::EmptyText(_)
+            | SingleFieldError::PaddedText(_)
+            | SingleFieldError::ConsecutiveWhitespace(_)
+            | SingleFieldError::ControlCharacters(_)
             | SingleFieldError::InvalidFontAwesomeClass(_)
             | SingleFieldError::InvalidMail(_)
             | SingleFieldError::UnexpectedNegativeOrZeroValue(_) => {
@@ -116,6 +132,24 @@ impl<A: core::fmt::Display> core::fmt::Display for SingleFieldError<A> {
         match self {
             SingleFieldError::EmptyText(field_name) => {
                 write!(f, "Please provide a value for the {field_name} field.")
+            }
+            SingleFieldError::PaddedText(field_name) => {
+                write!(
+                    f,
+                    "The {field_name} field contains leading or trailing spaces. Please remove them."
+                )
+            }
+            SingleFieldError::ConsecutiveWhitespace(field_name) => {
+                write!(
+                    f,
+                    "The {field_name} field contains consecutive whitespace characters. Please remove them."
+                )
+            }
+            SingleFieldError::ControlCharacters(field_name) => {
+                write!(
+                    f,
+                    "The {field_name} field contains control characters. Please remove them."
+                )
             }
             SingleFieldError::InvalidMail(field_name) => {
                 write!(
