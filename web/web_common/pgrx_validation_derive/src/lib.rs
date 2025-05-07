@@ -8,16 +8,20 @@ use syn::{Expr, ExprCall, ExprPath, parse_macro_input, spanned::Spanned, visit_m
 
 struct MethodRenamer;
 
+/// Valid prefixes for the validation functions.
+const VALID_PREFIXES: [&str; 4] =
+    ["must_be_", "must_not_be_", "must_contain_", "must_not_contain_"];
+
 impl VisitMut for MethodRenamer {
     fn visit_expr_call_mut(&mut self, node: &mut ExprCall) {
         if let Expr::Path(ExprPath { path, .. }) = node.func.as_mut() {
             if let Some(ident) = path.get_ident() {
-                if let Some(ident) = ident.to_string().strip_prefix("must_be_") {
-                    path.segments[0].ident =
-                        syn::Ident::new(&format!("__inner_must_be_{ident}"), path.span());
-                } else if let Some(ident) = ident.to_string().strip_prefix("must_not_be_") {
-                    path.segments[0].ident =
-                        syn::Ident::new(&format!("__inner_must_not_be_{ident}"), path.span());
+                for prefix in VALID_PREFIXES {
+                    if let Some(ident) = ident.to_string().strip_prefix(prefix) {
+                        path.segments[0].ident =
+                            syn::Ident::new(&format!("__inner_{prefix}{ident}"), path.span());
+                        break;
+                    }
                 }
             }
         }
@@ -113,9 +117,9 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     // We expect the function name to start with `must_be_` or `must_not_be_`.
-    if !function_name.starts_with("must_be_") && !function_name.starts_with("must_not_be_") {
+    if !VALID_PREFIXES.iter().any(|prefix| function_name.starts_with(prefix)) {
         let error_message = format!(
-            "Function `{fn_name}` must start with `must_be_` or `must_not_be_` to be decorated with `validation`.",
+            "Function `{fn_name}` must start with any of {VALID_PREFIXES:?} to be decorated with `validation`.",
         );
         return syn::Error::new(fn_name.span(), &error_message).to_compile_error().into();
     }
