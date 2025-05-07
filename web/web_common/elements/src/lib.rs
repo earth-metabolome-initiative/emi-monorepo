@@ -7,14 +7,14 @@
 use pgrx::FromDatum;
 
 mod as_ref;
+pub mod diesel_impls;
+mod display;
+pub mod errors;
+mod from_str;
+mod into;
 mod molar_mass;
 mod name;
-mod display;
-mod into;
 mod try_from;
-mod from_str;
-pub mod diesel_impls;
-pub mod errors;
 pub use molar_mass::MolarMass;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, strum_macros::EnumIter)]

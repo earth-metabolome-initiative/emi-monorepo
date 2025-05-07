@@ -22,18 +22,18 @@ pub enum Token {
     Plus,
     /// A minus sign
     Minus,
-	/// A multiplication sign
-	Mul,
+    /// A multiplication sign
+    Mul,
 }
 
 impl From<u8> for Token {
-	fn from(number: u8) -> Self {
-		Token::Number(number)
-	}
+    fn from(number: u8) -> Self {
+        Token::Number(number)
+    }
 }
 
 impl From<Element> for Token {
-	fn from(element: Element) -> Self {
-		Token::Element(element)
-	}
+    fn from(element: Element) -> Self {
+        Token::Element(element)
+    }
 }

@@ -20,15 +20,15 @@ pub enum Error {
     InvalidFormula,
     /// Error indicating that the expected closing token was not found.
     ClosingToken {
-		/// The expected closing token.
-		expected: Option<Token>,
-		/// The found closing token.
-		found: Option<Token>,
-	},
-	/// When the leading token is not a number or an element.
-	InvalidLeadingToken(Token),
+        /// The expected closing token.
+        expected: Option<Token>,
+        /// The found closing token.
+        found: Option<Token>,
+    },
+    /// When the leading token is not a number or an element.
+    InvalidLeadingToken(Token),
     /// When the parser is not completely consumed.
-    UnconsumedParser
+    UnconsumedParser,
 }
 
 impl From<UnknownElement> for Error {

@@ -15,8 +15,8 @@ impl MolarMass for MolecularFormula {
             MolecularFormula::Sequence(formulas) => {
                 formulas.iter().map(MolarMass::molar_mass).sum()
             }
-			MolecularFormula::Complex(formula) => formula.molar_mass(),
-			MolecularFormula::RepeatingUnit(formula) => formula.molar_mass(),
+            MolecularFormula::Complex(formula) => formula.molar_mass(),
+            MolecularFormula::RepeatingUnit(formula) => formula.molar_mass(),
         }
     }
 }

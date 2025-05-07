@@ -1,10 +1,10 @@
-//! Submodule implementing several `From` traits for the `MolecularFormula` struct
+//! Submodule implementing several `From` traits for the `MolecularFormula`
+//! struct
 
 use elements::Element;
 
-use crate::{Ion, Solvation};
-
 use super::MolecularFormula;
+use crate::{Ion, Solvation};
 
 impl From<Element> for MolecularFormula {
     fn from(element: Element) -> Self {
@@ -37,7 +37,7 @@ impl From<Vec<MolecularFormula>> for MolecularFormula {
 }
 
 impl From<Vec<MolecularFormula>> for Box<MolecularFormula> {
-	fn from(formulas: Vec<MolecularFormula>) -> Self {
-		MolecularFormula::Sequence(formulas).into()
-	}
+    fn from(formulas: Vec<MolecularFormula>) -> Self {
+        MolecularFormula::Sequence(formulas).into()
+    }
 }

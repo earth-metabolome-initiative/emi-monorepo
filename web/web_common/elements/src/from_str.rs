@@ -2,7 +2,6 @@
 
 use std::str::FromStr;
 
-
 impl FromStr for crate::Element {
     type Err = crate::errors::UnknownElement;
 

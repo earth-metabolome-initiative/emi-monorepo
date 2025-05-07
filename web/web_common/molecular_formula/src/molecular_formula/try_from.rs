@@ -3,7 +3,7 @@
 impl TryFrom<&str> for crate::MolecularFormula {
     type Error = crate::errors::Error;
 
-	#[inline]
+    #[inline]
     fn try_from(s: &str) -> Result<Self, Self::Error> {
         <crate::MolecularFormula as std::str::FromStr>::from_str(s)
     }
@@ -12,7 +12,7 @@ impl TryFrom<&str> for crate::MolecularFormula {
 impl TryFrom<String> for crate::MolecularFormula {
     type Error = crate::errors::Error;
 
-	#[inline]
+    #[inline]
     fn try_from(s: String) -> Result<Self, Self::Error> {
         <crate::MolecularFormula as std::str::FromStr>::from_str(&s)
     }
