@@ -1,0 +1,10 @@
+[package]
+name = "molecular_formula"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+elements.workspace = true
+
+[lints]
+workspace = true
