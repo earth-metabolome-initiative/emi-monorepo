@@ -12,12 +12,6 @@ mod display;
 pub mod errors;
 mod try_from;
 
-// name,description,icon
-// sample container,"A container appropriate for samples, such as leafs or
-// roots",FlaskVial sample container rack,"A rack for sample containers, such as
-// leafs or roots",Vials container box,"A box for sample containers, or sample
-// container racks",Box
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, strum_macros::EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
