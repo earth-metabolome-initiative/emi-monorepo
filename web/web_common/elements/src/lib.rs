@@ -14,6 +14,7 @@ mod from_str;
 mod into;
 mod molar_mass;
 mod name;
+mod oxidation_states;
 mod try_from;
 pub use molar_mass::MolarMass;
 
