@@ -30,7 +30,7 @@ impl Display for MolecularFormula {
             }
             Self::Sequence(formulas) => {
                 assert!(!formulas.is_empty(), "Empty sequence");
-                for formula in formulas.iter() {
+                for formula in formulas {
                     write!(f, "{formula}")?;
                 }
                 Ok(())

@@ -24,7 +24,7 @@ impl<E> Ion<E> {
 }
 
 /// Electron molar mass in amu
-pub const ELECTRON_MOLAR_MASS: f64 = 0.00054858;
+pub const ELECTRON_MOLAR_MASS: f64 = 0.000_548_58;
 
 impl<E> Display for Ion<E>
 where

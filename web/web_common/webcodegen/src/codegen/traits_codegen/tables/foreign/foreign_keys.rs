@@ -17,6 +17,7 @@ impl Codegen<'_> {
         Ok(Ident::new(&format!("{table_name}ForeignKeys"), proc_macro2::Span::call_site()))
     }
 
+    #[allow(clippy::too_many_lines)]
     /// Generates the [`ForeignKeys`](web_common_traits::prelude::ForeignKeys)
     /// traits implementation for the tables
     ///

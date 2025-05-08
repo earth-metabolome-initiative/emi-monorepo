@@ -18,7 +18,8 @@ impl<'a> From<&'a str> for Parser<'a> {
     }
 }
 
-impl<'a> Parser<'a> {
+impl Parser<'_> {
+    #[allow(clippy::too_many_lines)]
     fn update_formula(
         mut self,
         formula: Option<MolecularFormula>,
@@ -31,7 +32,7 @@ impl<'a> Parser<'a> {
             (Token::Residual, Some(previous)) => Some(previous.chain(MolecularFormula::Residual)),
             (Token::Number(count), None) => {
                 let (parser, inner_formula, closing_token) = self.inner_parse()?;
-                if closing_token != None {
+                if closing_token.is_some() {
                     return Err(crate::errors::Error::ClosingToken {
                         expected: None,
                         found: closing_token,
@@ -50,26 +51,26 @@ impl<'a> Parser<'a> {
             }
             (Token::Plus, Some(MolecularFormula::Element(element))) => {
                 if !element.is_valid_oxidation_state(1) {
-                    return Err(crate::errors::Error::InvalidOxidationState(element.clone(), 1));
+                    return Err(crate::errors::Error::InvalidOxidationState(element, 1));
                 }
                 Some(MolecularFormula::Ion(Ion::new(element.into(), 1)))
             }
             (Token::Minus, Some(MolecularFormula::Element(element))) => {
                 if !element.is_valid_oxidation_state(1) {
-                    return Err(crate::errors::Error::InvalidOxidationState(element.clone(), 1));
+                    return Err(crate::errors::Error::InvalidOxidationState(element, 1));
                 }
                 Some(MolecularFormula::Ion(Ion::new(element.into(), -1)))
             }
             (Token::Mul, Some(formula)) => {
                 let (parser, inner_formula, closing_token) = self.inner_parse()?;
-                if closing_token != None {
+                if closing_token.is_some() {
                     return Err(crate::errors::Error::ClosingToken {
                         expected: None,
                         found: closing_token,
                     });
                 }
                 self = parser;
-                Some(Solvation::new(formula.into(), inner_formula.into()).into())
+                Some(Solvation::new(formula, inner_formula).into())
             }
             (Token::Plus, Some(MolecularFormula::Count(formula, count))) => {
                 match *formula {
@@ -192,7 +193,7 @@ impl<'a> Parser<'a> {
         if token.is_some() {
             return Err(crate::errors::Error::ClosingToken { expected: None, found: token });
         }
-        if !parser.tokens_iter.peek().is_none() {
+        if parser.tokens_iter.peek().is_some() {
             return Err(crate::errors::Error::UnconsumedParser);
         }
         Ok(formula)

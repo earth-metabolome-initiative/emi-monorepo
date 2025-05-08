@@ -36,7 +36,7 @@ pub enum MolecularFormula {
 
 impl MolecularFormula {
     /// Chains the provided molecular formula with the current one.
-    pub fn chain(self, other: MolecularFormula) -> Self {
+    #[must_use] pub fn chain(self, other: MolecularFormula) -> Self {
         match self {
             Self::Sequence(mut formulas) => {
                 formulas.push(other);
@@ -47,7 +47,7 @@ impl MolecularFormula {
     }
 
     /// Returns the last element of the sequence.
-    pub fn last_dangling_element(&self) -> Option<&Element> {
+    #[must_use] pub fn last_dangling_element(&self) -> Option<&Element> {
         match self {
             Self::Sequence(formulas) => formulas.last().and_then(|f| f.last_dangling_element()),
             Self::Element(element) => Some(element),

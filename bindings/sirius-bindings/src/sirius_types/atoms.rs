@@ -112,7 +112,7 @@ pub enum Atoms {
     I,
     /// Xenon
     Xe,
-    /// Cesium
+    /// Caesium
     Cs,
     /// Barium
     Ba,

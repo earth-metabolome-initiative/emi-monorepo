@@ -1,11 +1,7 @@
 //! Submodule providing an utility to retrieve or insert an address.
 
-use core_structures::{Address as PortalAddress, City as PortalCity, Country as PortalCountry};
+use core_structures::{Address as PortalAddress, Country as PortalCountry};
 use diesel_async::AsyncPgConnection;
-use web_common_traits::{
-    database::{BackendInsertableVariant, Insertable},
-    prelude::Builder,
-};
 
 use crate::codegen::Address as DirectusAddress;
 

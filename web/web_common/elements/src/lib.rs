@@ -11,7 +11,7 @@ pub mod diesel_impls;
 mod display;
 pub mod errors;
 mod from_str;
-mod into;
+mod from;
 mod isotopes;
 mod name;
 mod oxidation_states;

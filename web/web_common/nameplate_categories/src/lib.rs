@@ -22,7 +22,7 @@ mod try_from;
 )]
 /// Enum representing the tool categories.
 pub enum NameplateCategory {
-    /// An aluminum nameplate with a brushed finish and adhesive backing.
+    /// An Aluminium nameplate with a brushed finish and adhesive backing.
     /// It is used for labeling specimens such as trees.
     /// Placed at human height and nailed to the trunk.
     Permanent,
@@ -40,7 +40,7 @@ impl NameplateCategory {
     pub fn description(&self) -> &'static str {
         match self {
             NameplateCategory::Permanent => {
-                "An aluminum nameplate with a brushed finish and adhesive backing. \
+                "An Aluminium nameplate with a brushed finish and adhesive backing. \
                 It is used for labeling specimens such as trees. Placed at human height \
                 and nailed to the trunk."
             }

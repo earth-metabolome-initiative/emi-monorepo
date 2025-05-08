@@ -1,4 +1,4 @@
-//! Build script for the `elements`	crate.
+//! Build script for the `elements` crate.
 
 use std::{io::Write, path::Path};
 
@@ -11,7 +11,7 @@ fn normalize_symbol(symbol: &str) -> String {
     let mut chars = symbol.chars();
     let first_char = chars.next().unwrap_or_default().to_uppercase();
     let rest = chars.as_str().to_lowercase();
-    format!("{}{}", first_char, rest)
+    format!("{first_char}{rest}")
 }
 
 fn element_name_from_symbol(symbol: &str) -> &'static str {
@@ -134,7 +134,7 @@ fn element_name_from_symbol(symbol: &str) -> &'static str {
         "Lv" => "Livermorium",
         "Ts" => "Tennessine",
         "Og" => "Oganesson",
-        _ => panic!("Unknown element symbol: {}", symbol),
+        _ => panic!("Unknown element symbol: {symbol}"),
     }
 }
 
@@ -267,7 +267,7 @@ pub fn main() {
     // We group the isotopes by atomic number
     let isotopes_by_atomic_number: std::collections::HashMap<u8, Vec<IsotopeMetadata>> =
         isotopes.into_iter().fold(std::collections::HashMap::new(), |mut acc, isotope| {
-            acc.entry(isotope.atomic_number).or_insert_with(Vec::new).push(isotope);
+            acc.entry(isotope.atomic_number).or_default().push(isotope);
             acc
         });
 
@@ -278,7 +278,7 @@ pub fn main() {
         let file_name = format!("{element_name}.rs");
         let file_path = isotopes_module_dir.join(&file_name);
         let mut file = std::fs::File::create(&file_path).expect("Failed to create file");
-        writeln!(file, "{}", tokens).expect("Failed to write to file");
+        writeln!(file, "{tokens}").expect("Failed to write to file");
 
         // We run rustfmt on the generated file
         let status = std::process::Command::new("rustfmt")
@@ -286,7 +286,7 @@ pub fn main() {
             .status()
             .expect("Failed to run rustfmt");
         if !status.success() {
-            panic!("rustfmt failed with status: {}", status);
+            panic!("rustfmt failed with status: {status}");
         }
     }
 }

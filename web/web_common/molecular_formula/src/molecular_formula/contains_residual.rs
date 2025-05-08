@@ -8,10 +8,8 @@ impl super::MolecularFormula {
             Self::Element(_) => false,
             Self::Ion(ion) => ion.entry.contains_residual(),
             Self::Solvation(solvation) => solvation.contains_residual(),
-            Self::Count(formula, _) => formula.contains_residual(),
             Self::Sequence(formulas) => formulas.iter().any(Self::contains_residual),
-            Self::Complex(formula) => formula.contains_residual(),
-            Self::RepeatingUnit(formula) => formula.contains_residual(),
+            Self::Count(formula, _) | Self::RepeatingUnit(formula) | Self::Complex(formula) => formula.contains_residual(),
             Self::Residual => true,
         }
     }

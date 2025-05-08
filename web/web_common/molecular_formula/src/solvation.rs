@@ -16,7 +16,13 @@ pub struct Solvation {
 }
 
 impl Solvation {
+    #[must_use]
     /// Creates a new `Solvation` instance with the given solvate and solvant.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `solvate` - A `MolecularFormula` representing the solvate molecule.
+    /// * `solvant` - A `MolecularFormula` representing the solvant molecule.
     pub fn new(solvate: MolecularFormula, solvant: MolecularFormula) -> Self {
         Self { solvate, solvant }
     }

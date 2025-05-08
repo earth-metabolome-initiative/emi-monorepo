@@ -322,7 +322,6 @@ impl<V: Version> Display for SiriusConfig<V> {
 }
 
 #[cfg(test)]
-
 mod tests {
     use super::*;
 

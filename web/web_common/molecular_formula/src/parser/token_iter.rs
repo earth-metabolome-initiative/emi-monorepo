@@ -63,19 +63,17 @@ impl Iterator for TokenIter<'_> {
                             return Some(
                                 Element::try_from([c, next]).map(Into::into).map_err(Into::into),
                             );
-                        } else {
-                            if c == 'R' {
-                                return Some(Ok(crate::token::Token::Residual));
-                            }
-
-                            return Some(Element::try_from(c).map(Into::into).map_err(Into::into));
                         }
-                    } else {
                         if c == 'R' {
                             return Some(Ok(crate::token::Token::Residual));
                         }
+
                         return Some(Element::try_from(c).map(Into::into).map_err(Into::into));
                     }
+                    if c == 'R' {
+                        return Some(Ok(crate::token::Token::Residual));
+                    }
+                    return Some(Element::try_from(c).map(Into::into).map_err(Into::into));
                 }
                 _ => {}
             }
