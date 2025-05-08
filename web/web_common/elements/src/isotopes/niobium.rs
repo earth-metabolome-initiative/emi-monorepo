@@ -1,0 +1,173 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+pub enum NiobiumIsotope {
+    Nb81,
+    Nb82,
+    Nb83,
+    Nb84,
+    Nb85,
+    Nb86,
+    Nb87,
+    Nb88,
+    Nb89,
+    Nb90,
+    Nb91,
+    Nb92,
+    Nb93,
+    Nb94,
+    Nb95,
+    Nb96,
+    Nb97,
+    Nb98,
+    Nb99,
+    Nb100,
+    Nb101,
+    Nb102,
+    Nb103,
+    Nb104,
+    Nb105,
+    Nb106,
+    Nb107,
+    Nb108,
+    Nb109,
+    Nb110,
+    Nb111,
+    Nb112,
+    Nb113,
+    Nb114,
+    Nb115,
+}
+impl super::RelativeAtomicMass for NiobiumIsotope {
+    fn relative_atomic_mass(&self) -> f64 {
+        match self {
+            Self::Nb81 => 80.9496f64,
+            Self::Nb82 => 81.94396f64,
+            Self::Nb83 => 82.93729f64,
+            Self::Nb84 => 83.93449f64,
+            Self::Nb85 => 84.9288458f64,
+            Self::Nb86 => 85.9257828f64,
+            Self::Nb87 => 86.9206937f64,
+            Self::Nb88 => 87.918222f64,
+            Self::Nb89 => 88.913445f64,
+            Self::Nb90 => 89.9112584f64,
+            Self::Nb91 => 90.9069897f64,
+            Self::Nb92 => 91.9071881f64,
+            Self::Nb93 => 92.906373f64,
+            Self::Nb94 => 93.9072788f64,
+            Self::Nb95 => 94.9068324f64,
+            Self::Nb96 => 95.9080973f64,
+            Self::Nb97 => 96.9080959f64,
+            Self::Nb98 => 97.9103265f64,
+            Self::Nb99 => 98.911613f64,
+            Self::Nb100 => 99.9143276f64,
+            Self::Nb101 => 100.9153103f64,
+            Self::Nb102 => 101.9180772f64,
+            Self::Nb103 => 102.9194572f64,
+            Self::Nb104 => 103.9228925f64,
+            Self::Nb105 => 104.9249465f64,
+            Self::Nb106 => 105.9289317f64,
+            Self::Nb107 => 106.9315937f64,
+            Self::Nb108 => 107.9360748f64,
+            Self::Nb109 => 108.93922f64,
+            Self::Nb110 => 109.94403f64,
+            Self::Nb111 => 110.94753f64,
+            Self::Nb112 => 111.95247f64,
+            Self::Nb113 => 112.95651f64,
+            Self::Nb114 => 113.96201f64,
+            Self::Nb115 => 114.96634f64,
+        }
+    }
+}
+impl super::ElementVariant for NiobiumIsotope {
+    fn element(&self) -> crate::Element {
+        crate::Element::Nb
+    }
+}
+impl super::MassNumber for NiobiumIsotope {
+    fn mass_number(&self) -> u16 {
+        match self {
+            Self::Nb81 => 81u16,
+            Self::Nb82 => 82u16,
+            Self::Nb83 => 83u16,
+            Self::Nb84 => 84u16,
+            Self::Nb85 => 85u16,
+            Self::Nb86 => 86u16,
+            Self::Nb87 => 87u16,
+            Self::Nb88 => 88u16,
+            Self::Nb89 => 89u16,
+            Self::Nb90 => 90u16,
+            Self::Nb91 => 91u16,
+            Self::Nb92 => 92u16,
+            Self::Nb93 => 93u16,
+            Self::Nb94 => 94u16,
+            Self::Nb95 => 95u16,
+            Self::Nb96 => 96u16,
+            Self::Nb97 => 97u16,
+            Self::Nb98 => 98u16,
+            Self::Nb99 => 99u16,
+            Self::Nb100 => 100u16,
+            Self::Nb101 => 101u16,
+            Self::Nb102 => 102u16,
+            Self::Nb103 => 103u16,
+            Self::Nb104 => 104u16,
+            Self::Nb105 => 105u16,
+            Self::Nb106 => 106u16,
+            Self::Nb107 => 107u16,
+            Self::Nb108 => 108u16,
+            Self::Nb109 => 109u16,
+            Self::Nb110 => 110u16,
+            Self::Nb111 => 111u16,
+            Self::Nb112 => 112u16,
+            Self::Nb113 => 113u16,
+            Self::Nb114 => 114u16,
+            Self::Nb115 => 115u16,
+        }
+    }
+}
+impl super::IsotopicComposition for NiobiumIsotope {
+    fn isotopic_composition(&self) -> Option<f64> {
+        match self {
+            Self::Nb81 => None,
+            Self::Nb82 => None,
+            Self::Nb83 => None,
+            Self::Nb84 => None,
+            Self::Nb85 => None,
+            Self::Nb86 => None,
+            Self::Nb87 => None,
+            Self::Nb88 => None,
+            Self::Nb89 => None,
+            Self::Nb90 => None,
+            Self::Nb91 => None,
+            Self::Nb92 => None,
+            Self::Nb93 => Some(1f64),
+            Self::Nb94 => None,
+            Self::Nb95 => None,
+            Self::Nb96 => None,
+            Self::Nb97 => None,
+            Self::Nb98 => None,
+            Self::Nb99 => None,
+            Self::Nb100 => None,
+            Self::Nb101 => None,
+            Self::Nb102 => None,
+            Self::Nb103 => None,
+            Self::Nb104 => None,
+            Self::Nb105 => None,
+            Self::Nb106 => None,
+            Self::Nb107 => None,
+            Self::Nb108 => None,
+            Self::Nb109 => None,
+            Self::Nb110 => None,
+            Self::Nb111 => None,
+            Self::Nb112 => None,
+            Self::Nb113 => None,
+            Self::Nb114 => None,
+            Self::Nb115 => None,
+        }
+    }
+}
+impl super::MostCommonIsotope for NiobiumIsotope {
+    fn most_common_isotope() -> Self {
+        Self::Nb93
+    }
+}

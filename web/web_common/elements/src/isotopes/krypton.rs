@@ -1,0 +1,165 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+pub enum KryptonIsotope {
+    Kr69,
+    Kr70,
+    Kr71,
+    Kr72,
+    Kr73,
+    Kr74,
+    Kr75,
+    Kr76,
+    Kr77,
+    Kr78,
+    Kr79,
+    Kr80,
+    Kr81,
+    Kr82,
+    Kr83,
+    Kr84,
+    Kr85,
+    Kr86,
+    Kr87,
+    Kr88,
+    Kr89,
+    Kr90,
+    Kr91,
+    Kr92,
+    Kr93,
+    Kr94,
+    Kr95,
+    Kr96,
+    Kr97,
+    Kr98,
+    Kr99,
+    Kr100,
+    Kr101,
+}
+impl super::RelativeAtomicMass for KryptonIsotope {
+    fn relative_atomic_mass(&self) -> f64 {
+        match self {
+            Self::Kr69 => 68.96518f64,
+            Self::Kr70 => 69.95604f64,
+            Self::Kr71 => 70.95027f64,
+            Self::Kr72 => 71.9420924f64,
+            Self::Kr73 => 72.9392892f64,
+            Self::Kr74 => 73.933084f64,
+            Self::Kr75 => 74.9309457f64,
+            Self::Kr76 => 75.9259103f64,
+            Self::Kr77 => 76.92467f64,
+            Self::Kr78 => 77.92036494f64,
+            Self::Kr79 => 78.9200829f64,
+            Self::Kr80 => 79.91637808f64,
+            Self::Kr81 => 80.9165912f64,
+            Self::Kr82 => 81.91348273f64,
+            Self::Kr83 => 82.91412716f64,
+            Self::Kr84 => 83.9114977282f64,
+            Self::Kr85 => 84.9125273f64,
+            Self::Kr86 => 85.9106106269f64,
+            Self::Kr87 => 86.91335476f64,
+            Self::Kr88 => 87.9144479f64,
+            Self::Kr89 => 88.9178355f64,
+            Self::Kr90 => 89.9195279f64,
+            Self::Kr91 => 90.9238063f64,
+            Self::Kr92 => 91.9261731f64,
+            Self::Kr93 => 92.9311472f64,
+            Self::Kr94 => 93.93414f64,
+            Self::Kr95 => 94.939711f64,
+            Self::Kr96 => 95.943017f64,
+            Self::Kr97 => 96.94909f64,
+            Self::Kr98 => 97.95243f64,
+            Self::Kr99 => 98.95839f64,
+            Self::Kr100 => 99.96237f64,
+            Self::Kr101 => 100.96873f64,
+        }
+    }
+}
+impl super::ElementVariant for KryptonIsotope {
+    fn element(&self) -> crate::Element {
+        crate::Element::Kr
+    }
+}
+impl super::MassNumber for KryptonIsotope {
+    fn mass_number(&self) -> u16 {
+        match self {
+            Self::Kr69 => 69u16,
+            Self::Kr70 => 70u16,
+            Self::Kr71 => 71u16,
+            Self::Kr72 => 72u16,
+            Self::Kr73 => 73u16,
+            Self::Kr74 => 74u16,
+            Self::Kr75 => 75u16,
+            Self::Kr76 => 76u16,
+            Self::Kr77 => 77u16,
+            Self::Kr78 => 78u16,
+            Self::Kr79 => 79u16,
+            Self::Kr80 => 80u16,
+            Self::Kr81 => 81u16,
+            Self::Kr82 => 82u16,
+            Self::Kr83 => 83u16,
+            Self::Kr84 => 84u16,
+            Self::Kr85 => 85u16,
+            Self::Kr86 => 86u16,
+            Self::Kr87 => 87u16,
+            Self::Kr88 => 88u16,
+            Self::Kr89 => 89u16,
+            Self::Kr90 => 90u16,
+            Self::Kr91 => 91u16,
+            Self::Kr92 => 92u16,
+            Self::Kr93 => 93u16,
+            Self::Kr94 => 94u16,
+            Self::Kr95 => 95u16,
+            Self::Kr96 => 96u16,
+            Self::Kr97 => 97u16,
+            Self::Kr98 => 98u16,
+            Self::Kr99 => 99u16,
+            Self::Kr100 => 100u16,
+            Self::Kr101 => 101u16,
+        }
+    }
+}
+impl super::IsotopicComposition for KryptonIsotope {
+    fn isotopic_composition(&self) -> Option<f64> {
+        match self {
+            Self::Kr69 => None,
+            Self::Kr70 => None,
+            Self::Kr71 => None,
+            Self::Kr72 => None,
+            Self::Kr73 => None,
+            Self::Kr74 => None,
+            Self::Kr75 => None,
+            Self::Kr76 => None,
+            Self::Kr77 => None,
+            Self::Kr78 => Some(0.00355f64),
+            Self::Kr79 => None,
+            Self::Kr80 => Some(0.02286f64),
+            Self::Kr81 => None,
+            Self::Kr82 => Some(0.11593f64),
+            Self::Kr83 => Some(0.115f64),
+            Self::Kr84 => Some(0.56987f64),
+            Self::Kr85 => None,
+            Self::Kr86 => Some(0.17279f64),
+            Self::Kr87 => None,
+            Self::Kr88 => None,
+            Self::Kr89 => None,
+            Self::Kr90 => None,
+            Self::Kr91 => None,
+            Self::Kr92 => None,
+            Self::Kr93 => None,
+            Self::Kr94 => None,
+            Self::Kr95 => None,
+            Self::Kr96 => None,
+            Self::Kr97 => None,
+            Self::Kr98 => None,
+            Self::Kr99 => None,
+            Self::Kr100 => None,
+            Self::Kr101 => None,
+        }
+    }
+}
+impl super::MostCommonIsotope for KryptonIsotope {
+    fn most_common_isotope() -> Self {
+        Self::Kr84
+    }
+}

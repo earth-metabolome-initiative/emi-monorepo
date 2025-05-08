@@ -1,0 +1,161 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+pub enum BromineIsotope {
+    Br67,
+    Br68,
+    Br69,
+    Br70,
+    Br71,
+    Br72,
+    Br73,
+    Br74,
+    Br75,
+    Br76,
+    Br77,
+    Br78,
+    Br79,
+    Br80,
+    Br81,
+    Br82,
+    Br83,
+    Br84,
+    Br85,
+    Br86,
+    Br87,
+    Br88,
+    Br89,
+    Br90,
+    Br91,
+    Br92,
+    Br93,
+    Br94,
+    Br95,
+    Br96,
+    Br97,
+    Br98,
+}
+impl super::RelativeAtomicMass for BromineIsotope {
+    fn relative_atomic_mass(&self) -> f64 {
+        match self {
+            Self::Br67 => 66.96465f64,
+            Self::Br68 => 67.95873f64,
+            Self::Br69 => 68.950497f64,
+            Self::Br70 => 69.944792f64,
+            Self::Br71 => 70.9393422f64,
+            Self::Br72 => 71.9365886f64,
+            Self::Br73 => 72.9316715f64,
+            Self::Br74 => 73.9299102f64,
+            Self::Br75 => 74.9258105f64,
+            Self::Br76 => 75.924542f64,
+            Self::Br77 => 76.9213792f64,
+            Self::Br78 => 77.9211459f64,
+            Self::Br79 => 78.9183376f64,
+            Self::Br80 => 79.9185298f64,
+            Self::Br81 => 80.9162897f64,
+            Self::Br82 => 81.9168032f64,
+            Self::Br83 => 82.9151756f64,
+            Self::Br84 => 83.916496f64,
+            Self::Br85 => 84.9156458f64,
+            Self::Br86 => 85.9188054f64,
+            Self::Br87 => 86.920674f64,
+            Self::Br88 => 87.9240833f64,
+            Self::Br89 => 88.9267046f64,
+            Self::Br90 => 89.9312928f64,
+            Self::Br91 => 90.9343986f64,
+            Self::Br92 => 91.9396316f64,
+            Self::Br93 => 92.94313f64,
+            Self::Br94 => 93.9489f64,
+            Self::Br95 => 94.95301f64,
+            Self::Br96 => 95.95903f64,
+            Self::Br97 => 96.96344f64,
+            Self::Br98 => 97.96946f64,
+        }
+    }
+}
+impl super::ElementVariant for BromineIsotope {
+    fn element(&self) -> crate::Element {
+        crate::Element::Br
+    }
+}
+impl super::MassNumber for BromineIsotope {
+    fn mass_number(&self) -> u16 {
+        match self {
+            Self::Br67 => 67u16,
+            Self::Br68 => 68u16,
+            Self::Br69 => 69u16,
+            Self::Br70 => 70u16,
+            Self::Br71 => 71u16,
+            Self::Br72 => 72u16,
+            Self::Br73 => 73u16,
+            Self::Br74 => 74u16,
+            Self::Br75 => 75u16,
+            Self::Br76 => 76u16,
+            Self::Br77 => 77u16,
+            Self::Br78 => 78u16,
+            Self::Br79 => 79u16,
+            Self::Br80 => 80u16,
+            Self::Br81 => 81u16,
+            Self::Br82 => 82u16,
+            Self::Br83 => 83u16,
+            Self::Br84 => 84u16,
+            Self::Br85 => 85u16,
+            Self::Br86 => 86u16,
+            Self::Br87 => 87u16,
+            Self::Br88 => 88u16,
+            Self::Br89 => 89u16,
+            Self::Br90 => 90u16,
+            Self::Br91 => 91u16,
+            Self::Br92 => 92u16,
+            Self::Br93 => 93u16,
+            Self::Br94 => 94u16,
+            Self::Br95 => 95u16,
+            Self::Br96 => 96u16,
+            Self::Br97 => 97u16,
+            Self::Br98 => 98u16,
+        }
+    }
+}
+impl super::IsotopicComposition for BromineIsotope {
+    fn isotopic_composition(&self) -> Option<f64> {
+        match self {
+            Self::Br67 => None,
+            Self::Br68 => None,
+            Self::Br69 => None,
+            Self::Br70 => None,
+            Self::Br71 => None,
+            Self::Br72 => None,
+            Self::Br73 => None,
+            Self::Br74 => None,
+            Self::Br75 => None,
+            Self::Br76 => None,
+            Self::Br77 => None,
+            Self::Br78 => None,
+            Self::Br79 => Some(0.5069f64),
+            Self::Br80 => None,
+            Self::Br81 => Some(0.4931f64),
+            Self::Br82 => None,
+            Self::Br83 => None,
+            Self::Br84 => None,
+            Self::Br85 => None,
+            Self::Br86 => None,
+            Self::Br87 => None,
+            Self::Br88 => None,
+            Self::Br89 => None,
+            Self::Br90 => None,
+            Self::Br91 => None,
+            Self::Br92 => None,
+            Self::Br93 => None,
+            Self::Br94 => None,
+            Self::Br95 => None,
+            Self::Br96 => None,
+            Self::Br97 => None,
+            Self::Br98 => None,
+        }
+    }
+}
+impl super::MostCommonIsotope for BromineIsotope {
+    fn most_common_isotope() -> Self {
+        Self::Br79
+    }
+}

@@ -1,0 +1,153 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+pub enum CobaltIsotope {
+    Co47,
+    Co48,
+    Co49,
+    Co50,
+    Co51,
+    Co52,
+    Co53,
+    Co54,
+    Co55,
+    Co56,
+    Co57,
+    Co58,
+    Co59,
+    Co60,
+    Co61,
+    Co62,
+    Co63,
+    Co64,
+    Co65,
+    Co66,
+    Co67,
+    Co68,
+    Co69,
+    Co70,
+    Co71,
+    Co72,
+    Co73,
+    Co74,
+    Co75,
+    Co76,
+}
+impl super::RelativeAtomicMass for CobaltIsotope {
+    fn relative_atomic_mass(&self) -> f64 {
+        match self {
+            Self::Co47 => 47.01057f64,
+            Self::Co48 => 48.00093f64,
+            Self::Co49 => 48.98891f64,
+            Self::Co50 => 49.98091f64,
+            Self::Co51 => 50.970647f64,
+            Self::Co52 => 51.96351f64,
+            Self::Co53 => 52.9542041f64,
+            Self::Co54 => 53.94845987f64,
+            Self::Co55 => 54.9419972f64,
+            Self::Co56 => 55.9398388f64,
+            Self::Co57 => 56.93629057f64,
+            Self::Co58 => 57.9357521f64,
+            Self::Co59 => 58.93319429f64,
+            Self::Co60 => 59.9338163f64,
+            Self::Co61 => 60.93247662f64,
+            Self::Co62 => 61.934059f64,
+            Self::Co63 => 62.9336f64,
+            Self::Co64 => 63.935811f64,
+            Self::Co65 => 64.9364621f64,
+            Self::Co66 => 65.939443f64,
+            Self::Co67 => 66.9406096f64,
+            Self::Co68 => 67.94426f64,
+            Self::Co69 => 68.94614f64,
+            Self::Co70 => 69.94963f64,
+            Self::Co71 => 70.95237f64,
+            Self::Co72 => 71.95729f64,
+            Self::Co73 => 72.96039f64,
+            Self::Co74 => 73.96515f64,
+            Self::Co75 => 74.96876f64,
+            Self::Co76 => 75.97413f64,
+        }
+    }
+}
+impl super::ElementVariant for CobaltIsotope {
+    fn element(&self) -> crate::Element {
+        crate::Element::Co
+    }
+}
+impl super::MassNumber for CobaltIsotope {
+    fn mass_number(&self) -> u16 {
+        match self {
+            Self::Co47 => 47u16,
+            Self::Co48 => 48u16,
+            Self::Co49 => 49u16,
+            Self::Co50 => 50u16,
+            Self::Co51 => 51u16,
+            Self::Co52 => 52u16,
+            Self::Co53 => 53u16,
+            Self::Co54 => 54u16,
+            Self::Co55 => 55u16,
+            Self::Co56 => 56u16,
+            Self::Co57 => 57u16,
+            Self::Co58 => 58u16,
+            Self::Co59 => 59u16,
+            Self::Co60 => 60u16,
+            Self::Co61 => 61u16,
+            Self::Co62 => 62u16,
+            Self::Co63 => 63u16,
+            Self::Co64 => 64u16,
+            Self::Co65 => 65u16,
+            Self::Co66 => 66u16,
+            Self::Co67 => 67u16,
+            Self::Co68 => 68u16,
+            Self::Co69 => 69u16,
+            Self::Co70 => 70u16,
+            Self::Co71 => 71u16,
+            Self::Co72 => 72u16,
+            Self::Co73 => 73u16,
+            Self::Co74 => 74u16,
+            Self::Co75 => 75u16,
+            Self::Co76 => 76u16,
+        }
+    }
+}
+impl super::IsotopicComposition for CobaltIsotope {
+    fn isotopic_composition(&self) -> Option<f64> {
+        match self {
+            Self::Co47 => None,
+            Self::Co48 => None,
+            Self::Co49 => None,
+            Self::Co50 => None,
+            Self::Co51 => None,
+            Self::Co52 => None,
+            Self::Co53 => None,
+            Self::Co54 => None,
+            Self::Co55 => None,
+            Self::Co56 => None,
+            Self::Co57 => None,
+            Self::Co58 => None,
+            Self::Co59 => Some(1f64),
+            Self::Co60 => None,
+            Self::Co61 => None,
+            Self::Co62 => None,
+            Self::Co63 => None,
+            Self::Co64 => None,
+            Self::Co65 => None,
+            Self::Co66 => None,
+            Self::Co67 => None,
+            Self::Co68 => None,
+            Self::Co69 => None,
+            Self::Co70 => None,
+            Self::Co71 => None,
+            Self::Co72 => None,
+            Self::Co73 => None,
+            Self::Co74 => None,
+            Self::Co75 => None,
+            Self::Co76 => None,
+        }
+    }
+}
+impl super::MostCommonIsotope for CobaltIsotope {
+    fn most_common_isotope() -> Self {
+        Self::Co59
+    }
+}

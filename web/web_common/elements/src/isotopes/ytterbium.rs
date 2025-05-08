@@ -1,0 +1,169 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+pub enum YtterbiumIsotope {
+    Yb148,
+    Yb149,
+    Yb150,
+    Yb151,
+    Yb152,
+    Yb153,
+    Yb154,
+    Yb155,
+    Yb156,
+    Yb157,
+    Yb158,
+    Yb159,
+    Yb160,
+    Yb161,
+    Yb162,
+    Yb163,
+    Yb164,
+    Yb165,
+    Yb166,
+    Yb167,
+    Yb168,
+    Yb169,
+    Yb170,
+    Yb171,
+    Yb172,
+    Yb173,
+    Yb174,
+    Yb175,
+    Yb176,
+    Yb177,
+    Yb178,
+    Yb179,
+    Yb180,
+    Yb181,
+}
+impl super::RelativeAtomicMass for YtterbiumIsotope {
+    fn relative_atomic_mass(&self) -> f64 {
+        match self {
+            Self::Yb148 => 147.96758f64,
+            Self::Yb149 => 148.96436f64,
+            Self::Yb150 => 149.95852f64,
+            Self::Yb151 => 150.9554f64,
+            Self::Yb152 => 151.95027f64,
+            Self::Yb153 => 152.94932f64,
+            Self::Yb154 => 153.946396f64,
+            Self::Yb155 => 154.945783f64,
+            Self::Yb156 => 155.942825f64,
+            Self::Yb157 => 156.942645f64,
+            Self::Yb158 => 157.9398705f64,
+            Self::Yb159 => 158.940055f64,
+            Self::Yb160 => 159.937557f64,
+            Self::Yb161 => 160.937907f64,
+            Self::Yb162 => 161.935774f64,
+            Self::Yb163 => 162.93634f64,
+            Self::Yb164 => 163.934495f64,
+            Self::Yb165 => 164.93527f64,
+            Self::Yb166 => 165.9338747f64,
+            Self::Yb167 => 166.934953f64,
+            Self::Yb168 => 167.9338896f64,
+            Self::Yb169 => 168.9351825f64,
+            Self::Yb170 => 169.9347664f64,
+            Self::Yb171 => 170.9363302f64,
+            Self::Yb172 => 171.9363859f64,
+            Self::Yb173 => 172.9382151f64,
+            Self::Yb174 => 173.9388664f64,
+            Self::Yb175 => 174.9412808f64,
+            Self::Yb176 => 175.9425764f64,
+            Self::Yb177 => 176.9452656f64,
+            Self::Yb178 => 177.946651f64,
+            Self::Yb179 => 178.95004f64,
+            Self::Yb180 => 179.95212f64,
+            Self::Yb181 => 180.95589f64,
+        }
+    }
+}
+impl super::ElementVariant for YtterbiumIsotope {
+    fn element(&self) -> crate::Element {
+        crate::Element::Yb
+    }
+}
+impl super::MassNumber for YtterbiumIsotope {
+    fn mass_number(&self) -> u16 {
+        match self {
+            Self::Yb148 => 148u16,
+            Self::Yb149 => 149u16,
+            Self::Yb150 => 150u16,
+            Self::Yb151 => 151u16,
+            Self::Yb152 => 152u16,
+            Self::Yb153 => 153u16,
+            Self::Yb154 => 154u16,
+            Self::Yb155 => 155u16,
+            Self::Yb156 => 156u16,
+            Self::Yb157 => 157u16,
+            Self::Yb158 => 158u16,
+            Self::Yb159 => 159u16,
+            Self::Yb160 => 160u16,
+            Self::Yb161 => 161u16,
+            Self::Yb162 => 162u16,
+            Self::Yb163 => 163u16,
+            Self::Yb164 => 164u16,
+            Self::Yb165 => 165u16,
+            Self::Yb166 => 166u16,
+            Self::Yb167 => 167u16,
+            Self::Yb168 => 168u16,
+            Self::Yb169 => 169u16,
+            Self::Yb170 => 170u16,
+            Self::Yb171 => 171u16,
+            Self::Yb172 => 172u16,
+            Self::Yb173 => 173u16,
+            Self::Yb174 => 174u16,
+            Self::Yb175 => 175u16,
+            Self::Yb176 => 176u16,
+            Self::Yb177 => 177u16,
+            Self::Yb178 => 178u16,
+            Self::Yb179 => 179u16,
+            Self::Yb180 => 180u16,
+            Self::Yb181 => 181u16,
+        }
+    }
+}
+impl super::IsotopicComposition for YtterbiumIsotope {
+    fn isotopic_composition(&self) -> Option<f64> {
+        match self {
+            Self::Yb148 => None,
+            Self::Yb149 => None,
+            Self::Yb150 => None,
+            Self::Yb151 => None,
+            Self::Yb152 => None,
+            Self::Yb153 => None,
+            Self::Yb154 => None,
+            Self::Yb155 => None,
+            Self::Yb156 => None,
+            Self::Yb157 => None,
+            Self::Yb158 => None,
+            Self::Yb159 => None,
+            Self::Yb160 => None,
+            Self::Yb161 => None,
+            Self::Yb162 => None,
+            Self::Yb163 => None,
+            Self::Yb164 => None,
+            Self::Yb165 => None,
+            Self::Yb166 => None,
+            Self::Yb167 => None,
+            Self::Yb168 => Some(0.00123f64),
+            Self::Yb169 => None,
+            Self::Yb170 => Some(0.02982f64),
+            Self::Yb171 => Some(0.1409f64),
+            Self::Yb172 => Some(0.2168f64),
+            Self::Yb173 => Some(0.16103f64),
+            Self::Yb174 => Some(0.32026f64),
+            Self::Yb175 => None,
+            Self::Yb176 => Some(0.12996f64),
+            Self::Yb177 => None,
+            Self::Yb178 => None,
+            Self::Yb179 => None,
+            Self::Yb180 => None,
+            Self::Yb181 => None,
+        }
+    }
+}
+impl super::MostCommonIsotope for YtterbiumIsotope {
+    fn most_common_isotope() -> Self {
+        Self::Yb174
+    }
+}

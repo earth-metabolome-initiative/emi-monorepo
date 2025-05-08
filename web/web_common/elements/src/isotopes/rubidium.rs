@@ -1,0 +1,165 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+pub enum RubidiumIsotope {
+    Rb71,
+    Rb72,
+    Rb73,
+    Rb74,
+    Rb75,
+    Rb76,
+    Rb77,
+    Rb78,
+    Rb79,
+    Rb80,
+    Rb81,
+    Rb82,
+    Rb83,
+    Rb84,
+    Rb85,
+    Rb86,
+    Rb87,
+    Rb88,
+    Rb89,
+    Rb90,
+    Rb91,
+    Rb92,
+    Rb93,
+    Rb94,
+    Rb95,
+    Rb96,
+    Rb97,
+    Rb98,
+    Rb99,
+    Rb100,
+    Rb101,
+    Rb102,
+    Rb103,
+}
+impl super::RelativeAtomicMass for RubidiumIsotope {
+    fn relative_atomic_mass(&self) -> f64 {
+        match self {
+            Self::Rb71 => 70.96532f64,
+            Self::Rb72 => 71.95908f64,
+            Self::Rb73 => 72.95053f64,
+            Self::Rb74 => 73.9442659f64,
+            Self::Rb75 => 74.9385732f64,
+            Self::Rb76 => 75.935073f64,
+            Self::Rb77 => 76.9304016f64,
+            Self::Rb78 => 77.9281419f64,
+            Self::Rb79 => 78.9239899f64,
+            Self::Rb80 => 79.9225164f64,
+            Self::Rb81 => 80.9189939f64,
+            Self::Rb82 => 81.918209f64,
+            Self::Rb83 => 82.9151142f64,
+            Self::Rb84 => 83.9143752f64,
+            Self::Rb85 => 84.9117897379f64,
+            Self::Rb86 => 85.91116743f64,
+            Self::Rb87 => 86.909180531f64,
+            Self::Rb88 => 87.91131559f64,
+            Self::Rb89 => 88.9122783f64,
+            Self::Rb90 => 89.9147985f64,
+            Self::Rb91 => 90.9165372f64,
+            Self::Rb92 => 91.9197284f64,
+            Self::Rb93 => 92.9220393f64,
+            Self::Rb94 => 93.9263948f64,
+            Self::Rb95 => 94.92926f64,
+            Self::Rb96 => 95.9341334f64,
+            Self::Rb97 => 96.9371771f64,
+            Self::Rb98 => 97.9416869f64,
+            Self::Rb99 => 98.94503f64,
+            Self::Rb100 => 99.95003f64,
+            Self::Rb101 => 100.95404f64,
+            Self::Rb102 => 101.95952f64,
+            Self::Rb103 => 102.96392f64,
+        }
+    }
+}
+impl super::ElementVariant for RubidiumIsotope {
+    fn element(&self) -> crate::Element {
+        crate::Element::Rb
+    }
+}
+impl super::MassNumber for RubidiumIsotope {
+    fn mass_number(&self) -> u16 {
+        match self {
+            Self::Rb71 => 71u16,
+            Self::Rb72 => 72u16,
+            Self::Rb73 => 73u16,
+            Self::Rb74 => 74u16,
+            Self::Rb75 => 75u16,
+            Self::Rb76 => 76u16,
+            Self::Rb77 => 77u16,
+            Self::Rb78 => 78u16,
+            Self::Rb79 => 79u16,
+            Self::Rb80 => 80u16,
+            Self::Rb81 => 81u16,
+            Self::Rb82 => 82u16,
+            Self::Rb83 => 83u16,
+            Self::Rb84 => 84u16,
+            Self::Rb85 => 85u16,
+            Self::Rb86 => 86u16,
+            Self::Rb87 => 87u16,
+            Self::Rb88 => 88u16,
+            Self::Rb89 => 89u16,
+            Self::Rb90 => 90u16,
+            Self::Rb91 => 91u16,
+            Self::Rb92 => 92u16,
+            Self::Rb93 => 93u16,
+            Self::Rb94 => 94u16,
+            Self::Rb95 => 95u16,
+            Self::Rb96 => 96u16,
+            Self::Rb97 => 97u16,
+            Self::Rb98 => 98u16,
+            Self::Rb99 => 99u16,
+            Self::Rb100 => 100u16,
+            Self::Rb101 => 101u16,
+            Self::Rb102 => 102u16,
+            Self::Rb103 => 103u16,
+        }
+    }
+}
+impl super::IsotopicComposition for RubidiumIsotope {
+    fn isotopic_composition(&self) -> Option<f64> {
+        match self {
+            Self::Rb71 => None,
+            Self::Rb72 => None,
+            Self::Rb73 => None,
+            Self::Rb74 => None,
+            Self::Rb75 => None,
+            Self::Rb76 => None,
+            Self::Rb77 => None,
+            Self::Rb78 => None,
+            Self::Rb79 => None,
+            Self::Rb80 => None,
+            Self::Rb81 => None,
+            Self::Rb82 => None,
+            Self::Rb83 => None,
+            Self::Rb84 => None,
+            Self::Rb85 => Some(0.7217f64),
+            Self::Rb86 => None,
+            Self::Rb87 => Some(0.2783f64),
+            Self::Rb88 => None,
+            Self::Rb89 => None,
+            Self::Rb90 => None,
+            Self::Rb91 => None,
+            Self::Rb92 => None,
+            Self::Rb93 => None,
+            Self::Rb94 => None,
+            Self::Rb95 => None,
+            Self::Rb96 => None,
+            Self::Rb97 => None,
+            Self::Rb98 => None,
+            Self::Rb99 => None,
+            Self::Rb100 => None,
+            Self::Rb101 => None,
+            Self::Rb102 => None,
+            Self::Rb103 => None,
+        }
+    }
+}
+impl super::MostCommonIsotope for RubidiumIsotope {
+    fn most_common_isotope() -> Self {
+        Self::Rb85
+    }
+}

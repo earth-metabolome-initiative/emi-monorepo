@@ -1,0 +1,173 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+pub enum MolybdenumIsotope {
+    Mo83,
+    Mo84,
+    Mo85,
+    Mo86,
+    Mo87,
+    Mo88,
+    Mo89,
+    Mo90,
+    Mo91,
+    Mo92,
+    Mo93,
+    Mo94,
+    Mo95,
+    Mo96,
+    Mo97,
+    Mo98,
+    Mo99,
+    Mo100,
+    Mo101,
+    Mo102,
+    Mo103,
+    Mo104,
+    Mo105,
+    Mo106,
+    Mo107,
+    Mo108,
+    Mo109,
+    Mo110,
+    Mo111,
+    Mo112,
+    Mo113,
+    Mo114,
+    Mo115,
+    Mo116,
+    Mo117,
+}
+impl super::RelativeAtomicMass for MolybdenumIsotope {
+    fn relative_atomic_mass(&self) -> f64 {
+        match self {
+            Self::Mo83 => 82.94988f64,
+            Self::Mo84 => 83.94149f64,
+            Self::Mo85 => 84.938261f64,
+            Self::Mo86 => 85.9311748f64,
+            Self::Mo87 => 86.9281962f64,
+            Self::Mo88 => 87.9219678f64,
+            Self::Mo89 => 88.9194682f64,
+            Self::Mo90 => 89.9139309f64,
+            Self::Mo91 => 90.9117453f64,
+            Self::Mo92 => 91.90680796f64,
+            Self::Mo93 => 92.90680958f64,
+            Self::Mo94 => 93.9050849f64,
+            Self::Mo95 => 94.90583877f64,
+            Self::Mo96 => 95.90467612f64,
+            Self::Mo97 => 96.90601812f64,
+            Self::Mo98 => 97.90540482f64,
+            Self::Mo99 => 98.90770851f64,
+            Self::Mo100 => 99.9074718f64,
+            Self::Mo101 => 100.9103414f64,
+            Self::Mo102 => 101.9102834f64,
+            Self::Mo103 => 102.913079f64,
+            Self::Mo104 => 103.9137344f64,
+            Self::Mo105 => 104.916969f64,
+            Self::Mo106 => 105.918259f64,
+            Self::Mo107 => 106.922106f64,
+            Self::Mo108 => 107.924033f64,
+            Self::Mo109 => 108.928424f64,
+            Self::Mo110 => 109.930704f64,
+            Self::Mo111 => 110.935654f64,
+            Self::Mo112 => 111.93831f64,
+            Self::Mo113 => 112.94335f64,
+            Self::Mo114 => 113.94653f64,
+            Self::Mo115 => 114.95196f64,
+            Self::Mo116 => 115.95545f64,
+            Self::Mo117 => 116.96117f64,
+        }
+    }
+}
+impl super::ElementVariant for MolybdenumIsotope {
+    fn element(&self) -> crate::Element {
+        crate::Element::Mo
+    }
+}
+impl super::MassNumber for MolybdenumIsotope {
+    fn mass_number(&self) -> u16 {
+        match self {
+            Self::Mo83 => 83u16,
+            Self::Mo84 => 84u16,
+            Self::Mo85 => 85u16,
+            Self::Mo86 => 86u16,
+            Self::Mo87 => 87u16,
+            Self::Mo88 => 88u16,
+            Self::Mo89 => 89u16,
+            Self::Mo90 => 90u16,
+            Self::Mo91 => 91u16,
+            Self::Mo92 => 92u16,
+            Self::Mo93 => 93u16,
+            Self::Mo94 => 94u16,
+            Self::Mo95 => 95u16,
+            Self::Mo96 => 96u16,
+            Self::Mo97 => 97u16,
+            Self::Mo98 => 98u16,
+            Self::Mo99 => 99u16,
+            Self::Mo100 => 100u16,
+            Self::Mo101 => 101u16,
+            Self::Mo102 => 102u16,
+            Self::Mo103 => 103u16,
+            Self::Mo104 => 104u16,
+            Self::Mo105 => 105u16,
+            Self::Mo106 => 106u16,
+            Self::Mo107 => 107u16,
+            Self::Mo108 => 108u16,
+            Self::Mo109 => 109u16,
+            Self::Mo110 => 110u16,
+            Self::Mo111 => 111u16,
+            Self::Mo112 => 112u16,
+            Self::Mo113 => 113u16,
+            Self::Mo114 => 114u16,
+            Self::Mo115 => 115u16,
+            Self::Mo116 => 116u16,
+            Self::Mo117 => 117u16,
+        }
+    }
+}
+impl super::IsotopicComposition for MolybdenumIsotope {
+    fn isotopic_composition(&self) -> Option<f64> {
+        match self {
+            Self::Mo83 => None,
+            Self::Mo84 => None,
+            Self::Mo85 => None,
+            Self::Mo86 => None,
+            Self::Mo87 => None,
+            Self::Mo88 => None,
+            Self::Mo89 => None,
+            Self::Mo90 => None,
+            Self::Mo91 => None,
+            Self::Mo92 => Some(0.1453f64),
+            Self::Mo93 => None,
+            Self::Mo94 => Some(0.0915f64),
+            Self::Mo95 => Some(0.1584f64),
+            Self::Mo96 => Some(0.1667f64),
+            Self::Mo97 => Some(0.096f64),
+            Self::Mo98 => Some(0.2439f64),
+            Self::Mo99 => None,
+            Self::Mo100 => Some(0.0982f64),
+            Self::Mo101 => None,
+            Self::Mo102 => None,
+            Self::Mo103 => None,
+            Self::Mo104 => None,
+            Self::Mo105 => None,
+            Self::Mo106 => None,
+            Self::Mo107 => None,
+            Self::Mo108 => None,
+            Self::Mo109 => None,
+            Self::Mo110 => None,
+            Self::Mo111 => None,
+            Self::Mo112 => None,
+            Self::Mo113 => None,
+            Self::Mo114 => None,
+            Self::Mo115 => None,
+            Self::Mo116 => None,
+            Self::Mo117 => None,
+        }
+    }
+}
+impl super::MostCommonIsotope for MolybdenumIsotope {
+    fn most_common_isotope() -> Self {
+        Self::Mo98
+    }
+}

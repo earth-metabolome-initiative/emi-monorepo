@@ -1,0 +1,173 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+pub enum ZirconiumIsotope {
+    Zr78,
+    Zr79,
+    Zr80,
+    Zr81,
+    Zr82,
+    Zr83,
+    Zr84,
+    Zr85,
+    Zr86,
+    Zr87,
+    Zr88,
+    Zr89,
+    Zr90,
+    Zr91,
+    Zr92,
+    Zr93,
+    Zr94,
+    Zr95,
+    Zr96,
+    Zr97,
+    Zr98,
+    Zr99,
+    Zr100,
+    Zr101,
+    Zr102,
+    Zr103,
+    Zr104,
+    Zr105,
+    Zr106,
+    Zr107,
+    Zr108,
+    Zr109,
+    Zr110,
+    Zr111,
+    Zr112,
+}
+impl super::RelativeAtomicMass for ZirconiumIsotope {
+    fn relative_atomic_mass(&self) -> f64 {
+        match self {
+            Self::Zr78 => 77.95566f64,
+            Self::Zr79 => 78.94948f64,
+            Self::Zr80 => 79.9404f64,
+            Self::Zr81 => 80.93731f64,
+            Self::Zr82 => 81.93135f64,
+            Self::Zr83 => 82.9292421f64,
+            Self::Zr84 => 83.9233269f64,
+            Self::Zr85 => 84.9214444f64,
+            Self::Zr86 => 85.9162972f64,
+            Self::Zr87 => 86.914818f64,
+            Self::Zr88 => 87.9102213f64,
+            Self::Zr89 => 88.9088814f64,
+            Self::Zr90 => 89.9046977f64,
+            Self::Zr91 => 90.9056396f64,
+            Self::Zr92 => 91.9050347f64,
+            Self::Zr93 => 92.9064699f64,
+            Self::Zr94 => 93.9063108f64,
+            Self::Zr95 => 94.9080385f64,
+            Self::Zr96 => 95.9082714f64,
+            Self::Zr97 => 96.9109512f64,
+            Self::Zr98 => 97.9127289f64,
+            Self::Zr99 => 98.916667f64,
+            Self::Zr100 => 99.9180006f64,
+            Self::Zr101 => 100.921448f64,
+            Self::Zr102 => 101.9231409f64,
+            Self::Zr103 => 102.927191f64,
+            Self::Zr104 => 103.929436f64,
+            Self::Zr105 => 104.934008f64,
+            Self::Zr106 => 105.93676f64,
+            Self::Zr107 => 106.94174f64,
+            Self::Zr108 => 107.94487f64,
+            Self::Zr109 => 108.95041f64,
+            Self::Zr110 => 109.95396f64,
+            Self::Zr111 => 110.95968f64,
+            Self::Zr112 => 111.9637f64,
+        }
+    }
+}
+impl super::ElementVariant for ZirconiumIsotope {
+    fn element(&self) -> crate::Element {
+        crate::Element::Zr
+    }
+}
+impl super::MassNumber for ZirconiumIsotope {
+    fn mass_number(&self) -> u16 {
+        match self {
+            Self::Zr78 => 78u16,
+            Self::Zr79 => 79u16,
+            Self::Zr80 => 80u16,
+            Self::Zr81 => 81u16,
+            Self::Zr82 => 82u16,
+            Self::Zr83 => 83u16,
+            Self::Zr84 => 84u16,
+            Self::Zr85 => 85u16,
+            Self::Zr86 => 86u16,
+            Self::Zr87 => 87u16,
+            Self::Zr88 => 88u16,
+            Self::Zr89 => 89u16,
+            Self::Zr90 => 90u16,
+            Self::Zr91 => 91u16,
+            Self::Zr92 => 92u16,
+            Self::Zr93 => 93u16,
+            Self::Zr94 => 94u16,
+            Self::Zr95 => 95u16,
+            Self::Zr96 => 96u16,
+            Self::Zr97 => 97u16,
+            Self::Zr98 => 98u16,
+            Self::Zr99 => 99u16,
+            Self::Zr100 => 100u16,
+            Self::Zr101 => 101u16,
+            Self::Zr102 => 102u16,
+            Self::Zr103 => 103u16,
+            Self::Zr104 => 104u16,
+            Self::Zr105 => 105u16,
+            Self::Zr106 => 106u16,
+            Self::Zr107 => 107u16,
+            Self::Zr108 => 108u16,
+            Self::Zr109 => 109u16,
+            Self::Zr110 => 110u16,
+            Self::Zr111 => 111u16,
+            Self::Zr112 => 112u16,
+        }
+    }
+}
+impl super::IsotopicComposition for ZirconiumIsotope {
+    fn isotopic_composition(&self) -> Option<f64> {
+        match self {
+            Self::Zr78 => None,
+            Self::Zr79 => None,
+            Self::Zr80 => None,
+            Self::Zr81 => None,
+            Self::Zr82 => None,
+            Self::Zr83 => None,
+            Self::Zr84 => None,
+            Self::Zr85 => None,
+            Self::Zr86 => None,
+            Self::Zr87 => None,
+            Self::Zr88 => None,
+            Self::Zr89 => None,
+            Self::Zr90 => Some(0.5145f64),
+            Self::Zr91 => Some(0.1122f64),
+            Self::Zr92 => Some(0.1715f64),
+            Self::Zr93 => None,
+            Self::Zr94 => Some(0.1738f64),
+            Self::Zr95 => None,
+            Self::Zr96 => Some(0.028f64),
+            Self::Zr97 => None,
+            Self::Zr98 => None,
+            Self::Zr99 => None,
+            Self::Zr100 => None,
+            Self::Zr101 => None,
+            Self::Zr102 => None,
+            Self::Zr103 => None,
+            Self::Zr104 => None,
+            Self::Zr105 => None,
+            Self::Zr106 => None,
+            Self::Zr107 => None,
+            Self::Zr108 => None,
+            Self::Zr109 => None,
+            Self::Zr110 => None,
+            Self::Zr111 => None,
+            Self::Zr112 => None,
+        }
+    }
+}
+impl super::MostCommonIsotope for ZirconiumIsotope {
+    fn most_common_isotope() -> Self {
+        Self::Zr90
+    }
+}

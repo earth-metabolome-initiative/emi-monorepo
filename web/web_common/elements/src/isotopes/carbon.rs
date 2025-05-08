@@ -1,0 +1,97 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+pub enum CarbonIsotope {
+    C8,
+    C9,
+    C10,
+    C11,
+    C12,
+    C13,
+    C14,
+    C15,
+    C16,
+    C17,
+    C18,
+    C19,
+    C20,
+    C21,
+    C22,
+    C23,
+}
+impl super::RelativeAtomicMass for CarbonIsotope {
+    fn relative_atomic_mass(&self) -> f64 {
+        match self {
+            Self::C8 => 8.037643f64,
+            Self::C9 => 9.0310372f64,
+            Self::C10 => 10.01685331f64,
+            Self::C11 => 11.0114336f64,
+            Self::C12 => 12f64,
+            Self::C13 => 13.00335483507f64,
+            Self::C14 => 14.0032419884f64,
+            Self::C15 => 15.01059926f64,
+            Self::C16 => 16.0147013f64,
+            Self::C17 => 17.022577f64,
+            Self::C18 => 18.026751f64,
+            Self::C19 => 19.0348f64,
+            Self::C20 => 20.04032f64,
+            Self::C21 => 21.049f64,
+            Self::C22 => 22.05753f64,
+            Self::C23 => 23.0689f64,
+        }
+    }
+}
+impl super::ElementVariant for CarbonIsotope {
+    fn element(&self) -> crate::Element {
+        crate::Element::C
+    }
+}
+impl super::MassNumber for CarbonIsotope {
+    fn mass_number(&self) -> u16 {
+        match self {
+            Self::C8 => 8u16,
+            Self::C9 => 9u16,
+            Self::C10 => 10u16,
+            Self::C11 => 11u16,
+            Self::C12 => 12u16,
+            Self::C13 => 13u16,
+            Self::C14 => 14u16,
+            Self::C15 => 15u16,
+            Self::C16 => 16u16,
+            Self::C17 => 17u16,
+            Self::C18 => 18u16,
+            Self::C19 => 19u16,
+            Self::C20 => 20u16,
+            Self::C21 => 21u16,
+            Self::C22 => 22u16,
+            Self::C23 => 23u16,
+        }
+    }
+}
+impl super::IsotopicComposition for CarbonIsotope {
+    fn isotopic_composition(&self) -> Option<f64> {
+        match self {
+            Self::C8 => None,
+            Self::C9 => None,
+            Self::C10 => None,
+            Self::C11 => None,
+            Self::C12 => Some(0.9893f64),
+            Self::C13 => Some(0.0107f64),
+            Self::C14 => None,
+            Self::C15 => None,
+            Self::C16 => None,
+            Self::C17 => None,
+            Self::C18 => None,
+            Self::C19 => None,
+            Self::C20 => None,
+            Self::C21 => None,
+            Self::C22 => None,
+            Self::C23 => None,
+        }
+    }
+}
+impl super::MostCommonIsotope for CarbonIsotope {
+    fn most_common_isotope() -> Self {
+        Self::C12
+    }
+}

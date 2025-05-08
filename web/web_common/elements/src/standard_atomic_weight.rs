@@ -1,25 +1,9 @@
 //! Submodule providing implementations of the `AsRef` trait
 //! for the `Element` enumeration.
 
-pub trait MolarMass {
-    /// Returns the molar mass of the element in molar mass units (amu).
-    fn molar_mass(&self) -> f64;
-}
-
-impl<T: MolarMass> MolarMass for Vec<T> {
-    fn molar_mass(&self) -> f64 {
-        self.iter().map(MolarMass::molar_mass).sum()
-    }
-}
-
-impl<T: MolarMass> MolarMass for Box<T> {
-    fn molar_mass(&self) -> f64 {
-        self.as_ref().molar_mass()
-    }
-}
-
-impl MolarMass for crate::Element {
-    fn molar_mass(&self) -> f64 {
+impl crate::Element {
+    /// Returns the standard atomic weight of the element.
+    pub fn standard_atomic_weight(&self) -> f64 {
         match self {
             Self::H => 1.008,
             Self::He => 4.002602,
@@ -29,9 +13,9 @@ impl MolarMass for crate::Element {
             Self::C => 12.011,
             Self::N => 14.007,
             Self::O => 15.999,
-            Self::F => 18.998403163,
+            Self::F => 18.998,
             Self::Ne => 20.1797,
-            Self::Na => 22.98976928,
+            Self::Na => 22.99,
             Self::Mg => 24.305,
             Self::Al => 26.9815385,
             Self::Si => 28.085,

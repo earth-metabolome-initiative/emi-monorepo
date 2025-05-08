@@ -1,0 +1,173 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+pub enum RadiumIsotope {
+    Ra201,
+    Ra202,
+    Ra203,
+    Ra204,
+    Ra205,
+    Ra206,
+    Ra207,
+    Ra208,
+    Ra209,
+    Ra210,
+    Ra211,
+    Ra212,
+    Ra213,
+    Ra214,
+    Ra215,
+    Ra216,
+    Ra217,
+    Ra218,
+    Ra219,
+    Ra220,
+    Ra221,
+    Ra222,
+    Ra223,
+    Ra224,
+    Ra225,
+    Ra226,
+    Ra227,
+    Ra228,
+    Ra229,
+    Ra230,
+    Ra231,
+    Ra232,
+    Ra233,
+    Ra234,
+    Ra235,
+}
+impl super::RelativeAtomicMass for RadiumIsotope {
+    fn relative_atomic_mass(&self) -> f64 {
+        match self {
+            Self::Ra201 => 201.01271f64,
+            Self::Ra202 => 202.00976f64,
+            Self::Ra203 => 203.009304f64,
+            Self::Ra204 => 204.006492f64,
+            Self::Ra205 => 205.006268f64,
+            Self::Ra206 => 206.003828f64,
+            Self::Ra207 => 207.003799f64,
+            Self::Ra208 => 208.001841f64,
+            Self::Ra209 => 209.00199f64,
+            Self::Ra210 => 210.000494f64,
+            Self::Ra211 => 211.0008932f64,
+            Self::Ra212 => 211.999787f64,
+            Self::Ra213 => 213.000384f64,
+            Self::Ra214 => 214.0000997f64,
+            Self::Ra215 => 215.0027204f64,
+            Self::Ra216 => 216.0035334f64,
+            Self::Ra217 => 217.0063207f64,
+            Self::Ra218 => 218.007141f64,
+            Self::Ra219 => 219.0100855f64,
+            Self::Ra220 => 220.0110259f64,
+            Self::Ra221 => 221.0139177f64,
+            Self::Ra222 => 222.0153748f64,
+            Self::Ra223 => 223.0185023f64,
+            Self::Ra224 => 224.020212f64,
+            Self::Ra225 => 225.0236119f64,
+            Self::Ra226 => 226.0254103f64,
+            Self::Ra227 => 227.0291783f64,
+            Self::Ra228 => 228.0310707f64,
+            Self::Ra229 => 229.034942f64,
+            Self::Ra230 => 230.037055f64,
+            Self::Ra231 => 231.041027f64,
+            Self::Ra232 => 232.0434753f64,
+            Self::Ra233 => 233.047582f64,
+            Self::Ra234 => 234.050342f64,
+            Self::Ra235 => 235.05497f64,
+        }
+    }
+}
+impl super::ElementVariant for RadiumIsotope {
+    fn element(&self) -> crate::Element {
+        crate::Element::Ra
+    }
+}
+impl super::MassNumber for RadiumIsotope {
+    fn mass_number(&self) -> u16 {
+        match self {
+            Self::Ra201 => 201u16,
+            Self::Ra202 => 202u16,
+            Self::Ra203 => 203u16,
+            Self::Ra204 => 204u16,
+            Self::Ra205 => 205u16,
+            Self::Ra206 => 206u16,
+            Self::Ra207 => 207u16,
+            Self::Ra208 => 208u16,
+            Self::Ra209 => 209u16,
+            Self::Ra210 => 210u16,
+            Self::Ra211 => 211u16,
+            Self::Ra212 => 212u16,
+            Self::Ra213 => 213u16,
+            Self::Ra214 => 214u16,
+            Self::Ra215 => 215u16,
+            Self::Ra216 => 216u16,
+            Self::Ra217 => 217u16,
+            Self::Ra218 => 218u16,
+            Self::Ra219 => 219u16,
+            Self::Ra220 => 220u16,
+            Self::Ra221 => 221u16,
+            Self::Ra222 => 222u16,
+            Self::Ra223 => 223u16,
+            Self::Ra224 => 224u16,
+            Self::Ra225 => 225u16,
+            Self::Ra226 => 226u16,
+            Self::Ra227 => 227u16,
+            Self::Ra228 => 228u16,
+            Self::Ra229 => 229u16,
+            Self::Ra230 => 230u16,
+            Self::Ra231 => 231u16,
+            Self::Ra232 => 232u16,
+            Self::Ra233 => 233u16,
+            Self::Ra234 => 234u16,
+            Self::Ra235 => 235u16,
+        }
+    }
+}
+impl super::IsotopicComposition for RadiumIsotope {
+    fn isotopic_composition(&self) -> Option<f64> {
+        match self {
+            Self::Ra201 => None,
+            Self::Ra202 => None,
+            Self::Ra203 => None,
+            Self::Ra204 => None,
+            Self::Ra205 => None,
+            Self::Ra206 => None,
+            Self::Ra207 => None,
+            Self::Ra208 => None,
+            Self::Ra209 => None,
+            Self::Ra210 => None,
+            Self::Ra211 => None,
+            Self::Ra212 => None,
+            Self::Ra213 => None,
+            Self::Ra214 => None,
+            Self::Ra215 => None,
+            Self::Ra216 => None,
+            Self::Ra217 => None,
+            Self::Ra218 => None,
+            Self::Ra219 => None,
+            Self::Ra220 => None,
+            Self::Ra221 => None,
+            Self::Ra222 => None,
+            Self::Ra223 => None,
+            Self::Ra224 => None,
+            Self::Ra225 => None,
+            Self::Ra226 => None,
+            Self::Ra227 => None,
+            Self::Ra228 => None,
+            Self::Ra229 => None,
+            Self::Ra230 => None,
+            Self::Ra231 => None,
+            Self::Ra232 => None,
+            Self::Ra233 => None,
+            Self::Ra234 => None,
+            Self::Ra235 => None,
+        }
+    }
+}
+impl super::MostCommonIsotope for RadiumIsotope {
+    fn most_common_isotope() -> Self {
+        Self::Ra235
+    }
+}

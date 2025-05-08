@@ -1,0 +1,161 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+pub enum GalliumIsotope {
+    Ga56,
+    Ga57,
+    Ga58,
+    Ga59,
+    Ga60,
+    Ga61,
+    Ga62,
+    Ga63,
+    Ga64,
+    Ga65,
+    Ga66,
+    Ga67,
+    Ga68,
+    Ga69,
+    Ga70,
+    Ga71,
+    Ga72,
+    Ga73,
+    Ga74,
+    Ga75,
+    Ga76,
+    Ga77,
+    Ga78,
+    Ga79,
+    Ga80,
+    Ga81,
+    Ga82,
+    Ga83,
+    Ga84,
+    Ga85,
+    Ga86,
+    Ga87,
+}
+impl super::RelativeAtomicMass for GalliumIsotope {
+    fn relative_atomic_mass(&self) -> f64 {
+        match self {
+            Self::Ga56 => 55.99536f64,
+            Self::Ga57 => 56.9832f64,
+            Self::Ga58 => 57.97478f64,
+            Self::Ga59 => 58.96353f64,
+            Self::Ga60 => 59.95729f64,
+            Self::Ga61 => 60.949399f64,
+            Self::Ga62 => 61.94419025f64,
+            Self::Ga63 => 62.9392942f64,
+            Self::Ga64 => 63.9368404f64,
+            Self::Ga65 => 64.93273459f64,
+            Self::Ga66 => 65.9315894f64,
+            Self::Ga67 => 66.9282025f64,
+            Self::Ga68 => 67.9279805f64,
+            Self::Ga69 => 68.9255735f64,
+            Self::Ga70 => 69.9260219f64,
+            Self::Ga71 => 70.92470258f64,
+            Self::Ga72 => 71.92636747f64,
+            Self::Ga73 => 72.9251747f64,
+            Self::Ga74 => 73.9269457f64,
+            Self::Ga75 => 74.9265002f64,
+            Self::Ga76 => 75.9288276f64,
+            Self::Ga77 => 76.9291543f64,
+            Self::Ga78 => 77.9316088f64,
+            Self::Ga79 => 78.9328523f64,
+            Self::Ga80 => 79.9364208f64,
+            Self::Ga81 => 80.9381338f64,
+            Self::Ga82 => 81.9431765f64,
+            Self::Ga83 => 82.9471203f64,
+            Self::Ga84 => 83.95246f64,
+            Self::Ga85 => 84.95699f64,
+            Self::Ga86 => 85.96301f64,
+            Self::Ga87 => 86.96824f64,
+        }
+    }
+}
+impl super::ElementVariant for GalliumIsotope {
+    fn element(&self) -> crate::Element {
+        crate::Element::Ga
+    }
+}
+impl super::MassNumber for GalliumIsotope {
+    fn mass_number(&self) -> u16 {
+        match self {
+            Self::Ga56 => 56u16,
+            Self::Ga57 => 57u16,
+            Self::Ga58 => 58u16,
+            Self::Ga59 => 59u16,
+            Self::Ga60 => 60u16,
+            Self::Ga61 => 61u16,
+            Self::Ga62 => 62u16,
+            Self::Ga63 => 63u16,
+            Self::Ga64 => 64u16,
+            Self::Ga65 => 65u16,
+            Self::Ga66 => 66u16,
+            Self::Ga67 => 67u16,
+            Self::Ga68 => 68u16,
+            Self::Ga69 => 69u16,
+            Self::Ga70 => 70u16,
+            Self::Ga71 => 71u16,
+            Self::Ga72 => 72u16,
+            Self::Ga73 => 73u16,
+            Self::Ga74 => 74u16,
+            Self::Ga75 => 75u16,
+            Self::Ga76 => 76u16,
+            Self::Ga77 => 77u16,
+            Self::Ga78 => 78u16,
+            Self::Ga79 => 79u16,
+            Self::Ga80 => 80u16,
+            Self::Ga81 => 81u16,
+            Self::Ga82 => 82u16,
+            Self::Ga83 => 83u16,
+            Self::Ga84 => 84u16,
+            Self::Ga85 => 85u16,
+            Self::Ga86 => 86u16,
+            Self::Ga87 => 87u16,
+        }
+    }
+}
+impl super::IsotopicComposition for GalliumIsotope {
+    fn isotopic_composition(&self) -> Option<f64> {
+        match self {
+            Self::Ga56 => None,
+            Self::Ga57 => None,
+            Self::Ga58 => None,
+            Self::Ga59 => None,
+            Self::Ga60 => None,
+            Self::Ga61 => None,
+            Self::Ga62 => None,
+            Self::Ga63 => None,
+            Self::Ga64 => None,
+            Self::Ga65 => None,
+            Self::Ga66 => None,
+            Self::Ga67 => None,
+            Self::Ga68 => None,
+            Self::Ga69 => Some(0.60108f64),
+            Self::Ga70 => None,
+            Self::Ga71 => Some(0.39892f64),
+            Self::Ga72 => None,
+            Self::Ga73 => None,
+            Self::Ga74 => None,
+            Self::Ga75 => None,
+            Self::Ga76 => None,
+            Self::Ga77 => None,
+            Self::Ga78 => None,
+            Self::Ga79 => None,
+            Self::Ga80 => None,
+            Self::Ga81 => None,
+            Self::Ga82 => None,
+            Self::Ga83 => None,
+            Self::Ga84 => None,
+            Self::Ga85 => None,
+            Self::Ga86 => None,
+            Self::Ga87 => None,
+        }
+    }
+}
+impl super::MostCommonIsotope for GalliumIsotope {
+    fn most_common_isotope() -> Self {
+        Self::Ga69
+    }
+}

@@ -1,0 +1,129 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+pub enum PhosphorusIsotope {
+    P24,
+    P25,
+    P26,
+    P27,
+    P28,
+    P29,
+    P30,
+    P31,
+    P32,
+    P33,
+    P34,
+    P35,
+    P36,
+    P37,
+    P38,
+    P39,
+    P40,
+    P41,
+    P42,
+    P43,
+    P44,
+    P45,
+    P46,
+    P47,
+}
+impl super::RelativeAtomicMass for PhosphorusIsotope {
+    fn relative_atomic_mass(&self) -> f64 {
+        match self {
+            Self::P24 => 24.03577f64,
+            Self::P25 => 25.02119f64,
+            Self::P26 => 26.01178f64,
+            Self::P27 => 26.999224f64,
+            Self::P28 => 27.9923266f64,
+            Self::P29 => 28.98180079f64,
+            Self::P30 => 29.97831375f64,
+            Self::P31 => 30.97376199842f64,
+            Self::P32 => 31.973907643f64,
+            Self::P33 => 32.9717257f64,
+            Self::P34 => 33.97364589f64,
+            Self::P35 => 34.9733141f64,
+            Self::P36 => 35.97826f64,
+            Self::P37 => 36.979607f64,
+            Self::P38 => 37.984252f64,
+            Self::P39 => 38.986227f64,
+            Self::P40 => 39.99133f64,
+            Self::P41 => 40.994654f64,
+            Self::P42 => 42.00108f64,
+            Self::P43 => 43.00502f64,
+            Self::P44 => 44.01121f64,
+            Self::P45 => 45.01645f64,
+            Self::P46 => 46.02446f64,
+            Self::P47 => 47.03139f64,
+        }
+    }
+}
+impl super::ElementVariant for PhosphorusIsotope {
+    fn element(&self) -> crate::Element {
+        crate::Element::P
+    }
+}
+impl super::MassNumber for PhosphorusIsotope {
+    fn mass_number(&self) -> u16 {
+        match self {
+            Self::P24 => 24u16,
+            Self::P25 => 25u16,
+            Self::P26 => 26u16,
+            Self::P27 => 27u16,
+            Self::P28 => 28u16,
+            Self::P29 => 29u16,
+            Self::P30 => 30u16,
+            Self::P31 => 31u16,
+            Self::P32 => 32u16,
+            Self::P33 => 33u16,
+            Self::P34 => 34u16,
+            Self::P35 => 35u16,
+            Self::P36 => 36u16,
+            Self::P37 => 37u16,
+            Self::P38 => 38u16,
+            Self::P39 => 39u16,
+            Self::P40 => 40u16,
+            Self::P41 => 41u16,
+            Self::P42 => 42u16,
+            Self::P43 => 43u16,
+            Self::P44 => 44u16,
+            Self::P45 => 45u16,
+            Self::P46 => 46u16,
+            Self::P47 => 47u16,
+        }
+    }
+}
+impl super::IsotopicComposition for PhosphorusIsotope {
+    fn isotopic_composition(&self) -> Option<f64> {
+        match self {
+            Self::P24 => None,
+            Self::P25 => None,
+            Self::P26 => None,
+            Self::P27 => None,
+            Self::P28 => None,
+            Self::P29 => None,
+            Self::P30 => None,
+            Self::P31 => Some(1f64),
+            Self::P32 => None,
+            Self::P33 => None,
+            Self::P34 => None,
+            Self::P35 => None,
+            Self::P36 => None,
+            Self::P37 => None,
+            Self::P38 => None,
+            Self::P39 => None,
+            Self::P40 => None,
+            Self::P41 => None,
+            Self::P42 => None,
+            Self::P43 => None,
+            Self::P44 => None,
+            Self::P45 => None,
+            Self::P46 => None,
+            Self::P47 => None,
+        }
+    }
+}
+impl super::MostCommonIsotope for PhosphorusIsotope {
+    fn most_common_isotope() -> Self {
+        Self::P31
+    }
+}

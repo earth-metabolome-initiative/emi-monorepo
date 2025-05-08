@@ -1,0 +1,173 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+pub enum FranciumIsotope {
+    Fr199,
+    Fr200,
+    Fr201,
+    Fr202,
+    Fr203,
+    Fr204,
+    Fr205,
+    Fr206,
+    Fr207,
+    Fr208,
+    Fr209,
+    Fr210,
+    Fr211,
+    Fr212,
+    Fr213,
+    Fr214,
+    Fr215,
+    Fr216,
+    Fr217,
+    Fr218,
+    Fr219,
+    Fr220,
+    Fr221,
+    Fr222,
+    Fr223,
+    Fr224,
+    Fr225,
+    Fr226,
+    Fr227,
+    Fr228,
+    Fr229,
+    Fr230,
+    Fr231,
+    Fr232,
+    Fr233,
+}
+impl super::RelativeAtomicMass for FranciumIsotope {
+    fn relative_atomic_mass(&self) -> f64 {
+        match self {
+            Self::Fr199 => 199.007259f64,
+            Self::Fr200 => 200.006586f64,
+            Self::Fr201 => 201.003867f64,
+            Self::Fr202 => 202.00332f64,
+            Self::Fr203 => 203.0009407f64,
+            Self::Fr204 => 204.000652f64,
+            Self::Fr205 => 204.9985939f64,
+            Self::Fr206 => 205.998666f64,
+            Self::Fr207 => 206.996946f64,
+            Self::Fr208 => 207.997138f64,
+            Self::Fr209 => 208.995955f64,
+            Self::Fr210 => 209.996422f64,
+            Self::Fr211 => 210.995556f64,
+            Self::Fr212 => 211.9962257f64,
+            Self::Fr213 => 212.996186f64,
+            Self::Fr214 => 213.9989713f64,
+            Self::Fr215 => 215.0003418f64,
+            Self::Fr216 => 216.0031899f64,
+            Self::Fr217 => 217.0046323f64,
+            Self::Fr218 => 218.0075787f64,
+            Self::Fr219 => 219.0092524f64,
+            Self::Fr220 => 220.0123277f64,
+            Self::Fr221 => 221.0142552f64,
+            Self::Fr222 => 222.017552f64,
+            Self::Fr223 => 223.019736f64,
+            Self::Fr224 => 224.023398f64,
+            Self::Fr225 => 225.025573f64,
+            Self::Fr226 => 226.029566f64,
+            Self::Fr227 => 227.031869f64,
+            Self::Fr228 => 228.035823f64,
+            Self::Fr229 => 229.038298f64,
+            Self::Fr230 => 230.042416f64,
+            Self::Fr231 => 231.045158f64,
+            Self::Fr232 => 232.04937f64,
+            Self::Fr233 => 233.05264f64,
+        }
+    }
+}
+impl super::ElementVariant for FranciumIsotope {
+    fn element(&self) -> crate::Element {
+        crate::Element::Fr
+    }
+}
+impl super::MassNumber for FranciumIsotope {
+    fn mass_number(&self) -> u16 {
+        match self {
+            Self::Fr199 => 199u16,
+            Self::Fr200 => 200u16,
+            Self::Fr201 => 201u16,
+            Self::Fr202 => 202u16,
+            Self::Fr203 => 203u16,
+            Self::Fr204 => 204u16,
+            Self::Fr205 => 205u16,
+            Self::Fr206 => 206u16,
+            Self::Fr207 => 207u16,
+            Self::Fr208 => 208u16,
+            Self::Fr209 => 209u16,
+            Self::Fr210 => 210u16,
+            Self::Fr211 => 211u16,
+            Self::Fr212 => 212u16,
+            Self::Fr213 => 213u16,
+            Self::Fr214 => 214u16,
+            Self::Fr215 => 215u16,
+            Self::Fr216 => 216u16,
+            Self::Fr217 => 217u16,
+            Self::Fr218 => 218u16,
+            Self::Fr219 => 219u16,
+            Self::Fr220 => 220u16,
+            Self::Fr221 => 221u16,
+            Self::Fr222 => 222u16,
+            Self::Fr223 => 223u16,
+            Self::Fr224 => 224u16,
+            Self::Fr225 => 225u16,
+            Self::Fr226 => 226u16,
+            Self::Fr227 => 227u16,
+            Self::Fr228 => 228u16,
+            Self::Fr229 => 229u16,
+            Self::Fr230 => 230u16,
+            Self::Fr231 => 231u16,
+            Self::Fr232 => 232u16,
+            Self::Fr233 => 233u16,
+        }
+    }
+}
+impl super::IsotopicComposition for FranciumIsotope {
+    fn isotopic_composition(&self) -> Option<f64> {
+        match self {
+            Self::Fr199 => None,
+            Self::Fr200 => None,
+            Self::Fr201 => None,
+            Self::Fr202 => None,
+            Self::Fr203 => None,
+            Self::Fr204 => None,
+            Self::Fr205 => None,
+            Self::Fr206 => None,
+            Self::Fr207 => None,
+            Self::Fr208 => None,
+            Self::Fr209 => None,
+            Self::Fr210 => None,
+            Self::Fr211 => None,
+            Self::Fr212 => None,
+            Self::Fr213 => None,
+            Self::Fr214 => None,
+            Self::Fr215 => None,
+            Self::Fr216 => None,
+            Self::Fr217 => None,
+            Self::Fr218 => None,
+            Self::Fr219 => None,
+            Self::Fr220 => None,
+            Self::Fr221 => None,
+            Self::Fr222 => None,
+            Self::Fr223 => None,
+            Self::Fr224 => None,
+            Self::Fr225 => None,
+            Self::Fr226 => None,
+            Self::Fr227 => None,
+            Self::Fr228 => None,
+            Self::Fr229 => None,
+            Self::Fr230 => None,
+            Self::Fr231 => None,
+            Self::Fr232 => None,
+            Self::Fr233 => None,
+        }
+    }
+}
+impl super::MostCommonIsotope for FranciumIsotope {
+    fn most_common_isotope() -> Self {
+        Self::Fr233
+    }
+}

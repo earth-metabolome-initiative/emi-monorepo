@@ -1,0 +1,165 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+pub enum ArsenicIsotope {
+    As60,
+    As61,
+    As62,
+    As63,
+    As64,
+    As65,
+    As66,
+    As67,
+    As68,
+    As69,
+    As70,
+    As71,
+    As72,
+    As73,
+    As74,
+    As75,
+    As76,
+    As77,
+    As78,
+    As79,
+    As80,
+    As81,
+    As82,
+    As83,
+    As84,
+    As85,
+    As86,
+    As87,
+    As88,
+    As89,
+    As90,
+    As91,
+    As92,
+}
+impl super::RelativeAtomicMass for ArsenicIsotope {
+    fn relative_atomic_mass(&self) -> f64 {
+        match self {
+            Self::As60 => 59.99388f64,
+            Self::As61 => 60.98112f64,
+            Self::As62 => 61.97361f64,
+            Self::As63 => 62.9639f64,
+            Self::As64 => 63.95743f64,
+            Self::As65 => 64.949611f64,
+            Self::As66 => 65.9441488f64,
+            Self::As67 => 66.93925111f64,
+            Self::As68 => 67.9367741f64,
+            Self::As69 => 68.932246f64,
+            Self::As70 => 69.930926f64,
+            Self::As71 => 70.9271138f64,
+            Self::As72 => 71.9267523f64,
+            Self::As73 => 72.9238291f64,
+            Self::As74 => 73.9239286f64,
+            Self::As75 => 74.92159457f64,
+            Self::As76 => 75.92239202f64,
+            Self::As77 => 76.9206476f64,
+            Self::As78 => 77.921828f64,
+            Self::As79 => 78.9209484f64,
+            Self::As80 => 79.9224746f64,
+            Self::As81 => 80.9221323f64,
+            Self::As82 => 81.9247412f64,
+            Self::As83 => 82.9252069f64,
+            Self::As84 => 83.9293033f64,
+            Self::As85 => 84.9321637f64,
+            Self::As86 => 85.9367015f64,
+            Self::As87 => 86.9402917f64,
+            Self::As88 => 87.94555f64,
+            Self::As89 => 88.94976f64,
+            Self::As90 => 89.95563f64,
+            Self::As91 => 90.96039f64,
+            Self::As92 => 91.96674f64,
+        }
+    }
+}
+impl super::ElementVariant for ArsenicIsotope {
+    fn element(&self) -> crate::Element {
+        crate::Element::As
+    }
+}
+impl super::MassNumber for ArsenicIsotope {
+    fn mass_number(&self) -> u16 {
+        match self {
+            Self::As60 => 60u16,
+            Self::As61 => 61u16,
+            Self::As62 => 62u16,
+            Self::As63 => 63u16,
+            Self::As64 => 64u16,
+            Self::As65 => 65u16,
+            Self::As66 => 66u16,
+            Self::As67 => 67u16,
+            Self::As68 => 68u16,
+            Self::As69 => 69u16,
+            Self::As70 => 70u16,
+            Self::As71 => 71u16,
+            Self::As72 => 72u16,
+            Self::As73 => 73u16,
+            Self::As74 => 74u16,
+            Self::As75 => 75u16,
+            Self::As76 => 76u16,
+            Self::As77 => 77u16,
+            Self::As78 => 78u16,
+            Self::As79 => 79u16,
+            Self::As80 => 80u16,
+            Self::As81 => 81u16,
+            Self::As82 => 82u16,
+            Self::As83 => 83u16,
+            Self::As84 => 84u16,
+            Self::As85 => 85u16,
+            Self::As86 => 86u16,
+            Self::As87 => 87u16,
+            Self::As88 => 88u16,
+            Self::As89 => 89u16,
+            Self::As90 => 90u16,
+            Self::As91 => 91u16,
+            Self::As92 => 92u16,
+        }
+    }
+}
+impl super::IsotopicComposition for ArsenicIsotope {
+    fn isotopic_composition(&self) -> Option<f64> {
+        match self {
+            Self::As60 => None,
+            Self::As61 => None,
+            Self::As62 => None,
+            Self::As63 => None,
+            Self::As64 => None,
+            Self::As65 => None,
+            Self::As66 => None,
+            Self::As67 => None,
+            Self::As68 => None,
+            Self::As69 => None,
+            Self::As70 => None,
+            Self::As71 => None,
+            Self::As72 => None,
+            Self::As73 => None,
+            Self::As74 => None,
+            Self::As75 => Some(1f64),
+            Self::As76 => None,
+            Self::As77 => None,
+            Self::As78 => None,
+            Self::As79 => None,
+            Self::As80 => None,
+            Self::As81 => None,
+            Self::As82 => None,
+            Self::As83 => None,
+            Self::As84 => None,
+            Self::As85 => None,
+            Self::As86 => None,
+            Self::As87 => None,
+            Self::As88 => None,
+            Self::As89 => None,
+            Self::As90 => None,
+            Self::As91 => None,
+            Self::As92 => None,
+        }
+    }
+}
+impl super::MostCommonIsotope for ArsenicIsotope {
+    fn most_common_isotope() -> Self {
+        Self::As75
+    }
+}
