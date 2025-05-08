@@ -5,8 +5,6 @@ edition = "2024"
 
 [dependencies]
 elements.workspace = true
-sophia_sparql_client.workspace = true
-sophia_api.workspace = true
 
 [lints]
 workspace = true
