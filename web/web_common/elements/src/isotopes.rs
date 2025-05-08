@@ -1,7 +1,7 @@
 //! Submodule providing the enumeration of `Isotopes` for each element.
 
-mod isotopic_composition;
 mod element_variant;
+mod isotopic_composition;
 mod mass_number;
 mod relative_atomic_mass;
 
@@ -397,7 +397,6 @@ pub enum Isotope {
     Ts(TennessineIsotope),
     Og(OganessonIsotope),
 }
-
 
 impl crate::Element {
     pub fn most_common_isotope(&self) -> Isotope {

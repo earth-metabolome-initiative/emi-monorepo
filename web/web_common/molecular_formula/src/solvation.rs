@@ -3,8 +3,6 @@
 
 use std::fmt::Display;
 
-use elements::MolarMass;
-
 use crate::MolecularFormula;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -23,18 +21,17 @@ impl Solvation {
         Self { solvate, solvant }
     }
 
+    /// Returns whether the solvation contains a residual group.
+    pub(crate) fn contains_residual(&self) -> bool {
+        self.solvate.contains_residual() || self.solvant.contains_residual()
+    }
+
     pub(crate) fn add_count_to_first_subformula(
         self,
         count: u8,
     ) -> Result<Self, crate::errors::Error> {
         let solvate = self.solvate.add_count_to_first_subformula(count)?;
         Ok(Self { solvate, solvant: self.solvant })
-    }
-}
-
-impl MolarMass for Solvation {
-    fn molar_mass(&self) -> f64 {
-        self.solvate.molar_mass() + self.solvant.molar_mass()
     }
 }
 

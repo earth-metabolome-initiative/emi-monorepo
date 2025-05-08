@@ -26,7 +26,9 @@ impl<'a> Parser<'a> {
     ) -> Result<(Self, Option<MolecularFormula>), crate::errors::Error> {
         let new_formula = match (token, formula) {
             (Token::Element(element), None) => Some(element.into()),
+            (Token::Residual, None) => Some(MolecularFormula::Residual),
             (Token::Element(element), Some(previous)) => Some(previous.chain(element.into())),
+            (Token::Residual, Some(previous)) => Some(previous.chain(MolecularFormula::Residual)),
             (Token::Number(count), None) => {
                 let (parser, inner_formula, closing_token) = self.inner_parse()?;
                 if closing_token != None {
@@ -47,9 +49,15 @@ impl<'a> Parser<'a> {
                 }
             }
             (Token::Plus, Some(MolecularFormula::Element(element))) => {
+                if !element.is_valid_oxidation_state(1) {
+                    return Err(crate::errors::Error::InvalidOxidationState(element.clone(), 1));
+                }
                 Some(MolecularFormula::Ion(Ion::new(element.into(), 1)))
             }
             (Token::Minus, Some(MolecularFormula::Element(element))) => {
+                if !element.is_valid_oxidation_state(1) {
+                    return Err(crate::errors::Error::InvalidOxidationState(element.clone(), 1));
+                }
                 Some(MolecularFormula::Ion(Ion::new(element.into(), -1)))
             }
             (Token::Mul, Some(formula)) => {

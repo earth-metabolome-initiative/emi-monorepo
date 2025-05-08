@@ -10,6 +10,8 @@ pub enum Token {
     Element(Element),
     /// A number
     Number(u8),
+    /// A residual group
+    Residual,
     /// An open round bracket
     OpenRoundBracket,
     /// A close round bracket

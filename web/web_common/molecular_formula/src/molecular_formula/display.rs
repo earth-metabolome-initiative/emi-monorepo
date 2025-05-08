@@ -41,6 +41,9 @@ impl Display for MolecularFormula {
             Self::Complex(formula) => {
                 write!(f, "[{formula}]")
             }
+            Self::Residual => {
+                write!(f, "R")
+            }
         }
     }
 }

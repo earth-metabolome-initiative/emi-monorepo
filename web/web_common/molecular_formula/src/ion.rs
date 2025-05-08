@@ -2,15 +2,13 @@
 
 use std::fmt::Display;
 
-use elements::MolarMass;
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// Ion struct representing an ion with a specific element and charge.
 pub struct Ion<E> {
     /// Can be an element or a molecular formula
-    entry: E,
+    pub(crate) entry: E,
     /// Charge
-    charge: i8,
+    pub(crate) charge: i8,
 }
 
 impl<E> Ion<E> {
@@ -27,15 +25,6 @@ impl<E> Ion<E> {
 
 /// Electron molar mass in amu
 pub const ELECTRON_MOLAR_MASS: f64 = 0.00054858;
-
-impl<E> MolarMass for Ion<E>
-where
-    E: MolarMass,
-{
-    fn molar_mass(&self) -> f64 {
-        self.entry.molar_mass() - f64::from(self.charge) * ELECTRON_MOLAR_MASS
-    }
-}
 
 impl<E> Display for Ion<E>
 where

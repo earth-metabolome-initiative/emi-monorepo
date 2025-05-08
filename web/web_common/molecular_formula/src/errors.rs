@@ -1,7 +1,7 @@
 //! Submodule providing the enumeration of errors which may occur while parsing
 //! a molecular formula.
 
-use elements::errors::UnknownElement;
+use elements::{Element, errors::UnknownElement};
 
 use crate::token::Token;
 
@@ -29,6 +29,8 @@ pub enum Error {
     InvalidLeadingToken(Token),
     /// When the parser is not completely consumed.
     UnconsumedParser,
+    /// When an oxidation state is invalid.
+    InvalidOxidationState(Element, i8),
 }
 
 impl From<UnknownElement> for Error {

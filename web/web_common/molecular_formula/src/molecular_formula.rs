@@ -4,6 +4,7 @@ use elements::Element;
 
 use crate::{Ion, Solvation};
 
+mod contains_residual;
 mod display;
 mod from;
 mod from_str;
@@ -29,6 +30,8 @@ pub enum MolecularFormula {
     Complex(Box<MolecularFormula>),
     /// A repeating unit wrapped in round brackets
     RepeatingUnit(Box<MolecularFormula>),
+    /// Residual group
+    Residual,
 }
 
 impl MolecularFormula {
@@ -40,6 +43,17 @@ impl MolecularFormula {
                 Self::Sequence(formulas)
             }
             _ => Self::Sequence(vec![self, other]),
+        }
+    }
+
+    /// Returns the last element of the sequence.
+    pub fn last_dangling_element(&self) -> Option<&Element> {
+        match self {
+            Self::Sequence(formulas) => formulas.last().and_then(|f| f.last_dangling_element()),
+            Self::Element(element) => Some(element),
+            Self::Count(formula, _) => formula.last_dangling_element(),
+            Self::Ion(ion) => ion.entry.last_dangling_element(),
+            _ => None,
         }
     }
 
@@ -63,6 +77,7 @@ impl MolecularFormula {
             Self::Count(_, _) => {
                 unreachable!("Count {self:?} should not be counted")
             }
+            Self::Residual => Ok(Self::Count(self.into(), count)),
         }
     }
 }
