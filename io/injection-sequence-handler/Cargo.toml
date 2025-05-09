@@ -6,6 +6,8 @@ edition = "2021"
 [dependencies]
 serde.workspace = true
 serde_with.workspace = true
+sophia_sparql_client.workspace = true
+sophia_api.workspace = true
 
 
 [lints]

@@ -119,6 +119,9 @@ cargo-husky = { version = "1", features = [
 ] }
 web-sys = { version = "0.3.77" }
 
+sophia_api = "0.9.0"
+sophia_sparql_client = "0.9.0"
+
 [workspace.lints.rust]
 missing_docs = "forbid"
 unused_macro_rules = "forbid"
