@@ -111,6 +111,34 @@ impl super::MostAbundantIsotope for CaliforniumIsotope {
         Self::Cf256
     }
 }
+impl TryFrom<u16> for CaliforniumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            237u16 => Ok(Self::Cf237),
+            238u16 => Ok(Self::Cf238),
+            239u16 => Ok(Self::Cf239),
+            240u16 => Ok(Self::Cf240),
+            241u16 => Ok(Self::Cf241),
+            242u16 => Ok(Self::Cf242),
+            243u16 => Ok(Self::Cf243),
+            244u16 => Ok(Self::Cf244),
+            245u16 => Ok(Self::Cf245),
+            246u16 => Ok(Self::Cf246),
+            247u16 => Ok(Self::Cf247),
+            248u16 => Ok(Self::Cf248),
+            249u16 => Ok(Self::Cf249),
+            250u16 => Ok(Self::Cf250),
+            251u16 => Ok(Self::Cf251),
+            252u16 => Ok(Self::Cf252),
+            253u16 => Ok(Self::Cf253),
+            254u16 => Ok(Self::Cf254),
+            255u16 => Ok(Self::Cf255),
+            256u16 => Ok(Self::Cf256),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Cf, value)),
+        }
+    }
+}
 impl std::fmt::Display for CaliforniumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

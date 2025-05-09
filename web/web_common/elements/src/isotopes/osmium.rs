@@ -199,6 +199,56 @@ impl super::MostAbundantIsotope for OsmiumIsotope {
         Self::Os192
     }
 }
+impl TryFrom<u16> for OsmiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            161u16 => Ok(Self::Os161),
+            162u16 => Ok(Self::Os162),
+            163u16 => Ok(Self::Os163),
+            164u16 => Ok(Self::Os164),
+            165u16 => Ok(Self::Os165),
+            166u16 => Ok(Self::Os166),
+            167u16 => Ok(Self::Os167),
+            168u16 => Ok(Self::Os168),
+            169u16 => Ok(Self::Os169),
+            170u16 => Ok(Self::Os170),
+            171u16 => Ok(Self::Os171),
+            172u16 => Ok(Self::Os172),
+            173u16 => Ok(Self::Os173),
+            174u16 => Ok(Self::Os174),
+            175u16 => Ok(Self::Os175),
+            176u16 => Ok(Self::Os176),
+            177u16 => Ok(Self::Os177),
+            178u16 => Ok(Self::Os178),
+            179u16 => Ok(Self::Os179),
+            180u16 => Ok(Self::Os180),
+            181u16 => Ok(Self::Os181),
+            182u16 => Ok(Self::Os182),
+            183u16 => Ok(Self::Os183),
+            184u16 => Ok(Self::Os184),
+            185u16 => Ok(Self::Os185),
+            186u16 => Ok(Self::Os186),
+            187u16 => Ok(Self::Os187),
+            188u16 => Ok(Self::Os188),
+            189u16 => Ok(Self::Os189),
+            190u16 => Ok(Self::Os190),
+            191u16 => Ok(Self::Os191),
+            192u16 => Ok(Self::Os192),
+            193u16 => Ok(Self::Os193),
+            194u16 => Ok(Self::Os194),
+            195u16 => Ok(Self::Os195),
+            196u16 => Ok(Self::Os196),
+            197u16 => Ok(Self::Os197),
+            198u16 => Ok(Self::Os198),
+            199u16 => Ok(Self::Os199),
+            200u16 => Ok(Self::Os200),
+            201u16 => Ok(Self::Os201),
+            202u16 => Ok(Self::Os202),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Os, value)),
+        }
+    }
+}
 impl std::fmt::Display for OsmiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

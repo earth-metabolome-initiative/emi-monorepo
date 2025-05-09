@@ -203,6 +203,57 @@ impl super::MostAbundantIsotope for LeadIsotope {
         Self::Pb208
     }
 }
+impl TryFrom<u16> for LeadIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            178u16 => Ok(Self::Pb178),
+            179u16 => Ok(Self::Pb179),
+            180u16 => Ok(Self::Pb180),
+            181u16 => Ok(Self::Pb181),
+            182u16 => Ok(Self::Pb182),
+            183u16 => Ok(Self::Pb183),
+            184u16 => Ok(Self::Pb184),
+            185u16 => Ok(Self::Pb185),
+            186u16 => Ok(Self::Pb186),
+            187u16 => Ok(Self::Pb187),
+            188u16 => Ok(Self::Pb188),
+            189u16 => Ok(Self::Pb189),
+            190u16 => Ok(Self::Pb190),
+            191u16 => Ok(Self::Pb191),
+            192u16 => Ok(Self::Pb192),
+            193u16 => Ok(Self::Pb193),
+            194u16 => Ok(Self::Pb194),
+            195u16 => Ok(Self::Pb195),
+            196u16 => Ok(Self::Pb196),
+            197u16 => Ok(Self::Pb197),
+            198u16 => Ok(Self::Pb198),
+            199u16 => Ok(Self::Pb199),
+            200u16 => Ok(Self::Pb200),
+            201u16 => Ok(Self::Pb201),
+            202u16 => Ok(Self::Pb202),
+            203u16 => Ok(Self::Pb203),
+            204u16 => Ok(Self::Pb204),
+            205u16 => Ok(Self::Pb205),
+            206u16 => Ok(Self::Pb206),
+            207u16 => Ok(Self::Pb207),
+            208u16 => Ok(Self::Pb208),
+            209u16 => Ok(Self::Pb209),
+            210u16 => Ok(Self::Pb210),
+            211u16 => Ok(Self::Pb211),
+            212u16 => Ok(Self::Pb212),
+            213u16 => Ok(Self::Pb213),
+            214u16 => Ok(Self::Pb214),
+            215u16 => Ok(Self::Pb215),
+            216u16 => Ok(Self::Pb216),
+            217u16 => Ok(Self::Pb217),
+            218u16 => Ok(Self::Pb218),
+            219u16 => Ok(Self::Pb219),
+            220u16 => Ok(Self::Pb220),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Pb, value)),
+        }
+    }
+}
 impl std::fmt::Display for LeadIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

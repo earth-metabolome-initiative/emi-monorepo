@@ -175,6 +175,50 @@ impl super::MostAbundantIsotope for ErbiumIsotope {
         Self::Er166
     }
 }
+impl TryFrom<u16> for ErbiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            142u16 => Ok(Self::Er142),
+            143u16 => Ok(Self::Er143),
+            144u16 => Ok(Self::Er144),
+            145u16 => Ok(Self::Er145),
+            146u16 => Ok(Self::Er146),
+            147u16 => Ok(Self::Er147),
+            148u16 => Ok(Self::Er148),
+            149u16 => Ok(Self::Er149),
+            150u16 => Ok(Self::Er150),
+            151u16 => Ok(Self::Er151),
+            152u16 => Ok(Self::Er152),
+            153u16 => Ok(Self::Er153),
+            154u16 => Ok(Self::Er154),
+            155u16 => Ok(Self::Er155),
+            156u16 => Ok(Self::Er156),
+            157u16 => Ok(Self::Er157),
+            158u16 => Ok(Self::Er158),
+            159u16 => Ok(Self::Er159),
+            160u16 => Ok(Self::Er160),
+            161u16 => Ok(Self::Er161),
+            162u16 => Ok(Self::Er162),
+            163u16 => Ok(Self::Er163),
+            164u16 => Ok(Self::Er164),
+            165u16 => Ok(Self::Er165),
+            166u16 => Ok(Self::Er166),
+            167u16 => Ok(Self::Er167),
+            168u16 => Ok(Self::Er168),
+            169u16 => Ok(Self::Er169),
+            170u16 => Ok(Self::Er170),
+            171u16 => Ok(Self::Er171),
+            172u16 => Ok(Self::Er172),
+            173u16 => Ok(Self::Er173),
+            174u16 => Ok(Self::Er174),
+            175u16 => Ok(Self::Er175),
+            176u16 => Ok(Self::Er176),
+            177u16 => Ok(Self::Er177),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Er, value)),
+        }
+    }
+}
 impl std::fmt::Display for ErbiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

@@ -107,6 +107,33 @@ impl super::MostAbundantIsotope for NeonIsotope {
         Self::Ne20
     }
 }
+impl TryFrom<u16> for NeonIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            16u16 => Ok(Self::Ne16),
+            17u16 => Ok(Self::Ne17),
+            18u16 => Ok(Self::Ne18),
+            19u16 => Ok(Self::Ne19),
+            20u16 => Ok(Self::Ne20),
+            21u16 => Ok(Self::Ne21),
+            22u16 => Ok(Self::Ne22),
+            23u16 => Ok(Self::Ne23),
+            24u16 => Ok(Self::Ne24),
+            25u16 => Ok(Self::Ne25),
+            26u16 => Ok(Self::Ne26),
+            27u16 => Ok(Self::Ne27),
+            28u16 => Ok(Self::Ne28),
+            29u16 => Ok(Self::Ne29),
+            30u16 => Ok(Self::Ne30),
+            31u16 => Ok(Self::Ne31),
+            32u16 => Ok(Self::Ne32),
+            33u16 => Ok(Self::Ne33),
+            34u16 => Ok(Self::Ne34),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Ne, value)),
+        }
+    }
+}
 impl std::fmt::Display for NeonIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

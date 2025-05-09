@@ -183,6 +183,52 @@ impl super::MostAbundantIsotope for TungstenIsotope {
         Self::W184
     }
 }
+impl TryFrom<u16> for TungstenIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            157u16 => Ok(Self::W157),
+            158u16 => Ok(Self::W158),
+            159u16 => Ok(Self::W159),
+            160u16 => Ok(Self::W160),
+            161u16 => Ok(Self::W161),
+            162u16 => Ok(Self::W162),
+            163u16 => Ok(Self::W163),
+            164u16 => Ok(Self::W164),
+            165u16 => Ok(Self::W165),
+            166u16 => Ok(Self::W166),
+            167u16 => Ok(Self::W167),
+            168u16 => Ok(Self::W168),
+            169u16 => Ok(Self::W169),
+            170u16 => Ok(Self::W170),
+            171u16 => Ok(Self::W171),
+            172u16 => Ok(Self::W172),
+            173u16 => Ok(Self::W173),
+            174u16 => Ok(Self::W174),
+            175u16 => Ok(Self::W175),
+            176u16 => Ok(Self::W176),
+            177u16 => Ok(Self::W177),
+            178u16 => Ok(Self::W178),
+            179u16 => Ok(Self::W179),
+            180u16 => Ok(Self::W180),
+            181u16 => Ok(Self::W181),
+            182u16 => Ok(Self::W182),
+            183u16 => Ok(Self::W183),
+            184u16 => Ok(Self::W184),
+            185u16 => Ok(Self::W185),
+            186u16 => Ok(Self::W186),
+            187u16 => Ok(Self::W187),
+            188u16 => Ok(Self::W188),
+            189u16 => Ok(Self::W189),
+            190u16 => Ok(Self::W190),
+            191u16 => Ok(Self::W191),
+            192u16 => Ok(Self::W192),
+            193u16 => Ok(Self::W193),
+            194u16 => Ok(Self::W194),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::W, value)),
+        }
+    }
+}
 impl std::fmt::Display for TungstenIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

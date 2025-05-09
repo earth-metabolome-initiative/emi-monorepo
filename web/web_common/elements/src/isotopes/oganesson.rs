@@ -43,6 +43,17 @@ impl super::MostAbundantIsotope for OganessonIsotope {
         Self::Og295
     }
 }
+impl TryFrom<u16> for OganessonIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            293u16 => Ok(Self::Og293),
+            294u16 => Ok(Self::Og294),
+            295u16 => Ok(Self::Og295),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Og, value)),
+        }
+    }
+}
 impl std::fmt::Display for OganessonIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

@@ -111,6 +111,34 @@ impl super::MostAbundantIsotope for FermiumIsotope {
         Self::Fm260
     }
 }
+impl TryFrom<u16> for FermiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            241u16 => Ok(Self::Fm241),
+            242u16 => Ok(Self::Fm242),
+            243u16 => Ok(Self::Fm243),
+            244u16 => Ok(Self::Fm244),
+            245u16 => Ok(Self::Fm245),
+            246u16 => Ok(Self::Fm246),
+            247u16 => Ok(Self::Fm247),
+            248u16 => Ok(Self::Fm248),
+            249u16 => Ok(Self::Fm249),
+            250u16 => Ok(Self::Fm250),
+            251u16 => Ok(Self::Fm251),
+            252u16 => Ok(Self::Fm252),
+            253u16 => Ok(Self::Fm253),
+            254u16 => Ok(Self::Fm254),
+            255u16 => Ok(Self::Fm255),
+            256u16 => Ok(Self::Fm256),
+            257u16 => Ok(Self::Fm257),
+            258u16 => Ok(Self::Fm258),
+            259u16 => Ok(Self::Fm259),
+            260u16 => Ok(Self::Fm260),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Fm, value)),
+        }
+    }
+}
 impl std::fmt::Display for FermiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

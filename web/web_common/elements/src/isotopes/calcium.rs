@@ -131,6 +131,39 @@ impl super::MostAbundantIsotope for CalciumIsotope {
         Self::Ca40
     }
 }
+impl TryFrom<u16> for CalciumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            34u16 => Ok(Self::Ca34),
+            35u16 => Ok(Self::Ca35),
+            36u16 => Ok(Self::Ca36),
+            37u16 => Ok(Self::Ca37),
+            38u16 => Ok(Self::Ca38),
+            39u16 => Ok(Self::Ca39),
+            40u16 => Ok(Self::Ca40),
+            41u16 => Ok(Self::Ca41),
+            42u16 => Ok(Self::Ca42),
+            43u16 => Ok(Self::Ca43),
+            44u16 => Ok(Self::Ca44),
+            45u16 => Ok(Self::Ca45),
+            46u16 => Ok(Self::Ca46),
+            47u16 => Ok(Self::Ca47),
+            48u16 => Ok(Self::Ca48),
+            49u16 => Ok(Self::Ca49),
+            50u16 => Ok(Self::Ca50),
+            51u16 => Ok(Self::Ca51),
+            52u16 => Ok(Self::Ca52),
+            53u16 => Ok(Self::Ca53),
+            54u16 => Ok(Self::Ca54),
+            55u16 => Ok(Self::Ca55),
+            56u16 => Ok(Self::Ca56),
+            57u16 => Ok(Self::Ca57),
+            58u16 => Ok(Self::Ca58),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Ca, value)),
+        }
+    }
+}
 impl std::fmt::Display for CalciumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

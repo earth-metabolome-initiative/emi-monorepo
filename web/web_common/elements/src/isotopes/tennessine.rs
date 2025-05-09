@@ -47,6 +47,18 @@ impl super::MostAbundantIsotope for TennessineIsotope {
         Self::Uus294
     }
 }
+impl TryFrom<u16> for TennessineIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            291u16 => Ok(Self::Ts291),
+            292u16 => Ok(Self::Ts292),
+            293u16 => Ok(Self::Ts293),
+            294u16 => Ok(Self::Uus294),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Ts, value)),
+        }
+    }
+}
 impl std::fmt::Display for TennessineIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

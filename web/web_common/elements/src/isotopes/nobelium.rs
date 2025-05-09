@@ -99,6 +99,31 @@ impl super::MostAbundantIsotope for NobeliumIsotope {
         Self::No264
     }
 }
+impl TryFrom<u16> for NobeliumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            248u16 => Ok(Self::No248),
+            249u16 => Ok(Self::No249),
+            250u16 => Ok(Self::No250),
+            251u16 => Ok(Self::No251),
+            252u16 => Ok(Self::No252),
+            253u16 => Ok(Self::No253),
+            254u16 => Ok(Self::No254),
+            255u16 => Ok(Self::No255),
+            256u16 => Ok(Self::No256),
+            257u16 => Ok(Self::No257),
+            258u16 => Ok(Self::No258),
+            259u16 => Ok(Self::No259),
+            260u16 => Ok(Self::No260),
+            261u16 => Ok(Self::No261),
+            262u16 => Ok(Self::No262),
+            263u16 => Ok(Self::No263),
+            264u16 => Ok(Self::No264),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::No, value)),
+        }
+    }
+}
 impl std::fmt::Display for NobeliumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

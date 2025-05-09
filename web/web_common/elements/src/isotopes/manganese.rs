@@ -143,6 +143,42 @@ impl super::MostAbundantIsotope for ManganeseIsotope {
         Self::Mn55
     }
 }
+impl TryFrom<u16> for ManganeseIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            44u16 => Ok(Self::Mn44),
+            45u16 => Ok(Self::Mn45),
+            46u16 => Ok(Self::Mn46),
+            47u16 => Ok(Self::Mn47),
+            48u16 => Ok(Self::Mn48),
+            49u16 => Ok(Self::Mn49),
+            50u16 => Ok(Self::Mn50),
+            51u16 => Ok(Self::Mn51),
+            52u16 => Ok(Self::Mn52),
+            53u16 => Ok(Self::Mn53),
+            54u16 => Ok(Self::Mn54),
+            55u16 => Ok(Self::Mn55),
+            56u16 => Ok(Self::Mn56),
+            57u16 => Ok(Self::Mn57),
+            58u16 => Ok(Self::Mn58),
+            59u16 => Ok(Self::Mn59),
+            60u16 => Ok(Self::Mn60),
+            61u16 => Ok(Self::Mn61),
+            62u16 => Ok(Self::Mn62),
+            63u16 => Ok(Self::Mn63),
+            64u16 => Ok(Self::Mn64),
+            65u16 => Ok(Self::Mn65),
+            66u16 => Ok(Self::Mn66),
+            67u16 => Ok(Self::Mn67),
+            68u16 => Ok(Self::Mn68),
+            69u16 => Ok(Self::Mn69),
+            70u16 => Ok(Self::Mn70),
+            71u16 => Ok(Self::Mn71),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Mn, value)),
+        }
+    }
+}
 impl std::fmt::Display for ManganeseIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

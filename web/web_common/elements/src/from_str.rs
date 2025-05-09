@@ -3,7 +3,7 @@
 use std::str::FromStr;
 
 impl FromStr for crate::Element {
-    type Err = crate::errors::UnknownElement;
+    type Err = crate::errors::Error;
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         Ok(match value {
@@ -131,7 +131,7 @@ impl FromStr for crate::Element {
                     characters[i] = c;
                 }
 
-                return Err(crate::errors::UnknownElement::Unknown(characters));
+                return Err(crate::errors::Error::Element(characters));
             }
         })
     }

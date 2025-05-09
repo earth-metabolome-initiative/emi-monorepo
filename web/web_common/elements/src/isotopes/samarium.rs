@@ -183,6 +183,52 @@ impl super::MostAbundantIsotope for SamariumIsotope {
         Self::Sm152
     }
 }
+impl TryFrom<u16> for SamariumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            128u16 => Ok(Self::Sm128),
+            129u16 => Ok(Self::Sm129),
+            130u16 => Ok(Self::Sm130),
+            131u16 => Ok(Self::Sm131),
+            132u16 => Ok(Self::Sm132),
+            133u16 => Ok(Self::Sm133),
+            134u16 => Ok(Self::Sm134),
+            135u16 => Ok(Self::Sm135),
+            136u16 => Ok(Self::Sm136),
+            137u16 => Ok(Self::Sm137),
+            138u16 => Ok(Self::Sm138),
+            139u16 => Ok(Self::Sm139),
+            140u16 => Ok(Self::Sm140),
+            141u16 => Ok(Self::Sm141),
+            142u16 => Ok(Self::Sm142),
+            143u16 => Ok(Self::Sm143),
+            144u16 => Ok(Self::Sm144),
+            145u16 => Ok(Self::Sm145),
+            146u16 => Ok(Self::Sm146),
+            147u16 => Ok(Self::Sm147),
+            148u16 => Ok(Self::Sm148),
+            149u16 => Ok(Self::Sm149),
+            150u16 => Ok(Self::Sm150),
+            151u16 => Ok(Self::Sm151),
+            152u16 => Ok(Self::Sm152),
+            153u16 => Ok(Self::Sm153),
+            154u16 => Ok(Self::Sm154),
+            155u16 => Ok(Self::Sm155),
+            156u16 => Ok(Self::Sm156),
+            157u16 => Ok(Self::Sm157),
+            158u16 => Ok(Self::Sm158),
+            159u16 => Ok(Self::Sm159),
+            160u16 => Ok(Self::Sm160),
+            161u16 => Ok(Self::Sm161),
+            162u16 => Ok(Self::Sm162),
+            163u16 => Ok(Self::Sm163),
+            164u16 => Ok(Self::Sm164),
+            165u16 => Ok(Self::Sm165),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Sm, value)),
+        }
+    }
+}
 impl std::fmt::Display for SamariumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

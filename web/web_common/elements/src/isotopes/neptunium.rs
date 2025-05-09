@@ -139,6 +139,41 @@ impl super::MostAbundantIsotope for NeptuniumIsotope {
         Self::Np245
     }
 }
+impl TryFrom<u16> for NeptuniumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            219u16 => Ok(Self::Np219),
+            220u16 => Ok(Self::Np220),
+            221u16 => Ok(Self::Np221),
+            222u16 => Ok(Self::Np222),
+            223u16 => Ok(Self::Np223),
+            224u16 => Ok(Self::Np224),
+            225u16 => Ok(Self::Np225),
+            226u16 => Ok(Self::Np226),
+            227u16 => Ok(Self::Np227),
+            228u16 => Ok(Self::Np228),
+            229u16 => Ok(Self::Np229),
+            230u16 => Ok(Self::Np230),
+            231u16 => Ok(Self::Np231),
+            232u16 => Ok(Self::Np232),
+            233u16 => Ok(Self::Np233),
+            234u16 => Ok(Self::Np234),
+            235u16 => Ok(Self::Np235),
+            236u16 => Ok(Self::Np236),
+            237u16 => Ok(Self::Np237),
+            238u16 => Ok(Self::Np238),
+            239u16 => Ok(Self::Np239),
+            240u16 => Ok(Self::Np240),
+            241u16 => Ok(Self::Np241),
+            242u16 => Ok(Self::Np242),
+            243u16 => Ok(Self::Np243),
+            244u16 => Ok(Self::Np244),
+            245u16 => Ok(Self::Np245),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Np, value)),
+        }
+    }
+}
 impl std::fmt::Display for NeptuniumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

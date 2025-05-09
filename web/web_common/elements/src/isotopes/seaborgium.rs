@@ -95,6 +95,30 @@ impl super::MostAbundantIsotope for SeaborgiumIsotope {
         Self::Sg273
     }
 }
+impl TryFrom<u16> for SeaborgiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            258u16 => Ok(Self::Sg258),
+            259u16 => Ok(Self::Sg259),
+            260u16 => Ok(Self::Sg260),
+            261u16 => Ok(Self::Sg261),
+            262u16 => Ok(Self::Sg262),
+            263u16 => Ok(Self::Sg263),
+            264u16 => Ok(Self::Sg264),
+            265u16 => Ok(Self::Sg265),
+            266u16 => Ok(Self::Sg266),
+            267u16 => Ok(Self::Sg267),
+            268u16 => Ok(Self::Sg268),
+            269u16 => Ok(Self::Sg269),
+            270u16 => Ok(Self::Sg270),
+            271u16 => Ok(Self::Sg271),
+            272u16 => Ok(Self::Sg272),
+            273u16 => Ok(Self::Sg273),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Sg, value)),
+        }
+    }
+}
 impl std::fmt::Display for SeaborgiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

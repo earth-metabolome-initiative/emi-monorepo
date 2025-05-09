@@ -203,6 +203,57 @@ impl super::MostAbundantIsotope for ThalliumIsotope {
         Self::Tl205
     }
 }
+impl TryFrom<u16> for ThalliumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            176u16 => Ok(Self::Tl176),
+            177u16 => Ok(Self::Tl177),
+            178u16 => Ok(Self::Tl178),
+            179u16 => Ok(Self::Tl179),
+            180u16 => Ok(Self::Tl180),
+            181u16 => Ok(Self::Tl181),
+            182u16 => Ok(Self::Tl182),
+            183u16 => Ok(Self::Tl183),
+            184u16 => Ok(Self::Tl184),
+            185u16 => Ok(Self::Tl185),
+            186u16 => Ok(Self::Tl186),
+            187u16 => Ok(Self::Tl187),
+            188u16 => Ok(Self::Tl188),
+            189u16 => Ok(Self::Tl189),
+            190u16 => Ok(Self::Tl190),
+            191u16 => Ok(Self::Tl191),
+            192u16 => Ok(Self::Tl192),
+            193u16 => Ok(Self::Tl193),
+            194u16 => Ok(Self::Tl194),
+            195u16 => Ok(Self::Tl195),
+            196u16 => Ok(Self::Tl196),
+            197u16 => Ok(Self::Tl197),
+            198u16 => Ok(Self::Tl198),
+            199u16 => Ok(Self::Tl199),
+            200u16 => Ok(Self::Tl200),
+            201u16 => Ok(Self::Tl201),
+            202u16 => Ok(Self::Tl202),
+            203u16 => Ok(Self::Tl203),
+            204u16 => Ok(Self::Tl204),
+            205u16 => Ok(Self::Tl205),
+            206u16 => Ok(Self::Tl206),
+            207u16 => Ok(Self::Tl207),
+            208u16 => Ok(Self::Tl208),
+            209u16 => Ok(Self::Tl209),
+            210u16 => Ok(Self::Tl210),
+            211u16 => Ok(Self::Tl211),
+            212u16 => Ok(Self::Tl212),
+            213u16 => Ok(Self::Tl213),
+            214u16 => Ok(Self::Tl214),
+            215u16 => Ok(Self::Tl215),
+            216u16 => Ok(Self::Tl216),
+            217u16 => Ok(Self::Tl217),
+            218u16 => Ok(Self::Tl218),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Tl, value)),
+        }
+    }
+}
 impl std::fmt::Display for ThalliumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

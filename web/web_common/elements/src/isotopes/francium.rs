@@ -171,6 +171,49 @@ impl super::MostAbundantIsotope for FranciumIsotope {
         Self::Fr233
     }
 }
+impl TryFrom<u16> for FranciumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            199u16 => Ok(Self::Fr199),
+            200u16 => Ok(Self::Fr200),
+            201u16 => Ok(Self::Fr201),
+            202u16 => Ok(Self::Fr202),
+            203u16 => Ok(Self::Fr203),
+            204u16 => Ok(Self::Fr204),
+            205u16 => Ok(Self::Fr205),
+            206u16 => Ok(Self::Fr206),
+            207u16 => Ok(Self::Fr207),
+            208u16 => Ok(Self::Fr208),
+            209u16 => Ok(Self::Fr209),
+            210u16 => Ok(Self::Fr210),
+            211u16 => Ok(Self::Fr211),
+            212u16 => Ok(Self::Fr212),
+            213u16 => Ok(Self::Fr213),
+            214u16 => Ok(Self::Fr214),
+            215u16 => Ok(Self::Fr215),
+            216u16 => Ok(Self::Fr216),
+            217u16 => Ok(Self::Fr217),
+            218u16 => Ok(Self::Fr218),
+            219u16 => Ok(Self::Fr219),
+            220u16 => Ok(Self::Fr220),
+            221u16 => Ok(Self::Fr221),
+            222u16 => Ok(Self::Fr222),
+            223u16 => Ok(Self::Fr223),
+            224u16 => Ok(Self::Fr224),
+            225u16 => Ok(Self::Fr225),
+            226u16 => Ok(Self::Fr226),
+            227u16 => Ok(Self::Fr227),
+            228u16 => Ok(Self::Fr228),
+            229u16 => Ok(Self::Fr229),
+            230u16 => Ok(Self::Fr230),
+            231u16 => Ok(Self::Fr231),
+            232u16 => Ok(Self::Fr232),
+            233u16 => Ok(Self::Fr233),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Fr, value)),
+        }
+    }
+}
 impl std::fmt::Display for FranciumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

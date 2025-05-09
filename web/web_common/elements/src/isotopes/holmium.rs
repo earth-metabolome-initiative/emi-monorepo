@@ -175,6 +175,50 @@ impl super::MostAbundantIsotope for HolmiumIsotope {
         Self::Ho165
     }
 }
+impl TryFrom<u16> for HolmiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            140u16 => Ok(Self::Ho140),
+            141u16 => Ok(Self::Ho141),
+            142u16 => Ok(Self::Ho142),
+            143u16 => Ok(Self::Ho143),
+            144u16 => Ok(Self::Ho144),
+            145u16 => Ok(Self::Ho145),
+            146u16 => Ok(Self::Ho146),
+            147u16 => Ok(Self::Ho147),
+            148u16 => Ok(Self::Ho148),
+            149u16 => Ok(Self::Ho149),
+            150u16 => Ok(Self::Ho150),
+            151u16 => Ok(Self::Ho151),
+            152u16 => Ok(Self::Ho152),
+            153u16 => Ok(Self::Ho153),
+            154u16 => Ok(Self::Ho154),
+            155u16 => Ok(Self::Ho155),
+            156u16 => Ok(Self::Ho156),
+            157u16 => Ok(Self::Ho157),
+            158u16 => Ok(Self::Ho158),
+            159u16 => Ok(Self::Ho159),
+            160u16 => Ok(Self::Ho160),
+            161u16 => Ok(Self::Ho161),
+            162u16 => Ok(Self::Ho162),
+            163u16 => Ok(Self::Ho163),
+            164u16 => Ok(Self::Ho164),
+            165u16 => Ok(Self::Ho165),
+            166u16 => Ok(Self::Ho166),
+            167u16 => Ok(Self::Ho167),
+            168u16 => Ok(Self::Ho168),
+            169u16 => Ok(Self::Ho169),
+            170u16 => Ok(Self::Ho170),
+            171u16 => Ok(Self::Ho171),
+            172u16 => Ok(Self::Ho172),
+            173u16 => Ok(Self::Ho173),
+            174u16 => Ok(Self::Ho174),
+            175u16 => Ok(Self::Ho175),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Ho, value)),
+        }
+    }
+}
 impl std::fmt::Display for HolmiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

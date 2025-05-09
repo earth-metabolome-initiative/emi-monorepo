@@ -171,6 +171,49 @@ impl super::MostAbundantIsotope for ZirconiumIsotope {
         Self::Zr90
     }
 }
+impl TryFrom<u16> for ZirconiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            78u16 => Ok(Self::Zr78),
+            79u16 => Ok(Self::Zr79),
+            80u16 => Ok(Self::Zr80),
+            81u16 => Ok(Self::Zr81),
+            82u16 => Ok(Self::Zr82),
+            83u16 => Ok(Self::Zr83),
+            84u16 => Ok(Self::Zr84),
+            85u16 => Ok(Self::Zr85),
+            86u16 => Ok(Self::Zr86),
+            87u16 => Ok(Self::Zr87),
+            88u16 => Ok(Self::Zr88),
+            89u16 => Ok(Self::Zr89),
+            90u16 => Ok(Self::Zr90),
+            91u16 => Ok(Self::Zr91),
+            92u16 => Ok(Self::Zr92),
+            93u16 => Ok(Self::Zr93),
+            94u16 => Ok(Self::Zr94),
+            95u16 => Ok(Self::Zr95),
+            96u16 => Ok(Self::Zr96),
+            97u16 => Ok(Self::Zr97),
+            98u16 => Ok(Self::Zr98),
+            99u16 => Ok(Self::Zr99),
+            100u16 => Ok(Self::Zr100),
+            101u16 => Ok(Self::Zr101),
+            102u16 => Ok(Self::Zr102),
+            103u16 => Ok(Self::Zr103),
+            104u16 => Ok(Self::Zr104),
+            105u16 => Ok(Self::Zr105),
+            106u16 => Ok(Self::Zr106),
+            107u16 => Ok(Self::Zr107),
+            108u16 => Ok(Self::Zr108),
+            109u16 => Ok(Self::Zr109),
+            110u16 => Ok(Self::Zr110),
+            111u16 => Ok(Self::Zr111),
+            112u16 => Ok(Self::Zr112),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Zr, value)),
+        }
+    }
+}
 impl std::fmt::Display for ZirconiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

@@ -159,6 +159,46 @@ impl super::MostAbundantIsotope for ZincIsotope {
         Self::Zn64
     }
 }
+impl TryFrom<u16> for ZincIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            54u16 => Ok(Self::Zn54),
+            55u16 => Ok(Self::Zn55),
+            56u16 => Ok(Self::Zn56),
+            57u16 => Ok(Self::Zn57),
+            58u16 => Ok(Self::Zn58),
+            59u16 => Ok(Self::Zn59),
+            60u16 => Ok(Self::Zn60),
+            61u16 => Ok(Self::Zn61),
+            62u16 => Ok(Self::Zn62),
+            63u16 => Ok(Self::Zn63),
+            64u16 => Ok(Self::Zn64),
+            65u16 => Ok(Self::Zn65),
+            66u16 => Ok(Self::Zn66),
+            67u16 => Ok(Self::Zn67),
+            68u16 => Ok(Self::Zn68),
+            69u16 => Ok(Self::Zn69),
+            70u16 => Ok(Self::Zn70),
+            71u16 => Ok(Self::Zn71),
+            72u16 => Ok(Self::Zn72),
+            73u16 => Ok(Self::Zn73),
+            74u16 => Ok(Self::Zn74),
+            75u16 => Ok(Self::Zn75),
+            76u16 => Ok(Self::Zn76),
+            77u16 => Ok(Self::Zn77),
+            78u16 => Ok(Self::Zn78),
+            79u16 => Ok(Self::Zn79),
+            80u16 => Ok(Self::Zn80),
+            81u16 => Ok(Self::Zn81),
+            82u16 => Ok(Self::Zn82),
+            83u16 => Ok(Self::Zn83),
+            84u16 => Ok(Self::Zn84),
+            85u16 => Ok(Self::Zn85),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Zn, value)),
+        }
+    }
+}
 impl std::fmt::Display for ZincIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

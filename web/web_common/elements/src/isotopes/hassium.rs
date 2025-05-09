@@ -91,6 +91,29 @@ impl super::MostAbundantIsotope for HassiumIsotope {
         Self::Hs277
     }
 }
+impl TryFrom<u16> for HassiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            263u16 => Ok(Self::Hs263),
+            264u16 => Ok(Self::Hs264),
+            265u16 => Ok(Self::Hs265),
+            266u16 => Ok(Self::Hs266),
+            267u16 => Ok(Self::Hs267),
+            268u16 => Ok(Self::Hs268),
+            269u16 => Ok(Self::Hs269),
+            270u16 => Ok(Self::Hs270),
+            271u16 => Ok(Self::Hs271),
+            272u16 => Ok(Self::Hs272),
+            273u16 => Ok(Self::Hs273),
+            274u16 => Ok(Self::Hs274),
+            275u16 => Ok(Self::Hs275),
+            276u16 => Ok(Self::Hs276),
+            277u16 => Ok(Self::Hs277),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Hs, value)),
+        }
+    }
+}
 impl std::fmt::Display for HassiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

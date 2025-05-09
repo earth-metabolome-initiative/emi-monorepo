@@ -2,12 +2,12 @@
 
 impl super::Element {
     /// Returns whether the provided oxidation state is valid for the element.
-    pub fn is_valid_oxidation_state(&self, state: i8) -> bool {
+    pub fn is_valid_oxidation_state(&self, state: i16) -> bool {
         self.oxidation_states().contains(&state)
     }
 
     /// Returns the allowed oxidation states of the element.
-    pub fn oxidation_states(&self) -> &'static [i8] {
+    pub fn oxidation_states(&self) -> &'static [i16] {
         match self {
             Self::H => &[-1, 1],
             Self::He => &[],

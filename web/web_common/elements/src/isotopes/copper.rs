@@ -155,6 +155,45 @@ impl super::MostAbundantIsotope for CopperIsotope {
         Self::Cu63
     }
 }
+impl TryFrom<u16> for CopperIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            52u16 => Ok(Self::Cu52),
+            53u16 => Ok(Self::Cu53),
+            54u16 => Ok(Self::Cu54),
+            55u16 => Ok(Self::Cu55),
+            56u16 => Ok(Self::Cu56),
+            57u16 => Ok(Self::Cu57),
+            58u16 => Ok(Self::Cu58),
+            59u16 => Ok(Self::Cu59),
+            60u16 => Ok(Self::Cu60),
+            61u16 => Ok(Self::Cu61),
+            62u16 => Ok(Self::Cu62),
+            63u16 => Ok(Self::Cu63),
+            64u16 => Ok(Self::Cu64),
+            65u16 => Ok(Self::Cu65),
+            66u16 => Ok(Self::Cu66),
+            67u16 => Ok(Self::Cu67),
+            68u16 => Ok(Self::Cu68),
+            69u16 => Ok(Self::Cu69),
+            70u16 => Ok(Self::Cu70),
+            71u16 => Ok(Self::Cu71),
+            72u16 => Ok(Self::Cu72),
+            73u16 => Ok(Self::Cu73),
+            74u16 => Ok(Self::Cu74),
+            75u16 => Ok(Self::Cu75),
+            76u16 => Ok(Self::Cu76),
+            77u16 => Ok(Self::Cu77),
+            78u16 => Ok(Self::Cu78),
+            79u16 => Ok(Self::Cu79),
+            80u16 => Ok(Self::Cu80),
+            81u16 => Ok(Self::Cu81),
+            82u16 => Ok(Self::Cu82),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Cu, value)),
+        }
+    }
+}
 impl std::fmt::Display for CopperIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

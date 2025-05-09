@@ -187,6 +187,53 @@ impl super::MostAbundantIsotope for AstatineIsotope {
         Self::At229
     }
 }
+impl TryFrom<u16> for AstatineIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            191u16 => Ok(Self::At191),
+            192u16 => Ok(Self::At192),
+            193u16 => Ok(Self::At193),
+            194u16 => Ok(Self::At194),
+            195u16 => Ok(Self::At195),
+            196u16 => Ok(Self::At196),
+            197u16 => Ok(Self::At197),
+            198u16 => Ok(Self::At198),
+            199u16 => Ok(Self::At199),
+            200u16 => Ok(Self::At200),
+            201u16 => Ok(Self::At201),
+            202u16 => Ok(Self::At202),
+            203u16 => Ok(Self::At203),
+            204u16 => Ok(Self::At204),
+            205u16 => Ok(Self::At205),
+            206u16 => Ok(Self::At206),
+            207u16 => Ok(Self::At207),
+            208u16 => Ok(Self::At208),
+            209u16 => Ok(Self::At209),
+            210u16 => Ok(Self::At210),
+            211u16 => Ok(Self::At211),
+            212u16 => Ok(Self::At212),
+            213u16 => Ok(Self::At213),
+            214u16 => Ok(Self::At214),
+            215u16 => Ok(Self::At215),
+            216u16 => Ok(Self::At216),
+            217u16 => Ok(Self::At217),
+            218u16 => Ok(Self::At218),
+            219u16 => Ok(Self::At219),
+            220u16 => Ok(Self::At220),
+            221u16 => Ok(Self::At221),
+            222u16 => Ok(Self::At222),
+            223u16 => Ok(Self::At223),
+            224u16 => Ok(Self::At224),
+            225u16 => Ok(Self::At225),
+            226u16 => Ok(Self::At226),
+            227u16 => Ok(Self::At227),
+            228u16 => Ok(Self::At228),
+            229u16 => Ok(Self::At229),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::At, value)),
+        }
+    }
+}
 impl std::fmt::Display for AstatineIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

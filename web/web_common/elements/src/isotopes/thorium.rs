@@ -159,6 +159,46 @@ impl super::MostAbundantIsotope for ThoriumIsotope {
         Self::Th232
     }
 }
+impl TryFrom<u16> for ThoriumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            208u16 => Ok(Self::Th208),
+            209u16 => Ok(Self::Th209),
+            210u16 => Ok(Self::Th210),
+            211u16 => Ok(Self::Th211),
+            212u16 => Ok(Self::Th212),
+            213u16 => Ok(Self::Th213),
+            214u16 => Ok(Self::Th214),
+            215u16 => Ok(Self::Th215),
+            216u16 => Ok(Self::Th216),
+            217u16 => Ok(Self::Th217),
+            218u16 => Ok(Self::Th218),
+            219u16 => Ok(Self::Th219),
+            220u16 => Ok(Self::Th220),
+            221u16 => Ok(Self::Th221),
+            222u16 => Ok(Self::Th222),
+            223u16 => Ok(Self::Th223),
+            224u16 => Ok(Self::Th224),
+            225u16 => Ok(Self::Th225),
+            226u16 => Ok(Self::Th226),
+            227u16 => Ok(Self::Th227),
+            228u16 => Ok(Self::Th228),
+            229u16 => Ok(Self::Th229),
+            230u16 => Ok(Self::Th230),
+            231u16 => Ok(Self::Th231),
+            232u16 => Ok(Self::Th232),
+            233u16 => Ok(Self::Th233),
+            234u16 => Ok(Self::Th234),
+            235u16 => Ok(Self::Th235),
+            236u16 => Ok(Self::Th236),
+            237u16 => Ok(Self::Th237),
+            238u16 => Ok(Self::Th238),
+            239u16 => Ok(Self::Th239),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Th, value)),
+        }
+    }
+}
 impl std::fmt::Display for ThoriumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

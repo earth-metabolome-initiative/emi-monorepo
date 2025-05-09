@@ -215,6 +215,60 @@ impl super::MostAbundantIsotope for MercuryIsotope {
         Self::Hg202
     }
 }
+impl TryFrom<u16> for MercuryIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            171u16 => Ok(Self::Hg171),
+            172u16 => Ok(Self::Hg172),
+            173u16 => Ok(Self::Hg173),
+            174u16 => Ok(Self::Hg174),
+            175u16 => Ok(Self::Hg175),
+            176u16 => Ok(Self::Hg176),
+            177u16 => Ok(Self::Hg177),
+            178u16 => Ok(Self::Hg178),
+            179u16 => Ok(Self::Hg179),
+            180u16 => Ok(Self::Hg180),
+            181u16 => Ok(Self::Hg181),
+            182u16 => Ok(Self::Hg182),
+            183u16 => Ok(Self::Hg183),
+            184u16 => Ok(Self::Hg184),
+            185u16 => Ok(Self::Hg185),
+            186u16 => Ok(Self::Hg186),
+            187u16 => Ok(Self::Hg187),
+            188u16 => Ok(Self::Hg188),
+            189u16 => Ok(Self::Hg189),
+            190u16 => Ok(Self::Hg190),
+            191u16 => Ok(Self::Hg191),
+            192u16 => Ok(Self::Hg192),
+            193u16 => Ok(Self::Hg193),
+            194u16 => Ok(Self::Hg194),
+            195u16 => Ok(Self::Hg195),
+            196u16 => Ok(Self::Hg196),
+            197u16 => Ok(Self::Hg197),
+            198u16 => Ok(Self::Hg198),
+            199u16 => Ok(Self::Hg199),
+            200u16 => Ok(Self::Hg200),
+            201u16 => Ok(Self::Hg201),
+            202u16 => Ok(Self::Hg202),
+            203u16 => Ok(Self::Hg203),
+            204u16 => Ok(Self::Hg204),
+            205u16 => Ok(Self::Hg205),
+            206u16 => Ok(Self::Hg206),
+            207u16 => Ok(Self::Hg207),
+            208u16 => Ok(Self::Hg208),
+            209u16 => Ok(Self::Hg209),
+            210u16 => Ok(Self::Hg210),
+            211u16 => Ok(Self::Hg211),
+            212u16 => Ok(Self::Hg212),
+            213u16 => Ok(Self::Hg213),
+            214u16 => Ok(Self::Hg214),
+            215u16 => Ok(Self::Hg215),
+            216u16 => Ok(Self::Hg216),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Hg, value)),
+        }
+    }
+}
 impl std::fmt::Display for MercuryIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

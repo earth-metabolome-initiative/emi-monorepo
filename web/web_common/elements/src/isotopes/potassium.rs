@@ -131,6 +131,39 @@ impl super::MostAbundantIsotope for PotassiumIsotope {
         Self::K39
     }
 }
+impl TryFrom<u16> for PotassiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            32u16 => Ok(Self::K32),
+            33u16 => Ok(Self::K33),
+            34u16 => Ok(Self::K34),
+            35u16 => Ok(Self::K35),
+            36u16 => Ok(Self::K36),
+            37u16 => Ok(Self::K37),
+            38u16 => Ok(Self::K38),
+            39u16 => Ok(Self::K39),
+            40u16 => Ok(Self::K40),
+            41u16 => Ok(Self::K41),
+            42u16 => Ok(Self::K42),
+            43u16 => Ok(Self::K43),
+            44u16 => Ok(Self::K44),
+            45u16 => Ok(Self::K45),
+            46u16 => Ok(Self::K46),
+            47u16 => Ok(Self::K47),
+            48u16 => Ok(Self::K48),
+            49u16 => Ok(Self::K49),
+            50u16 => Ok(Self::K50),
+            51u16 => Ok(Self::K51),
+            52u16 => Ok(Self::K52),
+            53u16 => Ok(Self::K53),
+            54u16 => Ok(Self::K54),
+            55u16 => Ok(Self::K55),
+            56u16 => Ok(Self::K56),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::K, value)),
+        }
+    }
+}
 impl std::fmt::Display for PotassiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

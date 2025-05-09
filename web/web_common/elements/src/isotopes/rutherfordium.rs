@@ -95,6 +95,30 @@ impl super::MostAbundantIsotope for RutherfordiumIsotope {
         Self::Rf268
     }
 }
+impl TryFrom<u16> for RutherfordiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            253u16 => Ok(Self::Rf253),
+            254u16 => Ok(Self::Rf254),
+            255u16 => Ok(Self::Rf255),
+            256u16 => Ok(Self::Rf256),
+            257u16 => Ok(Self::Rf257),
+            258u16 => Ok(Self::Rf258),
+            259u16 => Ok(Self::Rf259),
+            260u16 => Ok(Self::Rf260),
+            261u16 => Ok(Self::Rf261),
+            262u16 => Ok(Self::Rf262),
+            263u16 => Ok(Self::Rf263),
+            264u16 => Ok(Self::Rf264),
+            265u16 => Ok(Self::Rf265),
+            266u16 => Ok(Self::Rf266),
+            267u16 => Ok(Self::Rf267),
+            268u16 => Ok(Self::Rf268),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Rf, value)),
+        }
+    }
+}
 impl std::fmt::Display for RutherfordiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

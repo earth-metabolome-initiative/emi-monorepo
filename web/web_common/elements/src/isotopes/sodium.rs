@@ -111,6 +111,34 @@ impl super::MostAbundantIsotope for SodiumIsotope {
         Self::Na23
     }
 }
+impl TryFrom<u16> for SodiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            18u16 => Ok(Self::Na18),
+            19u16 => Ok(Self::Na19),
+            20u16 => Ok(Self::Na20),
+            21u16 => Ok(Self::Na21),
+            22u16 => Ok(Self::Na22),
+            23u16 => Ok(Self::Na23),
+            24u16 => Ok(Self::Na24),
+            25u16 => Ok(Self::Na25),
+            26u16 => Ok(Self::Na26),
+            27u16 => Ok(Self::Na27),
+            28u16 => Ok(Self::Na28),
+            29u16 => Ok(Self::Na29),
+            30u16 => Ok(Self::Na30),
+            31u16 => Ok(Self::Na31),
+            32u16 => Ok(Self::Na32),
+            33u16 => Ok(Self::Na33),
+            34u16 => Ok(Self::Na34),
+            35u16 => Ok(Self::Na35),
+            36u16 => Ok(Self::Na36),
+            37u16 => Ok(Self::Na37),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Na, value)),
+        }
+    }
+}
 impl std::fmt::Display for SodiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

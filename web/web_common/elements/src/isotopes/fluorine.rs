@@ -103,6 +103,32 @@ impl super::MostAbundantIsotope for FluorineIsotope {
         Self::F19
     }
 }
+impl TryFrom<u16> for FluorineIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            14u16 => Ok(Self::F14),
+            15u16 => Ok(Self::F15),
+            16u16 => Ok(Self::F16),
+            17u16 => Ok(Self::F17),
+            18u16 => Ok(Self::F18),
+            19u16 => Ok(Self::F19),
+            20u16 => Ok(Self::F20),
+            21u16 => Ok(Self::F21),
+            22u16 => Ok(Self::F22),
+            23u16 => Ok(Self::F23),
+            24u16 => Ok(Self::F24),
+            25u16 => Ok(Self::F25),
+            26u16 => Ok(Self::F26),
+            27u16 => Ok(Self::F27),
+            28u16 => Ok(Self::F28),
+            29u16 => Ok(Self::F29),
+            30u16 => Ok(Self::F30),
+            31u16 => Ok(Self::F31),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::F, value)),
+        }
+    }
+}
 impl std::fmt::Display for FluorineIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

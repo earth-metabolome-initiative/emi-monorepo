@@ -71,6 +71,24 @@ impl super::MostAbundantIsotope for NihoniumIsotope {
         Self::Nh287
     }
 }
+impl TryFrom<u16> for NihoniumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            278u16 => Ok(Self::Nh278),
+            279u16 => Ok(Self::Nh279),
+            280u16 => Ok(Self::Nh280),
+            281u16 => Ok(Self::Nh281),
+            282u16 => Ok(Self::Nh282),
+            283u16 => Ok(Self::Nh283),
+            284u16 => Ok(Self::Nh284),
+            285u16 => Ok(Self::Nh285),
+            286u16 => Ok(Self::Nh286),
+            287u16 => Ok(Self::Nh287),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Nh, value)),
+        }
+    }
+}
 impl std::fmt::Display for NihoniumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

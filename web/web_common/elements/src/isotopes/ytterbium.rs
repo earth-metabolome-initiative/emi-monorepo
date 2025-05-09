@@ -167,6 +167,48 @@ impl super::MostAbundantIsotope for YtterbiumIsotope {
         Self::Yb174
     }
 }
+impl TryFrom<u16> for YtterbiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            148u16 => Ok(Self::Yb148),
+            149u16 => Ok(Self::Yb149),
+            150u16 => Ok(Self::Yb150),
+            151u16 => Ok(Self::Yb151),
+            152u16 => Ok(Self::Yb152),
+            153u16 => Ok(Self::Yb153),
+            154u16 => Ok(Self::Yb154),
+            155u16 => Ok(Self::Yb155),
+            156u16 => Ok(Self::Yb156),
+            157u16 => Ok(Self::Yb157),
+            158u16 => Ok(Self::Yb158),
+            159u16 => Ok(Self::Yb159),
+            160u16 => Ok(Self::Yb160),
+            161u16 => Ok(Self::Yb161),
+            162u16 => Ok(Self::Yb162),
+            163u16 => Ok(Self::Yb163),
+            164u16 => Ok(Self::Yb164),
+            165u16 => Ok(Self::Yb165),
+            166u16 => Ok(Self::Yb166),
+            167u16 => Ok(Self::Yb167),
+            168u16 => Ok(Self::Yb168),
+            169u16 => Ok(Self::Yb169),
+            170u16 => Ok(Self::Yb170),
+            171u16 => Ok(Self::Yb171),
+            172u16 => Ok(Self::Yb172),
+            173u16 => Ok(Self::Yb173),
+            174u16 => Ok(Self::Yb174),
+            175u16 => Ok(Self::Yb175),
+            176u16 => Ok(Self::Yb176),
+            177u16 => Ok(Self::Yb177),
+            178u16 => Ok(Self::Yb178),
+            179u16 => Ok(Self::Yb179),
+            180u16 => Ok(Self::Yb180),
+            181u16 => Ok(Self::Yb181),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Yb, value)),
+        }
+    }
+}
 impl std::fmt::Display for YtterbiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

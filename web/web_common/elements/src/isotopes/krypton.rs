@@ -163,6 +163,47 @@ impl super::MostAbundantIsotope for KryptonIsotope {
         Self::Kr84
     }
 }
+impl TryFrom<u16> for KryptonIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            69u16 => Ok(Self::Kr69),
+            70u16 => Ok(Self::Kr70),
+            71u16 => Ok(Self::Kr71),
+            72u16 => Ok(Self::Kr72),
+            73u16 => Ok(Self::Kr73),
+            74u16 => Ok(Self::Kr74),
+            75u16 => Ok(Self::Kr75),
+            76u16 => Ok(Self::Kr76),
+            77u16 => Ok(Self::Kr77),
+            78u16 => Ok(Self::Kr78),
+            79u16 => Ok(Self::Kr79),
+            80u16 => Ok(Self::Kr80),
+            81u16 => Ok(Self::Kr81),
+            82u16 => Ok(Self::Kr82),
+            83u16 => Ok(Self::Kr83),
+            84u16 => Ok(Self::Kr84),
+            85u16 => Ok(Self::Kr85),
+            86u16 => Ok(Self::Kr86),
+            87u16 => Ok(Self::Kr87),
+            88u16 => Ok(Self::Kr88),
+            89u16 => Ok(Self::Kr89),
+            90u16 => Ok(Self::Kr90),
+            91u16 => Ok(Self::Kr91),
+            92u16 => Ok(Self::Kr92),
+            93u16 => Ok(Self::Kr93),
+            94u16 => Ok(Self::Kr94),
+            95u16 => Ok(Self::Kr95),
+            96u16 => Ok(Self::Kr96),
+            97u16 => Ok(Self::Kr97),
+            98u16 => Ok(Self::Kr98),
+            99u16 => Ok(Self::Kr99),
+            100u16 => Ok(Self::Kr100),
+            101u16 => Ok(Self::Kr101),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Kr, value)),
+        }
+    }
+}
 impl std::fmt::Display for KryptonIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

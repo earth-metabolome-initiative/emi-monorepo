@@ -91,6 +91,29 @@ impl super::MostAbundantIsotope for MeitneriumIsotope {
         Self::Mt279
     }
 }
+impl TryFrom<u16> for MeitneriumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            265u16 => Ok(Self::Mt265),
+            266u16 => Ok(Self::Mt266),
+            267u16 => Ok(Self::Mt267),
+            268u16 => Ok(Self::Mt268),
+            269u16 => Ok(Self::Mt269),
+            270u16 => Ok(Self::Mt270),
+            271u16 => Ok(Self::Mt271),
+            272u16 => Ok(Self::Mt272),
+            273u16 => Ok(Self::Mt273),
+            274u16 => Ok(Self::Mt274),
+            275u16 => Ok(Self::Mt275),
+            276u16 => Ok(Self::Mt276),
+            277u16 => Ok(Self::Mt277),
+            278u16 => Ok(Self::Mt278),
+            279u16 => Ok(Self::Mt279),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Mt, value)),
+        }
+    }
+}
 impl std::fmt::Display for MeitneriumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

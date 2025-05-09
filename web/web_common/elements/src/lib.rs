@@ -17,7 +17,10 @@ mod name;
 mod oxidation_states;
 mod standard_atomic_weight;
 mod try_from;
-pub use isotopes::{Isotope, IsotopicComposition, MostAbundantIsotope, RelativeAtomicMass};
+pub use isotopes::{
+    ElementVariant, Isotope, IsotopicComposition, MassNumber, MostAbundantIsotope,
+    RelativeAtomicMass,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, strum_macros::EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

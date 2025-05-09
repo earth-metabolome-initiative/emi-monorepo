@@ -2,7 +2,7 @@
 //! [`Element`] enum.
 
 impl TryFrom<char> for crate::Element {
-    type Error = crate::errors::UnknownElement;
+    type Error = crate::errors::Error;
 
     fn try_from(value: char) -> Result<Self, Self::Error> {
         Ok(match value {
@@ -21,14 +21,14 @@ impl TryFrom<char> for crate::Element {
             'W' => Self::W,
             'U' => Self::U,
             _ => {
-                return Err(crate::errors::UnknownElement::Unknown([value, ' ']));
+                return Err(crate::errors::Error::Element([value, ' ']));
             }
         })
     }
 }
 
 impl TryFrom<[char; 2]> for crate::Element {
-    type Error = crate::errors::UnknownElement;
+    type Error = crate::errors::Error;
 
     fn try_from(value: [char; 2]) -> Result<Self, Self::Error> {
         Ok(match value {
@@ -137,14 +137,14 @@ impl TryFrom<[char; 2]> for crate::Element {
             ['T', 's'] => Self::Ts,
             ['O', 'g'] => Self::Og,
             _ => {
-                return Err(crate::errors::UnknownElement::Unknown(value));
+                return Err(crate::errors::Error::Element(value));
             }
         })
     }
 }
 
 impl TryFrom<&str> for crate::Element {
-    type Error = crate::errors::UnknownElement;
+    type Error = crate::errors::Error;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         <Self as std::str::FromStr>::from_str(value)
@@ -152,7 +152,7 @@ impl TryFrom<&str> for crate::Element {
 }
 
 impl TryFrom<String> for crate::Element {
-    type Error = crate::errors::UnknownElement;
+    type Error = crate::errors::Error;
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
         Self::try_from(value.as_str())

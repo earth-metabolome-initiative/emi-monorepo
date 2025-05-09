@@ -139,6 +139,41 @@ impl super::MostAbundantIsotope for UraniumIsotope {
         Self::U238
     }
 }
+impl TryFrom<u16> for UraniumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            217u16 => Ok(Self::U217),
+            218u16 => Ok(Self::U218),
+            219u16 => Ok(Self::U219),
+            220u16 => Ok(Self::U220),
+            221u16 => Ok(Self::U221),
+            222u16 => Ok(Self::U222),
+            223u16 => Ok(Self::U223),
+            224u16 => Ok(Self::U224),
+            225u16 => Ok(Self::U225),
+            226u16 => Ok(Self::U226),
+            227u16 => Ok(Self::U227),
+            228u16 => Ok(Self::U228),
+            229u16 => Ok(Self::U229),
+            230u16 => Ok(Self::U230),
+            231u16 => Ok(Self::U231),
+            232u16 => Ok(Self::U232),
+            233u16 => Ok(Self::U233),
+            234u16 => Ok(Self::U234),
+            235u16 => Ok(Self::U235),
+            236u16 => Ok(Self::U236),
+            237u16 => Ok(Self::U237),
+            238u16 => Ok(Self::U238),
+            239u16 => Ok(Self::U239),
+            240u16 => Ok(Self::U240),
+            241u16 => Ok(Self::U241),
+            242u16 => Ok(Self::U242),
+            243u16 => Ok(Self::U243),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::U, value)),
+        }
+    }
+}
 impl std::fmt::Display for UraniumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

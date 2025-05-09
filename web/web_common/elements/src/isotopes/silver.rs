@@ -183,6 +183,52 @@ impl super::MostAbundantIsotope for SilverIsotope {
         Self::Ag107
     }
 }
+impl TryFrom<u16> for SilverIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            93u16 => Ok(Self::Ag93),
+            94u16 => Ok(Self::Ag94),
+            95u16 => Ok(Self::Ag95),
+            96u16 => Ok(Self::Ag96),
+            97u16 => Ok(Self::Ag97),
+            98u16 => Ok(Self::Ag98),
+            99u16 => Ok(Self::Ag99),
+            100u16 => Ok(Self::Ag100),
+            101u16 => Ok(Self::Ag101),
+            102u16 => Ok(Self::Ag102),
+            103u16 => Ok(Self::Ag103),
+            104u16 => Ok(Self::Ag104),
+            105u16 => Ok(Self::Ag105),
+            106u16 => Ok(Self::Ag106),
+            107u16 => Ok(Self::Ag107),
+            108u16 => Ok(Self::Ag108),
+            109u16 => Ok(Self::Ag109),
+            110u16 => Ok(Self::Ag110),
+            111u16 => Ok(Self::Ag111),
+            112u16 => Ok(Self::Ag112),
+            113u16 => Ok(Self::Ag113),
+            114u16 => Ok(Self::Ag114),
+            115u16 => Ok(Self::Ag115),
+            116u16 => Ok(Self::Ag116),
+            117u16 => Ok(Self::Ag117),
+            118u16 => Ok(Self::Ag118),
+            119u16 => Ok(Self::Ag119),
+            120u16 => Ok(Self::Ag120),
+            121u16 => Ok(Self::Ag121),
+            122u16 => Ok(Self::Ag122),
+            123u16 => Ok(Self::Ag123),
+            124u16 => Ok(Self::Ag124),
+            125u16 => Ok(Self::Ag125),
+            126u16 => Ok(Self::Ag126),
+            127u16 => Ok(Self::Ag127),
+            128u16 => Ok(Self::Ag128),
+            129u16 => Ok(Self::Ag129),
+            130u16 => Ok(Self::Ag130),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Ag, value)),
+        }
+    }
+}
 impl std::fmt::Display for SilverIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

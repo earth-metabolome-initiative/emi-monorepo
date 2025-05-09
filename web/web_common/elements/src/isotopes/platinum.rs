@@ -195,6 +195,55 @@ impl super::MostAbundantIsotope for PlatinumIsotope {
         Self::Pt195
     }
 }
+impl TryFrom<u16> for PlatinumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            166u16 => Ok(Self::Pt166),
+            167u16 => Ok(Self::Pt167),
+            168u16 => Ok(Self::Pt168),
+            169u16 => Ok(Self::Pt169),
+            170u16 => Ok(Self::Pt170),
+            171u16 => Ok(Self::Pt171),
+            172u16 => Ok(Self::Pt172),
+            173u16 => Ok(Self::Pt173),
+            174u16 => Ok(Self::Pt174),
+            175u16 => Ok(Self::Pt175),
+            176u16 => Ok(Self::Pt176),
+            177u16 => Ok(Self::Pt177),
+            178u16 => Ok(Self::Pt178),
+            179u16 => Ok(Self::Pt179),
+            180u16 => Ok(Self::Pt180),
+            181u16 => Ok(Self::Pt181),
+            182u16 => Ok(Self::Pt182),
+            183u16 => Ok(Self::Pt183),
+            184u16 => Ok(Self::Pt184),
+            185u16 => Ok(Self::Pt185),
+            186u16 => Ok(Self::Pt186),
+            187u16 => Ok(Self::Pt187),
+            188u16 => Ok(Self::Pt188),
+            189u16 => Ok(Self::Pt189),
+            190u16 => Ok(Self::Pt190),
+            191u16 => Ok(Self::Pt191),
+            192u16 => Ok(Self::Pt192),
+            193u16 => Ok(Self::Pt193),
+            194u16 => Ok(Self::Pt194),
+            195u16 => Ok(Self::Pt195),
+            196u16 => Ok(Self::Pt196),
+            197u16 => Ok(Self::Pt197),
+            198u16 => Ok(Self::Pt198),
+            199u16 => Ok(Self::Pt199),
+            200u16 => Ok(Self::Pt200),
+            201u16 => Ok(Self::Pt201),
+            202u16 => Ok(Self::Pt202),
+            203u16 => Ok(Self::Pt203),
+            204u16 => Ok(Self::Pt204),
+            205u16 => Ok(Self::Pt205),
+            206u16 => Ok(Self::Pt206),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Pt, value)),
+        }
+    }
+}
 impl std::fmt::Display for PlatinumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

@@ -183,6 +183,52 @@ impl super::MostAbundantIsotope for EuropiumIsotope {
         Self::Eu153
     }
 }
+impl TryFrom<u16> for EuropiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            130u16 => Ok(Self::Eu130),
+            131u16 => Ok(Self::Eu131),
+            132u16 => Ok(Self::Eu132),
+            133u16 => Ok(Self::Eu133),
+            134u16 => Ok(Self::Eu134),
+            135u16 => Ok(Self::Eu135),
+            136u16 => Ok(Self::Eu136),
+            137u16 => Ok(Self::Eu137),
+            138u16 => Ok(Self::Eu138),
+            139u16 => Ok(Self::Eu139),
+            140u16 => Ok(Self::Eu140),
+            141u16 => Ok(Self::Eu141),
+            142u16 => Ok(Self::Eu142),
+            143u16 => Ok(Self::Eu143),
+            144u16 => Ok(Self::Eu144),
+            145u16 => Ok(Self::Eu145),
+            146u16 => Ok(Self::Eu146),
+            147u16 => Ok(Self::Eu147),
+            148u16 => Ok(Self::Eu148),
+            149u16 => Ok(Self::Eu149),
+            150u16 => Ok(Self::Eu150),
+            151u16 => Ok(Self::Eu151),
+            152u16 => Ok(Self::Eu152),
+            153u16 => Ok(Self::Eu153),
+            154u16 => Ok(Self::Eu154),
+            155u16 => Ok(Self::Eu155),
+            156u16 => Ok(Self::Eu156),
+            157u16 => Ok(Self::Eu157),
+            158u16 => Ok(Self::Eu158),
+            159u16 => Ok(Self::Eu159),
+            160u16 => Ok(Self::Eu160),
+            161u16 => Ok(Self::Eu161),
+            162u16 => Ok(Self::Eu162),
+            163u16 => Ok(Self::Eu163),
+            164u16 => Ok(Self::Eu164),
+            165u16 => Ok(Self::Eu165),
+            166u16 => Ok(Self::Eu166),
+            167u16 => Ok(Self::Eu167),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Eu, value)),
+        }
+    }
+}
 impl std::fmt::Display for EuropiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

@@ -95,6 +95,30 @@ impl super::MostAbundantIsotope for BohriumIsotope {
         Self::Bh275
     }
 }
+impl TryFrom<u16> for BohriumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            260u16 => Ok(Self::Bh260),
+            261u16 => Ok(Self::Bh261),
+            262u16 => Ok(Self::Bh262),
+            263u16 => Ok(Self::Bh263),
+            264u16 => Ok(Self::Bh264),
+            265u16 => Ok(Self::Bh265),
+            266u16 => Ok(Self::Bh266),
+            267u16 => Ok(Self::Bh267),
+            268u16 => Ok(Self::Bh268),
+            269u16 => Ok(Self::Bh269),
+            270u16 => Ok(Self::Bh270),
+            271u16 => Ok(Self::Bh271),
+            272u16 => Ok(Self::Bh272),
+            273u16 => Ok(Self::Bh273),
+            274u16 => Ok(Self::Bh274),
+            275u16 => Ok(Self::Bh275),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Bh, value)),
+        }
+    }
+}
 impl std::fmt::Display for BohriumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

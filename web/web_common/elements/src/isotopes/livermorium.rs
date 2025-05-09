@@ -51,6 +51,19 @@ impl super::MostAbundantIsotope for LivermoriumIsotope {
         Self::Lv293
     }
 }
+impl TryFrom<u16> for LivermoriumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            289u16 => Ok(Self::Lv289),
+            290u16 => Ok(Self::Lv290),
+            291u16 => Ok(Self::Lv291),
+            292u16 => Ok(Self::Lv292),
+            293u16 => Ok(Self::Lv293),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Lv, value)),
+        }
+    }
+}
 impl std::fmt::Display for LivermoriumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

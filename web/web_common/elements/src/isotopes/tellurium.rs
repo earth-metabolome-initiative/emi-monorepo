@@ -187,6 +187,53 @@ impl super::MostAbundantIsotope for TelluriumIsotope {
         Self::Te130
     }
 }
+impl TryFrom<u16> for TelluriumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            105u16 => Ok(Self::Te105),
+            106u16 => Ok(Self::Te106),
+            107u16 => Ok(Self::Te107),
+            108u16 => Ok(Self::Te108),
+            109u16 => Ok(Self::Te109),
+            110u16 => Ok(Self::Te110),
+            111u16 => Ok(Self::Te111),
+            112u16 => Ok(Self::Te112),
+            113u16 => Ok(Self::Te113),
+            114u16 => Ok(Self::Te114),
+            115u16 => Ok(Self::Te115),
+            116u16 => Ok(Self::Te116),
+            117u16 => Ok(Self::Te117),
+            118u16 => Ok(Self::Te118),
+            119u16 => Ok(Self::Te119),
+            120u16 => Ok(Self::Te120),
+            121u16 => Ok(Self::Te121),
+            122u16 => Ok(Self::Te122),
+            123u16 => Ok(Self::Te123),
+            124u16 => Ok(Self::Te124),
+            125u16 => Ok(Self::Te125),
+            126u16 => Ok(Self::Te126),
+            127u16 => Ok(Self::Te127),
+            128u16 => Ok(Self::Te128),
+            129u16 => Ok(Self::Te129),
+            130u16 => Ok(Self::Te130),
+            131u16 => Ok(Self::Te131),
+            132u16 => Ok(Self::Te132),
+            133u16 => Ok(Self::Te133),
+            134u16 => Ok(Self::Te134),
+            135u16 => Ok(Self::Te135),
+            136u16 => Ok(Self::Te136),
+            137u16 => Ok(Self::Te137),
+            138u16 => Ok(Self::Te138),
+            139u16 => Ok(Self::Te139),
+            140u16 => Ok(Self::Te140),
+            141u16 => Ok(Self::Te141),
+            142u16 => Ok(Self::Te142),
+            143u16 => Ok(Self::Te143),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Te, value)),
+        }
+    }
+}
 impl std::fmt::Display for TelluriumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

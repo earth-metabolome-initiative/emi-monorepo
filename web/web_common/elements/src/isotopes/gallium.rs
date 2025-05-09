@@ -159,6 +159,46 @@ impl super::MostAbundantIsotope for GalliumIsotope {
         Self::Ga69
     }
 }
+impl TryFrom<u16> for GalliumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            56u16 => Ok(Self::Ga56),
+            57u16 => Ok(Self::Ga57),
+            58u16 => Ok(Self::Ga58),
+            59u16 => Ok(Self::Ga59),
+            60u16 => Ok(Self::Ga60),
+            61u16 => Ok(Self::Ga61),
+            62u16 => Ok(Self::Ga62),
+            63u16 => Ok(Self::Ga63),
+            64u16 => Ok(Self::Ga64),
+            65u16 => Ok(Self::Ga65),
+            66u16 => Ok(Self::Ga66),
+            67u16 => Ok(Self::Ga67),
+            68u16 => Ok(Self::Ga68),
+            69u16 => Ok(Self::Ga69),
+            70u16 => Ok(Self::Ga70),
+            71u16 => Ok(Self::Ga71),
+            72u16 => Ok(Self::Ga72),
+            73u16 => Ok(Self::Ga73),
+            74u16 => Ok(Self::Ga74),
+            75u16 => Ok(Self::Ga75),
+            76u16 => Ok(Self::Ga76),
+            77u16 => Ok(Self::Ga77),
+            78u16 => Ok(Self::Ga78),
+            79u16 => Ok(Self::Ga79),
+            80u16 => Ok(Self::Ga80),
+            81u16 => Ok(Self::Ga81),
+            82u16 => Ok(Self::Ga82),
+            83u16 => Ok(Self::Ga83),
+            84u16 => Ok(Self::Ga84),
+            85u16 => Ok(Self::Ga85),
+            86u16 => Ok(Self::Ga86),
+            87u16 => Ok(Self::Ga87),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Ga, value)),
+        }
+    }
+}
 impl std::fmt::Display for GalliumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

@@ -51,6 +51,19 @@ impl super::MostAbundantIsotope for MoscoviumIsotope {
         Self::Uup291
     }
 }
+impl TryFrom<u16> for MoscoviumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            287u16 => Ok(Self::Mc287),
+            288u16 => Ok(Self::Mc288),
+            289u16 => Ok(Self::Mc289),
+            290u16 => Ok(Self::Mc290),
+            291u16 => Ok(Self::Uup291),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Mc, value)),
+        }
+    }
+}
 impl std::fmt::Display for MoscoviumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

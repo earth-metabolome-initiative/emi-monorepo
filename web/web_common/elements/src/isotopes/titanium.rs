@@ -135,6 +135,40 @@ impl super::MostAbundantIsotope for TitaniumIsotope {
         Self::Ti48
     }
 }
+impl TryFrom<u16> for TitaniumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            38u16 => Ok(Self::Ti38),
+            39u16 => Ok(Self::Ti39),
+            40u16 => Ok(Self::Ti40),
+            41u16 => Ok(Self::Ti41),
+            42u16 => Ok(Self::Ti42),
+            43u16 => Ok(Self::Ti43),
+            44u16 => Ok(Self::Ti44),
+            45u16 => Ok(Self::Ti45),
+            46u16 => Ok(Self::Ti46),
+            47u16 => Ok(Self::Ti47),
+            48u16 => Ok(Self::Ti48),
+            49u16 => Ok(Self::Ti49),
+            50u16 => Ok(Self::Ti50),
+            51u16 => Ok(Self::Ti51),
+            52u16 => Ok(Self::Ti52),
+            53u16 => Ok(Self::Ti53),
+            54u16 => Ok(Self::Ti54),
+            55u16 => Ok(Self::Ti55),
+            56u16 => Ok(Self::Ti56),
+            57u16 => Ok(Self::Ti57),
+            58u16 => Ok(Self::Ti58),
+            59u16 => Ok(Self::Ti59),
+            60u16 => Ok(Self::Ti60),
+            61u16 => Ok(Self::Ti61),
+            62u16 => Ok(Self::Ti62),
+            63u16 => Ok(Self::Ti63),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Ti, value)),
+        }
+    }
+}
 impl std::fmt::Display for TitaniumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

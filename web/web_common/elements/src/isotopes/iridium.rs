@@ -195,6 +195,55 @@ impl super::MostAbundantIsotope for IridiumIsotope {
         Self::Ir193
     }
 }
+impl TryFrom<u16> for IridiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            164u16 => Ok(Self::Ir164),
+            165u16 => Ok(Self::Ir165),
+            166u16 => Ok(Self::Ir166),
+            167u16 => Ok(Self::Ir167),
+            168u16 => Ok(Self::Ir168),
+            169u16 => Ok(Self::Ir169),
+            170u16 => Ok(Self::Ir170),
+            171u16 => Ok(Self::Ir171),
+            172u16 => Ok(Self::Ir172),
+            173u16 => Ok(Self::Ir173),
+            174u16 => Ok(Self::Ir174),
+            175u16 => Ok(Self::Ir175),
+            176u16 => Ok(Self::Ir176),
+            177u16 => Ok(Self::Ir177),
+            178u16 => Ok(Self::Ir178),
+            179u16 => Ok(Self::Ir179),
+            180u16 => Ok(Self::Ir180),
+            181u16 => Ok(Self::Ir181),
+            182u16 => Ok(Self::Ir182),
+            183u16 => Ok(Self::Ir183),
+            184u16 => Ok(Self::Ir184),
+            185u16 => Ok(Self::Ir185),
+            186u16 => Ok(Self::Ir186),
+            187u16 => Ok(Self::Ir187),
+            188u16 => Ok(Self::Ir188),
+            189u16 => Ok(Self::Ir189),
+            190u16 => Ok(Self::Ir190),
+            191u16 => Ok(Self::Ir191),
+            192u16 => Ok(Self::Ir192),
+            193u16 => Ok(Self::Ir193),
+            194u16 => Ok(Self::Ir194),
+            195u16 => Ok(Self::Ir195),
+            196u16 => Ok(Self::Ir196),
+            197u16 => Ok(Self::Ir197),
+            198u16 => Ok(Self::Ir198),
+            199u16 => Ok(Self::Ir199),
+            200u16 => Ok(Self::Ir200),
+            201u16 => Ok(Self::Ir201),
+            202u16 => Ok(Self::Ir202),
+            203u16 => Ok(Self::Ir203),
+            204u16 => Ok(Self::Ir204),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Ir, value)),
+        }
+    }
+}
 impl std::fmt::Display for IridiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

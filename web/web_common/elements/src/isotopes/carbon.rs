@@ -95,6 +95,30 @@ impl super::MostAbundantIsotope for CarbonIsotope {
         Self::C12
     }
 }
+impl TryFrom<u16> for CarbonIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            8u16 => Ok(Self::C8),
+            9u16 => Ok(Self::C9),
+            10u16 => Ok(Self::C10),
+            11u16 => Ok(Self::C11),
+            12u16 => Ok(Self::C12),
+            13u16 => Ok(Self::C13),
+            14u16 => Ok(Self::C14),
+            15u16 => Ok(Self::C15),
+            16u16 => Ok(Self::C16),
+            17u16 => Ok(Self::C17),
+            18u16 => Ok(Self::C18),
+            19u16 => Ok(Self::C19),
+            20u16 => Ok(Self::C20),
+            21u16 => Ok(Self::C21),
+            22u16 => Ok(Self::C22),
+            23u16 => Ok(Self::C23),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::C, value)),
+        }
+    }
+}
 impl std::fmt::Display for CarbonIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

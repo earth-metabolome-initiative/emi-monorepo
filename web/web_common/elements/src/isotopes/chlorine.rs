@@ -127,6 +127,38 @@ impl super::MostAbundantIsotope for ChlorineIsotope {
         Self::Cl35
     }
 }
+impl TryFrom<u16> for ChlorineIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            28u16 => Ok(Self::Cl28),
+            29u16 => Ok(Self::Cl29),
+            30u16 => Ok(Self::Cl30),
+            31u16 => Ok(Self::Cl31),
+            32u16 => Ok(Self::Cl32),
+            33u16 => Ok(Self::Cl33),
+            34u16 => Ok(Self::Cl34),
+            35u16 => Ok(Self::Cl35),
+            36u16 => Ok(Self::Cl36),
+            37u16 => Ok(Self::Cl37),
+            38u16 => Ok(Self::Cl38),
+            39u16 => Ok(Self::Cl39),
+            40u16 => Ok(Self::Cl40),
+            41u16 => Ok(Self::Cl41),
+            42u16 => Ok(Self::Cl42),
+            43u16 => Ok(Self::Cl43),
+            44u16 => Ok(Self::Cl44),
+            45u16 => Ok(Self::Cl45),
+            46u16 => Ok(Self::Cl46),
+            47u16 => Ok(Self::Cl47),
+            48u16 => Ok(Self::Cl48),
+            49u16 => Ok(Self::Cl49),
+            50u16 => Ok(Self::Cl50),
+            51u16 => Ok(Self::Cl51),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Cl, value)),
+        }
+    }
+}
 impl std::fmt::Display for ChlorineIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

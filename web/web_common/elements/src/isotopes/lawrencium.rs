@@ -95,6 +95,30 @@ impl super::MostAbundantIsotope for LawrenciumIsotope {
         Self::Lr266
     }
 }
+impl TryFrom<u16> for LawrenciumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            251u16 => Ok(Self::Lr251),
+            252u16 => Ok(Self::Lr252),
+            253u16 => Ok(Self::Lr253),
+            254u16 => Ok(Self::Lr254),
+            255u16 => Ok(Self::Lr255),
+            256u16 => Ok(Self::Lr256),
+            257u16 => Ok(Self::Lr257),
+            258u16 => Ok(Self::Lr258),
+            259u16 => Ok(Self::Lr259),
+            260u16 => Ok(Self::Lr260),
+            261u16 => Ok(Self::Lr261),
+            262u16 => Ok(Self::Lr262),
+            263u16 => Ok(Self::Lr263),
+            264u16 => Ok(Self::Lr264),
+            265u16 => Ok(Self::Lr265),
+            266u16 => Ok(Self::Lr266),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Lr, value)),
+        }
+    }
+}
 impl std::fmt::Display for LawrenciumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

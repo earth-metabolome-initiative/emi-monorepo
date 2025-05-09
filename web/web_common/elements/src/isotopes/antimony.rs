@@ -183,6 +183,52 @@ impl super::MostAbundantIsotope for AntimonyIsotope {
         Self::Sb121
     }
 }
+impl TryFrom<u16> for AntimonyIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            103u16 => Ok(Self::Sb103),
+            104u16 => Ok(Self::Sb104),
+            105u16 => Ok(Self::Sb105),
+            106u16 => Ok(Self::Sb106),
+            107u16 => Ok(Self::Sb107),
+            108u16 => Ok(Self::Sb108),
+            109u16 => Ok(Self::Sb109),
+            110u16 => Ok(Self::Sb110),
+            111u16 => Ok(Self::Sb111),
+            112u16 => Ok(Self::Sb112),
+            113u16 => Ok(Self::Sb113),
+            114u16 => Ok(Self::Sb114),
+            115u16 => Ok(Self::Sb115),
+            116u16 => Ok(Self::Sb116),
+            117u16 => Ok(Self::Sb117),
+            118u16 => Ok(Self::Sb118),
+            119u16 => Ok(Self::Sb119),
+            120u16 => Ok(Self::Sb120),
+            121u16 => Ok(Self::Sb121),
+            122u16 => Ok(Self::Sb122),
+            123u16 => Ok(Self::Sb123),
+            124u16 => Ok(Self::Sb124),
+            125u16 => Ok(Self::Sb125),
+            126u16 => Ok(Self::Sb126),
+            127u16 => Ok(Self::Sb127),
+            128u16 => Ok(Self::Sb128),
+            129u16 => Ok(Self::Sb129),
+            130u16 => Ok(Self::Sb130),
+            131u16 => Ok(Self::Sb131),
+            132u16 => Ok(Self::Sb132),
+            133u16 => Ok(Self::Sb133),
+            134u16 => Ok(Self::Sb134),
+            135u16 => Ok(Self::Sb135),
+            136u16 => Ok(Self::Sb136),
+            137u16 => Ok(Self::Sb137),
+            138u16 => Ok(Self::Sb138),
+            139u16 => Ok(Self::Sb139),
+            140u16 => Ok(Self::Sb140),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Sb, value)),
+        }
+    }
+}
 impl std::fmt::Display for AntimonyIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

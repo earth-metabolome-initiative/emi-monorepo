@@ -99,6 +99,31 @@ impl super::MostAbundantIsotope for OxygenIsotope {
         Self::O16
     }
 }
+impl TryFrom<u16> for OxygenIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            12u16 => Ok(Self::O12),
+            13u16 => Ok(Self::O13),
+            14u16 => Ok(Self::O14),
+            15u16 => Ok(Self::O15),
+            16u16 => Ok(Self::O16),
+            17u16 => Ok(Self::O17),
+            18u16 => Ok(Self::O18),
+            19u16 => Ok(Self::O19),
+            20u16 => Ok(Self::O20),
+            21u16 => Ok(Self::O21),
+            22u16 => Ok(Self::O22),
+            23u16 => Ok(Self::O23),
+            24u16 => Ok(Self::O24),
+            25u16 => Ok(Self::O25),
+            26u16 => Ok(Self::O26),
+            27u16 => Ok(Self::O27),
+            28u16 => Ok(Self::O28),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::O, value)),
+        }
+    }
+}
 impl std::fmt::Display for OxygenIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

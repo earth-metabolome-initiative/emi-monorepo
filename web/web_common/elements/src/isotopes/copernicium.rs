@@ -71,6 +71,24 @@ impl super::MostAbundantIsotope for CoperniciumIsotope {
         Self::Cn285
     }
 }
+impl TryFrom<u16> for CoperniciumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            276u16 => Ok(Self::Cn276),
+            277u16 => Ok(Self::Cn277),
+            278u16 => Ok(Self::Cn278),
+            279u16 => Ok(Self::Cn279),
+            280u16 => Ok(Self::Cn280),
+            281u16 => Ok(Self::Cn281),
+            282u16 => Ok(Self::Cn282),
+            283u16 => Ok(Self::Cn283),
+            284u16 => Ok(Self::Cn284),
+            285u16 => Ok(Self::Cn285),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Cn, value)),
+        }
+    }
+}
 impl std::fmt::Display for CoperniciumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

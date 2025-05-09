@@ -111,6 +111,34 @@ impl super::MostAbundantIsotope for EinsteiniumIsotope {
         Self::Es258
     }
 }
+impl TryFrom<u16> for EinsteiniumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            239u16 => Ok(Self::Es239),
+            240u16 => Ok(Self::Es240),
+            241u16 => Ok(Self::Es241),
+            242u16 => Ok(Self::Es242),
+            243u16 => Ok(Self::Es243),
+            244u16 => Ok(Self::Es244),
+            245u16 => Ok(Self::Es245),
+            246u16 => Ok(Self::Es246),
+            247u16 => Ok(Self::Es247),
+            248u16 => Ok(Self::Es248),
+            249u16 => Ok(Self::Es249),
+            250u16 => Ok(Self::Es250),
+            251u16 => Ok(Self::Es251),
+            252u16 => Ok(Self::Es252),
+            253u16 => Ok(Self::Es253),
+            254u16 => Ok(Self::Es254),
+            255u16 => Ok(Self::Es255),
+            256u16 => Ok(Self::Es256),
+            257u16 => Ok(Self::Es257),
+            258u16 => Ok(Self::Es258),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Es, value)),
+        }
+    }
+}
 impl std::fmt::Display for EinsteiniumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

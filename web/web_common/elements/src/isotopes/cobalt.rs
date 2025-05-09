@@ -151,6 +151,44 @@ impl super::MostAbundantIsotope for CobaltIsotope {
         Self::Co59
     }
 }
+impl TryFrom<u16> for CobaltIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            47u16 => Ok(Self::Co47),
+            48u16 => Ok(Self::Co48),
+            49u16 => Ok(Self::Co49),
+            50u16 => Ok(Self::Co50),
+            51u16 => Ok(Self::Co51),
+            52u16 => Ok(Self::Co52),
+            53u16 => Ok(Self::Co53),
+            54u16 => Ok(Self::Co54),
+            55u16 => Ok(Self::Co55),
+            56u16 => Ok(Self::Co56),
+            57u16 => Ok(Self::Co57),
+            58u16 => Ok(Self::Co58),
+            59u16 => Ok(Self::Co59),
+            60u16 => Ok(Self::Co60),
+            61u16 => Ok(Self::Co61),
+            62u16 => Ok(Self::Co62),
+            63u16 => Ok(Self::Co63),
+            64u16 => Ok(Self::Co64),
+            65u16 => Ok(Self::Co65),
+            66u16 => Ok(Self::Co66),
+            67u16 => Ok(Self::Co67),
+            68u16 => Ok(Self::Co68),
+            69u16 => Ok(Self::Co69),
+            70u16 => Ok(Self::Co70),
+            71u16 => Ok(Self::Co71),
+            72u16 => Ok(Self::Co72),
+            73u16 => Ok(Self::Co73),
+            74u16 => Ok(Self::Co74),
+            75u16 => Ok(Self::Co75),
+            76u16 => Ok(Self::Co76),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Co, value)),
+        }
+    }
+}
 impl std::fmt::Display for CobaltIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

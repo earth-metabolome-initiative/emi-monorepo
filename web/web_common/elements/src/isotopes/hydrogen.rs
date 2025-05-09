@@ -59,6 +59,21 @@ impl super::MostAbundantIsotope for HydrogenIsotope {
         Self::H1
     }
 }
+impl TryFrom<u16> for HydrogenIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            1u16 => Ok(Self::H1),
+            2u16 => Ok(Self::D2),
+            3u16 => Ok(Self::T3),
+            4u16 => Ok(Self::H4),
+            5u16 => Ok(Self::H5),
+            6u16 => Ok(Self::H6),
+            7u16 => Ok(Self::H7),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::H, value)),
+        }
+    }
+}
 impl std::fmt::Display for HydrogenIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

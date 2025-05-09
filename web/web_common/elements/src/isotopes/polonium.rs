@@ -199,6 +199,56 @@ impl super::MostAbundantIsotope for PoloniumIsotope {
         Self::Po227
     }
 }
+impl TryFrom<u16> for PoloniumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            186u16 => Ok(Self::Po186),
+            187u16 => Ok(Self::Po187),
+            188u16 => Ok(Self::Po188),
+            189u16 => Ok(Self::Po189),
+            190u16 => Ok(Self::Po190),
+            191u16 => Ok(Self::Po191),
+            192u16 => Ok(Self::Po192),
+            193u16 => Ok(Self::Po193),
+            194u16 => Ok(Self::Po194),
+            195u16 => Ok(Self::Po195),
+            196u16 => Ok(Self::Po196),
+            197u16 => Ok(Self::Po197),
+            198u16 => Ok(Self::Po198),
+            199u16 => Ok(Self::Po199),
+            200u16 => Ok(Self::Po200),
+            201u16 => Ok(Self::Po201),
+            202u16 => Ok(Self::Po202),
+            203u16 => Ok(Self::Po203),
+            204u16 => Ok(Self::Po204),
+            205u16 => Ok(Self::Po205),
+            206u16 => Ok(Self::Po206),
+            207u16 => Ok(Self::Po207),
+            208u16 => Ok(Self::Po208),
+            209u16 => Ok(Self::Po209),
+            210u16 => Ok(Self::Po210),
+            211u16 => Ok(Self::Po211),
+            212u16 => Ok(Self::Po212),
+            213u16 => Ok(Self::Po213),
+            214u16 => Ok(Self::Po214),
+            215u16 => Ok(Self::Po215),
+            216u16 => Ok(Self::Po216),
+            217u16 => Ok(Self::Po217),
+            218u16 => Ok(Self::Po218),
+            219u16 => Ok(Self::Po219),
+            220u16 => Ok(Self::Po220),
+            221u16 => Ok(Self::Po221),
+            222u16 => Ok(Self::Po222),
+            223u16 => Ok(Self::Po223),
+            224u16 => Ok(Self::Po224),
+            225u16 => Ok(Self::Po225),
+            226u16 => Ok(Self::Po226),
+            227u16 => Ok(Self::Po227),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Po, value)),
+        }
+    }
+}
 impl std::fmt::Display for PoloniumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

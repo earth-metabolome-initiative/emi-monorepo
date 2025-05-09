@@ -135,6 +135,40 @@ impl super::MostAbundantIsotope for ScandiumIsotope {
         Self::Sc45
     }
 }
+impl TryFrom<u16> for ScandiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            36u16 => Ok(Self::Sc36),
+            37u16 => Ok(Self::Sc37),
+            38u16 => Ok(Self::Sc38),
+            39u16 => Ok(Self::Sc39),
+            40u16 => Ok(Self::Sc40),
+            41u16 => Ok(Self::Sc41),
+            42u16 => Ok(Self::Sc42),
+            43u16 => Ok(Self::Sc43),
+            44u16 => Ok(Self::Sc44),
+            45u16 => Ok(Self::Sc45),
+            46u16 => Ok(Self::Sc46),
+            47u16 => Ok(Self::Sc47),
+            48u16 => Ok(Self::Sc48),
+            49u16 => Ok(Self::Sc49),
+            50u16 => Ok(Self::Sc50),
+            51u16 => Ok(Self::Sc51),
+            52u16 => Ok(Self::Sc52),
+            53u16 => Ok(Self::Sc53),
+            54u16 => Ok(Self::Sc54),
+            55u16 => Ok(Self::Sc55),
+            56u16 => Ok(Self::Sc56),
+            57u16 => Ok(Self::Sc57),
+            58u16 => Ok(Self::Sc58),
+            59u16 => Ok(Self::Sc59),
+            60u16 => Ok(Self::Sc60),
+            61u16 => Ok(Self::Sc61),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Sc, value)),
+        }
+    }
+}
 impl std::fmt::Display for ScandiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

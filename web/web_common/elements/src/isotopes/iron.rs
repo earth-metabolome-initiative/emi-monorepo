@@ -151,6 +151,44 @@ impl super::MostAbundantIsotope for IronIsotope {
         Self::Fe56
     }
 }
+impl TryFrom<u16> for IronIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            45u16 => Ok(Self::Fe45),
+            46u16 => Ok(Self::Fe46),
+            47u16 => Ok(Self::Fe47),
+            48u16 => Ok(Self::Fe48),
+            49u16 => Ok(Self::Fe49),
+            50u16 => Ok(Self::Fe50),
+            51u16 => Ok(Self::Fe51),
+            52u16 => Ok(Self::Fe52),
+            53u16 => Ok(Self::Fe53),
+            54u16 => Ok(Self::Fe54),
+            55u16 => Ok(Self::Fe55),
+            56u16 => Ok(Self::Fe56),
+            57u16 => Ok(Self::Fe57),
+            58u16 => Ok(Self::Fe58),
+            59u16 => Ok(Self::Fe59),
+            60u16 => Ok(Self::Fe60),
+            61u16 => Ok(Self::Fe61),
+            62u16 => Ok(Self::Fe62),
+            63u16 => Ok(Self::Fe63),
+            64u16 => Ok(Self::Fe64),
+            65u16 => Ok(Self::Fe65),
+            66u16 => Ok(Self::Fe66),
+            67u16 => Ok(Self::Fe67),
+            68u16 => Ok(Self::Fe68),
+            69u16 => Ok(Self::Fe69),
+            70u16 => Ok(Self::Fe70),
+            71u16 => Ok(Self::Fe71),
+            72u16 => Ok(Self::Fe72),
+            73u16 => Ok(Self::Fe73),
+            74u16 => Ok(Self::Fe74),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Fe, value)),
+        }
+    }
+}
 impl std::fmt::Display for IronIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

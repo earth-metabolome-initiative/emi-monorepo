@@ -187,6 +187,53 @@ impl super::MostAbundantIsotope for IndiumIsotope {
         Self::In115
     }
 }
+impl TryFrom<u16> for IndiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            97u16 => Ok(Self::In97),
+            98u16 => Ok(Self::In98),
+            99u16 => Ok(Self::In99),
+            100u16 => Ok(Self::In100),
+            101u16 => Ok(Self::In101),
+            102u16 => Ok(Self::In102),
+            103u16 => Ok(Self::In103),
+            104u16 => Ok(Self::In104),
+            105u16 => Ok(Self::In105),
+            106u16 => Ok(Self::In106),
+            107u16 => Ok(Self::In107),
+            108u16 => Ok(Self::In108),
+            109u16 => Ok(Self::In109),
+            110u16 => Ok(Self::In110),
+            111u16 => Ok(Self::In111),
+            112u16 => Ok(Self::In112),
+            113u16 => Ok(Self::In113),
+            114u16 => Ok(Self::In114),
+            115u16 => Ok(Self::In115),
+            116u16 => Ok(Self::In116),
+            117u16 => Ok(Self::In117),
+            118u16 => Ok(Self::In118),
+            119u16 => Ok(Self::In119),
+            120u16 => Ok(Self::In120),
+            121u16 => Ok(Self::In121),
+            122u16 => Ok(Self::In122),
+            123u16 => Ok(Self::In123),
+            124u16 => Ok(Self::In124),
+            125u16 => Ok(Self::In125),
+            126u16 => Ok(Self::In126),
+            127u16 => Ok(Self::In127),
+            128u16 => Ok(Self::In128),
+            129u16 => Ok(Self::In129),
+            130u16 => Ok(Self::In130),
+            131u16 => Ok(Self::In131),
+            132u16 => Ok(Self::In132),
+            133u16 => Ok(Self::In133),
+            134u16 => Ok(Self::In134),
+            135u16 => Ok(Self::In135),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::In, value)),
+        }
+    }
+}
 impl std::fmt::Display for IndiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

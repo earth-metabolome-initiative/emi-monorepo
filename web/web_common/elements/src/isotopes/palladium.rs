@@ -183,6 +183,52 @@ impl super::MostAbundantIsotope for PalladiumIsotope {
         Self::Pd106
     }
 }
+impl TryFrom<u16> for PalladiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            91u16 => Ok(Self::Pd91),
+            92u16 => Ok(Self::Pd92),
+            93u16 => Ok(Self::Pd93),
+            94u16 => Ok(Self::Pd94),
+            95u16 => Ok(Self::Pd95),
+            96u16 => Ok(Self::Pd96),
+            97u16 => Ok(Self::Pd97),
+            98u16 => Ok(Self::Pd98),
+            99u16 => Ok(Self::Pd99),
+            100u16 => Ok(Self::Pd100),
+            101u16 => Ok(Self::Pd101),
+            102u16 => Ok(Self::Pd102),
+            103u16 => Ok(Self::Pd103),
+            104u16 => Ok(Self::Pd104),
+            105u16 => Ok(Self::Pd105),
+            106u16 => Ok(Self::Pd106),
+            107u16 => Ok(Self::Pd107),
+            108u16 => Ok(Self::Pd108),
+            109u16 => Ok(Self::Pd109),
+            110u16 => Ok(Self::Pd110),
+            111u16 => Ok(Self::Pd111),
+            112u16 => Ok(Self::Pd112),
+            113u16 => Ok(Self::Pd113),
+            114u16 => Ok(Self::Pd114),
+            115u16 => Ok(Self::Pd115),
+            116u16 => Ok(Self::Pd116),
+            117u16 => Ok(Self::Pd117),
+            118u16 => Ok(Self::Pd118),
+            119u16 => Ok(Self::Pd119),
+            120u16 => Ok(Self::Pd120),
+            121u16 => Ok(Self::Pd121),
+            122u16 => Ok(Self::Pd122),
+            123u16 => Ok(Self::Pd123),
+            124u16 => Ok(Self::Pd124),
+            125u16 => Ok(Self::Pd125),
+            126u16 => Ok(Self::Pd126),
+            127u16 => Ok(Self::Pd127),
+            128u16 => Ok(Self::Pd128),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Pd, value)),
+        }
+    }
+}
 impl std::fmt::Display for PalladiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

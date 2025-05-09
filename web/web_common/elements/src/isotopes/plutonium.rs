@@ -111,6 +111,34 @@ impl super::MostAbundantIsotope for PlutoniumIsotope {
         Self::Pu247
     }
 }
+impl TryFrom<u16> for PlutoniumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            228u16 => Ok(Self::Pu228),
+            229u16 => Ok(Self::Pu229),
+            230u16 => Ok(Self::Pu230),
+            231u16 => Ok(Self::Pu231),
+            232u16 => Ok(Self::Pu232),
+            233u16 => Ok(Self::Pu233),
+            234u16 => Ok(Self::Pu234),
+            235u16 => Ok(Self::Pu235),
+            236u16 => Ok(Self::Pu236),
+            237u16 => Ok(Self::Pu237),
+            238u16 => Ok(Self::Pu238),
+            239u16 => Ok(Self::Pu239),
+            240u16 => Ok(Self::Pu240),
+            241u16 => Ok(Self::Pu241),
+            242u16 => Ok(Self::Pu242),
+            243u16 => Ok(Self::Pu243),
+            244u16 => Ok(Self::Pu244),
+            245u16 => Ok(Self::Pu245),
+            246u16 => Ok(Self::Pu246),
+            247u16 => Ok(Self::Pu247),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Pu, value)),
+        }
+    }
+}
 impl std::fmt::Display for PlutoniumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

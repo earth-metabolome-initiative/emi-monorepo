@@ -111,6 +111,34 @@ impl super::MostAbundantIsotope for AmericiumIsotope {
         Self::Am249
     }
 }
+impl TryFrom<u16> for AmericiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            230u16 => Ok(Self::Am230),
+            231u16 => Ok(Self::Am231),
+            232u16 => Ok(Self::Am232),
+            233u16 => Ok(Self::Am233),
+            234u16 => Ok(Self::Am234),
+            235u16 => Ok(Self::Am235),
+            236u16 => Ok(Self::Am236),
+            237u16 => Ok(Self::Am237),
+            238u16 => Ok(Self::Am238),
+            239u16 => Ok(Self::Am239),
+            240u16 => Ok(Self::Am240),
+            241u16 => Ok(Self::Am241),
+            242u16 => Ok(Self::Am242),
+            243u16 => Ok(Self::Am243),
+            244u16 => Ok(Self::Am244),
+            245u16 => Ok(Self::Am245),
+            246u16 => Ok(Self::Am246),
+            247u16 => Ok(Self::Am247),
+            248u16 => Ok(Self::Am248),
+            249u16 => Ok(Self::Am249),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Am, value)),
+        }
+    }
+}
 impl std::fmt::Display for AmericiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

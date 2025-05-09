@@ -175,6 +175,50 @@ impl super::MostAbundantIsotope for LutetiumIsotope {
         Self::Lu175
     }
 }
+impl TryFrom<u16> for LutetiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            150u16 => Ok(Self::Lu150),
+            151u16 => Ok(Self::Lu151),
+            152u16 => Ok(Self::Lu152),
+            153u16 => Ok(Self::Lu153),
+            154u16 => Ok(Self::Lu154),
+            155u16 => Ok(Self::Lu155),
+            156u16 => Ok(Self::Lu156),
+            157u16 => Ok(Self::Lu157),
+            158u16 => Ok(Self::Lu158),
+            159u16 => Ok(Self::Lu159),
+            160u16 => Ok(Self::Lu160),
+            161u16 => Ok(Self::Lu161),
+            162u16 => Ok(Self::Lu162),
+            163u16 => Ok(Self::Lu163),
+            164u16 => Ok(Self::Lu164),
+            165u16 => Ok(Self::Lu165),
+            166u16 => Ok(Self::Lu166),
+            167u16 => Ok(Self::Lu167),
+            168u16 => Ok(Self::Lu168),
+            169u16 => Ok(Self::Lu169),
+            170u16 => Ok(Self::Lu170),
+            171u16 => Ok(Self::Lu171),
+            172u16 => Ok(Self::Lu172),
+            173u16 => Ok(Self::Lu173),
+            174u16 => Ok(Self::Lu174),
+            175u16 => Ok(Self::Lu175),
+            176u16 => Ok(Self::Lu176),
+            177u16 => Ok(Self::Lu177),
+            178u16 => Ok(Self::Lu178),
+            179u16 => Ok(Self::Lu179),
+            180u16 => Ok(Self::Lu180),
+            181u16 => Ok(Self::Lu181),
+            182u16 => Ok(Self::Lu182),
+            183u16 => Ok(Self::Lu183),
+            184u16 => Ok(Self::Lu184),
+            185u16 => Ok(Self::Lu185),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Lu, value)),
+        }
+    }
+}
 impl std::fmt::Display for LutetiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

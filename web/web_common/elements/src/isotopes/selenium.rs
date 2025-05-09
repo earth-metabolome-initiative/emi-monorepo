@@ -159,6 +159,46 @@ impl super::MostAbundantIsotope for SeleniumIsotope {
         Self::Se80
     }
 }
+impl TryFrom<u16> for SeleniumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            64u16 => Ok(Self::Se64),
+            65u16 => Ok(Self::Se65),
+            66u16 => Ok(Self::Se66),
+            67u16 => Ok(Self::Se67),
+            68u16 => Ok(Self::Se68),
+            69u16 => Ok(Self::Se69),
+            70u16 => Ok(Self::Se70),
+            71u16 => Ok(Self::Se71),
+            72u16 => Ok(Self::Se72),
+            73u16 => Ok(Self::Se73),
+            74u16 => Ok(Self::Se74),
+            75u16 => Ok(Self::Se75),
+            76u16 => Ok(Self::Se76),
+            77u16 => Ok(Self::Se77),
+            78u16 => Ok(Self::Se78),
+            79u16 => Ok(Self::Se79),
+            80u16 => Ok(Self::Se80),
+            81u16 => Ok(Self::Se81),
+            82u16 => Ok(Self::Se82),
+            83u16 => Ok(Self::Se83),
+            84u16 => Ok(Self::Se84),
+            85u16 => Ok(Self::Se85),
+            86u16 => Ok(Self::Se86),
+            87u16 => Ok(Self::Se87),
+            88u16 => Ok(Self::Se88),
+            89u16 => Ok(Self::Se89),
+            90u16 => Ok(Self::Se90),
+            91u16 => Ok(Self::Se91),
+            92u16 => Ok(Self::Se92),
+            93u16 => Ok(Self::Se93),
+            94u16 => Ok(Self::Se94),
+            95u16 => Ok(Self::Se95),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Se, value)),
+        }
+    }
+}
 impl std::fmt::Display for SeleniumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

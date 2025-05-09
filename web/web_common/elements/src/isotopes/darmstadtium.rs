@@ -91,6 +91,29 @@ impl super::MostAbundantIsotope for DarmstadtiumIsotope {
         Self::Ds281
     }
 }
+impl TryFrom<u16> for DarmstadtiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            267u16 => Ok(Self::Ds267),
+            268u16 => Ok(Self::Ds268),
+            269u16 => Ok(Self::Ds269),
+            270u16 => Ok(Self::Ds270),
+            271u16 => Ok(Self::Ds271),
+            272u16 => Ok(Self::Ds272),
+            273u16 => Ok(Self::Ds273),
+            274u16 => Ok(Self::Ds274),
+            275u16 => Ok(Self::Ds275),
+            276u16 => Ok(Self::Ds276),
+            277u16 => Ok(Self::Ds277),
+            278u16 => Ok(Self::Ds278),
+            279u16 => Ok(Self::Ds279),
+            280u16 => Ok(Self::Ds280),
+            281u16 => Ok(Self::Ds281),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Ds, value)),
+        }
+    }
+}
 impl std::fmt::Display for DarmstadtiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

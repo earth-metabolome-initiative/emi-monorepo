@@ -79,6 +79,26 @@ impl super::MostAbundantIsotope for RoentgeniumIsotope {
         Self::Rg283
     }
 }
+impl TryFrom<u16> for RoentgeniumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            272u16 => Ok(Self::Rg272),
+            273u16 => Ok(Self::Rg273),
+            274u16 => Ok(Self::Rg274),
+            275u16 => Ok(Self::Rg275),
+            276u16 => Ok(Self::Rg276),
+            277u16 => Ok(Self::Rg277),
+            278u16 => Ok(Self::Rg278),
+            279u16 => Ok(Self::Rg279),
+            280u16 => Ok(Self::Rg280),
+            281u16 => Ok(Self::Rg281),
+            282u16 => Ok(Self::Rg282),
+            283u16 => Ok(Self::Rg283),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Rg, value)),
+        }
+    }
+}
 impl std::fmt::Display for RoentgeniumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

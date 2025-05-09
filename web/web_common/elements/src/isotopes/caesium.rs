@@ -191,6 +191,54 @@ impl super::MostAbundantIsotope for CaesiumIsotope {
         Self::Cs133
     }
 }
+impl TryFrom<u16> for CaesiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            112u16 => Ok(Self::Cs112),
+            113u16 => Ok(Self::Cs113),
+            114u16 => Ok(Self::Cs114),
+            115u16 => Ok(Self::Cs115),
+            116u16 => Ok(Self::Cs116),
+            117u16 => Ok(Self::Cs117),
+            118u16 => Ok(Self::Cs118),
+            119u16 => Ok(Self::Cs119),
+            120u16 => Ok(Self::Cs120),
+            121u16 => Ok(Self::Cs121),
+            122u16 => Ok(Self::Cs122),
+            123u16 => Ok(Self::Cs123),
+            124u16 => Ok(Self::Cs124),
+            125u16 => Ok(Self::Cs125),
+            126u16 => Ok(Self::Cs126),
+            127u16 => Ok(Self::Cs127),
+            128u16 => Ok(Self::Cs128),
+            129u16 => Ok(Self::Cs129),
+            130u16 => Ok(Self::Cs130),
+            131u16 => Ok(Self::Cs131),
+            132u16 => Ok(Self::Cs132),
+            133u16 => Ok(Self::Cs133),
+            134u16 => Ok(Self::Cs134),
+            135u16 => Ok(Self::Cs135),
+            136u16 => Ok(Self::Cs136),
+            137u16 => Ok(Self::Cs137),
+            138u16 => Ok(Self::Cs138),
+            139u16 => Ok(Self::Cs139),
+            140u16 => Ok(Self::Cs140),
+            141u16 => Ok(Self::Cs141),
+            142u16 => Ok(Self::Cs142),
+            143u16 => Ok(Self::Cs143),
+            144u16 => Ok(Self::Cs144),
+            145u16 => Ok(Self::Cs145),
+            146u16 => Ok(Self::Cs146),
+            147u16 => Ok(Self::Cs147),
+            148u16 => Ok(Self::Cs148),
+            149u16 => Ok(Self::Cs149),
+            150u16 => Ok(Self::Cs150),
+            151u16 => Ok(Self::Cs151),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Cs, value)),
+        }
+    }
+}
 impl std::fmt::Display for CaesiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

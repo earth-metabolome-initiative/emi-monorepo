@@ -179,6 +179,51 @@ impl super::MostAbundantIsotope for GadoliniumIsotope {
         Self::Gd158
     }
 }
+impl TryFrom<u16> for GadoliniumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            133u16 => Ok(Self::Gd133),
+            134u16 => Ok(Self::Gd134),
+            135u16 => Ok(Self::Gd135),
+            136u16 => Ok(Self::Gd136),
+            137u16 => Ok(Self::Gd137),
+            138u16 => Ok(Self::Gd138),
+            139u16 => Ok(Self::Gd139),
+            140u16 => Ok(Self::Gd140),
+            141u16 => Ok(Self::Gd141),
+            142u16 => Ok(Self::Gd142),
+            143u16 => Ok(Self::Gd143),
+            144u16 => Ok(Self::Gd144),
+            145u16 => Ok(Self::Gd145),
+            146u16 => Ok(Self::Gd146),
+            147u16 => Ok(Self::Gd147),
+            148u16 => Ok(Self::Gd148),
+            149u16 => Ok(Self::Gd149),
+            150u16 => Ok(Self::Gd150),
+            151u16 => Ok(Self::Gd151),
+            152u16 => Ok(Self::Gd152),
+            153u16 => Ok(Self::Gd153),
+            154u16 => Ok(Self::Gd154),
+            155u16 => Ok(Self::Gd155),
+            156u16 => Ok(Self::Gd156),
+            157u16 => Ok(Self::Gd157),
+            158u16 => Ok(Self::Gd158),
+            159u16 => Ok(Self::Gd159),
+            160u16 => Ok(Self::Gd160),
+            161u16 => Ok(Self::Gd161),
+            162u16 => Ok(Self::Gd162),
+            163u16 => Ok(Self::Gd163),
+            164u16 => Ok(Self::Gd164),
+            165u16 => Ok(Self::Gd165),
+            166u16 => Ok(Self::Gd166),
+            167u16 => Ok(Self::Gd167),
+            168u16 => Ok(Self::Gd168),
+            169u16 => Ok(Self::Gd169),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Gd, value)),
+        }
+    }
+}
 impl std::fmt::Display for GadoliniumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

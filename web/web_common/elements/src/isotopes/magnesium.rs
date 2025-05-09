@@ -119,6 +119,36 @@ impl super::MostAbundantIsotope for MagnesiumIsotope {
         Self::Mg24
     }
 }
+impl TryFrom<u16> for MagnesiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            19u16 => Ok(Self::Mg19),
+            20u16 => Ok(Self::Mg20),
+            21u16 => Ok(Self::Mg21),
+            22u16 => Ok(Self::Mg22),
+            23u16 => Ok(Self::Mg23),
+            24u16 => Ok(Self::Mg24),
+            25u16 => Ok(Self::Mg25),
+            26u16 => Ok(Self::Mg26),
+            27u16 => Ok(Self::Mg27),
+            28u16 => Ok(Self::Mg28),
+            29u16 => Ok(Self::Mg29),
+            30u16 => Ok(Self::Mg30),
+            31u16 => Ok(Self::Mg31),
+            32u16 => Ok(Self::Mg32),
+            33u16 => Ok(Self::Mg33),
+            34u16 => Ok(Self::Mg34),
+            35u16 => Ok(Self::Mg35),
+            36u16 => Ok(Self::Mg36),
+            37u16 => Ok(Self::Mg37),
+            38u16 => Ok(Self::Mg38),
+            39u16 => Ok(Self::Mg39),
+            40u16 => Ok(Self::Mg40),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Mg, value)),
+        }
+    }
+}
 impl std::fmt::Display for MagnesiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

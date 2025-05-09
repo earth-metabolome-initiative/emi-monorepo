@@ -95,6 +95,30 @@ impl super::MostAbundantIsotope for DubniumIsotope {
         Self::Db270
     }
 }
+impl TryFrom<u16> for DubniumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            255u16 => Ok(Self::Db255),
+            256u16 => Ok(Self::Db256),
+            257u16 => Ok(Self::Db257),
+            258u16 => Ok(Self::Db258),
+            259u16 => Ok(Self::Db259),
+            260u16 => Ok(Self::Db260),
+            261u16 => Ok(Self::Db261),
+            262u16 => Ok(Self::Db262),
+            263u16 => Ok(Self::Db263),
+            264u16 => Ok(Self::Db264),
+            265u16 => Ok(Self::Db265),
+            266u16 => Ok(Self::Db266),
+            267u16 => Ok(Self::Db267),
+            268u16 => Ok(Self::Db268),
+            269u16 => Ok(Self::Db269),
+            270u16 => Ok(Self::Db270),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Db, value)),
+        }
+    }
+}
 impl std::fmt::Display for DubniumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

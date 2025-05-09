@@ -79,6 +79,26 @@ impl super::MostAbundantIsotope for BerylliumIsotope {
         Self::Be9
     }
 }
+impl TryFrom<u16> for BerylliumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            5u16 => Ok(Self::Be5),
+            6u16 => Ok(Self::Be6),
+            7u16 => Ok(Self::Be7),
+            8u16 => Ok(Self::Be8),
+            9u16 => Ok(Self::Be9),
+            10u16 => Ok(Self::Be10),
+            11u16 => Ok(Self::Be11),
+            12u16 => Ok(Self::Be12),
+            13u16 => Ok(Self::Be13),
+            14u16 => Ok(Self::Be14),
+            15u16 => Ok(Self::Be15),
+            16u16 => Ok(Self::Be16),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Be, value)),
+        }
+    }
+}
 impl std::fmt::Display for BerylliumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

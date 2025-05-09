@@ -103,6 +103,32 @@ impl super::MostAbundantIsotope for MendeleviumIsotope {
         Self::Md262
     }
 }
+impl TryFrom<u16> for MendeleviumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            245u16 => Ok(Self::Md245),
+            246u16 => Ok(Self::Md246),
+            247u16 => Ok(Self::Md247),
+            248u16 => Ok(Self::Md248),
+            249u16 => Ok(Self::Md249),
+            250u16 => Ok(Self::Md250),
+            251u16 => Ok(Self::Md251),
+            252u16 => Ok(Self::Md252),
+            253u16 => Ok(Self::Md253),
+            254u16 => Ok(Self::Md254),
+            255u16 => Ok(Self::Md255),
+            256u16 => Ok(Self::Md256),
+            257u16 => Ok(Self::Md257),
+            258u16 => Ok(Self::Md258),
+            259u16 => Ok(Self::Md259),
+            260u16 => Ok(Self::Md260),
+            261u16 => Ok(Self::Md261),
+            262u16 => Ok(Self::Md262),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Md, value)),
+        }
+    }
+}
 impl std::fmt::Display for MendeleviumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

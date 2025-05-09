@@ -183,6 +183,52 @@ impl super::MostAbundantIsotope for PromethiumIsotope {
         Self::Pm163
     }
 }
+impl TryFrom<u16> for PromethiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            126u16 => Ok(Self::Pm126),
+            127u16 => Ok(Self::Pm127),
+            128u16 => Ok(Self::Pm128),
+            129u16 => Ok(Self::Pm129),
+            130u16 => Ok(Self::Pm130),
+            131u16 => Ok(Self::Pm131),
+            132u16 => Ok(Self::Pm132),
+            133u16 => Ok(Self::Pm133),
+            134u16 => Ok(Self::Pm134),
+            135u16 => Ok(Self::Pm135),
+            136u16 => Ok(Self::Pm136),
+            137u16 => Ok(Self::Pm137),
+            138u16 => Ok(Self::Pm138),
+            139u16 => Ok(Self::Pm139),
+            140u16 => Ok(Self::Pm140),
+            141u16 => Ok(Self::Pm141),
+            142u16 => Ok(Self::Pm142),
+            143u16 => Ok(Self::Pm143),
+            144u16 => Ok(Self::Pm144),
+            145u16 => Ok(Self::Pm145),
+            146u16 => Ok(Self::Pm146),
+            147u16 => Ok(Self::Pm147),
+            148u16 => Ok(Self::Pm148),
+            149u16 => Ok(Self::Pm149),
+            150u16 => Ok(Self::Pm150),
+            151u16 => Ok(Self::Pm151),
+            152u16 => Ok(Self::Pm152),
+            153u16 => Ok(Self::Pm153),
+            154u16 => Ok(Self::Pm154),
+            155u16 => Ok(Self::Pm155),
+            156u16 => Ok(Self::Pm156),
+            157u16 => Ok(Self::Pm157),
+            158u16 => Ok(Self::Pm158),
+            159u16 => Ok(Self::Pm159),
+            160u16 => Ok(Self::Pm160),
+            161u16 => Ok(Self::Pm161),
+            162u16 => Ok(Self::Pm162),
+            163u16 => Ok(Self::Pm163),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Pm, value)),
+        }
+    }
+}
 impl std::fmt::Display for PromethiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

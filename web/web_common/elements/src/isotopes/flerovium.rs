@@ -51,6 +51,19 @@ impl super::MostAbundantIsotope for FleroviumIsotope {
         Self::Fl289
     }
 }
+impl TryFrom<u16> for FleroviumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            285u16 => Ok(Self::Fl285),
+            286u16 => Ok(Self::Fl286),
+            287u16 => Ok(Self::Fl287),
+            288u16 => Ok(Self::Fl288),
+            289u16 => Ok(Self::Fl289),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Fl, value)),
+        }
+    }
+}
 impl std::fmt::Display for FleroviumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

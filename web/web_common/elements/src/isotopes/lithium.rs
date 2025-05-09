@@ -75,6 +75,25 @@ impl super::MostAbundantIsotope for LithiumIsotope {
         Self::Li7
     }
 }
+impl TryFrom<u16> for LithiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            3u16 => Ok(Self::Li3),
+            4u16 => Ok(Self::Li4),
+            5u16 => Ok(Self::Li5),
+            6u16 => Ok(Self::Li6),
+            7u16 => Ok(Self::Li7),
+            8u16 => Ok(Self::Li8),
+            9u16 => Ok(Self::Li9),
+            10u16 => Ok(Self::Li10),
+            11u16 => Ok(Self::Li11),
+            12u16 => Ok(Self::Li12),
+            13u16 => Ok(Self::Li13),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Li, value)),
+        }
+    }
+}
 impl std::fmt::Display for LithiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

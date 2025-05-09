@@ -191,6 +191,54 @@ impl super::MostAbundantIsotope for TinIsotope {
         Self::Sn120
     }
 }
+impl TryFrom<u16> for TinIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            99u16 => Ok(Self::Sn99),
+            100u16 => Ok(Self::Sn100),
+            101u16 => Ok(Self::Sn101),
+            102u16 => Ok(Self::Sn102),
+            103u16 => Ok(Self::Sn103),
+            104u16 => Ok(Self::Sn104),
+            105u16 => Ok(Self::Sn105),
+            106u16 => Ok(Self::Sn106),
+            107u16 => Ok(Self::Sn107),
+            108u16 => Ok(Self::Sn108),
+            109u16 => Ok(Self::Sn109),
+            110u16 => Ok(Self::Sn110),
+            111u16 => Ok(Self::Sn111),
+            112u16 => Ok(Self::Sn112),
+            113u16 => Ok(Self::Sn113),
+            114u16 => Ok(Self::Sn114),
+            115u16 => Ok(Self::Sn115),
+            116u16 => Ok(Self::Sn116),
+            117u16 => Ok(Self::Sn117),
+            118u16 => Ok(Self::Sn118),
+            119u16 => Ok(Self::Sn119),
+            120u16 => Ok(Self::Sn120),
+            121u16 => Ok(Self::Sn121),
+            122u16 => Ok(Self::Sn122),
+            123u16 => Ok(Self::Sn123),
+            124u16 => Ok(Self::Sn124),
+            125u16 => Ok(Self::Sn125),
+            126u16 => Ok(Self::Sn126),
+            127u16 => Ok(Self::Sn127),
+            128u16 => Ok(Self::Sn128),
+            129u16 => Ok(Self::Sn129),
+            130u16 => Ok(Self::Sn130),
+            131u16 => Ok(Self::Sn131),
+            132u16 => Ok(Self::Sn132),
+            133u16 => Ok(Self::Sn133),
+            134u16 => Ok(Self::Sn134),
+            135u16 => Ok(Self::Sn135),
+            136u16 => Ok(Self::Sn136),
+            137u16 => Ok(Self::Sn137),
+            138u16 => Ok(Self::Sn138),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Sn, value)),
+        }
+    }
+}
 impl std::fmt::Display for TinIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

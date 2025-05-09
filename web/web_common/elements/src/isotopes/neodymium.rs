@@ -183,6 +183,52 @@ impl super::MostAbundantIsotope for NeodymiumIsotope {
         Self::Nd142
     }
 }
+impl TryFrom<u16> for NeodymiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            124u16 => Ok(Self::Nd124),
+            125u16 => Ok(Self::Nd125),
+            126u16 => Ok(Self::Nd126),
+            127u16 => Ok(Self::Nd127),
+            128u16 => Ok(Self::Nd128),
+            129u16 => Ok(Self::Nd129),
+            130u16 => Ok(Self::Nd130),
+            131u16 => Ok(Self::Nd131),
+            132u16 => Ok(Self::Nd132),
+            133u16 => Ok(Self::Nd133),
+            134u16 => Ok(Self::Nd134),
+            135u16 => Ok(Self::Nd135),
+            136u16 => Ok(Self::Nd136),
+            137u16 => Ok(Self::Nd137),
+            138u16 => Ok(Self::Nd138),
+            139u16 => Ok(Self::Nd139),
+            140u16 => Ok(Self::Nd140),
+            141u16 => Ok(Self::Nd141),
+            142u16 => Ok(Self::Nd142),
+            143u16 => Ok(Self::Nd143),
+            144u16 => Ok(Self::Nd144),
+            145u16 => Ok(Self::Nd145),
+            146u16 => Ok(Self::Nd146),
+            147u16 => Ok(Self::Nd147),
+            148u16 => Ok(Self::Nd148),
+            149u16 => Ok(Self::Nd149),
+            150u16 => Ok(Self::Nd150),
+            151u16 => Ok(Self::Nd151),
+            152u16 => Ok(Self::Nd152),
+            153u16 => Ok(Self::Nd153),
+            154u16 => Ok(Self::Nd154),
+            155u16 => Ok(Self::Nd155),
+            156u16 => Ok(Self::Nd156),
+            157u16 => Ok(Self::Nd157),
+            158u16 => Ok(Self::Nd158),
+            159u16 => Ok(Self::Nd159),
+            160u16 => Ok(Self::Nd160),
+            161u16 => Ok(Self::Nd161),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Nd, value)),
+        }
+    }
+}
 impl std::fmt::Display for NeodymiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

@@ -187,6 +187,53 @@ impl super::MostAbundantIsotope for PraseodymiumIsotope {
         Self::Pr141
     }
 }
+impl TryFrom<u16> for PraseodymiumIsotope {
+    type Error = crate::errors::Error;
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            121u16 => Ok(Self::Pr121),
+            122u16 => Ok(Self::Pr122),
+            123u16 => Ok(Self::Pr123),
+            124u16 => Ok(Self::Pr124),
+            125u16 => Ok(Self::Pr125),
+            126u16 => Ok(Self::Pr126),
+            127u16 => Ok(Self::Pr127),
+            128u16 => Ok(Self::Pr128),
+            129u16 => Ok(Self::Pr129),
+            130u16 => Ok(Self::Pr130),
+            131u16 => Ok(Self::Pr131),
+            132u16 => Ok(Self::Pr132),
+            133u16 => Ok(Self::Pr133),
+            134u16 => Ok(Self::Pr134),
+            135u16 => Ok(Self::Pr135),
+            136u16 => Ok(Self::Pr136),
+            137u16 => Ok(Self::Pr137),
+            138u16 => Ok(Self::Pr138),
+            139u16 => Ok(Self::Pr139),
+            140u16 => Ok(Self::Pr140),
+            141u16 => Ok(Self::Pr141),
+            142u16 => Ok(Self::Pr142),
+            143u16 => Ok(Self::Pr143),
+            144u16 => Ok(Self::Pr144),
+            145u16 => Ok(Self::Pr145),
+            146u16 => Ok(Self::Pr146),
+            147u16 => Ok(Self::Pr147),
+            148u16 => Ok(Self::Pr148),
+            149u16 => Ok(Self::Pr149),
+            150u16 => Ok(Self::Pr150),
+            151u16 => Ok(Self::Pr151),
+            152u16 => Ok(Self::Pr152),
+            153u16 => Ok(Self::Pr153),
+            154u16 => Ok(Self::Pr154),
+            155u16 => Ok(Self::Pr155),
+            156u16 => Ok(Self::Pr156),
+            157u16 => Ok(Self::Pr157),
+            158u16 => Ok(Self::Pr158),
+            159u16 => Ok(Self::Pr159),
+            _ => Err(crate::errors::Error::Isotope(crate::Element::Pr, value)),
+        }
+    }
+}
 impl std::fmt::Display for PraseodymiumIsotope {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
