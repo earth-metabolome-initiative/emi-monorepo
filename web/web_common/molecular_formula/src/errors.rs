@@ -1,8 +1,6 @@
 //! Submodule providing the enumeration of errors which may occur while parsing
 //! a molecular formula.
 
-use elements::Element;
-
 use crate::token::Token;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -40,7 +38,7 @@ pub enum Error {
     /// When an operation is not defined for mixtures.
     InvalidOperationForMixture,
     /// When an oxidation state is invalid.
-    InvalidOxidationState(Element, i16),
+    InvalidOxidationState(i16),
 }
 
 impl From<elements::errors::Error> for Error {

@@ -1,4 +1,5 @@
-//! Submodule to test the `monoisotopic_mass` method of the `MolecularFormula` struct
+//! Submodule to test the `monoisotopic_mass` method of the `MolecularFormula`
+//! struct
 
 use std::str::FromStr;
 
@@ -31,7 +32,8 @@ fn test_isotopologue_mass_without_charge() {
         let formula = MolecularFormula::from_str(formula).unwrap();
         let monoisotopic_mass = formula.isotopologue_mass_without_charge().unwrap();
 
-        // We round the exact mass to 11 decimal places to avoid floating point precision issues
+        // We round the exact mass to 11 decimal places to avoid floating point
+        // precision issues
         let monoisotopic_mass = (monoisotopic_mass * 1e11).round() / 1e11;
 
         assert_eq!(
@@ -49,7 +51,8 @@ fn test_isotopologue_mass_with_charge() {
         let formula = MolecularFormula::from_str(formula).unwrap();
         let monoisotopic_mass = formula.isotopologue_mass_with_charge().unwrap();
 
-        // We round the exact mass to 11 decimal places to avoid floating point precision issues
+        // We round the exact mass to 11 decimal places to avoid floating point
+        // precision issues
         let monoisotopic_mass = (monoisotopic_mass * 1e11).round() / 1e11;
 
         assert_eq!(

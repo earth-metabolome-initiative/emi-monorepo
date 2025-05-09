@@ -28,15 +28,7 @@ impl Parser<'_> {
         token: Token,
     ) -> Result<(Self, Option<MolecularFormula>), crate::errors::Error> {
         let new_formula = match (token, formula) {
-            (
-                Token::Residual
-                | Token::Element(_)
-                | Token::SuperscriptMinus
-                | Token::SuperscriptPlus
-                | Token::Plus
-                | Token::Minus,
-                Some(MolecularFormula::Ion(_)),
-            ) => {
+            (Token::Number(_) | Token::Superscript(_), Some(MolecularFormula::Ion(_))) => {
                 return Err(crate::errors::Error::InvalidChargePosition);
             }
             (Token::Residual | Token::Element(_), previous) => {
@@ -47,7 +39,7 @@ impl Parser<'_> {
             }
             (Token::Superscript(number), something) => {
                 // We peak the next token and ensure it is an element.
-                let Some(next) = self.tokens_iter.peek().copied().transpose()? else {
+                let Some(next) = self.tokens_iter.next().transpose()? else {
                     return Err(crate::errors::Error::InvalidSuperscriptPosition);
                 };
                 let formula = match next {
@@ -60,6 +52,16 @@ impl Parser<'_> {
                         }
                     }
                     Token::SuperscriptMinus | Token::SuperscriptPlus => {
+                        if let Some(
+                            Token::SuperscriptMinus
+                            | Token::SuperscriptPlus
+                            | Token::Minus
+                            | Token::Plus,
+                        ) = self.tokens_iter.peek().copied().transpose()?
+                        {
+                            return Err(crate::errors::Error::InvalidChargePosition);
+                        }
+
                         match something {
                             Some(formula) => {
                                 // We need to check whether the next token is a number or not. If
@@ -81,7 +83,6 @@ impl Parser<'_> {
                         return Err(crate::errors::Error::InvalidSuperscriptPosition);
                     }
                 };
-                self.tokens_iter.next();
                 Some(formula)
             }
 
@@ -111,13 +112,15 @@ impl Parser<'_> {
                 // We need to check whether the next token is a number or not. If
                 // it is, we create a new `Ion` with the element and the number,
                 // otherwise we create a new `Ion` with the element and charge 1.
-                let mut charge: i16 = if let Some(Token::Superscript(charge)) =
-                    self.tokens_iter.peek().copied().transpose()?
-                {
-                    self.tokens_iter.next();
-                    i16::try_from(charge).map_err(|_| crate::errors::Error::InvalidNumber)?
-                } else {
-                    1
+                let mut charge: i16 = match self.tokens_iter.peek().copied().transpose()? {
+                    Some(Token::Superscript(charge)) => {
+                        self.tokens_iter.next();
+                        i16::try_from(charge).map_err(|_| crate::errors::Error::InvalidNumber)?
+                    }
+                    Some(token) if token.is_charge() => {
+                        return Err(crate::errors::Error::InvalidChargePosition);
+                    }
+                    _ => 1,
                 };
 
                 if token == Token::SuperscriptMinus {
@@ -130,13 +133,15 @@ impl Parser<'_> {
                 // We need to check whether the next token is a number or not. If
                 // it is, we create a new `Ion` with the element and the number,
                 // otherwise we create a new `Ion` with the element and charge 1.
-                let mut charge: i16 = if let Some(Token::Number(charge)) =
-                    self.tokens_iter.peek().copied().transpose()?
-                {
-                    self.tokens_iter.next();
-                    i16::try_from(charge).map_err(|_| crate::errors::Error::InvalidNumber)?
-                } else {
-                    1
+                let mut charge: i16 = match self.tokens_iter.peek().copied().transpose()? {
+                    Some(Token::Number(charge)) => {
+                        self.tokens_iter.next();
+                        i16::try_from(charge).map_err(|_| crate::errors::Error::InvalidNumber)?
+                    }
+                    Some(token) if token.is_charge() => {
+                        return Err(crate::errors::Error::InvalidChargePosition);
+                    }
+                    _ => 1,
                 };
 
                 if token == Token::Minus {

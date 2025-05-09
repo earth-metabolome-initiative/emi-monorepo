@@ -9,7 +9,7 @@ pub enum Error {
     /// The provided container category string is unknown.
     Element([char; 2]),
     /// The provided combination of Element and atomic mass is unknown.
-    Isotope(Element, u16)
+    Isotope(Element, u16),
 }
 
 impl std::fmt::Display for Error {

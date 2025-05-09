@@ -177,9 +177,7 @@ fn implement_isotope_enum(isotopes: &[IsotopeMetadata]) -> TokenStream {
 
     let isotope_names = isotopes
         .iter()
-        .map(|isotope| {
-            format!("{}{}", isotope.atomic_symbol, isotope.mass_number)
-        })
+        .map(|isotope| format!("{}{}", isotope.atomic_symbol, isotope.mass_number))
         .collect::<Vec<_>>();
 
     let relative_atomic_masses =

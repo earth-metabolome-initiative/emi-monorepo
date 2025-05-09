@@ -35,7 +35,7 @@ impl Ion<Element> {
             return Err(crate::errors::Error::ZeroCharge);
         }
         if !element.oxidation_states().contains(&charge) {
-            return Err(crate::errors::Error::InvalidOxidationState(element, charge));
+            return Err(crate::errors::Error::InvalidOxidationState(charge));
         }
         Ok(Ion { entry: element, charge })
     }
@@ -60,10 +60,8 @@ impl Ion<MolecularFormula> {
         if charge == 0 {
             return Err(crate::errors::Error::ZeroCharge);
         }
-        if let MolecularFormula::Element(element) = &formula {
-            if !element.oxidation_states().contains(&charge) {
-                return Err(crate::errors::Error::InvalidOxidationState(element.clone(), charge));
-            }
+        if !formula.is_valid_oxidation_state(charge)? {
+            return Err(crate::errors::Error::InvalidOxidationState(charge));
         }
 
         Ok(Ion { entry: formula, charge })

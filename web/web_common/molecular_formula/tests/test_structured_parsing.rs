@@ -182,3 +182,49 @@ fn test_formula_including_isotopes() {
         Some("¹²C₁₈¹H₁₈¹⁰⁶Pd₂³⁵Cl₂"),
     )
 }
+
+#[test]
+fn test_irregular_ion_position1() {
+    test_parse(
+        "C+4H4",
+        MolecularFormula::Sequence(vec![
+            MolecularFormula::Ion(Ion::from_element(Element::C, 4).unwrap().into()),
+            MolecularFormula::Count(Element::H.into(), 4),
+        ]),
+        Some("C⁺⁴H₄"),
+    )
+}
+
+#[test]
+fn test_irregular_ion_position2() {
+    test_parse(
+        "C²⁺H4",
+        MolecularFormula::Sequence(vec![
+            MolecularFormula::Ion(Ion::from_element(Element::C, 2).unwrap().into()),
+            MolecularFormula::Count(Element::H.into(), 4),
+        ]),
+        Some("C⁺²H₄"),
+    )
+}
+
+#[test]
+fn test_irregular_ion_position3() {
+    test_parse(
+        "C²⁻H4",
+        MolecularFormula::Sequence(vec![
+            MolecularFormula::Ion(Ion::from_element(Element::C, -2).unwrap().into()),
+            MolecularFormula::Count(Element::H.into(), 4),
+        ]),
+        Some("C⁻²H₄"),
+    )
+}
+
+#[test]
+fn test_ion1() {
+    test_parse("C²⁻", Ion::from_element(Element::C, -2).unwrap(), Some("C⁻²"))
+}
+
+#[test]
+fn test_ion2() {
+    test_parse("C²⁺", Ion::from_element(Element::C, 2).unwrap(), Some("C⁺²"))
+}

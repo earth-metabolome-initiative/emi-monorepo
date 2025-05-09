@@ -6,31 +6,33 @@
 
 use std::str::FromStr;
 
-use elements::Element;
 use molecular_formula::{MolecularFormula, errors::Error};
 
-const INVALID_OXIDATIVE_STATE: &[(&str, Element, i16)] = &[
-    ("H+99", Element::H, 99),
-    ("H+2", Element::H, 2),
-    ("H-2", Element::H, -2),
-    ("H⁺⁹⁹", Element::H, 99),
-    ("H⁺²", Element::H, 2),
-    ("H⁻²", Element::H, -2),
-    ("H²⁺", Element::H, 2),
-    ("H²⁻", Element::H, -2),
+const INVALID_OXIDATIVE_STATE: &[(&str, i16)] = &[
+    ("H+99", 99),
+    ("H+2", 2),
+    ("H-2", -2),
+    ("H⁺⁹⁹", 99),
+    ("H⁺²", 2),
+    ("H⁻²", -2),
+    ("H²⁺", 2),
+    ("H²⁻", -2),
+    ("CH+7", 7),
+    ("McLv⁺²", 2),
 ];
 
 const CHARGE_INCORRECT_POSITION: &[&str] =
-    &["C+4H4", "C⁺4H4", "C²⁺H4", "C²⁻H4", "C⁻⁻", "C⁺⁺", "C⁺4", "⁻C"];
+    &["C⁺4H4", "C⁻⁻", "C-⁻", "C+⁻", "C⁻-", "C⁻+", "C--", "C⁺+", "C⁺+", "C⁺⁺", "C++", "C⁺4", "⁻C"];
 
 #[test]
 /// Test that invalid oxidative states raise the appropriate error when
 /// attempting to create an Ion
 fn test_invalid_oxidative_state() {
-    for (formula, element, charge) in INVALID_OXIDATIVE_STATE {
+    for (formula, charge) in INVALID_OXIDATIVE_STATE {
         assert_eq!(
             MolecularFormula::from_str(formula).unwrap_err(),
-            Error::InvalidOxidationState(*element, *charge)
+            Error::InvalidOxidationState(*charge),
+            "Formula `{formula}` should raise InvalidOxidationState error",
         );
     }
 }
