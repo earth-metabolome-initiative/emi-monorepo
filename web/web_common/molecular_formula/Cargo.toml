@@ -5,6 +5,12 @@ edition = "2024"
 
 [dependencies]
 elements.workspace = true
+fmtastic.workspace = true
 
-[lints]
-workspace = true
+[dev-dependencies]
+strum.workspace = true
+criterion.workspace = true
+
+[[bench]]
+name = "bench_oxidation_states"
+harness = false

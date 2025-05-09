@@ -1,7 +1,7 @@
 //! Submodule providing the enumeration of errors which may occur while parsing
 //! a molecular formula.
 
-use elements::{Element, errors::UnknownElement};
+use elements::Element;
 
 use crate::token::Token;
 
@@ -9,7 +9,7 @@ use crate::token::Token;
 /// Enumeration of errors which may occur while parsing a molecular formula.
 pub enum Error {
     /// Error indicating that an unknown element was encountered.
-    Element(UnknownElement),
+    Element(elements::errors::Error),
     /// Error indicating that a character in the formula is invalid.
     InvalidCharacter(char),
     /// Error indicating that a number in the formula is invalid.
@@ -31,12 +31,20 @@ pub enum Error {
     UnconsumedParser,
     /// When an ion has a charge of 0.
     ZeroCharge,
+    /// When a charge is not at the end of the formula.
+    InvalidChargePosition,
+    /// When a superscript is at an invalid position.
+    InvalidSuperscriptPosition,
+    /// When an operation is not defined for residuals.
+    InvalidOperationForResidual,
+    /// When an operation is not defined for mixtures.
+    InvalidOperationForMixture,
     /// When an oxidation state is invalid.
-    InvalidOxidationState(Element, i8),
+    InvalidOxidationState(Element, i16),
 }
 
-impl From<UnknownElement> for Error {
-    fn from(err: UnknownElement) -> Self {
+impl From<elements::errors::Error> for Error {
+    fn from(err: elements::errors::Error) -> Self {
         Error::Element(err)
     }
 }

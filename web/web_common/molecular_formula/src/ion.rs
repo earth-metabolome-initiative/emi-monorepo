@@ -3,6 +3,7 @@
 use std::fmt::Display;
 
 use elements::Element;
+use fmtastic::Superscript;
 
 use crate::MolecularFormula;
 
@@ -12,7 +13,7 @@ pub struct Ion<E> {
     /// Can be an element or a molecular formula
     pub(crate) entry: E,
     /// Charge
-    pub(crate) charge: i8,
+    pub(crate) charge: i16,
 }
 
 impl Ion<Element> {
@@ -29,7 +30,7 @@ impl Ion<Element> {
     ///   error is returned.
     /// * If the charge is not in the oxidation states of the element, an error
     ///   is returned.
-    pub fn from_element(element: Element, charge: i8) -> Result<Self, crate::errors::Error> {
+    pub fn from_element(element: Element, charge: i16) -> Result<Self, crate::errors::Error> {
         if charge == 0 {
             return Err(crate::errors::Error::ZeroCharge);
         }
@@ -54,7 +55,7 @@ impl Ion<MolecularFormula> {
     ///   error is returned.
     pub fn from_formula(
         formula: MolecularFormula,
-        charge: i8,
+        charge: i16,
     ) -> Result<Self, crate::errors::Error> {
         if charge == 0 {
             return Err(crate::errors::Error::ZeroCharge);
@@ -96,13 +97,13 @@ where
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.charge == -1 {
-            write!(f, "{}-", self.entry)
+            write!(f, "{}⁻", self.entry)
         } else if self.charge == 1 {
-            write!(f, "{}+", self.entry)
+            write!(f, "{}⁺", self.entry)
         } else if self.charge < 0 {
-            write!(f, "{}{}", self.entry, self.charge)
+            write!(f, "{}{}", self.entry, Superscript(self.charge))
         } else {
-            write!(f, "{}+{}", self.entry, self.charge)
+            write!(f, "{}⁺{}", self.entry, Superscript(self.charge))
         }
     }
 }

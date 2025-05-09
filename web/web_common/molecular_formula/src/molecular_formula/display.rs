@@ -2,12 +2,20 @@
 
 use std::fmt::Display;
 
+use elements::{ElementVariant, MassNumber};
+use fmtastic::{Subscript, Superscript};
+
 use super::MolecularFormula;
 
 impl Display for MolecularFormula {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Element(element) => write!(f, "{element}"),
+            Self::Isotope(isotope) => {
+                let atomic_mass = Superscript(isotope.mass_number());
+                let element = isotope.element();
+                write!(f, "{atomic_mass}{element}")
+            }
             Self::Ion(ion) => write!(f, "{ion}"),
             Self::Mixture(mixture) => {
                 write!(
@@ -17,22 +25,8 @@ impl Display for MolecularFormula {
                 )
             }
             Self::Count(formula, count) => {
-                match formula.as_ref() {
-                    Self::Element(_) => {
-                        if *count == 1 {
-                            unreachable!("Something appearing once should not be a count")
-                        } else {
-                            write!(f, "{formula}{count}")
-                        }
-                    }
-                    _ => {
-                        if *count == 1 {
-                            unreachable!("Something appearing once should not be a count")
-                        } else {
-                            write!(f, "{count}{formula}")
-                        }
-                    }
-                }
+                let count = Subscript(*count);
+                write!(f, "{formula}{count}")
             }
             Self::Sequence(formulas) => {
                 assert!(!formulas.is_empty(), "Empty sequence");

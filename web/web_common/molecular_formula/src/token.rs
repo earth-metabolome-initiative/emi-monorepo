@@ -9,7 +9,11 @@ pub enum Token {
     /// An element
     Element(Element),
     /// A number
-    Number(u8),
+    Number(u16),
+    /// A superscript number, which may be an isotope
+    Superscript(u16),
+    /// A subscript number, which may be a count
+    Subscript(u16),
     /// A residual group
     Residual,
     /// An open round bracket
@@ -22,15 +26,23 @@ pub enum Token {
     CloseSquareBracket,
     /// A plus sign
     Plus,
+    /// A superscript plus sign
+    SuperscriptPlus,
     /// A minus sign
     Minus,
+    /// A superscript minus sign
+    SuperscriptMinus,
     /// A dot
     Dot,
 }
 
-impl From<u8> for Token {
-    fn from(number: u8) -> Self {
-        Token::Number(number)
+impl Token {
+    /// Returns whether the token represents a charge.
+    pub fn is_charge(&self) -> bool {
+        matches!(
+            self,
+            Token::SuperscriptPlus | Token::SuperscriptMinus | Token::Plus | Token::Minus
+        )
     }
 }
 

@@ -1,15 +1,21 @@
 //! Represents each molecular formula that can be parsed.
 
-use elements::Element;
+use elements::{Element, Isotope};
 
 use crate::Ion;
 
+mod charge;
+mod contains_elements;
+mod contains_isotopes;
+mod contains_mixtures;
 mod contains_residual;
 mod display;
 mod from;
 mod from_str;
+mod isotopologue_mass;
+mod isotopologue_mass_over_charge;
 mod molar_mass;
-mod monoisotopic_mass;
+mod oxidation_states;
 mod try_from;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -18,12 +24,14 @@ mod try_from;
 pub enum MolecularFormula {
     /// An atom (element)
     Element(Element),
+    /// An isotope (element with mass number)
+    Isotope(Isotope),
     /// An ion (element or molecule with charge)
     Ion(Ion<Box<MolecularFormula>>),
     /// A mixture of molecules
     Mixture(Vec<MolecularFormula>),
     /// Number of molecules
-    Count(Box<MolecularFormula>, u8),
+    Count(Box<MolecularFormula>, u16),
     /// A sequence of molecular formulas
     Sequence(Vec<MolecularFormula>),
     /// A complex wrapped in square brackets
@@ -49,7 +57,7 @@ impl MolecularFormula {
 
     pub(crate) fn add_count_to_first_subformula(
         self,
-        count: u8,
+        count: u16,
     ) -> Result<Self, crate::errors::Error> {
         match self {
             Self::Sequence(mut formulas) => {
@@ -64,9 +72,11 @@ impl MolecularFormula {
                 formulas[0] = first;
                 Ok(Self::Mixture(formulas))
             }
-            Self::Element(_) | Self::Ion(_) | Self::Complex(_) | Self::RepeatingUnit(_) => {
-                Ok(Self::Count(self.into(), count))
-            }
+            Self::Isotope(_)
+            | Self::Element(_)
+            | Self::Ion(_)
+            | Self::Complex(_)
+            | Self::RepeatingUnit(_) => Ok(Self::Count(self.into(), count)),
             Self::Count(_, _) => {
                 unreachable!("Count {self:?} should not be counted")
             }

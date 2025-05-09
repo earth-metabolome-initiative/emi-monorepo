@@ -1,6 +1,8 @@
 //! Submodule implementing the `molar_mass` method for the `MolecularFormula`
 //! struct
 
+use elements::ElementVariant;
+
 use super::MolecularFormula;
 
 impl MolecularFormula {
@@ -8,6 +10,7 @@ impl MolecularFormula {
     pub fn molar_mass(&self) -> Option<f64> {
         match self {
             MolecularFormula::Element(element) => Some(element.standard_atomic_weight()),
+            MolecularFormula::Isotope(isotope) => Some(isotope.element().standard_atomic_weight()),
             MolecularFormula::Ion(ion) => {
                 ion.entry.molar_mass().map(|molar_mass| {
                     molar_mass - f64::from(ion.charge) * crate::ion::ELECTRON_MASS

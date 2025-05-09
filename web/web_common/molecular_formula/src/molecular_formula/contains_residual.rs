@@ -5,7 +5,7 @@ impl super::MolecularFormula {
     /// Checks if the molecular formula contains a residual.
     pub fn contains_residual(&self) -> bool {
         match self {
-            Self::Element(_) => false,
+            Self::Element(_) | Self::Isotope(_) => false,
             Self::Ion(ion) => ion.entry.contains_residual(),
             Self::Mixture(formulas) | Self::Sequence(formulas) => {
                 formulas.iter().any(Self::contains_residual)

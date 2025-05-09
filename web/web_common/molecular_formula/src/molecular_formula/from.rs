@@ -1,7 +1,7 @@
 //! Submodule implementing several `From` traits for the `MolecularFormula`
 //! struct
 
-use elements::Element;
+use elements::{Element, Isotope};
 
 use super::MolecularFormula;
 use crate::Ion;
@@ -9,6 +9,18 @@ use crate::Ion;
 impl From<Element> for MolecularFormula {
     fn from(element: Element) -> Self {
         MolecularFormula::Element(element)
+    }
+}
+
+impl From<Isotope> for MolecularFormula {
+    fn from(isotope: Isotope) -> Self {
+        MolecularFormula::Isotope(isotope)
+    }
+}
+
+impl From<Isotope> for Box<MolecularFormula> {
+    fn from(isotope: Isotope) -> Self {
+        MolecularFormula::Isotope(isotope).into()
     }
 }
 
