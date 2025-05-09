@@ -54,47 +54,23 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Color(colors),
+                crate::codegen::tables::row::Row::ProjectState(project_states),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if colors.id == self.color_id {
-                    foreign_keys.color = Some(colors);
+                if project_states.id == self.state_id {
+                    foreign_keys.state = Some(project_states);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::Color(colors),
+                crate::codegen::tables::row::Row::ProjectState(project_states),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if colors.id == self.color_id {
-                    foreign_keys.color = None;
+                if project_states.id == self.state_id {
+                    foreign_keys.state = None;
                     updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Project(projects),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if let Some(parent_project_id) = self.parent_project_id {
-                    if projects.id == parent_project_id {
-                        foreign_keys.parent_project = Some(projects);
-                        updated = true;
-                    }
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Project(projects),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if let Some(parent_project_id) = self.parent_project_id {
-                    if projects.id == parent_project_id {
-                        foreign_keys.parent_project = None;
-                        updated = true;
-                    }
                 }
             }
             (
@@ -126,22 +102,46 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProjectState(project_states),
+                crate::codegen::tables::row::Row::Project(projects),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if project_states.id == self.state_id {
-                    foreign_keys.state = Some(project_states);
+                if let Some(parent_project_id) = self.parent_project_id {
+                    if projects.id == parent_project_id {
+                        foreign_keys.parent_project = Some(projects);
+                        updated = true;
+                    }
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Project(projects),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if let Some(parent_project_id) = self.parent_project_id {
+                    if projects.id == parent_project_id {
+                        foreign_keys.parent_project = None;
+                        updated = true;
+                    }
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Color(colors),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if colors.id == self.color_id {
+                    foreign_keys.color = Some(colors);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProjectState(project_states),
+                crate::codegen::tables::row::Row::Color(colors),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if project_states.id == self.state_id {
-                    foreign_keys.state = None;
+                if colors.id == self.color_id {
+                    foreign_keys.color = None;
                     updated = true;
                 }
             }

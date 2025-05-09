@@ -1,8 +1,8 @@
 use crate::codegen::diesel_codegen::tables::{
-    commercial_products::commercial_products, users::users,
+    commercial_products::commercial_products, photographs::photographs,
 };
-diesel::allow_tables_to_appear_in_same_query!(commercial_products, users);
-use crate::codegen::diesel_codegen::tables::photographs::photographs;
 diesel::allow_tables_to_appear_in_same_query!(commercial_products, photographs);
+use crate::codegen::diesel_codegen::tables::users::users;
+diesel::allow_tables_to_appear_in_same_query!(commercial_products, users);
 use crate::codegen::diesel_codegen::tables::brands::brands;
 diesel::allow_tables_to_appear_in_same_query!(commercial_products, brands);

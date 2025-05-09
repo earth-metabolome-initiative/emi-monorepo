@@ -14,6 +14,7 @@ pub enum TablePrimaryKey {
     Color(i16),
     CommercialProductLot(i32),
     CommercialProduct(i32),
+    CommercialReagentModel(i32),
     CommercialReagent(rosetta_uuid::Uuid),
     ContainerModel(i32),
     Country(iso_codes::CountryCode),
@@ -55,6 +56,7 @@ pub enum TablePrimaryKey {
     ProjectWorkflowModel(i32),
     Project(i32),
     Rank(i16),
+    Reagent(i32),
     Role(i16),
     Room(i32),
     SampleState(i16),
@@ -132,6 +134,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::CommercialProduct(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialProduct
+            }
+            TablePrimaryKey::CommercialReagentModel(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialReagentModel
             }
             TablePrimaryKey::CommercialReagent(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialReagent
@@ -250,6 +255,7 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::Project(_) => crate::codegen::tables::table_names::TableName::Project,
             TablePrimaryKey::Rank(_) => crate::codegen::tables::table_names::TableName::Rank,
+            TablePrimaryKey::Reagent(_) => crate::codegen::tables::table_names::TableName::Reagent,
             TablePrimaryKey::Role(_) => crate::codegen::tables::table_names::TableName::Role,
             TablePrimaryKey::Room(_) => crate::codegen::tables::table_names::TableName::Room,
             TablePrimaryKey::SampleState(_) => {

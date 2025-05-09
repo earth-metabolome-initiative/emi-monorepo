@@ -98,6 +98,26 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
+                crate::codegen::tables::row::Row::Step(steps),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if steps.id == self.id {
+                    foreign_keys.id = Some(steps);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Step(steps),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if steps.id == self.id {
+                    foreign_keys.id = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::VolumetricProcessable(volumetric_processables),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -122,26 +142,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if volumetric_processables.id == self.destination_processable_id {
                     foreign_keys.destination_processable = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Step(steps),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if steps.id == self.id {
-                    foreign_keys.id = Some(steps);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Step(steps),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if steps.id == self.id {
-                    foreign_keys.id = None;
                     updated = true;
                 }
             }

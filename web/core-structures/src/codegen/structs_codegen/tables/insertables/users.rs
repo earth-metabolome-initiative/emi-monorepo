@@ -51,6 +51,8 @@ impl InsertableUserBuilder {
         first_name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         let first_name = first_name.into();
+        pgrx_validation::must_be_paragraph(first_name.as_ref())
+            .map_err(|e| e.rename_field(InsertableUserAttributes::FirstName))?;
         self.first_name = Some(first_name);
         Ok(self)
     }
@@ -59,6 +61,8 @@ impl InsertableUserBuilder {
         last_name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         let last_name = last_name.into();
+        pgrx_validation::must_be_paragraph(last_name.as_ref())
+            .map_err(|e| e.rename_field(InsertableUserAttributes::LastName))?;
         self.last_name = Some(last_name);
         Ok(self)
     }

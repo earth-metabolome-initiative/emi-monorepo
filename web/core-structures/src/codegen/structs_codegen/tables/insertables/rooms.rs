@@ -121,6 +121,8 @@ impl InsertableRoomBuilder {
         name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         let name = name.into();
+        pgrx_validation::must_be_paragraph(name.as_ref())
+            .map_err(|e| e.rename_field(InsertableRoomAttributes::Name))?;
         self.name = Some(name);
         Ok(self)
     }
@@ -129,6 +131,8 @@ impl InsertableRoomBuilder {
         description: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         let description = description.into();
+        pgrx_validation::must_be_paragraph(description.as_ref())
+            .map_err(|e| e.rename_field(InsertableRoomAttributes::Description))?;
         self.description = Some(description);
         Ok(self)
     }

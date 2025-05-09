@@ -52,7 +52,7 @@ impl InsertableLoginProviderBuilder {
         name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         let name = name.into();
-        pgrx_validation::must_not_be_empty(name.as_ref())
+        pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::Name))?;
         self.name = Some(name);
         Ok(self)
@@ -72,7 +72,7 @@ impl InsertableLoginProviderBuilder {
         client_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         let client_id = client_id.into();
-        pgrx_validation::must_not_be_empty(client_id.as_ref())
+        pgrx_validation::must_be_paragraph(client_id.as_ref())
             .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::ClientId))?;
         self.client_id = Some(client_id);
         Ok(self)
@@ -98,7 +98,7 @@ impl InsertableLoginProviderBuilder {
         scope: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         let scope = scope.into();
-        pgrx_validation::must_not_be_empty(scope.as_ref())
+        pgrx_validation::must_be_paragraph(scope.as_ref())
             .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::Scope))?;
         self.scope = Some(scope);
         Ok(self)

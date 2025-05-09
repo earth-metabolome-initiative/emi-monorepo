@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS step_models (
 	id SERIAL PRIMARY KEY,
-	name TEXT NOT NULL CHECK (must_not_be_empty(name)),
-	description TEXT NOT NULL CHECK (must_not_be_empty(description)),
+	name TEXT NOT NULL CHECK (must_be_paragraph(name)),
+	description TEXT NOT NULL CHECK (must_be_paragraph(description)),
 	-- How long a step can be snoozed for. When None, the step is not snoozable.
 	-- Examples of snoozable steps are: "put on gloves before collecting".
 	snoozable BOOLEAN NOT NULL DEFAULT FALSE,

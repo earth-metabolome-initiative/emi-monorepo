@@ -85,6 +85,11 @@ where
         let entry = entry?;
         let path = entry.path();
         if path.is_dir() && is_extension_crate(&path).unwrap_or(false) {
+            // We temporarily skip the `cas_code` crate.
+            if path.ends_with("cas_code") {
+                continue;
+            }
+
             pgrx_extensions.push(path);
         }
     }
@@ -115,7 +120,8 @@ async fn reference_docker(
     for extension in &pgrx_extensions {
         assert!(
             extension.join("extension").exists(),
-            "The extension `{extension:?}` was not built. Most likely you forgot to build the extension. Refer to the README for more information."
+            "The extension `{}` was not built. Most likely you forgot to build the extension. Refer to the README for more information.",
+            extension.display()
         );
     }
 

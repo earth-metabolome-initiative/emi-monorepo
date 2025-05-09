@@ -66,7 +66,7 @@ impl InsertableOrganismBuilder {
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         let name = name.into();
         if let Some(name) = name.as_ref() {
-            pgrx_validation::must_not_be_empty(name)
+            pgrx_validation::must_be_paragraph(name)
                 .map_err(|e| e.rename_field(InsertableOrganismAttributes::Name))?;
         }
         self.name = name;

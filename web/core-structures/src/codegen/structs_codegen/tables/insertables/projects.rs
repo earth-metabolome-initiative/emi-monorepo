@@ -217,7 +217,7 @@ impl InsertableProjectBuilder {
                 )
             })?;
         }
-        pgrx_validation::must_not_be_empty(name.as_ref())
+        pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| e.rename_field(InsertableProjectAttributes::Name))?;
         self.name = Some(name);
         Ok(self)
@@ -235,7 +235,7 @@ impl InsertableProjectBuilder {
                 )
             })?;
         }
-        pgrx_validation::must_not_be_empty(description.as_ref())
+        pgrx_validation::must_be_paragraph(description.as_ref())
             .map_err(|e| e.rename_field(InsertableProjectAttributes::Description))?;
         self.description = Some(description);
         Ok(self)

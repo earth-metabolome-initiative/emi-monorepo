@@ -14,6 +14,7 @@ pub enum TableName {
     Color,
     CommercialProductLot,
     CommercialProduct,
+    CommercialReagentModel,
     CommercialReagent,
     ContainerModel,
     Country,
@@ -55,6 +56,7 @@ pub enum TableName {
     ProjectWorkflowModel,
     Project,
     Rank,
+    Reagent,
     Role,
     Room,
     SampleState,
@@ -118,6 +120,9 @@ impl core::fmt::Display for TableName {
                 write!(f, stringify!(CommercialProductLot))
             }
             TableName::CommercialProduct => write!(f, stringify!(CommercialProduct)),
+            TableName::CommercialReagentModel => {
+                write!(f, stringify!(CommercialReagentModel))
+            }
             TableName::CommercialReagent => write!(f, stringify!(CommercialReagent)),
             TableName::ContainerModel => write!(f, stringify!(ContainerModel)),
             TableName::Country => write!(f, stringify!(Country)),
@@ -177,6 +182,7 @@ impl core::fmt::Display for TableName {
             }
             TableName::Project => write!(f, stringify!(Project)),
             TableName::Rank => write!(f, stringify!(Rank)),
+            TableName::Reagent => write!(f, stringify!(Reagent)),
             TableName::Role => write!(f, stringify!(Role)),
             TableName::Room => write!(f, stringify!(Room)),
             TableName::SampleState => write!(f, stringify!(SampleState)),

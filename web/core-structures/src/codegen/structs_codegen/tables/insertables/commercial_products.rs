@@ -145,7 +145,7 @@ impl InsertableCommercialProductBuilder {
         name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         let name = name.into();
-        pgrx_validation::must_not_be_empty(name.as_ref())
+        pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| e.rename_field(InsertableCommercialProductAttributes::Name))?;
         self.name = Some(name);
         Ok(self)
@@ -155,7 +155,7 @@ impl InsertableCommercialProductBuilder {
         description: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         let description = description.into();
-        pgrx_validation::must_not_be_empty(description.as_ref())
+        pgrx_validation::must_be_paragraph(description.as_ref())
             .map_err(|e| e.rename_field(InsertableCommercialProductAttributes::Description))?;
         self.description = Some(description);
         Ok(self)

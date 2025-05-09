@@ -9,6 +9,7 @@ mod centrifuge_steps;
 mod cities;
 mod commercial_product_lots;
 mod commercial_products;
+mod commercial_reagent_models;
 mod commercial_reagents;
 mod container_models;
 mod disposal_step_models;

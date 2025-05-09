@@ -58,6 +58,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::CommercialProduct)
                     .collect::<Vec<_>>()
             }
+            super::Rows::CommercialReagentModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::CommercialReagentModel)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::CommercialReagent(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::CommercialReagent)
@@ -252,6 +257,9 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             }
             super::Rows::Rank(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Rank).collect::<Vec<_>>()
+            }
+            super::Rows::Reagent(rows) => {
+                rows.into_iter().map(crate::codegen::tables::row::Row::Reagent).collect::<Vec<_>>()
             }
             super::Rows::Role(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Role).collect::<Vec<_>>()

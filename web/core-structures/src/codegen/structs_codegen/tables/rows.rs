@@ -11,6 +11,7 @@ mod cities;
 mod colors;
 mod commercial_product_lots;
 mod commercial_products;
+mod commercial_reagent_models;
 mod commercial_reagents;
 mod container_models;
 mod countries;
@@ -55,6 +56,7 @@ mod project_states;
 mod project_workflow_models;
 mod projects;
 mod ranks;
+mod reagents;
 mod roles;
 mod rooms;
 mod sample_states;
@@ -143,6 +145,11 @@ pub enum Rows {
     CommercialProduct(
         Vec<
             crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+        >,
+    ),
+    CommercialReagentModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_reagent_models::CommercialReagentModel,
         >,
     ),
     CommercialReagent(
@@ -284,6 +291,7 @@ pub enum Rows {
     ),
     Project(Vec<crate::codegen::structs_codegen::tables::projects::Project>),
     Rank(Vec<crate::codegen::structs_codegen::tables::ranks::Rank>),
+    Reagent(Vec<crate::codegen::structs_codegen::tables::reagents::Reagent>),
     Role(Vec<crate::codegen::structs_codegen::tables::roles::Role>),
     Room(Vec<crate::codegen::structs_codegen::tables::rooms::Room>),
     SampleState(
@@ -516,6 +524,13 @@ impl Rows {
             }
             Rows::CommercialProduct(commercial_products) => {
                 commercial_products
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialReagentModel(commercial_reagent_models) => {
+                commercial_reagent_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -803,6 +818,13 @@ impl Rows {
             }
             Rows::Rank(ranks) => {
                 ranks
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::Reagent(reagents) => {
+                reagents
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -1129,6 +1151,9 @@ impl web_common_traits::prelude::Rows for Rows {
                 commercial_product_lots.primary_keys()
             }
             Rows::CommercialProduct(commercial_products) => commercial_products.primary_keys(),
+            Rows::CommercialReagentModel(commercial_reagent_models) => {
+                commercial_reagent_models.primary_keys()
+            }
             Rows::CommercialReagent(commercial_reagents) => commercial_reagents.primary_keys(),
             Rows::ContainerModel(container_models) => container_models.primary_keys(),
             Rows::Country(countries) => countries.primary_keys(),
@@ -1190,6 +1215,7 @@ impl web_common_traits::prelude::Rows for Rows {
             }
             Rows::Project(projects) => projects.primary_keys(),
             Rows::Rank(ranks) => ranks.primary_keys(),
+            Rows::Reagent(reagents) => reagents.primary_keys(),
             Rows::Role(roles) => roles.primary_keys(),
             Rows::Room(rooms) => rooms.primary_keys(),
             Rows::SampleState(sample_states) => sample_states.primary_keys(),

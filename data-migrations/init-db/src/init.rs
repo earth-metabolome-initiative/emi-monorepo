@@ -25,7 +25,7 @@ pub async fn init_database(
 
     conn.transaction(|portal_conn| {
         Box::pin(async move {
-            init_csvs(&csv_directory, &container_directory, portal_conn).await?;
+            init_csvs(&csv_directory, container_directory, portal_conn).await?;
             init_migrations(&migrations_directory, &extension_migrations_directory, portal_conn)
                 .await?;
             execute_consistency_constraint_checks(database_name, portal_conn).await?;

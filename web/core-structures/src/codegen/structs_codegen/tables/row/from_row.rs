@@ -32,6 +32,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::CommercialProduct(commercial_products) => {
                 crate::codegen::tables::rows::Rows::from(commercial_products)
             }
+            super::Row::CommercialReagentModel(commercial_reagent_models) => {
+                crate::codegen::tables::rows::Rows::from(commercial_reagent_models)
+            }
             super::Row::CommercialReagent(commercial_reagents) => {
                 crate::codegen::tables::rows::Rows::from(commercial_reagents)
             }
@@ -145,6 +148,7 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::Project(projects) => crate::codegen::tables::rows::Rows::from(projects),
             super::Row::Rank(ranks) => crate::codegen::tables::rows::Rows::from(ranks),
+            super::Row::Reagent(reagents) => crate::codegen::tables::rows::Rows::from(reagents),
             super::Row::Role(roles) => crate::codegen::tables::rows::Rows::from(roles),
             super::Row::Room(rooms) => crate::codegen::tables::rows::Rows::from(rooms),
             super::Row::SampleState(sample_states) => {

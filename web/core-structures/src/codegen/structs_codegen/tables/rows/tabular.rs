@@ -33,6 +33,9 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::CommercialProduct(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialProduct
             }
+            super::Rows::CommercialReagentModel(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialReagentModel
+            }
             super::Rows::CommercialReagent(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialReagent
             }
@@ -144,6 +147,7 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             }
             super::Rows::Project(_) => crate::codegen::tables::table_names::TableName::Project,
             super::Rows::Rank(_) => crate::codegen::tables::table_names::TableName::Rank,
+            super::Rows::Reagent(_) => crate::codegen::tables::table_names::TableName::Reagent,
             super::Rows::Role(_) => crate::codegen::tables::table_names::TableName::Role,
             super::Rows::Room(_) => crate::codegen::tables::table_names::TableName::Room,
             super::Rows::SampleState(_) => {

@@ -60,26 +60,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = Some(users);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::Room(rooms),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -96,6 +76,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if rooms.id == self.room_id {
                     foreign_keys.room = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if users.id == self.created_by {
+                    foreign_keys.created_by = Some(users);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if users.id == self.created_by {
+                    foreign_keys.created_by = None;
                     updated = true;
                 }
             }

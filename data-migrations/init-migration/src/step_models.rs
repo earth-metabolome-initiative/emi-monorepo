@@ -1,6 +1,6 @@
 //! Submodule defining the init migrations for the step models.
 
-use core_structures::{StepModel, User};
+use core_structures::User;
 use diesel_async::AsyncPgConnection;
 
 pub(crate) async fn init_step_models(

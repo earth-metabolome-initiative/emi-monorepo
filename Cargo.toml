@@ -47,6 +47,11 @@ members = [
   "web/web_common/instrument_categories",
   "web/web_common/container_categories",
   "web/web_common/nameplate_categories",
+  "web/web_common/cas_code",
+  "utils/diesel-pgrx-derive",
+  "utils/diesel-pgrx",
+  "web/web_common/elements",
+  "utils/diesel-pgrx/example_extension", "web/web_common/molecular_formula",
 ]
 
 [workspace.dependencies]
@@ -74,6 +79,9 @@ diesel = { git = "https://github.com/LucaCappelletti94/diesel.git", branch = "su
 ] }
 diesel-async = { git = "https://github.com/LucaCappelletti94/diesel_async", branch = "custom-diesel" }
 diesel_full_text_search = "2.2"
+diesel-pgrx = { path = "utils/diesel-pgrx" }
+diesel-pgrx-derive = { path = "utils/diesel-pgrx-derive" }
+example_extension = { path = "utils/diesel-pgrx/example_extension" }
 redis = { version = "0.30", features = ["tokio-comp"] }
 postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel.git", default-features = false, branch = "custom-diesel" }
 chrono = { version = "0.4.39", features = ["serde"] }
@@ -91,12 +99,12 @@ strum_macros = "0.27"
 zip = "2.6"
 reference-docker = { path = "web/web_common/reference-docker" }
 async-trait = "0.1.88"
-pgrx = "0.14.1"
-pgrx-tests = "0.14.1"
+pgrx = "0.14.2"
+pgrx-tests = "0.14.2"
+pgrx-sql-entity-graph = "0.14.2"
 image = "0.25.6"
 rsa = { version = "0.9.8" }
 rand = { version = "0.8" }
-pgrx-sql-entity-graph = "0.14.1"
 gloo = "0.11.0"
 criterion = { version = "0.5", features = ["html_reports"] }
 rosetta-uuid = { path = "data-structures/rosetta-uuid" }
@@ -104,6 +112,7 @@ rosetta-timestamp = { path = "utils/rosetta-timestamp" }
 taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
 csqlv = { path = "web/web_common/csqlv", default-features = false }
 iso_codes = { path = "web/web_common/iso_codes" }
+elements = { path = "web/web_common/elements" }
 tool_categories = { path = "web/web_common/tool_categories" }
 instrument_categories = { path = "web/web_common/instrument_categories" }
 nameplate_categories = { path = "web/web_common/nameplate_categories" }
@@ -151,6 +160,10 @@ validator = { version = "0.20", features = ["derive"] }
 web-sys = { version = "0.3.77" }
 cached = "0.55"
 dotenvy = "0.15.7"
+serde_cbor = "0.11.2"
+sophia_api = "0.9.0"
+sophia_sparql_client = "0.9.0"
+fmtastic = "0.2.1"
 
 [workspace.lints.rust]
 missing_docs = "forbid"
@@ -163,6 +176,7 @@ unused_must_use = "forbid"
 [workspace.lints.clippy]
 missing_panics_doc = "allow"
 struct_excessive_bools = "allow"
+should_panic_without_expect = "allow"
 pedantic = { level = "deny", priority = -1 }
 
 [profile.bench]

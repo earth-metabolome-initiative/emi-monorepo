@@ -1,8 +1,8 @@
 -- SQL to create the projects table.
 CREATE TABLE IF NOT EXISTS projects (
     id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE CHECK (must_not_be_empty(name)),
-    description TEXT NOT NULL CHECK (must_not_be_empty(description)),
+    name TEXT NOT NULL UNIQUE CHECK (must_be_paragraph(name)),
+    description TEXT NOT NULL CHECK (must_be_paragraph(description)),
     state_id SMALLINT NOT NULL DEFAULT 1,
     icon TEXT NOT NULL CHECK (must_be_font_awesome_class(icon)),
     color_id SMALLINT NOT NULL DEFAULT 1,

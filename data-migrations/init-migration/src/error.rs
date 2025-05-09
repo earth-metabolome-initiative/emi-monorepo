@@ -4,7 +4,8 @@ use core_structures::tables::insertables::{
     InsertableBrandAttributes, InsertableCommercialProductAttributes,
     InsertableLoginProviderAttributes, InsertableProcedureModelAttributes,
     InsertableProcedureModelContainerCategoryAttributes,
-    InsertableProcedureModelToolCategoryAttributes, InsertableUserAttributes,
+    InsertableProcedureModelToolCategoryAttributes, InsertableReagentAttributes,
+    InsertableUserAttributes,
 };
 use web_common_traits::database::InsertError;
 
@@ -32,6 +33,8 @@ pub enum Error {
     Brand(InsertError<InsertableBrandAttributes>),
     /// Failed to insert a  new user
     User(InsertError<InsertableUserAttributes>),
+    /// Failed to insert a new reagent
+    Reagent(InsertError<InsertableReagentAttributes>),
 }
 
 impl From<diesel::ConnectionError> for Error {
@@ -85,5 +88,11 @@ impl From<InsertError<InsertableCommercialProductAttributes>> for Error {
 impl From<InsertError<InsertableBrandAttributes>> for Error {
     fn from(value: InsertError<InsertableBrandAttributes>) -> Self {
         Error::Brand(value)
+    }
+}
+
+impl From<InsertError<InsertableReagentAttributes>> for Error {
+    fn from(value: InsertError<InsertableReagentAttributes>) -> Self {
+        Error::Reagent(value)
     }
 }

@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS rooms (
 	id SERIAL PRIMARY KEY,
-	name TEXT NOT NULL,
-	description TEXT NOT NULL,
+	name TEXT NOT NULL  CHECK (must_be_paragraph(name)),
+	description TEXT NOT NULL CHECK (must_be_paragraph(description)),
 	qrcode UUID NOT NULL UNIQUE,
 	addresses_id INTEGER NOT NULL REFERENCES addresses(id),
 	geolocation GEOGRAPHY(POINT, 4326) NOT NULL,

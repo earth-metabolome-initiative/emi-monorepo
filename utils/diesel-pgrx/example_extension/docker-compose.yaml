@@ -1,0 +1,18 @@
+services:
+  example_extension:
+    build:
+      context: .
+      dockerfile: ../../../shared_docker_files/PGRXDocker
+      args:
+        HOST_UID: ${USER_ID}
+        HOST_GID: ${GROUP_ID}
+    environment:
+      - HOST_UID=${USER_ID}
+      - HOST_GID=${GROUP_ID}
+    container_name: example_extension_builder
+    volumes:
+      - ../../../:/workspace  # Mount the entire monorepo
+      - ./extension:/home/appuser/extension # Output directory
+    working_dir: /workspace/utils/diesel-pgrx/example_extension
+    entrypoint: ["/workspace/utils/diesel-pgrx/example_extension/build.sh"]
+    user: "${USER_ID}:${GROUP_ID}"

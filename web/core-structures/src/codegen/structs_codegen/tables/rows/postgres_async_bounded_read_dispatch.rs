@@ -101,6 +101,13 @@ impl web_common_traits::prelude::AsyncBoundedReadDispatch<diesel_async::AsyncPgC
                     .await
                     .map(super::Rows::from)
             }
+            crate::codegen::tables::table_names::TableName::CommercialReagentModel => {
+                <crate::codegen::structs_codegen::tables::commercial_reagent_models::CommercialReagentModel as web_common_traits::database::AsyncBoundedRead<
+                    diesel_async::AsyncPgConnection,
+                >>::bounded_read_async(offset, limit, conn)
+                    .await
+                    .map(super::Rows::from)
+            }
             crate::codegen::tables::table_names::TableName::CommercialReagent => {
                 <crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent as web_common_traits::database::AsyncBoundedRead<
                     diesel_async::AsyncPgConnection,
@@ -383,6 +390,13 @@ impl web_common_traits::prelude::AsyncBoundedReadDispatch<diesel_async::AsyncPgC
             }
             crate::codegen::tables::table_names::TableName::Rank => {
                 <crate::codegen::structs_codegen::tables::ranks::Rank as web_common_traits::database::AsyncBoundedRead<
+                    diesel_async::AsyncPgConnection,
+                >>::bounded_read_async(offset, limit, conn)
+                    .await
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::Reagent => {
+                <crate::codegen::structs_codegen::tables::reagents::Reagent as web_common_traits::database::AsyncBoundedRead<
                     diesel_async::AsyncPgConnection,
                 >>::bounded_read_async(offset, limit, conn)
                     .await

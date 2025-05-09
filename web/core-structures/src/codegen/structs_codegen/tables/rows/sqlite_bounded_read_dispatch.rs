@@ -86,6 +86,12 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
+            crate::codegen::tables::table_names::TableName::CommercialReagentModel => {
+                <crate::codegen::structs_codegen::tables::commercial_reagent_models::CommercialReagentModel as web_common_traits::database::BoundedRead<
+                    diesel::SqliteConnection,
+                >>::bounded_read(offset, limit, conn)
+                    .map(super::Rows::from)
+            }
             crate::codegen::tables::table_names::TableName::CommercialReagent => {
                 <crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
@@ -328,6 +334,12 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
             }
             crate::codegen::tables::table_names::TableName::Rank => {
                 <crate::codegen::structs_codegen::tables::ranks::Rank as web_common_traits::database::BoundedRead<
+                    diesel::SqliteConnection,
+                >>::bounded_read(offset, limit, conn)
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::Reagent => {
+                <crate::codegen::structs_codegen::tables::reagents::Reagent as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)

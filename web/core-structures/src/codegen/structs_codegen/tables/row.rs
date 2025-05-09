@@ -11,6 +11,7 @@ mod cities;
 mod colors;
 mod commercial_product_lots;
 mod commercial_products;
+mod commercial_reagent_models;
 mod commercial_reagents;
 mod container_models;
 mod countries;
@@ -54,6 +55,7 @@ mod project_states;
 mod project_workflow_models;
 mod projects;
 mod ranks;
+mod reagents;
 mod roles;
 mod rooms;
 mod sample_states;
@@ -129,6 +131,9 @@ pub enum Row {
     ),
     CommercialProduct(
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+    ),
+    CommercialReagentModel(
+        crate::codegen::structs_codegen::tables::commercial_reagent_models::CommercialReagentModel,
     ),
     CommercialReagent(
         crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent,
@@ -227,6 +232,7 @@ pub enum Row {
     ),
     Project(crate::codegen::structs_codegen::tables::projects::Project),
     Rank(crate::codegen::structs_codegen::tables::ranks::Rank),
+    Reagent(crate::codegen::structs_codegen::tables::reagents::Reagent),
     Role(crate::codegen::structs_codegen::tables::roles::Role),
     Room(crate::codegen::structs_codegen::tables::rooms::Room),
     SampleState(crate::codegen::structs_codegen::tables::sample_states::SampleState),
@@ -348,6 +354,9 @@ impl Row {
             Row::CommercialProduct(commercial_products) => {
                 commercial_products.upsert(conn)?.map(Row::from)
             }
+            Row::CommercialReagentModel(commercial_reagent_models) => {
+                commercial_reagent_models.upsert(conn)?.map(Row::from)
+            }
             Row::CommercialReagent(commercial_reagents) => {
                 commercial_reagents.upsert(conn)?.map(Row::from)
             }
@@ -429,6 +438,7 @@ impl Row {
             }
             Row::Project(projects) => projects.upsert(conn)?.map(Row::from),
             Row::Rank(ranks) => ranks.upsert(conn)?.map(Row::from),
+            Row::Reagent(reagents) => reagents.upsert(conn)?.map(Row::from),
             Row::Role(roles) => roles.upsert(conn)?.map(Row::from),
             Row::Room(rooms) => rooms.upsert(conn)?.map(Row::from),
             Row::SampleState(sample_states) => sample_states.upsert(conn)?.map(Row::from),
@@ -537,6 +547,9 @@ impl web_common_traits::prelude::Row for Row {
                 commercial_product_lots.primary_key()
             }
             Row::CommercialProduct(commercial_products) => commercial_products.primary_key(),
+            Row::CommercialReagentModel(commercial_reagent_models) => {
+                commercial_reagent_models.primary_key()
+            }
             Row::CommercialReagent(commercial_reagents) => commercial_reagents.primary_key(),
             Row::ContainerModel(container_models) => container_models.primary_key(),
             Row::Country(countries) => countries.primary_key(),
@@ -596,6 +609,7 @@ impl web_common_traits::prelude::Row for Row {
             }
             Row::Project(projects) => projects.primary_key(),
             Row::Rank(ranks) => ranks.primary_key(),
+            Row::Reagent(reagents) => reagents.primary_key(),
             Row::Role(roles) => roles.primary_key(),
             Row::Room(rooms) => rooms.primary_key(),
             Row::SampleState(sample_states) => sample_states.primary_key(),

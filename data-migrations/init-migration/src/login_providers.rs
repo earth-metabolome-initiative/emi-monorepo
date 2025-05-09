@@ -11,13 +11,13 @@ use web_common_traits::prelude::*;
 ///
 /// # Arguments
 ///
-/// * `portal_conn` - A mutable reference to an asynchronous PostgreSQL
+/// * `portal_conn` - A mutable reference to an asynchronous `PostgreSQL`
 ///   connection.
 ///
 /// # Errors
 ///
-/// * If the login provider cannot be created or inserted into the database,
-///  an error is returned.
+/// * If the login provider cannot be created or inserted into the database, an
+///   error is returned.
 async fn init_github_login_provider(
     portal_conn: &mut AsyncPgConnection,
 ) -> Result<(), crate::error::Error> {
@@ -40,13 +40,13 @@ async fn init_github_login_provider(
 ///
 /// # Arguments
 ///
-/// * `portal_conn` - A mutable reference to an asynchronous PostgreSQL
+/// * `portal_conn` - A mutable reference to an asynchronous `PostgreSQL`
 ///   connection.
 ///
 /// # Errors
 ///
-/// * If the login provider cannot be created or inserted into the database,
-///  an error is returned.
+/// * If the login provider cannot be created or inserted into the database, an
+///   error is returned.
 pub(crate) async fn init_login_providers(
     portal_conn: &mut AsyncPgConnection,
 ) -> Result<(), crate::error::Error> {

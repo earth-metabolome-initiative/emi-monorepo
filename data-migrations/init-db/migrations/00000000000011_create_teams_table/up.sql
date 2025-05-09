@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS teams (
     -- change to integer and the change it to serial in a new directoy
     id INTEGER PRIMARY KEY,
     -- a name of the team
-    name TEXT NOT NULL UNIQUE CHECK (must_not_be_empty(name)),
+    name TEXT NOT NULL UNIQUE CHECK (must_be_paragraph(name)),
     -- a description of the team
     description TEXT NOT NULL,
     icon TEXT NOT NULL CHECK (must_be_font_awesome_class(icon)),

@@ -69,26 +69,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::InstrumentModel(instrument_models),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if instrument_models.id == self.instrument_model_id {
-                    foreign_keys.instrument_model = Some(instrument_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::InstrumentModel(instrument_models),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if instrument_models.id == self.instrument_model_id {
-                    foreign_keys.instrument_model = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -113,6 +93,26 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::InstrumentModel(instrument_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if instrument_models.id == self.instrument_model_id {
+                    foreign_keys.instrument_model = Some(instrument_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::InstrumentModel(instrument_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if instrument_models.id == self.instrument_model_id {
+                    foreign_keys.instrument_model = None;
                     updated = true;
                 }
             }

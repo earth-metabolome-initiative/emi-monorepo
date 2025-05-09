@@ -136,6 +136,16 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
                         .map(super::Row::from),
                 )
             }
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialReagentModel(
+                primary_key,
+            ) => {
+                Ok(
+                    <crate::codegen::structs_codegen::tables::commercial_reagent_models::CommercialReagentModel as web_common_traits::database::Read<
+                        diesel::SqliteConnection,
+                    >>::read(primary_key, conn)?
+                        .map(super::Row::from),
+                )
+            }
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialReagent(
                 primary_key,
             ) => {
@@ -541,6 +551,16 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
             ) => {
                 Ok(
                     <crate::codegen::structs_codegen::tables::ranks::Rank as web_common_traits::database::Read<
+                        diesel::SqliteConnection,
+                    >>::read(primary_key, conn)?
+                        .map(super::Row::from),
+                )
+            }
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Reagent(
+                primary_key,
+            ) => {
+                Ok(
+                    <crate::codegen::structs_codegen::tables::reagents::Reagent as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),

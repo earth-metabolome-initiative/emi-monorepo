@@ -48,6 +48,11 @@ pub use commercial_products::{
     InsertableCommercialProduct, InsertableCommercialProductAttributes,
     InsertableCommercialProductBuilder,
 };
+mod commercial_reagent_models;
+pub use commercial_reagent_models::{
+    InsertableCommercialReagentModel, InsertableCommercialReagentModelAttributes,
+    InsertableCommercialReagentModelBuilder,
+};
 mod commercial_reagents;
 pub use commercial_reagents::{
     InsertableCommercialReagent, InsertableCommercialReagentAttributes,
@@ -223,6 +228,8 @@ mod projects;
 pub use projects::{InsertableProject, InsertableProjectAttributes, InsertableProjectBuilder};
 mod ranks;
 pub use ranks::{InsertableRank, InsertableRankAttributes, InsertableRankBuilder};
+mod reagents;
+pub use reagents::{InsertableReagent, InsertableReagentAttributes, InsertableReagentBuilder};
 mod roles;
 pub use roles::{InsertableRole, InsertableRoleAttributes, InsertableRoleBuilder};
 mod rooms;

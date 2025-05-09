@@ -105,7 +105,7 @@ impl InsertableProcedureModelBuilder {
                 )
             })?;
         }
-        pgrx_validation::must_not_be_empty(name.as_ref())
+        pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| e.rename_field(InsertableProcedureModelAttributes::Name))?;
         self.name = Some(name);
         Ok(self)
@@ -123,7 +123,7 @@ impl InsertableProcedureModelBuilder {
                 )
             })?;
         }
-        pgrx_validation::must_not_be_empty(description.as_ref())
+        pgrx_validation::must_be_paragraph(description.as_ref())
             .map_err(|e| e.rename_field(InsertableProcedureModelAttributes::Description))?;
         self.description = Some(description);
         Ok(self)
