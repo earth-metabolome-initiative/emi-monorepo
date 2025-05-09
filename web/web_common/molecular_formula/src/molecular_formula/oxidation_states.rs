@@ -18,10 +18,10 @@ impl super::MolecularFormula {
 
         match self {
             Self::Element(element) => {
-                oxidation_states.extend(element.oxidation_states().into_iter().copied());
+                oxidation_states.extend(element.oxidation_states().iter().copied());
             }
             Self::Isotope(isotope) => {
-                oxidation_states.extend(isotope.element().oxidation_states().into_iter().copied());
+                oxidation_states.extend(isotope.element().oxidation_states().iter().copied());
             }
             Self::Complex(formula) | Self::RepeatingUnit(formula) => {
                 let formula_oxidation_states = formula.oxidation_states()?;

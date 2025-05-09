@@ -50,89 +50,71 @@ impl Iterator for TokenIter<'_> {
     type Item = Result<crate::token::Token, crate::errors::Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some(c) = self.chars.next() {
-            match c {
-                '(' => return Some(Ok(crate::token::Token::OpenRoundBracket)),
-                ')' => return Some(Ok(crate::token::Token::CloseRoundBracket)),
-                '[' => return Some(Ok(crate::token::Token::OpenSquareBracket)),
-                ']' => return Some(Ok(crate::token::Token::CloseSquareBracket)),
-                '+' => return Some(Ok(crate::token::Token::Plus)),
-                '-' => return Some(Ok(crate::token::Token::Minus)),
-                '.' => return Some(Ok(crate::token::Token::Dot)),
-                '\u{207A}' => return Some(Ok(crate::token::Token::SuperscriptPlus)),
-                '\u{207B}' => return Some(Ok(crate::token::Token::SuperscriptMinus)),
-                _ if is_superscript_digit(c) => {
-                    let number = superscript_to_digit(c);
-                    let mut number = match u16::try_from(number) {
-                        Ok(number) => number,
-                        Err(_) => return Some(Err(crate::errors::Error::InvalidNumber)),
-                    };
-                    while let Some(&next) = self.chars.peek() {
-                        if is_superscript_digit(next) {
-                            let next = superscript_to_digit(next);
-                            number = number * 10
-                                + match u16::try_from(next) {
-                                    Ok(number) => number,
-                                    Err(_) => {
-                                        return Some(Err(crate::errors::Error::InvalidNumber));
-                                    }
-                                };
-                            self.chars.next();
-                        } else {
-                            break;
-                        }
+        Some(match self.chars.next()? {
+            '(' => Ok(crate::token::Token::OpenRoundBracket),
+            ')' => Ok(crate::token::Token::CloseRoundBracket),
+            '[' => Ok(crate::token::Token::OpenSquareBracket),
+            ']' => Ok(crate::token::Token::CloseSquareBracket),
+            '+' => Ok(crate::token::Token::Plus),
+            '-' => Ok(crate::token::Token::Minus),
+            '.' => Ok(crate::token::Token::Dot),
+            '\u{207A}' => Ok(crate::token::Token::SuperscriptPlus),
+            '\u{207B}' => Ok(crate::token::Token::SuperscriptMinus),
+            c if is_superscript_digit(c) => {
+                let number = superscript_to_digit(c);
+                let mut number = u16::from(number);
+                while let Some(&next) = self.chars.peek() {
+                    if is_superscript_digit(next) {
+                        let next = superscript_to_digit(next);
+                        number = number * 10 + u16::from(next);
+                        self.chars.next();
+                    } else {
+                        break;
                     }
-                    return Some(Ok(crate::token::Token::Superscript(number)));
                 }
-                _ if c.is_ascii_digit() => {
-                    let number = c.to_digit(10).unwrap();
-                    let mut number = match u16::try_from(number) {
-                        Ok(number) => number,
-                        Err(_) => return Some(Err(crate::errors::Error::InvalidNumber)),
-                    };
-                    while let Some(&next) = self.chars.peek() {
-                        if next.is_ascii_digit() {
-                            let next = next.to_digit(10).unwrap();
-                            number = number * 10
-                                + match u16::try_from(next) {
-                                    Ok(number) => number,
-                                    Err(_) => {
-                                        return Some(Err(crate::errors::Error::InvalidNumber));
-                                    }
-                                };
-                            self.chars.next();
-                        } else {
-                            break;
-                        }
+                Ok(crate::token::Token::Superscript(number))
+            }
+            c if c.is_ascii_digit() => {
+                let number = c.to_digit(10).unwrap();
+                let mut number = match u16::try_from(number) {
+                    Ok(number) => number,
+                    Err(_) => return Some(Err(crate::errors::Error::InvalidNumber)),
+                };
+                while let Some(&next) = self.chars.peek() {
+                    if next.is_ascii_digit() {
+                        let next = next.to_digit(10).unwrap();
+                        number = number * 10
+                            + match u16::try_from(next) {
+                                Ok(number) => number,
+                                Err(_) => {
+                                    return Some(Err(crate::errors::Error::InvalidNumber));
+                                }
+                            };
+                        self.chars.next();
+                    } else {
+                        break;
                     }
-                    return Some(Ok(crate::token::Token::Number(number)));
                 }
-                _ if c.is_alphabetic() => {
-                    // We peak whether the next character is an alphabetic character
-                    // and whether it is lowercase or uppercase.
-                    if let Some(&next) = self.chars.peek() {
-                        if next.is_lowercase() {
-                            self.chars.next();
-                            return Some(
-                                Element::try_from([c, next]).map(Into::into).map_err(Into::into),
-                            );
-                        }
-                        if c == 'R' {
-                            return Some(Ok(crate::token::Token::Residual));
-                        }
-
-                        return Some(Element::try_from(c).map(Into::into).map_err(Into::into));
+                Ok(crate::token::Token::Number(number))
+            }
+            c if c.is_alphabetic() => {
+                // We peak whether the next character is an alphabetic character
+                // and whether it is lowercase or uppercase.
+                if let Some(&next) = self.chars.peek() {
+                    if next.is_lowercase() {
+                        self.chars.next();
+                        return Some(
+                            Element::try_from([c, next]).map(Into::into).map_err(Into::into),
+                        );
                     }
-                    if c == 'R' {
-                        return Some(Ok(crate::token::Token::Residual));
-                    }
-                    return Some(Element::try_from(c).map(Into::into).map_err(Into::into));
                 }
-                invalid_character => {
-                    return Some(Err(crate::errors::Error::InvalidCharacter(invalid_character)));
+                if c == 'R' {
+                    Ok(crate::token::Token::Residual)
+                } else {
+                    Element::try_from(c).map(Into::into).map_err(Into::into)
                 }
             }
-        }
-        None
+            invalid_character => Err(crate::errors::Error::InvalidCharacter(invalid_character)),
+        })
     }
 }
