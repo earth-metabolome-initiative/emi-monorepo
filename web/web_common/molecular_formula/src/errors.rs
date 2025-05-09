@@ -5,7 +5,7 @@ use elements::{Element, errors::UnknownElement};
 
 use crate::token::Token;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 /// Enumeration of errors which may occur while parsing a molecular formula.
 pub enum Error {
     /// Error indicating that an unknown element was encountered.
@@ -29,6 +29,8 @@ pub enum Error {
     InvalidLeadingToken(Token),
     /// When the parser is not completely consumed.
     UnconsumedParser,
+    /// When an ion has a charge of 0.
+    ZeroCharge,
     /// When an oxidation state is invalid.
     InvalidOxidationState(Element, i8),
 }

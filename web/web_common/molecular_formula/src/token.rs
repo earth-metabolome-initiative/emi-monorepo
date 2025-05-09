@@ -24,8 +24,8 @@ pub enum Token {
     Plus,
     /// A minus sign
     Minus,
-    /// A multiplication sign
-    Mul,
+    /// A dot
+    Dot,
 }
 
 impl From<u8> for Token {

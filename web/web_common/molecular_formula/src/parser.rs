@@ -2,7 +2,7 @@
 
 use std::iter::Peekable;
 
-use crate::{Ion, MolecularFormula, Solvation, token::Token};
+use crate::{Ion, MolecularFormula, token::Token};
 
 mod token_iter;
 
@@ -42,26 +42,36 @@ impl Parser<'_> {
                 match inner_formula {
                     MolecularFormula::Sequence(sequence) => {
                         Some(MolecularFormula::Count(
-                            MolecularFormula::RepeatingUnit(sequence.into()).into(),
+                            MolecularFormula::RepeatingUnit(Box::new(MolecularFormula::Sequence(
+                                sequence,
+                            )))
+                            .into(),
                             count,
                         ))
                     }
                     _ => inner_formula.add_count_to_first_subformula(count).ok(),
                 }
             }
-            (Token::Plus, Some(MolecularFormula::Element(element))) => {
-                if !element.is_valid_oxidation_state(1) {
-                    return Err(crate::errors::Error::InvalidOxidationState(element, 1));
+            (Token::Plus | Token::Minus, Some(formula)) => {
+                // We need to check whether the next token is a number or not. If
+                // it is, we create a new `Ion` with the element and the number,
+                // otherwise we create a new `Ion` with the element and charge 1.
+                let mut charge: i8 = if let Some(Token::Number(charge)) =
+                    self.tokens_iter.peek().copied().transpose()?
+                {
+                    self.tokens_iter.next();
+                    i8::try_from(charge).map_err(|_| crate::errors::Error::InvalidNumber)?
+                } else {
+                    1
+                };
+
+                if token == Token::Minus {
+                    charge *= -1;
                 }
-                Some(MolecularFormula::Ion(Ion::new(element.into(), 1)))
+
+                Some(Ion::from_formula(formula, charge)?.into())
             }
-            (Token::Minus, Some(MolecularFormula::Element(element))) => {
-                if !element.is_valid_oxidation_state(1) {
-                    return Err(crate::errors::Error::InvalidOxidationState(element, 1));
-                }
-                Some(MolecularFormula::Ion(Ion::new(element.into(), -1)))
-            }
-            (Token::Mul, Some(formula)) => {
+            (Token::Dot, Some(formula)) => {
                 let (parser, inner_formula, closing_token) = self.inner_parse()?;
                 if closing_token.is_some() {
                     return Err(crate::errors::Error::ClosingToken {
@@ -70,42 +80,13 @@ impl Parser<'_> {
                     });
                 }
                 self = parser;
-                Some(Solvation::new(formula, inner_formula).into())
-            }
-            (Token::Plus, Some(MolecularFormula::Count(formula, count))) => {
-                match *formula {
-                    MolecularFormula::Element(element) => {
-                        Some(MolecularFormula::Ion(Ion::new(
-                            element.into(),
-                            i8::try_from(count).map_err(|_| crate::errors::Error::InvalidNumber)?,
-                        )))
-                    }
-                    formula => {
-                        Some(MolecularFormula::Ion(Ion::new(
-                            MolecularFormula::Count(formula.into(), count).into(),
-                            1,
-                        )))
-                    }
+                if let MolecularFormula::Mixture(mut mixture) = formula {
+                    mixture.push(inner_formula);
+                    Some(MolecularFormula::Mixture(mixture))
+                } else {
+                    Some(MolecularFormula::Mixture(vec![formula, inner_formula]))
                 }
             }
-            (Token::Minus, Some(MolecularFormula::Count(formula, count))) => {
-                match *formula {
-                    MolecularFormula::Element(element) => {
-                        Some(MolecularFormula::Ion(Ion::new(
-                            element.into(),
-                            -i8::try_from(count)
-                                .map_err(|_| crate::errors::Error::InvalidNumber)?,
-                        )))
-                    }
-                    formula => {
-                        Some(MolecularFormula::Ion(Ion::new(
-                            MolecularFormula::Count(formula.into(), count).into(),
-                            -1,
-                        )))
-                    }
-                }
-            }
-
             (Token::OpenRoundBracket, outer_formula) => {
                 let (parser, inner_formula, closing_token) = self.inner_parse()?;
                 if closing_token != Some(Token::CloseRoundBracket) {
@@ -153,11 +134,9 @@ impl Parser<'_> {
             (Token::CloseRoundBracket | Token::CloseSquareBracket, _) => {
                 unreachable!("This case should be handled in the `inner_parse` function")
             }
-            (Token::Mul | Token::Plus | Token::Minus, None) => {
+            (Token::Dot | Token::Plus | Token::Minus, None) => {
                 return Err(crate::errors::Error::InvalidLeadingToken(token));
             }
-
-            case => unimplemented!("Parsing of the case {case:?} is not implemented"),
         };
 
         Ok((self, new_formula))

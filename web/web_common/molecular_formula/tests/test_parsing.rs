@@ -14,12 +14,12 @@ const COMPLEX_FORMULAS: &[&str] = &[
     "Na3[AlF6]",
     "C55H72O5N4Mg",
     "C149H240N40O38S",
-    "[Cu(C2H4(NH2)2)2(H2O)2]SO4*H2O",
+    "[Cu(C2H4(NH2)2)2(H2O)2]SO4.H2O",
     "C76H104N20O24S4Zn",
-    "(NH4)6[Mo7O24]*4H2O",
-    "C6H6*CH3NO2",
-    "C6H6*CHCl3",
-    "C6H5NO2*HNO3",
+    "(NH4)6[Mo7O24].4H2O",
+    "C6H6.CH3NO2",
+    "C6H6.CHCl3",
+    "C6H5NO2.HNO3",
 ];
 
 const NAMED_FORMULAS: &[(&str, &str)] = &[
@@ -36,7 +36,7 @@ const NAMED_FORMULAS: &[(&str, &str)] = &[
     ("Aluminium iodide formula", "AlI3"),
     ("Aluminium oxide formula", "Al2O3"),
     ("Aluminium phosphate formula", "AlPO4"),
-    // ("Amino acid formula", "H2NCHRCOOH"), WTF ASK!
+    ("Amino acid formula", "H2NCHRCOOH"),
     ("Ammonia formula", "NH3"),
     ("Ammonium dichromate formula", "Cr2H8N2O7"),
     ("Ammonium acetate formula", "C2H3O2NH4"),
@@ -75,7 +75,7 @@ const NAMED_FORMULAS: &[(&str, &str)] = &[
     ("Bromine formula", "Br"),
     ("Butane formula", "C4H10"),
     ("Butanoic acid formula", "C4H8O2"),
-    ("Calcium acetate formula", "C₄H₆CaO₄"),
+    ("Calcium acetate formula", "C4H6CaO4"),
     ("Calcium bromide formula", "CaBr2"),
     ("Calcium carbonate formula", "CaCO3"),
     ("Calcium hydride formula", "CaH2"),

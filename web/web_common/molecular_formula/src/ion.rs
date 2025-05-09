@@ -2,6 +2,10 @@
 
 use std::fmt::Display;
 
+use elements::Element;
+
+use crate::MolecularFormula;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// Ion struct representing an ion with a specific element and charge.
 pub struct Ion<E> {
@@ -11,42 +15,94 @@ pub struct Ion<E> {
     pub(crate) charge: i8,
 }
 
-impl<E> Ion<E> {
-    /// Creates a new `Ion` instance with the given entry and charge.
+impl Ion<Element> {
+    /// Creates a new `Ion` instance with the given element and charge.
     ///
-    /// # Panics
+    /// # Arguments
     ///
-    /// * Panics if the charge is zero.
-    pub fn new(entry: E, charge: i8) -> Self {
-        assert!(charge != 0, "Ion charge cannot be zero. Use Element or MolecularFormula instead.");
-        Ion { entry, charge }
+    /// * `element` - The element to be used as the entry.
+    /// * `charge` - The charge of the ion.
+    ///
+    /// # Errors
+    ///
+    /// * If the charge is 0 or not in the oxidation states of the element, an
+    ///   error is returned.
+    /// * If the charge is not in the oxidation states of the element, an error
+    ///   is returned.
+    pub fn from_element(element: Element, charge: i8) -> Result<Self, crate::errors::Error> {
+        if charge == 0 {
+            return Err(crate::errors::Error::ZeroCharge);
+        }
+        if !element.oxidation_states().contains(&charge) {
+            return Err(crate::errors::Error::InvalidOxidationState(element, charge));
+        }
+        Ok(Ion { entry: element, charge })
     }
 }
 
-/// Electron molar mass in amu
-pub const ELECTRON_MOLAR_MASS: f64 = 0.000_548_58;
+impl Ion<MolecularFormula> {
+    /// Creates a new `Ion` instance with the given formula and charge.
+    ///
+    /// # Arguments
+    ///
+    /// * `formula` - The formula to be used as the entry.
+    /// * `charge` - The charge of the ion.
+    ///
+    /// # Errors
+    ///
+    /// * If the charge is 0 or not in the oxidation states of the element, an
+    ///   error is returned.
+    pub fn from_formula(
+        formula: MolecularFormula,
+        charge: i8,
+    ) -> Result<Self, crate::errors::Error> {
+        if charge == 0 {
+            return Err(crate::errors::Error::ZeroCharge);
+        }
+        if let MolecularFormula::Element(element) = &formula {
+            if !element.oxidation_states().contains(&charge) {
+                return Err(crate::errors::Error::InvalidOxidationState(element.clone(), charge));
+            }
+        }
+
+        Ok(Ion { entry: formula, charge })
+    }
+}
+
+impl From<Ion<elements::Element>> for Ion<MolecularFormula> {
+    fn from(ion: Ion<elements::Element>) -> Self {
+        Ion { entry: MolecularFormula::Element(ion.entry), charge: ion.charge }
+    }
+}
+
+impl From<Ion<elements::Element>> for Ion<Box<MolecularFormula>> {
+    fn from(ion: Ion<elements::Element>) -> Self {
+        Ion { entry: Box::new(MolecularFormula::Element(ion.entry)), charge: ion.charge }
+    }
+}
+
+impl From<Ion<MolecularFormula>> for Ion<Box<MolecularFormula>> {
+    fn from(ion: Ion<MolecularFormula>) -> Self {
+        Ion { entry: Box::new(ion.entry), charge: ion.charge }
+    }
+}
+
+/// Electron mass in amu
+pub const ELECTRON_MASS: f64 = 0.000_548_58;
 
 impl<E> Display for Ion<E>
 where
     E: Display,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self.charge.cmp(&0) {
-            std::cmp::Ordering::Less => {
-                if self.charge == -1 {
-                    write!(f, "{}-", self.entry)
-                } else {
-                    write!(f, "{}{}-", self.entry, -self.charge)
-                }
-            }
-            std::cmp::Ordering::Equal => write!(f, "{}", self.entry),
-            std::cmp::Ordering::Greater => {
-                if self.charge == 1 {
-                    write!(f, "{}+", self.entry)
-                } else {
-                    write!(f, "{}{}+", self.entry, self.charge)
-                }
-            }
+        if self.charge == -1 {
+            write!(f, "{}-", self.entry)
+        } else if self.charge == 1 {
+            write!(f, "{}+", self.entry)
+        } else if self.charge < 0 {
+            write!(f, "{}{}", self.entry, self.charge)
+        } else {
+            write!(f, "{}+{}", self.entry, self.charge)
         }
     }
 }

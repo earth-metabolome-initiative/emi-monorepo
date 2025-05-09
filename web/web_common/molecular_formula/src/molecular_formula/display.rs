@@ -9,21 +9,27 @@ impl Display for MolecularFormula {
         match self {
             Self::Element(element) => write!(f, "{element}"),
             Self::Ion(ion) => write!(f, "{ion}"),
-            Self::Solvation(solvation) => write!(f, "{solvation}"),
+            Self::Mixture(mixture) => {
+                write!(
+                    f,
+                    "{}",
+                    mixture.iter().map(MolecularFormula::to_string).collect::<Vec<_>>().join(".")
+                )
+            }
             Self::Count(formula, count) => {
                 match formula.as_ref() {
                     Self::Element(_) => {
                         if *count == 1 {
-                            unreachable!("Element should not be counted")
+                            unreachable!("Something appearing once should not be a count")
                         } else {
                             write!(f, "{formula}{count}")
                         }
                     }
                     _ => {
                         if *count == 1 {
-                            unreachable!("Element should not be counted")
+                            unreachable!("Something appearing once should not be a count")
                         } else {
-                            write!(f, "{count}[{formula}]")
+                            write!(f, "{count}{formula}")
                         }
                     }
                 }

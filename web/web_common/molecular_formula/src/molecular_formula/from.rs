@@ -4,7 +4,7 @@
 use elements::Element;
 
 use super::MolecularFormula;
-use crate::{Ion, Solvation};
+use crate::Ion;
 
 impl From<Element> for MolecularFormula {
     fn from(element: Element) -> Self {
@@ -24,20 +24,20 @@ impl From<Ion<Box<MolecularFormula>>> for MolecularFormula {
     }
 }
 
-impl From<Solvation> for MolecularFormula {
-    fn from(solvation: Solvation) -> Self {
-        MolecularFormula::Solvation(Box::new(solvation))
+impl From<Ion<MolecularFormula>> for MolecularFormula {
+    fn from(ion: Ion<MolecularFormula>) -> Self {
+        MolecularFormula::Ion(ion.into())
     }
 }
 
-impl From<Vec<MolecularFormula>> for MolecularFormula {
-    fn from(formulas: Vec<MolecularFormula>) -> Self {
-        MolecularFormula::Sequence(formulas)
+impl From<Ion<Element>> for MolecularFormula {
+    fn from(ion: Ion<Element>) -> Self {
+        MolecularFormula::Ion(ion.into())
     }
 }
 
-impl From<Vec<MolecularFormula>> for Box<MolecularFormula> {
-    fn from(formulas: Vec<MolecularFormula>) -> Self {
-        MolecularFormula::Sequence(formulas).into()
+impl From<Ion<Element>> for Box<MolecularFormula> {
+    fn from(ion: Ion<Element>) -> Self {
+        Box::new(ion.into())
     }
 }

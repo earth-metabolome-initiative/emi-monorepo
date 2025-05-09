@@ -26,7 +26,7 @@ impl Iterator for TokenIter<'_> {
                 ']' => return Some(Ok(crate::token::Token::CloseSquareBracket)),
                 '+' => return Some(Ok(crate::token::Token::Plus)),
                 '-' => return Some(Ok(crate::token::Token::Minus)),
-                '*' => return Some(Ok(crate::token::Token::Mul)),
+                '.' => return Some(Ok(crate::token::Token::Dot)),
                 _ if c.is_ascii_digit() => {
                     let Some(number) = c.to_digit(10) else {
                         return Some(Err(crate::errors::Error::InvalidNumber));
@@ -75,7 +75,9 @@ impl Iterator for TokenIter<'_> {
                     }
                     return Some(Element::try_from(c).map(Into::into).map_err(Into::into));
                 }
-                _ => {}
+                invalid_character => {
+                    return Some(Err(crate::errors::Error::InvalidCharacter(invalid_character)));
+                }
             }
         }
         None
