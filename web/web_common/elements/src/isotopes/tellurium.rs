@@ -182,8 +182,53 @@ impl super::IsotopicComposition for TelluriumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for TelluriumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for TelluriumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Te130
+    }
+}
+impl std::fmt::Display for TelluriumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Te105 => write!(f, "Te105"),
+            Self::Te106 => write!(f, "Te106"),
+            Self::Te107 => write!(f, "Te107"),
+            Self::Te108 => write!(f, "Te108"),
+            Self::Te109 => write!(f, "Te109"),
+            Self::Te110 => write!(f, "Te110"),
+            Self::Te111 => write!(f, "Te111"),
+            Self::Te112 => write!(f, "Te112"),
+            Self::Te113 => write!(f, "Te113"),
+            Self::Te114 => write!(f, "Te114"),
+            Self::Te115 => write!(f, "Te115"),
+            Self::Te116 => write!(f, "Te116"),
+            Self::Te117 => write!(f, "Te117"),
+            Self::Te118 => write!(f, "Te118"),
+            Self::Te119 => write!(f, "Te119"),
+            Self::Te120 => write!(f, "Te120"),
+            Self::Te121 => write!(f, "Te121"),
+            Self::Te122 => write!(f, "Te122"),
+            Self::Te123 => write!(f, "Te123"),
+            Self::Te124 => write!(f, "Te124"),
+            Self::Te125 => write!(f, "Te125"),
+            Self::Te126 => write!(f, "Te126"),
+            Self::Te127 => write!(f, "Te127"),
+            Self::Te128 => write!(f, "Te128"),
+            Self::Te129 => write!(f, "Te129"),
+            Self::Te130 => write!(f, "Te130"),
+            Self::Te131 => write!(f, "Te131"),
+            Self::Te132 => write!(f, "Te132"),
+            Self::Te133 => write!(f, "Te133"),
+            Self::Te134 => write!(f, "Te134"),
+            Self::Te135 => write!(f, "Te135"),
+            Self::Te136 => write!(f, "Te136"),
+            Self::Te137 => write!(f, "Te137"),
+            Self::Te138 => write!(f, "Te138"),
+            Self::Te139 => write!(f, "Te139"),
+            Self::Te140 => write!(f, "Te140"),
+            Self::Te141 => write!(f, "Te141"),
+            Self::Te142 => write!(f, "Te142"),
+            Self::Te143 => write!(f, "Te143"),
+        }
     }
 }

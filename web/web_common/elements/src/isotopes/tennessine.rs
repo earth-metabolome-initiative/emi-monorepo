@@ -42,8 +42,18 @@ impl super::IsotopicComposition for TennessineIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for TennessineIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for TennessineIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Uus294
+    }
+}
+impl std::fmt::Display for TennessineIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ts291 => write!(f, "Ts291"),
+            Self::Ts292 => write!(f, "Ts292"),
+            Self::Ts293 => write!(f, "Ts293"),
+            Self::Uus294 => write!(f, "Uus294"),
+        }
     }
 }

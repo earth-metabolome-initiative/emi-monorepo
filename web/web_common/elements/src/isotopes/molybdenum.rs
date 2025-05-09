@@ -166,8 +166,49 @@ impl super::IsotopicComposition for MolybdenumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for MolybdenumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for MolybdenumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Mo98
+    }
+}
+impl std::fmt::Display for MolybdenumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Mo83 => write!(f, "Mo83"),
+            Self::Mo84 => write!(f, "Mo84"),
+            Self::Mo85 => write!(f, "Mo85"),
+            Self::Mo86 => write!(f, "Mo86"),
+            Self::Mo87 => write!(f, "Mo87"),
+            Self::Mo88 => write!(f, "Mo88"),
+            Self::Mo89 => write!(f, "Mo89"),
+            Self::Mo90 => write!(f, "Mo90"),
+            Self::Mo91 => write!(f, "Mo91"),
+            Self::Mo92 => write!(f, "Mo92"),
+            Self::Mo93 => write!(f, "Mo93"),
+            Self::Mo94 => write!(f, "Mo94"),
+            Self::Mo95 => write!(f, "Mo95"),
+            Self::Mo96 => write!(f, "Mo96"),
+            Self::Mo97 => write!(f, "Mo97"),
+            Self::Mo98 => write!(f, "Mo98"),
+            Self::Mo99 => write!(f, "Mo99"),
+            Self::Mo100 => write!(f, "Mo100"),
+            Self::Mo101 => write!(f, "Mo101"),
+            Self::Mo102 => write!(f, "Mo102"),
+            Self::Mo103 => write!(f, "Mo103"),
+            Self::Mo104 => write!(f, "Mo104"),
+            Self::Mo105 => write!(f, "Mo105"),
+            Self::Mo106 => write!(f, "Mo106"),
+            Self::Mo107 => write!(f, "Mo107"),
+            Self::Mo108 => write!(f, "Mo108"),
+            Self::Mo109 => write!(f, "Mo109"),
+            Self::Mo110 => write!(f, "Mo110"),
+            Self::Mo111 => write!(f, "Mo111"),
+            Self::Mo112 => write!(f, "Mo112"),
+            Self::Mo113 => write!(f, "Mo113"),
+            Self::Mo114 => write!(f, "Mo114"),
+            Self::Mo115 => write!(f, "Mo115"),
+            Self::Mo116 => write!(f, "Mo116"),
+            Self::Mo117 => write!(f, "Mo117"),
+        }
     }
 }

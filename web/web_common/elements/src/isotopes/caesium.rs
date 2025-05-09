@@ -186,8 +186,54 @@ impl super::IsotopicComposition for CaesiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for CaesiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for CaesiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Cs133
+    }
+}
+impl std::fmt::Display for CaesiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Cs112 => write!(f, "Cs112"),
+            Self::Cs113 => write!(f, "Cs113"),
+            Self::Cs114 => write!(f, "Cs114"),
+            Self::Cs115 => write!(f, "Cs115"),
+            Self::Cs116 => write!(f, "Cs116"),
+            Self::Cs117 => write!(f, "Cs117"),
+            Self::Cs118 => write!(f, "Cs118"),
+            Self::Cs119 => write!(f, "Cs119"),
+            Self::Cs120 => write!(f, "Cs120"),
+            Self::Cs121 => write!(f, "Cs121"),
+            Self::Cs122 => write!(f, "Cs122"),
+            Self::Cs123 => write!(f, "Cs123"),
+            Self::Cs124 => write!(f, "Cs124"),
+            Self::Cs125 => write!(f, "Cs125"),
+            Self::Cs126 => write!(f, "Cs126"),
+            Self::Cs127 => write!(f, "Cs127"),
+            Self::Cs128 => write!(f, "Cs128"),
+            Self::Cs129 => write!(f, "Cs129"),
+            Self::Cs130 => write!(f, "Cs130"),
+            Self::Cs131 => write!(f, "Cs131"),
+            Self::Cs132 => write!(f, "Cs132"),
+            Self::Cs133 => write!(f, "Cs133"),
+            Self::Cs134 => write!(f, "Cs134"),
+            Self::Cs135 => write!(f, "Cs135"),
+            Self::Cs136 => write!(f, "Cs136"),
+            Self::Cs137 => write!(f, "Cs137"),
+            Self::Cs138 => write!(f, "Cs138"),
+            Self::Cs139 => write!(f, "Cs139"),
+            Self::Cs140 => write!(f, "Cs140"),
+            Self::Cs141 => write!(f, "Cs141"),
+            Self::Cs142 => write!(f, "Cs142"),
+            Self::Cs143 => write!(f, "Cs143"),
+            Self::Cs144 => write!(f, "Cs144"),
+            Self::Cs145 => write!(f, "Cs145"),
+            Self::Cs146 => write!(f, "Cs146"),
+            Self::Cs147 => write!(f, "Cs147"),
+            Self::Cs148 => write!(f, "Cs148"),
+            Self::Cs149 => write!(f, "Cs149"),
+            Self::Cs150 => write!(f, "Cs150"),
+            Self::Cs151 => write!(f, "Cs151"),
+        }
     }
 }

@@ -90,8 +90,30 @@ impl super::IsotopicComposition for CarbonIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for CarbonIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for CarbonIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::C12
+    }
+}
+impl std::fmt::Display for CarbonIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::C8 => write!(f, "C8"),
+            Self::C9 => write!(f, "C9"),
+            Self::C10 => write!(f, "C10"),
+            Self::C11 => write!(f, "C11"),
+            Self::C12 => write!(f, "C12"),
+            Self::C13 => write!(f, "C13"),
+            Self::C14 => write!(f, "C14"),
+            Self::C15 => write!(f, "C15"),
+            Self::C16 => write!(f, "C16"),
+            Self::C17 => write!(f, "C17"),
+            Self::C18 => write!(f, "C18"),
+            Self::C19 => write!(f, "C19"),
+            Self::C20 => write!(f, "C20"),
+            Self::C21 => write!(f, "C21"),
+            Self::C22 => write!(f, "C22"),
+            Self::C23 => write!(f, "C23"),
+        }
     }
 }

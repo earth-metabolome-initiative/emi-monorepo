@@ -94,8 +94,31 @@ impl super::IsotopicComposition for OxygenIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for OxygenIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for OxygenIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::O16
+    }
+}
+impl std::fmt::Display for OxygenIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::O12 => write!(f, "O12"),
+            Self::O13 => write!(f, "O13"),
+            Self::O14 => write!(f, "O14"),
+            Self::O15 => write!(f, "O15"),
+            Self::O16 => write!(f, "O16"),
+            Self::O17 => write!(f, "O17"),
+            Self::O18 => write!(f, "O18"),
+            Self::O19 => write!(f, "O19"),
+            Self::O20 => write!(f, "O20"),
+            Self::O21 => write!(f, "O21"),
+            Self::O22 => write!(f, "O22"),
+            Self::O23 => write!(f, "O23"),
+            Self::O24 => write!(f, "O24"),
+            Self::O25 => write!(f, "O25"),
+            Self::O26 => write!(f, "O26"),
+            Self::O27 => write!(f, "O27"),
+            Self::O28 => write!(f, "O28"),
+        }
     }
 }

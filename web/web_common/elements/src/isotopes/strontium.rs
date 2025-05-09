@@ -166,8 +166,49 @@ impl super::IsotopicComposition for StrontiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for StrontiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for StrontiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Sr88
+    }
+}
+impl std::fmt::Display for StrontiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Sr73 => write!(f, "Sr73"),
+            Self::Sr74 => write!(f, "Sr74"),
+            Self::Sr75 => write!(f, "Sr75"),
+            Self::Sr76 => write!(f, "Sr76"),
+            Self::Sr77 => write!(f, "Sr77"),
+            Self::Sr78 => write!(f, "Sr78"),
+            Self::Sr79 => write!(f, "Sr79"),
+            Self::Sr80 => write!(f, "Sr80"),
+            Self::Sr81 => write!(f, "Sr81"),
+            Self::Sr82 => write!(f, "Sr82"),
+            Self::Sr83 => write!(f, "Sr83"),
+            Self::Sr84 => write!(f, "Sr84"),
+            Self::Sr85 => write!(f, "Sr85"),
+            Self::Sr86 => write!(f, "Sr86"),
+            Self::Sr87 => write!(f, "Sr87"),
+            Self::Sr88 => write!(f, "Sr88"),
+            Self::Sr89 => write!(f, "Sr89"),
+            Self::Sr90 => write!(f, "Sr90"),
+            Self::Sr91 => write!(f, "Sr91"),
+            Self::Sr92 => write!(f, "Sr92"),
+            Self::Sr93 => write!(f, "Sr93"),
+            Self::Sr94 => write!(f, "Sr94"),
+            Self::Sr95 => write!(f, "Sr95"),
+            Self::Sr96 => write!(f, "Sr96"),
+            Self::Sr97 => write!(f, "Sr97"),
+            Self::Sr98 => write!(f, "Sr98"),
+            Self::Sr99 => write!(f, "Sr99"),
+            Self::Sr100 => write!(f, "Sr100"),
+            Self::Sr101 => write!(f, "Sr101"),
+            Self::Sr102 => write!(f, "Sr102"),
+            Self::Sr103 => write!(f, "Sr103"),
+            Self::Sr104 => write!(f, "Sr104"),
+            Self::Sr105 => write!(f, "Sr105"),
+            Self::Sr106 => write!(f, "Sr106"),
+            Self::Sr107 => write!(f, "Sr107"),
+        }
     }
 }

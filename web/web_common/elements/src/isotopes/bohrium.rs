@@ -90,8 +90,30 @@ impl super::IsotopicComposition for BohriumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for BohriumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for BohriumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Bh275
+    }
+}
+impl std::fmt::Display for BohriumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Bh260 => write!(f, "Bh260"),
+            Self::Bh261 => write!(f, "Bh261"),
+            Self::Bh262 => write!(f, "Bh262"),
+            Self::Bh263 => write!(f, "Bh263"),
+            Self::Bh264 => write!(f, "Bh264"),
+            Self::Bh265 => write!(f, "Bh265"),
+            Self::Bh266 => write!(f, "Bh266"),
+            Self::Bh267 => write!(f, "Bh267"),
+            Self::Bh268 => write!(f, "Bh268"),
+            Self::Bh269 => write!(f, "Bh269"),
+            Self::Bh270 => write!(f, "Bh270"),
+            Self::Bh271 => write!(f, "Bh271"),
+            Self::Bh272 => write!(f, "Bh272"),
+            Self::Bh273 => write!(f, "Bh273"),
+            Self::Bh274 => write!(f, "Bh274"),
+            Self::Bh275 => write!(f, "Bh275"),
+        }
     }
 }

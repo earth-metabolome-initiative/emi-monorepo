@@ -126,8 +126,39 @@ impl super::IsotopicComposition for CalciumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for CalciumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for CalciumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ca40
+    }
+}
+impl std::fmt::Display for CalciumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ca34 => write!(f, "Ca34"),
+            Self::Ca35 => write!(f, "Ca35"),
+            Self::Ca36 => write!(f, "Ca36"),
+            Self::Ca37 => write!(f, "Ca37"),
+            Self::Ca38 => write!(f, "Ca38"),
+            Self::Ca39 => write!(f, "Ca39"),
+            Self::Ca40 => write!(f, "Ca40"),
+            Self::Ca41 => write!(f, "Ca41"),
+            Self::Ca42 => write!(f, "Ca42"),
+            Self::Ca43 => write!(f, "Ca43"),
+            Self::Ca44 => write!(f, "Ca44"),
+            Self::Ca45 => write!(f, "Ca45"),
+            Self::Ca46 => write!(f, "Ca46"),
+            Self::Ca47 => write!(f, "Ca47"),
+            Self::Ca48 => write!(f, "Ca48"),
+            Self::Ca49 => write!(f, "Ca49"),
+            Self::Ca50 => write!(f, "Ca50"),
+            Self::Ca51 => write!(f, "Ca51"),
+            Self::Ca52 => write!(f, "Ca52"),
+            Self::Ca53 => write!(f, "Ca53"),
+            Self::Ca54 => write!(f, "Ca54"),
+            Self::Ca55 => write!(f, "Ca55"),
+            Self::Ca56 => write!(f, "Ca56"),
+            Self::Ca57 => write!(f, "Ca57"),
+            Self::Ca58 => write!(f, "Ca58"),
+        }
     }
 }

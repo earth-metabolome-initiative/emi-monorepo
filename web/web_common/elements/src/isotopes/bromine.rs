@@ -154,8 +154,46 @@ impl super::IsotopicComposition for BromineIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for BromineIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for BromineIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Br79
+    }
+}
+impl std::fmt::Display for BromineIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Br67 => write!(f, "Br67"),
+            Self::Br68 => write!(f, "Br68"),
+            Self::Br69 => write!(f, "Br69"),
+            Self::Br70 => write!(f, "Br70"),
+            Self::Br71 => write!(f, "Br71"),
+            Self::Br72 => write!(f, "Br72"),
+            Self::Br73 => write!(f, "Br73"),
+            Self::Br74 => write!(f, "Br74"),
+            Self::Br75 => write!(f, "Br75"),
+            Self::Br76 => write!(f, "Br76"),
+            Self::Br77 => write!(f, "Br77"),
+            Self::Br78 => write!(f, "Br78"),
+            Self::Br79 => write!(f, "Br79"),
+            Self::Br80 => write!(f, "Br80"),
+            Self::Br81 => write!(f, "Br81"),
+            Self::Br82 => write!(f, "Br82"),
+            Self::Br83 => write!(f, "Br83"),
+            Self::Br84 => write!(f, "Br84"),
+            Self::Br85 => write!(f, "Br85"),
+            Self::Br86 => write!(f, "Br86"),
+            Self::Br87 => write!(f, "Br87"),
+            Self::Br88 => write!(f, "Br88"),
+            Self::Br89 => write!(f, "Br89"),
+            Self::Br90 => write!(f, "Br90"),
+            Self::Br91 => write!(f, "Br91"),
+            Self::Br92 => write!(f, "Br92"),
+            Self::Br93 => write!(f, "Br93"),
+            Self::Br94 => write!(f, "Br94"),
+            Self::Br95 => write!(f, "Br95"),
+            Self::Br96 => write!(f, "Br96"),
+            Self::Br97 => write!(f, "Br97"),
+            Self::Br98 => write!(f, "Br98"),
+        }
     }
 }

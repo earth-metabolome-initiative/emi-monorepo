@@ -190,8 +190,55 @@ impl super::IsotopicComposition for BismuthIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for BismuthIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for BismuthIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Bi209
+    }
+}
+impl std::fmt::Display for BismuthIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Bi184 => write!(f, "Bi184"),
+            Self::Bi185 => write!(f, "Bi185"),
+            Self::Bi186 => write!(f, "Bi186"),
+            Self::Bi187 => write!(f, "Bi187"),
+            Self::Bi188 => write!(f, "Bi188"),
+            Self::Bi189 => write!(f, "Bi189"),
+            Self::Bi190 => write!(f, "Bi190"),
+            Self::Bi191 => write!(f, "Bi191"),
+            Self::Bi192 => write!(f, "Bi192"),
+            Self::Bi193 => write!(f, "Bi193"),
+            Self::Bi194 => write!(f, "Bi194"),
+            Self::Bi195 => write!(f, "Bi195"),
+            Self::Bi196 => write!(f, "Bi196"),
+            Self::Bi197 => write!(f, "Bi197"),
+            Self::Bi198 => write!(f, "Bi198"),
+            Self::Bi199 => write!(f, "Bi199"),
+            Self::Bi200 => write!(f, "Bi200"),
+            Self::Bi201 => write!(f, "Bi201"),
+            Self::Bi202 => write!(f, "Bi202"),
+            Self::Bi203 => write!(f, "Bi203"),
+            Self::Bi204 => write!(f, "Bi204"),
+            Self::Bi205 => write!(f, "Bi205"),
+            Self::Bi206 => write!(f, "Bi206"),
+            Self::Bi207 => write!(f, "Bi207"),
+            Self::Bi208 => write!(f, "Bi208"),
+            Self::Bi209 => write!(f, "Bi209"),
+            Self::Bi210 => write!(f, "Bi210"),
+            Self::Bi211 => write!(f, "Bi211"),
+            Self::Bi212 => write!(f, "Bi212"),
+            Self::Bi213 => write!(f, "Bi213"),
+            Self::Bi214 => write!(f, "Bi214"),
+            Self::Bi215 => write!(f, "Bi215"),
+            Self::Bi216 => write!(f, "Bi216"),
+            Self::Bi217 => write!(f, "Bi217"),
+            Self::Bi218 => write!(f, "Bi218"),
+            Self::Bi219 => write!(f, "Bi219"),
+            Self::Bi220 => write!(f, "Bi220"),
+            Self::Bi221 => write!(f, "Bi221"),
+            Self::Bi222 => write!(f, "Bi222"),
+            Self::Bi223 => write!(f, "Bi223"),
+            Self::Bi224 => write!(f, "Bi224"),
+        }
     }
 }

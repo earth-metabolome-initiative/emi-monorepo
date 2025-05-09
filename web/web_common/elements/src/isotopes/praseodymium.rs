@@ -182,8 +182,53 @@ impl super::IsotopicComposition for PraseodymiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for PraseodymiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for PraseodymiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Pr141
+    }
+}
+impl std::fmt::Display for PraseodymiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Pr121 => write!(f, "Pr121"),
+            Self::Pr122 => write!(f, "Pr122"),
+            Self::Pr123 => write!(f, "Pr123"),
+            Self::Pr124 => write!(f, "Pr124"),
+            Self::Pr125 => write!(f, "Pr125"),
+            Self::Pr126 => write!(f, "Pr126"),
+            Self::Pr127 => write!(f, "Pr127"),
+            Self::Pr128 => write!(f, "Pr128"),
+            Self::Pr129 => write!(f, "Pr129"),
+            Self::Pr130 => write!(f, "Pr130"),
+            Self::Pr131 => write!(f, "Pr131"),
+            Self::Pr132 => write!(f, "Pr132"),
+            Self::Pr133 => write!(f, "Pr133"),
+            Self::Pr134 => write!(f, "Pr134"),
+            Self::Pr135 => write!(f, "Pr135"),
+            Self::Pr136 => write!(f, "Pr136"),
+            Self::Pr137 => write!(f, "Pr137"),
+            Self::Pr138 => write!(f, "Pr138"),
+            Self::Pr139 => write!(f, "Pr139"),
+            Self::Pr140 => write!(f, "Pr140"),
+            Self::Pr141 => write!(f, "Pr141"),
+            Self::Pr142 => write!(f, "Pr142"),
+            Self::Pr143 => write!(f, "Pr143"),
+            Self::Pr144 => write!(f, "Pr144"),
+            Self::Pr145 => write!(f, "Pr145"),
+            Self::Pr146 => write!(f, "Pr146"),
+            Self::Pr147 => write!(f, "Pr147"),
+            Self::Pr148 => write!(f, "Pr148"),
+            Self::Pr149 => write!(f, "Pr149"),
+            Self::Pr150 => write!(f, "Pr150"),
+            Self::Pr151 => write!(f, "Pr151"),
+            Self::Pr152 => write!(f, "Pr152"),
+            Self::Pr153 => write!(f, "Pr153"),
+            Self::Pr154 => write!(f, "Pr154"),
+            Self::Pr155 => write!(f, "Pr155"),
+            Self::Pr156 => write!(f, "Pr156"),
+            Self::Pr157 => write!(f, "Pr157"),
+            Self::Pr158 => write!(f, "Pr158"),
+            Self::Pr159 => write!(f, "Pr159"),
+        }
     }
 }

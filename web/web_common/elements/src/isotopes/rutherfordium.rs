@@ -90,8 +90,30 @@ impl super::IsotopicComposition for RutherfordiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for RutherfordiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for RutherfordiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Rf268
+    }
+}
+impl std::fmt::Display for RutherfordiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Rf253 => write!(f, "Rf253"),
+            Self::Rf254 => write!(f, "Rf254"),
+            Self::Rf255 => write!(f, "Rf255"),
+            Self::Rf256 => write!(f, "Rf256"),
+            Self::Rf257 => write!(f, "Rf257"),
+            Self::Rf258 => write!(f, "Rf258"),
+            Self::Rf259 => write!(f, "Rf259"),
+            Self::Rf260 => write!(f, "Rf260"),
+            Self::Rf261 => write!(f, "Rf261"),
+            Self::Rf262 => write!(f, "Rf262"),
+            Self::Rf263 => write!(f, "Rf263"),
+            Self::Rf264 => write!(f, "Rf264"),
+            Self::Rf265 => write!(f, "Rf265"),
+            Self::Rf266 => write!(f, "Rf266"),
+            Self::Rf267 => write!(f, "Rf267"),
+            Self::Rf268 => write!(f, "Rf268"),
+        }
     }
 }

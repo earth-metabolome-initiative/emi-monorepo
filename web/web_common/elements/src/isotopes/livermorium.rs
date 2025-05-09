@@ -46,8 +46,19 @@ impl super::IsotopicComposition for LivermoriumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for LivermoriumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for LivermoriumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Lv293
+    }
+}
+impl std::fmt::Display for LivermoriumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Lv289 => write!(f, "Lv289"),
+            Self::Lv290 => write!(f, "Lv290"),
+            Self::Lv291 => write!(f, "Lv291"),
+            Self::Lv292 => write!(f, "Lv292"),
+            Self::Lv293 => write!(f, "Lv293"),
+        }
     }
 }

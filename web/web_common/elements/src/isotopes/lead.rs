@@ -198,8 +198,57 @@ impl super::IsotopicComposition for LeadIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for LeadIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for LeadIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Pb208
+    }
+}
+impl std::fmt::Display for LeadIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Pb178 => write!(f, "Pb178"),
+            Self::Pb179 => write!(f, "Pb179"),
+            Self::Pb180 => write!(f, "Pb180"),
+            Self::Pb181 => write!(f, "Pb181"),
+            Self::Pb182 => write!(f, "Pb182"),
+            Self::Pb183 => write!(f, "Pb183"),
+            Self::Pb184 => write!(f, "Pb184"),
+            Self::Pb185 => write!(f, "Pb185"),
+            Self::Pb186 => write!(f, "Pb186"),
+            Self::Pb187 => write!(f, "Pb187"),
+            Self::Pb188 => write!(f, "Pb188"),
+            Self::Pb189 => write!(f, "Pb189"),
+            Self::Pb190 => write!(f, "Pb190"),
+            Self::Pb191 => write!(f, "Pb191"),
+            Self::Pb192 => write!(f, "Pb192"),
+            Self::Pb193 => write!(f, "Pb193"),
+            Self::Pb194 => write!(f, "Pb194"),
+            Self::Pb195 => write!(f, "Pb195"),
+            Self::Pb196 => write!(f, "Pb196"),
+            Self::Pb197 => write!(f, "Pb197"),
+            Self::Pb198 => write!(f, "Pb198"),
+            Self::Pb199 => write!(f, "Pb199"),
+            Self::Pb200 => write!(f, "Pb200"),
+            Self::Pb201 => write!(f, "Pb201"),
+            Self::Pb202 => write!(f, "Pb202"),
+            Self::Pb203 => write!(f, "Pb203"),
+            Self::Pb204 => write!(f, "Pb204"),
+            Self::Pb205 => write!(f, "Pb205"),
+            Self::Pb206 => write!(f, "Pb206"),
+            Self::Pb207 => write!(f, "Pb207"),
+            Self::Pb208 => write!(f, "Pb208"),
+            Self::Pb209 => write!(f, "Pb209"),
+            Self::Pb210 => write!(f, "Pb210"),
+            Self::Pb211 => write!(f, "Pb211"),
+            Self::Pb212 => write!(f, "Pb212"),
+            Self::Pb213 => write!(f, "Pb213"),
+            Self::Pb214 => write!(f, "Pb214"),
+            Self::Pb215 => write!(f, "Pb215"),
+            Self::Pb216 => write!(f, "Pb216"),
+            Self::Pb217 => write!(f, "Pb217"),
+            Self::Pb218 => write!(f, "Pb218"),
+            Self::Pb219 => write!(f, "Pb219"),
+            Self::Pb220 => write!(f, "Pb220"),
+        }
     }
 }

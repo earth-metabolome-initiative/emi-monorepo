@@ -122,8 +122,38 @@ impl super::IsotopicComposition for ChlorineIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for ChlorineIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for ChlorineIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Cl35
+    }
+}
+impl std::fmt::Display for ChlorineIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Cl28 => write!(f, "Cl28"),
+            Self::Cl29 => write!(f, "Cl29"),
+            Self::Cl30 => write!(f, "Cl30"),
+            Self::Cl31 => write!(f, "Cl31"),
+            Self::Cl32 => write!(f, "Cl32"),
+            Self::Cl33 => write!(f, "Cl33"),
+            Self::Cl34 => write!(f, "Cl34"),
+            Self::Cl35 => write!(f, "Cl35"),
+            Self::Cl36 => write!(f, "Cl36"),
+            Self::Cl37 => write!(f, "Cl37"),
+            Self::Cl38 => write!(f, "Cl38"),
+            Self::Cl39 => write!(f, "Cl39"),
+            Self::Cl40 => write!(f, "Cl40"),
+            Self::Cl41 => write!(f, "Cl41"),
+            Self::Cl42 => write!(f, "Cl42"),
+            Self::Cl43 => write!(f, "Cl43"),
+            Self::Cl44 => write!(f, "Cl44"),
+            Self::Cl45 => write!(f, "Cl45"),
+            Self::Cl46 => write!(f, "Cl46"),
+            Self::Cl47 => write!(f, "Cl47"),
+            Self::Cl48 => write!(f, "Cl48"),
+            Self::Cl49 => write!(f, "Cl49"),
+            Self::Cl50 => write!(f, "Cl50"),
+            Self::Cl51 => write!(f, "Cl51"),
+        }
     }
 }

@@ -154,8 +154,46 @@ impl super::IsotopicComposition for NickelIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for NickelIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for NickelIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ni58
+    }
+}
+impl std::fmt::Display for NickelIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ni48 => write!(f, "Ni48"),
+            Self::Ni49 => write!(f, "Ni49"),
+            Self::Ni50 => write!(f, "Ni50"),
+            Self::Ni51 => write!(f, "Ni51"),
+            Self::Ni52 => write!(f, "Ni52"),
+            Self::Ni53 => write!(f, "Ni53"),
+            Self::Ni54 => write!(f, "Ni54"),
+            Self::Ni55 => write!(f, "Ni55"),
+            Self::Ni56 => write!(f, "Ni56"),
+            Self::Ni57 => write!(f, "Ni57"),
+            Self::Ni58 => write!(f, "Ni58"),
+            Self::Ni59 => write!(f, "Ni59"),
+            Self::Ni60 => write!(f, "Ni60"),
+            Self::Ni61 => write!(f, "Ni61"),
+            Self::Ni62 => write!(f, "Ni62"),
+            Self::Ni63 => write!(f, "Ni63"),
+            Self::Ni64 => write!(f, "Ni64"),
+            Self::Ni65 => write!(f, "Ni65"),
+            Self::Ni66 => write!(f, "Ni66"),
+            Self::Ni67 => write!(f, "Ni67"),
+            Self::Ni68 => write!(f, "Ni68"),
+            Self::Ni69 => write!(f, "Ni69"),
+            Self::Ni70 => write!(f, "Ni70"),
+            Self::Ni71 => write!(f, "Ni71"),
+            Self::Ni72 => write!(f, "Ni72"),
+            Self::Ni73 => write!(f, "Ni73"),
+            Self::Ni74 => write!(f, "Ni74"),
+            Self::Ni75 => write!(f, "Ni75"),
+            Self::Ni76 => write!(f, "Ni76"),
+            Self::Ni77 => write!(f, "Ni77"),
+            Self::Ni78 => write!(f, "Ni78"),
+            Self::Ni79 => write!(f, "Ni79"),
+        }
     }
 }

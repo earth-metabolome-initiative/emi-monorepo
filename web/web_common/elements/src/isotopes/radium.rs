@@ -166,8 +166,49 @@ impl super::IsotopicComposition for RadiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for RadiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for RadiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ra235
+    }
+}
+impl std::fmt::Display for RadiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ra201 => write!(f, "Ra201"),
+            Self::Ra202 => write!(f, "Ra202"),
+            Self::Ra203 => write!(f, "Ra203"),
+            Self::Ra204 => write!(f, "Ra204"),
+            Self::Ra205 => write!(f, "Ra205"),
+            Self::Ra206 => write!(f, "Ra206"),
+            Self::Ra207 => write!(f, "Ra207"),
+            Self::Ra208 => write!(f, "Ra208"),
+            Self::Ra209 => write!(f, "Ra209"),
+            Self::Ra210 => write!(f, "Ra210"),
+            Self::Ra211 => write!(f, "Ra211"),
+            Self::Ra212 => write!(f, "Ra212"),
+            Self::Ra213 => write!(f, "Ra213"),
+            Self::Ra214 => write!(f, "Ra214"),
+            Self::Ra215 => write!(f, "Ra215"),
+            Self::Ra216 => write!(f, "Ra216"),
+            Self::Ra217 => write!(f, "Ra217"),
+            Self::Ra218 => write!(f, "Ra218"),
+            Self::Ra219 => write!(f, "Ra219"),
+            Self::Ra220 => write!(f, "Ra220"),
+            Self::Ra221 => write!(f, "Ra221"),
+            Self::Ra222 => write!(f, "Ra222"),
+            Self::Ra223 => write!(f, "Ra223"),
+            Self::Ra224 => write!(f, "Ra224"),
+            Self::Ra225 => write!(f, "Ra225"),
+            Self::Ra226 => write!(f, "Ra226"),
+            Self::Ra227 => write!(f, "Ra227"),
+            Self::Ra228 => write!(f, "Ra228"),
+            Self::Ra229 => write!(f, "Ra229"),
+            Self::Ra230 => write!(f, "Ra230"),
+            Self::Ra231 => write!(f, "Ra231"),
+            Self::Ra232 => write!(f, "Ra232"),
+            Self::Ra233 => write!(f, "Ra233"),
+            Self::Ra234 => write!(f, "Ra234"),
+            Self::Ra235 => write!(f, "Ra235"),
+        }
     }
 }

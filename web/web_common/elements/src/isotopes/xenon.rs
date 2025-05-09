@@ -186,8 +186,54 @@ impl super::IsotopicComposition for XenonIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for XenonIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for XenonIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Xe132
+    }
+}
+impl std::fmt::Display for XenonIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Xe109 => write!(f, "Xe109"),
+            Self::Xe110 => write!(f, "Xe110"),
+            Self::Xe111 => write!(f, "Xe111"),
+            Self::Xe112 => write!(f, "Xe112"),
+            Self::Xe113 => write!(f, "Xe113"),
+            Self::Xe114 => write!(f, "Xe114"),
+            Self::Xe115 => write!(f, "Xe115"),
+            Self::Xe116 => write!(f, "Xe116"),
+            Self::Xe117 => write!(f, "Xe117"),
+            Self::Xe118 => write!(f, "Xe118"),
+            Self::Xe119 => write!(f, "Xe119"),
+            Self::Xe120 => write!(f, "Xe120"),
+            Self::Xe121 => write!(f, "Xe121"),
+            Self::Xe122 => write!(f, "Xe122"),
+            Self::Xe123 => write!(f, "Xe123"),
+            Self::Xe124 => write!(f, "Xe124"),
+            Self::Xe125 => write!(f, "Xe125"),
+            Self::Xe126 => write!(f, "Xe126"),
+            Self::Xe127 => write!(f, "Xe127"),
+            Self::Xe128 => write!(f, "Xe128"),
+            Self::Xe129 => write!(f, "Xe129"),
+            Self::Xe130 => write!(f, "Xe130"),
+            Self::Xe131 => write!(f, "Xe131"),
+            Self::Xe132 => write!(f, "Xe132"),
+            Self::Xe133 => write!(f, "Xe133"),
+            Self::Xe134 => write!(f, "Xe134"),
+            Self::Xe135 => write!(f, "Xe135"),
+            Self::Xe136 => write!(f, "Xe136"),
+            Self::Xe137 => write!(f, "Xe137"),
+            Self::Xe138 => write!(f, "Xe138"),
+            Self::Xe139 => write!(f, "Xe139"),
+            Self::Xe140 => write!(f, "Xe140"),
+            Self::Xe141 => write!(f, "Xe141"),
+            Self::Xe142 => write!(f, "Xe142"),
+            Self::Xe143 => write!(f, "Xe143"),
+            Self::Xe144 => write!(f, "Xe144"),
+            Self::Xe145 => write!(f, "Xe145"),
+            Self::Xe146 => write!(f, "Xe146"),
+            Self::Xe147 => write!(f, "Xe147"),
+            Self::Xe148 => write!(f, "Xe148"),
+        }
     }
 }

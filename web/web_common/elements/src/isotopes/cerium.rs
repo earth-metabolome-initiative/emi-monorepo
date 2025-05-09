@@ -182,8 +182,53 @@ impl super::IsotopicComposition for CeriumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for CeriumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for CeriumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ce140
+    }
+}
+impl std::fmt::Display for CeriumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ce119 => write!(f, "Ce119"),
+            Self::Ce120 => write!(f, "Ce120"),
+            Self::Ce121 => write!(f, "Ce121"),
+            Self::Ce122 => write!(f, "Ce122"),
+            Self::Ce123 => write!(f, "Ce123"),
+            Self::Ce124 => write!(f, "Ce124"),
+            Self::Ce125 => write!(f, "Ce125"),
+            Self::Ce126 => write!(f, "Ce126"),
+            Self::Ce127 => write!(f, "Ce127"),
+            Self::Ce128 => write!(f, "Ce128"),
+            Self::Ce129 => write!(f, "Ce129"),
+            Self::Ce130 => write!(f, "Ce130"),
+            Self::Ce131 => write!(f, "Ce131"),
+            Self::Ce132 => write!(f, "Ce132"),
+            Self::Ce133 => write!(f, "Ce133"),
+            Self::Ce134 => write!(f, "Ce134"),
+            Self::Ce135 => write!(f, "Ce135"),
+            Self::Ce136 => write!(f, "Ce136"),
+            Self::Ce137 => write!(f, "Ce137"),
+            Self::Ce138 => write!(f, "Ce138"),
+            Self::Ce139 => write!(f, "Ce139"),
+            Self::Ce140 => write!(f, "Ce140"),
+            Self::Ce141 => write!(f, "Ce141"),
+            Self::Ce142 => write!(f, "Ce142"),
+            Self::Ce143 => write!(f, "Ce143"),
+            Self::Ce144 => write!(f, "Ce144"),
+            Self::Ce145 => write!(f, "Ce145"),
+            Self::Ce146 => write!(f, "Ce146"),
+            Self::Ce147 => write!(f, "Ce147"),
+            Self::Ce148 => write!(f, "Ce148"),
+            Self::Ce149 => write!(f, "Ce149"),
+            Self::Ce150 => write!(f, "Ce150"),
+            Self::Ce151 => write!(f, "Ce151"),
+            Self::Ce152 => write!(f, "Ce152"),
+            Self::Ce153 => write!(f, "Ce153"),
+            Self::Ce154 => write!(f, "Ce154"),
+            Self::Ce155 => write!(f, "Ce155"),
+            Self::Ce156 => write!(f, "Ce156"),
+            Self::Ce157 => write!(f, "Ce157"),
+        }
     }
 }

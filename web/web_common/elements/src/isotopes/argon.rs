@@ -122,8 +122,38 @@ impl super::IsotopicComposition for ArgonIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for ArgonIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for ArgonIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ar40
+    }
+}
+impl std::fmt::Display for ArgonIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ar30 => write!(f, "Ar30"),
+            Self::Ar31 => write!(f, "Ar31"),
+            Self::Ar32 => write!(f, "Ar32"),
+            Self::Ar33 => write!(f, "Ar33"),
+            Self::Ar34 => write!(f, "Ar34"),
+            Self::Ar35 => write!(f, "Ar35"),
+            Self::Ar36 => write!(f, "Ar36"),
+            Self::Ar37 => write!(f, "Ar37"),
+            Self::Ar38 => write!(f, "Ar38"),
+            Self::Ar39 => write!(f, "Ar39"),
+            Self::Ar40 => write!(f, "Ar40"),
+            Self::Ar41 => write!(f, "Ar41"),
+            Self::Ar42 => write!(f, "Ar42"),
+            Self::Ar43 => write!(f, "Ar43"),
+            Self::Ar44 => write!(f, "Ar44"),
+            Self::Ar45 => write!(f, "Ar45"),
+            Self::Ar46 => write!(f, "Ar46"),
+            Self::Ar47 => write!(f, "Ar47"),
+            Self::Ar48 => write!(f, "Ar48"),
+            Self::Ar49 => write!(f, "Ar49"),
+            Self::Ar50 => write!(f, "Ar50"),
+            Self::Ar51 => write!(f, "Ar51"),
+            Self::Ar52 => write!(f, "Ar52"),
+            Self::Ar53 => write!(f, "Ar53"),
+        }
     }
 }

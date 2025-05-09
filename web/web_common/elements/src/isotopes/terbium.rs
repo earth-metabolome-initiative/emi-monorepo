@@ -174,8 +174,51 @@ impl super::IsotopicComposition for TerbiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for TerbiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for TerbiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Tb159
+    }
+}
+impl std::fmt::Display for TerbiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Tb135 => write!(f, "Tb135"),
+            Self::Tb136 => write!(f, "Tb136"),
+            Self::Tb137 => write!(f, "Tb137"),
+            Self::Tb138 => write!(f, "Tb138"),
+            Self::Tb139 => write!(f, "Tb139"),
+            Self::Tb140 => write!(f, "Tb140"),
+            Self::Tb141 => write!(f, "Tb141"),
+            Self::Tb142 => write!(f, "Tb142"),
+            Self::Tb143 => write!(f, "Tb143"),
+            Self::Tb144 => write!(f, "Tb144"),
+            Self::Tb145 => write!(f, "Tb145"),
+            Self::Tb146 => write!(f, "Tb146"),
+            Self::Tb147 => write!(f, "Tb147"),
+            Self::Tb148 => write!(f, "Tb148"),
+            Self::Tb149 => write!(f, "Tb149"),
+            Self::Tb150 => write!(f, "Tb150"),
+            Self::Tb151 => write!(f, "Tb151"),
+            Self::Tb152 => write!(f, "Tb152"),
+            Self::Tb153 => write!(f, "Tb153"),
+            Self::Tb154 => write!(f, "Tb154"),
+            Self::Tb155 => write!(f, "Tb155"),
+            Self::Tb156 => write!(f, "Tb156"),
+            Self::Tb157 => write!(f, "Tb157"),
+            Self::Tb158 => write!(f, "Tb158"),
+            Self::Tb159 => write!(f, "Tb159"),
+            Self::Tb160 => write!(f, "Tb160"),
+            Self::Tb161 => write!(f, "Tb161"),
+            Self::Tb162 => write!(f, "Tb162"),
+            Self::Tb163 => write!(f, "Tb163"),
+            Self::Tb164 => write!(f, "Tb164"),
+            Self::Tb165 => write!(f, "Tb165"),
+            Self::Tb166 => write!(f, "Tb166"),
+            Self::Tb167 => write!(f, "Tb167"),
+            Self::Tb168 => write!(f, "Tb168"),
+            Self::Tb169 => write!(f, "Tb169"),
+            Self::Tb170 => write!(f, "Tb170"),
+            Self::Tb171 => write!(f, "Tb171"),
+        }
     }
 }

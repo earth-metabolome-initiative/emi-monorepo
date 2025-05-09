@@ -90,8 +90,30 @@ impl super::IsotopicComposition for LawrenciumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for LawrenciumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for LawrenciumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Lr266
+    }
+}
+impl std::fmt::Display for LawrenciumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Lr251 => write!(f, "Lr251"),
+            Self::Lr252 => write!(f, "Lr252"),
+            Self::Lr253 => write!(f, "Lr253"),
+            Self::Lr254 => write!(f, "Lr254"),
+            Self::Lr255 => write!(f, "Lr255"),
+            Self::Lr256 => write!(f, "Lr256"),
+            Self::Lr257 => write!(f, "Lr257"),
+            Self::Lr258 => write!(f, "Lr258"),
+            Self::Lr259 => write!(f, "Lr259"),
+            Self::Lr260 => write!(f, "Lr260"),
+            Self::Lr261 => write!(f, "Lr261"),
+            Self::Lr262 => write!(f, "Lr262"),
+            Self::Lr263 => write!(f, "Lr263"),
+            Self::Lr264 => write!(f, "Lr264"),
+            Self::Lr265 => write!(f, "Lr265"),
+            Self::Lr266 => write!(f, "Lr266"),
+        }
     }
 }

@@ -90,8 +90,30 @@ impl super::IsotopicComposition for DubniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for DubniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for DubniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Db270
+    }
+}
+impl std::fmt::Display for DubniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Db255 => write!(f, "Db255"),
+            Self::Db256 => write!(f, "Db256"),
+            Self::Db257 => write!(f, "Db257"),
+            Self::Db258 => write!(f, "Db258"),
+            Self::Db259 => write!(f, "Db259"),
+            Self::Db260 => write!(f, "Db260"),
+            Self::Db261 => write!(f, "Db261"),
+            Self::Db262 => write!(f, "Db262"),
+            Self::Db263 => write!(f, "Db263"),
+            Self::Db264 => write!(f, "Db264"),
+            Self::Db265 => write!(f, "Db265"),
+            Self::Db266 => write!(f, "Db266"),
+            Self::Db267 => write!(f, "Db267"),
+            Self::Db268 => write!(f, "Db268"),
+            Self::Db269 => write!(f, "Db269"),
+            Self::Db270 => write!(f, "Db270"),
+        }
     }
 }

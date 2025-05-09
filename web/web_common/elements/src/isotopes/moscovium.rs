@@ -46,8 +46,19 @@ impl super::IsotopicComposition for MoscoviumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for MoscoviumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for MoscoviumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Uup291
+    }
+}
+impl std::fmt::Display for MoscoviumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Mc287 => write!(f, "Mc287"),
+            Self::Mc288 => write!(f, "Mc288"),
+            Self::Mc289 => write!(f, "Mc289"),
+            Self::Mc290 => write!(f, "Mc290"),
+            Self::Uup291 => write!(f, "Uup291"),
+        }
     }
 }

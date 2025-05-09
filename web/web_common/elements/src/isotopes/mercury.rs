@@ -210,8 +210,60 @@ impl super::IsotopicComposition for MercuryIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for MercuryIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for MercuryIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Hg202
+    }
+}
+impl std::fmt::Display for MercuryIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Hg171 => write!(f, "Hg171"),
+            Self::Hg172 => write!(f, "Hg172"),
+            Self::Hg173 => write!(f, "Hg173"),
+            Self::Hg174 => write!(f, "Hg174"),
+            Self::Hg175 => write!(f, "Hg175"),
+            Self::Hg176 => write!(f, "Hg176"),
+            Self::Hg177 => write!(f, "Hg177"),
+            Self::Hg178 => write!(f, "Hg178"),
+            Self::Hg179 => write!(f, "Hg179"),
+            Self::Hg180 => write!(f, "Hg180"),
+            Self::Hg181 => write!(f, "Hg181"),
+            Self::Hg182 => write!(f, "Hg182"),
+            Self::Hg183 => write!(f, "Hg183"),
+            Self::Hg184 => write!(f, "Hg184"),
+            Self::Hg185 => write!(f, "Hg185"),
+            Self::Hg186 => write!(f, "Hg186"),
+            Self::Hg187 => write!(f, "Hg187"),
+            Self::Hg188 => write!(f, "Hg188"),
+            Self::Hg189 => write!(f, "Hg189"),
+            Self::Hg190 => write!(f, "Hg190"),
+            Self::Hg191 => write!(f, "Hg191"),
+            Self::Hg192 => write!(f, "Hg192"),
+            Self::Hg193 => write!(f, "Hg193"),
+            Self::Hg194 => write!(f, "Hg194"),
+            Self::Hg195 => write!(f, "Hg195"),
+            Self::Hg196 => write!(f, "Hg196"),
+            Self::Hg197 => write!(f, "Hg197"),
+            Self::Hg198 => write!(f, "Hg198"),
+            Self::Hg199 => write!(f, "Hg199"),
+            Self::Hg200 => write!(f, "Hg200"),
+            Self::Hg201 => write!(f, "Hg201"),
+            Self::Hg202 => write!(f, "Hg202"),
+            Self::Hg203 => write!(f, "Hg203"),
+            Self::Hg204 => write!(f, "Hg204"),
+            Self::Hg205 => write!(f, "Hg205"),
+            Self::Hg206 => write!(f, "Hg206"),
+            Self::Hg207 => write!(f, "Hg207"),
+            Self::Hg208 => write!(f, "Hg208"),
+            Self::Hg209 => write!(f, "Hg209"),
+            Self::Hg210 => write!(f, "Hg210"),
+            Self::Hg211 => write!(f, "Hg211"),
+            Self::Hg212 => write!(f, "Hg212"),
+            Self::Hg213 => write!(f, "Hg213"),
+            Self::Hg214 => write!(f, "Hg214"),
+            Self::Hg215 => write!(f, "Hg215"),
+            Self::Hg216 => write!(f, "Hg216"),
+        }
     }
 }

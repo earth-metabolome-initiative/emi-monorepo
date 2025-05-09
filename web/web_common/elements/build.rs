@@ -175,6 +175,13 @@ fn implement_isotope_enum(isotopes: &[IsotopeMetadata]) -> TokenStream {
         })
         .collect::<Vec<_>>();
 
+    let isotope_names = isotopes
+        .iter()
+        .map(|isotope| {
+            format!("{}{}", isotope.atomic_symbol, isotope.mass_number)
+        })
+        .collect::<Vec<_>>();
+
     let relative_atomic_masses =
         isotopes.iter().map(|isotope| isotope.relative_atomic_mass).collect::<Vec<_>>();
 
@@ -191,7 +198,7 @@ fn implement_isotope_enum(isotopes: &[IsotopeMetadata]) -> TokenStream {
         })
         .collect::<Vec<_>>();
 
-    let most_common_isotope = isotopes
+    let most_abundant_isotope = isotopes
         .iter()
         .max_by(|a, b| {
             a.isotopic_composition
@@ -200,8 +207,8 @@ fn implement_isotope_enum(isotopes: &[IsotopeMetadata]) -> TokenStream {
                 .unwrap()
         })
         .unwrap();
-    let most_common_isotope_ident = Ident::new(
-        &format!("{}{}", most_common_isotope.atomic_symbol, most_common_isotope.mass_number),
+    let most_abundant_isotope_ident = Ident::new(
+        &format!("{}{}", most_abundant_isotope.atomic_symbol, most_abundant_isotope.mass_number),
         proc_macro2::Span::call_site(),
     );
 
@@ -253,9 +260,17 @@ fn implement_isotope_enum(isotopes: &[IsotopeMetadata]) -> TokenStream {
             }
         }
 
-        impl super::MostCommonIsotope for #isotope_ident {
-            fn most_common_isotope() -> Self {
-                Self::#most_common_isotope_ident
+        impl super::MostAbundantIsotope for #isotope_ident {
+            fn most_abundant_isotope() -> Self {
+                Self::#most_abundant_isotope_ident
+            }
+        }
+
+        impl std::fmt::Display for #isotope_ident {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                match self {
+                    #(Self::#enum_variants => write!(f, #isotope_names),)*
+                }
             }
         }
     }

@@ -170,8 +170,50 @@ impl super::IsotopicComposition for HolmiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for HolmiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for HolmiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ho165
+    }
+}
+impl std::fmt::Display for HolmiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ho140 => write!(f, "Ho140"),
+            Self::Ho141 => write!(f, "Ho141"),
+            Self::Ho142 => write!(f, "Ho142"),
+            Self::Ho143 => write!(f, "Ho143"),
+            Self::Ho144 => write!(f, "Ho144"),
+            Self::Ho145 => write!(f, "Ho145"),
+            Self::Ho146 => write!(f, "Ho146"),
+            Self::Ho147 => write!(f, "Ho147"),
+            Self::Ho148 => write!(f, "Ho148"),
+            Self::Ho149 => write!(f, "Ho149"),
+            Self::Ho150 => write!(f, "Ho150"),
+            Self::Ho151 => write!(f, "Ho151"),
+            Self::Ho152 => write!(f, "Ho152"),
+            Self::Ho153 => write!(f, "Ho153"),
+            Self::Ho154 => write!(f, "Ho154"),
+            Self::Ho155 => write!(f, "Ho155"),
+            Self::Ho156 => write!(f, "Ho156"),
+            Self::Ho157 => write!(f, "Ho157"),
+            Self::Ho158 => write!(f, "Ho158"),
+            Self::Ho159 => write!(f, "Ho159"),
+            Self::Ho160 => write!(f, "Ho160"),
+            Self::Ho161 => write!(f, "Ho161"),
+            Self::Ho162 => write!(f, "Ho162"),
+            Self::Ho163 => write!(f, "Ho163"),
+            Self::Ho164 => write!(f, "Ho164"),
+            Self::Ho165 => write!(f, "Ho165"),
+            Self::Ho166 => write!(f, "Ho166"),
+            Self::Ho167 => write!(f, "Ho167"),
+            Self::Ho168 => write!(f, "Ho168"),
+            Self::Ho169 => write!(f, "Ho169"),
+            Self::Ho170 => write!(f, "Ho170"),
+            Self::Ho171 => write!(f, "Ho171"),
+            Self::Ho172 => write!(f, "Ho172"),
+            Self::Ho173 => write!(f, "Ho173"),
+            Self::Ho174 => write!(f, "Ho174"),
+            Self::Ho175 => write!(f, "Ho175"),
+        }
     }
 }

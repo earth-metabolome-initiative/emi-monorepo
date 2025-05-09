@@ -170,8 +170,50 @@ impl super::IsotopicComposition for LutetiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for LutetiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for LutetiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Lu175
+    }
+}
+impl std::fmt::Display for LutetiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Lu150 => write!(f, "Lu150"),
+            Self::Lu151 => write!(f, "Lu151"),
+            Self::Lu152 => write!(f, "Lu152"),
+            Self::Lu153 => write!(f, "Lu153"),
+            Self::Lu154 => write!(f, "Lu154"),
+            Self::Lu155 => write!(f, "Lu155"),
+            Self::Lu156 => write!(f, "Lu156"),
+            Self::Lu157 => write!(f, "Lu157"),
+            Self::Lu158 => write!(f, "Lu158"),
+            Self::Lu159 => write!(f, "Lu159"),
+            Self::Lu160 => write!(f, "Lu160"),
+            Self::Lu161 => write!(f, "Lu161"),
+            Self::Lu162 => write!(f, "Lu162"),
+            Self::Lu163 => write!(f, "Lu163"),
+            Self::Lu164 => write!(f, "Lu164"),
+            Self::Lu165 => write!(f, "Lu165"),
+            Self::Lu166 => write!(f, "Lu166"),
+            Self::Lu167 => write!(f, "Lu167"),
+            Self::Lu168 => write!(f, "Lu168"),
+            Self::Lu169 => write!(f, "Lu169"),
+            Self::Lu170 => write!(f, "Lu170"),
+            Self::Lu171 => write!(f, "Lu171"),
+            Self::Lu172 => write!(f, "Lu172"),
+            Self::Lu173 => write!(f, "Lu173"),
+            Self::Lu174 => write!(f, "Lu174"),
+            Self::Lu175 => write!(f, "Lu175"),
+            Self::Lu176 => write!(f, "Lu176"),
+            Self::Lu177 => write!(f, "Lu177"),
+            Self::Lu178 => write!(f, "Lu178"),
+            Self::Lu179 => write!(f, "Lu179"),
+            Self::Lu180 => write!(f, "Lu180"),
+            Self::Lu181 => write!(f, "Lu181"),
+            Self::Lu182 => write!(f, "Lu182"),
+            Self::Lu183 => write!(f, "Lu183"),
+            Self::Lu184 => write!(f, "Lu184"),
+            Self::Lu185 => write!(f, "Lu185"),
+        }
     }
 }

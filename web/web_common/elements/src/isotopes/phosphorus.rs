@@ -122,8 +122,38 @@ impl super::IsotopicComposition for PhosphorusIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for PhosphorusIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for PhosphorusIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::P31
+    }
+}
+impl std::fmt::Display for PhosphorusIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::P24 => write!(f, "P24"),
+            Self::P25 => write!(f, "P25"),
+            Self::P26 => write!(f, "P26"),
+            Self::P27 => write!(f, "P27"),
+            Self::P28 => write!(f, "P28"),
+            Self::P29 => write!(f, "P29"),
+            Self::P30 => write!(f, "P30"),
+            Self::P31 => write!(f, "P31"),
+            Self::P32 => write!(f, "P32"),
+            Self::P33 => write!(f, "P33"),
+            Self::P34 => write!(f, "P34"),
+            Self::P35 => write!(f, "P35"),
+            Self::P36 => write!(f, "P36"),
+            Self::P37 => write!(f, "P37"),
+            Self::P38 => write!(f, "P38"),
+            Self::P39 => write!(f, "P39"),
+            Self::P40 => write!(f, "P40"),
+            Self::P41 => write!(f, "P41"),
+            Self::P42 => write!(f, "P42"),
+            Self::P43 => write!(f, "P43"),
+            Self::P44 => write!(f, "P44"),
+            Self::P45 => write!(f, "P45"),
+            Self::P46 => write!(f, "P46"),
+            Self::P47 => write!(f, "P47"),
+        }
     }
 }

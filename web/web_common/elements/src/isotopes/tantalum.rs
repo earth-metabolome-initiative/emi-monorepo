@@ -178,8 +178,52 @@ impl super::IsotopicComposition for TantalumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for TantalumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for TantalumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ta181
+    }
+}
+impl std::fmt::Display for TantalumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ta155 => write!(f, "Ta155"),
+            Self::Ta156 => write!(f, "Ta156"),
+            Self::Ta157 => write!(f, "Ta157"),
+            Self::Ta158 => write!(f, "Ta158"),
+            Self::Ta159 => write!(f, "Ta159"),
+            Self::Ta160 => write!(f, "Ta160"),
+            Self::Ta161 => write!(f, "Ta161"),
+            Self::Ta162 => write!(f, "Ta162"),
+            Self::Ta163 => write!(f, "Ta163"),
+            Self::Ta164 => write!(f, "Ta164"),
+            Self::Ta165 => write!(f, "Ta165"),
+            Self::Ta166 => write!(f, "Ta166"),
+            Self::Ta167 => write!(f, "Ta167"),
+            Self::Ta168 => write!(f, "Ta168"),
+            Self::Ta169 => write!(f, "Ta169"),
+            Self::Ta170 => write!(f, "Ta170"),
+            Self::Ta171 => write!(f, "Ta171"),
+            Self::Ta172 => write!(f, "Ta172"),
+            Self::Ta173 => write!(f, "Ta173"),
+            Self::Ta174 => write!(f, "Ta174"),
+            Self::Ta175 => write!(f, "Ta175"),
+            Self::Ta176 => write!(f, "Ta176"),
+            Self::Ta177 => write!(f, "Ta177"),
+            Self::Ta178 => write!(f, "Ta178"),
+            Self::Ta179 => write!(f, "Ta179"),
+            Self::Ta180 => write!(f, "Ta180"),
+            Self::Ta181 => write!(f, "Ta181"),
+            Self::Ta182 => write!(f, "Ta182"),
+            Self::Ta183 => write!(f, "Ta183"),
+            Self::Ta184 => write!(f, "Ta184"),
+            Self::Ta185 => write!(f, "Ta185"),
+            Self::Ta186 => write!(f, "Ta186"),
+            Self::Ta187 => write!(f, "Ta187"),
+            Self::Ta188 => write!(f, "Ta188"),
+            Self::Ta189 => write!(f, "Ta189"),
+            Self::Ta190 => write!(f, "Ta190"),
+            Self::Ta191 => write!(f, "Ta191"),
+            Self::Ta192 => write!(f, "Ta192"),
+        }
     }
 }

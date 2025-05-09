@@ -33,7 +33,7 @@ impl super::RelativeAtomicMass for super::Isotope {
             Self::Co(isotope) => isotope.relative_atomic_mass(),
             Self::Ni(isotope) => isotope.relative_atomic_mass(),
             Self::Cu(isotope) => isotope.relative_atomic_mass(),
-            Self::Zn(isotype) => isotype.relative_atomic_mass(),
+            Self::Zn(isotope) => isotope.relative_atomic_mass(),
             Self::Ga(isotope) => isotope.relative_atomic_mass(),
             Self::Ge(isotope) => isotope.relative_atomic_mass(),
             Self::As(isotope) => isotope.relative_atomic_mass(),

@@ -158,8 +158,47 @@ impl super::IsotopicComposition for RubidiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for RubidiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for RubidiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Rb85
+    }
+}
+impl std::fmt::Display for RubidiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Rb71 => write!(f, "Rb71"),
+            Self::Rb72 => write!(f, "Rb72"),
+            Self::Rb73 => write!(f, "Rb73"),
+            Self::Rb74 => write!(f, "Rb74"),
+            Self::Rb75 => write!(f, "Rb75"),
+            Self::Rb76 => write!(f, "Rb76"),
+            Self::Rb77 => write!(f, "Rb77"),
+            Self::Rb78 => write!(f, "Rb78"),
+            Self::Rb79 => write!(f, "Rb79"),
+            Self::Rb80 => write!(f, "Rb80"),
+            Self::Rb81 => write!(f, "Rb81"),
+            Self::Rb82 => write!(f, "Rb82"),
+            Self::Rb83 => write!(f, "Rb83"),
+            Self::Rb84 => write!(f, "Rb84"),
+            Self::Rb85 => write!(f, "Rb85"),
+            Self::Rb86 => write!(f, "Rb86"),
+            Self::Rb87 => write!(f, "Rb87"),
+            Self::Rb88 => write!(f, "Rb88"),
+            Self::Rb89 => write!(f, "Rb89"),
+            Self::Rb90 => write!(f, "Rb90"),
+            Self::Rb91 => write!(f, "Rb91"),
+            Self::Rb92 => write!(f, "Rb92"),
+            Self::Rb93 => write!(f, "Rb93"),
+            Self::Rb94 => write!(f, "Rb94"),
+            Self::Rb95 => write!(f, "Rb95"),
+            Self::Rb96 => write!(f, "Rb96"),
+            Self::Rb97 => write!(f, "Rb97"),
+            Self::Rb98 => write!(f, "Rb98"),
+            Self::Rb99 => write!(f, "Rb99"),
+            Self::Rb100 => write!(f, "Rb100"),
+            Self::Rb101 => write!(f, "Rb101"),
+            Self::Rb102 => write!(f, "Rb102"),
+            Self::Rb103 => write!(f, "Rb103"),
+        }
     }
 }

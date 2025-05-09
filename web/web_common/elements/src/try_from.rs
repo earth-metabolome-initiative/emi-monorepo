@@ -21,7 +21,7 @@ impl TryFrom<char> for crate::Element {
             'W' => Self::W,
             'U' => Self::U,
             _ => {
-                return Err(crate::errors::UnknownElement::Unknown(value.to_string()));
+                return Err(crate::errors::UnknownElement::Unknown([value, ' ']));
             }
         })
     }
@@ -137,10 +137,7 @@ impl TryFrom<[char; 2]> for crate::Element {
             ['T', 's'] => Self::Ts,
             ['O', 'g'] => Self::Og,
             _ => {
-                return Err(crate::errors::UnknownElement::Unknown(format!(
-                    "{}{}",
-                    value[0], value[1]
-                )));
+                return Err(crate::errors::UnknownElement::Unknown(value));
             }
         })
     }

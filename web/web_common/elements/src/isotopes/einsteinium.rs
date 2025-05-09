@@ -106,8 +106,34 @@ impl super::IsotopicComposition for EinsteiniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for EinsteiniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for EinsteiniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Es258
+    }
+}
+impl std::fmt::Display for EinsteiniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Es239 => write!(f, "Es239"),
+            Self::Es240 => write!(f, "Es240"),
+            Self::Es241 => write!(f, "Es241"),
+            Self::Es242 => write!(f, "Es242"),
+            Self::Es243 => write!(f, "Es243"),
+            Self::Es244 => write!(f, "Es244"),
+            Self::Es245 => write!(f, "Es245"),
+            Self::Es246 => write!(f, "Es246"),
+            Self::Es247 => write!(f, "Es247"),
+            Self::Es248 => write!(f, "Es248"),
+            Self::Es249 => write!(f, "Es249"),
+            Self::Es250 => write!(f, "Es250"),
+            Self::Es251 => write!(f, "Es251"),
+            Self::Es252 => write!(f, "Es252"),
+            Self::Es253 => write!(f, "Es253"),
+            Self::Es254 => write!(f, "Es254"),
+            Self::Es255 => write!(f, "Es255"),
+            Self::Es256 => write!(f, "Es256"),
+            Self::Es257 => write!(f, "Es257"),
+            Self::Es258 => write!(f, "Es258"),
+        }
     }
 }

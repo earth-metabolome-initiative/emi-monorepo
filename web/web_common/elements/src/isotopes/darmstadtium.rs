@@ -86,8 +86,29 @@ impl super::IsotopicComposition for DarmstadtiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for DarmstadtiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for DarmstadtiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ds281
+    }
+}
+impl std::fmt::Display for DarmstadtiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ds267 => write!(f, "Ds267"),
+            Self::Ds268 => write!(f, "Ds268"),
+            Self::Ds269 => write!(f, "Ds269"),
+            Self::Ds270 => write!(f, "Ds270"),
+            Self::Ds271 => write!(f, "Ds271"),
+            Self::Ds272 => write!(f, "Ds272"),
+            Self::Ds273 => write!(f, "Ds273"),
+            Self::Ds274 => write!(f, "Ds274"),
+            Self::Ds275 => write!(f, "Ds275"),
+            Self::Ds276 => write!(f, "Ds276"),
+            Self::Ds277 => write!(f, "Ds277"),
+            Self::Ds278 => write!(f, "Ds278"),
+            Self::Ds279 => write!(f, "Ds279"),
+            Self::Ds280 => write!(f, "Ds280"),
+            Self::Ds281 => write!(f, "Ds281"),
+        }
     }
 }

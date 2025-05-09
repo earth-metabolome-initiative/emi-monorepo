@@ -106,8 +106,34 @@ impl super::IsotopicComposition for CaliforniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for CaliforniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for CaliforniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Cf256
+    }
+}
+impl std::fmt::Display for CaliforniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Cf237 => write!(f, "Cf237"),
+            Self::Cf238 => write!(f, "Cf238"),
+            Self::Cf239 => write!(f, "Cf239"),
+            Self::Cf240 => write!(f, "Cf240"),
+            Self::Cf241 => write!(f, "Cf241"),
+            Self::Cf242 => write!(f, "Cf242"),
+            Self::Cf243 => write!(f, "Cf243"),
+            Self::Cf244 => write!(f, "Cf244"),
+            Self::Cf245 => write!(f, "Cf245"),
+            Self::Cf246 => write!(f, "Cf246"),
+            Self::Cf247 => write!(f, "Cf247"),
+            Self::Cf248 => write!(f, "Cf248"),
+            Self::Cf249 => write!(f, "Cf249"),
+            Self::Cf250 => write!(f, "Cf250"),
+            Self::Cf251 => write!(f, "Cf251"),
+            Self::Cf252 => write!(f, "Cf252"),
+            Self::Cf253 => write!(f, "Cf253"),
+            Self::Cf254 => write!(f, "Cf254"),
+            Self::Cf255 => write!(f, "Cf255"),
+            Self::Cf256 => write!(f, "Cf256"),
+        }
     }
 }

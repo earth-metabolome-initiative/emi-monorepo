@@ -158,8 +158,47 @@ impl super::IsotopicComposition for GermaniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for GermaniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for GermaniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ge74
+    }
+}
+impl std::fmt::Display for GermaniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ge58 => write!(f, "Ge58"),
+            Self::Ge59 => write!(f, "Ge59"),
+            Self::Ge60 => write!(f, "Ge60"),
+            Self::Ge61 => write!(f, "Ge61"),
+            Self::Ge62 => write!(f, "Ge62"),
+            Self::Ge63 => write!(f, "Ge63"),
+            Self::Ge64 => write!(f, "Ge64"),
+            Self::Ge65 => write!(f, "Ge65"),
+            Self::Ge66 => write!(f, "Ge66"),
+            Self::Ge67 => write!(f, "Ge67"),
+            Self::Ge68 => write!(f, "Ge68"),
+            Self::Ge69 => write!(f, "Ge69"),
+            Self::Ge70 => write!(f, "Ge70"),
+            Self::Ge71 => write!(f, "Ge71"),
+            Self::Ge72 => write!(f, "Ge72"),
+            Self::Ge73 => write!(f, "Ge73"),
+            Self::Ge74 => write!(f, "Ge74"),
+            Self::Ge75 => write!(f, "Ge75"),
+            Self::Ge76 => write!(f, "Ge76"),
+            Self::Ge77 => write!(f, "Ge77"),
+            Self::Ge78 => write!(f, "Ge78"),
+            Self::Ge79 => write!(f, "Ge79"),
+            Self::Ge80 => write!(f, "Ge80"),
+            Self::Ge81 => write!(f, "Ge81"),
+            Self::Ge82 => write!(f, "Ge82"),
+            Self::Ge83 => write!(f, "Ge83"),
+            Self::Ge84 => write!(f, "Ge84"),
+            Self::Ge85 => write!(f, "Ge85"),
+            Self::Ge86 => write!(f, "Ge86"),
+            Self::Ge87 => write!(f, "Ge87"),
+            Self::Ge88 => write!(f, "Ge88"),
+            Self::Ge89 => write!(f, "Ge89"),
+            Self::Ge90 => write!(f, "Ge90"),
+        }
     }
 }

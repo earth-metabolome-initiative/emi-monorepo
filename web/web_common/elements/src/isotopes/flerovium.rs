@@ -46,8 +46,19 @@ impl super::IsotopicComposition for FleroviumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for FleroviumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for FleroviumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Fl289
+    }
+}
+impl std::fmt::Display for FleroviumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Fl285 => write!(f, "Fl285"),
+            Self::Fl286 => write!(f, "Fl286"),
+            Self::Fl287 => write!(f, "Fl287"),
+            Self::Fl288 => write!(f, "Fl288"),
+            Self::Fl289 => write!(f, "Fl289"),
+        }
     }
 }

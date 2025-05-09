@@ -94,8 +94,31 @@ impl super::IsotopicComposition for NobeliumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for NobeliumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for NobeliumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::No264
+    }
+}
+impl std::fmt::Display for NobeliumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::No248 => write!(f, "No248"),
+            Self::No249 => write!(f, "No249"),
+            Self::No250 => write!(f, "No250"),
+            Self::No251 => write!(f, "No251"),
+            Self::No252 => write!(f, "No252"),
+            Self::No253 => write!(f, "No253"),
+            Self::No254 => write!(f, "No254"),
+            Self::No255 => write!(f, "No255"),
+            Self::No256 => write!(f, "No256"),
+            Self::No257 => write!(f, "No257"),
+            Self::No258 => write!(f, "No258"),
+            Self::No259 => write!(f, "No259"),
+            Self::No260 => write!(f, "No260"),
+            Self::No261 => write!(f, "No261"),
+            Self::No262 => write!(f, "No262"),
+            Self::No263 => write!(f, "No263"),
+            Self::No264 => write!(f, "No264"),
+        }
     }
 }

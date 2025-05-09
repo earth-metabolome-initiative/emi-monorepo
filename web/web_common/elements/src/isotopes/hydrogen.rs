@@ -54,8 +54,21 @@ impl super::IsotopicComposition for HydrogenIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for HydrogenIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for HydrogenIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::H1
+    }
+}
+impl std::fmt::Display for HydrogenIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::H1 => write!(f, "H1"),
+            Self::D2 => write!(f, "D2"),
+            Self::T3 => write!(f, "T3"),
+            Self::H4 => write!(f, "H4"),
+            Self::H5 => write!(f, "H5"),
+            Self::H6 => write!(f, "H6"),
+            Self::H7 => write!(f, "H7"),
+        }
     }
 }

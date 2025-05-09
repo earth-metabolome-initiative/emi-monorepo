@@ -33,7 +33,7 @@ impl super::MassNumber for super::Isotope {
             Self::Co(isotope) => isotope.mass_number(),
             Self::Ni(isotope) => isotope.mass_number(),
             Self::Cu(isotope) => isotope.mass_number(),
-            Self::Zn(isotype) => isotype.mass_number(),
+            Self::Zn(isotope) => isotope.mass_number(),
             Self::Ga(isotope) => isotope.mass_number(),
             Self::Ge(isotope) => isotope.mass_number(),
             Self::As(isotope) => isotope.mass_number(),

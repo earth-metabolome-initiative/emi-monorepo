@@ -74,8 +74,26 @@ impl super::IsotopicComposition for RoentgeniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for RoentgeniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for RoentgeniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Rg283
+    }
+}
+impl std::fmt::Display for RoentgeniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Rg272 => write!(f, "Rg272"),
+            Self::Rg273 => write!(f, "Rg273"),
+            Self::Rg274 => write!(f, "Rg274"),
+            Self::Rg275 => write!(f, "Rg275"),
+            Self::Rg276 => write!(f, "Rg276"),
+            Self::Rg277 => write!(f, "Rg277"),
+            Self::Rg278 => write!(f, "Rg278"),
+            Self::Rg279 => write!(f, "Rg279"),
+            Self::Rg280 => write!(f, "Rg280"),
+            Self::Rg281 => write!(f, "Rg281"),
+            Self::Rg282 => write!(f, "Rg282"),
+            Self::Rg283 => write!(f, "Rg283"),
+        }
     }
 }

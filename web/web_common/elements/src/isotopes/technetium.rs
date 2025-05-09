@@ -170,8 +170,50 @@ impl super::IsotopicComposition for TechnetiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for TechnetiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for TechnetiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Tc120
+    }
+}
+impl std::fmt::Display for TechnetiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Tc85 => write!(f, "Tc85"),
+            Self::Tc86 => write!(f, "Tc86"),
+            Self::Tc87 => write!(f, "Tc87"),
+            Self::Tc88 => write!(f, "Tc88"),
+            Self::Tc89 => write!(f, "Tc89"),
+            Self::Tc90 => write!(f, "Tc90"),
+            Self::Tc91 => write!(f, "Tc91"),
+            Self::Tc92 => write!(f, "Tc92"),
+            Self::Tc93 => write!(f, "Tc93"),
+            Self::Tc94 => write!(f, "Tc94"),
+            Self::Tc95 => write!(f, "Tc95"),
+            Self::Tc96 => write!(f, "Tc96"),
+            Self::Tc97 => write!(f, "Tc97"),
+            Self::Tc98 => write!(f, "Tc98"),
+            Self::Tc99 => write!(f, "Tc99"),
+            Self::Tc100 => write!(f, "Tc100"),
+            Self::Tc101 => write!(f, "Tc101"),
+            Self::Tc102 => write!(f, "Tc102"),
+            Self::Tc103 => write!(f, "Tc103"),
+            Self::Tc104 => write!(f, "Tc104"),
+            Self::Tc105 => write!(f, "Tc105"),
+            Self::Tc106 => write!(f, "Tc106"),
+            Self::Tc107 => write!(f, "Tc107"),
+            Self::Tc108 => write!(f, "Tc108"),
+            Self::Tc109 => write!(f, "Tc109"),
+            Self::Tc110 => write!(f, "Tc110"),
+            Self::Tc111 => write!(f, "Tc111"),
+            Self::Tc112 => write!(f, "Tc112"),
+            Self::Tc113 => write!(f, "Tc113"),
+            Self::Tc114 => write!(f, "Tc114"),
+            Self::Tc115 => write!(f, "Tc115"),
+            Self::Tc116 => write!(f, "Tc116"),
+            Self::Tc117 => write!(f, "Tc117"),
+            Self::Tc118 => write!(f, "Tc118"),
+            Self::Tc119 => write!(f, "Tc119"),
+            Self::Tc120 => write!(f, "Tc120"),
+        }
     }
 }

@@ -186,8 +186,54 @@ impl super::IsotopicComposition for BariumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for BariumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for BariumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ba138
+    }
+}
+impl std::fmt::Display for BariumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ba114 => write!(f, "Ba114"),
+            Self::Ba115 => write!(f, "Ba115"),
+            Self::Ba116 => write!(f, "Ba116"),
+            Self::Ba117 => write!(f, "Ba117"),
+            Self::Ba118 => write!(f, "Ba118"),
+            Self::Ba119 => write!(f, "Ba119"),
+            Self::Ba120 => write!(f, "Ba120"),
+            Self::Ba121 => write!(f, "Ba121"),
+            Self::Ba122 => write!(f, "Ba122"),
+            Self::Ba123 => write!(f, "Ba123"),
+            Self::Ba124 => write!(f, "Ba124"),
+            Self::Ba125 => write!(f, "Ba125"),
+            Self::Ba126 => write!(f, "Ba126"),
+            Self::Ba127 => write!(f, "Ba127"),
+            Self::Ba128 => write!(f, "Ba128"),
+            Self::Ba129 => write!(f, "Ba129"),
+            Self::Ba130 => write!(f, "Ba130"),
+            Self::Ba131 => write!(f, "Ba131"),
+            Self::Ba132 => write!(f, "Ba132"),
+            Self::Ba133 => write!(f, "Ba133"),
+            Self::Ba134 => write!(f, "Ba134"),
+            Self::Ba135 => write!(f, "Ba135"),
+            Self::Ba136 => write!(f, "Ba136"),
+            Self::Ba137 => write!(f, "Ba137"),
+            Self::Ba138 => write!(f, "Ba138"),
+            Self::Ba139 => write!(f, "Ba139"),
+            Self::Ba140 => write!(f, "Ba140"),
+            Self::Ba141 => write!(f, "Ba141"),
+            Self::Ba142 => write!(f, "Ba142"),
+            Self::Ba143 => write!(f, "Ba143"),
+            Self::Ba144 => write!(f, "Ba144"),
+            Self::Ba145 => write!(f, "Ba145"),
+            Self::Ba146 => write!(f, "Ba146"),
+            Self::Ba147 => write!(f, "Ba147"),
+            Self::Ba148 => write!(f, "Ba148"),
+            Self::Ba149 => write!(f, "Ba149"),
+            Self::Ba150 => write!(f, "Ba150"),
+            Self::Ba151 => write!(f, "Ba151"),
+            Self::Ba152 => write!(f, "Ba152"),
+            Self::Ba153 => write!(f, "Ba153"),
+        }
     }
 }

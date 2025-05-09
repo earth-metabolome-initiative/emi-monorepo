@@ -66,8 +66,24 @@ impl super::IsotopicComposition for NihoniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for NihoniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for NihoniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Nh287
+    }
+}
+impl std::fmt::Display for NihoniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Nh278 => write!(f, "Nh278"),
+            Self::Nh279 => write!(f, "Nh279"),
+            Self::Nh280 => write!(f, "Nh280"),
+            Self::Nh281 => write!(f, "Nh281"),
+            Self::Nh282 => write!(f, "Nh282"),
+            Self::Nh283 => write!(f, "Nh283"),
+            Self::Nh284 => write!(f, "Nh284"),
+            Self::Nh285 => write!(f, "Nh285"),
+            Self::Nh286 => write!(f, "Nh286"),
+            Self::Nh287 => write!(f, "Nh287"),
+        }
     }
 }

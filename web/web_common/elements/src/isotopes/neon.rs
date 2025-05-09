@@ -102,8 +102,33 @@ impl super::IsotopicComposition for NeonIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for NeonIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for NeonIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ne20
+    }
+}
+impl std::fmt::Display for NeonIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ne16 => write!(f, "Ne16"),
+            Self::Ne17 => write!(f, "Ne17"),
+            Self::Ne18 => write!(f, "Ne18"),
+            Self::Ne19 => write!(f, "Ne19"),
+            Self::Ne20 => write!(f, "Ne20"),
+            Self::Ne21 => write!(f, "Ne21"),
+            Self::Ne22 => write!(f, "Ne22"),
+            Self::Ne23 => write!(f, "Ne23"),
+            Self::Ne24 => write!(f, "Ne24"),
+            Self::Ne25 => write!(f, "Ne25"),
+            Self::Ne26 => write!(f, "Ne26"),
+            Self::Ne27 => write!(f, "Ne27"),
+            Self::Ne28 => write!(f, "Ne28"),
+            Self::Ne29 => write!(f, "Ne29"),
+            Self::Ne30 => write!(f, "Ne30"),
+            Self::Ne31 => write!(f, "Ne31"),
+            Self::Ne32 => write!(f, "Ne32"),
+            Self::Ne33 => write!(f, "Ne33"),
+            Self::Ne34 => write!(f, "Ne34"),
+        }
     }
 }

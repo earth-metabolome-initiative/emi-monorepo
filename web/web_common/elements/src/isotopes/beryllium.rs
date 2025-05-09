@@ -74,8 +74,26 @@ impl super::IsotopicComposition for BerylliumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for BerylliumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for BerylliumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Be9
+    }
+}
+impl std::fmt::Display for BerylliumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Be5 => write!(f, "Be5"),
+            Self::Be6 => write!(f, "Be6"),
+            Self::Be7 => write!(f, "Be7"),
+            Self::Be8 => write!(f, "Be8"),
+            Self::Be9 => write!(f, "Be9"),
+            Self::Be10 => write!(f, "Be10"),
+            Self::Be11 => write!(f, "Be11"),
+            Self::Be12 => write!(f, "Be12"),
+            Self::Be13 => write!(f, "Be13"),
+            Self::Be14 => write!(f, "Be14"),
+            Self::Be15 => write!(f, "Be15"),
+            Self::Be16 => write!(f, "Be16"),
+        }
     }
 }

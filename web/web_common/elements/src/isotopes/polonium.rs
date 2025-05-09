@@ -194,8 +194,56 @@ impl super::IsotopicComposition for PoloniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for PoloniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for PoloniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Po227
+    }
+}
+impl std::fmt::Display for PoloniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Po186 => write!(f, "Po186"),
+            Self::Po187 => write!(f, "Po187"),
+            Self::Po188 => write!(f, "Po188"),
+            Self::Po189 => write!(f, "Po189"),
+            Self::Po190 => write!(f, "Po190"),
+            Self::Po191 => write!(f, "Po191"),
+            Self::Po192 => write!(f, "Po192"),
+            Self::Po193 => write!(f, "Po193"),
+            Self::Po194 => write!(f, "Po194"),
+            Self::Po195 => write!(f, "Po195"),
+            Self::Po196 => write!(f, "Po196"),
+            Self::Po197 => write!(f, "Po197"),
+            Self::Po198 => write!(f, "Po198"),
+            Self::Po199 => write!(f, "Po199"),
+            Self::Po200 => write!(f, "Po200"),
+            Self::Po201 => write!(f, "Po201"),
+            Self::Po202 => write!(f, "Po202"),
+            Self::Po203 => write!(f, "Po203"),
+            Self::Po204 => write!(f, "Po204"),
+            Self::Po205 => write!(f, "Po205"),
+            Self::Po206 => write!(f, "Po206"),
+            Self::Po207 => write!(f, "Po207"),
+            Self::Po208 => write!(f, "Po208"),
+            Self::Po209 => write!(f, "Po209"),
+            Self::Po210 => write!(f, "Po210"),
+            Self::Po211 => write!(f, "Po211"),
+            Self::Po212 => write!(f, "Po212"),
+            Self::Po213 => write!(f, "Po213"),
+            Self::Po214 => write!(f, "Po214"),
+            Self::Po215 => write!(f, "Po215"),
+            Self::Po216 => write!(f, "Po216"),
+            Self::Po217 => write!(f, "Po217"),
+            Self::Po218 => write!(f, "Po218"),
+            Self::Po219 => write!(f, "Po219"),
+            Self::Po220 => write!(f, "Po220"),
+            Self::Po221 => write!(f, "Po221"),
+            Self::Po222 => write!(f, "Po222"),
+            Self::Po223 => write!(f, "Po223"),
+            Self::Po224 => write!(f, "Po224"),
+            Self::Po225 => write!(f, "Po225"),
+            Self::Po226 => write!(f, "Po226"),
+            Self::Po227 => write!(f, "Po227"),
+        }
     }
 }

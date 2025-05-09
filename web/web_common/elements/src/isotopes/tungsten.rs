@@ -178,8 +178,52 @@ impl super::IsotopicComposition for TungstenIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for TungstenIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for TungstenIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::W184
+    }
+}
+impl std::fmt::Display for TungstenIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::W157 => write!(f, "W157"),
+            Self::W158 => write!(f, "W158"),
+            Self::W159 => write!(f, "W159"),
+            Self::W160 => write!(f, "W160"),
+            Self::W161 => write!(f, "W161"),
+            Self::W162 => write!(f, "W162"),
+            Self::W163 => write!(f, "W163"),
+            Self::W164 => write!(f, "W164"),
+            Self::W165 => write!(f, "W165"),
+            Self::W166 => write!(f, "W166"),
+            Self::W167 => write!(f, "W167"),
+            Self::W168 => write!(f, "W168"),
+            Self::W169 => write!(f, "W169"),
+            Self::W170 => write!(f, "W170"),
+            Self::W171 => write!(f, "W171"),
+            Self::W172 => write!(f, "W172"),
+            Self::W173 => write!(f, "W173"),
+            Self::W174 => write!(f, "W174"),
+            Self::W175 => write!(f, "W175"),
+            Self::W176 => write!(f, "W176"),
+            Self::W177 => write!(f, "W177"),
+            Self::W178 => write!(f, "W178"),
+            Self::W179 => write!(f, "W179"),
+            Self::W180 => write!(f, "W180"),
+            Self::W181 => write!(f, "W181"),
+            Self::W182 => write!(f, "W182"),
+            Self::W183 => write!(f, "W183"),
+            Self::W184 => write!(f, "W184"),
+            Self::W185 => write!(f, "W185"),
+            Self::W186 => write!(f, "W186"),
+            Self::W187 => write!(f, "W187"),
+            Self::W188 => write!(f, "W188"),
+            Self::W189 => write!(f, "W189"),
+            Self::W190 => write!(f, "W190"),
+            Self::W191 => write!(f, "W191"),
+            Self::W192 => write!(f, "W192"),
+            Self::W193 => write!(f, "W193"),
+            Self::W194 => write!(f, "W194"),
+        }
     }
 }

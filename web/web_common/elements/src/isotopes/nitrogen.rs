@@ -90,8 +90,30 @@ impl super::IsotopicComposition for NitrogenIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for NitrogenIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for NitrogenIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::N14
+    }
+}
+impl std::fmt::Display for NitrogenIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::N10 => write!(f, "N10"),
+            Self::N11 => write!(f, "N11"),
+            Self::N12 => write!(f, "N12"),
+            Self::N13 => write!(f, "N13"),
+            Self::N14 => write!(f, "N14"),
+            Self::N15 => write!(f, "N15"),
+            Self::N16 => write!(f, "N16"),
+            Self::N17 => write!(f, "N17"),
+            Self::N18 => write!(f, "N18"),
+            Self::N19 => write!(f, "N19"),
+            Self::N20 => write!(f, "N20"),
+            Self::N21 => write!(f, "N21"),
+            Self::N22 => write!(f, "N22"),
+            Self::N23 => write!(f, "N23"),
+            Self::N24 => write!(f, "N24"),
+            Self::N25 => write!(f, "N25"),
+        }
     }
 }

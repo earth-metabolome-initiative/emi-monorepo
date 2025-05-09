@@ -178,8 +178,52 @@ impl super::IsotopicComposition for RutheniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for RutheniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for RutheniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ru102
+    }
+}
+impl std::fmt::Display for RutheniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ru87 => write!(f, "Ru87"),
+            Self::Ru88 => write!(f, "Ru88"),
+            Self::Ru89 => write!(f, "Ru89"),
+            Self::Ru90 => write!(f, "Ru90"),
+            Self::Ru91 => write!(f, "Ru91"),
+            Self::Ru92 => write!(f, "Ru92"),
+            Self::Ru93 => write!(f, "Ru93"),
+            Self::Ru94 => write!(f, "Ru94"),
+            Self::Ru95 => write!(f, "Ru95"),
+            Self::Ru96 => write!(f, "Ru96"),
+            Self::Ru97 => write!(f, "Ru97"),
+            Self::Ru98 => write!(f, "Ru98"),
+            Self::Ru99 => write!(f, "Ru99"),
+            Self::Ru100 => write!(f, "Ru100"),
+            Self::Ru101 => write!(f, "Ru101"),
+            Self::Ru102 => write!(f, "Ru102"),
+            Self::Ru103 => write!(f, "Ru103"),
+            Self::Ru104 => write!(f, "Ru104"),
+            Self::Ru105 => write!(f, "Ru105"),
+            Self::Ru106 => write!(f, "Ru106"),
+            Self::Ru107 => write!(f, "Ru107"),
+            Self::Ru108 => write!(f, "Ru108"),
+            Self::Ru109 => write!(f, "Ru109"),
+            Self::Ru110 => write!(f, "Ru110"),
+            Self::Ru111 => write!(f, "Ru111"),
+            Self::Ru112 => write!(f, "Ru112"),
+            Self::Ru113 => write!(f, "Ru113"),
+            Self::Ru114 => write!(f, "Ru114"),
+            Self::Ru115 => write!(f, "Ru115"),
+            Self::Ru116 => write!(f, "Ru116"),
+            Self::Ru117 => write!(f, "Ru117"),
+            Self::Ru118 => write!(f, "Ru118"),
+            Self::Ru119 => write!(f, "Ru119"),
+            Self::Ru120 => write!(f, "Ru120"),
+            Self::Ru121 => write!(f, "Ru121"),
+            Self::Ru122 => write!(f, "Ru122"),
+            Self::Ru123 => write!(f, "Ru123"),
+            Self::Ru124 => write!(f, "Ru124"),
+        }
     }
 }

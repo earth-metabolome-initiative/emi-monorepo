@@ -190,8 +190,55 @@ impl super::IsotopicComposition for IridiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for IridiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for IridiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ir193
+    }
+}
+impl std::fmt::Display for IridiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ir164 => write!(f, "Ir164"),
+            Self::Ir165 => write!(f, "Ir165"),
+            Self::Ir166 => write!(f, "Ir166"),
+            Self::Ir167 => write!(f, "Ir167"),
+            Self::Ir168 => write!(f, "Ir168"),
+            Self::Ir169 => write!(f, "Ir169"),
+            Self::Ir170 => write!(f, "Ir170"),
+            Self::Ir171 => write!(f, "Ir171"),
+            Self::Ir172 => write!(f, "Ir172"),
+            Self::Ir173 => write!(f, "Ir173"),
+            Self::Ir174 => write!(f, "Ir174"),
+            Self::Ir175 => write!(f, "Ir175"),
+            Self::Ir176 => write!(f, "Ir176"),
+            Self::Ir177 => write!(f, "Ir177"),
+            Self::Ir178 => write!(f, "Ir178"),
+            Self::Ir179 => write!(f, "Ir179"),
+            Self::Ir180 => write!(f, "Ir180"),
+            Self::Ir181 => write!(f, "Ir181"),
+            Self::Ir182 => write!(f, "Ir182"),
+            Self::Ir183 => write!(f, "Ir183"),
+            Self::Ir184 => write!(f, "Ir184"),
+            Self::Ir185 => write!(f, "Ir185"),
+            Self::Ir186 => write!(f, "Ir186"),
+            Self::Ir187 => write!(f, "Ir187"),
+            Self::Ir188 => write!(f, "Ir188"),
+            Self::Ir189 => write!(f, "Ir189"),
+            Self::Ir190 => write!(f, "Ir190"),
+            Self::Ir191 => write!(f, "Ir191"),
+            Self::Ir192 => write!(f, "Ir192"),
+            Self::Ir193 => write!(f, "Ir193"),
+            Self::Ir194 => write!(f, "Ir194"),
+            Self::Ir195 => write!(f, "Ir195"),
+            Self::Ir196 => write!(f, "Ir196"),
+            Self::Ir197 => write!(f, "Ir197"),
+            Self::Ir198 => write!(f, "Ir198"),
+            Self::Ir199 => write!(f, "Ir199"),
+            Self::Ir200 => write!(f, "Ir200"),
+            Self::Ir201 => write!(f, "Ir201"),
+            Self::Ir202 => write!(f, "Ir202"),
+            Self::Ir203 => write!(f, "Ir203"),
+            Self::Ir204 => write!(f, "Ir204"),
+        }
     }
 }

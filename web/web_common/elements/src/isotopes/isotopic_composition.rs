@@ -33,7 +33,7 @@ impl super::IsotopicComposition for super::Isotope {
             Self::Co(isotope) => isotope.isotopic_composition(),
             Self::Ni(isotope) => isotope.isotopic_composition(),
             Self::Cu(isotope) => isotope.isotopic_composition(),
-            Self::Zn(isotype) => isotype.isotopic_composition(),
+            Self::Zn(isotope) => isotope.isotopic_composition(),
             Self::Ga(isotope) => isotope.isotopic_composition(),
             Self::Ge(isotope) => isotope.isotopic_composition(),
             Self::As(isotope) => isotope.isotopic_composition(),

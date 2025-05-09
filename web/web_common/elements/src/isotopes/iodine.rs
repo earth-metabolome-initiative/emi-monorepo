@@ -182,8 +182,53 @@ impl super::IsotopicComposition for IodineIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for IodineIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for IodineIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::I127
+    }
+}
+impl std::fmt::Display for IodineIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::I107 => write!(f, "I107"),
+            Self::I108 => write!(f, "I108"),
+            Self::I109 => write!(f, "I109"),
+            Self::I110 => write!(f, "I110"),
+            Self::I111 => write!(f, "I111"),
+            Self::I112 => write!(f, "I112"),
+            Self::I113 => write!(f, "I113"),
+            Self::I114 => write!(f, "I114"),
+            Self::I115 => write!(f, "I115"),
+            Self::I116 => write!(f, "I116"),
+            Self::I117 => write!(f, "I117"),
+            Self::I118 => write!(f, "I118"),
+            Self::I119 => write!(f, "I119"),
+            Self::I120 => write!(f, "I120"),
+            Self::I121 => write!(f, "I121"),
+            Self::I122 => write!(f, "I122"),
+            Self::I123 => write!(f, "I123"),
+            Self::I124 => write!(f, "I124"),
+            Self::I125 => write!(f, "I125"),
+            Self::I126 => write!(f, "I126"),
+            Self::I127 => write!(f, "I127"),
+            Self::I128 => write!(f, "I128"),
+            Self::I129 => write!(f, "I129"),
+            Self::I130 => write!(f, "I130"),
+            Self::I131 => write!(f, "I131"),
+            Self::I132 => write!(f, "I132"),
+            Self::I133 => write!(f, "I133"),
+            Self::I134 => write!(f, "I134"),
+            Self::I135 => write!(f, "I135"),
+            Self::I136 => write!(f, "I136"),
+            Self::I137 => write!(f, "I137"),
+            Self::I138 => write!(f, "I138"),
+            Self::I139 => write!(f, "I139"),
+            Self::I140 => write!(f, "I140"),
+            Self::I141 => write!(f, "I141"),
+            Self::I142 => write!(f, "I142"),
+            Self::I143 => write!(f, "I143"),
+            Self::I144 => write!(f, "I144"),
+            Self::I145 => write!(f, "I145"),
+        }
     }
 }

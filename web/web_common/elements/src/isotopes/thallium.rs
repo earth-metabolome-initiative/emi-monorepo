@@ -198,8 +198,57 @@ impl super::IsotopicComposition for ThalliumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for ThalliumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for ThalliumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Tl205
+    }
+}
+impl std::fmt::Display for ThalliumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Tl176 => write!(f, "Tl176"),
+            Self::Tl177 => write!(f, "Tl177"),
+            Self::Tl178 => write!(f, "Tl178"),
+            Self::Tl179 => write!(f, "Tl179"),
+            Self::Tl180 => write!(f, "Tl180"),
+            Self::Tl181 => write!(f, "Tl181"),
+            Self::Tl182 => write!(f, "Tl182"),
+            Self::Tl183 => write!(f, "Tl183"),
+            Self::Tl184 => write!(f, "Tl184"),
+            Self::Tl185 => write!(f, "Tl185"),
+            Self::Tl186 => write!(f, "Tl186"),
+            Self::Tl187 => write!(f, "Tl187"),
+            Self::Tl188 => write!(f, "Tl188"),
+            Self::Tl189 => write!(f, "Tl189"),
+            Self::Tl190 => write!(f, "Tl190"),
+            Self::Tl191 => write!(f, "Tl191"),
+            Self::Tl192 => write!(f, "Tl192"),
+            Self::Tl193 => write!(f, "Tl193"),
+            Self::Tl194 => write!(f, "Tl194"),
+            Self::Tl195 => write!(f, "Tl195"),
+            Self::Tl196 => write!(f, "Tl196"),
+            Self::Tl197 => write!(f, "Tl197"),
+            Self::Tl198 => write!(f, "Tl198"),
+            Self::Tl199 => write!(f, "Tl199"),
+            Self::Tl200 => write!(f, "Tl200"),
+            Self::Tl201 => write!(f, "Tl201"),
+            Self::Tl202 => write!(f, "Tl202"),
+            Self::Tl203 => write!(f, "Tl203"),
+            Self::Tl204 => write!(f, "Tl204"),
+            Self::Tl205 => write!(f, "Tl205"),
+            Self::Tl206 => write!(f, "Tl206"),
+            Self::Tl207 => write!(f, "Tl207"),
+            Self::Tl208 => write!(f, "Tl208"),
+            Self::Tl209 => write!(f, "Tl209"),
+            Self::Tl210 => write!(f, "Tl210"),
+            Self::Tl211 => write!(f, "Tl211"),
+            Self::Tl212 => write!(f, "Tl212"),
+            Self::Tl213 => write!(f, "Tl213"),
+            Self::Tl214 => write!(f, "Tl214"),
+            Self::Tl215 => write!(f, "Tl215"),
+            Self::Tl216 => write!(f, "Tl216"),
+            Self::Tl217 => write!(f, "Tl217"),
+            Self::Tl218 => write!(f, "Tl218"),
+        }
     }
 }

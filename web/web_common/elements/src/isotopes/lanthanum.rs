@@ -186,8 +186,54 @@ impl super::IsotopicComposition for LanthanumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for LanthanumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for LanthanumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::La139
+    }
+}
+impl std::fmt::Display for LanthanumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::La116 => write!(f, "La116"),
+            Self::La117 => write!(f, "La117"),
+            Self::La118 => write!(f, "La118"),
+            Self::La119 => write!(f, "La119"),
+            Self::La120 => write!(f, "La120"),
+            Self::La121 => write!(f, "La121"),
+            Self::La122 => write!(f, "La122"),
+            Self::La123 => write!(f, "La123"),
+            Self::La124 => write!(f, "La124"),
+            Self::La125 => write!(f, "La125"),
+            Self::La126 => write!(f, "La126"),
+            Self::La127 => write!(f, "La127"),
+            Self::La128 => write!(f, "La128"),
+            Self::La129 => write!(f, "La129"),
+            Self::La130 => write!(f, "La130"),
+            Self::La131 => write!(f, "La131"),
+            Self::La132 => write!(f, "La132"),
+            Self::La133 => write!(f, "La133"),
+            Self::La134 => write!(f, "La134"),
+            Self::La135 => write!(f, "La135"),
+            Self::La136 => write!(f, "La136"),
+            Self::La137 => write!(f, "La137"),
+            Self::La138 => write!(f, "La138"),
+            Self::La139 => write!(f, "La139"),
+            Self::La140 => write!(f, "La140"),
+            Self::La141 => write!(f, "La141"),
+            Self::La142 => write!(f, "La142"),
+            Self::La143 => write!(f, "La143"),
+            Self::La144 => write!(f, "La144"),
+            Self::La145 => write!(f, "La145"),
+            Self::La146 => write!(f, "La146"),
+            Self::La147 => write!(f, "La147"),
+            Self::La148 => write!(f, "La148"),
+            Self::La149 => write!(f, "La149"),
+            Self::La150 => write!(f, "La150"),
+            Self::La151 => write!(f, "La151"),
+            Self::La152 => write!(f, "La152"),
+            Self::La153 => write!(f, "La153"),
+            Self::La154 => write!(f, "La154"),
+            Self::La155 => write!(f, "La155"),
+        }
     }
 }

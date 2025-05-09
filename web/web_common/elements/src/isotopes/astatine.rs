@@ -182,8 +182,53 @@ impl super::IsotopicComposition for AstatineIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for AstatineIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for AstatineIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::At229
+    }
+}
+impl std::fmt::Display for AstatineIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::At191 => write!(f, "At191"),
+            Self::At192 => write!(f, "At192"),
+            Self::At193 => write!(f, "At193"),
+            Self::At194 => write!(f, "At194"),
+            Self::At195 => write!(f, "At195"),
+            Self::At196 => write!(f, "At196"),
+            Self::At197 => write!(f, "At197"),
+            Self::At198 => write!(f, "At198"),
+            Self::At199 => write!(f, "At199"),
+            Self::At200 => write!(f, "At200"),
+            Self::At201 => write!(f, "At201"),
+            Self::At202 => write!(f, "At202"),
+            Self::At203 => write!(f, "At203"),
+            Self::At204 => write!(f, "At204"),
+            Self::At205 => write!(f, "At205"),
+            Self::At206 => write!(f, "At206"),
+            Self::At207 => write!(f, "At207"),
+            Self::At208 => write!(f, "At208"),
+            Self::At209 => write!(f, "At209"),
+            Self::At210 => write!(f, "At210"),
+            Self::At211 => write!(f, "At211"),
+            Self::At212 => write!(f, "At212"),
+            Self::At213 => write!(f, "At213"),
+            Self::At214 => write!(f, "At214"),
+            Self::At215 => write!(f, "At215"),
+            Self::At216 => write!(f, "At216"),
+            Self::At217 => write!(f, "At217"),
+            Self::At218 => write!(f, "At218"),
+            Self::At219 => write!(f, "At219"),
+            Self::At220 => write!(f, "At220"),
+            Self::At221 => write!(f, "At221"),
+            Self::At222 => write!(f, "At222"),
+            Self::At223 => write!(f, "At223"),
+            Self::At224 => write!(f, "At224"),
+            Self::At225 => write!(f, "At225"),
+            Self::At226 => write!(f, "At226"),
+            Self::At227 => write!(f, "At227"),
+            Self::At228 => write!(f, "At228"),
+            Self::At229 => write!(f, "At229"),
+        }
     }
 }

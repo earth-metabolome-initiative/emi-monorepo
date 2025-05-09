@@ -194,8 +194,56 @@ impl super::IsotopicComposition for OsmiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for OsmiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for OsmiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Os192
+    }
+}
+impl std::fmt::Display for OsmiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Os161 => write!(f, "Os161"),
+            Self::Os162 => write!(f, "Os162"),
+            Self::Os163 => write!(f, "Os163"),
+            Self::Os164 => write!(f, "Os164"),
+            Self::Os165 => write!(f, "Os165"),
+            Self::Os166 => write!(f, "Os166"),
+            Self::Os167 => write!(f, "Os167"),
+            Self::Os168 => write!(f, "Os168"),
+            Self::Os169 => write!(f, "Os169"),
+            Self::Os170 => write!(f, "Os170"),
+            Self::Os171 => write!(f, "Os171"),
+            Self::Os172 => write!(f, "Os172"),
+            Self::Os173 => write!(f, "Os173"),
+            Self::Os174 => write!(f, "Os174"),
+            Self::Os175 => write!(f, "Os175"),
+            Self::Os176 => write!(f, "Os176"),
+            Self::Os177 => write!(f, "Os177"),
+            Self::Os178 => write!(f, "Os178"),
+            Self::Os179 => write!(f, "Os179"),
+            Self::Os180 => write!(f, "Os180"),
+            Self::Os181 => write!(f, "Os181"),
+            Self::Os182 => write!(f, "Os182"),
+            Self::Os183 => write!(f, "Os183"),
+            Self::Os184 => write!(f, "Os184"),
+            Self::Os185 => write!(f, "Os185"),
+            Self::Os186 => write!(f, "Os186"),
+            Self::Os187 => write!(f, "Os187"),
+            Self::Os188 => write!(f, "Os188"),
+            Self::Os189 => write!(f, "Os189"),
+            Self::Os190 => write!(f, "Os190"),
+            Self::Os191 => write!(f, "Os191"),
+            Self::Os192 => write!(f, "Os192"),
+            Self::Os193 => write!(f, "Os193"),
+            Self::Os194 => write!(f, "Os194"),
+            Self::Os195 => write!(f, "Os195"),
+            Self::Os196 => write!(f, "Os196"),
+            Self::Os197 => write!(f, "Os197"),
+            Self::Os198 => write!(f, "Os198"),
+            Self::Os199 => write!(f, "Os199"),
+            Self::Os200 => write!(f, "Os200"),
+            Self::Os201 => write!(f, "Os201"),
+            Self::Os202 => write!(f, "Os202"),
+        }
     }
 }

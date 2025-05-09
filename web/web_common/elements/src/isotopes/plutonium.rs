@@ -106,8 +106,34 @@ impl super::IsotopicComposition for PlutoniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for PlutoniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for PlutoniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Pu247
+    }
+}
+impl std::fmt::Display for PlutoniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Pu228 => write!(f, "Pu228"),
+            Self::Pu229 => write!(f, "Pu229"),
+            Self::Pu230 => write!(f, "Pu230"),
+            Self::Pu231 => write!(f, "Pu231"),
+            Self::Pu232 => write!(f, "Pu232"),
+            Self::Pu233 => write!(f, "Pu233"),
+            Self::Pu234 => write!(f, "Pu234"),
+            Self::Pu235 => write!(f, "Pu235"),
+            Self::Pu236 => write!(f, "Pu236"),
+            Self::Pu237 => write!(f, "Pu237"),
+            Self::Pu238 => write!(f, "Pu238"),
+            Self::Pu239 => write!(f, "Pu239"),
+            Self::Pu240 => write!(f, "Pu240"),
+            Self::Pu241 => write!(f, "Pu241"),
+            Self::Pu242 => write!(f, "Pu242"),
+            Self::Pu243 => write!(f, "Pu243"),
+            Self::Pu244 => write!(f, "Pu244"),
+            Self::Pu245 => write!(f, "Pu245"),
+            Self::Pu246 => write!(f, "Pu246"),
+            Self::Pu247 => write!(f, "Pu247"),
+        }
     }
 }

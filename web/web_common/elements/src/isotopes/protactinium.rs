@@ -146,8 +146,44 @@ impl super::IsotopicComposition for ProtactiniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for ProtactiniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for ProtactiniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Pa231
+    }
+}
+impl std::fmt::Display for ProtactiniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Pa212 => write!(f, "Pa212"),
+            Self::Pa213 => write!(f, "Pa213"),
+            Self::Pa214 => write!(f, "Pa214"),
+            Self::Pa215 => write!(f, "Pa215"),
+            Self::Pa216 => write!(f, "Pa216"),
+            Self::Pa217 => write!(f, "Pa217"),
+            Self::Pa218 => write!(f, "Pa218"),
+            Self::Pa219 => write!(f, "Pa219"),
+            Self::Pa220 => write!(f, "Pa220"),
+            Self::Pa221 => write!(f, "Pa221"),
+            Self::Pa222 => write!(f, "Pa222"),
+            Self::Pa223 => write!(f, "Pa223"),
+            Self::Pa224 => write!(f, "Pa224"),
+            Self::Pa225 => write!(f, "Pa225"),
+            Self::Pa226 => write!(f, "Pa226"),
+            Self::Pa227 => write!(f, "Pa227"),
+            Self::Pa228 => write!(f, "Pa228"),
+            Self::Pa229 => write!(f, "Pa229"),
+            Self::Pa230 => write!(f, "Pa230"),
+            Self::Pa231 => write!(f, "Pa231"),
+            Self::Pa232 => write!(f, "Pa232"),
+            Self::Pa233 => write!(f, "Pa233"),
+            Self::Pa234 => write!(f, "Pa234"),
+            Self::Pa235 => write!(f, "Pa235"),
+            Self::Pa236 => write!(f, "Pa236"),
+            Self::Pa237 => write!(f, "Pa237"),
+            Self::Pa238 => write!(f, "Pa238"),
+            Self::Pa239 => write!(f, "Pa239"),
+            Self::Pa240 => write!(f, "Pa240"),
+            Self::Pa241 => write!(f, "Pa241"),
+        }
     }
 }

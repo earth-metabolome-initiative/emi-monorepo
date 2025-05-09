@@ -178,8 +178,52 @@ impl super::IsotopicComposition for RhodiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for RhodiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for RhodiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Rh103
+    }
+}
+impl std::fmt::Display for RhodiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Rh89 => write!(f, "Rh89"),
+            Self::Rh90 => write!(f, "Rh90"),
+            Self::Rh91 => write!(f, "Rh91"),
+            Self::Rh92 => write!(f, "Rh92"),
+            Self::Rh93 => write!(f, "Rh93"),
+            Self::Rh94 => write!(f, "Rh94"),
+            Self::Rh95 => write!(f, "Rh95"),
+            Self::Rh96 => write!(f, "Rh96"),
+            Self::Rh97 => write!(f, "Rh97"),
+            Self::Rh98 => write!(f, "Rh98"),
+            Self::Rh99 => write!(f, "Rh99"),
+            Self::Rh100 => write!(f, "Rh100"),
+            Self::Rh101 => write!(f, "Rh101"),
+            Self::Rh102 => write!(f, "Rh102"),
+            Self::Rh103 => write!(f, "Rh103"),
+            Self::Rh104 => write!(f, "Rh104"),
+            Self::Rh105 => write!(f, "Rh105"),
+            Self::Rh106 => write!(f, "Rh106"),
+            Self::Rh107 => write!(f, "Rh107"),
+            Self::Rh108 => write!(f, "Rh108"),
+            Self::Rh109 => write!(f, "Rh109"),
+            Self::Rh110 => write!(f, "Rh110"),
+            Self::Rh111 => write!(f, "Rh111"),
+            Self::Rh112 => write!(f, "Rh112"),
+            Self::Rh113 => write!(f, "Rh113"),
+            Self::Rh114 => write!(f, "Rh114"),
+            Self::Rh115 => write!(f, "Rh115"),
+            Self::Rh116 => write!(f, "Rh116"),
+            Self::Rh117 => write!(f, "Rh117"),
+            Self::Rh118 => write!(f, "Rh118"),
+            Self::Rh119 => write!(f, "Rh119"),
+            Self::Rh120 => write!(f, "Rh120"),
+            Self::Rh121 => write!(f, "Rh121"),
+            Self::Rh122 => write!(f, "Rh122"),
+            Self::Rh123 => write!(f, "Rh123"),
+            Self::Rh124 => write!(f, "Rh124"),
+            Self::Rh125 => write!(f, "Rh125"),
+            Self::Rh126 => write!(f, "Rh126"),
+        }
     }
 }

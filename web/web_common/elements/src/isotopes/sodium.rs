@@ -106,8 +106,34 @@ impl super::IsotopicComposition for SodiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for SodiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for SodiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Na23
+    }
+}
+impl std::fmt::Display for SodiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Na18 => write!(f, "Na18"),
+            Self::Na19 => write!(f, "Na19"),
+            Self::Na20 => write!(f, "Na20"),
+            Self::Na21 => write!(f, "Na21"),
+            Self::Na22 => write!(f, "Na22"),
+            Self::Na23 => write!(f, "Na23"),
+            Self::Na24 => write!(f, "Na24"),
+            Self::Na25 => write!(f, "Na25"),
+            Self::Na26 => write!(f, "Na26"),
+            Self::Na27 => write!(f, "Na27"),
+            Self::Na28 => write!(f, "Na28"),
+            Self::Na29 => write!(f, "Na29"),
+            Self::Na30 => write!(f, "Na30"),
+            Self::Na31 => write!(f, "Na31"),
+            Self::Na32 => write!(f, "Na32"),
+            Self::Na33 => write!(f, "Na33"),
+            Self::Na34 => write!(f, "Na34"),
+            Self::Na35 => write!(f, "Na35"),
+            Self::Na36 => write!(f, "Na36"),
+            Self::Na37 => write!(f, "Na37"),
+        }
     }
 }

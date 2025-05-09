@@ -166,8 +166,49 @@ impl super::IsotopicComposition for ZirconiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for ZirconiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for ZirconiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Zr90
+    }
+}
+impl std::fmt::Display for ZirconiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Zr78 => write!(f, "Zr78"),
+            Self::Zr79 => write!(f, "Zr79"),
+            Self::Zr80 => write!(f, "Zr80"),
+            Self::Zr81 => write!(f, "Zr81"),
+            Self::Zr82 => write!(f, "Zr82"),
+            Self::Zr83 => write!(f, "Zr83"),
+            Self::Zr84 => write!(f, "Zr84"),
+            Self::Zr85 => write!(f, "Zr85"),
+            Self::Zr86 => write!(f, "Zr86"),
+            Self::Zr87 => write!(f, "Zr87"),
+            Self::Zr88 => write!(f, "Zr88"),
+            Self::Zr89 => write!(f, "Zr89"),
+            Self::Zr90 => write!(f, "Zr90"),
+            Self::Zr91 => write!(f, "Zr91"),
+            Self::Zr92 => write!(f, "Zr92"),
+            Self::Zr93 => write!(f, "Zr93"),
+            Self::Zr94 => write!(f, "Zr94"),
+            Self::Zr95 => write!(f, "Zr95"),
+            Self::Zr96 => write!(f, "Zr96"),
+            Self::Zr97 => write!(f, "Zr97"),
+            Self::Zr98 => write!(f, "Zr98"),
+            Self::Zr99 => write!(f, "Zr99"),
+            Self::Zr100 => write!(f, "Zr100"),
+            Self::Zr101 => write!(f, "Zr101"),
+            Self::Zr102 => write!(f, "Zr102"),
+            Self::Zr103 => write!(f, "Zr103"),
+            Self::Zr104 => write!(f, "Zr104"),
+            Self::Zr105 => write!(f, "Zr105"),
+            Self::Zr106 => write!(f, "Zr106"),
+            Self::Zr107 => write!(f, "Zr107"),
+            Self::Zr108 => write!(f, "Zr108"),
+            Self::Zr109 => write!(f, "Zr109"),
+            Self::Zr110 => write!(f, "Zr110"),
+            Self::Zr111 => write!(f, "Zr111"),
+            Self::Zr112 => write!(f, "Zr112"),
+        }
     }
 }

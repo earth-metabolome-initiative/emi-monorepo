@@ -170,8 +170,50 @@ impl super::IsotopicComposition for DysprosiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for DysprosiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for DysprosiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Dy164
+    }
+}
+impl std::fmt::Display for DysprosiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Dy138 => write!(f, "Dy138"),
+            Self::Dy139 => write!(f, "Dy139"),
+            Self::Dy140 => write!(f, "Dy140"),
+            Self::Dy141 => write!(f, "Dy141"),
+            Self::Dy142 => write!(f, "Dy142"),
+            Self::Dy143 => write!(f, "Dy143"),
+            Self::Dy144 => write!(f, "Dy144"),
+            Self::Dy145 => write!(f, "Dy145"),
+            Self::Dy146 => write!(f, "Dy146"),
+            Self::Dy147 => write!(f, "Dy147"),
+            Self::Dy148 => write!(f, "Dy148"),
+            Self::Dy149 => write!(f, "Dy149"),
+            Self::Dy150 => write!(f, "Dy150"),
+            Self::Dy151 => write!(f, "Dy151"),
+            Self::Dy152 => write!(f, "Dy152"),
+            Self::Dy153 => write!(f, "Dy153"),
+            Self::Dy154 => write!(f, "Dy154"),
+            Self::Dy155 => write!(f, "Dy155"),
+            Self::Dy156 => write!(f, "Dy156"),
+            Self::Dy157 => write!(f, "Dy157"),
+            Self::Dy158 => write!(f, "Dy158"),
+            Self::Dy159 => write!(f, "Dy159"),
+            Self::Dy160 => write!(f, "Dy160"),
+            Self::Dy161 => write!(f, "Dy161"),
+            Self::Dy162 => write!(f, "Dy162"),
+            Self::Dy163 => write!(f, "Dy163"),
+            Self::Dy164 => write!(f, "Dy164"),
+            Self::Dy165 => write!(f, "Dy165"),
+            Self::Dy166 => write!(f, "Dy166"),
+            Self::Dy167 => write!(f, "Dy167"),
+            Self::Dy168 => write!(f, "Dy168"),
+            Self::Dy169 => write!(f, "Dy169"),
+            Self::Dy170 => write!(f, "Dy170"),
+            Self::Dy171 => write!(f, "Dy171"),
+            Self::Dy172 => write!(f, "Dy172"),
+            Self::Dy173 => write!(f, "Dy173"),
+        }
     }
 }

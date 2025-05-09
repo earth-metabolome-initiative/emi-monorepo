@@ -178,8 +178,52 @@ impl super::IsotopicComposition for SilverIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for SilverIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for SilverIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ag107
+    }
+}
+impl std::fmt::Display for SilverIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ag93 => write!(f, "Ag93"),
+            Self::Ag94 => write!(f, "Ag94"),
+            Self::Ag95 => write!(f, "Ag95"),
+            Self::Ag96 => write!(f, "Ag96"),
+            Self::Ag97 => write!(f, "Ag97"),
+            Self::Ag98 => write!(f, "Ag98"),
+            Self::Ag99 => write!(f, "Ag99"),
+            Self::Ag100 => write!(f, "Ag100"),
+            Self::Ag101 => write!(f, "Ag101"),
+            Self::Ag102 => write!(f, "Ag102"),
+            Self::Ag103 => write!(f, "Ag103"),
+            Self::Ag104 => write!(f, "Ag104"),
+            Self::Ag105 => write!(f, "Ag105"),
+            Self::Ag106 => write!(f, "Ag106"),
+            Self::Ag107 => write!(f, "Ag107"),
+            Self::Ag108 => write!(f, "Ag108"),
+            Self::Ag109 => write!(f, "Ag109"),
+            Self::Ag110 => write!(f, "Ag110"),
+            Self::Ag111 => write!(f, "Ag111"),
+            Self::Ag112 => write!(f, "Ag112"),
+            Self::Ag113 => write!(f, "Ag113"),
+            Self::Ag114 => write!(f, "Ag114"),
+            Self::Ag115 => write!(f, "Ag115"),
+            Self::Ag116 => write!(f, "Ag116"),
+            Self::Ag117 => write!(f, "Ag117"),
+            Self::Ag118 => write!(f, "Ag118"),
+            Self::Ag119 => write!(f, "Ag119"),
+            Self::Ag120 => write!(f, "Ag120"),
+            Self::Ag121 => write!(f, "Ag121"),
+            Self::Ag122 => write!(f, "Ag122"),
+            Self::Ag123 => write!(f, "Ag123"),
+            Self::Ag124 => write!(f, "Ag124"),
+            Self::Ag125 => write!(f, "Ag125"),
+            Self::Ag126 => write!(f, "Ag126"),
+            Self::Ag127 => write!(f, "Ag127"),
+            Self::Ag128 => write!(f, "Ag128"),
+            Self::Ag129 => write!(f, "Ag129"),
+            Self::Ag130 => write!(f, "Ag130"),
+        }
     }
 }

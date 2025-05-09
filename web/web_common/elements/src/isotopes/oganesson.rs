@@ -38,8 +38,17 @@ impl super::IsotopicComposition for OganessonIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for OganessonIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for OganessonIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Og295
+    }
+}
+impl std::fmt::Display for OganessonIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Og293 => write!(f, "Og293"),
+            Self::Og294 => write!(f, "Og294"),
+            Self::Og295 => write!(f, "Og295"),
+        }
     }
 }

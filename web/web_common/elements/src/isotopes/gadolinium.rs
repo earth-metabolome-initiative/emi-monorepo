@@ -174,8 +174,51 @@ impl super::IsotopicComposition for GadoliniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for GadoliniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for GadoliniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Gd158
+    }
+}
+impl std::fmt::Display for GadoliniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Gd133 => write!(f, "Gd133"),
+            Self::Gd134 => write!(f, "Gd134"),
+            Self::Gd135 => write!(f, "Gd135"),
+            Self::Gd136 => write!(f, "Gd136"),
+            Self::Gd137 => write!(f, "Gd137"),
+            Self::Gd138 => write!(f, "Gd138"),
+            Self::Gd139 => write!(f, "Gd139"),
+            Self::Gd140 => write!(f, "Gd140"),
+            Self::Gd141 => write!(f, "Gd141"),
+            Self::Gd142 => write!(f, "Gd142"),
+            Self::Gd143 => write!(f, "Gd143"),
+            Self::Gd144 => write!(f, "Gd144"),
+            Self::Gd145 => write!(f, "Gd145"),
+            Self::Gd146 => write!(f, "Gd146"),
+            Self::Gd147 => write!(f, "Gd147"),
+            Self::Gd148 => write!(f, "Gd148"),
+            Self::Gd149 => write!(f, "Gd149"),
+            Self::Gd150 => write!(f, "Gd150"),
+            Self::Gd151 => write!(f, "Gd151"),
+            Self::Gd152 => write!(f, "Gd152"),
+            Self::Gd153 => write!(f, "Gd153"),
+            Self::Gd154 => write!(f, "Gd154"),
+            Self::Gd155 => write!(f, "Gd155"),
+            Self::Gd156 => write!(f, "Gd156"),
+            Self::Gd157 => write!(f, "Gd157"),
+            Self::Gd158 => write!(f, "Gd158"),
+            Self::Gd159 => write!(f, "Gd159"),
+            Self::Gd160 => write!(f, "Gd160"),
+            Self::Gd161 => write!(f, "Gd161"),
+            Self::Gd162 => write!(f, "Gd162"),
+            Self::Gd163 => write!(f, "Gd163"),
+            Self::Gd164 => write!(f, "Gd164"),
+            Self::Gd165 => write!(f, "Gd165"),
+            Self::Gd166 => write!(f, "Gd166"),
+            Self::Gd167 => write!(f, "Gd167"),
+            Self::Gd168 => write!(f, "Gd168"),
+            Self::Gd169 => write!(f, "Gd169"),
+        }
     }
 }

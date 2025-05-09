@@ -134,8 +134,41 @@ impl super::IsotopicComposition for ChromiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for ChromiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for ChromiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Cr52
+    }
+}
+impl std::fmt::Display for ChromiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Cr42 => write!(f, "Cr42"),
+            Self::Cr43 => write!(f, "Cr43"),
+            Self::Cr44 => write!(f, "Cr44"),
+            Self::Cr45 => write!(f, "Cr45"),
+            Self::Cr46 => write!(f, "Cr46"),
+            Self::Cr47 => write!(f, "Cr47"),
+            Self::Cr48 => write!(f, "Cr48"),
+            Self::Cr49 => write!(f, "Cr49"),
+            Self::Cr50 => write!(f, "Cr50"),
+            Self::Cr51 => write!(f, "Cr51"),
+            Self::Cr52 => write!(f, "Cr52"),
+            Self::Cr53 => write!(f, "Cr53"),
+            Self::Cr54 => write!(f, "Cr54"),
+            Self::Cr55 => write!(f, "Cr55"),
+            Self::Cr56 => write!(f, "Cr56"),
+            Self::Cr57 => write!(f, "Cr57"),
+            Self::Cr58 => write!(f, "Cr58"),
+            Self::Cr59 => write!(f, "Cr59"),
+            Self::Cr60 => write!(f, "Cr60"),
+            Self::Cr61 => write!(f, "Cr61"),
+            Self::Cr62 => write!(f, "Cr62"),
+            Self::Cr63 => write!(f, "Cr63"),
+            Self::Cr64 => write!(f, "Cr64"),
+            Self::Cr65 => write!(f, "Cr65"),
+            Self::Cr66 => write!(f, "Cr66"),
+            Self::Cr67 => write!(f, "Cr67"),
+            Self::Cr68 => write!(f, "Cr68"),
+        }
     }
 }

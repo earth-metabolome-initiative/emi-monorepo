@@ -170,8 +170,50 @@ impl super::IsotopicComposition for ErbiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for ErbiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for ErbiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Er166
+    }
+}
+impl std::fmt::Display for ErbiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Er142 => write!(f, "Er142"),
+            Self::Er143 => write!(f, "Er143"),
+            Self::Er144 => write!(f, "Er144"),
+            Self::Er145 => write!(f, "Er145"),
+            Self::Er146 => write!(f, "Er146"),
+            Self::Er147 => write!(f, "Er147"),
+            Self::Er148 => write!(f, "Er148"),
+            Self::Er149 => write!(f, "Er149"),
+            Self::Er150 => write!(f, "Er150"),
+            Self::Er151 => write!(f, "Er151"),
+            Self::Er152 => write!(f, "Er152"),
+            Self::Er153 => write!(f, "Er153"),
+            Self::Er154 => write!(f, "Er154"),
+            Self::Er155 => write!(f, "Er155"),
+            Self::Er156 => write!(f, "Er156"),
+            Self::Er157 => write!(f, "Er157"),
+            Self::Er158 => write!(f, "Er158"),
+            Self::Er159 => write!(f, "Er159"),
+            Self::Er160 => write!(f, "Er160"),
+            Self::Er161 => write!(f, "Er161"),
+            Self::Er162 => write!(f, "Er162"),
+            Self::Er163 => write!(f, "Er163"),
+            Self::Er164 => write!(f, "Er164"),
+            Self::Er165 => write!(f, "Er165"),
+            Self::Er166 => write!(f, "Er166"),
+            Self::Er167 => write!(f, "Er167"),
+            Self::Er168 => write!(f, "Er168"),
+            Self::Er169 => write!(f, "Er169"),
+            Self::Er170 => write!(f, "Er170"),
+            Self::Er171 => write!(f, "Er171"),
+            Self::Er172 => write!(f, "Er172"),
+            Self::Er173 => write!(f, "Er173"),
+            Self::Er174 => write!(f, "Er174"),
+            Self::Er175 => write!(f, "Er175"),
+            Self::Er176 => write!(f, "Er176"),
+            Self::Er177 => write!(f, "Er177"),
+        }
     }
 }

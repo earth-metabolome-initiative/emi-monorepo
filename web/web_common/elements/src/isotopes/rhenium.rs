@@ -186,8 +186,54 @@ impl super::IsotopicComposition for RheniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for RheniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for RheniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Re187
+    }
+}
+impl std::fmt::Display for RheniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Re159 => write!(f, "Re159"),
+            Self::Re160 => write!(f, "Re160"),
+            Self::Re161 => write!(f, "Re161"),
+            Self::Re162 => write!(f, "Re162"),
+            Self::Re163 => write!(f, "Re163"),
+            Self::Re164 => write!(f, "Re164"),
+            Self::Re165 => write!(f, "Re165"),
+            Self::Re166 => write!(f, "Re166"),
+            Self::Re167 => write!(f, "Re167"),
+            Self::Re168 => write!(f, "Re168"),
+            Self::Re169 => write!(f, "Re169"),
+            Self::Re170 => write!(f, "Re170"),
+            Self::Re171 => write!(f, "Re171"),
+            Self::Re172 => write!(f, "Re172"),
+            Self::Re173 => write!(f, "Re173"),
+            Self::Re174 => write!(f, "Re174"),
+            Self::Re175 => write!(f, "Re175"),
+            Self::Re176 => write!(f, "Re176"),
+            Self::Re177 => write!(f, "Re177"),
+            Self::Re178 => write!(f, "Re178"),
+            Self::Re179 => write!(f, "Re179"),
+            Self::Re180 => write!(f, "Re180"),
+            Self::Re181 => write!(f, "Re181"),
+            Self::Re182 => write!(f, "Re182"),
+            Self::Re183 => write!(f, "Re183"),
+            Self::Re184 => write!(f, "Re184"),
+            Self::Re185 => write!(f, "Re185"),
+            Self::Re186 => write!(f, "Re186"),
+            Self::Re187 => write!(f, "Re187"),
+            Self::Re188 => write!(f, "Re188"),
+            Self::Re189 => write!(f, "Re189"),
+            Self::Re190 => write!(f, "Re190"),
+            Self::Re191 => write!(f, "Re191"),
+            Self::Re192 => write!(f, "Re192"),
+            Self::Re193 => write!(f, "Re193"),
+            Self::Re194 => write!(f, "Re194"),
+            Self::Re195 => write!(f, "Re195"),
+            Self::Re196 => write!(f, "Re196"),
+            Self::Re197 => write!(f, "Re197"),
+            Self::Re198 => write!(f, "Re198"),
+        }
     }
 }

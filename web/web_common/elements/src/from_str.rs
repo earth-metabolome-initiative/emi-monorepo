@@ -126,7 +126,12 @@ impl FromStr for crate::Element {
             "Ts" => Self::Ts,
             "Og" => Self::Og,
             _ => {
-                return Err(crate::errors::UnknownElement::Unknown(value.to_string()));
+                let mut characters: [char; 2] = [' '; 2];
+                for (i, c) in value.chars().take(2).enumerate() {
+                    characters[i] = c;
+                }
+
+                return Err(crate::errors::UnknownElement::Unknown(characters));
             }
         })
     }

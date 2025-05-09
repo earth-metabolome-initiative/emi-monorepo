@@ -186,8 +186,54 @@ impl super::IsotopicComposition for TinIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for TinIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for TinIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Sn120
+    }
+}
+impl std::fmt::Display for TinIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Sn99 => write!(f, "Sn99"),
+            Self::Sn100 => write!(f, "Sn100"),
+            Self::Sn101 => write!(f, "Sn101"),
+            Self::Sn102 => write!(f, "Sn102"),
+            Self::Sn103 => write!(f, "Sn103"),
+            Self::Sn104 => write!(f, "Sn104"),
+            Self::Sn105 => write!(f, "Sn105"),
+            Self::Sn106 => write!(f, "Sn106"),
+            Self::Sn107 => write!(f, "Sn107"),
+            Self::Sn108 => write!(f, "Sn108"),
+            Self::Sn109 => write!(f, "Sn109"),
+            Self::Sn110 => write!(f, "Sn110"),
+            Self::Sn111 => write!(f, "Sn111"),
+            Self::Sn112 => write!(f, "Sn112"),
+            Self::Sn113 => write!(f, "Sn113"),
+            Self::Sn114 => write!(f, "Sn114"),
+            Self::Sn115 => write!(f, "Sn115"),
+            Self::Sn116 => write!(f, "Sn116"),
+            Self::Sn117 => write!(f, "Sn117"),
+            Self::Sn118 => write!(f, "Sn118"),
+            Self::Sn119 => write!(f, "Sn119"),
+            Self::Sn120 => write!(f, "Sn120"),
+            Self::Sn121 => write!(f, "Sn121"),
+            Self::Sn122 => write!(f, "Sn122"),
+            Self::Sn123 => write!(f, "Sn123"),
+            Self::Sn124 => write!(f, "Sn124"),
+            Self::Sn125 => write!(f, "Sn125"),
+            Self::Sn126 => write!(f, "Sn126"),
+            Self::Sn127 => write!(f, "Sn127"),
+            Self::Sn128 => write!(f, "Sn128"),
+            Self::Sn129 => write!(f, "Sn129"),
+            Self::Sn130 => write!(f, "Sn130"),
+            Self::Sn131 => write!(f, "Sn131"),
+            Self::Sn132 => write!(f, "Sn132"),
+            Self::Sn133 => write!(f, "Sn133"),
+            Self::Sn134 => write!(f, "Sn134"),
+            Self::Sn135 => write!(f, "Sn135"),
+            Self::Sn136 => write!(f, "Sn136"),
+            Self::Sn137 => write!(f, "Sn137"),
+            Self::Sn138 => write!(f, "Sn138"),
+        }
     }
 }

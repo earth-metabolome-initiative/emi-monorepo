@@ -146,8 +146,44 @@ impl super::IsotopicComposition for CobaltIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for CobaltIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for CobaltIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Co59
+    }
+}
+impl std::fmt::Display for CobaltIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Co47 => write!(f, "Co47"),
+            Self::Co48 => write!(f, "Co48"),
+            Self::Co49 => write!(f, "Co49"),
+            Self::Co50 => write!(f, "Co50"),
+            Self::Co51 => write!(f, "Co51"),
+            Self::Co52 => write!(f, "Co52"),
+            Self::Co53 => write!(f, "Co53"),
+            Self::Co54 => write!(f, "Co54"),
+            Self::Co55 => write!(f, "Co55"),
+            Self::Co56 => write!(f, "Co56"),
+            Self::Co57 => write!(f, "Co57"),
+            Self::Co58 => write!(f, "Co58"),
+            Self::Co59 => write!(f, "Co59"),
+            Self::Co60 => write!(f, "Co60"),
+            Self::Co61 => write!(f, "Co61"),
+            Self::Co62 => write!(f, "Co62"),
+            Self::Co63 => write!(f, "Co63"),
+            Self::Co64 => write!(f, "Co64"),
+            Self::Co65 => write!(f, "Co65"),
+            Self::Co66 => write!(f, "Co66"),
+            Self::Co67 => write!(f, "Co67"),
+            Self::Co68 => write!(f, "Co68"),
+            Self::Co69 => write!(f, "Co69"),
+            Self::Co70 => write!(f, "Co70"),
+            Self::Co71 => write!(f, "Co71"),
+            Self::Co72 => write!(f, "Co72"),
+            Self::Co73 => write!(f, "Co73"),
+            Self::Co74 => write!(f, "Co74"),
+            Self::Co75 => write!(f, "Co75"),
+            Self::Co76 => write!(f, "Co76"),
+        }
     }
 }

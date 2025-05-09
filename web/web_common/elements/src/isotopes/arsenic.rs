@@ -158,8 +158,47 @@ impl super::IsotopicComposition for ArsenicIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for ArsenicIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for ArsenicIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::As75
+    }
+}
+impl std::fmt::Display for ArsenicIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::As60 => write!(f, "As60"),
+            Self::As61 => write!(f, "As61"),
+            Self::As62 => write!(f, "As62"),
+            Self::As63 => write!(f, "As63"),
+            Self::As64 => write!(f, "As64"),
+            Self::As65 => write!(f, "As65"),
+            Self::As66 => write!(f, "As66"),
+            Self::As67 => write!(f, "As67"),
+            Self::As68 => write!(f, "As68"),
+            Self::As69 => write!(f, "As69"),
+            Self::As70 => write!(f, "As70"),
+            Self::As71 => write!(f, "As71"),
+            Self::As72 => write!(f, "As72"),
+            Self::As73 => write!(f, "As73"),
+            Self::As74 => write!(f, "As74"),
+            Self::As75 => write!(f, "As75"),
+            Self::As76 => write!(f, "As76"),
+            Self::As77 => write!(f, "As77"),
+            Self::As78 => write!(f, "As78"),
+            Self::As79 => write!(f, "As79"),
+            Self::As80 => write!(f, "As80"),
+            Self::As81 => write!(f, "As81"),
+            Self::As82 => write!(f, "As82"),
+            Self::As83 => write!(f, "As83"),
+            Self::As84 => write!(f, "As84"),
+            Self::As85 => write!(f, "As85"),
+            Self::As86 => write!(f, "As86"),
+            Self::As87 => write!(f, "As87"),
+            Self::As88 => write!(f, "As88"),
+            Self::As89 => write!(f, "As89"),
+            Self::As90 => write!(f, "As90"),
+            Self::As91 => write!(f, "As91"),
+            Self::As92 => write!(f, "As92"),
+        }
     }
 }

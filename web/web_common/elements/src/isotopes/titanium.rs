@@ -130,8 +130,40 @@ impl super::IsotopicComposition for TitaniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for TitaniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for TitaniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ti48
+    }
+}
+impl std::fmt::Display for TitaniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ti38 => write!(f, "Ti38"),
+            Self::Ti39 => write!(f, "Ti39"),
+            Self::Ti40 => write!(f, "Ti40"),
+            Self::Ti41 => write!(f, "Ti41"),
+            Self::Ti42 => write!(f, "Ti42"),
+            Self::Ti43 => write!(f, "Ti43"),
+            Self::Ti44 => write!(f, "Ti44"),
+            Self::Ti45 => write!(f, "Ti45"),
+            Self::Ti46 => write!(f, "Ti46"),
+            Self::Ti47 => write!(f, "Ti47"),
+            Self::Ti48 => write!(f, "Ti48"),
+            Self::Ti49 => write!(f, "Ti49"),
+            Self::Ti50 => write!(f, "Ti50"),
+            Self::Ti51 => write!(f, "Ti51"),
+            Self::Ti52 => write!(f, "Ti52"),
+            Self::Ti53 => write!(f, "Ti53"),
+            Self::Ti54 => write!(f, "Ti54"),
+            Self::Ti55 => write!(f, "Ti55"),
+            Self::Ti56 => write!(f, "Ti56"),
+            Self::Ti57 => write!(f, "Ti57"),
+            Self::Ti58 => write!(f, "Ti58"),
+            Self::Ti59 => write!(f, "Ti59"),
+            Self::Ti60 => write!(f, "Ti60"),
+            Self::Ti61 => write!(f, "Ti61"),
+            Self::Ti62 => write!(f, "Ti62"),
+            Self::Ti63 => write!(f, "Ti63"),
+        }
     }
 }

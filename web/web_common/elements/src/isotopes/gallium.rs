@@ -154,8 +154,46 @@ impl super::IsotopicComposition for GalliumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for GalliumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for GalliumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ga69
+    }
+}
+impl std::fmt::Display for GalliumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ga56 => write!(f, "Ga56"),
+            Self::Ga57 => write!(f, "Ga57"),
+            Self::Ga58 => write!(f, "Ga58"),
+            Self::Ga59 => write!(f, "Ga59"),
+            Self::Ga60 => write!(f, "Ga60"),
+            Self::Ga61 => write!(f, "Ga61"),
+            Self::Ga62 => write!(f, "Ga62"),
+            Self::Ga63 => write!(f, "Ga63"),
+            Self::Ga64 => write!(f, "Ga64"),
+            Self::Ga65 => write!(f, "Ga65"),
+            Self::Ga66 => write!(f, "Ga66"),
+            Self::Ga67 => write!(f, "Ga67"),
+            Self::Ga68 => write!(f, "Ga68"),
+            Self::Ga69 => write!(f, "Ga69"),
+            Self::Ga70 => write!(f, "Ga70"),
+            Self::Ga71 => write!(f, "Ga71"),
+            Self::Ga72 => write!(f, "Ga72"),
+            Self::Ga73 => write!(f, "Ga73"),
+            Self::Ga74 => write!(f, "Ga74"),
+            Self::Ga75 => write!(f, "Ga75"),
+            Self::Ga76 => write!(f, "Ga76"),
+            Self::Ga77 => write!(f, "Ga77"),
+            Self::Ga78 => write!(f, "Ga78"),
+            Self::Ga79 => write!(f, "Ga79"),
+            Self::Ga80 => write!(f, "Ga80"),
+            Self::Ga81 => write!(f, "Ga81"),
+            Self::Ga82 => write!(f, "Ga82"),
+            Self::Ga83 => write!(f, "Ga83"),
+            Self::Ga84 => write!(f, "Ga84"),
+            Self::Ga85 => write!(f, "Ga85"),
+            Self::Ga86 => write!(f, "Ga86"),
+            Self::Ga87 => write!(f, "Ga87"),
+        }
     }
 }

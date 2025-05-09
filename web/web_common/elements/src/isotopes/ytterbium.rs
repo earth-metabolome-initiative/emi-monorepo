@@ -162,8 +162,48 @@ impl super::IsotopicComposition for YtterbiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for YtterbiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for YtterbiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Yb174
+    }
+}
+impl std::fmt::Display for YtterbiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Yb148 => write!(f, "Yb148"),
+            Self::Yb149 => write!(f, "Yb149"),
+            Self::Yb150 => write!(f, "Yb150"),
+            Self::Yb151 => write!(f, "Yb151"),
+            Self::Yb152 => write!(f, "Yb152"),
+            Self::Yb153 => write!(f, "Yb153"),
+            Self::Yb154 => write!(f, "Yb154"),
+            Self::Yb155 => write!(f, "Yb155"),
+            Self::Yb156 => write!(f, "Yb156"),
+            Self::Yb157 => write!(f, "Yb157"),
+            Self::Yb158 => write!(f, "Yb158"),
+            Self::Yb159 => write!(f, "Yb159"),
+            Self::Yb160 => write!(f, "Yb160"),
+            Self::Yb161 => write!(f, "Yb161"),
+            Self::Yb162 => write!(f, "Yb162"),
+            Self::Yb163 => write!(f, "Yb163"),
+            Self::Yb164 => write!(f, "Yb164"),
+            Self::Yb165 => write!(f, "Yb165"),
+            Self::Yb166 => write!(f, "Yb166"),
+            Self::Yb167 => write!(f, "Yb167"),
+            Self::Yb168 => write!(f, "Yb168"),
+            Self::Yb169 => write!(f, "Yb169"),
+            Self::Yb170 => write!(f, "Yb170"),
+            Self::Yb171 => write!(f, "Yb171"),
+            Self::Yb172 => write!(f, "Yb172"),
+            Self::Yb173 => write!(f, "Yb173"),
+            Self::Yb174 => write!(f, "Yb174"),
+            Self::Yb175 => write!(f, "Yb175"),
+            Self::Yb176 => write!(f, "Yb176"),
+            Self::Yb177 => write!(f, "Yb177"),
+            Self::Yb178 => write!(f, "Yb178"),
+            Self::Yb179 => write!(f, "Yb179"),
+            Self::Yb180 => write!(f, "Yb180"),
+            Self::Yb181 => write!(f, "Yb181"),
+        }
     }
 }

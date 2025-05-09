@@ -134,8 +134,41 @@ impl super::IsotopicComposition for VanadiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for VanadiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for VanadiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::V51
+    }
+}
+impl std::fmt::Display for VanadiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::V40 => write!(f, "V40"),
+            Self::V41 => write!(f, "V41"),
+            Self::V42 => write!(f, "V42"),
+            Self::V43 => write!(f, "V43"),
+            Self::V44 => write!(f, "V44"),
+            Self::V45 => write!(f, "V45"),
+            Self::V46 => write!(f, "V46"),
+            Self::V47 => write!(f, "V47"),
+            Self::V48 => write!(f, "V48"),
+            Self::V49 => write!(f, "V49"),
+            Self::V50 => write!(f, "V50"),
+            Self::V51 => write!(f, "V51"),
+            Self::V52 => write!(f, "V52"),
+            Self::V53 => write!(f, "V53"),
+            Self::V54 => write!(f, "V54"),
+            Self::V55 => write!(f, "V55"),
+            Self::V56 => write!(f, "V56"),
+            Self::V57 => write!(f, "V57"),
+            Self::V58 => write!(f, "V58"),
+            Self::V59 => write!(f, "V59"),
+            Self::V60 => write!(f, "V60"),
+            Self::V61 => write!(f, "V61"),
+            Self::V62 => write!(f, "V62"),
+            Self::V63 => write!(f, "V63"),
+            Self::V64 => write!(f, "V64"),
+            Self::V65 => write!(f, "V65"),
+            Self::V66 => write!(f, "V66"),
+        }
     }
 }

@@ -118,8 +118,37 @@ impl super::IsotopicComposition for AluminiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for AluminiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for AluminiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Al27
+    }
+}
+impl std::fmt::Display for AluminiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Al21 => write!(f, "Al21"),
+            Self::Al22 => write!(f, "Al22"),
+            Self::Al23 => write!(f, "Al23"),
+            Self::Al24 => write!(f, "Al24"),
+            Self::Al25 => write!(f, "Al25"),
+            Self::Al26 => write!(f, "Al26"),
+            Self::Al27 => write!(f, "Al27"),
+            Self::Al28 => write!(f, "Al28"),
+            Self::Al29 => write!(f, "Al29"),
+            Self::Al30 => write!(f, "Al30"),
+            Self::Al31 => write!(f, "Al31"),
+            Self::Al32 => write!(f, "Al32"),
+            Self::Al33 => write!(f, "Al33"),
+            Self::Al34 => write!(f, "Al34"),
+            Self::Al35 => write!(f, "Al35"),
+            Self::Al36 => write!(f, "Al36"),
+            Self::Al37 => write!(f, "Al37"),
+            Self::Al38 => write!(f, "Al38"),
+            Self::Al39 => write!(f, "Al39"),
+            Self::Al40 => write!(f, "Al40"),
+            Self::Al41 => write!(f, "Al41"),
+            Self::Al42 => write!(f, "Al42"),
+            Self::Al43 => write!(f, "Al43"),
+        }
     }
 }

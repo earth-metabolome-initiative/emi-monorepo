@@ -86,8 +86,29 @@ impl super::IsotopicComposition for MeitneriumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for MeitneriumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for MeitneriumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Mt279
+    }
+}
+impl std::fmt::Display for MeitneriumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Mt265 => write!(f, "Mt265"),
+            Self::Mt266 => write!(f, "Mt266"),
+            Self::Mt267 => write!(f, "Mt267"),
+            Self::Mt268 => write!(f, "Mt268"),
+            Self::Mt269 => write!(f, "Mt269"),
+            Self::Mt270 => write!(f, "Mt270"),
+            Self::Mt271 => write!(f, "Mt271"),
+            Self::Mt272 => write!(f, "Mt272"),
+            Self::Mt273 => write!(f, "Mt273"),
+            Self::Mt274 => write!(f, "Mt274"),
+            Self::Mt275 => write!(f, "Mt275"),
+            Self::Mt276 => write!(f, "Mt276"),
+            Self::Mt277 => write!(f, "Mt277"),
+            Self::Mt278 => write!(f, "Mt278"),
+            Self::Mt279 => write!(f, "Mt279"),
+        }
     }
 }

@@ -134,8 +134,41 @@ impl super::IsotopicComposition for UraniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for UraniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for UraniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::U238
+    }
+}
+impl std::fmt::Display for UraniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::U217 => write!(f, "U217"),
+            Self::U218 => write!(f, "U218"),
+            Self::U219 => write!(f, "U219"),
+            Self::U220 => write!(f, "U220"),
+            Self::U221 => write!(f, "U221"),
+            Self::U222 => write!(f, "U222"),
+            Self::U223 => write!(f, "U223"),
+            Self::U224 => write!(f, "U224"),
+            Self::U225 => write!(f, "U225"),
+            Self::U226 => write!(f, "U226"),
+            Self::U227 => write!(f, "U227"),
+            Self::U228 => write!(f, "U228"),
+            Self::U229 => write!(f, "U229"),
+            Self::U230 => write!(f, "U230"),
+            Self::U231 => write!(f, "U231"),
+            Self::U232 => write!(f, "U232"),
+            Self::U233 => write!(f, "U233"),
+            Self::U234 => write!(f, "U234"),
+            Self::U235 => write!(f, "U235"),
+            Self::U236 => write!(f, "U236"),
+            Self::U237 => write!(f, "U237"),
+            Self::U238 => write!(f, "U238"),
+            Self::U239 => write!(f, "U239"),
+            Self::U240 => write!(f, "U240"),
+            Self::U241 => write!(f, "U241"),
+            Self::U242 => write!(f, "U242"),
+            Self::U243 => write!(f, "U243"),
+        }
     }
 }

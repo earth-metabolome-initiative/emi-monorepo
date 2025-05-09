@@ -166,8 +166,49 @@ impl super::IsotopicComposition for NiobiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for NiobiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for NiobiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Nb93
+    }
+}
+impl std::fmt::Display for NiobiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Nb81 => write!(f, "Nb81"),
+            Self::Nb82 => write!(f, "Nb82"),
+            Self::Nb83 => write!(f, "Nb83"),
+            Self::Nb84 => write!(f, "Nb84"),
+            Self::Nb85 => write!(f, "Nb85"),
+            Self::Nb86 => write!(f, "Nb86"),
+            Self::Nb87 => write!(f, "Nb87"),
+            Self::Nb88 => write!(f, "Nb88"),
+            Self::Nb89 => write!(f, "Nb89"),
+            Self::Nb90 => write!(f, "Nb90"),
+            Self::Nb91 => write!(f, "Nb91"),
+            Self::Nb92 => write!(f, "Nb92"),
+            Self::Nb93 => write!(f, "Nb93"),
+            Self::Nb94 => write!(f, "Nb94"),
+            Self::Nb95 => write!(f, "Nb95"),
+            Self::Nb96 => write!(f, "Nb96"),
+            Self::Nb97 => write!(f, "Nb97"),
+            Self::Nb98 => write!(f, "Nb98"),
+            Self::Nb99 => write!(f, "Nb99"),
+            Self::Nb100 => write!(f, "Nb100"),
+            Self::Nb101 => write!(f, "Nb101"),
+            Self::Nb102 => write!(f, "Nb102"),
+            Self::Nb103 => write!(f, "Nb103"),
+            Self::Nb104 => write!(f, "Nb104"),
+            Self::Nb105 => write!(f, "Nb105"),
+            Self::Nb106 => write!(f, "Nb106"),
+            Self::Nb107 => write!(f, "Nb107"),
+            Self::Nb108 => write!(f, "Nb108"),
+            Self::Nb109 => write!(f, "Nb109"),
+            Self::Nb110 => write!(f, "Nb110"),
+            Self::Nb111 => write!(f, "Nb111"),
+            Self::Nb112 => write!(f, "Nb112"),
+            Self::Nb113 => write!(f, "Nb113"),
+            Self::Nb114 => write!(f, "Nb114"),
+            Self::Nb115 => write!(f, "Nb115"),
+        }
     }
 }

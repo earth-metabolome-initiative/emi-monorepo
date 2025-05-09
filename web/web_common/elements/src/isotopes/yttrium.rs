@@ -162,8 +162,48 @@ impl super::IsotopicComposition for YttriumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for YttriumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for YttriumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Y89
+    }
+}
+impl std::fmt::Display for YttriumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Y76 => write!(f, "Y76"),
+            Self::Y77 => write!(f, "Y77"),
+            Self::Y78 => write!(f, "Y78"),
+            Self::Y79 => write!(f, "Y79"),
+            Self::Y80 => write!(f, "Y80"),
+            Self::Y81 => write!(f, "Y81"),
+            Self::Y82 => write!(f, "Y82"),
+            Self::Y83 => write!(f, "Y83"),
+            Self::Y84 => write!(f, "Y84"),
+            Self::Y85 => write!(f, "Y85"),
+            Self::Y86 => write!(f, "Y86"),
+            Self::Y87 => write!(f, "Y87"),
+            Self::Y88 => write!(f, "Y88"),
+            Self::Y89 => write!(f, "Y89"),
+            Self::Y90 => write!(f, "Y90"),
+            Self::Y91 => write!(f, "Y91"),
+            Self::Y92 => write!(f, "Y92"),
+            Self::Y93 => write!(f, "Y93"),
+            Self::Y94 => write!(f, "Y94"),
+            Self::Y95 => write!(f, "Y95"),
+            Self::Y96 => write!(f, "Y96"),
+            Self::Y97 => write!(f, "Y97"),
+            Self::Y98 => write!(f, "Y98"),
+            Self::Y99 => write!(f, "Y99"),
+            Self::Y100 => write!(f, "Y100"),
+            Self::Y101 => write!(f, "Y101"),
+            Self::Y102 => write!(f, "Y102"),
+            Self::Y103 => write!(f, "Y103"),
+            Self::Y104 => write!(f, "Y104"),
+            Self::Y105 => write!(f, "Y105"),
+            Self::Y106 => write!(f, "Y106"),
+            Self::Y107 => write!(f, "Y107"),
+            Self::Y108 => write!(f, "Y108"),
+            Self::Y109 => write!(f, "Y109"),
+        }
     }
 }

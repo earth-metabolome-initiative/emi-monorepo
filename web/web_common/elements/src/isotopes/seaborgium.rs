@@ -90,8 +90,30 @@ impl super::IsotopicComposition for SeaborgiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for SeaborgiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for SeaborgiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Sg273
+    }
+}
+impl std::fmt::Display for SeaborgiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Sg258 => write!(f, "Sg258"),
+            Self::Sg259 => write!(f, "Sg259"),
+            Self::Sg260 => write!(f, "Sg260"),
+            Self::Sg261 => write!(f, "Sg261"),
+            Self::Sg262 => write!(f, "Sg262"),
+            Self::Sg263 => write!(f, "Sg263"),
+            Self::Sg264 => write!(f, "Sg264"),
+            Self::Sg265 => write!(f, "Sg265"),
+            Self::Sg266 => write!(f, "Sg266"),
+            Self::Sg267 => write!(f, "Sg267"),
+            Self::Sg268 => write!(f, "Sg268"),
+            Self::Sg269 => write!(f, "Sg269"),
+            Self::Sg270 => write!(f, "Sg270"),
+            Self::Sg271 => write!(f, "Sg271"),
+            Self::Sg272 => write!(f, "Sg272"),
+            Self::Sg273 => write!(f, "Sg273"),
+        }
     }
 }

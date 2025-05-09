@@ -33,7 +33,7 @@ impl super::ElementVariant for super::Isotope {
             Self::Co(isotope) => isotope.element(),
             Self::Ni(isotope) => isotope.element(),
             Self::Cu(isotope) => isotope.element(),
-            Self::Zn(isotype) => isotype.element(),
+            Self::Zn(isotope) => isotope.element(),
             Self::Ga(isotope) => isotope.element(),
             Self::Ge(isotope) => isotope.element(),
             Self::As(isotope) => isotope.element(),

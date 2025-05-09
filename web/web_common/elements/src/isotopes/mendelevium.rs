@@ -98,8 +98,32 @@ impl super::IsotopicComposition for MendeleviumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for MendeleviumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for MendeleviumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Md262
+    }
+}
+impl std::fmt::Display for MendeleviumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Md245 => write!(f, "Md245"),
+            Self::Md246 => write!(f, "Md246"),
+            Self::Md247 => write!(f, "Md247"),
+            Self::Md248 => write!(f, "Md248"),
+            Self::Md249 => write!(f, "Md249"),
+            Self::Md250 => write!(f, "Md250"),
+            Self::Md251 => write!(f, "Md251"),
+            Self::Md252 => write!(f, "Md252"),
+            Self::Md253 => write!(f, "Md253"),
+            Self::Md254 => write!(f, "Md254"),
+            Self::Md255 => write!(f, "Md255"),
+            Self::Md256 => write!(f, "Md256"),
+            Self::Md257 => write!(f, "Md257"),
+            Self::Md258 => write!(f, "Md258"),
+            Self::Md259 => write!(f, "Md259"),
+            Self::Md260 => write!(f, "Md260"),
+            Self::Md261 => write!(f, "Md261"),
+            Self::Md262 => write!(f, "Md262"),
+        }
     }
 }

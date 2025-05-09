@@ -110,8 +110,35 @@ impl super::IsotopicComposition for CuriumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for CuriumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for CuriumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Cm252
+    }
+}
+impl std::fmt::Display for CuriumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Cm232 => write!(f, "Cm232"),
+            Self::Cm233 => write!(f, "Cm233"),
+            Self::Cm234 => write!(f, "Cm234"),
+            Self::Cm235 => write!(f, "Cm235"),
+            Self::Cm236 => write!(f, "Cm236"),
+            Self::Cm237 => write!(f, "Cm237"),
+            Self::Cm238 => write!(f, "Cm238"),
+            Self::Cm239 => write!(f, "Cm239"),
+            Self::Cm240 => write!(f, "Cm240"),
+            Self::Cm241 => write!(f, "Cm241"),
+            Self::Cm242 => write!(f, "Cm242"),
+            Self::Cm243 => write!(f, "Cm243"),
+            Self::Cm244 => write!(f, "Cm244"),
+            Self::Cm245 => write!(f, "Cm245"),
+            Self::Cm246 => write!(f, "Cm246"),
+            Self::Cm247 => write!(f, "Cm247"),
+            Self::Cm248 => write!(f, "Cm248"),
+            Self::Cm249 => write!(f, "Cm249"),
+            Self::Cm250 => write!(f, "Cm250"),
+            Self::Cm251 => write!(f, "Cm251"),
+            Self::Cm252 => write!(f, "Cm252"),
+        }
     }
 }

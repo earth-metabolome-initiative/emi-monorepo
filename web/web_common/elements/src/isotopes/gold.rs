@@ -194,8 +194,56 @@ impl super::IsotopicComposition for GoldIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for GoldIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for GoldIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Au197
+    }
+}
+impl std::fmt::Display for GoldIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Au169 => write!(f, "Au169"),
+            Self::Au170 => write!(f, "Au170"),
+            Self::Au171 => write!(f, "Au171"),
+            Self::Au172 => write!(f, "Au172"),
+            Self::Au173 => write!(f, "Au173"),
+            Self::Au174 => write!(f, "Au174"),
+            Self::Au175 => write!(f, "Au175"),
+            Self::Au176 => write!(f, "Au176"),
+            Self::Au177 => write!(f, "Au177"),
+            Self::Au178 => write!(f, "Au178"),
+            Self::Au179 => write!(f, "Au179"),
+            Self::Au180 => write!(f, "Au180"),
+            Self::Au181 => write!(f, "Au181"),
+            Self::Au182 => write!(f, "Au182"),
+            Self::Au183 => write!(f, "Au183"),
+            Self::Au184 => write!(f, "Au184"),
+            Self::Au185 => write!(f, "Au185"),
+            Self::Au186 => write!(f, "Au186"),
+            Self::Au187 => write!(f, "Au187"),
+            Self::Au188 => write!(f, "Au188"),
+            Self::Au189 => write!(f, "Au189"),
+            Self::Au190 => write!(f, "Au190"),
+            Self::Au191 => write!(f, "Au191"),
+            Self::Au192 => write!(f, "Au192"),
+            Self::Au193 => write!(f, "Au193"),
+            Self::Au194 => write!(f, "Au194"),
+            Self::Au195 => write!(f, "Au195"),
+            Self::Au196 => write!(f, "Au196"),
+            Self::Au197 => write!(f, "Au197"),
+            Self::Au198 => write!(f, "Au198"),
+            Self::Au199 => write!(f, "Au199"),
+            Self::Au200 => write!(f, "Au200"),
+            Self::Au201 => write!(f, "Au201"),
+            Self::Au202 => write!(f, "Au202"),
+            Self::Au203 => write!(f, "Au203"),
+            Self::Au204 => write!(f, "Au204"),
+            Self::Au205 => write!(f, "Au205"),
+            Self::Au206 => write!(f, "Au206"),
+            Self::Au207 => write!(f, "Au207"),
+            Self::Au208 => write!(f, "Au208"),
+            Self::Au209 => write!(f, "Au209"),
+            Self::Au210 => write!(f, "Au210"),
+        }
     }
 }

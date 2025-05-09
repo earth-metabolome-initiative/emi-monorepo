@@ -130,8 +130,40 @@ impl super::IsotopicComposition for ScandiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for ScandiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for ScandiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Sc45
+    }
+}
+impl std::fmt::Display for ScandiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Sc36 => write!(f, "Sc36"),
+            Self::Sc37 => write!(f, "Sc37"),
+            Self::Sc38 => write!(f, "Sc38"),
+            Self::Sc39 => write!(f, "Sc39"),
+            Self::Sc40 => write!(f, "Sc40"),
+            Self::Sc41 => write!(f, "Sc41"),
+            Self::Sc42 => write!(f, "Sc42"),
+            Self::Sc43 => write!(f, "Sc43"),
+            Self::Sc44 => write!(f, "Sc44"),
+            Self::Sc45 => write!(f, "Sc45"),
+            Self::Sc46 => write!(f, "Sc46"),
+            Self::Sc47 => write!(f, "Sc47"),
+            Self::Sc48 => write!(f, "Sc48"),
+            Self::Sc49 => write!(f, "Sc49"),
+            Self::Sc50 => write!(f, "Sc50"),
+            Self::Sc51 => write!(f, "Sc51"),
+            Self::Sc52 => write!(f, "Sc52"),
+            Self::Sc53 => write!(f, "Sc53"),
+            Self::Sc54 => write!(f, "Sc54"),
+            Self::Sc55 => write!(f, "Sc55"),
+            Self::Sc56 => write!(f, "Sc56"),
+            Self::Sc57 => write!(f, "Sc57"),
+            Self::Sc58 => write!(f, "Sc58"),
+            Self::Sc59 => write!(f, "Sc59"),
+            Self::Sc60 => write!(f, "Sc60"),
+            Self::Sc61 => write!(f, "Sc61"),
+        }
     }
 }

@@ -122,8 +122,38 @@ impl super::IsotopicComposition for SulfurIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for SulfurIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for SulfurIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::S32
+    }
+}
+impl std::fmt::Display for SulfurIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::S26 => write!(f, "S26"),
+            Self::S27 => write!(f, "S27"),
+            Self::S28 => write!(f, "S28"),
+            Self::S29 => write!(f, "S29"),
+            Self::S30 => write!(f, "S30"),
+            Self::S31 => write!(f, "S31"),
+            Self::S32 => write!(f, "S32"),
+            Self::S33 => write!(f, "S33"),
+            Self::S34 => write!(f, "S34"),
+            Self::S35 => write!(f, "S35"),
+            Self::S36 => write!(f, "S36"),
+            Self::S37 => write!(f, "S37"),
+            Self::S38 => write!(f, "S38"),
+            Self::S39 => write!(f, "S39"),
+            Self::S40 => write!(f, "S40"),
+            Self::S41 => write!(f, "S41"),
+            Self::S42 => write!(f, "S42"),
+            Self::S43 => write!(f, "S43"),
+            Self::S44 => write!(f, "S44"),
+            Self::S45 => write!(f, "S45"),
+            Self::S46 => write!(f, "S46"),
+            Self::S47 => write!(f, "S47"),
+            Self::S48 => write!(f, "S48"),
+            Self::S49 => write!(f, "S49"),
+        }
     }
 }

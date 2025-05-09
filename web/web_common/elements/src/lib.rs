@@ -10,13 +10,14 @@ mod as_ref;
 pub mod diesel_impls;
 mod display;
 pub mod errors;
-mod from_str;
 mod from;
-mod isotopes;
+mod from_str;
+pub mod isotopes;
 mod name;
 mod oxidation_states;
 mod standard_atomic_weight;
 mod try_from;
+pub use isotopes::{Isotope, IsotopicComposition, MostAbundantIsotope, RelativeAtomicMass};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, strum_macros::EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

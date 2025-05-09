@@ -70,8 +70,25 @@ impl super::IsotopicComposition for LithiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for LithiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for LithiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Li7
+    }
+}
+impl std::fmt::Display for LithiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Li3 => write!(f, "Li3"),
+            Self::Li4 => write!(f, "Li4"),
+            Self::Li5 => write!(f, "Li5"),
+            Self::Li6 => write!(f, "Li6"),
+            Self::Li7 => write!(f, "Li7"),
+            Self::Li8 => write!(f, "Li8"),
+            Self::Li9 => write!(f, "Li9"),
+            Self::Li10 => write!(f, "Li10"),
+            Self::Li11 => write!(f, "Li11"),
+            Self::Li12 => write!(f, "Li12"),
+            Self::Li13 => write!(f, "Li13"),
+        }
     }
 }

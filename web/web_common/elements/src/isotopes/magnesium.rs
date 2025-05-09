@@ -114,8 +114,36 @@ impl super::IsotopicComposition for MagnesiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for MagnesiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for MagnesiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Mg24
+    }
+}
+impl std::fmt::Display for MagnesiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Mg19 => write!(f, "Mg19"),
+            Self::Mg20 => write!(f, "Mg20"),
+            Self::Mg21 => write!(f, "Mg21"),
+            Self::Mg22 => write!(f, "Mg22"),
+            Self::Mg23 => write!(f, "Mg23"),
+            Self::Mg24 => write!(f, "Mg24"),
+            Self::Mg25 => write!(f, "Mg25"),
+            Self::Mg26 => write!(f, "Mg26"),
+            Self::Mg27 => write!(f, "Mg27"),
+            Self::Mg28 => write!(f, "Mg28"),
+            Self::Mg29 => write!(f, "Mg29"),
+            Self::Mg30 => write!(f, "Mg30"),
+            Self::Mg31 => write!(f, "Mg31"),
+            Self::Mg32 => write!(f, "Mg32"),
+            Self::Mg33 => write!(f, "Mg33"),
+            Self::Mg34 => write!(f, "Mg34"),
+            Self::Mg35 => write!(f, "Mg35"),
+            Self::Mg36 => write!(f, "Mg36"),
+            Self::Mg37 => write!(f, "Mg37"),
+            Self::Mg38 => write!(f, "Mg38"),
+            Self::Mg39 => write!(f, "Mg39"),
+            Self::Mg40 => write!(f, "Mg40"),
+        }
     }
 }

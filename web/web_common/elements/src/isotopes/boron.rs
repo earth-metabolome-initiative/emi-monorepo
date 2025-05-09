@@ -90,8 +90,30 @@ impl super::IsotopicComposition for BoronIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for BoronIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for BoronIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::B11
+    }
+}
+impl std::fmt::Display for BoronIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::B6 => write!(f, "B6"),
+            Self::B7 => write!(f, "B7"),
+            Self::B8 => write!(f, "B8"),
+            Self::B9 => write!(f, "B9"),
+            Self::B10 => write!(f, "B10"),
+            Self::B11 => write!(f, "B11"),
+            Self::B12 => write!(f, "B12"),
+            Self::B13 => write!(f, "B13"),
+            Self::B14 => write!(f, "B14"),
+            Self::B15 => write!(f, "B15"),
+            Self::B16 => write!(f, "B16"),
+            Self::B17 => write!(f, "B17"),
+            Self::B18 => write!(f, "B18"),
+            Self::B19 => write!(f, "B19"),
+            Self::B20 => write!(f, "B20"),
+            Self::B21 => write!(f, "B21"),
+        }
     }
 }

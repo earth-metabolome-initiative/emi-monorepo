@@ -110,8 +110,35 @@ impl super::IsotopicComposition for BerkeliumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for BerkeliumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for BerkeliumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Bk254
+    }
+}
+impl std::fmt::Display for BerkeliumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Bk234 => write!(f, "Bk234"),
+            Self::Bk235 => write!(f, "Bk235"),
+            Self::Bk236 => write!(f, "Bk236"),
+            Self::Bk237 => write!(f, "Bk237"),
+            Self::Bk238 => write!(f, "Bk238"),
+            Self::Bk239 => write!(f, "Bk239"),
+            Self::Bk240 => write!(f, "Bk240"),
+            Self::Bk241 => write!(f, "Bk241"),
+            Self::Bk242 => write!(f, "Bk242"),
+            Self::Bk243 => write!(f, "Bk243"),
+            Self::Bk244 => write!(f, "Bk244"),
+            Self::Bk245 => write!(f, "Bk245"),
+            Self::Bk246 => write!(f, "Bk246"),
+            Self::Bk247 => write!(f, "Bk247"),
+            Self::Bk248 => write!(f, "Bk248"),
+            Self::Bk249 => write!(f, "Bk249"),
+            Self::Bk250 => write!(f, "Bk250"),
+            Self::Bk251 => write!(f, "Bk251"),
+            Self::Bk252 => write!(f, "Bk252"),
+            Self::Bk253 => write!(f, "Bk253"),
+            Self::Bk254 => write!(f, "Bk254"),
+        }
     }
 }

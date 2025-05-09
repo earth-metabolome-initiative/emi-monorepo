@@ -178,8 +178,52 @@ impl super::IsotopicComposition for SamariumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for SamariumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for SamariumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Sm152
+    }
+}
+impl std::fmt::Display for SamariumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Sm128 => write!(f, "Sm128"),
+            Self::Sm129 => write!(f, "Sm129"),
+            Self::Sm130 => write!(f, "Sm130"),
+            Self::Sm131 => write!(f, "Sm131"),
+            Self::Sm132 => write!(f, "Sm132"),
+            Self::Sm133 => write!(f, "Sm133"),
+            Self::Sm134 => write!(f, "Sm134"),
+            Self::Sm135 => write!(f, "Sm135"),
+            Self::Sm136 => write!(f, "Sm136"),
+            Self::Sm137 => write!(f, "Sm137"),
+            Self::Sm138 => write!(f, "Sm138"),
+            Self::Sm139 => write!(f, "Sm139"),
+            Self::Sm140 => write!(f, "Sm140"),
+            Self::Sm141 => write!(f, "Sm141"),
+            Self::Sm142 => write!(f, "Sm142"),
+            Self::Sm143 => write!(f, "Sm143"),
+            Self::Sm144 => write!(f, "Sm144"),
+            Self::Sm145 => write!(f, "Sm145"),
+            Self::Sm146 => write!(f, "Sm146"),
+            Self::Sm147 => write!(f, "Sm147"),
+            Self::Sm148 => write!(f, "Sm148"),
+            Self::Sm149 => write!(f, "Sm149"),
+            Self::Sm150 => write!(f, "Sm150"),
+            Self::Sm151 => write!(f, "Sm151"),
+            Self::Sm152 => write!(f, "Sm152"),
+            Self::Sm153 => write!(f, "Sm153"),
+            Self::Sm154 => write!(f, "Sm154"),
+            Self::Sm155 => write!(f, "Sm155"),
+            Self::Sm156 => write!(f, "Sm156"),
+            Self::Sm157 => write!(f, "Sm157"),
+            Self::Sm158 => write!(f, "Sm158"),
+            Self::Sm159 => write!(f, "Sm159"),
+            Self::Sm160 => write!(f, "Sm160"),
+            Self::Sm161 => write!(f, "Sm161"),
+            Self::Sm162 => write!(f, "Sm162"),
+            Self::Sm163 => write!(f, "Sm163"),
+            Self::Sm164 => write!(f, "Sm164"),
+            Self::Sm165 => write!(f, "Sm165"),
+        }
     }
 }

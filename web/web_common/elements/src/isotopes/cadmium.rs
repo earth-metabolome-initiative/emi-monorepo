@@ -182,8 +182,53 @@ impl super::IsotopicComposition for CadmiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for CadmiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for CadmiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Cd114
+    }
+}
+impl std::fmt::Display for CadmiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Cd95 => write!(f, "Cd95"),
+            Self::Cd96 => write!(f, "Cd96"),
+            Self::Cd97 => write!(f, "Cd97"),
+            Self::Cd98 => write!(f, "Cd98"),
+            Self::Cd99 => write!(f, "Cd99"),
+            Self::Cd100 => write!(f, "Cd100"),
+            Self::Cd101 => write!(f, "Cd101"),
+            Self::Cd102 => write!(f, "Cd102"),
+            Self::Cd103 => write!(f, "Cd103"),
+            Self::Cd104 => write!(f, "Cd104"),
+            Self::Cd105 => write!(f, "Cd105"),
+            Self::Cd106 => write!(f, "Cd106"),
+            Self::Cd107 => write!(f, "Cd107"),
+            Self::Cd108 => write!(f, "Cd108"),
+            Self::Cd109 => write!(f, "Cd109"),
+            Self::Cd110 => write!(f, "Cd110"),
+            Self::Cd111 => write!(f, "Cd111"),
+            Self::Cd112 => write!(f, "Cd112"),
+            Self::Cd113 => write!(f, "Cd113"),
+            Self::Cd114 => write!(f, "Cd114"),
+            Self::Cd115 => write!(f, "Cd115"),
+            Self::Cd116 => write!(f, "Cd116"),
+            Self::Cd117 => write!(f, "Cd117"),
+            Self::Cd118 => write!(f, "Cd118"),
+            Self::Cd119 => write!(f, "Cd119"),
+            Self::Cd120 => write!(f, "Cd120"),
+            Self::Cd121 => write!(f, "Cd121"),
+            Self::Cd122 => write!(f, "Cd122"),
+            Self::Cd123 => write!(f, "Cd123"),
+            Self::Cd124 => write!(f, "Cd124"),
+            Self::Cd125 => write!(f, "Cd125"),
+            Self::Cd126 => write!(f, "Cd126"),
+            Self::Cd127 => write!(f, "Cd127"),
+            Self::Cd128 => write!(f, "Cd128"),
+            Self::Cd129 => write!(f, "Cd129"),
+            Self::Cd130 => write!(f, "Cd130"),
+            Self::Cd131 => write!(f, "Cd131"),
+            Self::Cd132 => write!(f, "Cd132"),
+            Self::Cd133 => write!(f, "Cd133"),
+        }
     }
 }

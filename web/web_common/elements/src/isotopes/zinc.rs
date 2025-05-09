@@ -154,8 +154,46 @@ impl super::IsotopicComposition for ZincIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for ZincIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for ZincIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Zn64
+    }
+}
+impl std::fmt::Display for ZincIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Zn54 => write!(f, "Zn54"),
+            Self::Zn55 => write!(f, "Zn55"),
+            Self::Zn56 => write!(f, "Zn56"),
+            Self::Zn57 => write!(f, "Zn57"),
+            Self::Zn58 => write!(f, "Zn58"),
+            Self::Zn59 => write!(f, "Zn59"),
+            Self::Zn60 => write!(f, "Zn60"),
+            Self::Zn61 => write!(f, "Zn61"),
+            Self::Zn62 => write!(f, "Zn62"),
+            Self::Zn63 => write!(f, "Zn63"),
+            Self::Zn64 => write!(f, "Zn64"),
+            Self::Zn65 => write!(f, "Zn65"),
+            Self::Zn66 => write!(f, "Zn66"),
+            Self::Zn67 => write!(f, "Zn67"),
+            Self::Zn68 => write!(f, "Zn68"),
+            Self::Zn69 => write!(f, "Zn69"),
+            Self::Zn70 => write!(f, "Zn70"),
+            Self::Zn71 => write!(f, "Zn71"),
+            Self::Zn72 => write!(f, "Zn72"),
+            Self::Zn73 => write!(f, "Zn73"),
+            Self::Zn74 => write!(f, "Zn74"),
+            Self::Zn75 => write!(f, "Zn75"),
+            Self::Zn76 => write!(f, "Zn76"),
+            Self::Zn77 => write!(f, "Zn77"),
+            Self::Zn78 => write!(f, "Zn78"),
+            Self::Zn79 => write!(f, "Zn79"),
+            Self::Zn80 => write!(f, "Zn80"),
+            Self::Zn81 => write!(f, "Zn81"),
+            Self::Zn82 => write!(f, "Zn82"),
+            Self::Zn83 => write!(f, "Zn83"),
+            Self::Zn84 => write!(f, "Zn84"),
+            Self::Zn85 => write!(f, "Zn85"),
+        }
     }
 }

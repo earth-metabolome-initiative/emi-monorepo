@@ -154,8 +154,46 @@ impl super::IsotopicComposition for ActiniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for ActiniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for ActiniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Ac237
+    }
+}
+impl std::fmt::Display for ActiniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Ac206 => write!(f, "Ac206"),
+            Self::Ac207 => write!(f, "Ac207"),
+            Self::Ac208 => write!(f, "Ac208"),
+            Self::Ac209 => write!(f, "Ac209"),
+            Self::Ac210 => write!(f, "Ac210"),
+            Self::Ac211 => write!(f, "Ac211"),
+            Self::Ac212 => write!(f, "Ac212"),
+            Self::Ac213 => write!(f, "Ac213"),
+            Self::Ac214 => write!(f, "Ac214"),
+            Self::Ac215 => write!(f, "Ac215"),
+            Self::Ac216 => write!(f, "Ac216"),
+            Self::Ac217 => write!(f, "Ac217"),
+            Self::Ac218 => write!(f, "Ac218"),
+            Self::Ac219 => write!(f, "Ac219"),
+            Self::Ac220 => write!(f, "Ac220"),
+            Self::Ac221 => write!(f, "Ac221"),
+            Self::Ac222 => write!(f, "Ac222"),
+            Self::Ac223 => write!(f, "Ac223"),
+            Self::Ac224 => write!(f, "Ac224"),
+            Self::Ac225 => write!(f, "Ac225"),
+            Self::Ac226 => write!(f, "Ac226"),
+            Self::Ac227 => write!(f, "Ac227"),
+            Self::Ac228 => write!(f, "Ac228"),
+            Self::Ac229 => write!(f, "Ac229"),
+            Self::Ac230 => write!(f, "Ac230"),
+            Self::Ac231 => write!(f, "Ac231"),
+            Self::Ac232 => write!(f, "Ac232"),
+            Self::Ac233 => write!(f, "Ac233"),
+            Self::Ac234 => write!(f, "Ac234"),
+            Self::Ac235 => write!(f, "Ac235"),
+            Self::Ac236 => write!(f, "Ac236"),
+            Self::Ac237 => write!(f, "Ac237"),
+        }
     }
 }

@@ -178,8 +178,52 @@ impl super::IsotopicComposition for PromethiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for PromethiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for PromethiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Pm163
+    }
+}
+impl std::fmt::Display for PromethiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Pm126 => write!(f, "Pm126"),
+            Self::Pm127 => write!(f, "Pm127"),
+            Self::Pm128 => write!(f, "Pm128"),
+            Self::Pm129 => write!(f, "Pm129"),
+            Self::Pm130 => write!(f, "Pm130"),
+            Self::Pm131 => write!(f, "Pm131"),
+            Self::Pm132 => write!(f, "Pm132"),
+            Self::Pm133 => write!(f, "Pm133"),
+            Self::Pm134 => write!(f, "Pm134"),
+            Self::Pm135 => write!(f, "Pm135"),
+            Self::Pm136 => write!(f, "Pm136"),
+            Self::Pm137 => write!(f, "Pm137"),
+            Self::Pm138 => write!(f, "Pm138"),
+            Self::Pm139 => write!(f, "Pm139"),
+            Self::Pm140 => write!(f, "Pm140"),
+            Self::Pm141 => write!(f, "Pm141"),
+            Self::Pm142 => write!(f, "Pm142"),
+            Self::Pm143 => write!(f, "Pm143"),
+            Self::Pm144 => write!(f, "Pm144"),
+            Self::Pm145 => write!(f, "Pm145"),
+            Self::Pm146 => write!(f, "Pm146"),
+            Self::Pm147 => write!(f, "Pm147"),
+            Self::Pm148 => write!(f, "Pm148"),
+            Self::Pm149 => write!(f, "Pm149"),
+            Self::Pm150 => write!(f, "Pm150"),
+            Self::Pm151 => write!(f, "Pm151"),
+            Self::Pm152 => write!(f, "Pm152"),
+            Self::Pm153 => write!(f, "Pm153"),
+            Self::Pm154 => write!(f, "Pm154"),
+            Self::Pm155 => write!(f, "Pm155"),
+            Self::Pm156 => write!(f, "Pm156"),
+            Self::Pm157 => write!(f, "Pm157"),
+            Self::Pm158 => write!(f, "Pm158"),
+            Self::Pm159 => write!(f, "Pm159"),
+            Self::Pm160 => write!(f, "Pm160"),
+            Self::Pm161 => write!(f, "Pm161"),
+            Self::Pm162 => write!(f, "Pm162"),
+            Self::Pm163 => write!(f, "Pm163"),
+        }
     }
 }

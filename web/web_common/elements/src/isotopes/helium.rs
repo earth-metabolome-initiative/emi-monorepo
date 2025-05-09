@@ -58,8 +58,22 @@ impl super::IsotopicComposition for HeliumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for HeliumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for HeliumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::He4
+    }
+}
+impl std::fmt::Display for HeliumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::He3 => write!(f, "He3"),
+            Self::He4 => write!(f, "He4"),
+            Self::He5 => write!(f, "He5"),
+            Self::He6 => write!(f, "He6"),
+            Self::He7 => write!(f, "He7"),
+            Self::He8 => write!(f, "He8"),
+            Self::He9 => write!(f, "He9"),
+            Self::He10 => write!(f, "He10"),
+        }
     }
 }

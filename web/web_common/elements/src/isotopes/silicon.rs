@@ -122,8 +122,38 @@ impl super::IsotopicComposition for SiliconIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for SiliconIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for SiliconIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Si28
+    }
+}
+impl std::fmt::Display for SiliconIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Si22 => write!(f, "Si22"),
+            Self::Si23 => write!(f, "Si23"),
+            Self::Si24 => write!(f, "Si24"),
+            Self::Si25 => write!(f, "Si25"),
+            Self::Si26 => write!(f, "Si26"),
+            Self::Si27 => write!(f, "Si27"),
+            Self::Si28 => write!(f, "Si28"),
+            Self::Si29 => write!(f, "Si29"),
+            Self::Si30 => write!(f, "Si30"),
+            Self::Si31 => write!(f, "Si31"),
+            Self::Si32 => write!(f, "Si32"),
+            Self::Si33 => write!(f, "Si33"),
+            Self::Si34 => write!(f, "Si34"),
+            Self::Si35 => write!(f, "Si35"),
+            Self::Si36 => write!(f, "Si36"),
+            Self::Si37 => write!(f, "Si37"),
+            Self::Si38 => write!(f, "Si38"),
+            Self::Si39 => write!(f, "Si39"),
+            Self::Si40 => write!(f, "Si40"),
+            Self::Si41 => write!(f, "Si41"),
+            Self::Si42 => write!(f, "Si42"),
+            Self::Si43 => write!(f, "Si43"),
+            Self::Si44 => write!(f, "Si44"),
+            Self::Si45 => write!(f, "Si45"),
+        }
     }
 }

@@ -134,8 +134,41 @@ impl super::IsotopicComposition for NeptuniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for NeptuniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for NeptuniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Np245
+    }
+}
+impl std::fmt::Display for NeptuniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Np219 => write!(f, "Np219"),
+            Self::Np220 => write!(f, "Np220"),
+            Self::Np221 => write!(f, "Np221"),
+            Self::Np222 => write!(f, "Np222"),
+            Self::Np223 => write!(f, "Np223"),
+            Self::Np224 => write!(f, "Np224"),
+            Self::Np225 => write!(f, "Np225"),
+            Self::Np226 => write!(f, "Np226"),
+            Self::Np227 => write!(f, "Np227"),
+            Self::Np228 => write!(f, "Np228"),
+            Self::Np229 => write!(f, "Np229"),
+            Self::Np230 => write!(f, "Np230"),
+            Self::Np231 => write!(f, "Np231"),
+            Self::Np232 => write!(f, "Np232"),
+            Self::Np233 => write!(f, "Np233"),
+            Self::Np234 => write!(f, "Np234"),
+            Self::Np235 => write!(f, "Np235"),
+            Self::Np236 => write!(f, "Np236"),
+            Self::Np237 => write!(f, "Np237"),
+            Self::Np238 => write!(f, "Np238"),
+            Self::Np239 => write!(f, "Np239"),
+            Self::Np240 => write!(f, "Np240"),
+            Self::Np241 => write!(f, "Np241"),
+            Self::Np242 => write!(f, "Np242"),
+            Self::Np243 => write!(f, "Np243"),
+            Self::Np244 => write!(f, "Np244"),
+            Self::Np245 => write!(f, "Np245"),
+        }
     }
 }

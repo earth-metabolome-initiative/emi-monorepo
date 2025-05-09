@@ -146,8 +146,44 @@ impl super::IsotopicComposition for IronIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for IronIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for IronIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Fe56
+    }
+}
+impl std::fmt::Display for IronIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Fe45 => write!(f, "Fe45"),
+            Self::Fe46 => write!(f, "Fe46"),
+            Self::Fe47 => write!(f, "Fe47"),
+            Self::Fe48 => write!(f, "Fe48"),
+            Self::Fe49 => write!(f, "Fe49"),
+            Self::Fe50 => write!(f, "Fe50"),
+            Self::Fe51 => write!(f, "Fe51"),
+            Self::Fe52 => write!(f, "Fe52"),
+            Self::Fe53 => write!(f, "Fe53"),
+            Self::Fe54 => write!(f, "Fe54"),
+            Self::Fe55 => write!(f, "Fe55"),
+            Self::Fe56 => write!(f, "Fe56"),
+            Self::Fe57 => write!(f, "Fe57"),
+            Self::Fe58 => write!(f, "Fe58"),
+            Self::Fe59 => write!(f, "Fe59"),
+            Self::Fe60 => write!(f, "Fe60"),
+            Self::Fe61 => write!(f, "Fe61"),
+            Self::Fe62 => write!(f, "Fe62"),
+            Self::Fe63 => write!(f, "Fe63"),
+            Self::Fe64 => write!(f, "Fe64"),
+            Self::Fe65 => write!(f, "Fe65"),
+            Self::Fe66 => write!(f, "Fe66"),
+            Self::Fe67 => write!(f, "Fe67"),
+            Self::Fe68 => write!(f, "Fe68"),
+            Self::Fe69 => write!(f, "Fe69"),
+            Self::Fe70 => write!(f, "Fe70"),
+            Self::Fe71 => write!(f, "Fe71"),
+            Self::Fe72 => write!(f, "Fe72"),
+            Self::Fe73 => write!(f, "Fe73"),
+            Self::Fe74 => write!(f, "Fe74"),
+        }
     }
 }

@@ -150,8 +150,45 @@ impl super::IsotopicComposition for CopperIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for CopperIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for CopperIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Cu63
+    }
+}
+impl std::fmt::Display for CopperIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Cu52 => write!(f, "Cu52"),
+            Self::Cu53 => write!(f, "Cu53"),
+            Self::Cu54 => write!(f, "Cu54"),
+            Self::Cu55 => write!(f, "Cu55"),
+            Self::Cu56 => write!(f, "Cu56"),
+            Self::Cu57 => write!(f, "Cu57"),
+            Self::Cu58 => write!(f, "Cu58"),
+            Self::Cu59 => write!(f, "Cu59"),
+            Self::Cu60 => write!(f, "Cu60"),
+            Self::Cu61 => write!(f, "Cu61"),
+            Self::Cu62 => write!(f, "Cu62"),
+            Self::Cu63 => write!(f, "Cu63"),
+            Self::Cu64 => write!(f, "Cu64"),
+            Self::Cu65 => write!(f, "Cu65"),
+            Self::Cu66 => write!(f, "Cu66"),
+            Self::Cu67 => write!(f, "Cu67"),
+            Self::Cu68 => write!(f, "Cu68"),
+            Self::Cu69 => write!(f, "Cu69"),
+            Self::Cu70 => write!(f, "Cu70"),
+            Self::Cu71 => write!(f, "Cu71"),
+            Self::Cu72 => write!(f, "Cu72"),
+            Self::Cu73 => write!(f, "Cu73"),
+            Self::Cu74 => write!(f, "Cu74"),
+            Self::Cu75 => write!(f, "Cu75"),
+            Self::Cu76 => write!(f, "Cu76"),
+            Self::Cu77 => write!(f, "Cu77"),
+            Self::Cu78 => write!(f, "Cu78"),
+            Self::Cu79 => write!(f, "Cu79"),
+            Self::Cu80 => write!(f, "Cu80"),
+            Self::Cu81 => write!(f, "Cu81"),
+            Self::Cu82 => write!(f, "Cu82"),
+        }
     }
 }

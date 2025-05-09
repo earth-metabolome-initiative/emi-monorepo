@@ -126,8 +126,39 @@ impl super::IsotopicComposition for PotassiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for PotassiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for PotassiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::K39
+    }
+}
+impl std::fmt::Display for PotassiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::K32 => write!(f, "K32"),
+            Self::K33 => write!(f, "K33"),
+            Self::K34 => write!(f, "K34"),
+            Self::K35 => write!(f, "K35"),
+            Self::K36 => write!(f, "K36"),
+            Self::K37 => write!(f, "K37"),
+            Self::K38 => write!(f, "K38"),
+            Self::K39 => write!(f, "K39"),
+            Self::K40 => write!(f, "K40"),
+            Self::K41 => write!(f, "K41"),
+            Self::K42 => write!(f, "K42"),
+            Self::K43 => write!(f, "K43"),
+            Self::K44 => write!(f, "K44"),
+            Self::K45 => write!(f, "K45"),
+            Self::K46 => write!(f, "K46"),
+            Self::K47 => write!(f, "K47"),
+            Self::K48 => write!(f, "K48"),
+            Self::K49 => write!(f, "K49"),
+            Self::K50 => write!(f, "K50"),
+            Self::K51 => write!(f, "K51"),
+            Self::K52 => write!(f, "K52"),
+            Self::K53 => write!(f, "K53"),
+            Self::K54 => write!(f, "K54"),
+            Self::K55 => write!(f, "K55"),
+            Self::K56 => write!(f, "K56"),
+        }
     }
 }

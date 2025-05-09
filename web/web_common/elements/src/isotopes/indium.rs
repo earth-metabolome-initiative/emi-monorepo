@@ -182,8 +182,53 @@ impl super::IsotopicComposition for IndiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for IndiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for IndiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::In115
+    }
+}
+impl std::fmt::Display for IndiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::In97 => write!(f, "In97"),
+            Self::In98 => write!(f, "In98"),
+            Self::In99 => write!(f, "In99"),
+            Self::In100 => write!(f, "In100"),
+            Self::In101 => write!(f, "In101"),
+            Self::In102 => write!(f, "In102"),
+            Self::In103 => write!(f, "In103"),
+            Self::In104 => write!(f, "In104"),
+            Self::In105 => write!(f, "In105"),
+            Self::In106 => write!(f, "In106"),
+            Self::In107 => write!(f, "In107"),
+            Self::In108 => write!(f, "In108"),
+            Self::In109 => write!(f, "In109"),
+            Self::In110 => write!(f, "In110"),
+            Self::In111 => write!(f, "In111"),
+            Self::In112 => write!(f, "In112"),
+            Self::In113 => write!(f, "In113"),
+            Self::In114 => write!(f, "In114"),
+            Self::In115 => write!(f, "In115"),
+            Self::In116 => write!(f, "In116"),
+            Self::In117 => write!(f, "In117"),
+            Self::In118 => write!(f, "In118"),
+            Self::In119 => write!(f, "In119"),
+            Self::In120 => write!(f, "In120"),
+            Self::In121 => write!(f, "In121"),
+            Self::In122 => write!(f, "In122"),
+            Self::In123 => write!(f, "In123"),
+            Self::In124 => write!(f, "In124"),
+            Self::In125 => write!(f, "In125"),
+            Self::In126 => write!(f, "In126"),
+            Self::In127 => write!(f, "In127"),
+            Self::In128 => write!(f, "In128"),
+            Self::In129 => write!(f, "In129"),
+            Self::In130 => write!(f, "In130"),
+            Self::In131 => write!(f, "In131"),
+            Self::In132 => write!(f, "In132"),
+            Self::In133 => write!(f, "In133"),
+            Self::In134 => write!(f, "In134"),
+            Self::In135 => write!(f, "In135"),
+        }
     }
 }

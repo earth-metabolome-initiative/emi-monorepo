@@ -174,8 +174,51 @@ impl super::IsotopicComposition for HafniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for HafniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for HafniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Hf180
+    }
+}
+impl std::fmt::Display for HafniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Hf153 => write!(f, "Hf153"),
+            Self::Hf154 => write!(f, "Hf154"),
+            Self::Hf155 => write!(f, "Hf155"),
+            Self::Hf156 => write!(f, "Hf156"),
+            Self::Hf157 => write!(f, "Hf157"),
+            Self::Hf158 => write!(f, "Hf158"),
+            Self::Hf159 => write!(f, "Hf159"),
+            Self::Hf160 => write!(f, "Hf160"),
+            Self::Hf161 => write!(f, "Hf161"),
+            Self::Hf162 => write!(f, "Hf162"),
+            Self::Hf163 => write!(f, "Hf163"),
+            Self::Hf164 => write!(f, "Hf164"),
+            Self::Hf165 => write!(f, "Hf165"),
+            Self::Hf166 => write!(f, "Hf166"),
+            Self::Hf167 => write!(f, "Hf167"),
+            Self::Hf168 => write!(f, "Hf168"),
+            Self::Hf169 => write!(f, "Hf169"),
+            Self::Hf170 => write!(f, "Hf170"),
+            Self::Hf171 => write!(f, "Hf171"),
+            Self::Hf172 => write!(f, "Hf172"),
+            Self::Hf173 => write!(f, "Hf173"),
+            Self::Hf174 => write!(f, "Hf174"),
+            Self::Hf175 => write!(f, "Hf175"),
+            Self::Hf176 => write!(f, "Hf176"),
+            Self::Hf177 => write!(f, "Hf177"),
+            Self::Hf178 => write!(f, "Hf178"),
+            Self::Hf179 => write!(f, "Hf179"),
+            Self::Hf180 => write!(f, "Hf180"),
+            Self::Hf181 => write!(f, "Hf181"),
+            Self::Hf182 => write!(f, "Hf182"),
+            Self::Hf183 => write!(f, "Hf183"),
+            Self::Hf184 => write!(f, "Hf184"),
+            Self::Hf185 => write!(f, "Hf185"),
+            Self::Hf186 => write!(f, "Hf186"),
+            Self::Hf187 => write!(f, "Hf187"),
+            Self::Hf188 => write!(f, "Hf188"),
+            Self::Hf189 => write!(f, "Hf189"),
+        }
     }
 }

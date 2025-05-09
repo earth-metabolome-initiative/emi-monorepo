@@ -98,8 +98,32 @@ impl super::IsotopicComposition for FluorineIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for FluorineIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for FluorineIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::F19
+    }
+}
+impl std::fmt::Display for FluorineIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::F14 => write!(f, "F14"),
+            Self::F15 => write!(f, "F15"),
+            Self::F16 => write!(f, "F16"),
+            Self::F17 => write!(f, "F17"),
+            Self::F18 => write!(f, "F18"),
+            Self::F19 => write!(f, "F19"),
+            Self::F20 => write!(f, "F20"),
+            Self::F21 => write!(f, "F21"),
+            Self::F22 => write!(f, "F22"),
+            Self::F23 => write!(f, "F23"),
+            Self::F24 => write!(f, "F24"),
+            Self::F25 => write!(f, "F25"),
+            Self::F26 => write!(f, "F26"),
+            Self::F27 => write!(f, "F27"),
+            Self::F28 => write!(f, "F28"),
+            Self::F29 => write!(f, "F29"),
+            Self::F30 => write!(f, "F30"),
+            Self::F31 => write!(f, "F31"),
+        }
     }
 }

@@ -66,8 +66,24 @@ impl super::IsotopicComposition for CoperniciumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for CoperniciumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for CoperniciumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Cn285
+    }
+}
+impl std::fmt::Display for CoperniciumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Cn276 => write!(f, "Cn276"),
+            Self::Cn277 => write!(f, "Cn277"),
+            Self::Cn278 => write!(f, "Cn278"),
+            Self::Cn279 => write!(f, "Cn279"),
+            Self::Cn280 => write!(f, "Cn280"),
+            Self::Cn281 => write!(f, "Cn281"),
+            Self::Cn282 => write!(f, "Cn282"),
+            Self::Cn283 => write!(f, "Cn283"),
+            Self::Cn284 => write!(f, "Cn284"),
+            Self::Cn285 => write!(f, "Cn285"),
+        }
     }
 }

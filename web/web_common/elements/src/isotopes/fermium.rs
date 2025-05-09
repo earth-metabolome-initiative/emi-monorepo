@@ -106,8 +106,34 @@ impl super::IsotopicComposition for FermiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for FermiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for FermiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Fm260
+    }
+}
+impl std::fmt::Display for FermiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Fm241 => write!(f, "Fm241"),
+            Self::Fm242 => write!(f, "Fm242"),
+            Self::Fm243 => write!(f, "Fm243"),
+            Self::Fm244 => write!(f, "Fm244"),
+            Self::Fm245 => write!(f, "Fm245"),
+            Self::Fm246 => write!(f, "Fm246"),
+            Self::Fm247 => write!(f, "Fm247"),
+            Self::Fm248 => write!(f, "Fm248"),
+            Self::Fm249 => write!(f, "Fm249"),
+            Self::Fm250 => write!(f, "Fm250"),
+            Self::Fm251 => write!(f, "Fm251"),
+            Self::Fm252 => write!(f, "Fm252"),
+            Self::Fm253 => write!(f, "Fm253"),
+            Self::Fm254 => write!(f, "Fm254"),
+            Self::Fm255 => write!(f, "Fm255"),
+            Self::Fm256 => write!(f, "Fm256"),
+            Self::Fm257 => write!(f, "Fm257"),
+            Self::Fm258 => write!(f, "Fm258"),
+            Self::Fm259 => write!(f, "Fm259"),
+            Self::Fm260 => write!(f, "Fm260"),
+        }
     }
 }

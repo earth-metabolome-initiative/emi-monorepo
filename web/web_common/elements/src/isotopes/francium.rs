@@ -166,8 +166,49 @@ impl super::IsotopicComposition for FranciumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for FranciumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for FranciumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Fr233
+    }
+}
+impl std::fmt::Display for FranciumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Fr199 => write!(f, "Fr199"),
+            Self::Fr200 => write!(f, "Fr200"),
+            Self::Fr201 => write!(f, "Fr201"),
+            Self::Fr202 => write!(f, "Fr202"),
+            Self::Fr203 => write!(f, "Fr203"),
+            Self::Fr204 => write!(f, "Fr204"),
+            Self::Fr205 => write!(f, "Fr205"),
+            Self::Fr206 => write!(f, "Fr206"),
+            Self::Fr207 => write!(f, "Fr207"),
+            Self::Fr208 => write!(f, "Fr208"),
+            Self::Fr209 => write!(f, "Fr209"),
+            Self::Fr210 => write!(f, "Fr210"),
+            Self::Fr211 => write!(f, "Fr211"),
+            Self::Fr212 => write!(f, "Fr212"),
+            Self::Fr213 => write!(f, "Fr213"),
+            Self::Fr214 => write!(f, "Fr214"),
+            Self::Fr215 => write!(f, "Fr215"),
+            Self::Fr216 => write!(f, "Fr216"),
+            Self::Fr217 => write!(f, "Fr217"),
+            Self::Fr218 => write!(f, "Fr218"),
+            Self::Fr219 => write!(f, "Fr219"),
+            Self::Fr220 => write!(f, "Fr220"),
+            Self::Fr221 => write!(f, "Fr221"),
+            Self::Fr222 => write!(f, "Fr222"),
+            Self::Fr223 => write!(f, "Fr223"),
+            Self::Fr224 => write!(f, "Fr224"),
+            Self::Fr225 => write!(f, "Fr225"),
+            Self::Fr226 => write!(f, "Fr226"),
+            Self::Fr227 => write!(f, "Fr227"),
+            Self::Fr228 => write!(f, "Fr228"),
+            Self::Fr229 => write!(f, "Fr229"),
+            Self::Fr230 => write!(f, "Fr230"),
+            Self::Fr231 => write!(f, "Fr231"),
+            Self::Fr232 => write!(f, "Fr232"),
+            Self::Fr233 => write!(f, "Fr233"),
+        }
     }
 }

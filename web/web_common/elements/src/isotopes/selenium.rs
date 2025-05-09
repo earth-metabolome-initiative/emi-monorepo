@@ -154,8 +154,46 @@ impl super::IsotopicComposition for SeleniumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for SeleniumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for SeleniumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Se80
+    }
+}
+impl std::fmt::Display for SeleniumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Se64 => write!(f, "Se64"),
+            Self::Se65 => write!(f, "Se65"),
+            Self::Se66 => write!(f, "Se66"),
+            Self::Se67 => write!(f, "Se67"),
+            Self::Se68 => write!(f, "Se68"),
+            Self::Se69 => write!(f, "Se69"),
+            Self::Se70 => write!(f, "Se70"),
+            Self::Se71 => write!(f, "Se71"),
+            Self::Se72 => write!(f, "Se72"),
+            Self::Se73 => write!(f, "Se73"),
+            Self::Se74 => write!(f, "Se74"),
+            Self::Se75 => write!(f, "Se75"),
+            Self::Se76 => write!(f, "Se76"),
+            Self::Se77 => write!(f, "Se77"),
+            Self::Se78 => write!(f, "Se78"),
+            Self::Se79 => write!(f, "Se79"),
+            Self::Se80 => write!(f, "Se80"),
+            Self::Se81 => write!(f, "Se81"),
+            Self::Se82 => write!(f, "Se82"),
+            Self::Se83 => write!(f, "Se83"),
+            Self::Se84 => write!(f, "Se84"),
+            Self::Se85 => write!(f, "Se85"),
+            Self::Se86 => write!(f, "Se86"),
+            Self::Se87 => write!(f, "Se87"),
+            Self::Se88 => write!(f, "Se88"),
+            Self::Se89 => write!(f, "Se89"),
+            Self::Se90 => write!(f, "Se90"),
+            Self::Se91 => write!(f, "Se91"),
+            Self::Se92 => write!(f, "Se92"),
+            Self::Se93 => write!(f, "Se93"),
+            Self::Se94 => write!(f, "Se94"),
+            Self::Se95 => write!(f, "Se95"),
+        }
     }
 }

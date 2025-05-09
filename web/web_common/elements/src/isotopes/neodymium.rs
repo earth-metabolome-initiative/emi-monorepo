@@ -178,8 +178,52 @@ impl super::IsotopicComposition for NeodymiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for NeodymiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for NeodymiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Nd142
+    }
+}
+impl std::fmt::Display for NeodymiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Nd124 => write!(f, "Nd124"),
+            Self::Nd125 => write!(f, "Nd125"),
+            Self::Nd126 => write!(f, "Nd126"),
+            Self::Nd127 => write!(f, "Nd127"),
+            Self::Nd128 => write!(f, "Nd128"),
+            Self::Nd129 => write!(f, "Nd129"),
+            Self::Nd130 => write!(f, "Nd130"),
+            Self::Nd131 => write!(f, "Nd131"),
+            Self::Nd132 => write!(f, "Nd132"),
+            Self::Nd133 => write!(f, "Nd133"),
+            Self::Nd134 => write!(f, "Nd134"),
+            Self::Nd135 => write!(f, "Nd135"),
+            Self::Nd136 => write!(f, "Nd136"),
+            Self::Nd137 => write!(f, "Nd137"),
+            Self::Nd138 => write!(f, "Nd138"),
+            Self::Nd139 => write!(f, "Nd139"),
+            Self::Nd140 => write!(f, "Nd140"),
+            Self::Nd141 => write!(f, "Nd141"),
+            Self::Nd142 => write!(f, "Nd142"),
+            Self::Nd143 => write!(f, "Nd143"),
+            Self::Nd144 => write!(f, "Nd144"),
+            Self::Nd145 => write!(f, "Nd145"),
+            Self::Nd146 => write!(f, "Nd146"),
+            Self::Nd147 => write!(f, "Nd147"),
+            Self::Nd148 => write!(f, "Nd148"),
+            Self::Nd149 => write!(f, "Nd149"),
+            Self::Nd150 => write!(f, "Nd150"),
+            Self::Nd151 => write!(f, "Nd151"),
+            Self::Nd152 => write!(f, "Nd152"),
+            Self::Nd153 => write!(f, "Nd153"),
+            Self::Nd154 => write!(f, "Nd154"),
+            Self::Nd155 => write!(f, "Nd155"),
+            Self::Nd156 => write!(f, "Nd156"),
+            Self::Nd157 => write!(f, "Nd157"),
+            Self::Nd158 => write!(f, "Nd158"),
+            Self::Nd159 => write!(f, "Nd159"),
+            Self::Nd160 => write!(f, "Nd160"),
+            Self::Nd161 => write!(f, "Nd161"),
+        }
     }
 }

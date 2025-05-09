@@ -158,8 +158,47 @@ impl super::IsotopicComposition for KryptonIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for KryptonIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for KryptonIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Kr84
+    }
+}
+impl std::fmt::Display for KryptonIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Kr69 => write!(f, "Kr69"),
+            Self::Kr70 => write!(f, "Kr70"),
+            Self::Kr71 => write!(f, "Kr71"),
+            Self::Kr72 => write!(f, "Kr72"),
+            Self::Kr73 => write!(f, "Kr73"),
+            Self::Kr74 => write!(f, "Kr74"),
+            Self::Kr75 => write!(f, "Kr75"),
+            Self::Kr76 => write!(f, "Kr76"),
+            Self::Kr77 => write!(f, "Kr77"),
+            Self::Kr78 => write!(f, "Kr78"),
+            Self::Kr79 => write!(f, "Kr79"),
+            Self::Kr80 => write!(f, "Kr80"),
+            Self::Kr81 => write!(f, "Kr81"),
+            Self::Kr82 => write!(f, "Kr82"),
+            Self::Kr83 => write!(f, "Kr83"),
+            Self::Kr84 => write!(f, "Kr84"),
+            Self::Kr85 => write!(f, "Kr85"),
+            Self::Kr86 => write!(f, "Kr86"),
+            Self::Kr87 => write!(f, "Kr87"),
+            Self::Kr88 => write!(f, "Kr88"),
+            Self::Kr89 => write!(f, "Kr89"),
+            Self::Kr90 => write!(f, "Kr90"),
+            Self::Kr91 => write!(f, "Kr91"),
+            Self::Kr92 => write!(f, "Kr92"),
+            Self::Kr93 => write!(f, "Kr93"),
+            Self::Kr94 => write!(f, "Kr94"),
+            Self::Kr95 => write!(f, "Kr95"),
+            Self::Kr96 => write!(f, "Kr96"),
+            Self::Kr97 => write!(f, "Kr97"),
+            Self::Kr98 => write!(f, "Kr98"),
+            Self::Kr99 => write!(f, "Kr99"),
+            Self::Kr100 => write!(f, "Kr100"),
+            Self::Kr101 => write!(f, "Kr101"),
+        }
     }
 }

@@ -86,8 +86,29 @@ impl super::IsotopicComposition for HassiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for HassiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for HassiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Hs277
+    }
+}
+impl std::fmt::Display for HassiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Hs263 => write!(f, "Hs263"),
+            Self::Hs264 => write!(f, "Hs264"),
+            Self::Hs265 => write!(f, "Hs265"),
+            Self::Hs266 => write!(f, "Hs266"),
+            Self::Hs267 => write!(f, "Hs267"),
+            Self::Hs268 => write!(f, "Hs268"),
+            Self::Hs269 => write!(f, "Hs269"),
+            Self::Hs270 => write!(f, "Hs270"),
+            Self::Hs271 => write!(f, "Hs271"),
+            Self::Hs272 => write!(f, "Hs272"),
+            Self::Hs273 => write!(f, "Hs273"),
+            Self::Hs274 => write!(f, "Hs274"),
+            Self::Hs275 => write!(f, "Hs275"),
+            Self::Hs276 => write!(f, "Hs276"),
+            Self::Hs277 => write!(f, "Hs277"),
+        }
     }
 }

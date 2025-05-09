@@ -178,8 +178,52 @@ impl super::IsotopicComposition for EuropiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for EuropiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for EuropiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Eu153
+    }
+}
+impl std::fmt::Display for EuropiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Eu130 => write!(f, "Eu130"),
+            Self::Eu131 => write!(f, "Eu131"),
+            Self::Eu132 => write!(f, "Eu132"),
+            Self::Eu133 => write!(f, "Eu133"),
+            Self::Eu134 => write!(f, "Eu134"),
+            Self::Eu135 => write!(f, "Eu135"),
+            Self::Eu136 => write!(f, "Eu136"),
+            Self::Eu137 => write!(f, "Eu137"),
+            Self::Eu138 => write!(f, "Eu138"),
+            Self::Eu139 => write!(f, "Eu139"),
+            Self::Eu140 => write!(f, "Eu140"),
+            Self::Eu141 => write!(f, "Eu141"),
+            Self::Eu142 => write!(f, "Eu142"),
+            Self::Eu143 => write!(f, "Eu143"),
+            Self::Eu144 => write!(f, "Eu144"),
+            Self::Eu145 => write!(f, "Eu145"),
+            Self::Eu146 => write!(f, "Eu146"),
+            Self::Eu147 => write!(f, "Eu147"),
+            Self::Eu148 => write!(f, "Eu148"),
+            Self::Eu149 => write!(f, "Eu149"),
+            Self::Eu150 => write!(f, "Eu150"),
+            Self::Eu151 => write!(f, "Eu151"),
+            Self::Eu152 => write!(f, "Eu152"),
+            Self::Eu153 => write!(f, "Eu153"),
+            Self::Eu154 => write!(f, "Eu154"),
+            Self::Eu155 => write!(f, "Eu155"),
+            Self::Eu156 => write!(f, "Eu156"),
+            Self::Eu157 => write!(f, "Eu157"),
+            Self::Eu158 => write!(f, "Eu158"),
+            Self::Eu159 => write!(f, "Eu159"),
+            Self::Eu160 => write!(f, "Eu160"),
+            Self::Eu161 => write!(f, "Eu161"),
+            Self::Eu162 => write!(f, "Eu162"),
+            Self::Eu163 => write!(f, "Eu163"),
+            Self::Eu164 => write!(f, "Eu164"),
+            Self::Eu165 => write!(f, "Eu165"),
+            Self::Eu166 => write!(f, "Eu166"),
+            Self::Eu167 => write!(f, "Eu167"),
+        }
     }
 }

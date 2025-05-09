@@ -182,8 +182,53 @@ impl super::IsotopicComposition for RadonIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for RadonIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for RadonIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Rn231
+    }
+}
+impl std::fmt::Display for RadonIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Rn193 => write!(f, "Rn193"),
+            Self::Rn194 => write!(f, "Rn194"),
+            Self::Rn195 => write!(f, "Rn195"),
+            Self::Rn196 => write!(f, "Rn196"),
+            Self::Rn197 => write!(f, "Rn197"),
+            Self::Rn198 => write!(f, "Rn198"),
+            Self::Rn199 => write!(f, "Rn199"),
+            Self::Rn200 => write!(f, "Rn200"),
+            Self::Rn201 => write!(f, "Rn201"),
+            Self::Rn202 => write!(f, "Rn202"),
+            Self::Rn203 => write!(f, "Rn203"),
+            Self::Rn204 => write!(f, "Rn204"),
+            Self::Rn205 => write!(f, "Rn205"),
+            Self::Rn206 => write!(f, "Rn206"),
+            Self::Rn207 => write!(f, "Rn207"),
+            Self::Rn208 => write!(f, "Rn208"),
+            Self::Rn209 => write!(f, "Rn209"),
+            Self::Rn210 => write!(f, "Rn210"),
+            Self::Rn211 => write!(f, "Rn211"),
+            Self::Rn212 => write!(f, "Rn212"),
+            Self::Rn213 => write!(f, "Rn213"),
+            Self::Rn214 => write!(f, "Rn214"),
+            Self::Rn215 => write!(f, "Rn215"),
+            Self::Rn216 => write!(f, "Rn216"),
+            Self::Rn217 => write!(f, "Rn217"),
+            Self::Rn218 => write!(f, "Rn218"),
+            Self::Rn219 => write!(f, "Rn219"),
+            Self::Rn220 => write!(f, "Rn220"),
+            Self::Rn221 => write!(f, "Rn221"),
+            Self::Rn222 => write!(f, "Rn222"),
+            Self::Rn223 => write!(f, "Rn223"),
+            Self::Rn224 => write!(f, "Rn224"),
+            Self::Rn225 => write!(f, "Rn225"),
+            Self::Rn226 => write!(f, "Rn226"),
+            Self::Rn227 => write!(f, "Rn227"),
+            Self::Rn228 => write!(f, "Rn228"),
+            Self::Rn229 => write!(f, "Rn229"),
+            Self::Rn230 => write!(f, "Rn230"),
+            Self::Rn231 => write!(f, "Rn231"),
+        }
     }
 }

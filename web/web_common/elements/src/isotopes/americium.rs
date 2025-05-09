@@ -106,8 +106,34 @@ impl super::IsotopicComposition for AmericiumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for AmericiumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for AmericiumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Am249
+    }
+}
+impl std::fmt::Display for AmericiumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Am230 => write!(f, "Am230"),
+            Self::Am231 => write!(f, "Am231"),
+            Self::Am232 => write!(f, "Am232"),
+            Self::Am233 => write!(f, "Am233"),
+            Self::Am234 => write!(f, "Am234"),
+            Self::Am235 => write!(f, "Am235"),
+            Self::Am236 => write!(f, "Am236"),
+            Self::Am237 => write!(f, "Am237"),
+            Self::Am238 => write!(f, "Am238"),
+            Self::Am239 => write!(f, "Am239"),
+            Self::Am240 => write!(f, "Am240"),
+            Self::Am241 => write!(f, "Am241"),
+            Self::Am242 => write!(f, "Am242"),
+            Self::Am243 => write!(f, "Am243"),
+            Self::Am244 => write!(f, "Am244"),
+            Self::Am245 => write!(f, "Am245"),
+            Self::Am246 => write!(f, "Am246"),
+            Self::Am247 => write!(f, "Am247"),
+            Self::Am248 => write!(f, "Am248"),
+            Self::Am249 => write!(f, "Am249"),
+        }
     }
 }

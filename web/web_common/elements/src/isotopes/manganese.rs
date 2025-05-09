@@ -138,8 +138,42 @@ impl super::IsotopicComposition for ManganeseIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for ManganeseIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for ManganeseIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Mn55
+    }
+}
+impl std::fmt::Display for ManganeseIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Mn44 => write!(f, "Mn44"),
+            Self::Mn45 => write!(f, "Mn45"),
+            Self::Mn46 => write!(f, "Mn46"),
+            Self::Mn47 => write!(f, "Mn47"),
+            Self::Mn48 => write!(f, "Mn48"),
+            Self::Mn49 => write!(f, "Mn49"),
+            Self::Mn50 => write!(f, "Mn50"),
+            Self::Mn51 => write!(f, "Mn51"),
+            Self::Mn52 => write!(f, "Mn52"),
+            Self::Mn53 => write!(f, "Mn53"),
+            Self::Mn54 => write!(f, "Mn54"),
+            Self::Mn55 => write!(f, "Mn55"),
+            Self::Mn56 => write!(f, "Mn56"),
+            Self::Mn57 => write!(f, "Mn57"),
+            Self::Mn58 => write!(f, "Mn58"),
+            Self::Mn59 => write!(f, "Mn59"),
+            Self::Mn60 => write!(f, "Mn60"),
+            Self::Mn61 => write!(f, "Mn61"),
+            Self::Mn62 => write!(f, "Mn62"),
+            Self::Mn63 => write!(f, "Mn63"),
+            Self::Mn64 => write!(f, "Mn64"),
+            Self::Mn65 => write!(f, "Mn65"),
+            Self::Mn66 => write!(f, "Mn66"),
+            Self::Mn67 => write!(f, "Mn67"),
+            Self::Mn68 => write!(f, "Mn68"),
+            Self::Mn69 => write!(f, "Mn69"),
+            Self::Mn70 => write!(f, "Mn70"),
+            Self::Mn71 => write!(f, "Mn71"),
+        }
     }
 }

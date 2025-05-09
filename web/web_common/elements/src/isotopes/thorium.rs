@@ -154,8 +154,46 @@ impl super::IsotopicComposition for ThoriumIsotope {
         }
     }
 }
-impl super::MostCommonIsotope for ThoriumIsotope {
-    fn most_common_isotope() -> Self {
+impl super::MostAbundantIsotope for ThoriumIsotope {
+    fn most_abundant_isotope() -> Self {
         Self::Th232
+    }
+}
+impl std::fmt::Display for ThoriumIsotope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Th208 => write!(f, "Th208"),
+            Self::Th209 => write!(f, "Th209"),
+            Self::Th210 => write!(f, "Th210"),
+            Self::Th211 => write!(f, "Th211"),
+            Self::Th212 => write!(f, "Th212"),
+            Self::Th213 => write!(f, "Th213"),
+            Self::Th214 => write!(f, "Th214"),
+            Self::Th215 => write!(f, "Th215"),
+            Self::Th216 => write!(f, "Th216"),
+            Self::Th217 => write!(f, "Th217"),
+            Self::Th218 => write!(f, "Th218"),
+            Self::Th219 => write!(f, "Th219"),
+            Self::Th220 => write!(f, "Th220"),
+            Self::Th221 => write!(f, "Th221"),
+            Self::Th222 => write!(f, "Th222"),
+            Self::Th223 => write!(f, "Th223"),
+            Self::Th224 => write!(f, "Th224"),
+            Self::Th225 => write!(f, "Th225"),
+            Self::Th226 => write!(f, "Th226"),
+            Self::Th227 => write!(f, "Th227"),
+            Self::Th228 => write!(f, "Th228"),
+            Self::Th229 => write!(f, "Th229"),
+            Self::Th230 => write!(f, "Th230"),
+            Self::Th231 => write!(f, "Th231"),
+            Self::Th232 => write!(f, "Th232"),
+            Self::Th233 => write!(f, "Th233"),
+            Self::Th234 => write!(f, "Th234"),
+            Self::Th235 => write!(f, "Th235"),
+            Self::Th236 => write!(f, "Th236"),
+            Self::Th237 => write!(f, "Th237"),
+            Self::Th238 => write!(f, "Th238"),
+            Self::Th239 => write!(f, "Th239"),
+        }
     }
 }
