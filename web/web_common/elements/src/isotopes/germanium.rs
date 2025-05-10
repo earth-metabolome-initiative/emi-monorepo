@@ -1,39 +1,74 @@
+//! Isotopes of the element Germanium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Germanium
 pub enum GermaniumIsotope {
+    /// Isotope Ge58 of Germanium
     Ge58,
+    /// Isotope Ge59 of Germanium
     Ge59,
+    /// Isotope Ge60 of Germanium
     Ge60,
+    /// Isotope Ge61 of Germanium
     Ge61,
+    /// Isotope Ge62 of Germanium
     Ge62,
+    /// Isotope Ge63 of Germanium
     Ge63,
+    /// Isotope Ge64 of Germanium
     Ge64,
+    /// Isotope Ge65 of Germanium
     Ge65,
+    /// Isotope Ge66 of Germanium
     Ge66,
+    /// Isotope Ge67 of Germanium
     Ge67,
+    /// Isotope Ge68 of Germanium
     Ge68,
+    /// Isotope Ge69 of Germanium
     Ge69,
+    /// Isotope Ge70 of Germanium
     Ge70,
+    /// Isotope Ge71 of Germanium
     Ge71,
+    /// Isotope Ge72 of Germanium
     Ge72,
+    /// Isotope Ge73 of Germanium
     Ge73,
+    /// Isotope Ge74 of Germanium
     Ge74,
+    /// Isotope Ge75 of Germanium
     Ge75,
+    /// Isotope Ge76 of Germanium
     Ge76,
+    /// Isotope Ge77 of Germanium
     Ge77,
+    /// Isotope Ge78 of Germanium
     Ge78,
+    /// Isotope Ge79 of Germanium
     Ge79,
+    /// Isotope Ge80 of Germanium
     Ge80,
+    /// Isotope Ge81 of Germanium
     Ge81,
+    /// Isotope Ge82 of Germanium
     Ge82,
+    /// Isotope Ge83 of Germanium
     Ge83,
+    /// Isotope Ge84 of Germanium
     Ge84,
+    /// Isotope Ge85 of Germanium
     Ge85,
+    /// Isotope Ge86 of Germanium
     Ge86,
+    /// Isotope Ge87 of Germanium
     Ge87,
+    /// Isotope Ge88 of Germanium
     Ge88,
+    /// Isotope Ge89 of Germanium
     Ge89,
+    /// Isotope Ge90 of Germanium
     Ge90,
 }
 impl super::RelativeAtomicMass for GermaniumIsotope {
@@ -122,39 +157,39 @@ impl super::MassNumber for GermaniumIsotope {
 impl super::IsotopicComposition for GermaniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Ge58 => None,
-            Self::Ge59 => None,
-            Self::Ge60 => None,
-            Self::Ge61 => None,
-            Self::Ge62 => None,
-            Self::Ge63 => None,
-            Self::Ge64 => None,
-            Self::Ge65 => None,
-            Self::Ge66 => None,
-            Self::Ge67 => None,
-            Self::Ge68 => None,
-            Self::Ge69 => None,
             Self::Ge70 => Some(0.2057f64),
-            Self::Ge71 => None,
             Self::Ge72 => Some(0.2745f64),
             Self::Ge73 => Some(0.0775f64),
             Self::Ge74 => Some(0.365f64),
-            Self::Ge75 => None,
             Self::Ge76 => Some(0.0773f64),
-            Self::Ge77 => None,
-            Self::Ge78 => None,
-            Self::Ge79 => None,
-            Self::Ge80 => None,
-            Self::Ge81 => None,
-            Self::Ge82 => None,
-            Self::Ge83 => None,
-            Self::Ge84 => None,
-            Self::Ge85 => None,
-            Self::Ge86 => None,
-            Self::Ge87 => None,
-            Self::Ge88 => None,
-            Self::Ge89 => None,
-            Self::Ge90 => None,
+            Self::Ge58
+            | Self::Ge59
+            | Self::Ge60
+            | Self::Ge61
+            | Self::Ge62
+            | Self::Ge63
+            | Self::Ge64
+            | Self::Ge65
+            | Self::Ge66
+            | Self::Ge67
+            | Self::Ge68
+            | Self::Ge69
+            | Self::Ge71
+            | Self::Ge75
+            | Self::Ge77
+            | Self::Ge78
+            | Self::Ge79
+            | Self::Ge80
+            | Self::Ge81
+            | Self::Ge82
+            | Self::Ge83
+            | Self::Ge84
+            | Self::Ge85
+            | Self::Ge86
+            | Self::Ge87
+            | Self::Ge88
+            | Self::Ge89
+            | Self::Ge90 => None,
         }
     }
 }

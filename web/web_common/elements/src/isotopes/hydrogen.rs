@@ -1,13 +1,22 @@
+//! Isotopes of the element Hydrogen
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Hydrogen
 pub enum HydrogenIsotope {
+    /// Isotope H1 of Hydrogen
     H1,
+    /// Isotope D2 of Hydrogen
     D2,
+    /// Isotope T3 of Hydrogen
     T3,
+    /// Isotope H4 of Hydrogen
     H4,
+    /// Isotope H5 of Hydrogen
     H5,
+    /// Isotope H6 of Hydrogen
     H6,
+    /// Isotope H7 of Hydrogen
     H7,
 }
 impl super::RelativeAtomicMass for HydrogenIsotope {
@@ -46,11 +55,7 @@ impl super::IsotopicComposition for HydrogenIsotope {
         match self {
             Self::H1 => Some(0.999885f64),
             Self::D2 => Some(0.000115f64),
-            Self::T3 => None,
-            Self::H4 => None,
-            Self::H5 => None,
-            Self::H6 => None,
-            Self::H7 => None,
+            Self::T3 | Self::H4 | Self::H5 | Self::H6 | Self::H7 => None,
         }
     }
 }

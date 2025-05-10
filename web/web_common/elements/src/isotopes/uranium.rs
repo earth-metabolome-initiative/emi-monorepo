@@ -1,33 +1,62 @@
+//! Isotopes of the element Uranium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Uranium
 pub enum UraniumIsotope {
+    /// Isotope U217 of Uranium
     U217,
+    /// Isotope U218 of Uranium
     U218,
+    /// Isotope U219 of Uranium
     U219,
+    /// Isotope U220 of Uranium
     U220,
+    /// Isotope U221 of Uranium
     U221,
+    /// Isotope U222 of Uranium
     U222,
+    /// Isotope U223 of Uranium
     U223,
+    /// Isotope U224 of Uranium
     U224,
+    /// Isotope U225 of Uranium
     U225,
+    /// Isotope U226 of Uranium
     U226,
+    /// Isotope U227 of Uranium
     U227,
+    /// Isotope U228 of Uranium
     U228,
+    /// Isotope U229 of Uranium
     U229,
+    /// Isotope U230 of Uranium
     U230,
+    /// Isotope U231 of Uranium
     U231,
+    /// Isotope U232 of Uranium
     U232,
+    /// Isotope U233 of Uranium
     U233,
+    /// Isotope U234 of Uranium
     U234,
+    /// Isotope U235 of Uranium
     U235,
+    /// Isotope U236 of Uranium
     U236,
+    /// Isotope U237 of Uranium
     U237,
+    /// Isotope U238 of Uranium
     U238,
+    /// Isotope U239 of Uranium
     U239,
+    /// Isotope U240 of Uranium
     U240,
+    /// Isotope U241 of Uranium
     U241,
+    /// Isotope U242 of Uranium
     U242,
+    /// Isotope U243 of Uranium
     U243,
 }
 impl super::RelativeAtomicMass for UraniumIsotope {
@@ -104,33 +133,33 @@ impl super::MassNumber for UraniumIsotope {
 impl super::IsotopicComposition for UraniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::U217 => None,
-            Self::U218 => None,
-            Self::U219 => None,
-            Self::U220 => None,
-            Self::U221 => None,
-            Self::U222 => None,
-            Self::U223 => None,
-            Self::U224 => None,
-            Self::U225 => None,
-            Self::U226 => None,
-            Self::U227 => None,
-            Self::U228 => None,
-            Self::U229 => None,
-            Self::U230 => None,
-            Self::U231 => None,
-            Self::U232 => None,
-            Self::U233 => None,
             Self::U234 => Some(0.000054f64),
             Self::U235 => Some(0.007204f64),
-            Self::U236 => None,
-            Self::U237 => None,
             Self::U238 => Some(0.992742f64),
-            Self::U239 => None,
-            Self::U240 => None,
-            Self::U241 => None,
-            Self::U242 => None,
-            Self::U243 => None,
+            Self::U217
+            | Self::U218
+            | Self::U219
+            | Self::U220
+            | Self::U221
+            | Self::U222
+            | Self::U223
+            | Self::U224
+            | Self::U225
+            | Self::U226
+            | Self::U227
+            | Self::U228
+            | Self::U229
+            | Self::U230
+            | Self::U231
+            | Self::U232
+            | Self::U233
+            | Self::U236
+            | Self::U237
+            | Self::U239
+            | Self::U240
+            | Self::U241
+            | Self::U242
+            | Self::U243 => None,
         }
     }
 }

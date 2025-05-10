@@ -1,41 +1,78 @@
+//! Isotopes of the element Radium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Radium
 pub enum RadiumIsotope {
+    /// Isotope Ra201 of Radium
     Ra201,
+    /// Isotope Ra202 of Radium
     Ra202,
+    /// Isotope Ra203 of Radium
     Ra203,
+    /// Isotope Ra204 of Radium
     Ra204,
+    /// Isotope Ra205 of Radium
     Ra205,
+    /// Isotope Ra206 of Radium
     Ra206,
+    /// Isotope Ra207 of Radium
     Ra207,
+    /// Isotope Ra208 of Radium
     Ra208,
+    /// Isotope Ra209 of Radium
     Ra209,
+    /// Isotope Ra210 of Radium
     Ra210,
+    /// Isotope Ra211 of Radium
     Ra211,
+    /// Isotope Ra212 of Radium
     Ra212,
+    /// Isotope Ra213 of Radium
     Ra213,
+    /// Isotope Ra214 of Radium
     Ra214,
+    /// Isotope Ra215 of Radium
     Ra215,
+    /// Isotope Ra216 of Radium
     Ra216,
+    /// Isotope Ra217 of Radium
     Ra217,
+    /// Isotope Ra218 of Radium
     Ra218,
+    /// Isotope Ra219 of Radium
     Ra219,
+    /// Isotope Ra220 of Radium
     Ra220,
+    /// Isotope Ra221 of Radium
     Ra221,
+    /// Isotope Ra222 of Radium
     Ra222,
+    /// Isotope Ra223 of Radium
     Ra223,
+    /// Isotope Ra224 of Radium
     Ra224,
+    /// Isotope Ra225 of Radium
     Ra225,
+    /// Isotope Ra226 of Radium
     Ra226,
+    /// Isotope Ra227 of Radium
     Ra227,
+    /// Isotope Ra228 of Radium
     Ra228,
+    /// Isotope Ra229 of Radium
     Ra229,
+    /// Isotope Ra230 of Radium
     Ra230,
+    /// Isotope Ra231 of Radium
     Ra231,
+    /// Isotope Ra232 of Radium
     Ra232,
+    /// Isotope Ra233 of Radium
     Ra233,
+    /// Isotope Ra234 of Radium
     Ra234,
+    /// Isotope Ra235 of Radium
     Ra235,
 }
 impl super::RelativeAtomicMass for RadiumIsotope {
@@ -127,43 +164,7 @@ impl super::MassNumber for RadiumIsotope {
 }
 impl super::IsotopicComposition for RadiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Ra201 => None,
-            Self::Ra202 => None,
-            Self::Ra203 => None,
-            Self::Ra204 => None,
-            Self::Ra205 => None,
-            Self::Ra206 => None,
-            Self::Ra207 => None,
-            Self::Ra208 => None,
-            Self::Ra209 => None,
-            Self::Ra210 => None,
-            Self::Ra211 => None,
-            Self::Ra212 => None,
-            Self::Ra213 => None,
-            Self::Ra214 => None,
-            Self::Ra215 => None,
-            Self::Ra216 => None,
-            Self::Ra217 => None,
-            Self::Ra218 => None,
-            Self::Ra219 => None,
-            Self::Ra220 => None,
-            Self::Ra221 => None,
-            Self::Ra222 => None,
-            Self::Ra223 => None,
-            Self::Ra224 => None,
-            Self::Ra225 => None,
-            Self::Ra226 => None,
-            Self::Ra227 => None,
-            Self::Ra228 => None,
-            Self::Ra229 => None,
-            Self::Ra230 => None,
-            Self::Ra231 => None,
-            Self::Ra232 => None,
-            Self::Ra233 => None,
-            Self::Ra234 => None,
-            Self::Ra235 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for RadiumIsotope {

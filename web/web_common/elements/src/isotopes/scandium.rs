@@ -1,32 +1,60 @@
+//! Isotopes of the element Scandium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Scandium
 pub enum ScandiumIsotope {
+    /// Isotope Sc36 of Scandium
     Sc36,
+    /// Isotope Sc37 of Scandium
     Sc37,
+    /// Isotope Sc38 of Scandium
     Sc38,
+    /// Isotope Sc39 of Scandium
     Sc39,
+    /// Isotope Sc40 of Scandium
     Sc40,
+    /// Isotope Sc41 of Scandium
     Sc41,
+    /// Isotope Sc42 of Scandium
     Sc42,
+    /// Isotope Sc43 of Scandium
     Sc43,
+    /// Isotope Sc44 of Scandium
     Sc44,
+    /// Isotope Sc45 of Scandium
     Sc45,
+    /// Isotope Sc46 of Scandium
     Sc46,
+    /// Isotope Sc47 of Scandium
     Sc47,
+    /// Isotope Sc48 of Scandium
     Sc48,
+    /// Isotope Sc49 of Scandium
     Sc49,
+    /// Isotope Sc50 of Scandium
     Sc50,
+    /// Isotope Sc51 of Scandium
     Sc51,
+    /// Isotope Sc52 of Scandium
     Sc52,
+    /// Isotope Sc53 of Scandium
     Sc53,
+    /// Isotope Sc54 of Scandium
     Sc54,
+    /// Isotope Sc55 of Scandium
     Sc55,
+    /// Isotope Sc56 of Scandium
     Sc56,
+    /// Isotope Sc57 of Scandium
     Sc57,
+    /// Isotope Sc58 of Scandium
     Sc58,
+    /// Isotope Sc59 of Scandium
     Sc59,
+    /// Isotope Sc60 of Scandium
     Sc60,
+    /// Isotope Sc61 of Scandium
     Sc61,
 }
 impl super::RelativeAtomicMass for ScandiumIsotope {
@@ -101,32 +129,32 @@ impl super::MassNumber for ScandiumIsotope {
 impl super::IsotopicComposition for ScandiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Sc36 => None,
-            Self::Sc37 => None,
-            Self::Sc38 => None,
-            Self::Sc39 => None,
-            Self::Sc40 => None,
-            Self::Sc41 => None,
-            Self::Sc42 => None,
-            Self::Sc43 => None,
-            Self::Sc44 => None,
             Self::Sc45 => Some(1f64),
-            Self::Sc46 => None,
-            Self::Sc47 => None,
-            Self::Sc48 => None,
-            Self::Sc49 => None,
-            Self::Sc50 => None,
-            Self::Sc51 => None,
-            Self::Sc52 => None,
-            Self::Sc53 => None,
-            Self::Sc54 => None,
-            Self::Sc55 => None,
-            Self::Sc56 => None,
-            Self::Sc57 => None,
-            Self::Sc58 => None,
-            Self::Sc59 => None,
-            Self::Sc60 => None,
-            Self::Sc61 => None,
+            Self::Sc36
+            | Self::Sc37
+            | Self::Sc38
+            | Self::Sc39
+            | Self::Sc40
+            | Self::Sc41
+            | Self::Sc42
+            | Self::Sc43
+            | Self::Sc44
+            | Self::Sc46
+            | Self::Sc47
+            | Self::Sc48
+            | Self::Sc49
+            | Self::Sc50
+            | Self::Sc51
+            | Self::Sc52
+            | Self::Sc53
+            | Self::Sc54
+            | Self::Sc55
+            | Self::Sc56
+            | Self::Sc57
+            | Self::Sc58
+            | Self::Sc59
+            | Self::Sc60
+            | Self::Sc61 => None,
         }
     }
 }

@@ -1,44 +1,84 @@
+//! Isotopes of the element Promethium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Promethium
 pub enum PromethiumIsotope {
+    /// Isotope Pm126 of Promethium
     Pm126,
+    /// Isotope Pm127 of Promethium
     Pm127,
+    /// Isotope Pm128 of Promethium
     Pm128,
+    /// Isotope Pm129 of Promethium
     Pm129,
+    /// Isotope Pm130 of Promethium
     Pm130,
+    /// Isotope Pm131 of Promethium
     Pm131,
+    /// Isotope Pm132 of Promethium
     Pm132,
+    /// Isotope Pm133 of Promethium
     Pm133,
+    /// Isotope Pm134 of Promethium
     Pm134,
+    /// Isotope Pm135 of Promethium
     Pm135,
+    /// Isotope Pm136 of Promethium
     Pm136,
+    /// Isotope Pm137 of Promethium
     Pm137,
+    /// Isotope Pm138 of Promethium
     Pm138,
+    /// Isotope Pm139 of Promethium
     Pm139,
+    /// Isotope Pm140 of Promethium
     Pm140,
+    /// Isotope Pm141 of Promethium
     Pm141,
+    /// Isotope Pm142 of Promethium
     Pm142,
+    /// Isotope Pm143 of Promethium
     Pm143,
+    /// Isotope Pm144 of Promethium
     Pm144,
+    /// Isotope Pm145 of Promethium
     Pm145,
+    /// Isotope Pm146 of Promethium
     Pm146,
+    /// Isotope Pm147 of Promethium
     Pm147,
+    /// Isotope Pm148 of Promethium
     Pm148,
+    /// Isotope Pm149 of Promethium
     Pm149,
+    /// Isotope Pm150 of Promethium
     Pm150,
+    /// Isotope Pm151 of Promethium
     Pm151,
+    /// Isotope Pm152 of Promethium
     Pm152,
+    /// Isotope Pm153 of Promethium
     Pm153,
+    /// Isotope Pm154 of Promethium
     Pm154,
+    /// Isotope Pm155 of Promethium
     Pm155,
+    /// Isotope Pm156 of Promethium
     Pm156,
+    /// Isotope Pm157 of Promethium
     Pm157,
+    /// Isotope Pm158 of Promethium
     Pm158,
+    /// Isotope Pm159 of Promethium
     Pm159,
+    /// Isotope Pm160 of Promethium
     Pm160,
+    /// Isotope Pm161 of Promethium
     Pm161,
+    /// Isotope Pm162 of Promethium
     Pm162,
+    /// Isotope Pm163 of Promethium
     Pm163,
 }
 impl super::RelativeAtomicMass for PromethiumIsotope {
@@ -136,46 +176,7 @@ impl super::MassNumber for PromethiumIsotope {
 }
 impl super::IsotopicComposition for PromethiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Pm126 => None,
-            Self::Pm127 => None,
-            Self::Pm128 => None,
-            Self::Pm129 => None,
-            Self::Pm130 => None,
-            Self::Pm131 => None,
-            Self::Pm132 => None,
-            Self::Pm133 => None,
-            Self::Pm134 => None,
-            Self::Pm135 => None,
-            Self::Pm136 => None,
-            Self::Pm137 => None,
-            Self::Pm138 => None,
-            Self::Pm139 => None,
-            Self::Pm140 => None,
-            Self::Pm141 => None,
-            Self::Pm142 => None,
-            Self::Pm143 => None,
-            Self::Pm144 => None,
-            Self::Pm145 => None,
-            Self::Pm146 => None,
-            Self::Pm147 => None,
-            Self::Pm148 => None,
-            Self::Pm149 => None,
-            Self::Pm150 => None,
-            Self::Pm151 => None,
-            Self::Pm152 => None,
-            Self::Pm153 => None,
-            Self::Pm154 => None,
-            Self::Pm155 => None,
-            Self::Pm156 => None,
-            Self::Pm157 => None,
-            Self::Pm158 => None,
-            Self::Pm159 => None,
-            Self::Pm160 => None,
-            Self::Pm161 => None,
-            Self::Pm162 => None,
-            Self::Pm163 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for PromethiumIsotope {

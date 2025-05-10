@@ -1,39 +1,74 @@
+//! Isotopes of the element Arsenic
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Arsenic
 pub enum ArsenicIsotope {
+    /// Isotope As60 of Arsenic
     As60,
+    /// Isotope As61 of Arsenic
     As61,
+    /// Isotope As62 of Arsenic
     As62,
+    /// Isotope As63 of Arsenic
     As63,
+    /// Isotope As64 of Arsenic
     As64,
+    /// Isotope As65 of Arsenic
     As65,
+    /// Isotope As66 of Arsenic
     As66,
+    /// Isotope As67 of Arsenic
     As67,
+    /// Isotope As68 of Arsenic
     As68,
+    /// Isotope As69 of Arsenic
     As69,
+    /// Isotope As70 of Arsenic
     As70,
+    /// Isotope As71 of Arsenic
     As71,
+    /// Isotope As72 of Arsenic
     As72,
+    /// Isotope As73 of Arsenic
     As73,
+    /// Isotope As74 of Arsenic
     As74,
+    /// Isotope As75 of Arsenic
     As75,
+    /// Isotope As76 of Arsenic
     As76,
+    /// Isotope As77 of Arsenic
     As77,
+    /// Isotope As78 of Arsenic
     As78,
+    /// Isotope As79 of Arsenic
     As79,
+    /// Isotope As80 of Arsenic
     As80,
+    /// Isotope As81 of Arsenic
     As81,
+    /// Isotope As82 of Arsenic
     As82,
+    /// Isotope As83 of Arsenic
     As83,
+    /// Isotope As84 of Arsenic
     As84,
+    /// Isotope As85 of Arsenic
     As85,
+    /// Isotope As86 of Arsenic
     As86,
+    /// Isotope As87 of Arsenic
     As87,
+    /// Isotope As88 of Arsenic
     As88,
+    /// Isotope As89 of Arsenic
     As89,
+    /// Isotope As90 of Arsenic
     As90,
+    /// Isotope As91 of Arsenic
     As91,
+    /// Isotope As92 of Arsenic
     As92,
 }
 impl super::RelativeAtomicMass for ArsenicIsotope {
@@ -122,39 +157,39 @@ impl super::MassNumber for ArsenicIsotope {
 impl super::IsotopicComposition for ArsenicIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::As60 => None,
-            Self::As61 => None,
-            Self::As62 => None,
-            Self::As63 => None,
-            Self::As64 => None,
-            Self::As65 => None,
-            Self::As66 => None,
-            Self::As67 => None,
-            Self::As68 => None,
-            Self::As69 => None,
-            Self::As70 => None,
-            Self::As71 => None,
-            Self::As72 => None,
-            Self::As73 => None,
-            Self::As74 => None,
             Self::As75 => Some(1f64),
-            Self::As76 => None,
-            Self::As77 => None,
-            Self::As78 => None,
-            Self::As79 => None,
-            Self::As80 => None,
-            Self::As81 => None,
-            Self::As82 => None,
-            Self::As83 => None,
-            Self::As84 => None,
-            Self::As85 => None,
-            Self::As86 => None,
-            Self::As87 => None,
-            Self::As88 => None,
-            Self::As89 => None,
-            Self::As90 => None,
-            Self::As91 => None,
-            Self::As92 => None,
+            Self::As60
+            | Self::As61
+            | Self::As62
+            | Self::As63
+            | Self::As64
+            | Self::As65
+            | Self::As66
+            | Self::As67
+            | Self::As68
+            | Self::As69
+            | Self::As70
+            | Self::As71
+            | Self::As72
+            | Self::As73
+            | Self::As74
+            | Self::As76
+            | Self::As77
+            | Self::As78
+            | Self::As79
+            | Self::As80
+            | Self::As81
+            | Self::As82
+            | Self::As83
+            | Self::As84
+            | Self::As85
+            | Self::As86
+            | Self::As87
+            | Self::As88
+            | Self::As89
+            | Self::As90
+            | Self::As91
+            | Self::As92 => None,
         }
     }
 }

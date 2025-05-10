@@ -1,21 +1,38 @@
+//! Isotopes of the element Darmstadtium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Darmstadtium
 pub enum DarmstadtiumIsotope {
+    /// Isotope Ds267 of Darmstadtium
     Ds267,
+    /// Isotope Ds268 of Darmstadtium
     Ds268,
+    /// Isotope Ds269 of Darmstadtium
     Ds269,
+    /// Isotope Ds270 of Darmstadtium
     Ds270,
+    /// Isotope Ds271 of Darmstadtium
     Ds271,
+    /// Isotope Ds272 of Darmstadtium
     Ds272,
+    /// Isotope Ds273 of Darmstadtium
     Ds273,
+    /// Isotope Ds274 of Darmstadtium
     Ds274,
+    /// Isotope Ds275 of Darmstadtium
     Ds275,
+    /// Isotope Ds276 of Darmstadtium
     Ds276,
+    /// Isotope Ds277 of Darmstadtium
     Ds277,
+    /// Isotope Ds278 of Darmstadtium
     Ds278,
+    /// Isotope Ds279 of Darmstadtium
     Ds279,
+    /// Isotope Ds280 of Darmstadtium
     Ds280,
+    /// Isotope Ds281 of Darmstadtium
     Ds281,
 }
 impl super::RelativeAtomicMass for DarmstadtiumIsotope {
@@ -67,23 +84,7 @@ impl super::MassNumber for DarmstadtiumIsotope {
 }
 impl super::IsotopicComposition for DarmstadtiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Ds267 => None,
-            Self::Ds268 => None,
-            Self::Ds269 => None,
-            Self::Ds270 => None,
-            Self::Ds271 => None,
-            Self::Ds272 => None,
-            Self::Ds273 => None,
-            Self::Ds274 => None,
-            Self::Ds275 => None,
-            Self::Ds276 => None,
-            Self::Ds277 => None,
-            Self::Ds278 => None,
-            Self::Ds279 => None,
-            Self::Ds280 => None,
-            Self::Ds281 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for DarmstadtiumIsotope {

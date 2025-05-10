@@ -1,47 +1,90 @@
+//! Isotopes of the element Bismuth
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Bismuth
 pub enum BismuthIsotope {
+    /// Isotope Bi184 of Bismuth
     Bi184,
+    /// Isotope Bi185 of Bismuth
     Bi185,
+    /// Isotope Bi186 of Bismuth
     Bi186,
+    /// Isotope Bi187 of Bismuth
     Bi187,
+    /// Isotope Bi188 of Bismuth
     Bi188,
+    /// Isotope Bi189 of Bismuth
     Bi189,
+    /// Isotope Bi190 of Bismuth
     Bi190,
+    /// Isotope Bi191 of Bismuth
     Bi191,
+    /// Isotope Bi192 of Bismuth
     Bi192,
+    /// Isotope Bi193 of Bismuth
     Bi193,
+    /// Isotope Bi194 of Bismuth
     Bi194,
+    /// Isotope Bi195 of Bismuth
     Bi195,
+    /// Isotope Bi196 of Bismuth
     Bi196,
+    /// Isotope Bi197 of Bismuth
     Bi197,
+    /// Isotope Bi198 of Bismuth
     Bi198,
+    /// Isotope Bi199 of Bismuth
     Bi199,
+    /// Isotope Bi200 of Bismuth
     Bi200,
+    /// Isotope Bi201 of Bismuth
     Bi201,
+    /// Isotope Bi202 of Bismuth
     Bi202,
+    /// Isotope Bi203 of Bismuth
     Bi203,
+    /// Isotope Bi204 of Bismuth
     Bi204,
+    /// Isotope Bi205 of Bismuth
     Bi205,
+    /// Isotope Bi206 of Bismuth
     Bi206,
+    /// Isotope Bi207 of Bismuth
     Bi207,
+    /// Isotope Bi208 of Bismuth
     Bi208,
+    /// Isotope Bi209 of Bismuth
     Bi209,
+    /// Isotope Bi210 of Bismuth
     Bi210,
+    /// Isotope Bi211 of Bismuth
     Bi211,
+    /// Isotope Bi212 of Bismuth
     Bi212,
+    /// Isotope Bi213 of Bismuth
     Bi213,
+    /// Isotope Bi214 of Bismuth
     Bi214,
+    /// Isotope Bi215 of Bismuth
     Bi215,
+    /// Isotope Bi216 of Bismuth
     Bi216,
+    /// Isotope Bi217 of Bismuth
     Bi217,
+    /// Isotope Bi218 of Bismuth
     Bi218,
+    /// Isotope Bi219 of Bismuth
     Bi219,
+    /// Isotope Bi220 of Bismuth
     Bi220,
+    /// Isotope Bi221 of Bismuth
     Bi221,
+    /// Isotope Bi222 of Bismuth
     Bi222,
+    /// Isotope Bi223 of Bismuth
     Bi223,
+    /// Isotope Bi224 of Bismuth
     Bi224,
 }
 impl super::RelativeAtomicMass for BismuthIsotope {
@@ -146,47 +189,47 @@ impl super::MassNumber for BismuthIsotope {
 impl super::IsotopicComposition for BismuthIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Bi184 => None,
-            Self::Bi185 => None,
-            Self::Bi186 => None,
-            Self::Bi187 => None,
-            Self::Bi188 => None,
-            Self::Bi189 => None,
-            Self::Bi190 => None,
-            Self::Bi191 => None,
-            Self::Bi192 => None,
-            Self::Bi193 => None,
-            Self::Bi194 => None,
-            Self::Bi195 => None,
-            Self::Bi196 => None,
-            Self::Bi197 => None,
-            Self::Bi198 => None,
-            Self::Bi199 => None,
-            Self::Bi200 => None,
-            Self::Bi201 => None,
-            Self::Bi202 => None,
-            Self::Bi203 => None,
-            Self::Bi204 => None,
-            Self::Bi205 => None,
-            Self::Bi206 => None,
-            Self::Bi207 => None,
-            Self::Bi208 => None,
             Self::Bi209 => Some(1f64),
-            Self::Bi210 => None,
-            Self::Bi211 => None,
-            Self::Bi212 => None,
-            Self::Bi213 => None,
-            Self::Bi214 => None,
-            Self::Bi215 => None,
-            Self::Bi216 => None,
-            Self::Bi217 => None,
-            Self::Bi218 => None,
-            Self::Bi219 => None,
-            Self::Bi220 => None,
-            Self::Bi221 => None,
-            Self::Bi222 => None,
-            Self::Bi223 => None,
-            Self::Bi224 => None,
+            Self::Bi184
+            | Self::Bi185
+            | Self::Bi186
+            | Self::Bi187
+            | Self::Bi188
+            | Self::Bi189
+            | Self::Bi190
+            | Self::Bi191
+            | Self::Bi192
+            | Self::Bi193
+            | Self::Bi194
+            | Self::Bi195
+            | Self::Bi196
+            | Self::Bi197
+            | Self::Bi198
+            | Self::Bi199
+            | Self::Bi200
+            | Self::Bi201
+            | Self::Bi202
+            | Self::Bi203
+            | Self::Bi204
+            | Self::Bi205
+            | Self::Bi206
+            | Self::Bi207
+            | Self::Bi208
+            | Self::Bi210
+            | Self::Bi211
+            | Self::Bi212
+            | Self::Bi213
+            | Self::Bi214
+            | Self::Bi215
+            | Self::Bi216
+            | Self::Bi217
+            | Self::Bi218
+            | Self::Bi219
+            | Self::Bi220
+            | Self::Bi221
+            | Self::Bi222
+            | Self::Bi223
+            | Self::Bi224 => None,
         }
     }
 }

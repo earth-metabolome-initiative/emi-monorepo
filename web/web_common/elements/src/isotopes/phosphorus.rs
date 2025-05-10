@@ -1,30 +1,56 @@
+//! Isotopes of the element Phosphorus
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Phosphorus
 pub enum PhosphorusIsotope {
+    /// Isotope P24 of Phosphorus
     P24,
+    /// Isotope P25 of Phosphorus
     P25,
+    /// Isotope P26 of Phosphorus
     P26,
+    /// Isotope P27 of Phosphorus
     P27,
+    /// Isotope P28 of Phosphorus
     P28,
+    /// Isotope P29 of Phosphorus
     P29,
+    /// Isotope P30 of Phosphorus
     P30,
+    /// Isotope P31 of Phosphorus
     P31,
+    /// Isotope P32 of Phosphorus
     P32,
+    /// Isotope P33 of Phosphorus
     P33,
+    /// Isotope P34 of Phosphorus
     P34,
+    /// Isotope P35 of Phosphorus
     P35,
+    /// Isotope P36 of Phosphorus
     P36,
+    /// Isotope P37 of Phosphorus
     P37,
+    /// Isotope P38 of Phosphorus
     P38,
+    /// Isotope P39 of Phosphorus
     P39,
+    /// Isotope P40 of Phosphorus
     P40,
+    /// Isotope P41 of Phosphorus
     P41,
+    /// Isotope P42 of Phosphorus
     P42,
+    /// Isotope P43 of Phosphorus
     P43,
+    /// Isotope P44 of Phosphorus
     P44,
+    /// Isotope P45 of Phosphorus
     P45,
+    /// Isotope P46 of Phosphorus
     P46,
+    /// Isotope P47 of Phosphorus
     P47,
 }
 impl super::RelativeAtomicMass for PhosphorusIsotope {
@@ -95,30 +121,30 @@ impl super::MassNumber for PhosphorusIsotope {
 impl super::IsotopicComposition for PhosphorusIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::P24 => None,
-            Self::P25 => None,
-            Self::P26 => None,
-            Self::P27 => None,
-            Self::P28 => None,
-            Self::P29 => None,
-            Self::P30 => None,
             Self::P31 => Some(1f64),
-            Self::P32 => None,
-            Self::P33 => None,
-            Self::P34 => None,
-            Self::P35 => None,
-            Self::P36 => None,
-            Self::P37 => None,
-            Self::P38 => None,
-            Self::P39 => None,
-            Self::P40 => None,
-            Self::P41 => None,
-            Self::P42 => None,
-            Self::P43 => None,
-            Self::P44 => None,
-            Self::P45 => None,
-            Self::P46 => None,
-            Self::P47 => None,
+            Self::P24
+            | Self::P25
+            | Self::P26
+            | Self::P27
+            | Self::P28
+            | Self::P29
+            | Self::P30
+            | Self::P32
+            | Self::P33
+            | Self::P34
+            | Self::P35
+            | Self::P36
+            | Self::P37
+            | Self::P38
+            | Self::P39
+            | Self::P40
+            | Self::P41
+            | Self::P42
+            | Self::P43
+            | Self::P44
+            | Self::P45
+            | Self::P46
+            | Self::P47 => None,
         }
     }
 }

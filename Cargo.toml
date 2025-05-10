@@ -51,7 +51,8 @@ members = [
   "utils/diesel-pgrx-derive",
   "utils/diesel-pgrx",
   "web/web_common/elements",
-  "utils/diesel-pgrx/example_extension", "web/web_common/molecular_formula",
+  "utils/diesel-pgrx/example_extension",
+  "web/web_common/molecular_formula",
 ]
 
 [workspace.dependencies]
@@ -174,6 +175,7 @@ unused_import_braces = "forbid"
 unused_must_use = "forbid"
 
 [workspace.lints.clippy]
+unreadable_literal = "allow"
 missing_panics_doc = "allow"
 struct_excessive_bools = "allow"
 should_panic_without_expect = "allow"

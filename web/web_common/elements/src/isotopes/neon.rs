@@ -1,25 +1,46 @@
+//! Isotopes of the element Neon
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Neon
 pub enum NeonIsotope {
+    /// Isotope Ne16 of Neon
     Ne16,
+    /// Isotope Ne17 of Neon
     Ne17,
+    /// Isotope Ne18 of Neon
     Ne18,
+    /// Isotope Ne19 of Neon
     Ne19,
+    /// Isotope Ne20 of Neon
     Ne20,
+    /// Isotope Ne21 of Neon
     Ne21,
+    /// Isotope Ne22 of Neon
     Ne22,
+    /// Isotope Ne23 of Neon
     Ne23,
+    /// Isotope Ne24 of Neon
     Ne24,
+    /// Isotope Ne25 of Neon
     Ne25,
+    /// Isotope Ne26 of Neon
     Ne26,
+    /// Isotope Ne27 of Neon
     Ne27,
+    /// Isotope Ne28 of Neon
     Ne28,
+    /// Isotope Ne29 of Neon
     Ne29,
+    /// Isotope Ne30 of Neon
     Ne30,
+    /// Isotope Ne31 of Neon
     Ne31,
+    /// Isotope Ne32 of Neon
     Ne32,
+    /// Isotope Ne33 of Neon
     Ne33,
+    /// Isotope Ne34 of Neon
     Ne34,
 }
 impl super::RelativeAtomicMass for NeonIsotope {
@@ -80,25 +101,25 @@ impl super::MassNumber for NeonIsotope {
 impl super::IsotopicComposition for NeonIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Ne16 => None,
-            Self::Ne17 => None,
-            Self::Ne18 => None,
-            Self::Ne19 => None,
             Self::Ne20 => Some(0.9048f64),
             Self::Ne21 => Some(0.0027f64),
             Self::Ne22 => Some(0.0925f64),
-            Self::Ne23 => None,
-            Self::Ne24 => None,
-            Self::Ne25 => None,
-            Self::Ne26 => None,
-            Self::Ne27 => None,
-            Self::Ne28 => None,
-            Self::Ne29 => None,
-            Self::Ne30 => None,
-            Self::Ne31 => None,
-            Self::Ne32 => None,
-            Self::Ne33 => None,
-            Self::Ne34 => None,
+            Self::Ne16
+            | Self::Ne17
+            | Self::Ne18
+            | Self::Ne19
+            | Self::Ne23
+            | Self::Ne24
+            | Self::Ne25
+            | Self::Ne26
+            | Self::Ne27
+            | Self::Ne28
+            | Self::Ne29
+            | Self::Ne30
+            | Self::Ne31
+            | Self::Ne32
+            | Self::Ne33
+            | Self::Ne34 => None,
         }
     }
 }

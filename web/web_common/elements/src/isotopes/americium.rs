@@ -1,26 +1,48 @@
+//! Isotopes of the element Americium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Americium
 pub enum AmericiumIsotope {
+    /// Isotope Am230 of Americium
     Am230,
+    /// Isotope Am231 of Americium
     Am231,
+    /// Isotope Am232 of Americium
     Am232,
+    /// Isotope Am233 of Americium
     Am233,
+    /// Isotope Am234 of Americium
     Am234,
+    /// Isotope Am235 of Americium
     Am235,
+    /// Isotope Am236 of Americium
     Am236,
+    /// Isotope Am237 of Americium
     Am237,
+    /// Isotope Am238 of Americium
     Am238,
+    /// Isotope Am239 of Americium
     Am239,
+    /// Isotope Am240 of Americium
     Am240,
+    /// Isotope Am241 of Americium
     Am241,
+    /// Isotope Am242 of Americium
     Am242,
+    /// Isotope Am243 of Americium
     Am243,
+    /// Isotope Am244 of Americium
     Am244,
+    /// Isotope Am245 of Americium
     Am245,
+    /// Isotope Am246 of Americium
     Am246,
+    /// Isotope Am247 of Americium
     Am247,
+    /// Isotope Am248 of Americium
     Am248,
+    /// Isotope Am249 of Americium
     Am249,
 }
 impl super::RelativeAtomicMass for AmericiumIsotope {
@@ -82,28 +104,7 @@ impl super::MassNumber for AmericiumIsotope {
 }
 impl super::IsotopicComposition for AmericiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Am230 => None,
-            Self::Am231 => None,
-            Self::Am232 => None,
-            Self::Am233 => None,
-            Self::Am234 => None,
-            Self::Am235 => None,
-            Self::Am236 => None,
-            Self::Am237 => None,
-            Self::Am238 => None,
-            Self::Am239 => None,
-            Self::Am240 => None,
-            Self::Am241 => None,
-            Self::Am242 => None,
-            Self::Am243 => None,
-            Self::Am244 => None,
-            Self::Am245 => None,
-            Self::Am246 => None,
-            Self::Am247 => None,
-            Self::Am248 => None,
-            Self::Am249 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for AmericiumIsotope {

@@ -1,41 +1,78 @@
+//! Isotopes of the element Francium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Francium
 pub enum FranciumIsotope {
+    /// Isotope Fr199 of Francium
     Fr199,
+    /// Isotope Fr200 of Francium
     Fr200,
+    /// Isotope Fr201 of Francium
     Fr201,
+    /// Isotope Fr202 of Francium
     Fr202,
+    /// Isotope Fr203 of Francium
     Fr203,
+    /// Isotope Fr204 of Francium
     Fr204,
+    /// Isotope Fr205 of Francium
     Fr205,
+    /// Isotope Fr206 of Francium
     Fr206,
+    /// Isotope Fr207 of Francium
     Fr207,
+    /// Isotope Fr208 of Francium
     Fr208,
+    /// Isotope Fr209 of Francium
     Fr209,
+    /// Isotope Fr210 of Francium
     Fr210,
+    /// Isotope Fr211 of Francium
     Fr211,
+    /// Isotope Fr212 of Francium
     Fr212,
+    /// Isotope Fr213 of Francium
     Fr213,
+    /// Isotope Fr214 of Francium
     Fr214,
+    /// Isotope Fr215 of Francium
     Fr215,
+    /// Isotope Fr216 of Francium
     Fr216,
+    /// Isotope Fr217 of Francium
     Fr217,
+    /// Isotope Fr218 of Francium
     Fr218,
+    /// Isotope Fr219 of Francium
     Fr219,
+    /// Isotope Fr220 of Francium
     Fr220,
+    /// Isotope Fr221 of Francium
     Fr221,
+    /// Isotope Fr222 of Francium
     Fr222,
+    /// Isotope Fr223 of Francium
     Fr223,
+    /// Isotope Fr224 of Francium
     Fr224,
+    /// Isotope Fr225 of Francium
     Fr225,
+    /// Isotope Fr226 of Francium
     Fr226,
+    /// Isotope Fr227 of Francium
     Fr227,
+    /// Isotope Fr228 of Francium
     Fr228,
+    /// Isotope Fr229 of Francium
     Fr229,
+    /// Isotope Fr230 of Francium
     Fr230,
+    /// Isotope Fr231 of Francium
     Fr231,
+    /// Isotope Fr232 of Francium
     Fr232,
+    /// Isotope Fr233 of Francium
     Fr233,
 }
 impl super::RelativeAtomicMass for FranciumIsotope {
@@ -127,43 +164,7 @@ impl super::MassNumber for FranciumIsotope {
 }
 impl super::IsotopicComposition for FranciumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Fr199 => None,
-            Self::Fr200 => None,
-            Self::Fr201 => None,
-            Self::Fr202 => None,
-            Self::Fr203 => None,
-            Self::Fr204 => None,
-            Self::Fr205 => None,
-            Self::Fr206 => None,
-            Self::Fr207 => None,
-            Self::Fr208 => None,
-            Self::Fr209 => None,
-            Self::Fr210 => None,
-            Self::Fr211 => None,
-            Self::Fr212 => None,
-            Self::Fr213 => None,
-            Self::Fr214 => None,
-            Self::Fr215 => None,
-            Self::Fr216 => None,
-            Self::Fr217 => None,
-            Self::Fr218 => None,
-            Self::Fr219 => None,
-            Self::Fr220 => None,
-            Self::Fr221 => None,
-            Self::Fr222 => None,
-            Self::Fr223 => None,
-            Self::Fr224 => None,
-            Self::Fr225 => None,
-            Self::Fr226 => None,
-            Self::Fr227 => None,
-            Self::Fr228 => None,
-            Self::Fr229 => None,
-            Self::Fr230 => None,
-            Self::Fr231 => None,
-            Self::Fr232 => None,
-            Self::Fr233 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for FranciumIsotope {

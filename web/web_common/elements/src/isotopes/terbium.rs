@@ -1,43 +1,82 @@
+//! Isotopes of the element Terbium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Terbium
 pub enum TerbiumIsotope {
+    /// Isotope Tb135 of Terbium
     Tb135,
+    /// Isotope Tb136 of Terbium
     Tb136,
+    /// Isotope Tb137 of Terbium
     Tb137,
+    /// Isotope Tb138 of Terbium
     Tb138,
+    /// Isotope Tb139 of Terbium
     Tb139,
+    /// Isotope Tb140 of Terbium
     Tb140,
+    /// Isotope Tb141 of Terbium
     Tb141,
+    /// Isotope Tb142 of Terbium
     Tb142,
+    /// Isotope Tb143 of Terbium
     Tb143,
+    /// Isotope Tb144 of Terbium
     Tb144,
+    /// Isotope Tb145 of Terbium
     Tb145,
+    /// Isotope Tb146 of Terbium
     Tb146,
+    /// Isotope Tb147 of Terbium
     Tb147,
+    /// Isotope Tb148 of Terbium
     Tb148,
+    /// Isotope Tb149 of Terbium
     Tb149,
+    /// Isotope Tb150 of Terbium
     Tb150,
+    /// Isotope Tb151 of Terbium
     Tb151,
+    /// Isotope Tb152 of Terbium
     Tb152,
+    /// Isotope Tb153 of Terbium
     Tb153,
+    /// Isotope Tb154 of Terbium
     Tb154,
+    /// Isotope Tb155 of Terbium
     Tb155,
+    /// Isotope Tb156 of Terbium
     Tb156,
+    /// Isotope Tb157 of Terbium
     Tb157,
+    /// Isotope Tb158 of Terbium
     Tb158,
+    /// Isotope Tb159 of Terbium
     Tb159,
+    /// Isotope Tb160 of Terbium
     Tb160,
+    /// Isotope Tb161 of Terbium
     Tb161,
+    /// Isotope Tb162 of Terbium
     Tb162,
+    /// Isotope Tb163 of Terbium
     Tb163,
+    /// Isotope Tb164 of Terbium
     Tb164,
+    /// Isotope Tb165 of Terbium
     Tb165,
+    /// Isotope Tb166 of Terbium
     Tb166,
+    /// Isotope Tb167 of Terbium
     Tb167,
+    /// Isotope Tb168 of Terbium
     Tb168,
+    /// Isotope Tb169 of Terbium
     Tb169,
+    /// Isotope Tb170 of Terbium
     Tb170,
+    /// Isotope Tb171 of Terbium
     Tb171,
 }
 impl super::RelativeAtomicMass for TerbiumIsotope {
@@ -134,43 +173,43 @@ impl super::MassNumber for TerbiumIsotope {
 impl super::IsotopicComposition for TerbiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Tb135 => None,
-            Self::Tb136 => None,
-            Self::Tb137 => None,
-            Self::Tb138 => None,
-            Self::Tb139 => None,
-            Self::Tb140 => None,
-            Self::Tb141 => None,
-            Self::Tb142 => None,
-            Self::Tb143 => None,
-            Self::Tb144 => None,
-            Self::Tb145 => None,
-            Self::Tb146 => None,
-            Self::Tb147 => None,
-            Self::Tb148 => None,
-            Self::Tb149 => None,
-            Self::Tb150 => None,
-            Self::Tb151 => None,
-            Self::Tb152 => None,
-            Self::Tb153 => None,
-            Self::Tb154 => None,
-            Self::Tb155 => None,
-            Self::Tb156 => None,
-            Self::Tb157 => None,
-            Self::Tb158 => None,
             Self::Tb159 => Some(1f64),
-            Self::Tb160 => None,
-            Self::Tb161 => None,
-            Self::Tb162 => None,
-            Self::Tb163 => None,
-            Self::Tb164 => None,
-            Self::Tb165 => None,
-            Self::Tb166 => None,
-            Self::Tb167 => None,
-            Self::Tb168 => None,
-            Self::Tb169 => None,
-            Self::Tb170 => None,
-            Self::Tb171 => None,
+            Self::Tb135
+            | Self::Tb136
+            | Self::Tb137
+            | Self::Tb138
+            | Self::Tb139
+            | Self::Tb140
+            | Self::Tb141
+            | Self::Tb142
+            | Self::Tb143
+            | Self::Tb144
+            | Self::Tb145
+            | Self::Tb146
+            | Self::Tb147
+            | Self::Tb148
+            | Self::Tb149
+            | Self::Tb150
+            | Self::Tb151
+            | Self::Tb152
+            | Self::Tb153
+            | Self::Tb154
+            | Self::Tb155
+            | Self::Tb156
+            | Self::Tb157
+            | Self::Tb158
+            | Self::Tb160
+            | Self::Tb161
+            | Self::Tb162
+            | Self::Tb163
+            | Self::Tb164
+            | Self::Tb165
+            | Self::Tb166
+            | Self::Tb167
+            | Self::Tb168
+            | Self::Tb169
+            | Self::Tb170
+            | Self::Tb171 => None,
         }
     }
 }

@@ -1,43 +1,82 @@
+//! Isotopes of the element Gadolinium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Gadolinium
 pub enum GadoliniumIsotope {
+    /// Isotope Gd133 of Gadolinium
     Gd133,
+    /// Isotope Gd134 of Gadolinium
     Gd134,
+    /// Isotope Gd135 of Gadolinium
     Gd135,
+    /// Isotope Gd136 of Gadolinium
     Gd136,
+    /// Isotope Gd137 of Gadolinium
     Gd137,
+    /// Isotope Gd138 of Gadolinium
     Gd138,
+    /// Isotope Gd139 of Gadolinium
     Gd139,
+    /// Isotope Gd140 of Gadolinium
     Gd140,
+    /// Isotope Gd141 of Gadolinium
     Gd141,
+    /// Isotope Gd142 of Gadolinium
     Gd142,
+    /// Isotope Gd143 of Gadolinium
     Gd143,
+    /// Isotope Gd144 of Gadolinium
     Gd144,
+    /// Isotope Gd145 of Gadolinium
     Gd145,
+    /// Isotope Gd146 of Gadolinium
     Gd146,
+    /// Isotope Gd147 of Gadolinium
     Gd147,
+    /// Isotope Gd148 of Gadolinium
     Gd148,
+    /// Isotope Gd149 of Gadolinium
     Gd149,
+    /// Isotope Gd150 of Gadolinium
     Gd150,
+    /// Isotope Gd151 of Gadolinium
     Gd151,
+    /// Isotope Gd152 of Gadolinium
     Gd152,
+    /// Isotope Gd153 of Gadolinium
     Gd153,
+    /// Isotope Gd154 of Gadolinium
     Gd154,
+    /// Isotope Gd155 of Gadolinium
     Gd155,
+    /// Isotope Gd156 of Gadolinium
     Gd156,
+    /// Isotope Gd157 of Gadolinium
     Gd157,
+    /// Isotope Gd158 of Gadolinium
     Gd158,
+    /// Isotope Gd159 of Gadolinium
     Gd159,
+    /// Isotope Gd160 of Gadolinium
     Gd160,
+    /// Isotope Gd161 of Gadolinium
     Gd161,
+    /// Isotope Gd162 of Gadolinium
     Gd162,
+    /// Isotope Gd163 of Gadolinium
     Gd163,
+    /// Isotope Gd164 of Gadolinium
     Gd164,
+    /// Isotope Gd165 of Gadolinium
     Gd165,
+    /// Isotope Gd166 of Gadolinium
     Gd166,
+    /// Isotope Gd167 of Gadolinium
     Gd167,
+    /// Isotope Gd168 of Gadolinium
     Gd168,
+    /// Isotope Gd169 of Gadolinium
     Gd169,
 }
 impl super::RelativeAtomicMass for GadoliniumIsotope {
@@ -134,43 +173,43 @@ impl super::MassNumber for GadoliniumIsotope {
 impl super::IsotopicComposition for GadoliniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Gd133 => None,
-            Self::Gd134 => None,
-            Self::Gd135 => None,
-            Self::Gd136 => None,
-            Self::Gd137 => None,
-            Self::Gd138 => None,
-            Self::Gd139 => None,
-            Self::Gd140 => None,
-            Self::Gd141 => None,
-            Self::Gd142 => None,
-            Self::Gd143 => None,
-            Self::Gd144 => None,
-            Self::Gd145 => None,
-            Self::Gd146 => None,
-            Self::Gd147 => None,
-            Self::Gd148 => None,
-            Self::Gd149 => None,
-            Self::Gd150 => None,
-            Self::Gd151 => None,
             Self::Gd152 => Some(0.002f64),
-            Self::Gd153 => None,
             Self::Gd154 => Some(0.0218f64),
             Self::Gd155 => Some(0.148f64),
             Self::Gd156 => Some(0.2047f64),
             Self::Gd157 => Some(0.1565f64),
             Self::Gd158 => Some(0.2484f64),
-            Self::Gd159 => None,
             Self::Gd160 => Some(0.2186f64),
-            Self::Gd161 => None,
-            Self::Gd162 => None,
-            Self::Gd163 => None,
-            Self::Gd164 => None,
-            Self::Gd165 => None,
-            Self::Gd166 => None,
-            Self::Gd167 => None,
-            Self::Gd168 => None,
-            Self::Gd169 => None,
+            Self::Gd133
+            | Self::Gd134
+            | Self::Gd135
+            | Self::Gd136
+            | Self::Gd137
+            | Self::Gd138
+            | Self::Gd139
+            | Self::Gd140
+            | Self::Gd141
+            | Self::Gd142
+            | Self::Gd143
+            | Self::Gd144
+            | Self::Gd145
+            | Self::Gd146
+            | Self::Gd147
+            | Self::Gd148
+            | Self::Gd149
+            | Self::Gd150
+            | Self::Gd151
+            | Self::Gd153
+            | Self::Gd159
+            | Self::Gd161
+            | Self::Gd162
+            | Self::Gd163
+            | Self::Gd164
+            | Self::Gd165
+            | Self::Gd166
+            | Self::Gd167
+            | Self::Gd168
+            | Self::Gd169 => None,
         }
     }
 }

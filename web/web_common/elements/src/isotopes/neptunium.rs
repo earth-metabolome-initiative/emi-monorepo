@@ -1,33 +1,62 @@
+//! Isotopes of the element Neptunium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Neptunium
 pub enum NeptuniumIsotope {
+    /// Isotope Np219 of Neptunium
     Np219,
+    /// Isotope Np220 of Neptunium
     Np220,
+    /// Isotope Np221 of Neptunium
     Np221,
+    /// Isotope Np222 of Neptunium
     Np222,
+    /// Isotope Np223 of Neptunium
     Np223,
+    /// Isotope Np224 of Neptunium
     Np224,
+    /// Isotope Np225 of Neptunium
     Np225,
+    /// Isotope Np226 of Neptunium
     Np226,
+    /// Isotope Np227 of Neptunium
     Np227,
+    /// Isotope Np228 of Neptunium
     Np228,
+    /// Isotope Np229 of Neptunium
     Np229,
+    /// Isotope Np230 of Neptunium
     Np230,
+    /// Isotope Np231 of Neptunium
     Np231,
+    /// Isotope Np232 of Neptunium
     Np232,
+    /// Isotope Np233 of Neptunium
     Np233,
+    /// Isotope Np234 of Neptunium
     Np234,
+    /// Isotope Np235 of Neptunium
     Np235,
+    /// Isotope Np236 of Neptunium
     Np236,
+    /// Isotope Np237 of Neptunium
     Np237,
+    /// Isotope Np238 of Neptunium
     Np238,
+    /// Isotope Np239 of Neptunium
     Np239,
+    /// Isotope Np240 of Neptunium
     Np240,
+    /// Isotope Np241 of Neptunium
     Np241,
+    /// Isotope Np242 of Neptunium
     Np242,
+    /// Isotope Np243 of Neptunium
     Np243,
+    /// Isotope Np244 of Neptunium
     Np244,
+    /// Isotope Np245 of Neptunium
     Np245,
 }
 impl super::RelativeAtomicMass for NeptuniumIsotope {
@@ -103,35 +132,7 @@ impl super::MassNumber for NeptuniumIsotope {
 }
 impl super::IsotopicComposition for NeptuniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Np219 => None,
-            Self::Np220 => None,
-            Self::Np221 => None,
-            Self::Np222 => None,
-            Self::Np223 => None,
-            Self::Np224 => None,
-            Self::Np225 => None,
-            Self::Np226 => None,
-            Self::Np227 => None,
-            Self::Np228 => None,
-            Self::Np229 => None,
-            Self::Np230 => None,
-            Self::Np231 => None,
-            Self::Np232 => None,
-            Self::Np233 => None,
-            Self::Np234 => None,
-            Self::Np235 => None,
-            Self::Np236 => None,
-            Self::Np237 => None,
-            Self::Np238 => None,
-            Self::Np239 => None,
-            Self::Np240 => None,
-            Self::Np241 => None,
-            Self::Np242 => None,
-            Self::Np243 => None,
-            Self::Np244 => None,
-            Self::Np245 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for NeptuniumIsotope {

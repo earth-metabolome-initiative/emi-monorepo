@@ -5,6 +5,7 @@ use std::str::FromStr;
 impl FromStr for crate::Element {
     type Err = crate::errors::Error;
 
+    #[allow(clippy::too_many_lines)]
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         Ok(match value {
             "H" => Self::H,

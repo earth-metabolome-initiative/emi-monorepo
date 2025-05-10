@@ -1,44 +1,84 @@
+//! Isotopes of the element Palladium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Palladium
 pub enum PalladiumIsotope {
+    /// Isotope Pd91 of Palladium
     Pd91,
+    /// Isotope Pd92 of Palladium
     Pd92,
+    /// Isotope Pd93 of Palladium
     Pd93,
+    /// Isotope Pd94 of Palladium
     Pd94,
+    /// Isotope Pd95 of Palladium
     Pd95,
+    /// Isotope Pd96 of Palladium
     Pd96,
+    /// Isotope Pd97 of Palladium
     Pd97,
+    /// Isotope Pd98 of Palladium
     Pd98,
+    /// Isotope Pd99 of Palladium
     Pd99,
+    /// Isotope Pd100 of Palladium
     Pd100,
+    /// Isotope Pd101 of Palladium
     Pd101,
+    /// Isotope Pd102 of Palladium
     Pd102,
+    /// Isotope Pd103 of Palladium
     Pd103,
+    /// Isotope Pd104 of Palladium
     Pd104,
+    /// Isotope Pd105 of Palladium
     Pd105,
+    /// Isotope Pd106 of Palladium
     Pd106,
+    /// Isotope Pd107 of Palladium
     Pd107,
+    /// Isotope Pd108 of Palladium
     Pd108,
+    /// Isotope Pd109 of Palladium
     Pd109,
+    /// Isotope Pd110 of Palladium
     Pd110,
+    /// Isotope Pd111 of Palladium
     Pd111,
+    /// Isotope Pd112 of Palladium
     Pd112,
+    /// Isotope Pd113 of Palladium
     Pd113,
+    /// Isotope Pd114 of Palladium
     Pd114,
+    /// Isotope Pd115 of Palladium
     Pd115,
+    /// Isotope Pd116 of Palladium
     Pd116,
+    /// Isotope Pd117 of Palladium
     Pd117,
+    /// Isotope Pd118 of Palladium
     Pd118,
+    /// Isotope Pd119 of Palladium
     Pd119,
+    /// Isotope Pd120 of Palladium
     Pd120,
+    /// Isotope Pd121 of Palladium
     Pd121,
+    /// Isotope Pd122 of Palladium
     Pd122,
+    /// Isotope Pd123 of Palladium
     Pd123,
+    /// Isotope Pd124 of Palladium
     Pd124,
+    /// Isotope Pd125 of Palladium
     Pd125,
+    /// Isotope Pd126 of Palladium
     Pd126,
+    /// Isotope Pd127 of Palladium
     Pd127,
+    /// Isotope Pd128 of Palladium
     Pd128,
 }
 impl super::RelativeAtomicMass for PalladiumIsotope {
@@ -137,44 +177,44 @@ impl super::MassNumber for PalladiumIsotope {
 impl super::IsotopicComposition for PalladiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Pd91 => None,
-            Self::Pd92 => None,
-            Self::Pd93 => None,
-            Self::Pd94 => None,
-            Self::Pd95 => None,
-            Self::Pd96 => None,
-            Self::Pd97 => None,
-            Self::Pd98 => None,
-            Self::Pd99 => None,
-            Self::Pd100 => None,
-            Self::Pd101 => None,
             Self::Pd102 => Some(0.0102f64),
-            Self::Pd103 => None,
             Self::Pd104 => Some(0.1114f64),
             Self::Pd105 => Some(0.2233f64),
             Self::Pd106 => Some(0.2733f64),
-            Self::Pd107 => None,
             Self::Pd108 => Some(0.2646f64),
-            Self::Pd109 => None,
             Self::Pd110 => Some(0.1172f64),
-            Self::Pd111 => None,
-            Self::Pd112 => None,
-            Self::Pd113 => None,
-            Self::Pd114 => None,
-            Self::Pd115 => None,
-            Self::Pd116 => None,
-            Self::Pd117 => None,
-            Self::Pd118 => None,
-            Self::Pd119 => None,
-            Self::Pd120 => None,
-            Self::Pd121 => None,
-            Self::Pd122 => None,
-            Self::Pd123 => None,
-            Self::Pd124 => None,
-            Self::Pd125 => None,
-            Self::Pd126 => None,
-            Self::Pd127 => None,
-            Self::Pd128 => None,
+            Self::Pd91
+            | Self::Pd92
+            | Self::Pd93
+            | Self::Pd94
+            | Self::Pd95
+            | Self::Pd96
+            | Self::Pd97
+            | Self::Pd98
+            | Self::Pd99
+            | Self::Pd100
+            | Self::Pd101
+            | Self::Pd103
+            | Self::Pd107
+            | Self::Pd109
+            | Self::Pd111
+            | Self::Pd112
+            | Self::Pd113
+            | Self::Pd114
+            | Self::Pd115
+            | Self::Pd116
+            | Self::Pd117
+            | Self::Pd118
+            | Self::Pd119
+            | Self::Pd120
+            | Self::Pd121
+            | Self::Pd122
+            | Self::Pd123
+            | Self::Pd124
+            | Self::Pd125
+            | Self::Pd126
+            | Self::Pd127
+            | Self::Pd128 => None,
         }
     }
 }

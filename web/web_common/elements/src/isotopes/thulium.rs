@@ -1,42 +1,80 @@
+//! Isotopes of the element Thulium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Thulium
 pub enum ThuliumIsotope {
+    /// Isotope Tm144 of Thulium
     Tm144,
+    /// Isotope Tm145 of Thulium
     Tm145,
+    /// Isotope Tm146 of Thulium
     Tm146,
+    /// Isotope Tm147 of Thulium
     Tm147,
+    /// Isotope Tm148 of Thulium
     Tm148,
+    /// Isotope Tm149 of Thulium
     Tm149,
+    /// Isotope Tm150 of Thulium
     Tm150,
+    /// Isotope Tm151 of Thulium
     Tm151,
+    /// Isotope Tm152 of Thulium
     Tm152,
+    /// Isotope Tm153 of Thulium
     Tm153,
+    /// Isotope Tm154 of Thulium
     Tm154,
+    /// Isotope Tm155 of Thulium
     Tm155,
+    /// Isotope Tm156 of Thulium
     Tm156,
+    /// Isotope Tm157 of Thulium
     Tm157,
+    /// Isotope Tm158 of Thulium
     Tm158,
+    /// Isotope Tm159 of Thulium
     Tm159,
+    /// Isotope Tm160 of Thulium
     Tm160,
+    /// Isotope Tm161 of Thulium
     Tm161,
+    /// Isotope Tm162 of Thulium
     Tm162,
+    /// Isotope Tm163 of Thulium
     Tm163,
+    /// Isotope Tm164 of Thulium
     Tm164,
+    /// Isotope Tm165 of Thulium
     Tm165,
+    /// Isotope Tm166 of Thulium
     Tm166,
+    /// Isotope Tm167 of Thulium
     Tm167,
+    /// Isotope Tm168 of Thulium
     Tm168,
+    /// Isotope Tm169 of Thulium
     Tm169,
+    /// Isotope Tm170 of Thulium
     Tm170,
+    /// Isotope Tm171 of Thulium
     Tm171,
+    /// Isotope Tm172 of Thulium
     Tm172,
+    /// Isotope Tm173 of Thulium
     Tm173,
+    /// Isotope Tm174 of Thulium
     Tm174,
+    /// Isotope Tm175 of Thulium
     Tm175,
+    /// Isotope Tm176 of Thulium
     Tm176,
+    /// Isotope Tm177 of Thulium
     Tm177,
+    /// Isotope Tm178 of Thulium
     Tm178,
+    /// Isotope Tm179 of Thulium
     Tm179,
 }
 impl super::RelativeAtomicMass for ThuliumIsotope {
@@ -131,42 +169,42 @@ impl super::MassNumber for ThuliumIsotope {
 impl super::IsotopicComposition for ThuliumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Tm144 => None,
-            Self::Tm145 => None,
-            Self::Tm146 => None,
-            Self::Tm147 => None,
-            Self::Tm148 => None,
-            Self::Tm149 => None,
-            Self::Tm150 => None,
-            Self::Tm151 => None,
-            Self::Tm152 => None,
-            Self::Tm153 => None,
-            Self::Tm154 => None,
-            Self::Tm155 => None,
-            Self::Tm156 => None,
-            Self::Tm157 => None,
-            Self::Tm158 => None,
-            Self::Tm159 => None,
-            Self::Tm160 => None,
-            Self::Tm161 => None,
-            Self::Tm162 => None,
-            Self::Tm163 => None,
-            Self::Tm164 => None,
-            Self::Tm165 => None,
-            Self::Tm166 => None,
-            Self::Tm167 => None,
-            Self::Tm168 => None,
             Self::Tm169 => Some(1f64),
-            Self::Tm170 => None,
-            Self::Tm171 => None,
-            Self::Tm172 => None,
-            Self::Tm173 => None,
-            Self::Tm174 => None,
-            Self::Tm175 => None,
-            Self::Tm176 => None,
-            Self::Tm177 => None,
-            Self::Tm178 => None,
-            Self::Tm179 => None,
+            Self::Tm144
+            | Self::Tm145
+            | Self::Tm146
+            | Self::Tm147
+            | Self::Tm148
+            | Self::Tm149
+            | Self::Tm150
+            | Self::Tm151
+            | Self::Tm152
+            | Self::Tm153
+            | Self::Tm154
+            | Self::Tm155
+            | Self::Tm156
+            | Self::Tm157
+            | Self::Tm158
+            | Self::Tm159
+            | Self::Tm160
+            | Self::Tm161
+            | Self::Tm162
+            | Self::Tm163
+            | Self::Tm164
+            | Self::Tm165
+            | Self::Tm166
+            | Self::Tm167
+            | Self::Tm168
+            | Self::Tm170
+            | Self::Tm171
+            | Self::Tm172
+            | Self::Tm173
+            | Self::Tm174
+            | Self::Tm175
+            | Self::Tm176
+            | Self::Tm177
+            | Self::Tm178
+            | Self::Tm179 => None,
         }
     }
 }

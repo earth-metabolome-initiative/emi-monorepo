@@ -1,24 +1,44 @@
+//! Isotopes of the element Fluorine
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Fluorine
 pub enum FluorineIsotope {
+    /// Isotope F14 of Fluorine
     F14,
+    /// Isotope F15 of Fluorine
     F15,
+    /// Isotope F16 of Fluorine
     F16,
+    /// Isotope F17 of Fluorine
     F17,
+    /// Isotope F18 of Fluorine
     F18,
+    /// Isotope F19 of Fluorine
     F19,
+    /// Isotope F20 of Fluorine
     F20,
+    /// Isotope F21 of Fluorine
     F21,
+    /// Isotope F22 of Fluorine
     F22,
+    /// Isotope F23 of Fluorine
     F23,
+    /// Isotope F24 of Fluorine
     F24,
+    /// Isotope F25 of Fluorine
     F25,
+    /// Isotope F26 of Fluorine
     F26,
+    /// Isotope F27 of Fluorine
     F27,
+    /// Isotope F28 of Fluorine
     F28,
+    /// Isotope F29 of Fluorine
     F29,
+    /// Isotope F30 of Fluorine
     F30,
+    /// Isotope F31 of Fluorine
     F31,
 }
 impl super::RelativeAtomicMass for FluorineIsotope {
@@ -77,24 +97,24 @@ impl super::MassNumber for FluorineIsotope {
 impl super::IsotopicComposition for FluorineIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::F14 => None,
-            Self::F15 => None,
-            Self::F16 => None,
-            Self::F17 => None,
-            Self::F18 => None,
             Self::F19 => Some(1f64),
-            Self::F20 => None,
-            Self::F21 => None,
-            Self::F22 => None,
-            Self::F23 => None,
-            Self::F24 => None,
-            Self::F25 => None,
-            Self::F26 => None,
-            Self::F27 => None,
-            Self::F28 => None,
-            Self::F29 => None,
-            Self::F30 => None,
-            Self::F31 => None,
+            Self::F14
+            | Self::F15
+            | Self::F16
+            | Self::F17
+            | Self::F18
+            | Self::F20
+            | Self::F21
+            | Self::F22
+            | Self::F23
+            | Self::F24
+            | Self::F25
+            | Self::F26
+            | Self::F27
+            | Self::F28
+            | Self::F29
+            | Self::F30
+            | Self::F31 => None,
         }
     }
 }

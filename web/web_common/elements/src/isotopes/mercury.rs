@@ -1,52 +1,100 @@
+//! Isotopes of the element Mercury
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Mercury
 pub enum MercuryIsotope {
+    /// Isotope Hg171 of Mercury
     Hg171,
+    /// Isotope Hg172 of Mercury
     Hg172,
+    /// Isotope Hg173 of Mercury
     Hg173,
+    /// Isotope Hg174 of Mercury
     Hg174,
+    /// Isotope Hg175 of Mercury
     Hg175,
+    /// Isotope Hg176 of Mercury
     Hg176,
+    /// Isotope Hg177 of Mercury
     Hg177,
+    /// Isotope Hg178 of Mercury
     Hg178,
+    /// Isotope Hg179 of Mercury
     Hg179,
+    /// Isotope Hg180 of Mercury
     Hg180,
+    /// Isotope Hg181 of Mercury
     Hg181,
+    /// Isotope Hg182 of Mercury
     Hg182,
+    /// Isotope Hg183 of Mercury
     Hg183,
+    /// Isotope Hg184 of Mercury
     Hg184,
+    /// Isotope Hg185 of Mercury
     Hg185,
+    /// Isotope Hg186 of Mercury
     Hg186,
+    /// Isotope Hg187 of Mercury
     Hg187,
+    /// Isotope Hg188 of Mercury
     Hg188,
+    /// Isotope Hg189 of Mercury
     Hg189,
+    /// Isotope Hg190 of Mercury
     Hg190,
+    /// Isotope Hg191 of Mercury
     Hg191,
+    /// Isotope Hg192 of Mercury
     Hg192,
+    /// Isotope Hg193 of Mercury
     Hg193,
+    /// Isotope Hg194 of Mercury
     Hg194,
+    /// Isotope Hg195 of Mercury
     Hg195,
+    /// Isotope Hg196 of Mercury
     Hg196,
+    /// Isotope Hg197 of Mercury
     Hg197,
+    /// Isotope Hg198 of Mercury
     Hg198,
+    /// Isotope Hg199 of Mercury
     Hg199,
+    /// Isotope Hg200 of Mercury
     Hg200,
+    /// Isotope Hg201 of Mercury
     Hg201,
+    /// Isotope Hg202 of Mercury
     Hg202,
+    /// Isotope Hg203 of Mercury
     Hg203,
+    /// Isotope Hg204 of Mercury
     Hg204,
+    /// Isotope Hg205 of Mercury
     Hg205,
+    /// Isotope Hg206 of Mercury
     Hg206,
+    /// Isotope Hg207 of Mercury
     Hg207,
+    /// Isotope Hg208 of Mercury
     Hg208,
+    /// Isotope Hg209 of Mercury
     Hg209,
+    /// Isotope Hg210 of Mercury
     Hg210,
+    /// Isotope Hg211 of Mercury
     Hg211,
+    /// Isotope Hg212 of Mercury
     Hg212,
+    /// Isotope Hg213 of Mercury
     Hg213,
+    /// Isotope Hg214 of Mercury
     Hg214,
+    /// Isotope Hg215 of Mercury
     Hg215,
+    /// Isotope Hg216 of Mercury
     Hg216,
 }
 impl super::RelativeAtomicMass for MercuryIsotope {
@@ -161,52 +209,52 @@ impl super::MassNumber for MercuryIsotope {
 impl super::IsotopicComposition for MercuryIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Hg171 => None,
-            Self::Hg172 => None,
-            Self::Hg173 => None,
-            Self::Hg174 => None,
-            Self::Hg175 => None,
-            Self::Hg176 => None,
-            Self::Hg177 => None,
-            Self::Hg178 => None,
-            Self::Hg179 => None,
-            Self::Hg180 => None,
-            Self::Hg181 => None,
-            Self::Hg182 => None,
-            Self::Hg183 => None,
-            Self::Hg184 => None,
-            Self::Hg185 => None,
-            Self::Hg186 => None,
-            Self::Hg187 => None,
-            Self::Hg188 => None,
-            Self::Hg189 => None,
-            Self::Hg190 => None,
-            Self::Hg191 => None,
-            Self::Hg192 => None,
-            Self::Hg193 => None,
-            Self::Hg194 => None,
-            Self::Hg195 => None,
             Self::Hg196 => Some(0.0015f64),
-            Self::Hg197 => None,
             Self::Hg198 => Some(0.0997f64),
             Self::Hg199 => Some(0.1687f64),
             Self::Hg200 => Some(0.231f64),
             Self::Hg201 => Some(0.1318f64),
             Self::Hg202 => Some(0.2986f64),
-            Self::Hg203 => None,
             Self::Hg204 => Some(0.0687f64),
-            Self::Hg205 => None,
-            Self::Hg206 => None,
-            Self::Hg207 => None,
-            Self::Hg208 => None,
-            Self::Hg209 => None,
-            Self::Hg210 => None,
-            Self::Hg211 => None,
-            Self::Hg212 => None,
-            Self::Hg213 => None,
-            Self::Hg214 => None,
-            Self::Hg215 => None,
-            Self::Hg216 => None,
+            Self::Hg171
+            | Self::Hg172
+            | Self::Hg173
+            | Self::Hg174
+            | Self::Hg175
+            | Self::Hg176
+            | Self::Hg177
+            | Self::Hg178
+            | Self::Hg179
+            | Self::Hg180
+            | Self::Hg181
+            | Self::Hg182
+            | Self::Hg183
+            | Self::Hg184
+            | Self::Hg185
+            | Self::Hg186
+            | Self::Hg187
+            | Self::Hg188
+            | Self::Hg189
+            | Self::Hg190
+            | Self::Hg191
+            | Self::Hg192
+            | Self::Hg193
+            | Self::Hg194
+            | Self::Hg195
+            | Self::Hg197
+            | Self::Hg203
+            | Self::Hg205
+            | Self::Hg206
+            | Self::Hg207
+            | Self::Hg208
+            | Self::Hg209
+            | Self::Hg210
+            | Self::Hg211
+            | Self::Hg212
+            | Self::Hg213
+            | Self::Hg214
+            | Self::Hg215
+            | Self::Hg216 => None,
         }
     }
 }

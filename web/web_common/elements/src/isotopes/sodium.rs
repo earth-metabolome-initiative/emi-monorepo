@@ -1,26 +1,48 @@
+//! Isotopes of the element Sodium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Sodium
 pub enum SodiumIsotope {
+    /// Isotope Na18 of Sodium
     Na18,
+    /// Isotope Na19 of Sodium
     Na19,
+    /// Isotope Na20 of Sodium
     Na20,
+    /// Isotope Na21 of Sodium
     Na21,
+    /// Isotope Na22 of Sodium
     Na22,
+    /// Isotope Na23 of Sodium
     Na23,
+    /// Isotope Na24 of Sodium
     Na24,
+    /// Isotope Na25 of Sodium
     Na25,
+    /// Isotope Na26 of Sodium
     Na26,
+    /// Isotope Na27 of Sodium
     Na27,
+    /// Isotope Na28 of Sodium
     Na28,
+    /// Isotope Na29 of Sodium
     Na29,
+    /// Isotope Na30 of Sodium
     Na30,
+    /// Isotope Na31 of Sodium
     Na31,
+    /// Isotope Na32 of Sodium
     Na32,
+    /// Isotope Na33 of Sodium
     Na33,
+    /// Isotope Na34 of Sodium
     Na34,
+    /// Isotope Na35 of Sodium
     Na35,
+    /// Isotope Na36 of Sodium
     Na36,
+    /// Isotope Na37 of Sodium
     Na37,
 }
 impl super::RelativeAtomicMass for SodiumIsotope {
@@ -83,26 +105,26 @@ impl super::MassNumber for SodiumIsotope {
 impl super::IsotopicComposition for SodiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Na18 => None,
-            Self::Na19 => None,
-            Self::Na20 => None,
-            Self::Na21 => None,
-            Self::Na22 => None,
             Self::Na23 => Some(1f64),
-            Self::Na24 => None,
-            Self::Na25 => None,
-            Self::Na26 => None,
-            Self::Na27 => None,
-            Self::Na28 => None,
-            Self::Na29 => None,
-            Self::Na30 => None,
-            Self::Na31 => None,
-            Self::Na32 => None,
-            Self::Na33 => None,
-            Self::Na34 => None,
-            Self::Na35 => None,
-            Self::Na36 => None,
-            Self::Na37 => None,
+            Self::Na18
+            | Self::Na19
+            | Self::Na20
+            | Self::Na21
+            | Self::Na22
+            | Self::Na24
+            | Self::Na25
+            | Self::Na26
+            | Self::Na27
+            | Self::Na28
+            | Self::Na29
+            | Self::Na30
+            | Self::Na31
+            | Self::Na32
+            | Self::Na33
+            | Self::Na34
+            | Self::Na35
+            | Self::Na36
+            | Self::Na37 => None,
         }
     }
 }

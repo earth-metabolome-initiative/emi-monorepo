@@ -1,44 +1,84 @@
+//! Isotopes of the element Tungsten
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Tungsten
 pub enum TungstenIsotope {
+    /// Isotope W157 of Tungsten
     W157,
+    /// Isotope W158 of Tungsten
     W158,
+    /// Isotope W159 of Tungsten
     W159,
+    /// Isotope W160 of Tungsten
     W160,
+    /// Isotope W161 of Tungsten
     W161,
+    /// Isotope W162 of Tungsten
     W162,
+    /// Isotope W163 of Tungsten
     W163,
+    /// Isotope W164 of Tungsten
     W164,
+    /// Isotope W165 of Tungsten
     W165,
+    /// Isotope W166 of Tungsten
     W166,
+    /// Isotope W167 of Tungsten
     W167,
+    /// Isotope W168 of Tungsten
     W168,
+    /// Isotope W169 of Tungsten
     W169,
+    /// Isotope W170 of Tungsten
     W170,
+    /// Isotope W171 of Tungsten
     W171,
+    /// Isotope W172 of Tungsten
     W172,
+    /// Isotope W173 of Tungsten
     W173,
+    /// Isotope W174 of Tungsten
     W174,
+    /// Isotope W175 of Tungsten
     W175,
+    /// Isotope W176 of Tungsten
     W176,
+    /// Isotope W177 of Tungsten
     W177,
+    /// Isotope W178 of Tungsten
     W178,
+    /// Isotope W179 of Tungsten
     W179,
+    /// Isotope W180 of Tungsten
     W180,
+    /// Isotope W181 of Tungsten
     W181,
+    /// Isotope W182 of Tungsten
     W182,
+    /// Isotope W183 of Tungsten
     W183,
+    /// Isotope W184 of Tungsten
     W184,
+    /// Isotope W185 of Tungsten
     W185,
+    /// Isotope W186 of Tungsten
     W186,
+    /// Isotope W187 of Tungsten
     W187,
+    /// Isotope W188 of Tungsten
     W188,
+    /// Isotope W189 of Tungsten
     W189,
+    /// Isotope W190 of Tungsten
     W190,
+    /// Isotope W191 of Tungsten
     W191,
+    /// Isotope W192 of Tungsten
     W192,
+    /// Isotope W193 of Tungsten
     W193,
+    /// Isotope W194 of Tungsten
     W194,
 }
 impl super::RelativeAtomicMass for TungstenIsotope {
@@ -137,44 +177,44 @@ impl super::MassNumber for TungstenIsotope {
 impl super::IsotopicComposition for TungstenIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::W157 => None,
-            Self::W158 => None,
-            Self::W159 => None,
-            Self::W160 => None,
-            Self::W161 => None,
-            Self::W162 => None,
-            Self::W163 => None,
-            Self::W164 => None,
-            Self::W165 => None,
-            Self::W166 => None,
-            Self::W167 => None,
-            Self::W168 => None,
-            Self::W169 => None,
-            Self::W170 => None,
-            Self::W171 => None,
-            Self::W172 => None,
-            Self::W173 => None,
-            Self::W174 => None,
-            Self::W175 => None,
-            Self::W176 => None,
-            Self::W177 => None,
-            Self::W178 => None,
-            Self::W179 => None,
             Self::W180 => Some(0.0012f64),
-            Self::W181 => None,
             Self::W182 => Some(0.265f64),
             Self::W183 => Some(0.1431f64),
             Self::W184 => Some(0.3064f64),
-            Self::W185 => None,
             Self::W186 => Some(0.2843f64),
-            Self::W187 => None,
-            Self::W188 => None,
-            Self::W189 => None,
-            Self::W190 => None,
-            Self::W191 => None,
-            Self::W192 => None,
-            Self::W193 => None,
-            Self::W194 => None,
+            Self::W157
+            | Self::W158
+            | Self::W159
+            | Self::W160
+            | Self::W161
+            | Self::W162
+            | Self::W163
+            | Self::W164
+            | Self::W165
+            | Self::W166
+            | Self::W167
+            | Self::W168
+            | Self::W169
+            | Self::W170
+            | Self::W171
+            | Self::W172
+            | Self::W173
+            | Self::W174
+            | Self::W175
+            | Self::W176
+            | Self::W177
+            | Self::W178
+            | Self::W179
+            | Self::W181
+            | Self::W185
+            | Self::W187
+            | Self::W188
+            | Self::W189
+            | Self::W190
+            | Self::W191
+            | Self::W192
+            | Self::W193
+            | Self::W194 => None,
         }
     }
 }

@@ -1,45 +1,86 @@
+//! Isotopes of the element Praseodymium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Praseodymium
 pub enum PraseodymiumIsotope {
+    /// Isotope Pr121 of Praseodymium
     Pr121,
+    /// Isotope Pr122 of Praseodymium
     Pr122,
+    /// Isotope Pr123 of Praseodymium
     Pr123,
+    /// Isotope Pr124 of Praseodymium
     Pr124,
+    /// Isotope Pr125 of Praseodymium
     Pr125,
+    /// Isotope Pr126 of Praseodymium
     Pr126,
+    /// Isotope Pr127 of Praseodymium
     Pr127,
+    /// Isotope Pr128 of Praseodymium
     Pr128,
+    /// Isotope Pr129 of Praseodymium
     Pr129,
+    /// Isotope Pr130 of Praseodymium
     Pr130,
+    /// Isotope Pr131 of Praseodymium
     Pr131,
+    /// Isotope Pr132 of Praseodymium
     Pr132,
+    /// Isotope Pr133 of Praseodymium
     Pr133,
+    /// Isotope Pr134 of Praseodymium
     Pr134,
+    /// Isotope Pr135 of Praseodymium
     Pr135,
+    /// Isotope Pr136 of Praseodymium
     Pr136,
+    /// Isotope Pr137 of Praseodymium
     Pr137,
+    /// Isotope Pr138 of Praseodymium
     Pr138,
+    /// Isotope Pr139 of Praseodymium
     Pr139,
+    /// Isotope Pr140 of Praseodymium
     Pr140,
+    /// Isotope Pr141 of Praseodymium
     Pr141,
+    /// Isotope Pr142 of Praseodymium
     Pr142,
+    /// Isotope Pr143 of Praseodymium
     Pr143,
+    /// Isotope Pr144 of Praseodymium
     Pr144,
+    /// Isotope Pr145 of Praseodymium
     Pr145,
+    /// Isotope Pr146 of Praseodymium
     Pr146,
+    /// Isotope Pr147 of Praseodymium
     Pr147,
+    /// Isotope Pr148 of Praseodymium
     Pr148,
+    /// Isotope Pr149 of Praseodymium
     Pr149,
+    /// Isotope Pr150 of Praseodymium
     Pr150,
+    /// Isotope Pr151 of Praseodymium
     Pr151,
+    /// Isotope Pr152 of Praseodymium
     Pr152,
+    /// Isotope Pr153 of Praseodymium
     Pr153,
+    /// Isotope Pr154 of Praseodymium
     Pr154,
+    /// Isotope Pr155 of Praseodymium
     Pr155,
+    /// Isotope Pr156 of Praseodymium
     Pr156,
+    /// Isotope Pr157 of Praseodymium
     Pr157,
+    /// Isotope Pr158 of Praseodymium
     Pr158,
+    /// Isotope Pr159 of Praseodymium
     Pr159,
 }
 impl super::RelativeAtomicMass for PraseodymiumIsotope {
@@ -140,45 +181,45 @@ impl super::MassNumber for PraseodymiumIsotope {
 impl super::IsotopicComposition for PraseodymiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Pr121 => None,
-            Self::Pr122 => None,
-            Self::Pr123 => None,
-            Self::Pr124 => None,
-            Self::Pr125 => None,
-            Self::Pr126 => None,
-            Self::Pr127 => None,
-            Self::Pr128 => None,
-            Self::Pr129 => None,
-            Self::Pr130 => None,
-            Self::Pr131 => None,
-            Self::Pr132 => None,
-            Self::Pr133 => None,
-            Self::Pr134 => None,
-            Self::Pr135 => None,
-            Self::Pr136 => None,
-            Self::Pr137 => None,
-            Self::Pr138 => None,
-            Self::Pr139 => None,
-            Self::Pr140 => None,
             Self::Pr141 => Some(1f64),
-            Self::Pr142 => None,
-            Self::Pr143 => None,
-            Self::Pr144 => None,
-            Self::Pr145 => None,
-            Self::Pr146 => None,
-            Self::Pr147 => None,
-            Self::Pr148 => None,
-            Self::Pr149 => None,
-            Self::Pr150 => None,
-            Self::Pr151 => None,
-            Self::Pr152 => None,
-            Self::Pr153 => None,
-            Self::Pr154 => None,
-            Self::Pr155 => None,
-            Self::Pr156 => None,
-            Self::Pr157 => None,
-            Self::Pr158 => None,
-            Self::Pr159 => None,
+            Self::Pr121
+            | Self::Pr122
+            | Self::Pr123
+            | Self::Pr124
+            | Self::Pr125
+            | Self::Pr126
+            | Self::Pr127
+            | Self::Pr128
+            | Self::Pr129
+            | Self::Pr130
+            | Self::Pr131
+            | Self::Pr132
+            | Self::Pr133
+            | Self::Pr134
+            | Self::Pr135
+            | Self::Pr136
+            | Self::Pr137
+            | Self::Pr138
+            | Self::Pr139
+            | Self::Pr140
+            | Self::Pr142
+            | Self::Pr143
+            | Self::Pr144
+            | Self::Pr145
+            | Self::Pr146
+            | Self::Pr147
+            | Self::Pr148
+            | Self::Pr149
+            | Self::Pr150
+            | Self::Pr151
+            | Self::Pr152
+            | Self::Pr153
+            | Self::Pr154
+            | Self::Pr155
+            | Self::Pr156
+            | Self::Pr157
+            | Self::Pr158
+            | Self::Pr159 => None,
         }
     }
 }

@@ -1,32 +1,60 @@
+//! Isotopes of the element Titanium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Titanium
 pub enum TitaniumIsotope {
+    /// Isotope Ti38 of Titanium
     Ti38,
+    /// Isotope Ti39 of Titanium
     Ti39,
+    /// Isotope Ti40 of Titanium
     Ti40,
+    /// Isotope Ti41 of Titanium
     Ti41,
+    /// Isotope Ti42 of Titanium
     Ti42,
+    /// Isotope Ti43 of Titanium
     Ti43,
+    /// Isotope Ti44 of Titanium
     Ti44,
+    /// Isotope Ti45 of Titanium
     Ti45,
+    /// Isotope Ti46 of Titanium
     Ti46,
+    /// Isotope Ti47 of Titanium
     Ti47,
+    /// Isotope Ti48 of Titanium
     Ti48,
+    /// Isotope Ti49 of Titanium
     Ti49,
+    /// Isotope Ti50 of Titanium
     Ti50,
+    /// Isotope Ti51 of Titanium
     Ti51,
+    /// Isotope Ti52 of Titanium
     Ti52,
+    /// Isotope Ti53 of Titanium
     Ti53,
+    /// Isotope Ti54 of Titanium
     Ti54,
+    /// Isotope Ti55 of Titanium
     Ti55,
+    /// Isotope Ti56 of Titanium
     Ti56,
+    /// Isotope Ti57 of Titanium
     Ti57,
+    /// Isotope Ti58 of Titanium
     Ti58,
+    /// Isotope Ti59 of Titanium
     Ti59,
+    /// Isotope Ti60 of Titanium
     Ti60,
+    /// Isotope Ti61 of Titanium
     Ti61,
+    /// Isotope Ti62 of Titanium
     Ti62,
+    /// Isotope Ti63 of Titanium
     Ti63,
 }
 impl super::RelativeAtomicMass for TitaniumIsotope {
@@ -101,32 +129,32 @@ impl super::MassNumber for TitaniumIsotope {
 impl super::IsotopicComposition for TitaniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Ti38 => None,
-            Self::Ti39 => None,
-            Self::Ti40 => None,
-            Self::Ti41 => None,
-            Self::Ti42 => None,
-            Self::Ti43 => None,
-            Self::Ti44 => None,
-            Self::Ti45 => None,
             Self::Ti46 => Some(0.0825f64),
             Self::Ti47 => Some(0.0744f64),
             Self::Ti48 => Some(0.7372f64),
             Self::Ti49 => Some(0.0541f64),
             Self::Ti50 => Some(0.0518f64),
-            Self::Ti51 => None,
-            Self::Ti52 => None,
-            Self::Ti53 => None,
-            Self::Ti54 => None,
-            Self::Ti55 => None,
-            Self::Ti56 => None,
-            Self::Ti57 => None,
-            Self::Ti58 => None,
-            Self::Ti59 => None,
-            Self::Ti60 => None,
-            Self::Ti61 => None,
-            Self::Ti62 => None,
-            Self::Ti63 => None,
+            Self::Ti38
+            | Self::Ti39
+            | Self::Ti40
+            | Self::Ti41
+            | Self::Ti42
+            | Self::Ti43
+            | Self::Ti44
+            | Self::Ti45
+            | Self::Ti51
+            | Self::Ti52
+            | Self::Ti53
+            | Self::Ti54
+            | Self::Ti55
+            | Self::Ti56
+            | Self::Ti57
+            | Self::Ti58
+            | Self::Ti59
+            | Self::Ti60
+            | Self::Ti61
+            | Self::Ti62
+            | Self::Ti63 => None,
         }
     }
 }

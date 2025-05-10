@@ -2,7 +2,13 @@
 name = "elements"
 version = "0.1.0"
 edition = "2024"
-include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE", "isotopes_data.json"]
+include = [
+  "src/**/*",
+  "Cargo.toml",
+  "README.md",
+  "LICENSE",
+  "isotopes_data.json",
+]
 
 # [lib]
 # crate-type = ["cdylib", "lib"]
@@ -38,3 +44,6 @@ pg14 = ["pgrx", "pgrx/pg14"]
 pg15 = ["pgrx", "pgrx/pg15"]
 pg16 = ["pgrx", "pgrx/pg16"]
 pg17 = ["pgrx", "pgrx/pg17"]
+
+[lints]
+workspace = true

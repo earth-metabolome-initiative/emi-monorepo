@@ -1,22 +1,40 @@
+//! Isotopes of the element Seaborgium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Seaborgium
 pub enum SeaborgiumIsotope {
+    /// Isotope Sg258 of Seaborgium
     Sg258,
+    /// Isotope Sg259 of Seaborgium
     Sg259,
+    /// Isotope Sg260 of Seaborgium
     Sg260,
+    /// Isotope Sg261 of Seaborgium
     Sg261,
+    /// Isotope Sg262 of Seaborgium
     Sg262,
+    /// Isotope Sg263 of Seaborgium
     Sg263,
+    /// Isotope Sg264 of Seaborgium
     Sg264,
+    /// Isotope Sg265 of Seaborgium
     Sg265,
+    /// Isotope Sg266 of Seaborgium
     Sg266,
+    /// Isotope Sg267 of Seaborgium
     Sg267,
+    /// Isotope Sg268 of Seaborgium
     Sg268,
+    /// Isotope Sg269 of Seaborgium
     Sg269,
+    /// Isotope Sg270 of Seaborgium
     Sg270,
+    /// Isotope Sg271 of Seaborgium
     Sg271,
+    /// Isotope Sg272 of Seaborgium
     Sg272,
+    /// Isotope Sg273 of Seaborgium
     Sg273,
 }
 impl super::RelativeAtomicMass for SeaborgiumIsotope {
@@ -70,24 +88,7 @@ impl super::MassNumber for SeaborgiumIsotope {
 }
 impl super::IsotopicComposition for SeaborgiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Sg258 => None,
-            Self::Sg259 => None,
-            Self::Sg260 => None,
-            Self::Sg261 => None,
-            Self::Sg262 => None,
-            Self::Sg263 => None,
-            Self::Sg264 => None,
-            Self::Sg265 => None,
-            Self::Sg266 => None,
-            Self::Sg267 => None,
-            Self::Sg268 => None,
-            Self::Sg269 => None,
-            Self::Sg270 => None,
-            Self::Sg271 => None,
-            Self::Sg272 => None,
-            Self::Sg273 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for SeaborgiumIsotope {

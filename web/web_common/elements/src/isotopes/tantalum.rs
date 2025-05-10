@@ -1,44 +1,84 @@
+//! Isotopes of the element Tantalum
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Tantalum
 pub enum TantalumIsotope {
+    /// Isotope Ta155 of Tantalum
     Ta155,
+    /// Isotope Ta156 of Tantalum
     Ta156,
+    /// Isotope Ta157 of Tantalum
     Ta157,
+    /// Isotope Ta158 of Tantalum
     Ta158,
+    /// Isotope Ta159 of Tantalum
     Ta159,
+    /// Isotope Ta160 of Tantalum
     Ta160,
+    /// Isotope Ta161 of Tantalum
     Ta161,
+    /// Isotope Ta162 of Tantalum
     Ta162,
+    /// Isotope Ta163 of Tantalum
     Ta163,
+    /// Isotope Ta164 of Tantalum
     Ta164,
+    /// Isotope Ta165 of Tantalum
     Ta165,
+    /// Isotope Ta166 of Tantalum
     Ta166,
+    /// Isotope Ta167 of Tantalum
     Ta167,
+    /// Isotope Ta168 of Tantalum
     Ta168,
+    /// Isotope Ta169 of Tantalum
     Ta169,
+    /// Isotope Ta170 of Tantalum
     Ta170,
+    /// Isotope Ta171 of Tantalum
     Ta171,
+    /// Isotope Ta172 of Tantalum
     Ta172,
+    /// Isotope Ta173 of Tantalum
     Ta173,
+    /// Isotope Ta174 of Tantalum
     Ta174,
+    /// Isotope Ta175 of Tantalum
     Ta175,
+    /// Isotope Ta176 of Tantalum
     Ta176,
+    /// Isotope Ta177 of Tantalum
     Ta177,
+    /// Isotope Ta178 of Tantalum
     Ta178,
+    /// Isotope Ta179 of Tantalum
     Ta179,
+    /// Isotope Ta180 of Tantalum
     Ta180,
+    /// Isotope Ta181 of Tantalum
     Ta181,
+    /// Isotope Ta182 of Tantalum
     Ta182,
+    /// Isotope Ta183 of Tantalum
     Ta183,
+    /// Isotope Ta184 of Tantalum
     Ta184,
+    /// Isotope Ta185 of Tantalum
     Ta185,
+    /// Isotope Ta186 of Tantalum
     Ta186,
+    /// Isotope Ta187 of Tantalum
     Ta187,
+    /// Isotope Ta188 of Tantalum
     Ta188,
+    /// Isotope Ta189 of Tantalum
     Ta189,
+    /// Isotope Ta190 of Tantalum
     Ta190,
+    /// Isotope Ta191 of Tantalum
     Ta191,
+    /// Isotope Ta192 of Tantalum
     Ta192,
 }
 impl super::RelativeAtomicMass for TantalumIsotope {
@@ -137,44 +177,44 @@ impl super::MassNumber for TantalumIsotope {
 impl super::IsotopicComposition for TantalumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Ta155 => None,
-            Self::Ta156 => None,
-            Self::Ta157 => None,
-            Self::Ta158 => None,
-            Self::Ta159 => None,
-            Self::Ta160 => None,
-            Self::Ta161 => None,
-            Self::Ta162 => None,
-            Self::Ta163 => None,
-            Self::Ta164 => None,
-            Self::Ta165 => None,
-            Self::Ta166 => None,
-            Self::Ta167 => None,
-            Self::Ta168 => None,
-            Self::Ta169 => None,
-            Self::Ta170 => None,
-            Self::Ta171 => None,
-            Self::Ta172 => None,
-            Self::Ta173 => None,
-            Self::Ta174 => None,
-            Self::Ta175 => None,
-            Self::Ta176 => None,
-            Self::Ta177 => None,
-            Self::Ta178 => None,
-            Self::Ta179 => None,
             Self::Ta180 => Some(0.0001201f64),
             Self::Ta181 => Some(0.9998799f64),
-            Self::Ta182 => None,
-            Self::Ta183 => None,
-            Self::Ta184 => None,
-            Self::Ta185 => None,
-            Self::Ta186 => None,
-            Self::Ta187 => None,
-            Self::Ta188 => None,
-            Self::Ta189 => None,
-            Self::Ta190 => None,
-            Self::Ta191 => None,
-            Self::Ta192 => None,
+            Self::Ta155
+            | Self::Ta156
+            | Self::Ta157
+            | Self::Ta158
+            | Self::Ta159
+            | Self::Ta160
+            | Self::Ta161
+            | Self::Ta162
+            | Self::Ta163
+            | Self::Ta164
+            | Self::Ta165
+            | Self::Ta166
+            | Self::Ta167
+            | Self::Ta168
+            | Self::Ta169
+            | Self::Ta170
+            | Self::Ta171
+            | Self::Ta172
+            | Self::Ta173
+            | Self::Ta174
+            | Self::Ta175
+            | Self::Ta176
+            | Self::Ta177
+            | Self::Ta178
+            | Self::Ta179
+            | Self::Ta182
+            | Self::Ta183
+            | Self::Ta184
+            | Self::Ta185
+            | Self::Ta186
+            | Self::Ta187
+            | Self::Ta188
+            | Self::Ta189
+            | Self::Ta190
+            | Self::Ta191
+            | Self::Ta192 => None,
         }
     }
 }

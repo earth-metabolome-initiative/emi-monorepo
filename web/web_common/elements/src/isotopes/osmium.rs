@@ -1,48 +1,92 @@
+//! Isotopes of the element Osmium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Osmium
 pub enum OsmiumIsotope {
+    /// Isotope Os161 of Osmium
     Os161,
+    /// Isotope Os162 of Osmium
     Os162,
+    /// Isotope Os163 of Osmium
     Os163,
+    /// Isotope Os164 of Osmium
     Os164,
+    /// Isotope Os165 of Osmium
     Os165,
+    /// Isotope Os166 of Osmium
     Os166,
+    /// Isotope Os167 of Osmium
     Os167,
+    /// Isotope Os168 of Osmium
     Os168,
+    /// Isotope Os169 of Osmium
     Os169,
+    /// Isotope Os170 of Osmium
     Os170,
+    /// Isotope Os171 of Osmium
     Os171,
+    /// Isotope Os172 of Osmium
     Os172,
+    /// Isotope Os173 of Osmium
     Os173,
+    /// Isotope Os174 of Osmium
     Os174,
+    /// Isotope Os175 of Osmium
     Os175,
+    /// Isotope Os176 of Osmium
     Os176,
+    /// Isotope Os177 of Osmium
     Os177,
+    /// Isotope Os178 of Osmium
     Os178,
+    /// Isotope Os179 of Osmium
     Os179,
+    /// Isotope Os180 of Osmium
     Os180,
+    /// Isotope Os181 of Osmium
     Os181,
+    /// Isotope Os182 of Osmium
     Os182,
+    /// Isotope Os183 of Osmium
     Os183,
+    /// Isotope Os184 of Osmium
     Os184,
+    /// Isotope Os185 of Osmium
     Os185,
+    /// Isotope Os186 of Osmium
     Os186,
+    /// Isotope Os187 of Osmium
     Os187,
+    /// Isotope Os188 of Osmium
     Os188,
+    /// Isotope Os189 of Osmium
     Os189,
+    /// Isotope Os190 of Osmium
     Os190,
+    /// Isotope Os191 of Osmium
     Os191,
+    /// Isotope Os192 of Osmium
     Os192,
+    /// Isotope Os193 of Osmium
     Os193,
+    /// Isotope Os194 of Osmium
     Os194,
+    /// Isotope Os195 of Osmium
     Os195,
+    /// Isotope Os196 of Osmium
     Os196,
+    /// Isotope Os197 of Osmium
     Os197,
+    /// Isotope Os198 of Osmium
     Os198,
+    /// Isotope Os199 of Osmium
     Os199,
+    /// Isotope Os200 of Osmium
     Os200,
+    /// Isotope Os201 of Osmium
     Os201,
+    /// Isotope Os202 of Osmium
     Os202,
 }
 impl super::RelativeAtomicMass for OsmiumIsotope {
@@ -149,48 +193,48 @@ impl super::MassNumber for OsmiumIsotope {
 impl super::IsotopicComposition for OsmiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Os161 => None,
-            Self::Os162 => None,
-            Self::Os163 => None,
-            Self::Os164 => None,
-            Self::Os165 => None,
-            Self::Os166 => None,
-            Self::Os167 => None,
-            Self::Os168 => None,
-            Self::Os169 => None,
-            Self::Os170 => None,
-            Self::Os171 => None,
-            Self::Os172 => None,
-            Self::Os173 => None,
-            Self::Os174 => None,
-            Self::Os175 => None,
-            Self::Os176 => None,
-            Self::Os177 => None,
-            Self::Os178 => None,
-            Self::Os179 => None,
-            Self::Os180 => None,
-            Self::Os181 => None,
-            Self::Os182 => None,
-            Self::Os183 => None,
             Self::Os184 => Some(0.0002f64),
-            Self::Os185 => None,
             Self::Os186 => Some(0.0159f64),
             Self::Os187 => Some(0.0196f64),
             Self::Os188 => Some(0.1324f64),
             Self::Os189 => Some(0.1615f64),
             Self::Os190 => Some(0.2626f64),
-            Self::Os191 => None,
             Self::Os192 => Some(0.4078f64),
-            Self::Os193 => None,
-            Self::Os194 => None,
-            Self::Os195 => None,
-            Self::Os196 => None,
-            Self::Os197 => None,
-            Self::Os198 => None,
-            Self::Os199 => None,
-            Self::Os200 => None,
-            Self::Os201 => None,
-            Self::Os202 => None,
+            Self::Os161
+            | Self::Os162
+            | Self::Os163
+            | Self::Os164
+            | Self::Os165
+            | Self::Os166
+            | Self::Os167
+            | Self::Os168
+            | Self::Os169
+            | Self::Os170
+            | Self::Os171
+            | Self::Os172
+            | Self::Os173
+            | Self::Os174
+            | Self::Os175
+            | Self::Os176
+            | Self::Os177
+            | Self::Os178
+            | Self::Os179
+            | Self::Os180
+            | Self::Os181
+            | Self::Os182
+            | Self::Os183
+            | Self::Os185
+            | Self::Os191
+            | Self::Os193
+            | Self::Os194
+            | Self::Os195
+            | Self::Os196
+            | Self::Os197
+            | Self::Os198
+            | Self::Os199
+            | Self::Os200
+            | Self::Os201
+            | Self::Os202 => None,
         }
     }
 }

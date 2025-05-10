@@ -2,6 +2,7 @@
 //! enum.
 
 impl super::IsotopicComposition for super::Isotope {
+    #[allow(clippy::too_many_lines)]
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
             Self::H(isotope) => isotope.isotopic_composition(),

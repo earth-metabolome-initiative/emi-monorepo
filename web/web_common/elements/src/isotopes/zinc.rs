@@ -1,38 +1,72 @@
+//! Isotopes of the element Zinc
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Zinc
 pub enum ZincIsotope {
+    /// Isotope Zn54 of Zinc
     Zn54,
+    /// Isotope Zn55 of Zinc
     Zn55,
+    /// Isotope Zn56 of Zinc
     Zn56,
+    /// Isotope Zn57 of Zinc
     Zn57,
+    /// Isotope Zn58 of Zinc
     Zn58,
+    /// Isotope Zn59 of Zinc
     Zn59,
+    /// Isotope Zn60 of Zinc
     Zn60,
+    /// Isotope Zn61 of Zinc
     Zn61,
+    /// Isotope Zn62 of Zinc
     Zn62,
+    /// Isotope Zn63 of Zinc
     Zn63,
+    /// Isotope Zn64 of Zinc
     Zn64,
+    /// Isotope Zn65 of Zinc
     Zn65,
+    /// Isotope Zn66 of Zinc
     Zn66,
+    /// Isotope Zn67 of Zinc
     Zn67,
+    /// Isotope Zn68 of Zinc
     Zn68,
+    /// Isotope Zn69 of Zinc
     Zn69,
+    /// Isotope Zn70 of Zinc
     Zn70,
+    /// Isotope Zn71 of Zinc
     Zn71,
+    /// Isotope Zn72 of Zinc
     Zn72,
+    /// Isotope Zn73 of Zinc
     Zn73,
+    /// Isotope Zn74 of Zinc
     Zn74,
+    /// Isotope Zn75 of Zinc
     Zn75,
+    /// Isotope Zn76 of Zinc
     Zn76,
+    /// Isotope Zn77 of Zinc
     Zn77,
+    /// Isotope Zn78 of Zinc
     Zn78,
+    /// Isotope Zn79 of Zinc
     Zn79,
+    /// Isotope Zn80 of Zinc
     Zn80,
+    /// Isotope Zn81 of Zinc
     Zn81,
+    /// Isotope Zn82 of Zinc
     Zn82,
+    /// Isotope Zn83 of Zinc
     Zn83,
+    /// Isotope Zn84 of Zinc
     Zn84,
+    /// Isotope Zn85 of Zinc
     Zn85,
 }
 impl super::RelativeAtomicMass for ZincIsotope {
@@ -119,38 +153,38 @@ impl super::MassNumber for ZincIsotope {
 impl super::IsotopicComposition for ZincIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Zn54 => None,
-            Self::Zn55 => None,
-            Self::Zn56 => None,
-            Self::Zn57 => None,
-            Self::Zn58 => None,
-            Self::Zn59 => None,
-            Self::Zn60 => None,
-            Self::Zn61 => None,
-            Self::Zn62 => None,
-            Self::Zn63 => None,
             Self::Zn64 => Some(0.4917f64),
-            Self::Zn65 => None,
             Self::Zn66 => Some(0.2773f64),
             Self::Zn67 => Some(0.0404f64),
             Self::Zn68 => Some(0.1845f64),
-            Self::Zn69 => None,
             Self::Zn70 => Some(0.0061f64),
-            Self::Zn71 => None,
-            Self::Zn72 => None,
-            Self::Zn73 => None,
-            Self::Zn74 => None,
-            Self::Zn75 => None,
-            Self::Zn76 => None,
-            Self::Zn77 => None,
-            Self::Zn78 => None,
-            Self::Zn79 => None,
-            Self::Zn80 => None,
-            Self::Zn81 => None,
-            Self::Zn82 => None,
-            Self::Zn83 => None,
-            Self::Zn84 => None,
-            Self::Zn85 => None,
+            Self::Zn54
+            | Self::Zn55
+            | Self::Zn56
+            | Self::Zn57
+            | Self::Zn58
+            | Self::Zn59
+            | Self::Zn60
+            | Self::Zn61
+            | Self::Zn62
+            | Self::Zn63
+            | Self::Zn65
+            | Self::Zn69
+            | Self::Zn71
+            | Self::Zn72
+            | Self::Zn73
+            | Self::Zn74
+            | Self::Zn75
+            | Self::Zn76
+            | Self::Zn77
+            | Self::Zn78
+            | Self::Zn79
+            | Self::Zn80
+            | Self::Zn81
+            | Self::Zn82
+            | Self::Zn83
+            | Self::Zn84
+            | Self::Zn85 => None,
         }
     }
 }

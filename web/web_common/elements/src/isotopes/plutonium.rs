@@ -1,26 +1,48 @@
+//! Isotopes of the element Plutonium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Plutonium
 pub enum PlutoniumIsotope {
+    /// Isotope Pu228 of Plutonium
     Pu228,
+    /// Isotope Pu229 of Plutonium
     Pu229,
+    /// Isotope Pu230 of Plutonium
     Pu230,
+    /// Isotope Pu231 of Plutonium
     Pu231,
+    /// Isotope Pu232 of Plutonium
     Pu232,
+    /// Isotope Pu233 of Plutonium
     Pu233,
+    /// Isotope Pu234 of Plutonium
     Pu234,
+    /// Isotope Pu235 of Plutonium
     Pu235,
+    /// Isotope Pu236 of Plutonium
     Pu236,
+    /// Isotope Pu237 of Plutonium
     Pu237,
+    /// Isotope Pu238 of Plutonium
     Pu238,
+    /// Isotope Pu239 of Plutonium
     Pu239,
+    /// Isotope Pu240 of Plutonium
     Pu240,
+    /// Isotope Pu241 of Plutonium
     Pu241,
+    /// Isotope Pu242 of Plutonium
     Pu242,
+    /// Isotope Pu243 of Plutonium
     Pu243,
+    /// Isotope Pu244 of Plutonium
     Pu244,
+    /// Isotope Pu245 of Plutonium
     Pu245,
+    /// Isotope Pu246 of Plutonium
     Pu246,
+    /// Isotope Pu247 of Plutonium
     Pu247,
 }
 impl super::RelativeAtomicMass for PlutoniumIsotope {
@@ -82,28 +104,7 @@ impl super::MassNumber for PlutoniumIsotope {
 }
 impl super::IsotopicComposition for PlutoniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Pu228 => None,
-            Self::Pu229 => None,
-            Self::Pu230 => None,
-            Self::Pu231 => None,
-            Self::Pu232 => None,
-            Self::Pu233 => None,
-            Self::Pu234 => None,
-            Self::Pu235 => None,
-            Self::Pu236 => None,
-            Self::Pu237 => None,
-            Self::Pu238 => None,
-            Self::Pu239 => None,
-            Self::Pu240 => None,
-            Self::Pu241 => None,
-            Self::Pu242 => None,
-            Self::Pu243 => None,
-            Self::Pu244 => None,
-            Self::Pu245 => None,
-            Self::Pu246 => None,
-            Self::Pu247 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for PlutoniumIsotope {

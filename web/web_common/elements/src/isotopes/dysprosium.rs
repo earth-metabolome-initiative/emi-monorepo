@@ -1,42 +1,80 @@
+//! Isotopes of the element Dysprosium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Dysprosium
 pub enum DysprosiumIsotope {
+    /// Isotope Dy138 of Dysprosium
     Dy138,
+    /// Isotope Dy139 of Dysprosium
     Dy139,
+    /// Isotope Dy140 of Dysprosium
     Dy140,
+    /// Isotope Dy141 of Dysprosium
     Dy141,
+    /// Isotope Dy142 of Dysprosium
     Dy142,
+    /// Isotope Dy143 of Dysprosium
     Dy143,
+    /// Isotope Dy144 of Dysprosium
     Dy144,
+    /// Isotope Dy145 of Dysprosium
     Dy145,
+    /// Isotope Dy146 of Dysprosium
     Dy146,
+    /// Isotope Dy147 of Dysprosium
     Dy147,
+    /// Isotope Dy148 of Dysprosium
     Dy148,
+    /// Isotope Dy149 of Dysprosium
     Dy149,
+    /// Isotope Dy150 of Dysprosium
     Dy150,
+    /// Isotope Dy151 of Dysprosium
     Dy151,
+    /// Isotope Dy152 of Dysprosium
     Dy152,
+    /// Isotope Dy153 of Dysprosium
     Dy153,
+    /// Isotope Dy154 of Dysprosium
     Dy154,
+    /// Isotope Dy155 of Dysprosium
     Dy155,
+    /// Isotope Dy156 of Dysprosium
     Dy156,
+    /// Isotope Dy157 of Dysprosium
     Dy157,
+    /// Isotope Dy158 of Dysprosium
     Dy158,
+    /// Isotope Dy159 of Dysprosium
     Dy159,
+    /// Isotope Dy160 of Dysprosium
     Dy160,
+    /// Isotope Dy161 of Dysprosium
     Dy161,
+    /// Isotope Dy162 of Dysprosium
     Dy162,
+    /// Isotope Dy163 of Dysprosium
     Dy163,
+    /// Isotope Dy164 of Dysprosium
     Dy164,
+    /// Isotope Dy165 of Dysprosium
     Dy165,
+    /// Isotope Dy166 of Dysprosium
     Dy166,
+    /// Isotope Dy167 of Dysprosium
     Dy167,
+    /// Isotope Dy168 of Dysprosium
     Dy168,
+    /// Isotope Dy169 of Dysprosium
     Dy169,
+    /// Isotope Dy170 of Dysprosium
     Dy170,
+    /// Isotope Dy171 of Dysprosium
     Dy171,
+    /// Isotope Dy172 of Dysprosium
     Dy172,
+    /// Isotope Dy173 of Dysprosium
     Dy173,
 }
 impl super::RelativeAtomicMass for DysprosiumIsotope {
@@ -131,42 +169,42 @@ impl super::MassNumber for DysprosiumIsotope {
 impl super::IsotopicComposition for DysprosiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Dy138 => None,
-            Self::Dy139 => None,
-            Self::Dy140 => None,
-            Self::Dy141 => None,
-            Self::Dy142 => None,
-            Self::Dy143 => None,
-            Self::Dy144 => None,
-            Self::Dy145 => None,
-            Self::Dy146 => None,
-            Self::Dy147 => None,
-            Self::Dy148 => None,
-            Self::Dy149 => None,
-            Self::Dy150 => None,
-            Self::Dy151 => None,
-            Self::Dy152 => None,
-            Self::Dy153 => None,
-            Self::Dy154 => None,
-            Self::Dy155 => None,
             Self::Dy156 => Some(0.00056f64),
-            Self::Dy157 => None,
             Self::Dy158 => Some(0.00095f64),
-            Self::Dy159 => None,
             Self::Dy160 => Some(0.02329f64),
             Self::Dy161 => Some(0.18889f64),
             Self::Dy162 => Some(0.25475f64),
             Self::Dy163 => Some(0.24896f64),
             Self::Dy164 => Some(0.2826f64),
-            Self::Dy165 => None,
-            Self::Dy166 => None,
-            Self::Dy167 => None,
-            Self::Dy168 => None,
-            Self::Dy169 => None,
-            Self::Dy170 => None,
-            Self::Dy171 => None,
-            Self::Dy172 => None,
-            Self::Dy173 => None,
+            Self::Dy138
+            | Self::Dy139
+            | Self::Dy140
+            | Self::Dy141
+            | Self::Dy142
+            | Self::Dy143
+            | Self::Dy144
+            | Self::Dy145
+            | Self::Dy146
+            | Self::Dy147
+            | Self::Dy148
+            | Self::Dy149
+            | Self::Dy150
+            | Self::Dy151
+            | Self::Dy152
+            | Self::Dy153
+            | Self::Dy154
+            | Self::Dy155
+            | Self::Dy157
+            | Self::Dy159
+            | Self::Dy165
+            | Self::Dy166
+            | Self::Dy167
+            | Self::Dy168
+            | Self::Dy169
+            | Self::Dy170
+            | Self::Dy171
+            | Self::Dy172
+            | Self::Dy173 => None,
         }
     }
 }

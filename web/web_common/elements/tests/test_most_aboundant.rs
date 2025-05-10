@@ -19,8 +19,7 @@ fn test_most_abundant_isotope() {
         let most_abundant_isotope = element.most_abundant_isotope();
         assert_eq!(
             most_abundant_isotope, *isotope,
-            "Expected most abundant isotope of {} to be {}",
-            element, isotope
+            "Expected most abundant isotope of {element} to be {isotope}"
         );
     }
 }

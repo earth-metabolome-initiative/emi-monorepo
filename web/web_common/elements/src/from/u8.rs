@@ -1,6 +1,7 @@
 //! Implementation of `Into<u8>` for `Element`.
 
 impl From<crate::Element> for u8 {
+    #[allow(clippy::too_many_lines)]
     fn from(element: crate::Element) -> Self {
         match element {
             crate::Element::H => 1,

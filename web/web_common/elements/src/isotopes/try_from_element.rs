@@ -1,11 +1,40 @@
 //! Submodule implementing the `TryFrom<(Element, u16)>` trait for the `Isotope`
 //! enumeration.
 
-use crate::{Element, isotopes::*};
+use crate::{
+    Element,
+    isotopes::{
+        ActiniumIsotope, AluminiumIsotope, AmericiumIsotope, AntimonyIsotope, ArgonIsotope,
+        ArsenicIsotope, AstatineIsotope, BariumIsotope, BerkeliumIsotope, BerylliumIsotope,
+        BismuthIsotope, BohriumIsotope, BoronIsotope, BromineIsotope, CadmiumIsotope,
+        CaesiumIsotope, CalciumIsotope, CaliforniumIsotope, CarbonIsotope, CeriumIsotope,
+        ChlorineIsotope, ChromiumIsotope, CobaltIsotope, CoperniciumIsotope, CopperIsotope,
+        CuriumIsotope, DarmstadtiumIsotope, DubniumIsotope, DysprosiumIsotope, EinsteiniumIsotope,
+        ErbiumIsotope, EuropiumIsotope, FermiumIsotope, FleroviumIsotope, FluorineIsotope,
+        FranciumIsotope, GadoliniumIsotope, GalliumIsotope, GermaniumIsotope, GoldIsotope,
+        HafniumIsotope, HassiumIsotope, HeliumIsotope, HolmiumIsotope, HydrogenIsotope,
+        IndiumIsotope, IodineIsotope, IridiumIsotope, IronIsotope, KryptonIsotope,
+        LanthanumIsotope, LawrenciumIsotope, LeadIsotope, LithiumIsotope, LivermoriumIsotope,
+        LutetiumIsotope, MagnesiumIsotope, ManganeseIsotope, MeitneriumIsotope, MendeleviumIsotope,
+        MercuryIsotope, MolybdenumIsotope, MoscoviumIsotope, NeodymiumIsotope, NeonIsotope,
+        NeptuniumIsotope, NickelIsotope, NihoniumIsotope, NiobiumIsotope, NitrogenIsotope,
+        NobeliumIsotope, OganessonIsotope, OsmiumIsotope, OxygenIsotope, PalladiumIsotope,
+        PhosphorusIsotope, PlatinumIsotope, PlutoniumIsotope, PoloniumIsotope, PotassiumIsotope,
+        PraseodymiumIsotope, PromethiumIsotope, ProtactiniumIsotope, RadiumIsotope, RadonIsotope,
+        RheniumIsotope, RhodiumIsotope, RoentgeniumIsotope, RubidiumIsotope, RutheniumIsotope,
+        RutherfordiumIsotope, SamariumIsotope, ScandiumIsotope, SeaborgiumIsotope, SeleniumIsotope,
+        SiliconIsotope, SilverIsotope, SodiumIsotope, StrontiumIsotope, SulfurIsotope,
+        TantalumIsotope, TechnetiumIsotope, TelluriumIsotope, TennessineIsotope, TerbiumIsotope,
+        ThalliumIsotope, ThoriumIsotope, ThuliumIsotope, TinIsotope, TitaniumIsotope,
+        TungstenIsotope, UraniumIsotope, VanadiumIsotope, XenonIsotope, YtterbiumIsotope,
+        YttriumIsotope, ZincIsotope, ZirconiumIsotope,
+    },
+};
 
 impl TryFrom<(Element, u16)> for crate::Isotope {
     type Error = crate::errors::Error;
 
+    #[allow(clippy::too_many_lines)]
     fn try_from((element, mass): (Element, u16)) -> Result<Self, Self::Error> {
         Ok(match element {
             Element::H => Self::H(HydrogenIsotope::try_from(mass)?),

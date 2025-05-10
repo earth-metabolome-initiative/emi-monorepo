@@ -1,44 +1,84 @@
+//! Isotopes of the element Ruthenium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Ruthenium
 pub enum RutheniumIsotope {
+    /// Isotope Ru87 of Ruthenium
     Ru87,
+    /// Isotope Ru88 of Ruthenium
     Ru88,
+    /// Isotope Ru89 of Ruthenium
     Ru89,
+    /// Isotope Ru90 of Ruthenium
     Ru90,
+    /// Isotope Ru91 of Ruthenium
     Ru91,
+    /// Isotope Ru92 of Ruthenium
     Ru92,
+    /// Isotope Ru93 of Ruthenium
     Ru93,
+    /// Isotope Ru94 of Ruthenium
     Ru94,
+    /// Isotope Ru95 of Ruthenium
     Ru95,
+    /// Isotope Ru96 of Ruthenium
     Ru96,
+    /// Isotope Ru97 of Ruthenium
     Ru97,
+    /// Isotope Ru98 of Ruthenium
     Ru98,
+    /// Isotope Ru99 of Ruthenium
     Ru99,
+    /// Isotope Ru100 of Ruthenium
     Ru100,
+    /// Isotope Ru101 of Ruthenium
     Ru101,
+    /// Isotope Ru102 of Ruthenium
     Ru102,
+    /// Isotope Ru103 of Ruthenium
     Ru103,
+    /// Isotope Ru104 of Ruthenium
     Ru104,
+    /// Isotope Ru105 of Ruthenium
     Ru105,
+    /// Isotope Ru106 of Ruthenium
     Ru106,
+    /// Isotope Ru107 of Ruthenium
     Ru107,
+    /// Isotope Ru108 of Ruthenium
     Ru108,
+    /// Isotope Ru109 of Ruthenium
     Ru109,
+    /// Isotope Ru110 of Ruthenium
     Ru110,
+    /// Isotope Ru111 of Ruthenium
     Ru111,
+    /// Isotope Ru112 of Ruthenium
     Ru112,
+    /// Isotope Ru113 of Ruthenium
     Ru113,
+    /// Isotope Ru114 of Ruthenium
     Ru114,
+    /// Isotope Ru115 of Ruthenium
     Ru115,
+    /// Isotope Ru116 of Ruthenium
     Ru116,
+    /// Isotope Ru117 of Ruthenium
     Ru117,
+    /// Isotope Ru118 of Ruthenium
     Ru118,
+    /// Isotope Ru119 of Ruthenium
     Ru119,
+    /// Isotope Ru120 of Ruthenium
     Ru120,
+    /// Isotope Ru121 of Ruthenium
     Ru121,
+    /// Isotope Ru122 of Ruthenium
     Ru122,
+    /// Isotope Ru123 of Ruthenium
     Ru123,
+    /// Isotope Ru124 of Ruthenium
     Ru124,
 }
 impl super::RelativeAtomicMass for RutheniumIsotope {
@@ -137,44 +177,44 @@ impl super::MassNumber for RutheniumIsotope {
 impl super::IsotopicComposition for RutheniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Ru87 => None,
-            Self::Ru88 => None,
-            Self::Ru89 => None,
-            Self::Ru90 => None,
-            Self::Ru91 => None,
-            Self::Ru92 => None,
-            Self::Ru93 => None,
-            Self::Ru94 => None,
-            Self::Ru95 => None,
             Self::Ru96 => Some(0.0554f64),
-            Self::Ru97 => None,
             Self::Ru98 => Some(0.0187f64),
             Self::Ru99 => Some(0.1276f64),
             Self::Ru100 => Some(0.126f64),
             Self::Ru101 => Some(0.1706f64),
             Self::Ru102 => Some(0.3155f64),
-            Self::Ru103 => None,
             Self::Ru104 => Some(0.1862f64),
-            Self::Ru105 => None,
-            Self::Ru106 => None,
-            Self::Ru107 => None,
-            Self::Ru108 => None,
-            Self::Ru109 => None,
-            Self::Ru110 => None,
-            Self::Ru111 => None,
-            Self::Ru112 => None,
-            Self::Ru113 => None,
-            Self::Ru114 => None,
-            Self::Ru115 => None,
-            Self::Ru116 => None,
-            Self::Ru117 => None,
-            Self::Ru118 => None,
-            Self::Ru119 => None,
-            Self::Ru120 => None,
-            Self::Ru121 => None,
-            Self::Ru122 => None,
-            Self::Ru123 => None,
-            Self::Ru124 => None,
+            Self::Ru87
+            | Self::Ru88
+            | Self::Ru89
+            | Self::Ru90
+            | Self::Ru91
+            | Self::Ru92
+            | Self::Ru93
+            | Self::Ru94
+            | Self::Ru95
+            | Self::Ru97
+            | Self::Ru103
+            | Self::Ru105
+            | Self::Ru106
+            | Self::Ru107
+            | Self::Ru108
+            | Self::Ru109
+            | Self::Ru110
+            | Self::Ru111
+            | Self::Ru112
+            | Self::Ru113
+            | Self::Ru114
+            | Self::Ru115
+            | Self::Ru116
+            | Self::Ru117
+            | Self::Ru118
+            | Self::Ru119
+            | Self::Ru120
+            | Self::Ru121
+            | Self::Ru122
+            | Self::Ru123
+            | Self::Ru124 => None,
         }
     }
 }

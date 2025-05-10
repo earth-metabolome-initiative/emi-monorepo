@@ -1,30 +1,56 @@
+//! Isotopes of the element Silicon
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Silicon
 pub enum SiliconIsotope {
+    /// Isotope Si22 of Silicon
     Si22,
+    /// Isotope Si23 of Silicon
     Si23,
+    /// Isotope Si24 of Silicon
     Si24,
+    /// Isotope Si25 of Silicon
     Si25,
+    /// Isotope Si26 of Silicon
     Si26,
+    /// Isotope Si27 of Silicon
     Si27,
+    /// Isotope Si28 of Silicon
     Si28,
+    /// Isotope Si29 of Silicon
     Si29,
+    /// Isotope Si30 of Silicon
     Si30,
+    /// Isotope Si31 of Silicon
     Si31,
+    /// Isotope Si32 of Silicon
     Si32,
+    /// Isotope Si33 of Silicon
     Si33,
+    /// Isotope Si34 of Silicon
     Si34,
+    /// Isotope Si35 of Silicon
     Si35,
+    /// Isotope Si36 of Silicon
     Si36,
+    /// Isotope Si37 of Silicon
     Si37,
+    /// Isotope Si38 of Silicon
     Si38,
+    /// Isotope Si39 of Silicon
     Si39,
+    /// Isotope Si40 of Silicon
     Si40,
+    /// Isotope Si41 of Silicon
     Si41,
+    /// Isotope Si42 of Silicon
     Si42,
+    /// Isotope Si43 of Silicon
     Si43,
+    /// Isotope Si44 of Silicon
     Si44,
+    /// Isotope Si45 of Silicon
     Si45,
 }
 impl super::RelativeAtomicMass for SiliconIsotope {
@@ -95,30 +121,30 @@ impl super::MassNumber for SiliconIsotope {
 impl super::IsotopicComposition for SiliconIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Si22 => None,
-            Self::Si23 => None,
-            Self::Si24 => None,
-            Self::Si25 => None,
-            Self::Si26 => None,
-            Self::Si27 => None,
             Self::Si28 => Some(0.92223f64),
             Self::Si29 => Some(0.04685f64),
             Self::Si30 => Some(0.03092f64),
-            Self::Si31 => None,
-            Self::Si32 => None,
-            Self::Si33 => None,
-            Self::Si34 => None,
-            Self::Si35 => None,
-            Self::Si36 => None,
-            Self::Si37 => None,
-            Self::Si38 => None,
-            Self::Si39 => None,
-            Self::Si40 => None,
-            Self::Si41 => None,
-            Self::Si42 => None,
-            Self::Si43 => None,
-            Self::Si44 => None,
-            Self::Si45 => None,
+            Self::Si22
+            | Self::Si23
+            | Self::Si24
+            | Self::Si25
+            | Self::Si26
+            | Self::Si27
+            | Self::Si31
+            | Self::Si32
+            | Self::Si33
+            | Self::Si34
+            | Self::Si35
+            | Self::Si36
+            | Self::Si37
+            | Self::Si38
+            | Self::Si39
+            | Self::Si40
+            | Self::Si41
+            | Self::Si42
+            | Self::Si43
+            | Self::Si44
+            | Self::Si45 => None,
         }
     }
 }

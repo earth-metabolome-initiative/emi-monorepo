@@ -1,18 +1,32 @@
+//! Isotopes of the element Beryllium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Beryllium
 pub enum BerylliumIsotope {
+    /// Isotope Be5 of Beryllium
     Be5,
+    /// Isotope Be6 of Beryllium
     Be6,
+    /// Isotope Be7 of Beryllium
     Be7,
+    /// Isotope Be8 of Beryllium
     Be8,
+    /// Isotope Be9 of Beryllium
     Be9,
+    /// Isotope Be10 of Beryllium
     Be10,
+    /// Isotope Be11 of Beryllium
     Be11,
+    /// Isotope Be12 of Beryllium
     Be12,
+    /// Isotope Be13 of Beryllium
     Be13,
+    /// Isotope Be14 of Beryllium
     Be14,
+    /// Isotope Be15 of Beryllium
     Be15,
+    /// Isotope Be16 of Beryllium
     Be16,
 }
 impl super::RelativeAtomicMass for BerylliumIsotope {
@@ -59,18 +73,18 @@ impl super::MassNumber for BerylliumIsotope {
 impl super::IsotopicComposition for BerylliumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Be5 => None,
-            Self::Be6 => None,
-            Self::Be7 => None,
-            Self::Be8 => None,
             Self::Be9 => Some(1f64),
-            Self::Be10 => None,
-            Self::Be11 => None,
-            Self::Be12 => None,
-            Self::Be13 => None,
-            Self::Be14 => None,
-            Self::Be15 => None,
-            Self::Be16 => None,
+            Self::Be5
+            | Self::Be6
+            | Self::Be7
+            | Self::Be8
+            | Self::Be10
+            | Self::Be11
+            | Self::Be12
+            | Self::Be13
+            | Self::Be14
+            | Self::Be15
+            | Self::Be16 => None,
         }
     }
 }

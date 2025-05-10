@@ -1,23 +1,42 @@
+//! Isotopes of the element Oxygen
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Oxygen
 pub enum OxygenIsotope {
+    /// Isotope O12 of Oxygen
     O12,
+    /// Isotope O13 of Oxygen
     O13,
+    /// Isotope O14 of Oxygen
     O14,
+    /// Isotope O15 of Oxygen
     O15,
+    /// Isotope O16 of Oxygen
     O16,
+    /// Isotope O17 of Oxygen
     O17,
+    /// Isotope O18 of Oxygen
     O18,
+    /// Isotope O19 of Oxygen
     O19,
+    /// Isotope O20 of Oxygen
     O20,
+    /// Isotope O21 of Oxygen
     O21,
+    /// Isotope O22 of Oxygen
     O22,
+    /// Isotope O23 of Oxygen
     O23,
+    /// Isotope O24 of Oxygen
     O24,
+    /// Isotope O25 of Oxygen
     O25,
+    /// Isotope O26 of Oxygen
     O26,
+    /// Isotope O27 of Oxygen
     O27,
+    /// Isotope O28 of Oxygen
     O28,
 }
 impl super::RelativeAtomicMass for OxygenIsotope {
@@ -74,23 +93,23 @@ impl super::MassNumber for OxygenIsotope {
 impl super::IsotopicComposition for OxygenIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::O12 => None,
-            Self::O13 => None,
-            Self::O14 => None,
-            Self::O15 => None,
             Self::O16 => Some(0.99757f64),
             Self::O17 => Some(0.00038f64),
             Self::O18 => Some(0.00205f64),
-            Self::O19 => None,
-            Self::O20 => None,
-            Self::O21 => None,
-            Self::O22 => None,
-            Self::O23 => None,
-            Self::O24 => None,
-            Self::O25 => None,
-            Self::O26 => None,
-            Self::O27 => None,
-            Self::O28 => None,
+            Self::O12
+            | Self::O13
+            | Self::O14
+            | Self::O15
+            | Self::O19
+            | Self::O20
+            | Self::O21
+            | Self::O22
+            | Self::O23
+            | Self::O24
+            | Self::O25
+            | Self::O26
+            | Self::O27
+            | Self::O28 => None,
         }
     }
 }

@@ -1,39 +1,74 @@
+//! Isotopes of the element Rubidium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Rubidium
 pub enum RubidiumIsotope {
+    /// Isotope Rb71 of Rubidium
     Rb71,
+    /// Isotope Rb72 of Rubidium
     Rb72,
+    /// Isotope Rb73 of Rubidium
     Rb73,
+    /// Isotope Rb74 of Rubidium
     Rb74,
+    /// Isotope Rb75 of Rubidium
     Rb75,
+    /// Isotope Rb76 of Rubidium
     Rb76,
+    /// Isotope Rb77 of Rubidium
     Rb77,
+    /// Isotope Rb78 of Rubidium
     Rb78,
+    /// Isotope Rb79 of Rubidium
     Rb79,
+    /// Isotope Rb80 of Rubidium
     Rb80,
+    /// Isotope Rb81 of Rubidium
     Rb81,
+    /// Isotope Rb82 of Rubidium
     Rb82,
+    /// Isotope Rb83 of Rubidium
     Rb83,
+    /// Isotope Rb84 of Rubidium
     Rb84,
+    /// Isotope Rb85 of Rubidium
     Rb85,
+    /// Isotope Rb86 of Rubidium
     Rb86,
+    /// Isotope Rb87 of Rubidium
     Rb87,
+    /// Isotope Rb88 of Rubidium
     Rb88,
+    /// Isotope Rb89 of Rubidium
     Rb89,
+    /// Isotope Rb90 of Rubidium
     Rb90,
+    /// Isotope Rb91 of Rubidium
     Rb91,
+    /// Isotope Rb92 of Rubidium
     Rb92,
+    /// Isotope Rb93 of Rubidium
     Rb93,
+    /// Isotope Rb94 of Rubidium
     Rb94,
+    /// Isotope Rb95 of Rubidium
     Rb95,
+    /// Isotope Rb96 of Rubidium
     Rb96,
+    /// Isotope Rb97 of Rubidium
     Rb97,
+    /// Isotope Rb98 of Rubidium
     Rb98,
+    /// Isotope Rb99 of Rubidium
     Rb99,
+    /// Isotope Rb100 of Rubidium
     Rb100,
+    /// Isotope Rb101 of Rubidium
     Rb101,
+    /// Isotope Rb102 of Rubidium
     Rb102,
+    /// Isotope Rb103 of Rubidium
     Rb103,
 }
 impl super::RelativeAtomicMass for RubidiumIsotope {
@@ -122,39 +157,39 @@ impl super::MassNumber for RubidiumIsotope {
 impl super::IsotopicComposition for RubidiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Rb71 => None,
-            Self::Rb72 => None,
-            Self::Rb73 => None,
-            Self::Rb74 => None,
-            Self::Rb75 => None,
-            Self::Rb76 => None,
-            Self::Rb77 => None,
-            Self::Rb78 => None,
-            Self::Rb79 => None,
-            Self::Rb80 => None,
-            Self::Rb81 => None,
-            Self::Rb82 => None,
-            Self::Rb83 => None,
-            Self::Rb84 => None,
             Self::Rb85 => Some(0.7217f64),
-            Self::Rb86 => None,
             Self::Rb87 => Some(0.2783f64),
-            Self::Rb88 => None,
-            Self::Rb89 => None,
-            Self::Rb90 => None,
-            Self::Rb91 => None,
-            Self::Rb92 => None,
-            Self::Rb93 => None,
-            Self::Rb94 => None,
-            Self::Rb95 => None,
-            Self::Rb96 => None,
-            Self::Rb97 => None,
-            Self::Rb98 => None,
-            Self::Rb99 => None,
-            Self::Rb100 => None,
-            Self::Rb101 => None,
-            Self::Rb102 => None,
-            Self::Rb103 => None,
+            Self::Rb71
+            | Self::Rb72
+            | Self::Rb73
+            | Self::Rb74
+            | Self::Rb75
+            | Self::Rb76
+            | Self::Rb77
+            | Self::Rb78
+            | Self::Rb79
+            | Self::Rb80
+            | Self::Rb81
+            | Self::Rb82
+            | Self::Rb83
+            | Self::Rb84
+            | Self::Rb86
+            | Self::Rb88
+            | Self::Rb89
+            | Self::Rb90
+            | Self::Rb91
+            | Self::Rb92
+            | Self::Rb93
+            | Self::Rb94
+            | Self::Rb95
+            | Self::Rb96
+            | Self::Rb97
+            | Self::Rb98
+            | Self::Rb99
+            | Self::Rb100
+            | Self::Rb101
+            | Self::Rb102
+            | Self::Rb103 => None,
         }
     }
 }

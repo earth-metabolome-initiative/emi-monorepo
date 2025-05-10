@@ -1,33 +1,62 @@
+//! Isotopes of the element Vanadium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Vanadium
 pub enum VanadiumIsotope {
+    /// Isotope V40 of Vanadium
     V40,
+    /// Isotope V41 of Vanadium
     V41,
+    /// Isotope V42 of Vanadium
     V42,
+    /// Isotope V43 of Vanadium
     V43,
+    /// Isotope V44 of Vanadium
     V44,
+    /// Isotope V45 of Vanadium
     V45,
+    /// Isotope V46 of Vanadium
     V46,
+    /// Isotope V47 of Vanadium
     V47,
+    /// Isotope V48 of Vanadium
     V48,
+    /// Isotope V49 of Vanadium
     V49,
+    /// Isotope V50 of Vanadium
     V50,
+    /// Isotope V51 of Vanadium
     V51,
+    /// Isotope V52 of Vanadium
     V52,
+    /// Isotope V53 of Vanadium
     V53,
+    /// Isotope V54 of Vanadium
     V54,
+    /// Isotope V55 of Vanadium
     V55,
+    /// Isotope V56 of Vanadium
     V56,
+    /// Isotope V57 of Vanadium
     V57,
+    /// Isotope V58 of Vanadium
     V58,
+    /// Isotope V59 of Vanadium
     V59,
+    /// Isotope V60 of Vanadium
     V60,
+    /// Isotope V61 of Vanadium
     V61,
+    /// Isotope V62 of Vanadium
     V62,
+    /// Isotope V63 of Vanadium
     V63,
+    /// Isotope V64 of Vanadium
     V64,
+    /// Isotope V65 of Vanadium
     V65,
+    /// Isotope V66 of Vanadium
     V66,
 }
 impl super::RelativeAtomicMass for VanadiumIsotope {
@@ -104,33 +133,33 @@ impl super::MassNumber for VanadiumIsotope {
 impl super::IsotopicComposition for VanadiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::V40 => None,
-            Self::V41 => None,
-            Self::V42 => None,
-            Self::V43 => None,
-            Self::V44 => None,
-            Self::V45 => None,
-            Self::V46 => None,
-            Self::V47 => None,
-            Self::V48 => None,
-            Self::V49 => None,
             Self::V50 => Some(0.0025f64),
             Self::V51 => Some(0.9975f64),
-            Self::V52 => None,
-            Self::V53 => None,
-            Self::V54 => None,
-            Self::V55 => None,
-            Self::V56 => None,
-            Self::V57 => None,
-            Self::V58 => None,
-            Self::V59 => None,
-            Self::V60 => None,
-            Self::V61 => None,
-            Self::V62 => None,
-            Self::V63 => None,
-            Self::V64 => None,
-            Self::V65 => None,
-            Self::V66 => None,
+            Self::V40
+            | Self::V41
+            | Self::V42
+            | Self::V43
+            | Self::V44
+            | Self::V45
+            | Self::V46
+            | Self::V47
+            | Self::V48
+            | Self::V49
+            | Self::V52
+            | Self::V53
+            | Self::V54
+            | Self::V55
+            | Self::V56
+            | Self::V57
+            | Self::V58
+            | Self::V59
+            | Self::V60
+            | Self::V61
+            | Self::V62
+            | Self::V63
+            | Self::V64
+            | Self::V65
+            | Self::V66 => None,
         }
     }
 }

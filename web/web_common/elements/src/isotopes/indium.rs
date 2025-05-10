@@ -1,45 +1,86 @@
+//! Isotopes of the element Indium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Indium
 pub enum IndiumIsotope {
+    /// Isotope In97 of Indium
     In97,
+    /// Isotope In98 of Indium
     In98,
+    /// Isotope In99 of Indium
     In99,
+    /// Isotope In100 of Indium
     In100,
+    /// Isotope In101 of Indium
     In101,
+    /// Isotope In102 of Indium
     In102,
+    /// Isotope In103 of Indium
     In103,
+    /// Isotope In104 of Indium
     In104,
+    /// Isotope In105 of Indium
     In105,
+    /// Isotope In106 of Indium
     In106,
+    /// Isotope In107 of Indium
     In107,
+    /// Isotope In108 of Indium
     In108,
+    /// Isotope In109 of Indium
     In109,
+    /// Isotope In110 of Indium
     In110,
+    /// Isotope In111 of Indium
     In111,
+    /// Isotope In112 of Indium
     In112,
+    /// Isotope In113 of Indium
     In113,
+    /// Isotope In114 of Indium
     In114,
+    /// Isotope In115 of Indium
     In115,
+    /// Isotope In116 of Indium
     In116,
+    /// Isotope In117 of Indium
     In117,
+    /// Isotope In118 of Indium
     In118,
+    /// Isotope In119 of Indium
     In119,
+    /// Isotope In120 of Indium
     In120,
+    /// Isotope In121 of Indium
     In121,
+    /// Isotope In122 of Indium
     In122,
+    /// Isotope In123 of Indium
     In123,
+    /// Isotope In124 of Indium
     In124,
+    /// Isotope In125 of Indium
     In125,
+    /// Isotope In126 of Indium
     In126,
+    /// Isotope In127 of Indium
     In127,
+    /// Isotope In128 of Indium
     In128,
+    /// Isotope In129 of Indium
     In129,
+    /// Isotope In130 of Indium
     In130,
+    /// Isotope In131 of Indium
     In131,
+    /// Isotope In132 of Indium
     In132,
+    /// Isotope In133 of Indium
     In133,
+    /// Isotope In134 of Indium
     In134,
+    /// Isotope In135 of Indium
     In135,
 }
 impl super::RelativeAtomicMass for IndiumIsotope {
@@ -140,45 +181,45 @@ impl super::MassNumber for IndiumIsotope {
 impl super::IsotopicComposition for IndiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::In97 => None,
-            Self::In98 => None,
-            Self::In99 => None,
-            Self::In100 => None,
-            Self::In101 => None,
-            Self::In102 => None,
-            Self::In103 => None,
-            Self::In104 => None,
-            Self::In105 => None,
-            Self::In106 => None,
-            Self::In107 => None,
-            Self::In108 => None,
-            Self::In109 => None,
-            Self::In110 => None,
-            Self::In111 => None,
-            Self::In112 => None,
             Self::In113 => Some(0.0429f64),
-            Self::In114 => None,
             Self::In115 => Some(0.9571f64),
-            Self::In116 => None,
-            Self::In117 => None,
-            Self::In118 => None,
-            Self::In119 => None,
-            Self::In120 => None,
-            Self::In121 => None,
-            Self::In122 => None,
-            Self::In123 => None,
-            Self::In124 => None,
-            Self::In125 => None,
-            Self::In126 => None,
-            Self::In127 => None,
-            Self::In128 => None,
-            Self::In129 => None,
-            Self::In130 => None,
-            Self::In131 => None,
-            Self::In132 => None,
-            Self::In133 => None,
-            Self::In134 => None,
-            Self::In135 => None,
+            Self::In97
+            | Self::In98
+            | Self::In99
+            | Self::In100
+            | Self::In101
+            | Self::In102
+            | Self::In103
+            | Self::In104
+            | Self::In105
+            | Self::In106
+            | Self::In107
+            | Self::In108
+            | Self::In109
+            | Self::In110
+            | Self::In111
+            | Self::In112
+            | Self::In114
+            | Self::In116
+            | Self::In117
+            | Self::In118
+            | Self::In119
+            | Self::In120
+            | Self::In121
+            | Self::In122
+            | Self::In123
+            | Self::In124
+            | Self::In125
+            | Self::In126
+            | Self::In127
+            | Self::In128
+            | Self::In129
+            | Self::In130
+            | Self::In131
+            | Self::In132
+            | Self::In133
+            | Self::In134
+            | Self::In135 => None,
         }
     }
 }

@@ -2,6 +2,7 @@
 //! enum.
 
 impl super::ElementVariant for super::Isotope {
+    #[allow(clippy::too_many_lines)]
     fn element(&self) -> crate::Element {
         match self {
             Self::H(isotope) => isotope.element(),

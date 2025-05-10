@@ -1,40 +1,76 @@
+//! Isotopes of the element Ytterbium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Ytterbium
 pub enum YtterbiumIsotope {
+    /// Isotope Yb148 of Ytterbium
     Yb148,
+    /// Isotope Yb149 of Ytterbium
     Yb149,
+    /// Isotope Yb150 of Ytterbium
     Yb150,
+    /// Isotope Yb151 of Ytterbium
     Yb151,
+    /// Isotope Yb152 of Ytterbium
     Yb152,
+    /// Isotope Yb153 of Ytterbium
     Yb153,
+    /// Isotope Yb154 of Ytterbium
     Yb154,
+    /// Isotope Yb155 of Ytterbium
     Yb155,
+    /// Isotope Yb156 of Ytterbium
     Yb156,
+    /// Isotope Yb157 of Ytterbium
     Yb157,
+    /// Isotope Yb158 of Ytterbium
     Yb158,
+    /// Isotope Yb159 of Ytterbium
     Yb159,
+    /// Isotope Yb160 of Ytterbium
     Yb160,
+    /// Isotope Yb161 of Ytterbium
     Yb161,
+    /// Isotope Yb162 of Ytterbium
     Yb162,
+    /// Isotope Yb163 of Ytterbium
     Yb163,
+    /// Isotope Yb164 of Ytterbium
     Yb164,
+    /// Isotope Yb165 of Ytterbium
     Yb165,
+    /// Isotope Yb166 of Ytterbium
     Yb166,
+    /// Isotope Yb167 of Ytterbium
     Yb167,
+    /// Isotope Yb168 of Ytterbium
     Yb168,
+    /// Isotope Yb169 of Ytterbium
     Yb169,
+    /// Isotope Yb170 of Ytterbium
     Yb170,
+    /// Isotope Yb171 of Ytterbium
     Yb171,
+    /// Isotope Yb172 of Ytterbium
     Yb172,
+    /// Isotope Yb173 of Ytterbium
     Yb173,
+    /// Isotope Yb174 of Ytterbium
     Yb174,
+    /// Isotope Yb175 of Ytterbium
     Yb175,
+    /// Isotope Yb176 of Ytterbium
     Yb176,
+    /// Isotope Yb177 of Ytterbium
     Yb177,
+    /// Isotope Yb178 of Ytterbium
     Yb178,
+    /// Isotope Yb179 of Ytterbium
     Yb179,
+    /// Isotope Yb180 of Ytterbium
     Yb180,
+    /// Isotope Yb181 of Ytterbium
     Yb181,
 }
 impl super::RelativeAtomicMass for YtterbiumIsotope {
@@ -125,40 +161,40 @@ impl super::MassNumber for YtterbiumIsotope {
 impl super::IsotopicComposition for YtterbiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Yb148 => None,
-            Self::Yb149 => None,
-            Self::Yb150 => None,
-            Self::Yb151 => None,
-            Self::Yb152 => None,
-            Self::Yb153 => None,
-            Self::Yb154 => None,
-            Self::Yb155 => None,
-            Self::Yb156 => None,
-            Self::Yb157 => None,
-            Self::Yb158 => None,
-            Self::Yb159 => None,
-            Self::Yb160 => None,
-            Self::Yb161 => None,
-            Self::Yb162 => None,
-            Self::Yb163 => None,
-            Self::Yb164 => None,
-            Self::Yb165 => None,
-            Self::Yb166 => None,
-            Self::Yb167 => None,
             Self::Yb168 => Some(0.00123f64),
-            Self::Yb169 => None,
             Self::Yb170 => Some(0.02982f64),
             Self::Yb171 => Some(0.1409f64),
             Self::Yb172 => Some(0.2168f64),
             Self::Yb173 => Some(0.16103f64),
             Self::Yb174 => Some(0.32026f64),
-            Self::Yb175 => None,
             Self::Yb176 => Some(0.12996f64),
-            Self::Yb177 => None,
-            Self::Yb178 => None,
-            Self::Yb179 => None,
-            Self::Yb180 => None,
-            Self::Yb181 => None,
+            Self::Yb148
+            | Self::Yb149
+            | Self::Yb150
+            | Self::Yb151
+            | Self::Yb152
+            | Self::Yb153
+            | Self::Yb154
+            | Self::Yb155
+            | Self::Yb156
+            | Self::Yb157
+            | Self::Yb158
+            | Self::Yb159
+            | Self::Yb160
+            | Self::Yb161
+            | Self::Yb162
+            | Self::Yb163
+            | Self::Yb164
+            | Self::Yb165
+            | Self::Yb166
+            | Self::Yb167
+            | Self::Yb169
+            | Self::Yb175
+            | Self::Yb177
+            | Self::Yb178
+            | Self::Yb179
+            | Self::Yb180
+            | Self::Yb181 => None,
         }
     }
 }

@@ -1,16 +1,28 @@
+//! Isotopes of the element Nihonium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Nihonium
 pub enum NihoniumIsotope {
+    /// Isotope Nh278 of Nihonium
     Nh278,
+    /// Isotope Nh279 of Nihonium
     Nh279,
+    /// Isotope Nh280 of Nihonium
     Nh280,
+    /// Isotope Nh281 of Nihonium
     Nh281,
+    /// Isotope Nh282 of Nihonium
     Nh282,
+    /// Isotope Nh283 of Nihonium
     Nh283,
+    /// Isotope Nh284 of Nihonium
     Nh284,
+    /// Isotope Nh285 of Nihonium
     Nh285,
+    /// Isotope Nh286 of Nihonium
     Nh286,
+    /// Isotope Nh287 of Nihonium
     Nh287,
 }
 impl super::RelativeAtomicMass for NihoniumIsotope {
@@ -52,18 +64,7 @@ impl super::MassNumber for NihoniumIsotope {
 }
 impl super::IsotopicComposition for NihoniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Nh278 => None,
-            Self::Nh279 => None,
-            Self::Nh280 => None,
-            Self::Nh281 => None,
-            Self::Nh282 => None,
-            Self::Nh283 => None,
-            Self::Nh284 => None,
-            Self::Nh285 => None,
-            Self::Nh286 => None,
-            Self::Nh287 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for NihoniumIsotope {

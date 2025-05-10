@@ -1,34 +1,64 @@
+//! Isotopes of the element Manganese
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Manganese
 pub enum ManganeseIsotope {
+    /// Isotope Mn44 of Manganese
     Mn44,
+    /// Isotope Mn45 of Manganese
     Mn45,
+    /// Isotope Mn46 of Manganese
     Mn46,
+    /// Isotope Mn47 of Manganese
     Mn47,
+    /// Isotope Mn48 of Manganese
     Mn48,
+    /// Isotope Mn49 of Manganese
     Mn49,
+    /// Isotope Mn50 of Manganese
     Mn50,
+    /// Isotope Mn51 of Manganese
     Mn51,
+    /// Isotope Mn52 of Manganese
     Mn52,
+    /// Isotope Mn53 of Manganese
     Mn53,
+    /// Isotope Mn54 of Manganese
     Mn54,
+    /// Isotope Mn55 of Manganese
     Mn55,
+    /// Isotope Mn56 of Manganese
     Mn56,
+    /// Isotope Mn57 of Manganese
     Mn57,
+    /// Isotope Mn58 of Manganese
     Mn58,
+    /// Isotope Mn59 of Manganese
     Mn59,
+    /// Isotope Mn60 of Manganese
     Mn60,
+    /// Isotope Mn61 of Manganese
     Mn61,
+    /// Isotope Mn62 of Manganese
     Mn62,
+    /// Isotope Mn63 of Manganese
     Mn63,
+    /// Isotope Mn64 of Manganese
     Mn64,
+    /// Isotope Mn65 of Manganese
     Mn65,
+    /// Isotope Mn66 of Manganese
     Mn66,
+    /// Isotope Mn67 of Manganese
     Mn67,
+    /// Isotope Mn68 of Manganese
     Mn68,
+    /// Isotope Mn69 of Manganese
     Mn69,
+    /// Isotope Mn70 of Manganese
     Mn70,
+    /// Isotope Mn71 of Manganese
     Mn71,
 }
 impl super::RelativeAtomicMass for ManganeseIsotope {
@@ -107,34 +137,34 @@ impl super::MassNumber for ManganeseIsotope {
 impl super::IsotopicComposition for ManganeseIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Mn44 => None,
-            Self::Mn45 => None,
-            Self::Mn46 => None,
-            Self::Mn47 => None,
-            Self::Mn48 => None,
-            Self::Mn49 => None,
-            Self::Mn50 => None,
-            Self::Mn51 => None,
-            Self::Mn52 => None,
-            Self::Mn53 => None,
-            Self::Mn54 => None,
             Self::Mn55 => Some(1f64),
-            Self::Mn56 => None,
-            Self::Mn57 => None,
-            Self::Mn58 => None,
-            Self::Mn59 => None,
-            Self::Mn60 => None,
-            Self::Mn61 => None,
-            Self::Mn62 => None,
-            Self::Mn63 => None,
-            Self::Mn64 => None,
-            Self::Mn65 => None,
-            Self::Mn66 => None,
-            Self::Mn67 => None,
-            Self::Mn68 => None,
-            Self::Mn69 => None,
-            Self::Mn70 => None,
-            Self::Mn71 => None,
+            Self::Mn44
+            | Self::Mn45
+            | Self::Mn46
+            | Self::Mn47
+            | Self::Mn48
+            | Self::Mn49
+            | Self::Mn50
+            | Self::Mn51
+            | Self::Mn52
+            | Self::Mn53
+            | Self::Mn54
+            | Self::Mn56
+            | Self::Mn57
+            | Self::Mn58
+            | Self::Mn59
+            | Self::Mn60
+            | Self::Mn61
+            | Self::Mn62
+            | Self::Mn63
+            | Self::Mn64
+            | Self::Mn65
+            | Self::Mn66
+            | Self::Mn67
+            | Self::Mn68
+            | Self::Mn69
+            | Self::Mn70
+            | Self::Mn71 => None,
         }
     }
 }

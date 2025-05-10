@@ -1,28 +1,52 @@
+//! Isotopes of the element Magnesium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Magnesium
 pub enum MagnesiumIsotope {
+    /// Isotope Mg19 of Magnesium
     Mg19,
+    /// Isotope Mg20 of Magnesium
     Mg20,
+    /// Isotope Mg21 of Magnesium
     Mg21,
+    /// Isotope Mg22 of Magnesium
     Mg22,
+    /// Isotope Mg23 of Magnesium
     Mg23,
+    /// Isotope Mg24 of Magnesium
     Mg24,
+    /// Isotope Mg25 of Magnesium
     Mg25,
+    /// Isotope Mg26 of Magnesium
     Mg26,
+    /// Isotope Mg27 of Magnesium
     Mg27,
+    /// Isotope Mg28 of Magnesium
     Mg28,
+    /// Isotope Mg29 of Magnesium
     Mg29,
+    /// Isotope Mg30 of Magnesium
     Mg30,
+    /// Isotope Mg31 of Magnesium
     Mg31,
+    /// Isotope Mg32 of Magnesium
     Mg32,
+    /// Isotope Mg33 of Magnesium
     Mg33,
+    /// Isotope Mg34 of Magnesium
     Mg34,
+    /// Isotope Mg35 of Magnesium
     Mg35,
+    /// Isotope Mg36 of Magnesium
     Mg36,
+    /// Isotope Mg37 of Magnesium
     Mg37,
+    /// Isotope Mg38 of Magnesium
     Mg38,
+    /// Isotope Mg39 of Magnesium
     Mg39,
+    /// Isotope Mg40 of Magnesium
     Mg40,
 }
 impl super::RelativeAtomicMass for MagnesiumIsotope {
@@ -89,28 +113,28 @@ impl super::MassNumber for MagnesiumIsotope {
 impl super::IsotopicComposition for MagnesiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Mg19 => None,
-            Self::Mg20 => None,
-            Self::Mg21 => None,
-            Self::Mg22 => None,
-            Self::Mg23 => None,
             Self::Mg24 => Some(0.7899f64),
             Self::Mg25 => Some(0.1f64),
             Self::Mg26 => Some(0.1101f64),
-            Self::Mg27 => None,
-            Self::Mg28 => None,
-            Self::Mg29 => None,
-            Self::Mg30 => None,
-            Self::Mg31 => None,
-            Self::Mg32 => None,
-            Self::Mg33 => None,
-            Self::Mg34 => None,
-            Self::Mg35 => None,
-            Self::Mg36 => None,
-            Self::Mg37 => None,
-            Self::Mg38 => None,
-            Self::Mg39 => None,
-            Self::Mg40 => None,
+            Self::Mg19
+            | Self::Mg20
+            | Self::Mg21
+            | Self::Mg22
+            | Self::Mg23
+            | Self::Mg27
+            | Self::Mg28
+            | Self::Mg29
+            | Self::Mg30
+            | Self::Mg31
+            | Self::Mg32
+            | Self::Mg33
+            | Self::Mg34
+            | Self::Mg35
+            | Self::Mg36
+            | Self::Mg37
+            | Self::Mg38
+            | Self::Mg39
+            | Self::Mg40 => None,
         }
     }
 }

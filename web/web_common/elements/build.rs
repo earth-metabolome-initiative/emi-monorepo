@@ -8,15 +8,24 @@ use syn::Ident;
 
 fn normalize_symbol(symbol: &str) -> String {
     // We uppercase the first letter and lowercase the rest
+    debug_assert!(symbol.len() <= 2, "Received symbol is too long: `{symbol}`");
     let mut chars = symbol.chars();
     let first_char = chars.next().unwrap_or_default().to_uppercase();
     let rest = chars.as_str().to_lowercase();
-    format!("{first_char}{rest}")
+    let result = format!("{first_char}{rest}");
+    debug_assert!(
+        result.len() <= 2,
+        "Element symbol is too long: `{result}`, started from `{symbol}`"
+    );
+    debug_assert_eq!(symbol.to_lowercase(), result.to_lowercase(),);
+    result
 }
 
+#[allow(clippy::too_many_lines)]
+/// Returns the name of the element from its symbol.
 fn element_name_from_symbol(symbol: &str) -> &'static str {
     match symbol {
-        "H" => "Hydrogen",
+        "D" | "T" | "H" => "Hydrogen",
         "He" => "Helium",
         "Li" => "Lithium",
         "Be" => "Beryllium",
@@ -154,7 +163,7 @@ fn isotopes() -> Vec<IsotopeMetadata> {
     let mut isotopes: Vec<IsotopeMetadata> =
         serde_json::from_reader(reader).expect("Failed to parse isotopes_data.json");
 
-    for isotope in isotopes.iter_mut() {
+    for isotope in &mut isotopes {
         // Normalize the atomic symbol
         isotope.atomic_symbol = normalize_symbol(&isotope.atomic_symbol);
     }
@@ -162,6 +171,7 @@ fn isotopes() -> Vec<IsotopeMetadata> {
     isotopes
 }
 
+#[allow(clippy::too_many_lines)]
 fn implement_isotope_enum(isotopes: &[IsotopeMetadata]) -> TokenStream {
     // We generate the enum variants for each isotope
     let enum_variants = isotopes
@@ -170,6 +180,23 @@ fn implement_isotope_enum(isotopes: &[IsotopeMetadata]) -> TokenStream {
             let isotope_name = format!("{}{}", isotope.atomic_symbol, isotope.mass_number);
             let isotope_ident = Ident::new(&isotope_name, proc_macro2::Span::call_site());
             quote! {
+                #isotope_ident
+            }
+        })
+        .collect::<Vec<_>>();
+
+    let enum_variants_with_documentation = isotopes
+        .iter()
+        .map(|isotope| {
+            let isotope_name = format!("{}{}", isotope.atomic_symbol, isotope.mass_number);
+            let isotope_ident = Ident::new(&isotope_name, proc_macro2::Span::call_site());
+            let documentation = format!(
+                "Isotope {} of {}",
+                isotope_name,
+                element_name_from_symbol(&isotope.atomic_symbol)
+            );
+            quote! {
+                #[doc = #documentation]
                 #isotope_ident
             }
         })
@@ -185,13 +212,29 @@ fn implement_isotope_enum(isotopes: &[IsotopeMetadata]) -> TokenStream {
 
     let mass_numbers = isotopes.iter().map(|isotope| isotope.mass_number).collect::<Vec<_>>();
 
-    let isotopic_compositions = isotopes
+    let known_isotopic_compositions: Vec<TokenStream> = isotopes
         .iter()
-        .map(|isotope| {
-            if let Some(isotopic_composition) = isotope.isotopic_composition {
-                quote! { Some(#isotopic_composition) }
+        .filter_map(|isotope| {
+            isotope.isotopic_composition.map(|isotopic_composition| {
+                let isotope_name = format!("{}{}", isotope.atomic_symbol, isotope.mass_number);
+                let isotope_ident = Ident::new(&isotope_name, proc_macro2::Span::call_site());
+                quote! {
+                    Self::#isotope_ident => Some(#isotopic_composition)
+                }
+            })
+        })
+        .collect::<Vec<_>>();
+    let unknown_isotopic_compositions: Vec<TokenStream> = isotopes
+        .iter()
+        .filter_map(|isotope| {
+            if isotope.isotopic_composition.is_none() {
+                let isotope_name = format!("{}{}", isotope.atomic_symbol, isotope.mass_number);
+                let isotope_ident = Ident::new(&isotope_name, proc_macro2::Span::call_site());
+                Some(quote! {
+                    Self::#isotope_ident
+                })
             } else {
-                quote! { None }
+                None
             }
         })
         .collect::<Vec<_>>();
@@ -218,12 +261,36 @@ fn implement_isotope_enum(isotopes: &[IsotopeMetadata]) -> TokenStream {
         proc_macro2::Span::call_site(),
     );
 
+    let isotope_documentation =
+        format!("Isotopes of the element {}", element_name_from_symbol(&isotopes[0].atomic_symbol));
+
+    let submodule_documentation =
+        format!("Isotopes of the element {}", element_name_from_symbol(&isotopes[0].atomic_symbol));
+
+    let isotopic_composition_impl = if known_isotopic_compositions.is_empty() {
+        quote! {
+            None
+        }
+    } else {
+        quote! {
+            match self {
+                #(#known_isotopic_compositions),*,
+                #(
+                    #unknown_isotopic_compositions
+                )|* => None,
+            }
+        }
+    };
+
     quote! {
+        #![doc = #submodule_documentation]
+
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum::EnumIter)]
         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+        #[doc = #isotope_documentation]
         pub enum #isotope_ident {
-            #(#enum_variants),*
+            #(#enum_variants_with_documentation),*
         }
 
         impl super::RelativeAtomicMass for #isotope_ident {
@@ -250,11 +317,7 @@ fn implement_isotope_enum(isotopes: &[IsotopeMetadata]) -> TokenStream {
 
         impl super::IsotopicComposition for #isotope_ident {
             fn isotopic_composition(&self) -> Option<f64> {
-                match self {
-                    #(
-                        Self::#enum_variants => #isotopic_compositions,
-                    )*
-                }
+                #isotopic_composition_impl
             }
         }
 
@@ -314,8 +377,6 @@ pub fn main() {
             .arg(file_path.to_str().unwrap())
             .status()
             .expect("Failed to run rustfmt");
-        if !status.success() {
-            panic!("rustfmt failed with status: {status}");
-        }
+        assert!(status.success(), "rustfmt failed with status: {status}");
     }
 }

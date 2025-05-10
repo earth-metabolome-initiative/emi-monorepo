@@ -1,23 +1,42 @@
+//! Isotopes of the element Nobelium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Nobelium
 pub enum NobeliumIsotope {
+    /// Isotope No248 of Nobelium
     No248,
+    /// Isotope No249 of Nobelium
     No249,
+    /// Isotope No250 of Nobelium
     No250,
+    /// Isotope No251 of Nobelium
     No251,
+    /// Isotope No252 of Nobelium
     No252,
+    /// Isotope No253 of Nobelium
     No253,
+    /// Isotope No254 of Nobelium
     No254,
+    /// Isotope No255 of Nobelium
     No255,
+    /// Isotope No256 of Nobelium
     No256,
+    /// Isotope No257 of Nobelium
     No257,
+    /// Isotope No258 of Nobelium
     No258,
+    /// Isotope No259 of Nobelium
     No259,
+    /// Isotope No260 of Nobelium
     No260,
+    /// Isotope No261 of Nobelium
     No261,
+    /// Isotope No262 of Nobelium
     No262,
+    /// Isotope No263 of Nobelium
     No263,
+    /// Isotope No264 of Nobelium
     No264,
 }
 impl super::RelativeAtomicMass for NobeliumIsotope {
@@ -73,25 +92,7 @@ impl super::MassNumber for NobeliumIsotope {
 }
 impl super::IsotopicComposition for NobeliumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::No248 => None,
-            Self::No249 => None,
-            Self::No250 => None,
-            Self::No251 => None,
-            Self::No252 => None,
-            Self::No253 => None,
-            Self::No254 => None,
-            Self::No255 => None,
-            Self::No256 => None,
-            Self::No257 => None,
-            Self::No258 => None,
-            Self::No259 => None,
-            Self::No260 => None,
-            Self::No261 => None,
-            Self::No262 => None,
-            Self::No263 => None,
-            Self::No264 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for NobeliumIsotope {

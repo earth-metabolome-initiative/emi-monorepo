@@ -1,11 +1,18 @@
+//! Isotopes of the element Livermorium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Livermorium
 pub enum LivermoriumIsotope {
+    /// Isotope Lv289 of Livermorium
     Lv289,
+    /// Isotope Lv290 of Livermorium
     Lv290,
+    /// Isotope Lv291 of Livermorium
     Lv291,
+    /// Isotope Lv292 of Livermorium
     Lv292,
+    /// Isotope Lv293 of Livermorium
     Lv293,
 }
 impl super::RelativeAtomicMass for LivermoriumIsotope {
@@ -37,13 +44,7 @@ impl super::MassNumber for LivermoriumIsotope {
 }
 impl super::IsotopicComposition for LivermoriumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Lv289 => None,
-            Self::Lv290 => None,
-            Self::Lv291 => None,
-            Self::Lv292 => None,
-            Self::Lv293 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for LivermoriumIsotope {

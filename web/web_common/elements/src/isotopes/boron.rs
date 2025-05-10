@@ -1,22 +1,40 @@
+//! Isotopes of the element Boron
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Boron
 pub enum BoronIsotope {
+    /// Isotope B6 of Boron
     B6,
+    /// Isotope B7 of Boron
     B7,
+    /// Isotope B8 of Boron
     B8,
+    /// Isotope B9 of Boron
     B9,
+    /// Isotope B10 of Boron
     B10,
+    /// Isotope B11 of Boron
     B11,
+    /// Isotope B12 of Boron
     B12,
+    /// Isotope B13 of Boron
     B13,
+    /// Isotope B14 of Boron
     B14,
+    /// Isotope B15 of Boron
     B15,
+    /// Isotope B16 of Boron
     B16,
+    /// Isotope B17 of Boron
     B17,
+    /// Isotope B18 of Boron
     B18,
+    /// Isotope B19 of Boron
     B19,
+    /// Isotope B20 of Boron
     B20,
+    /// Isotope B21 of Boron
     B21,
 }
 impl super::RelativeAtomicMass for BoronIsotope {
@@ -71,22 +89,22 @@ impl super::MassNumber for BoronIsotope {
 impl super::IsotopicComposition for BoronIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::B6 => None,
-            Self::B7 => None,
-            Self::B8 => None,
-            Self::B9 => None,
             Self::B10 => Some(0.199f64),
             Self::B11 => Some(0.801f64),
-            Self::B12 => None,
-            Self::B13 => None,
-            Self::B14 => None,
-            Self::B15 => None,
-            Self::B16 => None,
-            Self::B17 => None,
-            Self::B18 => None,
-            Self::B19 => None,
-            Self::B20 => None,
-            Self::B21 => None,
+            Self::B6
+            | Self::B7
+            | Self::B8
+            | Self::B9
+            | Self::B12
+            | Self::B13
+            | Self::B14
+            | Self::B15
+            | Self::B16
+            | Self::B17
+            | Self::B18
+            | Self::B19
+            | Self::B20
+            | Self::B21 => None,
         }
     }
 }

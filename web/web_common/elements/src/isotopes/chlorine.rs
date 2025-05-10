@@ -1,30 +1,56 @@
+//! Isotopes of the element Chlorine
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Chlorine
 pub enum ChlorineIsotope {
+    /// Isotope Cl28 of Chlorine
     Cl28,
+    /// Isotope Cl29 of Chlorine
     Cl29,
+    /// Isotope Cl30 of Chlorine
     Cl30,
+    /// Isotope Cl31 of Chlorine
     Cl31,
+    /// Isotope Cl32 of Chlorine
     Cl32,
+    /// Isotope Cl33 of Chlorine
     Cl33,
+    /// Isotope Cl34 of Chlorine
     Cl34,
+    /// Isotope Cl35 of Chlorine
     Cl35,
+    /// Isotope Cl36 of Chlorine
     Cl36,
+    /// Isotope Cl37 of Chlorine
     Cl37,
+    /// Isotope Cl38 of Chlorine
     Cl38,
+    /// Isotope Cl39 of Chlorine
     Cl39,
+    /// Isotope Cl40 of Chlorine
     Cl40,
+    /// Isotope Cl41 of Chlorine
     Cl41,
+    /// Isotope Cl42 of Chlorine
     Cl42,
+    /// Isotope Cl43 of Chlorine
     Cl43,
+    /// Isotope Cl44 of Chlorine
     Cl44,
+    /// Isotope Cl45 of Chlorine
     Cl45,
+    /// Isotope Cl46 of Chlorine
     Cl46,
+    /// Isotope Cl47 of Chlorine
     Cl47,
+    /// Isotope Cl48 of Chlorine
     Cl48,
+    /// Isotope Cl49 of Chlorine
     Cl49,
+    /// Isotope Cl50 of Chlorine
     Cl50,
+    /// Isotope Cl51 of Chlorine
     Cl51,
 }
 impl super::RelativeAtomicMass for ChlorineIsotope {
@@ -95,30 +121,30 @@ impl super::MassNumber for ChlorineIsotope {
 impl super::IsotopicComposition for ChlorineIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Cl28 => None,
-            Self::Cl29 => None,
-            Self::Cl30 => None,
-            Self::Cl31 => None,
-            Self::Cl32 => None,
-            Self::Cl33 => None,
-            Self::Cl34 => None,
             Self::Cl35 => Some(0.7576f64),
-            Self::Cl36 => None,
             Self::Cl37 => Some(0.2424f64),
-            Self::Cl38 => None,
-            Self::Cl39 => None,
-            Self::Cl40 => None,
-            Self::Cl41 => None,
-            Self::Cl42 => None,
-            Self::Cl43 => None,
-            Self::Cl44 => None,
-            Self::Cl45 => None,
-            Self::Cl46 => None,
-            Self::Cl47 => None,
-            Self::Cl48 => None,
-            Self::Cl49 => None,
-            Self::Cl50 => None,
-            Self::Cl51 => None,
+            Self::Cl28
+            | Self::Cl29
+            | Self::Cl30
+            | Self::Cl31
+            | Self::Cl32
+            | Self::Cl33
+            | Self::Cl34
+            | Self::Cl36
+            | Self::Cl38
+            | Self::Cl39
+            | Self::Cl40
+            | Self::Cl41
+            | Self::Cl42
+            | Self::Cl43
+            | Self::Cl44
+            | Self::Cl45
+            | Self::Cl46
+            | Self::Cl47
+            | Self::Cl48
+            | Self::Cl49
+            | Self::Cl50
+            | Self::Cl51 => None,
         }
     }
 }

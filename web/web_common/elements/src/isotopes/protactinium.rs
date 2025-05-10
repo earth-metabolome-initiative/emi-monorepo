@@ -1,36 +1,68 @@
+//! Isotopes of the element Protactinium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Protactinium
 pub enum ProtactiniumIsotope {
+    /// Isotope Pa212 of Protactinium
     Pa212,
+    /// Isotope Pa213 of Protactinium
     Pa213,
+    /// Isotope Pa214 of Protactinium
     Pa214,
+    /// Isotope Pa215 of Protactinium
     Pa215,
+    /// Isotope Pa216 of Protactinium
     Pa216,
+    /// Isotope Pa217 of Protactinium
     Pa217,
+    /// Isotope Pa218 of Protactinium
     Pa218,
+    /// Isotope Pa219 of Protactinium
     Pa219,
+    /// Isotope Pa220 of Protactinium
     Pa220,
+    /// Isotope Pa221 of Protactinium
     Pa221,
+    /// Isotope Pa222 of Protactinium
     Pa222,
+    /// Isotope Pa223 of Protactinium
     Pa223,
+    /// Isotope Pa224 of Protactinium
     Pa224,
+    /// Isotope Pa225 of Protactinium
     Pa225,
+    /// Isotope Pa226 of Protactinium
     Pa226,
+    /// Isotope Pa227 of Protactinium
     Pa227,
+    /// Isotope Pa228 of Protactinium
     Pa228,
+    /// Isotope Pa229 of Protactinium
     Pa229,
+    /// Isotope Pa230 of Protactinium
     Pa230,
+    /// Isotope Pa231 of Protactinium
     Pa231,
+    /// Isotope Pa232 of Protactinium
     Pa232,
+    /// Isotope Pa233 of Protactinium
     Pa233,
+    /// Isotope Pa234 of Protactinium
     Pa234,
+    /// Isotope Pa235 of Protactinium
     Pa235,
+    /// Isotope Pa236 of Protactinium
     Pa236,
+    /// Isotope Pa237 of Protactinium
     Pa237,
+    /// Isotope Pa238 of Protactinium
     Pa238,
+    /// Isotope Pa239 of Protactinium
     Pa239,
+    /// Isotope Pa240 of Protactinium
     Pa240,
+    /// Isotope Pa241 of Protactinium
     Pa241,
 }
 impl super::RelativeAtomicMass for ProtactiniumIsotope {
@@ -113,36 +145,36 @@ impl super::MassNumber for ProtactiniumIsotope {
 impl super::IsotopicComposition for ProtactiniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Pa212 => None,
-            Self::Pa213 => None,
-            Self::Pa214 => None,
-            Self::Pa215 => None,
-            Self::Pa216 => None,
-            Self::Pa217 => None,
-            Self::Pa218 => None,
-            Self::Pa219 => None,
-            Self::Pa220 => None,
-            Self::Pa221 => None,
-            Self::Pa222 => None,
-            Self::Pa223 => None,
-            Self::Pa224 => None,
-            Self::Pa225 => None,
-            Self::Pa226 => None,
-            Self::Pa227 => None,
-            Self::Pa228 => None,
-            Self::Pa229 => None,
-            Self::Pa230 => None,
             Self::Pa231 => Some(1f64),
-            Self::Pa232 => None,
-            Self::Pa233 => None,
-            Self::Pa234 => None,
-            Self::Pa235 => None,
-            Self::Pa236 => None,
-            Self::Pa237 => None,
-            Self::Pa238 => None,
-            Self::Pa239 => None,
-            Self::Pa240 => None,
-            Self::Pa241 => None,
+            Self::Pa212
+            | Self::Pa213
+            | Self::Pa214
+            | Self::Pa215
+            | Self::Pa216
+            | Self::Pa217
+            | Self::Pa218
+            | Self::Pa219
+            | Self::Pa220
+            | Self::Pa221
+            | Self::Pa222
+            | Self::Pa223
+            | Self::Pa224
+            | Self::Pa225
+            | Self::Pa226
+            | Self::Pa227
+            | Self::Pa228
+            | Self::Pa229
+            | Self::Pa230
+            | Self::Pa232
+            | Self::Pa233
+            | Self::Pa234
+            | Self::Pa235
+            | Self::Pa236
+            | Self::Pa237
+            | Self::Pa238
+            | Self::Pa239
+            | Self::Pa240
+            | Self::Pa241 => None,
         }
     }
 }

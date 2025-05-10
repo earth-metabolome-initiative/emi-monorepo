@@ -1,45 +1,86 @@
+//! Isotopes of the element Tellurium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Tellurium
 pub enum TelluriumIsotope {
+    /// Isotope Te105 of Tellurium
     Te105,
+    /// Isotope Te106 of Tellurium
     Te106,
+    /// Isotope Te107 of Tellurium
     Te107,
+    /// Isotope Te108 of Tellurium
     Te108,
+    /// Isotope Te109 of Tellurium
     Te109,
+    /// Isotope Te110 of Tellurium
     Te110,
+    /// Isotope Te111 of Tellurium
     Te111,
+    /// Isotope Te112 of Tellurium
     Te112,
+    /// Isotope Te113 of Tellurium
     Te113,
+    /// Isotope Te114 of Tellurium
     Te114,
+    /// Isotope Te115 of Tellurium
     Te115,
+    /// Isotope Te116 of Tellurium
     Te116,
+    /// Isotope Te117 of Tellurium
     Te117,
+    /// Isotope Te118 of Tellurium
     Te118,
+    /// Isotope Te119 of Tellurium
     Te119,
+    /// Isotope Te120 of Tellurium
     Te120,
+    /// Isotope Te121 of Tellurium
     Te121,
+    /// Isotope Te122 of Tellurium
     Te122,
+    /// Isotope Te123 of Tellurium
     Te123,
+    /// Isotope Te124 of Tellurium
     Te124,
+    /// Isotope Te125 of Tellurium
     Te125,
+    /// Isotope Te126 of Tellurium
     Te126,
+    /// Isotope Te127 of Tellurium
     Te127,
+    /// Isotope Te128 of Tellurium
     Te128,
+    /// Isotope Te129 of Tellurium
     Te129,
+    /// Isotope Te130 of Tellurium
     Te130,
+    /// Isotope Te131 of Tellurium
     Te131,
+    /// Isotope Te132 of Tellurium
     Te132,
+    /// Isotope Te133 of Tellurium
     Te133,
+    /// Isotope Te134 of Tellurium
     Te134,
+    /// Isotope Te135 of Tellurium
     Te135,
+    /// Isotope Te136 of Tellurium
     Te136,
+    /// Isotope Te137 of Tellurium
     Te137,
+    /// Isotope Te138 of Tellurium
     Te138,
+    /// Isotope Te139 of Tellurium
     Te139,
+    /// Isotope Te140 of Tellurium
     Te140,
+    /// Isotope Te141 of Tellurium
     Te141,
+    /// Isotope Te142 of Tellurium
     Te142,
+    /// Isotope Te143 of Tellurium
     Te143,
 }
 impl super::RelativeAtomicMass for TelluriumIsotope {
@@ -140,45 +181,45 @@ impl super::MassNumber for TelluriumIsotope {
 impl super::IsotopicComposition for TelluriumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Te105 => None,
-            Self::Te106 => None,
-            Self::Te107 => None,
-            Self::Te108 => None,
-            Self::Te109 => None,
-            Self::Te110 => None,
-            Self::Te111 => None,
-            Self::Te112 => None,
-            Self::Te113 => None,
-            Self::Te114 => None,
-            Self::Te115 => None,
-            Self::Te116 => None,
-            Self::Te117 => None,
-            Self::Te118 => None,
-            Self::Te119 => None,
             Self::Te120 => Some(0.0009f64),
-            Self::Te121 => None,
             Self::Te122 => Some(0.0255f64),
             Self::Te123 => Some(0.0089f64),
             Self::Te124 => Some(0.0474f64),
             Self::Te125 => Some(0.0707f64),
             Self::Te126 => Some(0.1884f64),
-            Self::Te127 => None,
             Self::Te128 => Some(0.3174f64),
-            Self::Te129 => None,
             Self::Te130 => Some(0.3408f64),
-            Self::Te131 => None,
-            Self::Te132 => None,
-            Self::Te133 => None,
-            Self::Te134 => None,
-            Self::Te135 => None,
-            Self::Te136 => None,
-            Self::Te137 => None,
-            Self::Te138 => None,
-            Self::Te139 => None,
-            Self::Te140 => None,
-            Self::Te141 => None,
-            Self::Te142 => None,
-            Self::Te143 => None,
+            Self::Te105
+            | Self::Te106
+            | Self::Te107
+            | Self::Te108
+            | Self::Te109
+            | Self::Te110
+            | Self::Te111
+            | Self::Te112
+            | Self::Te113
+            | Self::Te114
+            | Self::Te115
+            | Self::Te116
+            | Self::Te117
+            | Self::Te118
+            | Self::Te119
+            | Self::Te121
+            | Self::Te127
+            | Self::Te129
+            | Self::Te131
+            | Self::Te132
+            | Self::Te133
+            | Self::Te134
+            | Self::Te135
+            | Self::Te136
+            | Self::Te137
+            | Self::Te138
+            | Self::Te139
+            | Self::Te140
+            | Self::Te141
+            | Self::Te142
+            | Self::Te143 => None,
         }
     }
 }

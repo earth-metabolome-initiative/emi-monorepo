@@ -1,22 +1,40 @@
+//! Isotopes of the element Lawrencium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Lawrencium
 pub enum LawrenciumIsotope {
+    /// Isotope Lr251 of Lawrencium
     Lr251,
+    /// Isotope Lr252 of Lawrencium
     Lr252,
+    /// Isotope Lr253 of Lawrencium
     Lr253,
+    /// Isotope Lr254 of Lawrencium
     Lr254,
+    /// Isotope Lr255 of Lawrencium
     Lr255,
+    /// Isotope Lr256 of Lawrencium
     Lr256,
+    /// Isotope Lr257 of Lawrencium
     Lr257,
+    /// Isotope Lr258 of Lawrencium
     Lr258,
+    /// Isotope Lr259 of Lawrencium
     Lr259,
+    /// Isotope Lr260 of Lawrencium
     Lr260,
+    /// Isotope Lr261 of Lawrencium
     Lr261,
+    /// Isotope Lr262 of Lawrencium
     Lr262,
+    /// Isotope Lr263 of Lawrencium
     Lr263,
+    /// Isotope Lr264 of Lawrencium
     Lr264,
+    /// Isotope Lr265 of Lawrencium
     Lr265,
+    /// Isotope Lr266 of Lawrencium
     Lr266,
 }
 impl super::RelativeAtomicMass for LawrenciumIsotope {
@@ -70,24 +88,7 @@ impl super::MassNumber for LawrenciumIsotope {
 }
 impl super::IsotopicComposition for LawrenciumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Lr251 => None,
-            Self::Lr252 => None,
-            Self::Lr253 => None,
-            Self::Lr254 => None,
-            Self::Lr255 => None,
-            Self::Lr256 => None,
-            Self::Lr257 => None,
-            Self::Lr258 => None,
-            Self::Lr259 => None,
-            Self::Lr260 => None,
-            Self::Lr261 => None,
-            Self::Lr262 => None,
-            Self::Lr263 => None,
-            Self::Lr264 => None,
-            Self::Lr265 => None,
-            Self::Lr266 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for LawrenciumIsotope {

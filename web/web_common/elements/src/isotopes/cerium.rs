@@ -1,45 +1,86 @@
+//! Isotopes of the element Cerium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Cerium
 pub enum CeriumIsotope {
+    /// Isotope Ce119 of Cerium
     Ce119,
+    /// Isotope Ce120 of Cerium
     Ce120,
+    /// Isotope Ce121 of Cerium
     Ce121,
+    /// Isotope Ce122 of Cerium
     Ce122,
+    /// Isotope Ce123 of Cerium
     Ce123,
+    /// Isotope Ce124 of Cerium
     Ce124,
+    /// Isotope Ce125 of Cerium
     Ce125,
+    /// Isotope Ce126 of Cerium
     Ce126,
+    /// Isotope Ce127 of Cerium
     Ce127,
+    /// Isotope Ce128 of Cerium
     Ce128,
+    /// Isotope Ce129 of Cerium
     Ce129,
+    /// Isotope Ce130 of Cerium
     Ce130,
+    /// Isotope Ce131 of Cerium
     Ce131,
+    /// Isotope Ce132 of Cerium
     Ce132,
+    /// Isotope Ce133 of Cerium
     Ce133,
+    /// Isotope Ce134 of Cerium
     Ce134,
+    /// Isotope Ce135 of Cerium
     Ce135,
+    /// Isotope Ce136 of Cerium
     Ce136,
+    /// Isotope Ce137 of Cerium
     Ce137,
+    /// Isotope Ce138 of Cerium
     Ce138,
+    /// Isotope Ce139 of Cerium
     Ce139,
+    /// Isotope Ce140 of Cerium
     Ce140,
+    /// Isotope Ce141 of Cerium
     Ce141,
+    /// Isotope Ce142 of Cerium
     Ce142,
+    /// Isotope Ce143 of Cerium
     Ce143,
+    /// Isotope Ce144 of Cerium
     Ce144,
+    /// Isotope Ce145 of Cerium
     Ce145,
+    /// Isotope Ce146 of Cerium
     Ce146,
+    /// Isotope Ce147 of Cerium
     Ce147,
+    /// Isotope Ce148 of Cerium
     Ce148,
+    /// Isotope Ce149 of Cerium
     Ce149,
+    /// Isotope Ce150 of Cerium
     Ce150,
+    /// Isotope Ce151 of Cerium
     Ce151,
+    /// Isotope Ce152 of Cerium
     Ce152,
+    /// Isotope Ce153 of Cerium
     Ce153,
+    /// Isotope Ce154 of Cerium
     Ce154,
+    /// Isotope Ce155 of Cerium
     Ce155,
+    /// Isotope Ce156 of Cerium
     Ce156,
+    /// Isotope Ce157 of Cerium
     Ce157,
 }
 impl super::RelativeAtomicMass for CeriumIsotope {
@@ -140,45 +181,45 @@ impl super::MassNumber for CeriumIsotope {
 impl super::IsotopicComposition for CeriumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Ce119 => None,
-            Self::Ce120 => None,
-            Self::Ce121 => None,
-            Self::Ce122 => None,
-            Self::Ce123 => None,
-            Self::Ce124 => None,
-            Self::Ce125 => None,
-            Self::Ce126 => None,
-            Self::Ce127 => None,
-            Self::Ce128 => None,
-            Self::Ce129 => None,
-            Self::Ce130 => None,
-            Self::Ce131 => None,
-            Self::Ce132 => None,
-            Self::Ce133 => None,
-            Self::Ce134 => None,
-            Self::Ce135 => None,
             Self::Ce136 => Some(0.00185f64),
-            Self::Ce137 => None,
             Self::Ce138 => Some(0.00251f64),
-            Self::Ce139 => None,
             Self::Ce140 => Some(0.8845f64),
-            Self::Ce141 => None,
             Self::Ce142 => Some(0.11114f64),
-            Self::Ce143 => None,
-            Self::Ce144 => None,
-            Self::Ce145 => None,
-            Self::Ce146 => None,
-            Self::Ce147 => None,
-            Self::Ce148 => None,
-            Self::Ce149 => None,
-            Self::Ce150 => None,
-            Self::Ce151 => None,
-            Self::Ce152 => None,
-            Self::Ce153 => None,
-            Self::Ce154 => None,
-            Self::Ce155 => None,
-            Self::Ce156 => None,
-            Self::Ce157 => None,
+            Self::Ce119
+            | Self::Ce120
+            | Self::Ce121
+            | Self::Ce122
+            | Self::Ce123
+            | Self::Ce124
+            | Self::Ce125
+            | Self::Ce126
+            | Self::Ce127
+            | Self::Ce128
+            | Self::Ce129
+            | Self::Ce130
+            | Self::Ce131
+            | Self::Ce132
+            | Self::Ce133
+            | Self::Ce134
+            | Self::Ce135
+            | Self::Ce137
+            | Self::Ce139
+            | Self::Ce141
+            | Self::Ce143
+            | Self::Ce144
+            | Self::Ce145
+            | Self::Ce146
+            | Self::Ce147
+            | Self::Ce148
+            | Self::Ce149
+            | Self::Ce150
+            | Self::Ce151
+            | Self::Ce152
+            | Self::Ce153
+            | Self::Ce154
+            | Self::Ce155
+            | Self::Ce156
+            | Self::Ce157 => None,
         }
     }
 }

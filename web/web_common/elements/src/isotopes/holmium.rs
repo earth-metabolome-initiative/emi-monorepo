@@ -1,42 +1,80 @@
+//! Isotopes of the element Holmium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Holmium
 pub enum HolmiumIsotope {
+    /// Isotope Ho140 of Holmium
     Ho140,
+    /// Isotope Ho141 of Holmium
     Ho141,
+    /// Isotope Ho142 of Holmium
     Ho142,
+    /// Isotope Ho143 of Holmium
     Ho143,
+    /// Isotope Ho144 of Holmium
     Ho144,
+    /// Isotope Ho145 of Holmium
     Ho145,
+    /// Isotope Ho146 of Holmium
     Ho146,
+    /// Isotope Ho147 of Holmium
     Ho147,
+    /// Isotope Ho148 of Holmium
     Ho148,
+    /// Isotope Ho149 of Holmium
     Ho149,
+    /// Isotope Ho150 of Holmium
     Ho150,
+    /// Isotope Ho151 of Holmium
     Ho151,
+    /// Isotope Ho152 of Holmium
     Ho152,
+    /// Isotope Ho153 of Holmium
     Ho153,
+    /// Isotope Ho154 of Holmium
     Ho154,
+    /// Isotope Ho155 of Holmium
     Ho155,
+    /// Isotope Ho156 of Holmium
     Ho156,
+    /// Isotope Ho157 of Holmium
     Ho157,
+    /// Isotope Ho158 of Holmium
     Ho158,
+    /// Isotope Ho159 of Holmium
     Ho159,
+    /// Isotope Ho160 of Holmium
     Ho160,
+    /// Isotope Ho161 of Holmium
     Ho161,
+    /// Isotope Ho162 of Holmium
     Ho162,
+    /// Isotope Ho163 of Holmium
     Ho163,
+    /// Isotope Ho164 of Holmium
     Ho164,
+    /// Isotope Ho165 of Holmium
     Ho165,
+    /// Isotope Ho166 of Holmium
     Ho166,
+    /// Isotope Ho167 of Holmium
     Ho167,
+    /// Isotope Ho168 of Holmium
     Ho168,
+    /// Isotope Ho169 of Holmium
     Ho169,
+    /// Isotope Ho170 of Holmium
     Ho170,
+    /// Isotope Ho171 of Holmium
     Ho171,
+    /// Isotope Ho172 of Holmium
     Ho172,
+    /// Isotope Ho173 of Holmium
     Ho173,
+    /// Isotope Ho174 of Holmium
     Ho174,
+    /// Isotope Ho175 of Holmium
     Ho175,
 }
 impl super::RelativeAtomicMass for HolmiumIsotope {
@@ -131,42 +169,42 @@ impl super::MassNumber for HolmiumIsotope {
 impl super::IsotopicComposition for HolmiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Ho140 => None,
-            Self::Ho141 => None,
-            Self::Ho142 => None,
-            Self::Ho143 => None,
-            Self::Ho144 => None,
-            Self::Ho145 => None,
-            Self::Ho146 => None,
-            Self::Ho147 => None,
-            Self::Ho148 => None,
-            Self::Ho149 => None,
-            Self::Ho150 => None,
-            Self::Ho151 => None,
-            Self::Ho152 => None,
-            Self::Ho153 => None,
-            Self::Ho154 => None,
-            Self::Ho155 => None,
-            Self::Ho156 => None,
-            Self::Ho157 => None,
-            Self::Ho158 => None,
-            Self::Ho159 => None,
-            Self::Ho160 => None,
-            Self::Ho161 => None,
-            Self::Ho162 => None,
-            Self::Ho163 => None,
-            Self::Ho164 => None,
             Self::Ho165 => Some(1f64),
-            Self::Ho166 => None,
-            Self::Ho167 => None,
-            Self::Ho168 => None,
-            Self::Ho169 => None,
-            Self::Ho170 => None,
-            Self::Ho171 => None,
-            Self::Ho172 => None,
-            Self::Ho173 => None,
-            Self::Ho174 => None,
-            Self::Ho175 => None,
+            Self::Ho140
+            | Self::Ho141
+            | Self::Ho142
+            | Self::Ho143
+            | Self::Ho144
+            | Self::Ho145
+            | Self::Ho146
+            | Self::Ho147
+            | Self::Ho148
+            | Self::Ho149
+            | Self::Ho150
+            | Self::Ho151
+            | Self::Ho152
+            | Self::Ho153
+            | Self::Ho154
+            | Self::Ho155
+            | Self::Ho156
+            | Self::Ho157
+            | Self::Ho158
+            | Self::Ho159
+            | Self::Ho160
+            | Self::Ho161
+            | Self::Ho162
+            | Self::Ho163
+            | Self::Ho164
+            | Self::Ho166
+            | Self::Ho167
+            | Self::Ho168
+            | Self::Ho169
+            | Self::Ho170
+            | Self::Ho171
+            | Self::Ho172
+            | Self::Ho173
+            | Self::Ho174
+            | Self::Ho175 => None,
         }
     }
 }

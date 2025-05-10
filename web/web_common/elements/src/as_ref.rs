@@ -2,6 +2,7 @@
 //! for the `Element` enumeration.
 
 impl AsRef<str> for crate::Element {
+    #[allow(clippy::too_many_lines)]
     fn as_ref(&self) -> &str {
         match self {
             Self::H => "H",

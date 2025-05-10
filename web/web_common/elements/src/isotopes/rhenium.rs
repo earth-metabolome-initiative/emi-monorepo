@@ -1,46 +1,88 @@
+//! Isotopes of the element Rhenium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Rhenium
 pub enum RheniumIsotope {
+    /// Isotope Re159 of Rhenium
     Re159,
+    /// Isotope Re160 of Rhenium
     Re160,
+    /// Isotope Re161 of Rhenium
     Re161,
+    /// Isotope Re162 of Rhenium
     Re162,
+    /// Isotope Re163 of Rhenium
     Re163,
+    /// Isotope Re164 of Rhenium
     Re164,
+    /// Isotope Re165 of Rhenium
     Re165,
+    /// Isotope Re166 of Rhenium
     Re166,
+    /// Isotope Re167 of Rhenium
     Re167,
+    /// Isotope Re168 of Rhenium
     Re168,
+    /// Isotope Re169 of Rhenium
     Re169,
+    /// Isotope Re170 of Rhenium
     Re170,
+    /// Isotope Re171 of Rhenium
     Re171,
+    /// Isotope Re172 of Rhenium
     Re172,
+    /// Isotope Re173 of Rhenium
     Re173,
+    /// Isotope Re174 of Rhenium
     Re174,
+    /// Isotope Re175 of Rhenium
     Re175,
+    /// Isotope Re176 of Rhenium
     Re176,
+    /// Isotope Re177 of Rhenium
     Re177,
+    /// Isotope Re178 of Rhenium
     Re178,
+    /// Isotope Re179 of Rhenium
     Re179,
+    /// Isotope Re180 of Rhenium
     Re180,
+    /// Isotope Re181 of Rhenium
     Re181,
+    /// Isotope Re182 of Rhenium
     Re182,
+    /// Isotope Re183 of Rhenium
     Re183,
+    /// Isotope Re184 of Rhenium
     Re184,
+    /// Isotope Re185 of Rhenium
     Re185,
+    /// Isotope Re186 of Rhenium
     Re186,
+    /// Isotope Re187 of Rhenium
     Re187,
+    /// Isotope Re188 of Rhenium
     Re188,
+    /// Isotope Re189 of Rhenium
     Re189,
+    /// Isotope Re190 of Rhenium
     Re190,
+    /// Isotope Re191 of Rhenium
     Re191,
+    /// Isotope Re192 of Rhenium
     Re192,
+    /// Isotope Re193 of Rhenium
     Re193,
+    /// Isotope Re194 of Rhenium
     Re194,
+    /// Isotope Re195 of Rhenium
     Re195,
+    /// Isotope Re196 of Rhenium
     Re196,
+    /// Isotope Re197 of Rhenium
     Re197,
+    /// Isotope Re198 of Rhenium
     Re198,
 }
 impl super::RelativeAtomicMass for RheniumIsotope {
@@ -143,46 +185,46 @@ impl super::MassNumber for RheniumIsotope {
 impl super::IsotopicComposition for RheniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Re159 => None,
-            Self::Re160 => None,
-            Self::Re161 => None,
-            Self::Re162 => None,
-            Self::Re163 => None,
-            Self::Re164 => None,
-            Self::Re165 => None,
-            Self::Re166 => None,
-            Self::Re167 => None,
-            Self::Re168 => None,
-            Self::Re169 => None,
-            Self::Re170 => None,
-            Self::Re171 => None,
-            Self::Re172 => None,
-            Self::Re173 => None,
-            Self::Re174 => None,
-            Self::Re175 => None,
-            Self::Re176 => None,
-            Self::Re177 => None,
-            Self::Re178 => None,
-            Self::Re179 => None,
-            Self::Re180 => None,
-            Self::Re181 => None,
-            Self::Re182 => None,
-            Self::Re183 => None,
-            Self::Re184 => None,
             Self::Re185 => Some(0.374f64),
-            Self::Re186 => None,
             Self::Re187 => Some(0.626f64),
-            Self::Re188 => None,
-            Self::Re189 => None,
-            Self::Re190 => None,
-            Self::Re191 => None,
-            Self::Re192 => None,
-            Self::Re193 => None,
-            Self::Re194 => None,
-            Self::Re195 => None,
-            Self::Re196 => None,
-            Self::Re197 => None,
-            Self::Re198 => None,
+            Self::Re159
+            | Self::Re160
+            | Self::Re161
+            | Self::Re162
+            | Self::Re163
+            | Self::Re164
+            | Self::Re165
+            | Self::Re166
+            | Self::Re167
+            | Self::Re168
+            | Self::Re169
+            | Self::Re170
+            | Self::Re171
+            | Self::Re172
+            | Self::Re173
+            | Self::Re174
+            | Self::Re175
+            | Self::Re176
+            | Self::Re177
+            | Self::Re178
+            | Self::Re179
+            | Self::Re180
+            | Self::Re181
+            | Self::Re182
+            | Self::Re183
+            | Self::Re184
+            | Self::Re186
+            | Self::Re188
+            | Self::Re189
+            | Self::Re190
+            | Self::Re191
+            | Self::Re192
+            | Self::Re193
+            | Self::Re194
+            | Self::Re195
+            | Self::Re196
+            | Self::Re197
+            | Self::Re198 => None,
         }
     }
 }

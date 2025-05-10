@@ -1,46 +1,88 @@
+//! Isotopes of the element Barium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Barium
 pub enum BariumIsotope {
+    /// Isotope Ba114 of Barium
     Ba114,
+    /// Isotope Ba115 of Barium
     Ba115,
+    /// Isotope Ba116 of Barium
     Ba116,
+    /// Isotope Ba117 of Barium
     Ba117,
+    /// Isotope Ba118 of Barium
     Ba118,
+    /// Isotope Ba119 of Barium
     Ba119,
+    /// Isotope Ba120 of Barium
     Ba120,
+    /// Isotope Ba121 of Barium
     Ba121,
+    /// Isotope Ba122 of Barium
     Ba122,
+    /// Isotope Ba123 of Barium
     Ba123,
+    /// Isotope Ba124 of Barium
     Ba124,
+    /// Isotope Ba125 of Barium
     Ba125,
+    /// Isotope Ba126 of Barium
     Ba126,
+    /// Isotope Ba127 of Barium
     Ba127,
+    /// Isotope Ba128 of Barium
     Ba128,
+    /// Isotope Ba129 of Barium
     Ba129,
+    /// Isotope Ba130 of Barium
     Ba130,
+    /// Isotope Ba131 of Barium
     Ba131,
+    /// Isotope Ba132 of Barium
     Ba132,
+    /// Isotope Ba133 of Barium
     Ba133,
+    /// Isotope Ba134 of Barium
     Ba134,
+    /// Isotope Ba135 of Barium
     Ba135,
+    /// Isotope Ba136 of Barium
     Ba136,
+    /// Isotope Ba137 of Barium
     Ba137,
+    /// Isotope Ba138 of Barium
     Ba138,
+    /// Isotope Ba139 of Barium
     Ba139,
+    /// Isotope Ba140 of Barium
     Ba140,
+    /// Isotope Ba141 of Barium
     Ba141,
+    /// Isotope Ba142 of Barium
     Ba142,
+    /// Isotope Ba143 of Barium
     Ba143,
+    /// Isotope Ba144 of Barium
     Ba144,
+    /// Isotope Ba145 of Barium
     Ba145,
+    /// Isotope Ba146 of Barium
     Ba146,
+    /// Isotope Ba147 of Barium
     Ba147,
+    /// Isotope Ba148 of Barium
     Ba148,
+    /// Isotope Ba149 of Barium
     Ba149,
+    /// Isotope Ba150 of Barium
     Ba150,
+    /// Isotope Ba151 of Barium
     Ba151,
+    /// Isotope Ba152 of Barium
     Ba152,
+    /// Isotope Ba153 of Barium
     Ba153,
 }
 impl super::RelativeAtomicMass for BariumIsotope {
@@ -143,46 +185,46 @@ impl super::MassNumber for BariumIsotope {
 impl super::IsotopicComposition for BariumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Ba114 => None,
-            Self::Ba115 => None,
-            Self::Ba116 => None,
-            Self::Ba117 => None,
-            Self::Ba118 => None,
-            Self::Ba119 => None,
-            Self::Ba120 => None,
-            Self::Ba121 => None,
-            Self::Ba122 => None,
-            Self::Ba123 => None,
-            Self::Ba124 => None,
-            Self::Ba125 => None,
-            Self::Ba126 => None,
-            Self::Ba127 => None,
-            Self::Ba128 => None,
-            Self::Ba129 => None,
             Self::Ba130 => Some(0.00106f64),
-            Self::Ba131 => None,
             Self::Ba132 => Some(0.00101f64),
-            Self::Ba133 => None,
             Self::Ba134 => Some(0.02417f64),
             Self::Ba135 => Some(0.06592f64),
             Self::Ba136 => Some(0.07854f64),
             Self::Ba137 => Some(0.11232f64),
             Self::Ba138 => Some(0.71698f64),
-            Self::Ba139 => None,
-            Self::Ba140 => None,
-            Self::Ba141 => None,
-            Self::Ba142 => None,
-            Self::Ba143 => None,
-            Self::Ba144 => None,
-            Self::Ba145 => None,
-            Self::Ba146 => None,
-            Self::Ba147 => None,
-            Self::Ba148 => None,
-            Self::Ba149 => None,
-            Self::Ba150 => None,
-            Self::Ba151 => None,
-            Self::Ba152 => None,
-            Self::Ba153 => None,
+            Self::Ba114
+            | Self::Ba115
+            | Self::Ba116
+            | Self::Ba117
+            | Self::Ba118
+            | Self::Ba119
+            | Self::Ba120
+            | Self::Ba121
+            | Self::Ba122
+            | Self::Ba123
+            | Self::Ba124
+            | Self::Ba125
+            | Self::Ba126
+            | Self::Ba127
+            | Self::Ba128
+            | Self::Ba129
+            | Self::Ba131
+            | Self::Ba133
+            | Self::Ba139
+            | Self::Ba140
+            | Self::Ba141
+            | Self::Ba142
+            | Self::Ba143
+            | Self::Ba144
+            | Self::Ba145
+            | Self::Ba146
+            | Self::Ba147
+            | Self::Ba148
+            | Self::Ba149
+            | Self::Ba150
+            | Self::Ba151
+            | Self::Ba152
+            | Self::Ba153 => None,
         }
     }
 }

@@ -1,45 +1,86 @@
+//! Isotopes of the element Cadmium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Cadmium
 pub enum CadmiumIsotope {
+    /// Isotope Cd95 of Cadmium
     Cd95,
+    /// Isotope Cd96 of Cadmium
     Cd96,
+    /// Isotope Cd97 of Cadmium
     Cd97,
+    /// Isotope Cd98 of Cadmium
     Cd98,
+    /// Isotope Cd99 of Cadmium
     Cd99,
+    /// Isotope Cd100 of Cadmium
     Cd100,
+    /// Isotope Cd101 of Cadmium
     Cd101,
+    /// Isotope Cd102 of Cadmium
     Cd102,
+    /// Isotope Cd103 of Cadmium
     Cd103,
+    /// Isotope Cd104 of Cadmium
     Cd104,
+    /// Isotope Cd105 of Cadmium
     Cd105,
+    /// Isotope Cd106 of Cadmium
     Cd106,
+    /// Isotope Cd107 of Cadmium
     Cd107,
+    /// Isotope Cd108 of Cadmium
     Cd108,
+    /// Isotope Cd109 of Cadmium
     Cd109,
+    /// Isotope Cd110 of Cadmium
     Cd110,
+    /// Isotope Cd111 of Cadmium
     Cd111,
+    /// Isotope Cd112 of Cadmium
     Cd112,
+    /// Isotope Cd113 of Cadmium
     Cd113,
+    /// Isotope Cd114 of Cadmium
     Cd114,
+    /// Isotope Cd115 of Cadmium
     Cd115,
+    /// Isotope Cd116 of Cadmium
     Cd116,
+    /// Isotope Cd117 of Cadmium
     Cd117,
+    /// Isotope Cd118 of Cadmium
     Cd118,
+    /// Isotope Cd119 of Cadmium
     Cd119,
+    /// Isotope Cd120 of Cadmium
     Cd120,
+    /// Isotope Cd121 of Cadmium
     Cd121,
+    /// Isotope Cd122 of Cadmium
     Cd122,
+    /// Isotope Cd123 of Cadmium
     Cd123,
+    /// Isotope Cd124 of Cadmium
     Cd124,
+    /// Isotope Cd125 of Cadmium
     Cd125,
+    /// Isotope Cd126 of Cadmium
     Cd126,
+    /// Isotope Cd127 of Cadmium
     Cd127,
+    /// Isotope Cd128 of Cadmium
     Cd128,
+    /// Isotope Cd129 of Cadmium
     Cd129,
+    /// Isotope Cd130 of Cadmium
     Cd130,
+    /// Isotope Cd131 of Cadmium
     Cd131,
+    /// Isotope Cd132 of Cadmium
     Cd132,
+    /// Isotope Cd133 of Cadmium
     Cd133,
 }
 impl super::RelativeAtomicMass for CadmiumIsotope {
@@ -140,45 +181,45 @@ impl super::MassNumber for CadmiumIsotope {
 impl super::IsotopicComposition for CadmiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Cd95 => None,
-            Self::Cd96 => None,
-            Self::Cd97 => None,
-            Self::Cd98 => None,
-            Self::Cd99 => None,
-            Self::Cd100 => None,
-            Self::Cd101 => None,
-            Self::Cd102 => None,
-            Self::Cd103 => None,
-            Self::Cd104 => None,
-            Self::Cd105 => None,
             Self::Cd106 => Some(0.0125f64),
-            Self::Cd107 => None,
             Self::Cd108 => Some(0.0089f64),
-            Self::Cd109 => None,
             Self::Cd110 => Some(0.1249f64),
             Self::Cd111 => Some(0.128f64),
             Self::Cd112 => Some(0.2413f64),
             Self::Cd113 => Some(0.1222f64),
             Self::Cd114 => Some(0.2873f64),
-            Self::Cd115 => None,
             Self::Cd116 => Some(0.0749f64),
-            Self::Cd117 => None,
-            Self::Cd118 => None,
-            Self::Cd119 => None,
-            Self::Cd120 => None,
-            Self::Cd121 => None,
-            Self::Cd122 => None,
-            Self::Cd123 => None,
-            Self::Cd124 => None,
-            Self::Cd125 => None,
-            Self::Cd126 => None,
-            Self::Cd127 => None,
-            Self::Cd128 => None,
-            Self::Cd129 => None,
-            Self::Cd130 => None,
-            Self::Cd131 => None,
-            Self::Cd132 => None,
-            Self::Cd133 => None,
+            Self::Cd95
+            | Self::Cd96
+            | Self::Cd97
+            | Self::Cd98
+            | Self::Cd99
+            | Self::Cd100
+            | Self::Cd101
+            | Self::Cd102
+            | Self::Cd103
+            | Self::Cd104
+            | Self::Cd105
+            | Self::Cd107
+            | Self::Cd109
+            | Self::Cd115
+            | Self::Cd117
+            | Self::Cd118
+            | Self::Cd119
+            | Self::Cd120
+            | Self::Cd121
+            | Self::Cd122
+            | Self::Cd123
+            | Self::Cd124
+            | Self::Cd125
+            | Self::Cd126
+            | Self::Cd127
+            | Self::Cd128
+            | Self::Cd129
+            | Self::Cd130
+            | Self::Cd131
+            | Self::Cd132
+            | Self::Cd133 => None,
         }
     }
 }

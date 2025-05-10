@@ -1,9 +1,14 @@
+//! Isotopes of the element Oganesson
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Oganesson
 pub enum OganessonIsotope {
+    /// Isotope Og293 of Oganesson
     Og293,
+    /// Isotope Og294 of Oganesson
     Og294,
+    /// Isotope Og295 of Oganesson
     Og295,
 }
 impl super::RelativeAtomicMass for OganessonIsotope {
@@ -31,11 +36,7 @@ impl super::MassNumber for OganessonIsotope {
 }
 impl super::IsotopicComposition for OganessonIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Og293 => None,
-            Self::Og294 => None,
-            Self::Og295 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for OganessonIsotope {

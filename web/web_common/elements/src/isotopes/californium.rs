@@ -1,26 +1,48 @@
+//! Isotopes of the element Californium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Californium
 pub enum CaliforniumIsotope {
+    /// Isotope Cf237 of Californium
     Cf237,
+    /// Isotope Cf238 of Californium
     Cf238,
+    /// Isotope Cf239 of Californium
     Cf239,
+    /// Isotope Cf240 of Californium
     Cf240,
+    /// Isotope Cf241 of Californium
     Cf241,
+    /// Isotope Cf242 of Californium
     Cf242,
+    /// Isotope Cf243 of Californium
     Cf243,
+    /// Isotope Cf244 of Californium
     Cf244,
+    /// Isotope Cf245 of Californium
     Cf245,
+    /// Isotope Cf246 of Californium
     Cf246,
+    /// Isotope Cf247 of Californium
     Cf247,
+    /// Isotope Cf248 of Californium
     Cf248,
+    /// Isotope Cf249 of Californium
     Cf249,
+    /// Isotope Cf250 of Californium
     Cf250,
+    /// Isotope Cf251 of Californium
     Cf251,
+    /// Isotope Cf252 of Californium
     Cf252,
+    /// Isotope Cf253 of Californium
     Cf253,
+    /// Isotope Cf254 of Californium
     Cf254,
+    /// Isotope Cf255 of Californium
     Cf255,
+    /// Isotope Cf256 of Californium
     Cf256,
 }
 impl super::RelativeAtomicMass for CaliforniumIsotope {
@@ -82,28 +104,7 @@ impl super::MassNumber for CaliforniumIsotope {
 }
 impl super::IsotopicComposition for CaliforniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Cf237 => None,
-            Self::Cf238 => None,
-            Self::Cf239 => None,
-            Self::Cf240 => None,
-            Self::Cf241 => None,
-            Self::Cf242 => None,
-            Self::Cf243 => None,
-            Self::Cf244 => None,
-            Self::Cf245 => None,
-            Self::Cf246 => None,
-            Self::Cf247 => None,
-            Self::Cf248 => None,
-            Self::Cf249 => None,
-            Self::Cf250 => None,
-            Self::Cf251 => None,
-            Self::Cf252 => None,
-            Self::Cf253 => None,
-            Self::Cf254 => None,
-            Self::Cf255 => None,
-            Self::Cf256 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for CaliforniumIsotope {

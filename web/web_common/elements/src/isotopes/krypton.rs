@@ -1,39 +1,74 @@
+//! Isotopes of the element Krypton
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Krypton
 pub enum KryptonIsotope {
+    /// Isotope Kr69 of Krypton
     Kr69,
+    /// Isotope Kr70 of Krypton
     Kr70,
+    /// Isotope Kr71 of Krypton
     Kr71,
+    /// Isotope Kr72 of Krypton
     Kr72,
+    /// Isotope Kr73 of Krypton
     Kr73,
+    /// Isotope Kr74 of Krypton
     Kr74,
+    /// Isotope Kr75 of Krypton
     Kr75,
+    /// Isotope Kr76 of Krypton
     Kr76,
+    /// Isotope Kr77 of Krypton
     Kr77,
+    /// Isotope Kr78 of Krypton
     Kr78,
+    /// Isotope Kr79 of Krypton
     Kr79,
+    /// Isotope Kr80 of Krypton
     Kr80,
+    /// Isotope Kr81 of Krypton
     Kr81,
+    /// Isotope Kr82 of Krypton
     Kr82,
+    /// Isotope Kr83 of Krypton
     Kr83,
+    /// Isotope Kr84 of Krypton
     Kr84,
+    /// Isotope Kr85 of Krypton
     Kr85,
+    /// Isotope Kr86 of Krypton
     Kr86,
+    /// Isotope Kr87 of Krypton
     Kr87,
+    /// Isotope Kr88 of Krypton
     Kr88,
+    /// Isotope Kr89 of Krypton
     Kr89,
+    /// Isotope Kr90 of Krypton
     Kr90,
+    /// Isotope Kr91 of Krypton
     Kr91,
+    /// Isotope Kr92 of Krypton
     Kr92,
+    /// Isotope Kr93 of Krypton
     Kr93,
+    /// Isotope Kr94 of Krypton
     Kr94,
+    /// Isotope Kr95 of Krypton
     Kr95,
+    /// Isotope Kr96 of Krypton
     Kr96,
+    /// Isotope Kr97 of Krypton
     Kr97,
+    /// Isotope Kr98 of Krypton
     Kr98,
+    /// Isotope Kr99 of Krypton
     Kr99,
+    /// Isotope Kr100 of Krypton
     Kr100,
+    /// Isotope Kr101 of Krypton
     Kr101,
 }
 impl super::RelativeAtomicMass for KryptonIsotope {
@@ -122,39 +157,39 @@ impl super::MassNumber for KryptonIsotope {
 impl super::IsotopicComposition for KryptonIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Kr69 => None,
-            Self::Kr70 => None,
-            Self::Kr71 => None,
-            Self::Kr72 => None,
-            Self::Kr73 => None,
-            Self::Kr74 => None,
-            Self::Kr75 => None,
-            Self::Kr76 => None,
-            Self::Kr77 => None,
             Self::Kr78 => Some(0.00355f64),
-            Self::Kr79 => None,
             Self::Kr80 => Some(0.02286f64),
-            Self::Kr81 => None,
             Self::Kr82 => Some(0.11593f64),
             Self::Kr83 => Some(0.115f64),
             Self::Kr84 => Some(0.56987f64),
-            Self::Kr85 => None,
             Self::Kr86 => Some(0.17279f64),
-            Self::Kr87 => None,
-            Self::Kr88 => None,
-            Self::Kr89 => None,
-            Self::Kr90 => None,
-            Self::Kr91 => None,
-            Self::Kr92 => None,
-            Self::Kr93 => None,
-            Self::Kr94 => None,
-            Self::Kr95 => None,
-            Self::Kr96 => None,
-            Self::Kr97 => None,
-            Self::Kr98 => None,
-            Self::Kr99 => None,
-            Self::Kr100 => None,
-            Self::Kr101 => None,
+            Self::Kr69
+            | Self::Kr70
+            | Self::Kr71
+            | Self::Kr72
+            | Self::Kr73
+            | Self::Kr74
+            | Self::Kr75
+            | Self::Kr76
+            | Self::Kr77
+            | Self::Kr79
+            | Self::Kr81
+            | Self::Kr85
+            | Self::Kr87
+            | Self::Kr88
+            | Self::Kr89
+            | Self::Kr90
+            | Self::Kr91
+            | Self::Kr92
+            | Self::Kr93
+            | Self::Kr94
+            | Self::Kr95
+            | Self::Kr96
+            | Self::Kr97
+            | Self::Kr98
+            | Self::Kr99
+            | Self::Kr100
+            | Self::Kr101 => None,
         }
     }
 }

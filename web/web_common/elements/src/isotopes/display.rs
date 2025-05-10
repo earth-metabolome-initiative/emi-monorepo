@@ -2,6 +2,7 @@
 //! enum.
 
 impl core::fmt::Display for super::Isotope {
+    #[allow(clippy::too_many_lines)]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::H(isotope) => write!(f, "{isotope}"),

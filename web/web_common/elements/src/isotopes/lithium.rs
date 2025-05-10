@@ -1,17 +1,30 @@
+//! Isotopes of the element Lithium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Lithium
 pub enum LithiumIsotope {
+    /// Isotope Li3 of Lithium
     Li3,
+    /// Isotope Li4 of Lithium
     Li4,
+    /// Isotope Li5 of Lithium
     Li5,
+    /// Isotope Li6 of Lithium
     Li6,
+    /// Isotope Li7 of Lithium
     Li7,
+    /// Isotope Li8 of Lithium
     Li8,
+    /// Isotope Li9 of Lithium
     Li9,
+    /// Isotope Li10 of Lithium
     Li10,
+    /// Isotope Li11 of Lithium
     Li11,
+    /// Isotope Li12 of Lithium
     Li12,
+    /// Isotope Li13 of Lithium
     Li13,
 }
 impl super::RelativeAtomicMass for LithiumIsotope {
@@ -56,17 +69,17 @@ impl super::MassNumber for LithiumIsotope {
 impl super::IsotopicComposition for LithiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Li3 => None,
-            Self::Li4 => None,
-            Self::Li5 => None,
             Self::Li6 => Some(0.0759f64),
             Self::Li7 => Some(0.9241f64),
-            Self::Li8 => None,
-            Self::Li9 => None,
-            Self::Li10 => None,
-            Self::Li11 => None,
-            Self::Li12 => None,
-            Self::Li13 => None,
+            Self::Li3
+            | Self::Li4
+            | Self::Li5
+            | Self::Li8
+            | Self::Li9
+            | Self::Li10
+            | Self::Li11
+            | Self::Li12
+            | Self::Li13 => None,
         }
     }
 }

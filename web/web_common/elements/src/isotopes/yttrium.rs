@@ -1,40 +1,76 @@
+//! Isotopes of the element Yttrium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Yttrium
 pub enum YttriumIsotope {
+    /// Isotope Y76 of Yttrium
     Y76,
+    /// Isotope Y77 of Yttrium
     Y77,
+    /// Isotope Y78 of Yttrium
     Y78,
+    /// Isotope Y79 of Yttrium
     Y79,
+    /// Isotope Y80 of Yttrium
     Y80,
+    /// Isotope Y81 of Yttrium
     Y81,
+    /// Isotope Y82 of Yttrium
     Y82,
+    /// Isotope Y83 of Yttrium
     Y83,
+    /// Isotope Y84 of Yttrium
     Y84,
+    /// Isotope Y85 of Yttrium
     Y85,
+    /// Isotope Y86 of Yttrium
     Y86,
+    /// Isotope Y87 of Yttrium
     Y87,
+    /// Isotope Y88 of Yttrium
     Y88,
+    /// Isotope Y89 of Yttrium
     Y89,
+    /// Isotope Y90 of Yttrium
     Y90,
+    /// Isotope Y91 of Yttrium
     Y91,
+    /// Isotope Y92 of Yttrium
     Y92,
+    /// Isotope Y93 of Yttrium
     Y93,
+    /// Isotope Y94 of Yttrium
     Y94,
+    /// Isotope Y95 of Yttrium
     Y95,
+    /// Isotope Y96 of Yttrium
     Y96,
+    /// Isotope Y97 of Yttrium
     Y97,
+    /// Isotope Y98 of Yttrium
     Y98,
+    /// Isotope Y99 of Yttrium
     Y99,
+    /// Isotope Y100 of Yttrium
     Y100,
+    /// Isotope Y101 of Yttrium
     Y101,
+    /// Isotope Y102 of Yttrium
     Y102,
+    /// Isotope Y103 of Yttrium
     Y103,
+    /// Isotope Y104 of Yttrium
     Y104,
+    /// Isotope Y105 of Yttrium
     Y105,
+    /// Isotope Y106 of Yttrium
     Y106,
+    /// Isotope Y107 of Yttrium
     Y107,
+    /// Isotope Y108 of Yttrium
     Y108,
+    /// Isotope Y109 of Yttrium
     Y109,
 }
 impl super::RelativeAtomicMass for YttriumIsotope {
@@ -125,40 +161,40 @@ impl super::MassNumber for YttriumIsotope {
 impl super::IsotopicComposition for YttriumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Y76 => None,
-            Self::Y77 => None,
-            Self::Y78 => None,
-            Self::Y79 => None,
-            Self::Y80 => None,
-            Self::Y81 => None,
-            Self::Y82 => None,
-            Self::Y83 => None,
-            Self::Y84 => None,
-            Self::Y85 => None,
-            Self::Y86 => None,
-            Self::Y87 => None,
-            Self::Y88 => None,
             Self::Y89 => Some(1f64),
-            Self::Y90 => None,
-            Self::Y91 => None,
-            Self::Y92 => None,
-            Self::Y93 => None,
-            Self::Y94 => None,
-            Self::Y95 => None,
-            Self::Y96 => None,
-            Self::Y97 => None,
-            Self::Y98 => None,
-            Self::Y99 => None,
-            Self::Y100 => None,
-            Self::Y101 => None,
-            Self::Y102 => None,
-            Self::Y103 => None,
-            Self::Y104 => None,
-            Self::Y105 => None,
-            Self::Y106 => None,
-            Self::Y107 => None,
-            Self::Y108 => None,
-            Self::Y109 => None,
+            Self::Y76
+            | Self::Y77
+            | Self::Y78
+            | Self::Y79
+            | Self::Y80
+            | Self::Y81
+            | Self::Y82
+            | Self::Y83
+            | Self::Y84
+            | Self::Y85
+            | Self::Y86
+            | Self::Y87
+            | Self::Y88
+            | Self::Y90
+            | Self::Y91
+            | Self::Y92
+            | Self::Y93
+            | Self::Y94
+            | Self::Y95
+            | Self::Y96
+            | Self::Y97
+            | Self::Y98
+            | Self::Y99
+            | Self::Y100
+            | Self::Y101
+            | Self::Y102
+            | Self::Y103
+            | Self::Y104
+            | Self::Y105
+            | Self::Y106
+            | Self::Y107
+            | Self::Y108
+            | Self::Y109 => None,
         }
     }
 }

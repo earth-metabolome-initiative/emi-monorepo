@@ -1,44 +1,84 @@
+//! Isotopes of the element Silver
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Silver
 pub enum SilverIsotope {
+    /// Isotope Ag93 of Silver
     Ag93,
+    /// Isotope Ag94 of Silver
     Ag94,
+    /// Isotope Ag95 of Silver
     Ag95,
+    /// Isotope Ag96 of Silver
     Ag96,
+    /// Isotope Ag97 of Silver
     Ag97,
+    /// Isotope Ag98 of Silver
     Ag98,
+    /// Isotope Ag99 of Silver
     Ag99,
+    /// Isotope Ag100 of Silver
     Ag100,
+    /// Isotope Ag101 of Silver
     Ag101,
+    /// Isotope Ag102 of Silver
     Ag102,
+    /// Isotope Ag103 of Silver
     Ag103,
+    /// Isotope Ag104 of Silver
     Ag104,
+    /// Isotope Ag105 of Silver
     Ag105,
+    /// Isotope Ag106 of Silver
     Ag106,
+    /// Isotope Ag107 of Silver
     Ag107,
+    /// Isotope Ag108 of Silver
     Ag108,
+    /// Isotope Ag109 of Silver
     Ag109,
+    /// Isotope Ag110 of Silver
     Ag110,
+    /// Isotope Ag111 of Silver
     Ag111,
+    /// Isotope Ag112 of Silver
     Ag112,
+    /// Isotope Ag113 of Silver
     Ag113,
+    /// Isotope Ag114 of Silver
     Ag114,
+    /// Isotope Ag115 of Silver
     Ag115,
+    /// Isotope Ag116 of Silver
     Ag116,
+    /// Isotope Ag117 of Silver
     Ag117,
+    /// Isotope Ag118 of Silver
     Ag118,
+    /// Isotope Ag119 of Silver
     Ag119,
+    /// Isotope Ag120 of Silver
     Ag120,
+    /// Isotope Ag121 of Silver
     Ag121,
+    /// Isotope Ag122 of Silver
     Ag122,
+    /// Isotope Ag123 of Silver
     Ag123,
+    /// Isotope Ag124 of Silver
     Ag124,
+    /// Isotope Ag125 of Silver
     Ag125,
+    /// Isotope Ag126 of Silver
     Ag126,
+    /// Isotope Ag127 of Silver
     Ag127,
+    /// Isotope Ag128 of Silver
     Ag128,
+    /// Isotope Ag129 of Silver
     Ag129,
+    /// Isotope Ag130 of Silver
     Ag130,
 }
 impl super::RelativeAtomicMass for SilverIsotope {
@@ -137,44 +177,44 @@ impl super::MassNumber for SilverIsotope {
 impl super::IsotopicComposition for SilverIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Ag93 => None,
-            Self::Ag94 => None,
-            Self::Ag95 => None,
-            Self::Ag96 => None,
-            Self::Ag97 => None,
-            Self::Ag98 => None,
-            Self::Ag99 => None,
-            Self::Ag100 => None,
-            Self::Ag101 => None,
-            Self::Ag102 => None,
-            Self::Ag103 => None,
-            Self::Ag104 => None,
-            Self::Ag105 => None,
-            Self::Ag106 => None,
             Self::Ag107 => Some(0.51839f64),
-            Self::Ag108 => None,
             Self::Ag109 => Some(0.48161f64),
-            Self::Ag110 => None,
-            Self::Ag111 => None,
-            Self::Ag112 => None,
-            Self::Ag113 => None,
-            Self::Ag114 => None,
-            Self::Ag115 => None,
-            Self::Ag116 => None,
-            Self::Ag117 => None,
-            Self::Ag118 => None,
-            Self::Ag119 => None,
-            Self::Ag120 => None,
-            Self::Ag121 => None,
-            Self::Ag122 => None,
-            Self::Ag123 => None,
-            Self::Ag124 => None,
-            Self::Ag125 => None,
-            Self::Ag126 => None,
-            Self::Ag127 => None,
-            Self::Ag128 => None,
-            Self::Ag129 => None,
-            Self::Ag130 => None,
+            Self::Ag93
+            | Self::Ag94
+            | Self::Ag95
+            | Self::Ag96
+            | Self::Ag97
+            | Self::Ag98
+            | Self::Ag99
+            | Self::Ag100
+            | Self::Ag101
+            | Self::Ag102
+            | Self::Ag103
+            | Self::Ag104
+            | Self::Ag105
+            | Self::Ag106
+            | Self::Ag108
+            | Self::Ag110
+            | Self::Ag111
+            | Self::Ag112
+            | Self::Ag113
+            | Self::Ag114
+            | Self::Ag115
+            | Self::Ag116
+            | Self::Ag117
+            | Self::Ag118
+            | Self::Ag119
+            | Self::Ag120
+            | Self::Ag121
+            | Self::Ag122
+            | Self::Ag123
+            | Self::Ag124
+            | Self::Ag125
+            | Self::Ag126
+            | Self::Ag127
+            | Self::Ag128
+            | Self::Ag129
+            | Self::Ag130 => None,
         }
     }
 }

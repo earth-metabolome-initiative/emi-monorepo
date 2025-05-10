@@ -1,21 +1,38 @@
+//! Isotopes of the element Meitnerium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Meitnerium
 pub enum MeitneriumIsotope {
+    /// Isotope Mt265 of Meitnerium
     Mt265,
+    /// Isotope Mt266 of Meitnerium
     Mt266,
+    /// Isotope Mt267 of Meitnerium
     Mt267,
+    /// Isotope Mt268 of Meitnerium
     Mt268,
+    /// Isotope Mt269 of Meitnerium
     Mt269,
+    /// Isotope Mt270 of Meitnerium
     Mt270,
+    /// Isotope Mt271 of Meitnerium
     Mt271,
+    /// Isotope Mt272 of Meitnerium
     Mt272,
+    /// Isotope Mt273 of Meitnerium
     Mt273,
+    /// Isotope Mt274 of Meitnerium
     Mt274,
+    /// Isotope Mt275 of Meitnerium
     Mt275,
+    /// Isotope Mt276 of Meitnerium
     Mt276,
+    /// Isotope Mt277 of Meitnerium
     Mt277,
+    /// Isotope Mt278 of Meitnerium
     Mt278,
+    /// Isotope Mt279 of Meitnerium
     Mt279,
 }
 impl super::RelativeAtomicMass for MeitneriumIsotope {
@@ -67,23 +84,7 @@ impl super::MassNumber for MeitneriumIsotope {
 }
 impl super::IsotopicComposition for MeitneriumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Mt265 => None,
-            Self::Mt266 => None,
-            Self::Mt267 => None,
-            Self::Mt268 => None,
-            Self::Mt269 => None,
-            Self::Mt270 => None,
-            Self::Mt271 => None,
-            Self::Mt272 => None,
-            Self::Mt273 => None,
-            Self::Mt274 => None,
-            Self::Mt275 => None,
-            Self::Mt276 => None,
-            Self::Mt277 => None,
-            Self::Mt278 => None,
-            Self::Mt279 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for MeitneriumIsotope {

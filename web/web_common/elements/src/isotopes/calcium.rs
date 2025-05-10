@@ -1,31 +1,58 @@
+//! Isotopes of the element Calcium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Calcium
 pub enum CalciumIsotope {
+    /// Isotope Ca34 of Calcium
     Ca34,
+    /// Isotope Ca35 of Calcium
     Ca35,
+    /// Isotope Ca36 of Calcium
     Ca36,
+    /// Isotope Ca37 of Calcium
     Ca37,
+    /// Isotope Ca38 of Calcium
     Ca38,
+    /// Isotope Ca39 of Calcium
     Ca39,
+    /// Isotope Ca40 of Calcium
     Ca40,
+    /// Isotope Ca41 of Calcium
     Ca41,
+    /// Isotope Ca42 of Calcium
     Ca42,
+    /// Isotope Ca43 of Calcium
     Ca43,
+    /// Isotope Ca44 of Calcium
     Ca44,
+    /// Isotope Ca45 of Calcium
     Ca45,
+    /// Isotope Ca46 of Calcium
     Ca46,
+    /// Isotope Ca47 of Calcium
     Ca47,
+    /// Isotope Ca48 of Calcium
     Ca48,
+    /// Isotope Ca49 of Calcium
     Ca49,
+    /// Isotope Ca50 of Calcium
     Ca50,
+    /// Isotope Ca51 of Calcium
     Ca51,
+    /// Isotope Ca52 of Calcium
     Ca52,
+    /// Isotope Ca53 of Calcium
     Ca53,
+    /// Isotope Ca54 of Calcium
     Ca54,
+    /// Isotope Ca55 of Calcium
     Ca55,
+    /// Isotope Ca56 of Calcium
     Ca56,
+    /// Isotope Ca57 of Calcium
     Ca57,
+    /// Isotope Ca58 of Calcium
     Ca58,
 }
 impl super::RelativeAtomicMass for CalciumIsotope {
@@ -98,31 +125,31 @@ impl super::MassNumber for CalciumIsotope {
 impl super::IsotopicComposition for CalciumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Ca34 => None,
-            Self::Ca35 => None,
-            Self::Ca36 => None,
-            Self::Ca37 => None,
-            Self::Ca38 => None,
-            Self::Ca39 => None,
             Self::Ca40 => Some(0.96941f64),
-            Self::Ca41 => None,
             Self::Ca42 => Some(0.00647f64),
             Self::Ca43 => Some(0.00135f64),
             Self::Ca44 => Some(0.02086f64),
-            Self::Ca45 => None,
             Self::Ca46 => Some(0.00004f64),
-            Self::Ca47 => None,
             Self::Ca48 => Some(0.00187f64),
-            Self::Ca49 => None,
-            Self::Ca50 => None,
-            Self::Ca51 => None,
-            Self::Ca52 => None,
-            Self::Ca53 => None,
-            Self::Ca54 => None,
-            Self::Ca55 => None,
-            Self::Ca56 => None,
-            Self::Ca57 => None,
-            Self::Ca58 => None,
+            Self::Ca34
+            | Self::Ca35
+            | Self::Ca36
+            | Self::Ca37
+            | Self::Ca38
+            | Self::Ca39
+            | Self::Ca41
+            | Self::Ca45
+            | Self::Ca47
+            | Self::Ca49
+            | Self::Ca50
+            | Self::Ca51
+            | Self::Ca52
+            | Self::Ca53
+            | Self::Ca54
+            | Self::Ca55
+            | Self::Ca56
+            | Self::Ca57
+            | Self::Ca58 => None,
         }
     }
 }

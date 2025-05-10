@@ -1,45 +1,86 @@
+//! Isotopes of the element Astatine
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Astatine
 pub enum AstatineIsotope {
+    /// Isotope At191 of Astatine
     At191,
+    /// Isotope At192 of Astatine
     At192,
+    /// Isotope At193 of Astatine
     At193,
+    /// Isotope At194 of Astatine
     At194,
+    /// Isotope At195 of Astatine
     At195,
+    /// Isotope At196 of Astatine
     At196,
+    /// Isotope At197 of Astatine
     At197,
+    /// Isotope At198 of Astatine
     At198,
+    /// Isotope At199 of Astatine
     At199,
+    /// Isotope At200 of Astatine
     At200,
+    /// Isotope At201 of Astatine
     At201,
+    /// Isotope At202 of Astatine
     At202,
+    /// Isotope At203 of Astatine
     At203,
+    /// Isotope At204 of Astatine
     At204,
+    /// Isotope At205 of Astatine
     At205,
+    /// Isotope At206 of Astatine
     At206,
+    /// Isotope At207 of Astatine
     At207,
+    /// Isotope At208 of Astatine
     At208,
+    /// Isotope At209 of Astatine
     At209,
+    /// Isotope At210 of Astatine
     At210,
+    /// Isotope At211 of Astatine
     At211,
+    /// Isotope At212 of Astatine
     At212,
+    /// Isotope At213 of Astatine
     At213,
+    /// Isotope At214 of Astatine
     At214,
+    /// Isotope At215 of Astatine
     At215,
+    /// Isotope At216 of Astatine
     At216,
+    /// Isotope At217 of Astatine
     At217,
+    /// Isotope At218 of Astatine
     At218,
+    /// Isotope At219 of Astatine
     At219,
+    /// Isotope At220 of Astatine
     At220,
+    /// Isotope At221 of Astatine
     At221,
+    /// Isotope At222 of Astatine
     At222,
+    /// Isotope At223 of Astatine
     At223,
+    /// Isotope At224 of Astatine
     At224,
+    /// Isotope At225 of Astatine
     At225,
+    /// Isotope At226 of Astatine
     At226,
+    /// Isotope At227 of Astatine
     At227,
+    /// Isotope At228 of Astatine
     At228,
+    /// Isotope At229 of Astatine
     At229,
 }
 impl super::RelativeAtomicMass for AstatineIsotope {
@@ -139,47 +180,7 @@ impl super::MassNumber for AstatineIsotope {
 }
 impl super::IsotopicComposition for AstatineIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::At191 => None,
-            Self::At192 => None,
-            Self::At193 => None,
-            Self::At194 => None,
-            Self::At195 => None,
-            Self::At196 => None,
-            Self::At197 => None,
-            Self::At198 => None,
-            Self::At199 => None,
-            Self::At200 => None,
-            Self::At201 => None,
-            Self::At202 => None,
-            Self::At203 => None,
-            Self::At204 => None,
-            Self::At205 => None,
-            Self::At206 => None,
-            Self::At207 => None,
-            Self::At208 => None,
-            Self::At209 => None,
-            Self::At210 => None,
-            Self::At211 => None,
-            Self::At212 => None,
-            Self::At213 => None,
-            Self::At214 => None,
-            Self::At215 => None,
-            Self::At216 => None,
-            Self::At217 => None,
-            Self::At218 => None,
-            Self::At219 => None,
-            Self::At220 => None,
-            Self::At221 => None,
-            Self::At222 => None,
-            Self::At223 => None,
-            Self::At224 => None,
-            Self::At225 => None,
-            Self::At226 => None,
-            Self::At227 => None,
-            Self::At228 => None,
-            Self::At229 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for AstatineIsotope {

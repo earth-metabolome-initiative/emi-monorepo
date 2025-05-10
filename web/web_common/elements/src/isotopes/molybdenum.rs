@@ -1,41 +1,78 @@
+//! Isotopes of the element Molybdenum
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Molybdenum
 pub enum MolybdenumIsotope {
+    /// Isotope Mo83 of Molybdenum
     Mo83,
+    /// Isotope Mo84 of Molybdenum
     Mo84,
+    /// Isotope Mo85 of Molybdenum
     Mo85,
+    /// Isotope Mo86 of Molybdenum
     Mo86,
+    /// Isotope Mo87 of Molybdenum
     Mo87,
+    /// Isotope Mo88 of Molybdenum
     Mo88,
+    /// Isotope Mo89 of Molybdenum
     Mo89,
+    /// Isotope Mo90 of Molybdenum
     Mo90,
+    /// Isotope Mo91 of Molybdenum
     Mo91,
+    /// Isotope Mo92 of Molybdenum
     Mo92,
+    /// Isotope Mo93 of Molybdenum
     Mo93,
+    /// Isotope Mo94 of Molybdenum
     Mo94,
+    /// Isotope Mo95 of Molybdenum
     Mo95,
+    /// Isotope Mo96 of Molybdenum
     Mo96,
+    /// Isotope Mo97 of Molybdenum
     Mo97,
+    /// Isotope Mo98 of Molybdenum
     Mo98,
+    /// Isotope Mo99 of Molybdenum
     Mo99,
+    /// Isotope Mo100 of Molybdenum
     Mo100,
+    /// Isotope Mo101 of Molybdenum
     Mo101,
+    /// Isotope Mo102 of Molybdenum
     Mo102,
+    /// Isotope Mo103 of Molybdenum
     Mo103,
+    /// Isotope Mo104 of Molybdenum
     Mo104,
+    /// Isotope Mo105 of Molybdenum
     Mo105,
+    /// Isotope Mo106 of Molybdenum
     Mo106,
+    /// Isotope Mo107 of Molybdenum
     Mo107,
+    /// Isotope Mo108 of Molybdenum
     Mo108,
+    /// Isotope Mo109 of Molybdenum
     Mo109,
+    /// Isotope Mo110 of Molybdenum
     Mo110,
+    /// Isotope Mo111 of Molybdenum
     Mo111,
+    /// Isotope Mo112 of Molybdenum
     Mo112,
+    /// Isotope Mo113 of Molybdenum
     Mo113,
+    /// Isotope Mo114 of Molybdenum
     Mo114,
+    /// Isotope Mo115 of Molybdenum
     Mo115,
+    /// Isotope Mo116 of Molybdenum
     Mo116,
+    /// Isotope Mo117 of Molybdenum
     Mo117,
 }
 impl super::RelativeAtomicMass for MolybdenumIsotope {
@@ -128,41 +165,41 @@ impl super::MassNumber for MolybdenumIsotope {
 impl super::IsotopicComposition for MolybdenumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Mo83 => None,
-            Self::Mo84 => None,
-            Self::Mo85 => None,
-            Self::Mo86 => None,
-            Self::Mo87 => None,
-            Self::Mo88 => None,
-            Self::Mo89 => None,
-            Self::Mo90 => None,
-            Self::Mo91 => None,
             Self::Mo92 => Some(0.1453f64),
-            Self::Mo93 => None,
             Self::Mo94 => Some(0.0915f64),
             Self::Mo95 => Some(0.1584f64),
             Self::Mo96 => Some(0.1667f64),
             Self::Mo97 => Some(0.096f64),
             Self::Mo98 => Some(0.2439f64),
-            Self::Mo99 => None,
             Self::Mo100 => Some(0.0982f64),
-            Self::Mo101 => None,
-            Self::Mo102 => None,
-            Self::Mo103 => None,
-            Self::Mo104 => None,
-            Self::Mo105 => None,
-            Self::Mo106 => None,
-            Self::Mo107 => None,
-            Self::Mo108 => None,
-            Self::Mo109 => None,
-            Self::Mo110 => None,
-            Self::Mo111 => None,
-            Self::Mo112 => None,
-            Self::Mo113 => None,
-            Self::Mo114 => None,
-            Self::Mo115 => None,
-            Self::Mo116 => None,
-            Self::Mo117 => None,
+            Self::Mo83
+            | Self::Mo84
+            | Self::Mo85
+            | Self::Mo86
+            | Self::Mo87
+            | Self::Mo88
+            | Self::Mo89
+            | Self::Mo90
+            | Self::Mo91
+            | Self::Mo93
+            | Self::Mo99
+            | Self::Mo101
+            | Self::Mo102
+            | Self::Mo103
+            | Self::Mo104
+            | Self::Mo105
+            | Self::Mo106
+            | Self::Mo107
+            | Self::Mo108
+            | Self::Mo109
+            | Self::Mo110
+            | Self::Mo111
+            | Self::Mo112
+            | Self::Mo113
+            | Self::Mo114
+            | Self::Mo115
+            | Self::Mo116
+            | Self::Mo117 => None,
         }
     }
 }

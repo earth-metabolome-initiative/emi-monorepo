@@ -1,27 +1,50 @@
+//! Isotopes of the element Berkelium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Berkelium
 pub enum BerkeliumIsotope {
+    /// Isotope Bk234 of Berkelium
     Bk234,
+    /// Isotope Bk235 of Berkelium
     Bk235,
+    /// Isotope Bk236 of Berkelium
     Bk236,
+    /// Isotope Bk237 of Berkelium
     Bk237,
+    /// Isotope Bk238 of Berkelium
     Bk238,
+    /// Isotope Bk239 of Berkelium
     Bk239,
+    /// Isotope Bk240 of Berkelium
     Bk240,
+    /// Isotope Bk241 of Berkelium
     Bk241,
+    /// Isotope Bk242 of Berkelium
     Bk242,
+    /// Isotope Bk243 of Berkelium
     Bk243,
+    /// Isotope Bk244 of Berkelium
     Bk244,
+    /// Isotope Bk245 of Berkelium
     Bk245,
+    /// Isotope Bk246 of Berkelium
     Bk246,
+    /// Isotope Bk247 of Berkelium
     Bk247,
+    /// Isotope Bk248 of Berkelium
     Bk248,
+    /// Isotope Bk249 of Berkelium
     Bk249,
+    /// Isotope Bk250 of Berkelium
     Bk250,
+    /// Isotope Bk251 of Berkelium
     Bk251,
+    /// Isotope Bk252 of Berkelium
     Bk252,
+    /// Isotope Bk253 of Berkelium
     Bk253,
+    /// Isotope Bk254 of Berkelium
     Bk254,
 }
 impl super::RelativeAtomicMass for BerkeliumIsotope {
@@ -85,29 +108,7 @@ impl super::MassNumber for BerkeliumIsotope {
 }
 impl super::IsotopicComposition for BerkeliumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Bk234 => None,
-            Self::Bk235 => None,
-            Self::Bk236 => None,
-            Self::Bk237 => None,
-            Self::Bk238 => None,
-            Self::Bk239 => None,
-            Self::Bk240 => None,
-            Self::Bk241 => None,
-            Self::Bk242 => None,
-            Self::Bk243 => None,
-            Self::Bk244 => None,
-            Self::Bk245 => None,
-            Self::Bk246 => None,
-            Self::Bk247 => None,
-            Self::Bk248 => None,
-            Self::Bk249 => None,
-            Self::Bk250 => None,
-            Self::Bk251 => None,
-            Self::Bk252 => None,
-            Self::Bk253 => None,
-            Self::Bk254 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for BerkeliumIsotope {

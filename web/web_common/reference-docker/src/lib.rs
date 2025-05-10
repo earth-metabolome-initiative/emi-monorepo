@@ -4,12 +4,10 @@ use std::{fmt::Debug, path::PathBuf};
 
 use diesel_async::AsyncConnection;
 use testcontainers::{
-    ContainerAsync, GenericImage, ImageExt,
+    ContainerAsync, GenericImage, ImageExt, TestcontainersError,
     core::{IntoContainerPort, WaitFor},
     runners::AsyncRunner,
 };
-
-pub mod errors;
 
 /// The default database user.
 pub const DATABASE_USER: &str = "user";
@@ -75,7 +73,7 @@ where
     Ok(false)
 }
 
-/// Returns all the `pgrx_extensions` in the given directory.
+/// Returns all the pgrx_extensions in the given directory.
 fn find_pgrx_extensions<P>(directory: P) -> Result<Vec<PathBuf>, std::io::Error>
 where
     P: AsRef<std::path::Path> + Debug,
@@ -84,13 +82,10 @@ where
     for entry in std::fs::read_dir(directory)? {
         let entry = entry?;
         let path = entry.path();
-        if path.is_dir() && is_extension_crate(&path).unwrap_or(false) {
-            // We temporarily skip the `cas_code` crate.
-            if path.ends_with("cas_code") {
-                continue;
+        if path.is_dir() {
+            if is_extension_crate(&path).unwrap_or(false) {
+                pgrx_extensions.push(path);
             }
-
-            pgrx_extensions.push(path);
         }
     }
     Ok(pgrx_extensions)
@@ -109,9 +104,9 @@ where
 async fn reference_docker(
     database_port: u16,
     database_name: &str,
-) -> Result<ContainerAsync<GenericImage>, crate::errors::Error> {
+) -> Result<ContainerAsync<GenericImage>, TestcontainersError> {
     let pgrx_extensions =
-        find_pgrx_extensions(PathBuf::from(format!("{}/../", env!("CARGO_MANIFEST_DIR"))))
+        find_pgrx_extensions(&PathBuf::from(format!("{}/../", env!("CARGO_MANIFEST_DIR"))))
             .unwrap_or_default();
 
     // We check whether the extension directory exists, or we raise an adequate
@@ -120,12 +115,11 @@ async fn reference_docker(
     for extension in &pgrx_extensions {
         assert!(
             extension.join("extension").exists(),
-            "The extension `{}` was not built. Most likely you forgot to build the extension. Refer to the README for more information.",
-            extension.display()
+            "The extension `{extension:?}` was not built. Most likely you forgot to build the extension. Refer to the README for more information."
         );
     }
 
-    let mut container_builder = GenericImage::new("mycustom/postgres-postgis", "17.4")
+    let mut container_builder = GenericImage::new("postgres", "17-bookworm")
         .with_wait_for(WaitFor::message_on_stderr("database system is ready to accept connections"))
         .with_network("bridge")
         .with_env_var("DEBUG", "1")
@@ -163,7 +157,7 @@ async fn reference_docker(
             );
     }
 
-    Ok(container_builder.start().await?)
+    container_builder.start().await
 }
 
 /// Establish a connection to a postgres database.
@@ -190,7 +184,8 @@ async fn establish_connection_to_postgres<C: AsyncConnection>(
         eprintln!("Failed to establish connection: {e:?}");
         std::thread::sleep(std::time::Duration::from_secs(1));
         if number_of_attempts > 10 {
-            return Err(e);
+            eprintln!("Failed to establish connection after 10 attempts");
+            std::process::exit(1);
         }
         number_of_attempts += 1;
     }
@@ -225,8 +220,8 @@ async fn establish_connection_to_postgres<C: AsyncConnection>(
 pub async fn reference_docker_with_connection<C: AsyncConnection>(
     database_name: &str,
     port: u16,
-) -> Result<(ContainerAsync<GenericImage>, C), crate::errors::Error> {
-    let docker = reference_docker(port, database_name).await?;
-    let conn = establish_connection_to_postgres(port, database_name).await?;
+) -> Result<(ContainerAsync<GenericImage>, C), diesel::ConnectionError> {
+    let docker = reference_docker(port, &database_name).await.expect("Failed to start container");
+    let conn = establish_connection_to_postgres(port, &database_name).await?;
     Ok((docker, conn))
 }

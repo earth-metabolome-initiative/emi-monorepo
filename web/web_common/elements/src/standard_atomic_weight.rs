@@ -2,7 +2,9 @@
 //! for the `Element` enumeration.
 
 impl crate::Element {
+    #[allow(clippy::too_many_lines)]
     /// Returns the standard atomic weight of the element.
+    #[must_use]
     pub fn standard_atomic_weight(&self) -> f64 {
         match self {
             Self::H => 1.008,
@@ -100,8 +102,7 @@ impl crate::Element {
             Self::Np => 237.0,
             Self::Pu => 244.0,
             Self::Am => 243.0,
-            Self::Cm => 247.0,
-            Self::Bk => 247.0,
+            Self::Cm | Self::Bk => 247.0,
             Self::Cf => 251.0,
             Self::Es => 252.0,
             Self::Fm => 257.0,
@@ -114,15 +115,13 @@ impl crate::Element {
             Self::Bh => 274.0,
             Self::Hs => 269.0,
             Self::Mt => 276.0,
-            Self::Ds => 281.0,
-            Self::Rg => 281.0,
+            Self::Ds | Self::Rg => 281.0,
             Self::Cn => 285.0,
             Self::Nh => 286.0,
             Self::Fl => 289.0,
             Self::Mc => 288.0,
             Self::Lv => 293.0,
-            Self::Ts => 294.0,
-            Self::Og => 294.0,
+            Self::Ts | Self::Og => 294.0,
         }
     }
 }

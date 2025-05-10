@@ -1,47 +1,90 @@
+//! Isotopes of the element Platinum
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Platinum
 pub enum PlatinumIsotope {
+    /// Isotope Pt166 of Platinum
     Pt166,
+    /// Isotope Pt167 of Platinum
     Pt167,
+    /// Isotope Pt168 of Platinum
     Pt168,
+    /// Isotope Pt169 of Platinum
     Pt169,
+    /// Isotope Pt170 of Platinum
     Pt170,
+    /// Isotope Pt171 of Platinum
     Pt171,
+    /// Isotope Pt172 of Platinum
     Pt172,
+    /// Isotope Pt173 of Platinum
     Pt173,
+    /// Isotope Pt174 of Platinum
     Pt174,
+    /// Isotope Pt175 of Platinum
     Pt175,
+    /// Isotope Pt176 of Platinum
     Pt176,
+    /// Isotope Pt177 of Platinum
     Pt177,
+    /// Isotope Pt178 of Platinum
     Pt178,
+    /// Isotope Pt179 of Platinum
     Pt179,
+    /// Isotope Pt180 of Platinum
     Pt180,
+    /// Isotope Pt181 of Platinum
     Pt181,
+    /// Isotope Pt182 of Platinum
     Pt182,
+    /// Isotope Pt183 of Platinum
     Pt183,
+    /// Isotope Pt184 of Platinum
     Pt184,
+    /// Isotope Pt185 of Platinum
     Pt185,
+    /// Isotope Pt186 of Platinum
     Pt186,
+    /// Isotope Pt187 of Platinum
     Pt187,
+    /// Isotope Pt188 of Platinum
     Pt188,
+    /// Isotope Pt189 of Platinum
     Pt189,
+    /// Isotope Pt190 of Platinum
     Pt190,
+    /// Isotope Pt191 of Platinum
     Pt191,
+    /// Isotope Pt192 of Platinum
     Pt192,
+    /// Isotope Pt193 of Platinum
     Pt193,
+    /// Isotope Pt194 of Platinum
     Pt194,
+    /// Isotope Pt195 of Platinum
     Pt195,
+    /// Isotope Pt196 of Platinum
     Pt196,
+    /// Isotope Pt197 of Platinum
     Pt197,
+    /// Isotope Pt198 of Platinum
     Pt198,
+    /// Isotope Pt199 of Platinum
     Pt199,
+    /// Isotope Pt200 of Platinum
     Pt200,
+    /// Isotope Pt201 of Platinum
     Pt201,
+    /// Isotope Pt202 of Platinum
     Pt202,
+    /// Isotope Pt203 of Platinum
     Pt203,
+    /// Isotope Pt204 of Platinum
     Pt204,
+    /// Isotope Pt205 of Platinum
     Pt205,
+    /// Isotope Pt206 of Platinum
     Pt206,
 }
 impl super::RelativeAtomicMass for PlatinumIsotope {
@@ -146,47 +189,47 @@ impl super::MassNumber for PlatinumIsotope {
 impl super::IsotopicComposition for PlatinumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Pt166 => None,
-            Self::Pt167 => None,
-            Self::Pt168 => None,
-            Self::Pt169 => None,
-            Self::Pt170 => None,
-            Self::Pt171 => None,
-            Self::Pt172 => None,
-            Self::Pt173 => None,
-            Self::Pt174 => None,
-            Self::Pt175 => None,
-            Self::Pt176 => None,
-            Self::Pt177 => None,
-            Self::Pt178 => None,
-            Self::Pt179 => None,
-            Self::Pt180 => None,
-            Self::Pt181 => None,
-            Self::Pt182 => None,
-            Self::Pt183 => None,
-            Self::Pt184 => None,
-            Self::Pt185 => None,
-            Self::Pt186 => None,
-            Self::Pt187 => None,
-            Self::Pt188 => None,
-            Self::Pt189 => None,
             Self::Pt190 => Some(0.00012f64),
-            Self::Pt191 => None,
             Self::Pt192 => Some(0.00782f64),
-            Self::Pt193 => None,
             Self::Pt194 => Some(0.3286f64),
             Self::Pt195 => Some(0.3378f64),
             Self::Pt196 => Some(0.2521f64),
-            Self::Pt197 => None,
             Self::Pt198 => Some(0.07356f64),
-            Self::Pt199 => None,
-            Self::Pt200 => None,
-            Self::Pt201 => None,
-            Self::Pt202 => None,
-            Self::Pt203 => None,
-            Self::Pt204 => None,
-            Self::Pt205 => None,
-            Self::Pt206 => None,
+            Self::Pt166
+            | Self::Pt167
+            | Self::Pt168
+            | Self::Pt169
+            | Self::Pt170
+            | Self::Pt171
+            | Self::Pt172
+            | Self::Pt173
+            | Self::Pt174
+            | Self::Pt175
+            | Self::Pt176
+            | Self::Pt177
+            | Self::Pt178
+            | Self::Pt179
+            | Self::Pt180
+            | Self::Pt181
+            | Self::Pt182
+            | Self::Pt183
+            | Self::Pt184
+            | Self::Pt185
+            | Self::Pt186
+            | Self::Pt187
+            | Self::Pt188
+            | Self::Pt189
+            | Self::Pt191
+            | Self::Pt193
+            | Self::Pt197
+            | Self::Pt199
+            | Self::Pt200
+            | Self::Pt201
+            | Self::Pt202
+            | Self::Pt203
+            | Self::Pt204
+            | Self::Pt205
+            | Self::Pt206 => None,
         }
     }
 }

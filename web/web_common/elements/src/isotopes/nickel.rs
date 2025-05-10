@@ -1,38 +1,72 @@
+//! Isotopes of the element Nickel
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Nickel
 pub enum NickelIsotope {
+    /// Isotope Ni48 of Nickel
     Ni48,
+    /// Isotope Ni49 of Nickel
     Ni49,
+    /// Isotope Ni50 of Nickel
     Ni50,
+    /// Isotope Ni51 of Nickel
     Ni51,
+    /// Isotope Ni52 of Nickel
     Ni52,
+    /// Isotope Ni53 of Nickel
     Ni53,
+    /// Isotope Ni54 of Nickel
     Ni54,
+    /// Isotope Ni55 of Nickel
     Ni55,
+    /// Isotope Ni56 of Nickel
     Ni56,
+    /// Isotope Ni57 of Nickel
     Ni57,
+    /// Isotope Ni58 of Nickel
     Ni58,
+    /// Isotope Ni59 of Nickel
     Ni59,
+    /// Isotope Ni60 of Nickel
     Ni60,
+    /// Isotope Ni61 of Nickel
     Ni61,
+    /// Isotope Ni62 of Nickel
     Ni62,
+    /// Isotope Ni63 of Nickel
     Ni63,
+    /// Isotope Ni64 of Nickel
     Ni64,
+    /// Isotope Ni65 of Nickel
     Ni65,
+    /// Isotope Ni66 of Nickel
     Ni66,
+    /// Isotope Ni67 of Nickel
     Ni67,
+    /// Isotope Ni68 of Nickel
     Ni68,
+    /// Isotope Ni69 of Nickel
     Ni69,
+    /// Isotope Ni70 of Nickel
     Ni70,
+    /// Isotope Ni71 of Nickel
     Ni71,
+    /// Isotope Ni72 of Nickel
     Ni72,
+    /// Isotope Ni73 of Nickel
     Ni73,
+    /// Isotope Ni74 of Nickel
     Ni74,
+    /// Isotope Ni75 of Nickel
     Ni75,
+    /// Isotope Ni76 of Nickel
     Ni76,
+    /// Isotope Ni77 of Nickel
     Ni77,
+    /// Isotope Ni78 of Nickel
     Ni78,
+    /// Isotope Ni79 of Nickel
     Ni79,
 }
 impl super::RelativeAtomicMass for NickelIsotope {
@@ -119,38 +153,38 @@ impl super::MassNumber for NickelIsotope {
 impl super::IsotopicComposition for NickelIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Ni48 => None,
-            Self::Ni49 => None,
-            Self::Ni50 => None,
-            Self::Ni51 => None,
-            Self::Ni52 => None,
-            Self::Ni53 => None,
-            Self::Ni54 => None,
-            Self::Ni55 => None,
-            Self::Ni56 => None,
-            Self::Ni57 => None,
             Self::Ni58 => Some(0.68077f64),
-            Self::Ni59 => None,
             Self::Ni60 => Some(0.26223f64),
             Self::Ni61 => Some(0.011399f64),
             Self::Ni62 => Some(0.036346f64),
-            Self::Ni63 => None,
             Self::Ni64 => Some(0.009255f64),
-            Self::Ni65 => None,
-            Self::Ni66 => None,
-            Self::Ni67 => None,
-            Self::Ni68 => None,
-            Self::Ni69 => None,
-            Self::Ni70 => None,
-            Self::Ni71 => None,
-            Self::Ni72 => None,
-            Self::Ni73 => None,
-            Self::Ni74 => None,
-            Self::Ni75 => None,
-            Self::Ni76 => None,
-            Self::Ni77 => None,
-            Self::Ni78 => None,
-            Self::Ni79 => None,
+            Self::Ni48
+            | Self::Ni49
+            | Self::Ni50
+            | Self::Ni51
+            | Self::Ni52
+            | Self::Ni53
+            | Self::Ni54
+            | Self::Ni55
+            | Self::Ni56
+            | Self::Ni57
+            | Self::Ni59
+            | Self::Ni63
+            | Self::Ni65
+            | Self::Ni66
+            | Self::Ni67
+            | Self::Ni68
+            | Self::Ni69
+            | Self::Ni70
+            | Self::Ni71
+            | Self::Ni72
+            | Self::Ni73
+            | Self::Ni74
+            | Self::Ni75
+            | Self::Ni76
+            | Self::Ni77
+            | Self::Ni78
+            | Self::Ni79 => None,
         }
     }
 }

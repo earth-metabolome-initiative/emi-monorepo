@@ -1,29 +1,54 @@
+//! Isotopes of the element Aluminium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Aluminium
 pub enum AluminiumIsotope {
+    /// Isotope Al21 of Aluminium
     Al21,
+    /// Isotope Al22 of Aluminium
     Al22,
+    /// Isotope Al23 of Aluminium
     Al23,
+    /// Isotope Al24 of Aluminium
     Al24,
+    /// Isotope Al25 of Aluminium
     Al25,
+    /// Isotope Al26 of Aluminium
     Al26,
+    /// Isotope Al27 of Aluminium
     Al27,
+    /// Isotope Al28 of Aluminium
     Al28,
+    /// Isotope Al29 of Aluminium
     Al29,
+    /// Isotope Al30 of Aluminium
     Al30,
+    /// Isotope Al31 of Aluminium
     Al31,
+    /// Isotope Al32 of Aluminium
     Al32,
+    /// Isotope Al33 of Aluminium
     Al33,
+    /// Isotope Al34 of Aluminium
     Al34,
+    /// Isotope Al35 of Aluminium
     Al35,
+    /// Isotope Al36 of Aluminium
     Al36,
+    /// Isotope Al37 of Aluminium
     Al37,
+    /// Isotope Al38 of Aluminium
     Al38,
+    /// Isotope Al39 of Aluminium
     Al39,
+    /// Isotope Al40 of Aluminium
     Al40,
+    /// Isotope Al41 of Aluminium
     Al41,
+    /// Isotope Al42 of Aluminium
     Al42,
+    /// Isotope Al43 of Aluminium
     Al43,
 }
 impl super::RelativeAtomicMass for AluminiumIsotope {
@@ -92,29 +117,29 @@ impl super::MassNumber for AluminiumIsotope {
 impl super::IsotopicComposition for AluminiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Al21 => None,
-            Self::Al22 => None,
-            Self::Al23 => None,
-            Self::Al24 => None,
-            Self::Al25 => None,
-            Self::Al26 => None,
             Self::Al27 => Some(1f64),
-            Self::Al28 => None,
-            Self::Al29 => None,
-            Self::Al30 => None,
-            Self::Al31 => None,
-            Self::Al32 => None,
-            Self::Al33 => None,
-            Self::Al34 => None,
-            Self::Al35 => None,
-            Self::Al36 => None,
-            Self::Al37 => None,
-            Self::Al38 => None,
-            Self::Al39 => None,
-            Self::Al40 => None,
-            Self::Al41 => None,
-            Self::Al42 => None,
-            Self::Al43 => None,
+            Self::Al21
+            | Self::Al22
+            | Self::Al23
+            | Self::Al24
+            | Self::Al25
+            | Self::Al26
+            | Self::Al28
+            | Self::Al29
+            | Self::Al30
+            | Self::Al31
+            | Self::Al32
+            | Self::Al33
+            | Self::Al34
+            | Self::Al35
+            | Self::Al36
+            | Self::Al37
+            | Self::Al38
+            | Self::Al39
+            | Self::Al40
+            | Self::Al41
+            | Self::Al42
+            | Self::Al43 => None,
         }
     }
 }

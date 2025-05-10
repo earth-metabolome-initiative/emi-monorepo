@@ -1,11 +1,18 @@
+//! Isotopes of the element Flerovium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Flerovium
 pub enum FleroviumIsotope {
+    /// Isotope Fl285 of Flerovium
     Fl285,
+    /// Isotope Fl286 of Flerovium
     Fl286,
+    /// Isotope Fl287 of Flerovium
     Fl287,
+    /// Isotope Fl288 of Flerovium
     Fl288,
+    /// Isotope Fl289 of Flerovium
     Fl289,
 }
 impl super::RelativeAtomicMass for FleroviumIsotope {
@@ -37,13 +44,7 @@ impl super::MassNumber for FleroviumIsotope {
 }
 impl super::IsotopicComposition for FleroviumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Fl285 => None,
-            Self::Fl286 => None,
-            Self::Fl287 => None,
-            Self::Fl288 => None,
-            Self::Fl289 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for FleroviumIsotope {

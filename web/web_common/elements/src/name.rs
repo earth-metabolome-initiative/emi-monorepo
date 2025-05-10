@@ -2,6 +2,9 @@
 //! for the `Element` enumeration.
 
 impl crate::Element {
+    #[must_use]
+    #[allow(clippy::too_many_lines)]
+    /// Returns the name of the element.
     pub fn name(&self) -> &str {
         match self {
             Self::H => "Hydrogen",

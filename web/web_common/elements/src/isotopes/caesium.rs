@@ -1,46 +1,88 @@
+//! Isotopes of the element Caesium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Caesium
 pub enum CaesiumIsotope {
+    /// Isotope Cs112 of Caesium
     Cs112,
+    /// Isotope Cs113 of Caesium
     Cs113,
+    /// Isotope Cs114 of Caesium
     Cs114,
+    /// Isotope Cs115 of Caesium
     Cs115,
+    /// Isotope Cs116 of Caesium
     Cs116,
+    /// Isotope Cs117 of Caesium
     Cs117,
+    /// Isotope Cs118 of Caesium
     Cs118,
+    /// Isotope Cs119 of Caesium
     Cs119,
+    /// Isotope Cs120 of Caesium
     Cs120,
+    /// Isotope Cs121 of Caesium
     Cs121,
+    /// Isotope Cs122 of Caesium
     Cs122,
+    /// Isotope Cs123 of Caesium
     Cs123,
+    /// Isotope Cs124 of Caesium
     Cs124,
+    /// Isotope Cs125 of Caesium
     Cs125,
+    /// Isotope Cs126 of Caesium
     Cs126,
+    /// Isotope Cs127 of Caesium
     Cs127,
+    /// Isotope Cs128 of Caesium
     Cs128,
+    /// Isotope Cs129 of Caesium
     Cs129,
+    /// Isotope Cs130 of Caesium
     Cs130,
+    /// Isotope Cs131 of Caesium
     Cs131,
+    /// Isotope Cs132 of Caesium
     Cs132,
+    /// Isotope Cs133 of Caesium
     Cs133,
+    /// Isotope Cs134 of Caesium
     Cs134,
+    /// Isotope Cs135 of Caesium
     Cs135,
+    /// Isotope Cs136 of Caesium
     Cs136,
+    /// Isotope Cs137 of Caesium
     Cs137,
+    /// Isotope Cs138 of Caesium
     Cs138,
+    /// Isotope Cs139 of Caesium
     Cs139,
+    /// Isotope Cs140 of Caesium
     Cs140,
+    /// Isotope Cs141 of Caesium
     Cs141,
+    /// Isotope Cs142 of Caesium
     Cs142,
+    /// Isotope Cs143 of Caesium
     Cs143,
+    /// Isotope Cs144 of Caesium
     Cs144,
+    /// Isotope Cs145 of Caesium
     Cs145,
+    /// Isotope Cs146 of Caesium
     Cs146,
+    /// Isotope Cs147 of Caesium
     Cs147,
+    /// Isotope Cs148 of Caesium
     Cs148,
+    /// Isotope Cs149 of Caesium
     Cs149,
+    /// Isotope Cs150 of Caesium
     Cs150,
+    /// Isotope Cs151 of Caesium
     Cs151,
 }
 impl super::RelativeAtomicMass for CaesiumIsotope {
@@ -143,46 +185,46 @@ impl super::MassNumber for CaesiumIsotope {
 impl super::IsotopicComposition for CaesiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Cs112 => None,
-            Self::Cs113 => None,
-            Self::Cs114 => None,
-            Self::Cs115 => None,
-            Self::Cs116 => None,
-            Self::Cs117 => None,
-            Self::Cs118 => None,
-            Self::Cs119 => None,
-            Self::Cs120 => None,
-            Self::Cs121 => None,
-            Self::Cs122 => None,
-            Self::Cs123 => None,
-            Self::Cs124 => None,
-            Self::Cs125 => None,
-            Self::Cs126 => None,
-            Self::Cs127 => None,
-            Self::Cs128 => None,
-            Self::Cs129 => None,
-            Self::Cs130 => None,
-            Self::Cs131 => None,
-            Self::Cs132 => None,
             Self::Cs133 => Some(1f64),
-            Self::Cs134 => None,
-            Self::Cs135 => None,
-            Self::Cs136 => None,
-            Self::Cs137 => None,
-            Self::Cs138 => None,
-            Self::Cs139 => None,
-            Self::Cs140 => None,
-            Self::Cs141 => None,
-            Self::Cs142 => None,
-            Self::Cs143 => None,
-            Self::Cs144 => None,
-            Self::Cs145 => None,
-            Self::Cs146 => None,
-            Self::Cs147 => None,
-            Self::Cs148 => None,
-            Self::Cs149 => None,
-            Self::Cs150 => None,
-            Self::Cs151 => None,
+            Self::Cs112
+            | Self::Cs113
+            | Self::Cs114
+            | Self::Cs115
+            | Self::Cs116
+            | Self::Cs117
+            | Self::Cs118
+            | Self::Cs119
+            | Self::Cs120
+            | Self::Cs121
+            | Self::Cs122
+            | Self::Cs123
+            | Self::Cs124
+            | Self::Cs125
+            | Self::Cs126
+            | Self::Cs127
+            | Self::Cs128
+            | Self::Cs129
+            | Self::Cs130
+            | Self::Cs131
+            | Self::Cs132
+            | Self::Cs134
+            | Self::Cs135
+            | Self::Cs136
+            | Self::Cs137
+            | Self::Cs138
+            | Self::Cs139
+            | Self::Cs140
+            | Self::Cs141
+            | Self::Cs142
+            | Self::Cs143
+            | Self::Cs144
+            | Self::Cs145
+            | Self::Cs146
+            | Self::Cs147
+            | Self::Cs148
+            | Self::Cs149
+            | Self::Cs150
+            | Self::Cs151 => None,
         }
     }
 }

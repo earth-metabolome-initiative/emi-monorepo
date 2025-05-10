@@ -1,43 +1,82 @@
+//! Isotopes of the element Hafnium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Hafnium
 pub enum HafniumIsotope {
+    /// Isotope Hf153 of Hafnium
     Hf153,
+    /// Isotope Hf154 of Hafnium
     Hf154,
+    /// Isotope Hf155 of Hafnium
     Hf155,
+    /// Isotope Hf156 of Hafnium
     Hf156,
+    /// Isotope Hf157 of Hafnium
     Hf157,
+    /// Isotope Hf158 of Hafnium
     Hf158,
+    /// Isotope Hf159 of Hafnium
     Hf159,
+    /// Isotope Hf160 of Hafnium
     Hf160,
+    /// Isotope Hf161 of Hafnium
     Hf161,
+    /// Isotope Hf162 of Hafnium
     Hf162,
+    /// Isotope Hf163 of Hafnium
     Hf163,
+    /// Isotope Hf164 of Hafnium
     Hf164,
+    /// Isotope Hf165 of Hafnium
     Hf165,
+    /// Isotope Hf166 of Hafnium
     Hf166,
+    /// Isotope Hf167 of Hafnium
     Hf167,
+    /// Isotope Hf168 of Hafnium
     Hf168,
+    /// Isotope Hf169 of Hafnium
     Hf169,
+    /// Isotope Hf170 of Hafnium
     Hf170,
+    /// Isotope Hf171 of Hafnium
     Hf171,
+    /// Isotope Hf172 of Hafnium
     Hf172,
+    /// Isotope Hf173 of Hafnium
     Hf173,
+    /// Isotope Hf174 of Hafnium
     Hf174,
+    /// Isotope Hf175 of Hafnium
     Hf175,
+    /// Isotope Hf176 of Hafnium
     Hf176,
+    /// Isotope Hf177 of Hafnium
     Hf177,
+    /// Isotope Hf178 of Hafnium
     Hf178,
+    /// Isotope Hf179 of Hafnium
     Hf179,
+    /// Isotope Hf180 of Hafnium
     Hf180,
+    /// Isotope Hf181 of Hafnium
     Hf181,
+    /// Isotope Hf182 of Hafnium
     Hf182,
+    /// Isotope Hf183 of Hafnium
     Hf183,
+    /// Isotope Hf184 of Hafnium
     Hf184,
+    /// Isotope Hf185 of Hafnium
     Hf185,
+    /// Isotope Hf186 of Hafnium
     Hf186,
+    /// Isotope Hf187 of Hafnium
     Hf187,
+    /// Isotope Hf188 of Hafnium
     Hf188,
+    /// Isotope Hf189 of Hafnium
     Hf189,
 }
 impl super::RelativeAtomicMass for HafniumIsotope {
@@ -134,43 +173,43 @@ impl super::MassNumber for HafniumIsotope {
 impl super::IsotopicComposition for HafniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Hf153 => None,
-            Self::Hf154 => None,
-            Self::Hf155 => None,
-            Self::Hf156 => None,
-            Self::Hf157 => None,
-            Self::Hf158 => None,
-            Self::Hf159 => None,
-            Self::Hf160 => None,
-            Self::Hf161 => None,
-            Self::Hf162 => None,
-            Self::Hf163 => None,
-            Self::Hf164 => None,
-            Self::Hf165 => None,
-            Self::Hf166 => None,
-            Self::Hf167 => None,
-            Self::Hf168 => None,
-            Self::Hf169 => None,
-            Self::Hf170 => None,
-            Self::Hf171 => None,
-            Self::Hf172 => None,
-            Self::Hf173 => None,
             Self::Hf174 => Some(0.0016f64),
-            Self::Hf175 => None,
             Self::Hf176 => Some(0.0526f64),
             Self::Hf177 => Some(0.186f64),
             Self::Hf178 => Some(0.2728f64),
             Self::Hf179 => Some(0.1362f64),
             Self::Hf180 => Some(0.3508f64),
-            Self::Hf181 => None,
-            Self::Hf182 => None,
-            Self::Hf183 => None,
-            Self::Hf184 => None,
-            Self::Hf185 => None,
-            Self::Hf186 => None,
-            Self::Hf187 => None,
-            Self::Hf188 => None,
-            Self::Hf189 => None,
+            Self::Hf153
+            | Self::Hf154
+            | Self::Hf155
+            | Self::Hf156
+            | Self::Hf157
+            | Self::Hf158
+            | Self::Hf159
+            | Self::Hf160
+            | Self::Hf161
+            | Self::Hf162
+            | Self::Hf163
+            | Self::Hf164
+            | Self::Hf165
+            | Self::Hf166
+            | Self::Hf167
+            | Self::Hf168
+            | Self::Hf169
+            | Self::Hf170
+            | Self::Hf171
+            | Self::Hf172
+            | Self::Hf173
+            | Self::Hf175
+            | Self::Hf181
+            | Self::Hf182
+            | Self::Hf183
+            | Self::Hf184
+            | Self::Hf185
+            | Self::Hf186
+            | Self::Hf187
+            | Self::Hf188
+            | Self::Hf189 => None,
         }
     }
 }

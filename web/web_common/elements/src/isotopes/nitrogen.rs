@@ -1,22 +1,40 @@
+//! Isotopes of the element Nitrogen
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Nitrogen
 pub enum NitrogenIsotope {
+    /// Isotope N10 of Nitrogen
     N10,
+    /// Isotope N11 of Nitrogen
     N11,
+    /// Isotope N12 of Nitrogen
     N12,
+    /// Isotope N13 of Nitrogen
     N13,
+    /// Isotope N14 of Nitrogen
     N14,
+    /// Isotope N15 of Nitrogen
     N15,
+    /// Isotope N16 of Nitrogen
     N16,
+    /// Isotope N17 of Nitrogen
     N17,
+    /// Isotope N18 of Nitrogen
     N18,
+    /// Isotope N19 of Nitrogen
     N19,
+    /// Isotope N20 of Nitrogen
     N20,
+    /// Isotope N21 of Nitrogen
     N21,
+    /// Isotope N22 of Nitrogen
     N22,
+    /// Isotope N23 of Nitrogen
     N23,
+    /// Isotope N24 of Nitrogen
     N24,
+    /// Isotope N25 of Nitrogen
     N25,
 }
 impl super::RelativeAtomicMass for NitrogenIsotope {
@@ -71,22 +89,22 @@ impl super::MassNumber for NitrogenIsotope {
 impl super::IsotopicComposition for NitrogenIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::N10 => None,
-            Self::N11 => None,
-            Self::N12 => None,
-            Self::N13 => None,
             Self::N14 => Some(0.99636f64),
             Self::N15 => Some(0.00364f64),
-            Self::N16 => None,
-            Self::N17 => None,
-            Self::N18 => None,
-            Self::N19 => None,
-            Self::N20 => None,
-            Self::N21 => None,
-            Self::N22 => None,
-            Self::N23 => None,
-            Self::N24 => None,
-            Self::N25 => None,
+            Self::N10
+            | Self::N11
+            | Self::N12
+            | Self::N13
+            | Self::N16
+            | Self::N17
+            | Self::N18
+            | Self::N19
+            | Self::N20
+            | Self::N21
+            | Self::N22
+            | Self::N23
+            | Self::N24
+            | Self::N25 => None,
         }
     }
 }

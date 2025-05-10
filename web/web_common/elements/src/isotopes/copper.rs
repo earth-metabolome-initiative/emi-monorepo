@@ -1,37 +1,70 @@
+//! Isotopes of the element Copper
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Copper
 pub enum CopperIsotope {
+    /// Isotope Cu52 of Copper
     Cu52,
+    /// Isotope Cu53 of Copper
     Cu53,
+    /// Isotope Cu54 of Copper
     Cu54,
+    /// Isotope Cu55 of Copper
     Cu55,
+    /// Isotope Cu56 of Copper
     Cu56,
+    /// Isotope Cu57 of Copper
     Cu57,
+    /// Isotope Cu58 of Copper
     Cu58,
+    /// Isotope Cu59 of Copper
     Cu59,
+    /// Isotope Cu60 of Copper
     Cu60,
+    /// Isotope Cu61 of Copper
     Cu61,
+    /// Isotope Cu62 of Copper
     Cu62,
+    /// Isotope Cu63 of Copper
     Cu63,
+    /// Isotope Cu64 of Copper
     Cu64,
+    /// Isotope Cu65 of Copper
     Cu65,
+    /// Isotope Cu66 of Copper
     Cu66,
+    /// Isotope Cu67 of Copper
     Cu67,
+    /// Isotope Cu68 of Copper
     Cu68,
+    /// Isotope Cu69 of Copper
     Cu69,
+    /// Isotope Cu70 of Copper
     Cu70,
+    /// Isotope Cu71 of Copper
     Cu71,
+    /// Isotope Cu72 of Copper
     Cu72,
+    /// Isotope Cu73 of Copper
     Cu73,
+    /// Isotope Cu74 of Copper
     Cu74,
+    /// Isotope Cu75 of Copper
     Cu75,
+    /// Isotope Cu76 of Copper
     Cu76,
+    /// Isotope Cu77 of Copper
     Cu77,
+    /// Isotope Cu78 of Copper
     Cu78,
+    /// Isotope Cu79 of Copper
     Cu79,
+    /// Isotope Cu80 of Copper
     Cu80,
+    /// Isotope Cu81 of Copper
     Cu81,
+    /// Isotope Cu82 of Copper
     Cu82,
 }
 impl super::RelativeAtomicMass for CopperIsotope {
@@ -116,37 +149,37 @@ impl super::MassNumber for CopperIsotope {
 impl super::IsotopicComposition for CopperIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Cu52 => None,
-            Self::Cu53 => None,
-            Self::Cu54 => None,
-            Self::Cu55 => None,
-            Self::Cu56 => None,
-            Self::Cu57 => None,
-            Self::Cu58 => None,
-            Self::Cu59 => None,
-            Self::Cu60 => None,
-            Self::Cu61 => None,
-            Self::Cu62 => None,
             Self::Cu63 => Some(0.6915f64),
-            Self::Cu64 => None,
             Self::Cu65 => Some(0.3085f64),
-            Self::Cu66 => None,
-            Self::Cu67 => None,
-            Self::Cu68 => None,
-            Self::Cu69 => None,
-            Self::Cu70 => None,
-            Self::Cu71 => None,
-            Self::Cu72 => None,
-            Self::Cu73 => None,
-            Self::Cu74 => None,
-            Self::Cu75 => None,
-            Self::Cu76 => None,
-            Self::Cu77 => None,
-            Self::Cu78 => None,
-            Self::Cu79 => None,
-            Self::Cu80 => None,
-            Self::Cu81 => None,
-            Self::Cu82 => None,
+            Self::Cu52
+            | Self::Cu53
+            | Self::Cu54
+            | Self::Cu55
+            | Self::Cu56
+            | Self::Cu57
+            | Self::Cu58
+            | Self::Cu59
+            | Self::Cu60
+            | Self::Cu61
+            | Self::Cu62
+            | Self::Cu64
+            | Self::Cu66
+            | Self::Cu67
+            | Self::Cu68
+            | Self::Cu69
+            | Self::Cu70
+            | Self::Cu71
+            | Self::Cu72
+            | Self::Cu73
+            | Self::Cu74
+            | Self::Cu75
+            | Self::Cu76
+            | Self::Cu77
+            | Self::Cu78
+            | Self::Cu79
+            | Self::Cu80
+            | Self::Cu81
+            | Self::Cu82 => None,
         }
     }
 }

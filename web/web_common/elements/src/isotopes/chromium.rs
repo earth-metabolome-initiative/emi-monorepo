@@ -1,33 +1,62 @@
+//! Isotopes of the element Chromium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Chromium
 pub enum ChromiumIsotope {
+    /// Isotope Cr42 of Chromium
     Cr42,
+    /// Isotope Cr43 of Chromium
     Cr43,
+    /// Isotope Cr44 of Chromium
     Cr44,
+    /// Isotope Cr45 of Chromium
     Cr45,
+    /// Isotope Cr46 of Chromium
     Cr46,
+    /// Isotope Cr47 of Chromium
     Cr47,
+    /// Isotope Cr48 of Chromium
     Cr48,
+    /// Isotope Cr49 of Chromium
     Cr49,
+    /// Isotope Cr50 of Chromium
     Cr50,
+    /// Isotope Cr51 of Chromium
     Cr51,
+    /// Isotope Cr52 of Chromium
     Cr52,
+    /// Isotope Cr53 of Chromium
     Cr53,
+    /// Isotope Cr54 of Chromium
     Cr54,
+    /// Isotope Cr55 of Chromium
     Cr55,
+    /// Isotope Cr56 of Chromium
     Cr56,
+    /// Isotope Cr57 of Chromium
     Cr57,
+    /// Isotope Cr58 of Chromium
     Cr58,
+    /// Isotope Cr59 of Chromium
     Cr59,
+    /// Isotope Cr60 of Chromium
     Cr60,
+    /// Isotope Cr61 of Chromium
     Cr61,
+    /// Isotope Cr62 of Chromium
     Cr62,
+    /// Isotope Cr63 of Chromium
     Cr63,
+    /// Isotope Cr64 of Chromium
     Cr64,
+    /// Isotope Cr65 of Chromium
     Cr65,
+    /// Isotope Cr66 of Chromium
     Cr66,
+    /// Isotope Cr67 of Chromium
     Cr67,
+    /// Isotope Cr68 of Chromium
     Cr68,
 }
 impl super::RelativeAtomicMass for ChromiumIsotope {
@@ -104,33 +133,33 @@ impl super::MassNumber for ChromiumIsotope {
 impl super::IsotopicComposition for ChromiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Cr42 => None,
-            Self::Cr43 => None,
-            Self::Cr44 => None,
-            Self::Cr45 => None,
-            Self::Cr46 => None,
-            Self::Cr47 => None,
-            Self::Cr48 => None,
-            Self::Cr49 => None,
             Self::Cr50 => Some(0.04345f64),
-            Self::Cr51 => None,
             Self::Cr52 => Some(0.83789f64),
             Self::Cr53 => Some(0.09501f64),
             Self::Cr54 => Some(0.02365f64),
-            Self::Cr55 => None,
-            Self::Cr56 => None,
-            Self::Cr57 => None,
-            Self::Cr58 => None,
-            Self::Cr59 => None,
-            Self::Cr60 => None,
-            Self::Cr61 => None,
-            Self::Cr62 => None,
-            Self::Cr63 => None,
-            Self::Cr64 => None,
-            Self::Cr65 => None,
-            Self::Cr66 => None,
-            Self::Cr67 => None,
-            Self::Cr68 => None,
+            Self::Cr42
+            | Self::Cr43
+            | Self::Cr44
+            | Self::Cr45
+            | Self::Cr46
+            | Self::Cr47
+            | Self::Cr48
+            | Self::Cr49
+            | Self::Cr51
+            | Self::Cr55
+            | Self::Cr56
+            | Self::Cr57
+            | Self::Cr58
+            | Self::Cr59
+            | Self::Cr60
+            | Self::Cr61
+            | Self::Cr62
+            | Self::Cr63
+            | Self::Cr64
+            | Self::Cr65
+            | Self::Cr66
+            | Self::Cr67
+            | Self::Cr68 => None,
         }
     }
 }

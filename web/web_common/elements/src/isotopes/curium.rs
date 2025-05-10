@@ -1,27 +1,50 @@
+//! Isotopes of the element Curium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Curium
 pub enum CuriumIsotope {
+    /// Isotope Cm232 of Curium
     Cm232,
+    /// Isotope Cm233 of Curium
     Cm233,
+    /// Isotope Cm234 of Curium
     Cm234,
+    /// Isotope Cm235 of Curium
     Cm235,
+    /// Isotope Cm236 of Curium
     Cm236,
+    /// Isotope Cm237 of Curium
     Cm237,
+    /// Isotope Cm238 of Curium
     Cm238,
+    /// Isotope Cm239 of Curium
     Cm239,
+    /// Isotope Cm240 of Curium
     Cm240,
+    /// Isotope Cm241 of Curium
     Cm241,
+    /// Isotope Cm242 of Curium
     Cm242,
+    /// Isotope Cm243 of Curium
     Cm243,
+    /// Isotope Cm244 of Curium
     Cm244,
+    /// Isotope Cm245 of Curium
     Cm245,
+    /// Isotope Cm246 of Curium
     Cm246,
+    /// Isotope Cm247 of Curium
     Cm247,
+    /// Isotope Cm248 of Curium
     Cm248,
+    /// Isotope Cm249 of Curium
     Cm249,
+    /// Isotope Cm250 of Curium
     Cm250,
+    /// Isotope Cm251 of Curium
     Cm251,
+    /// Isotope Cm252 of Curium
     Cm252,
 }
 impl super::RelativeAtomicMass for CuriumIsotope {
@@ -85,29 +108,7 @@ impl super::MassNumber for CuriumIsotope {
 }
 impl super::IsotopicComposition for CuriumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Cm232 => None,
-            Self::Cm233 => None,
-            Self::Cm234 => None,
-            Self::Cm235 => None,
-            Self::Cm236 => None,
-            Self::Cm237 => None,
-            Self::Cm238 => None,
-            Self::Cm239 => None,
-            Self::Cm240 => None,
-            Self::Cm241 => None,
-            Self::Cm242 => None,
-            Self::Cm243 => None,
-            Self::Cm244 => None,
-            Self::Cm245 => None,
-            Self::Cm246 => None,
-            Self::Cm247 => None,
-            Self::Cm248 => None,
-            Self::Cm249 => None,
-            Self::Cm250 => None,
-            Self::Cm251 => None,
-            Self::Cm252 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for CuriumIsotope {

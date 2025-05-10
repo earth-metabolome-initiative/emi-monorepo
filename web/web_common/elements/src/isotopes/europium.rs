@@ -1,44 +1,84 @@
+//! Isotopes of the element Europium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Europium
 pub enum EuropiumIsotope {
+    /// Isotope Eu130 of Europium
     Eu130,
+    /// Isotope Eu131 of Europium
     Eu131,
+    /// Isotope Eu132 of Europium
     Eu132,
+    /// Isotope Eu133 of Europium
     Eu133,
+    /// Isotope Eu134 of Europium
     Eu134,
+    /// Isotope Eu135 of Europium
     Eu135,
+    /// Isotope Eu136 of Europium
     Eu136,
+    /// Isotope Eu137 of Europium
     Eu137,
+    /// Isotope Eu138 of Europium
     Eu138,
+    /// Isotope Eu139 of Europium
     Eu139,
+    /// Isotope Eu140 of Europium
     Eu140,
+    /// Isotope Eu141 of Europium
     Eu141,
+    /// Isotope Eu142 of Europium
     Eu142,
+    /// Isotope Eu143 of Europium
     Eu143,
+    /// Isotope Eu144 of Europium
     Eu144,
+    /// Isotope Eu145 of Europium
     Eu145,
+    /// Isotope Eu146 of Europium
     Eu146,
+    /// Isotope Eu147 of Europium
     Eu147,
+    /// Isotope Eu148 of Europium
     Eu148,
+    /// Isotope Eu149 of Europium
     Eu149,
+    /// Isotope Eu150 of Europium
     Eu150,
+    /// Isotope Eu151 of Europium
     Eu151,
+    /// Isotope Eu152 of Europium
     Eu152,
+    /// Isotope Eu153 of Europium
     Eu153,
+    /// Isotope Eu154 of Europium
     Eu154,
+    /// Isotope Eu155 of Europium
     Eu155,
+    /// Isotope Eu156 of Europium
     Eu156,
+    /// Isotope Eu157 of Europium
     Eu157,
+    /// Isotope Eu158 of Europium
     Eu158,
+    /// Isotope Eu159 of Europium
     Eu159,
+    /// Isotope Eu160 of Europium
     Eu160,
+    /// Isotope Eu161 of Europium
     Eu161,
+    /// Isotope Eu162 of Europium
     Eu162,
+    /// Isotope Eu163 of Europium
     Eu163,
+    /// Isotope Eu164 of Europium
     Eu164,
+    /// Isotope Eu165 of Europium
     Eu165,
+    /// Isotope Eu166 of Europium
     Eu166,
+    /// Isotope Eu167 of Europium
     Eu167,
 }
 impl super::RelativeAtomicMass for EuropiumIsotope {
@@ -137,44 +177,44 @@ impl super::MassNumber for EuropiumIsotope {
 impl super::IsotopicComposition for EuropiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Eu130 => None,
-            Self::Eu131 => None,
-            Self::Eu132 => None,
-            Self::Eu133 => None,
-            Self::Eu134 => None,
-            Self::Eu135 => None,
-            Self::Eu136 => None,
-            Self::Eu137 => None,
-            Self::Eu138 => None,
-            Self::Eu139 => None,
-            Self::Eu140 => None,
-            Self::Eu141 => None,
-            Self::Eu142 => None,
-            Self::Eu143 => None,
-            Self::Eu144 => None,
-            Self::Eu145 => None,
-            Self::Eu146 => None,
-            Self::Eu147 => None,
-            Self::Eu148 => None,
-            Self::Eu149 => None,
-            Self::Eu150 => None,
             Self::Eu151 => Some(0.4781f64),
-            Self::Eu152 => None,
             Self::Eu153 => Some(0.5219f64),
-            Self::Eu154 => None,
-            Self::Eu155 => None,
-            Self::Eu156 => None,
-            Self::Eu157 => None,
-            Self::Eu158 => None,
-            Self::Eu159 => None,
-            Self::Eu160 => None,
-            Self::Eu161 => None,
-            Self::Eu162 => None,
-            Self::Eu163 => None,
-            Self::Eu164 => None,
-            Self::Eu165 => None,
-            Self::Eu166 => None,
-            Self::Eu167 => None,
+            Self::Eu130
+            | Self::Eu131
+            | Self::Eu132
+            | Self::Eu133
+            | Self::Eu134
+            | Self::Eu135
+            | Self::Eu136
+            | Self::Eu137
+            | Self::Eu138
+            | Self::Eu139
+            | Self::Eu140
+            | Self::Eu141
+            | Self::Eu142
+            | Self::Eu143
+            | Self::Eu144
+            | Self::Eu145
+            | Self::Eu146
+            | Self::Eu147
+            | Self::Eu148
+            | Self::Eu149
+            | Self::Eu150
+            | Self::Eu152
+            | Self::Eu154
+            | Self::Eu155
+            | Self::Eu156
+            | Self::Eu157
+            | Self::Eu158
+            | Self::Eu159
+            | Self::Eu160
+            | Self::Eu161
+            | Self::Eu162
+            | Self::Eu163
+            | Self::Eu164
+            | Self::Eu165
+            | Self::Eu166
+            | Self::Eu167 => None,
         }
     }
 }

@@ -1,26 +1,48 @@
+//! Isotopes of the element Einsteinium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Einsteinium
 pub enum EinsteiniumIsotope {
+    /// Isotope Es239 of Einsteinium
     Es239,
+    /// Isotope Es240 of Einsteinium
     Es240,
+    /// Isotope Es241 of Einsteinium
     Es241,
+    /// Isotope Es242 of Einsteinium
     Es242,
+    /// Isotope Es243 of Einsteinium
     Es243,
+    /// Isotope Es244 of Einsteinium
     Es244,
+    /// Isotope Es245 of Einsteinium
     Es245,
+    /// Isotope Es246 of Einsteinium
     Es246,
+    /// Isotope Es247 of Einsteinium
     Es247,
+    /// Isotope Es248 of Einsteinium
     Es248,
+    /// Isotope Es249 of Einsteinium
     Es249,
+    /// Isotope Es250 of Einsteinium
     Es250,
+    /// Isotope Es251 of Einsteinium
     Es251,
+    /// Isotope Es252 of Einsteinium
     Es252,
+    /// Isotope Es253 of Einsteinium
     Es253,
+    /// Isotope Es254 of Einsteinium
     Es254,
+    /// Isotope Es255 of Einsteinium
     Es255,
+    /// Isotope Es256 of Einsteinium
     Es256,
+    /// Isotope Es257 of Einsteinium
     Es257,
+    /// Isotope Es258 of Einsteinium
     Es258,
 }
 impl super::RelativeAtomicMass for EinsteiniumIsotope {
@@ -82,28 +104,7 @@ impl super::MassNumber for EinsteiniumIsotope {
 }
 impl super::IsotopicComposition for EinsteiniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Es239 => None,
-            Self::Es240 => None,
-            Self::Es241 => None,
-            Self::Es242 => None,
-            Self::Es243 => None,
-            Self::Es244 => None,
-            Self::Es245 => None,
-            Self::Es246 => None,
-            Self::Es247 => None,
-            Self::Es248 => None,
-            Self::Es249 => None,
-            Self::Es250 => None,
-            Self::Es251 => None,
-            Self::Es252 => None,
-            Self::Es253 => None,
-            Self::Es254 => None,
-            Self::Es255 => None,
-            Self::Es256 => None,
-            Self::Es257 => None,
-            Self::Es258 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for EinsteiniumIsotope {

@@ -1,22 +1,40 @@
+//! Isotopes of the element Carbon
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Carbon
 pub enum CarbonIsotope {
+    /// Isotope C8 of Carbon
     C8,
+    /// Isotope C9 of Carbon
     C9,
+    /// Isotope C10 of Carbon
     C10,
+    /// Isotope C11 of Carbon
     C11,
+    /// Isotope C12 of Carbon
     C12,
+    /// Isotope C13 of Carbon
     C13,
+    /// Isotope C14 of Carbon
     C14,
+    /// Isotope C15 of Carbon
     C15,
+    /// Isotope C16 of Carbon
     C16,
+    /// Isotope C17 of Carbon
     C17,
+    /// Isotope C18 of Carbon
     C18,
+    /// Isotope C19 of Carbon
     C19,
+    /// Isotope C20 of Carbon
     C20,
+    /// Isotope C21 of Carbon
     C21,
+    /// Isotope C22 of Carbon
     C22,
+    /// Isotope C23 of Carbon
     C23,
 }
 impl super::RelativeAtomicMass for CarbonIsotope {
@@ -71,22 +89,22 @@ impl super::MassNumber for CarbonIsotope {
 impl super::IsotopicComposition for CarbonIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::C8 => None,
-            Self::C9 => None,
-            Self::C10 => None,
-            Self::C11 => None,
             Self::C12 => Some(0.9893f64),
             Self::C13 => Some(0.0107f64),
-            Self::C14 => None,
-            Self::C15 => None,
-            Self::C16 => None,
-            Self::C17 => None,
-            Self::C18 => None,
-            Self::C19 => None,
-            Self::C20 => None,
-            Self::C21 => None,
-            Self::C22 => None,
-            Self::C23 => None,
+            Self::C8
+            | Self::C9
+            | Self::C10
+            | Self::C11
+            | Self::C14
+            | Self::C15
+            | Self::C16
+            | Self::C17
+            | Self::C18
+            | Self::C19
+            | Self::C20
+            | Self::C21
+            | Self::C22
+            | Self::C23 => None,
         }
     }
 }

@@ -1,41 +1,78 @@
+//! Isotopes of the element Zirconium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Zirconium
 pub enum ZirconiumIsotope {
+    /// Isotope Zr78 of Zirconium
     Zr78,
+    /// Isotope Zr79 of Zirconium
     Zr79,
+    /// Isotope Zr80 of Zirconium
     Zr80,
+    /// Isotope Zr81 of Zirconium
     Zr81,
+    /// Isotope Zr82 of Zirconium
     Zr82,
+    /// Isotope Zr83 of Zirconium
     Zr83,
+    /// Isotope Zr84 of Zirconium
     Zr84,
+    /// Isotope Zr85 of Zirconium
     Zr85,
+    /// Isotope Zr86 of Zirconium
     Zr86,
+    /// Isotope Zr87 of Zirconium
     Zr87,
+    /// Isotope Zr88 of Zirconium
     Zr88,
+    /// Isotope Zr89 of Zirconium
     Zr89,
+    /// Isotope Zr90 of Zirconium
     Zr90,
+    /// Isotope Zr91 of Zirconium
     Zr91,
+    /// Isotope Zr92 of Zirconium
     Zr92,
+    /// Isotope Zr93 of Zirconium
     Zr93,
+    /// Isotope Zr94 of Zirconium
     Zr94,
+    /// Isotope Zr95 of Zirconium
     Zr95,
+    /// Isotope Zr96 of Zirconium
     Zr96,
+    /// Isotope Zr97 of Zirconium
     Zr97,
+    /// Isotope Zr98 of Zirconium
     Zr98,
+    /// Isotope Zr99 of Zirconium
     Zr99,
+    /// Isotope Zr100 of Zirconium
     Zr100,
+    /// Isotope Zr101 of Zirconium
     Zr101,
+    /// Isotope Zr102 of Zirconium
     Zr102,
+    /// Isotope Zr103 of Zirconium
     Zr103,
+    /// Isotope Zr104 of Zirconium
     Zr104,
+    /// Isotope Zr105 of Zirconium
     Zr105,
+    /// Isotope Zr106 of Zirconium
     Zr106,
+    /// Isotope Zr107 of Zirconium
     Zr107,
+    /// Isotope Zr108 of Zirconium
     Zr108,
+    /// Isotope Zr109 of Zirconium
     Zr109,
+    /// Isotope Zr110 of Zirconium
     Zr110,
+    /// Isotope Zr111 of Zirconium
     Zr111,
+    /// Isotope Zr112 of Zirconium
     Zr112,
 }
 impl super::RelativeAtomicMass for ZirconiumIsotope {
@@ -128,41 +165,41 @@ impl super::MassNumber for ZirconiumIsotope {
 impl super::IsotopicComposition for ZirconiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Zr78 => None,
-            Self::Zr79 => None,
-            Self::Zr80 => None,
-            Self::Zr81 => None,
-            Self::Zr82 => None,
-            Self::Zr83 => None,
-            Self::Zr84 => None,
-            Self::Zr85 => None,
-            Self::Zr86 => None,
-            Self::Zr87 => None,
-            Self::Zr88 => None,
-            Self::Zr89 => None,
             Self::Zr90 => Some(0.5145f64),
             Self::Zr91 => Some(0.1122f64),
             Self::Zr92 => Some(0.1715f64),
-            Self::Zr93 => None,
             Self::Zr94 => Some(0.1738f64),
-            Self::Zr95 => None,
             Self::Zr96 => Some(0.028f64),
-            Self::Zr97 => None,
-            Self::Zr98 => None,
-            Self::Zr99 => None,
-            Self::Zr100 => None,
-            Self::Zr101 => None,
-            Self::Zr102 => None,
-            Self::Zr103 => None,
-            Self::Zr104 => None,
-            Self::Zr105 => None,
-            Self::Zr106 => None,
-            Self::Zr107 => None,
-            Self::Zr108 => None,
-            Self::Zr109 => None,
-            Self::Zr110 => None,
-            Self::Zr111 => None,
-            Self::Zr112 => None,
+            Self::Zr78
+            | Self::Zr79
+            | Self::Zr80
+            | Self::Zr81
+            | Self::Zr82
+            | Self::Zr83
+            | Self::Zr84
+            | Self::Zr85
+            | Self::Zr86
+            | Self::Zr87
+            | Self::Zr88
+            | Self::Zr89
+            | Self::Zr93
+            | Self::Zr95
+            | Self::Zr97
+            | Self::Zr98
+            | Self::Zr99
+            | Self::Zr100
+            | Self::Zr101
+            | Self::Zr102
+            | Self::Zr103
+            | Self::Zr104
+            | Self::Zr105
+            | Self::Zr106
+            | Self::Zr107
+            | Self::Zr108
+            | Self::Zr109
+            | Self::Zr110
+            | Self::Zr111
+            | Self::Zr112 => None,
         }
     }
 }

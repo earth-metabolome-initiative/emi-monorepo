@@ -1,41 +1,78 @@
+//! Isotopes of the element Niobium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Niobium
 pub enum NiobiumIsotope {
+    /// Isotope Nb81 of Niobium
     Nb81,
+    /// Isotope Nb82 of Niobium
     Nb82,
+    /// Isotope Nb83 of Niobium
     Nb83,
+    /// Isotope Nb84 of Niobium
     Nb84,
+    /// Isotope Nb85 of Niobium
     Nb85,
+    /// Isotope Nb86 of Niobium
     Nb86,
+    /// Isotope Nb87 of Niobium
     Nb87,
+    /// Isotope Nb88 of Niobium
     Nb88,
+    /// Isotope Nb89 of Niobium
     Nb89,
+    /// Isotope Nb90 of Niobium
     Nb90,
+    /// Isotope Nb91 of Niobium
     Nb91,
+    /// Isotope Nb92 of Niobium
     Nb92,
+    /// Isotope Nb93 of Niobium
     Nb93,
+    /// Isotope Nb94 of Niobium
     Nb94,
+    /// Isotope Nb95 of Niobium
     Nb95,
+    /// Isotope Nb96 of Niobium
     Nb96,
+    /// Isotope Nb97 of Niobium
     Nb97,
+    /// Isotope Nb98 of Niobium
     Nb98,
+    /// Isotope Nb99 of Niobium
     Nb99,
+    /// Isotope Nb100 of Niobium
     Nb100,
+    /// Isotope Nb101 of Niobium
     Nb101,
+    /// Isotope Nb102 of Niobium
     Nb102,
+    /// Isotope Nb103 of Niobium
     Nb103,
+    /// Isotope Nb104 of Niobium
     Nb104,
+    /// Isotope Nb105 of Niobium
     Nb105,
+    /// Isotope Nb106 of Niobium
     Nb106,
+    /// Isotope Nb107 of Niobium
     Nb107,
+    /// Isotope Nb108 of Niobium
     Nb108,
+    /// Isotope Nb109 of Niobium
     Nb109,
+    /// Isotope Nb110 of Niobium
     Nb110,
+    /// Isotope Nb111 of Niobium
     Nb111,
+    /// Isotope Nb112 of Niobium
     Nb112,
+    /// Isotope Nb113 of Niobium
     Nb113,
+    /// Isotope Nb114 of Niobium
     Nb114,
+    /// Isotope Nb115 of Niobium
     Nb115,
 }
 impl super::RelativeAtomicMass for NiobiumIsotope {
@@ -128,41 +165,41 @@ impl super::MassNumber for NiobiumIsotope {
 impl super::IsotopicComposition for NiobiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Nb81 => None,
-            Self::Nb82 => None,
-            Self::Nb83 => None,
-            Self::Nb84 => None,
-            Self::Nb85 => None,
-            Self::Nb86 => None,
-            Self::Nb87 => None,
-            Self::Nb88 => None,
-            Self::Nb89 => None,
-            Self::Nb90 => None,
-            Self::Nb91 => None,
-            Self::Nb92 => None,
             Self::Nb93 => Some(1f64),
-            Self::Nb94 => None,
-            Self::Nb95 => None,
-            Self::Nb96 => None,
-            Self::Nb97 => None,
-            Self::Nb98 => None,
-            Self::Nb99 => None,
-            Self::Nb100 => None,
-            Self::Nb101 => None,
-            Self::Nb102 => None,
-            Self::Nb103 => None,
-            Self::Nb104 => None,
-            Self::Nb105 => None,
-            Self::Nb106 => None,
-            Self::Nb107 => None,
-            Self::Nb108 => None,
-            Self::Nb109 => None,
-            Self::Nb110 => None,
-            Self::Nb111 => None,
-            Self::Nb112 => None,
-            Self::Nb113 => None,
-            Self::Nb114 => None,
-            Self::Nb115 => None,
+            Self::Nb81
+            | Self::Nb82
+            | Self::Nb83
+            | Self::Nb84
+            | Self::Nb85
+            | Self::Nb86
+            | Self::Nb87
+            | Self::Nb88
+            | Self::Nb89
+            | Self::Nb90
+            | Self::Nb91
+            | Self::Nb92
+            | Self::Nb94
+            | Self::Nb95
+            | Self::Nb96
+            | Self::Nb97
+            | Self::Nb98
+            | Self::Nb99
+            | Self::Nb100
+            | Self::Nb101
+            | Self::Nb102
+            | Self::Nb103
+            | Self::Nb104
+            | Self::Nb105
+            | Self::Nb106
+            | Self::Nb107
+            | Self::Nb108
+            | Self::Nb109
+            | Self::Nb110
+            | Self::Nb111
+            | Self::Nb112
+            | Self::Nb113
+            | Self::Nb114
+            | Self::Nb115 => None,
         }
     }
 }

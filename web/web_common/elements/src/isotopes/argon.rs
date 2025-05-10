@@ -1,30 +1,56 @@
+//! Isotopes of the element Argon
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Argon
 pub enum ArgonIsotope {
+    /// Isotope Ar30 of Argon
     Ar30,
+    /// Isotope Ar31 of Argon
     Ar31,
+    /// Isotope Ar32 of Argon
     Ar32,
+    /// Isotope Ar33 of Argon
     Ar33,
+    /// Isotope Ar34 of Argon
     Ar34,
+    /// Isotope Ar35 of Argon
     Ar35,
+    /// Isotope Ar36 of Argon
     Ar36,
+    /// Isotope Ar37 of Argon
     Ar37,
+    /// Isotope Ar38 of Argon
     Ar38,
+    /// Isotope Ar39 of Argon
     Ar39,
+    /// Isotope Ar40 of Argon
     Ar40,
+    /// Isotope Ar41 of Argon
     Ar41,
+    /// Isotope Ar42 of Argon
     Ar42,
+    /// Isotope Ar43 of Argon
     Ar43,
+    /// Isotope Ar44 of Argon
     Ar44,
+    /// Isotope Ar45 of Argon
     Ar45,
+    /// Isotope Ar46 of Argon
     Ar46,
+    /// Isotope Ar47 of Argon
     Ar47,
+    /// Isotope Ar48 of Argon
     Ar48,
+    /// Isotope Ar49 of Argon
     Ar49,
+    /// Isotope Ar50 of Argon
     Ar50,
+    /// Isotope Ar51 of Argon
     Ar51,
+    /// Isotope Ar52 of Argon
     Ar52,
+    /// Isotope Ar53 of Argon
     Ar53,
 }
 impl super::RelativeAtomicMass for ArgonIsotope {
@@ -95,30 +121,30 @@ impl super::MassNumber for ArgonIsotope {
 impl super::IsotopicComposition for ArgonIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Ar30 => None,
-            Self::Ar31 => None,
-            Self::Ar32 => None,
-            Self::Ar33 => None,
-            Self::Ar34 => None,
-            Self::Ar35 => None,
             Self::Ar36 => Some(0.003336f64),
-            Self::Ar37 => None,
             Self::Ar38 => Some(0.000629f64),
-            Self::Ar39 => None,
             Self::Ar40 => Some(0.996035f64),
-            Self::Ar41 => None,
-            Self::Ar42 => None,
-            Self::Ar43 => None,
-            Self::Ar44 => None,
-            Self::Ar45 => None,
-            Self::Ar46 => None,
-            Self::Ar47 => None,
-            Self::Ar48 => None,
-            Self::Ar49 => None,
-            Self::Ar50 => None,
-            Self::Ar51 => None,
-            Self::Ar52 => None,
-            Self::Ar53 => None,
+            Self::Ar30
+            | Self::Ar31
+            | Self::Ar32
+            | Self::Ar33
+            | Self::Ar34
+            | Self::Ar35
+            | Self::Ar37
+            | Self::Ar39
+            | Self::Ar41
+            | Self::Ar42
+            | Self::Ar43
+            | Self::Ar44
+            | Self::Ar45
+            | Self::Ar46
+            | Self::Ar47
+            | Self::Ar48
+            | Self::Ar49
+            | Self::Ar50
+            | Self::Ar51
+            | Self::Ar52
+            | Self::Ar53 => None,
         }
     }
 }

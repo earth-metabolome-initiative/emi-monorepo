@@ -1,36 +1,68 @@
+//! Isotopes of the element Iron
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Iron
 pub enum IronIsotope {
+    /// Isotope Fe45 of Iron
     Fe45,
+    /// Isotope Fe46 of Iron
     Fe46,
+    /// Isotope Fe47 of Iron
     Fe47,
+    /// Isotope Fe48 of Iron
     Fe48,
+    /// Isotope Fe49 of Iron
     Fe49,
+    /// Isotope Fe50 of Iron
     Fe50,
+    /// Isotope Fe51 of Iron
     Fe51,
+    /// Isotope Fe52 of Iron
     Fe52,
+    /// Isotope Fe53 of Iron
     Fe53,
+    /// Isotope Fe54 of Iron
     Fe54,
+    /// Isotope Fe55 of Iron
     Fe55,
+    /// Isotope Fe56 of Iron
     Fe56,
+    /// Isotope Fe57 of Iron
     Fe57,
+    /// Isotope Fe58 of Iron
     Fe58,
+    /// Isotope Fe59 of Iron
     Fe59,
+    /// Isotope Fe60 of Iron
     Fe60,
+    /// Isotope Fe61 of Iron
     Fe61,
+    /// Isotope Fe62 of Iron
     Fe62,
+    /// Isotope Fe63 of Iron
     Fe63,
+    /// Isotope Fe64 of Iron
     Fe64,
+    /// Isotope Fe65 of Iron
     Fe65,
+    /// Isotope Fe66 of Iron
     Fe66,
+    /// Isotope Fe67 of Iron
     Fe67,
+    /// Isotope Fe68 of Iron
     Fe68,
+    /// Isotope Fe69 of Iron
     Fe69,
+    /// Isotope Fe70 of Iron
     Fe70,
+    /// Isotope Fe71 of Iron
     Fe71,
+    /// Isotope Fe72 of Iron
     Fe72,
+    /// Isotope Fe73 of Iron
     Fe73,
+    /// Isotope Fe74 of Iron
     Fe74,
 }
 impl super::RelativeAtomicMass for IronIsotope {
@@ -113,36 +145,36 @@ impl super::MassNumber for IronIsotope {
 impl super::IsotopicComposition for IronIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Fe45 => None,
-            Self::Fe46 => None,
-            Self::Fe47 => None,
-            Self::Fe48 => None,
-            Self::Fe49 => None,
-            Self::Fe50 => None,
-            Self::Fe51 => None,
-            Self::Fe52 => None,
-            Self::Fe53 => None,
             Self::Fe54 => Some(0.05845f64),
-            Self::Fe55 => None,
             Self::Fe56 => Some(0.91754f64),
             Self::Fe57 => Some(0.02119f64),
             Self::Fe58 => Some(0.00282f64),
-            Self::Fe59 => None,
-            Self::Fe60 => None,
-            Self::Fe61 => None,
-            Self::Fe62 => None,
-            Self::Fe63 => None,
-            Self::Fe64 => None,
-            Self::Fe65 => None,
-            Self::Fe66 => None,
-            Self::Fe67 => None,
-            Self::Fe68 => None,
-            Self::Fe69 => None,
-            Self::Fe70 => None,
-            Self::Fe71 => None,
-            Self::Fe72 => None,
-            Self::Fe73 => None,
-            Self::Fe74 => None,
+            Self::Fe45
+            | Self::Fe46
+            | Self::Fe47
+            | Self::Fe48
+            | Self::Fe49
+            | Self::Fe50
+            | Self::Fe51
+            | Self::Fe52
+            | Self::Fe53
+            | Self::Fe55
+            | Self::Fe59
+            | Self::Fe60
+            | Self::Fe61
+            | Self::Fe62
+            | Self::Fe63
+            | Self::Fe64
+            | Self::Fe65
+            | Self::Fe66
+            | Self::Fe67
+            | Self::Fe68
+            | Self::Fe69
+            | Self::Fe70
+            | Self::Fe71
+            | Self::Fe72
+            | Self::Fe73
+            | Self::Fe74 => None,
         }
     }
 }

@@ -1,46 +1,88 @@
+//! Isotopes of the element Lanthanum
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Lanthanum
 pub enum LanthanumIsotope {
+    /// Isotope La116 of Lanthanum
     La116,
+    /// Isotope La117 of Lanthanum
     La117,
+    /// Isotope La118 of Lanthanum
     La118,
+    /// Isotope La119 of Lanthanum
     La119,
+    /// Isotope La120 of Lanthanum
     La120,
+    /// Isotope La121 of Lanthanum
     La121,
+    /// Isotope La122 of Lanthanum
     La122,
+    /// Isotope La123 of Lanthanum
     La123,
+    /// Isotope La124 of Lanthanum
     La124,
+    /// Isotope La125 of Lanthanum
     La125,
+    /// Isotope La126 of Lanthanum
     La126,
+    /// Isotope La127 of Lanthanum
     La127,
+    /// Isotope La128 of Lanthanum
     La128,
+    /// Isotope La129 of Lanthanum
     La129,
+    /// Isotope La130 of Lanthanum
     La130,
+    /// Isotope La131 of Lanthanum
     La131,
+    /// Isotope La132 of Lanthanum
     La132,
+    /// Isotope La133 of Lanthanum
     La133,
+    /// Isotope La134 of Lanthanum
     La134,
+    /// Isotope La135 of Lanthanum
     La135,
+    /// Isotope La136 of Lanthanum
     La136,
+    /// Isotope La137 of Lanthanum
     La137,
+    /// Isotope La138 of Lanthanum
     La138,
+    /// Isotope La139 of Lanthanum
     La139,
+    /// Isotope La140 of Lanthanum
     La140,
+    /// Isotope La141 of Lanthanum
     La141,
+    /// Isotope La142 of Lanthanum
     La142,
+    /// Isotope La143 of Lanthanum
     La143,
+    /// Isotope La144 of Lanthanum
     La144,
+    /// Isotope La145 of Lanthanum
     La145,
+    /// Isotope La146 of Lanthanum
     La146,
+    /// Isotope La147 of Lanthanum
     La147,
+    /// Isotope La148 of Lanthanum
     La148,
+    /// Isotope La149 of Lanthanum
     La149,
+    /// Isotope La150 of Lanthanum
     La150,
+    /// Isotope La151 of Lanthanum
     La151,
+    /// Isotope La152 of Lanthanum
     La152,
+    /// Isotope La153 of Lanthanum
     La153,
+    /// Isotope La154 of Lanthanum
     La154,
+    /// Isotope La155 of Lanthanum
     La155,
 }
 impl super::RelativeAtomicMass for LanthanumIsotope {
@@ -143,46 +185,46 @@ impl super::MassNumber for LanthanumIsotope {
 impl super::IsotopicComposition for LanthanumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::La116 => None,
-            Self::La117 => None,
-            Self::La118 => None,
-            Self::La119 => None,
-            Self::La120 => None,
-            Self::La121 => None,
-            Self::La122 => None,
-            Self::La123 => None,
-            Self::La124 => None,
-            Self::La125 => None,
-            Self::La126 => None,
-            Self::La127 => None,
-            Self::La128 => None,
-            Self::La129 => None,
-            Self::La130 => None,
-            Self::La131 => None,
-            Self::La132 => None,
-            Self::La133 => None,
-            Self::La134 => None,
-            Self::La135 => None,
-            Self::La136 => None,
-            Self::La137 => None,
             Self::La138 => Some(0.0008881f64),
             Self::La139 => Some(0.9991119f64),
-            Self::La140 => None,
-            Self::La141 => None,
-            Self::La142 => None,
-            Self::La143 => None,
-            Self::La144 => None,
-            Self::La145 => None,
-            Self::La146 => None,
-            Self::La147 => None,
-            Self::La148 => None,
-            Self::La149 => None,
-            Self::La150 => None,
-            Self::La151 => None,
-            Self::La152 => None,
-            Self::La153 => None,
-            Self::La154 => None,
-            Self::La155 => None,
+            Self::La116
+            | Self::La117
+            | Self::La118
+            | Self::La119
+            | Self::La120
+            | Self::La121
+            | Self::La122
+            | Self::La123
+            | Self::La124
+            | Self::La125
+            | Self::La126
+            | Self::La127
+            | Self::La128
+            | Self::La129
+            | Self::La130
+            | Self::La131
+            | Self::La132
+            | Self::La133
+            | Self::La134
+            | Self::La135
+            | Self::La136
+            | Self::La137
+            | Self::La140
+            | Self::La141
+            | Self::La142
+            | Self::La143
+            | Self::La144
+            | Self::La145
+            | Self::La146
+            | Self::La147
+            | Self::La148
+            | Self::La149
+            | Self::La150
+            | Self::La151
+            | Self::La152
+            | Self::La153
+            | Self::La154
+            | Self::La155 => None,
         }
     }
 }

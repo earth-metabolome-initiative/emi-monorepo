@@ -1,49 +1,94 @@
+//! Isotopes of the element Thallium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Thallium
 pub enum ThalliumIsotope {
+    /// Isotope Tl176 of Thallium
     Tl176,
+    /// Isotope Tl177 of Thallium
     Tl177,
+    /// Isotope Tl178 of Thallium
     Tl178,
+    /// Isotope Tl179 of Thallium
     Tl179,
+    /// Isotope Tl180 of Thallium
     Tl180,
+    /// Isotope Tl181 of Thallium
     Tl181,
+    /// Isotope Tl182 of Thallium
     Tl182,
+    /// Isotope Tl183 of Thallium
     Tl183,
+    /// Isotope Tl184 of Thallium
     Tl184,
+    /// Isotope Tl185 of Thallium
     Tl185,
+    /// Isotope Tl186 of Thallium
     Tl186,
+    /// Isotope Tl187 of Thallium
     Tl187,
+    /// Isotope Tl188 of Thallium
     Tl188,
+    /// Isotope Tl189 of Thallium
     Tl189,
+    /// Isotope Tl190 of Thallium
     Tl190,
+    /// Isotope Tl191 of Thallium
     Tl191,
+    /// Isotope Tl192 of Thallium
     Tl192,
+    /// Isotope Tl193 of Thallium
     Tl193,
+    /// Isotope Tl194 of Thallium
     Tl194,
+    /// Isotope Tl195 of Thallium
     Tl195,
+    /// Isotope Tl196 of Thallium
     Tl196,
+    /// Isotope Tl197 of Thallium
     Tl197,
+    /// Isotope Tl198 of Thallium
     Tl198,
+    /// Isotope Tl199 of Thallium
     Tl199,
+    /// Isotope Tl200 of Thallium
     Tl200,
+    /// Isotope Tl201 of Thallium
     Tl201,
+    /// Isotope Tl202 of Thallium
     Tl202,
+    /// Isotope Tl203 of Thallium
     Tl203,
+    /// Isotope Tl204 of Thallium
     Tl204,
+    /// Isotope Tl205 of Thallium
     Tl205,
+    /// Isotope Tl206 of Thallium
     Tl206,
+    /// Isotope Tl207 of Thallium
     Tl207,
+    /// Isotope Tl208 of Thallium
     Tl208,
+    /// Isotope Tl209 of Thallium
     Tl209,
+    /// Isotope Tl210 of Thallium
     Tl210,
+    /// Isotope Tl211 of Thallium
     Tl211,
+    /// Isotope Tl212 of Thallium
     Tl212,
+    /// Isotope Tl213 of Thallium
     Tl213,
+    /// Isotope Tl214 of Thallium
     Tl214,
+    /// Isotope Tl215 of Thallium
     Tl215,
+    /// Isotope Tl216 of Thallium
     Tl216,
+    /// Isotope Tl217 of Thallium
     Tl217,
+    /// Isotope Tl218 of Thallium
     Tl218,
 }
 impl super::RelativeAtomicMass for ThalliumIsotope {
@@ -152,49 +197,49 @@ impl super::MassNumber for ThalliumIsotope {
 impl super::IsotopicComposition for ThalliumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Tl176 => None,
-            Self::Tl177 => None,
-            Self::Tl178 => None,
-            Self::Tl179 => None,
-            Self::Tl180 => None,
-            Self::Tl181 => None,
-            Self::Tl182 => None,
-            Self::Tl183 => None,
-            Self::Tl184 => None,
-            Self::Tl185 => None,
-            Self::Tl186 => None,
-            Self::Tl187 => None,
-            Self::Tl188 => None,
-            Self::Tl189 => None,
-            Self::Tl190 => None,
-            Self::Tl191 => None,
-            Self::Tl192 => None,
-            Self::Tl193 => None,
-            Self::Tl194 => None,
-            Self::Tl195 => None,
-            Self::Tl196 => None,
-            Self::Tl197 => None,
-            Self::Tl198 => None,
-            Self::Tl199 => None,
-            Self::Tl200 => None,
-            Self::Tl201 => None,
-            Self::Tl202 => None,
             Self::Tl203 => Some(0.2952f64),
-            Self::Tl204 => None,
             Self::Tl205 => Some(0.7048f64),
-            Self::Tl206 => None,
-            Self::Tl207 => None,
-            Self::Tl208 => None,
-            Self::Tl209 => None,
-            Self::Tl210 => None,
-            Self::Tl211 => None,
-            Self::Tl212 => None,
-            Self::Tl213 => None,
-            Self::Tl214 => None,
-            Self::Tl215 => None,
-            Self::Tl216 => None,
-            Self::Tl217 => None,
-            Self::Tl218 => None,
+            Self::Tl176
+            | Self::Tl177
+            | Self::Tl178
+            | Self::Tl179
+            | Self::Tl180
+            | Self::Tl181
+            | Self::Tl182
+            | Self::Tl183
+            | Self::Tl184
+            | Self::Tl185
+            | Self::Tl186
+            | Self::Tl187
+            | Self::Tl188
+            | Self::Tl189
+            | Self::Tl190
+            | Self::Tl191
+            | Self::Tl192
+            | Self::Tl193
+            | Self::Tl194
+            | Self::Tl195
+            | Self::Tl196
+            | Self::Tl197
+            | Self::Tl198
+            | Self::Tl199
+            | Self::Tl200
+            | Self::Tl201
+            | Self::Tl202
+            | Self::Tl204
+            | Self::Tl206
+            | Self::Tl207
+            | Self::Tl208
+            | Self::Tl209
+            | Self::Tl210
+            | Self::Tl211
+            | Self::Tl212
+            | Self::Tl213
+            | Self::Tl214
+            | Self::Tl215
+            | Self::Tl216
+            | Self::Tl217
+            | Self::Tl218 => None,
         }
     }
 }

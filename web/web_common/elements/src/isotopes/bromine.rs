@@ -1,38 +1,72 @@
+//! Isotopes of the element Bromine
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Bromine
 pub enum BromineIsotope {
+    /// Isotope Br67 of Bromine
     Br67,
+    /// Isotope Br68 of Bromine
     Br68,
+    /// Isotope Br69 of Bromine
     Br69,
+    /// Isotope Br70 of Bromine
     Br70,
+    /// Isotope Br71 of Bromine
     Br71,
+    /// Isotope Br72 of Bromine
     Br72,
+    /// Isotope Br73 of Bromine
     Br73,
+    /// Isotope Br74 of Bromine
     Br74,
+    /// Isotope Br75 of Bromine
     Br75,
+    /// Isotope Br76 of Bromine
     Br76,
+    /// Isotope Br77 of Bromine
     Br77,
+    /// Isotope Br78 of Bromine
     Br78,
+    /// Isotope Br79 of Bromine
     Br79,
+    /// Isotope Br80 of Bromine
     Br80,
+    /// Isotope Br81 of Bromine
     Br81,
+    /// Isotope Br82 of Bromine
     Br82,
+    /// Isotope Br83 of Bromine
     Br83,
+    /// Isotope Br84 of Bromine
     Br84,
+    /// Isotope Br85 of Bromine
     Br85,
+    /// Isotope Br86 of Bromine
     Br86,
+    /// Isotope Br87 of Bromine
     Br87,
+    /// Isotope Br88 of Bromine
     Br88,
+    /// Isotope Br89 of Bromine
     Br89,
+    /// Isotope Br90 of Bromine
     Br90,
+    /// Isotope Br91 of Bromine
     Br91,
+    /// Isotope Br92 of Bromine
     Br92,
+    /// Isotope Br93 of Bromine
     Br93,
+    /// Isotope Br94 of Bromine
     Br94,
+    /// Isotope Br95 of Bromine
     Br95,
+    /// Isotope Br96 of Bromine
     Br96,
+    /// Isotope Br97 of Bromine
     Br97,
+    /// Isotope Br98 of Bromine
     Br98,
 }
 impl super::RelativeAtomicMass for BromineIsotope {
@@ -119,38 +153,38 @@ impl super::MassNumber for BromineIsotope {
 impl super::IsotopicComposition for BromineIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Br67 => None,
-            Self::Br68 => None,
-            Self::Br69 => None,
-            Self::Br70 => None,
-            Self::Br71 => None,
-            Self::Br72 => None,
-            Self::Br73 => None,
-            Self::Br74 => None,
-            Self::Br75 => None,
-            Self::Br76 => None,
-            Self::Br77 => None,
-            Self::Br78 => None,
             Self::Br79 => Some(0.5069f64),
-            Self::Br80 => None,
             Self::Br81 => Some(0.4931f64),
-            Self::Br82 => None,
-            Self::Br83 => None,
-            Self::Br84 => None,
-            Self::Br85 => None,
-            Self::Br86 => None,
-            Self::Br87 => None,
-            Self::Br88 => None,
-            Self::Br89 => None,
-            Self::Br90 => None,
-            Self::Br91 => None,
-            Self::Br92 => None,
-            Self::Br93 => None,
-            Self::Br94 => None,
-            Self::Br95 => None,
-            Self::Br96 => None,
-            Self::Br97 => None,
-            Self::Br98 => None,
+            Self::Br67
+            | Self::Br68
+            | Self::Br69
+            | Self::Br70
+            | Self::Br71
+            | Self::Br72
+            | Self::Br73
+            | Self::Br74
+            | Self::Br75
+            | Self::Br76
+            | Self::Br77
+            | Self::Br78
+            | Self::Br80
+            | Self::Br82
+            | Self::Br83
+            | Self::Br84
+            | Self::Br85
+            | Self::Br86
+            | Self::Br87
+            | Self::Br88
+            | Self::Br89
+            | Self::Br90
+            | Self::Br91
+            | Self::Br92
+            | Self::Br93
+            | Self::Br94
+            | Self::Br95
+            | Self::Br96
+            | Self::Br97
+            | Self::Br98 => None,
         }
     }
 }

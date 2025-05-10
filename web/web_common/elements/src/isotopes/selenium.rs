@@ -1,38 +1,72 @@
+//! Isotopes of the element Selenium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Selenium
 pub enum SeleniumIsotope {
+    /// Isotope Se64 of Selenium
     Se64,
+    /// Isotope Se65 of Selenium
     Se65,
+    /// Isotope Se66 of Selenium
     Se66,
+    /// Isotope Se67 of Selenium
     Se67,
+    /// Isotope Se68 of Selenium
     Se68,
+    /// Isotope Se69 of Selenium
     Se69,
+    /// Isotope Se70 of Selenium
     Se70,
+    /// Isotope Se71 of Selenium
     Se71,
+    /// Isotope Se72 of Selenium
     Se72,
+    /// Isotope Se73 of Selenium
     Se73,
+    /// Isotope Se74 of Selenium
     Se74,
+    /// Isotope Se75 of Selenium
     Se75,
+    /// Isotope Se76 of Selenium
     Se76,
+    /// Isotope Se77 of Selenium
     Se77,
+    /// Isotope Se78 of Selenium
     Se78,
+    /// Isotope Se79 of Selenium
     Se79,
+    /// Isotope Se80 of Selenium
     Se80,
+    /// Isotope Se81 of Selenium
     Se81,
+    /// Isotope Se82 of Selenium
     Se82,
+    /// Isotope Se83 of Selenium
     Se83,
+    /// Isotope Se84 of Selenium
     Se84,
+    /// Isotope Se85 of Selenium
     Se85,
+    /// Isotope Se86 of Selenium
     Se86,
+    /// Isotope Se87 of Selenium
     Se87,
+    /// Isotope Se88 of Selenium
     Se88,
+    /// Isotope Se89 of Selenium
     Se89,
+    /// Isotope Se90 of Selenium
     Se90,
+    /// Isotope Se91 of Selenium
     Se91,
+    /// Isotope Se92 of Selenium
     Se92,
+    /// Isotope Se93 of Selenium
     Se93,
+    /// Isotope Se94 of Selenium
     Se94,
+    /// Isotope Se95 of Selenium
     Se95,
 }
 impl super::RelativeAtomicMass for SeleniumIsotope {
@@ -119,38 +153,38 @@ impl super::MassNumber for SeleniumIsotope {
 impl super::IsotopicComposition for SeleniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Se64 => None,
-            Self::Se65 => None,
-            Self::Se66 => None,
-            Self::Se67 => None,
-            Self::Se68 => None,
-            Self::Se69 => None,
-            Self::Se70 => None,
-            Self::Se71 => None,
-            Self::Se72 => None,
-            Self::Se73 => None,
             Self::Se74 => Some(0.0089f64),
-            Self::Se75 => None,
             Self::Se76 => Some(0.0937f64),
             Self::Se77 => Some(0.0763f64),
             Self::Se78 => Some(0.2377f64),
-            Self::Se79 => None,
             Self::Se80 => Some(0.4961f64),
-            Self::Se81 => None,
             Self::Se82 => Some(0.0873f64),
-            Self::Se83 => None,
-            Self::Se84 => None,
-            Self::Se85 => None,
-            Self::Se86 => None,
-            Self::Se87 => None,
-            Self::Se88 => None,
-            Self::Se89 => None,
-            Self::Se90 => None,
-            Self::Se91 => None,
-            Self::Se92 => None,
-            Self::Se93 => None,
-            Self::Se94 => None,
-            Self::Se95 => None,
+            Self::Se64
+            | Self::Se65
+            | Self::Se66
+            | Self::Se67
+            | Self::Se68
+            | Self::Se69
+            | Self::Se70
+            | Self::Se71
+            | Self::Se72
+            | Self::Se73
+            | Self::Se75
+            | Self::Se79
+            | Self::Se81
+            | Self::Se83
+            | Self::Se84
+            | Self::Se85
+            | Self::Se86
+            | Self::Se87
+            | Self::Se88
+            | Self::Se89
+            | Self::Se90
+            | Self::Se91
+            | Self::Se92
+            | Self::Se93
+            | Self::Se94
+            | Self::Se95 => None,
         }
     }
 }

@@ -1,42 +1,80 @@
+//! Isotopes of the element Erbium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Erbium
 pub enum ErbiumIsotope {
+    /// Isotope Er142 of Erbium
     Er142,
+    /// Isotope Er143 of Erbium
     Er143,
+    /// Isotope Er144 of Erbium
     Er144,
+    /// Isotope Er145 of Erbium
     Er145,
+    /// Isotope Er146 of Erbium
     Er146,
+    /// Isotope Er147 of Erbium
     Er147,
+    /// Isotope Er148 of Erbium
     Er148,
+    /// Isotope Er149 of Erbium
     Er149,
+    /// Isotope Er150 of Erbium
     Er150,
+    /// Isotope Er151 of Erbium
     Er151,
+    /// Isotope Er152 of Erbium
     Er152,
+    /// Isotope Er153 of Erbium
     Er153,
+    /// Isotope Er154 of Erbium
     Er154,
+    /// Isotope Er155 of Erbium
     Er155,
+    /// Isotope Er156 of Erbium
     Er156,
+    /// Isotope Er157 of Erbium
     Er157,
+    /// Isotope Er158 of Erbium
     Er158,
+    /// Isotope Er159 of Erbium
     Er159,
+    /// Isotope Er160 of Erbium
     Er160,
+    /// Isotope Er161 of Erbium
     Er161,
+    /// Isotope Er162 of Erbium
     Er162,
+    /// Isotope Er163 of Erbium
     Er163,
+    /// Isotope Er164 of Erbium
     Er164,
+    /// Isotope Er165 of Erbium
     Er165,
+    /// Isotope Er166 of Erbium
     Er166,
+    /// Isotope Er167 of Erbium
     Er167,
+    /// Isotope Er168 of Erbium
     Er168,
+    /// Isotope Er169 of Erbium
     Er169,
+    /// Isotope Er170 of Erbium
     Er170,
+    /// Isotope Er171 of Erbium
     Er171,
+    /// Isotope Er172 of Erbium
     Er172,
+    /// Isotope Er173 of Erbium
     Er173,
+    /// Isotope Er174 of Erbium
     Er174,
+    /// Isotope Er175 of Erbium
     Er175,
+    /// Isotope Er176 of Erbium
     Er176,
+    /// Isotope Er177 of Erbium
     Er177,
 }
 impl super::RelativeAtomicMass for ErbiumIsotope {
@@ -131,42 +169,42 @@ impl super::MassNumber for ErbiumIsotope {
 impl super::IsotopicComposition for ErbiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Er142 => None,
-            Self::Er143 => None,
-            Self::Er144 => None,
-            Self::Er145 => None,
-            Self::Er146 => None,
-            Self::Er147 => None,
-            Self::Er148 => None,
-            Self::Er149 => None,
-            Self::Er150 => None,
-            Self::Er151 => None,
-            Self::Er152 => None,
-            Self::Er153 => None,
-            Self::Er154 => None,
-            Self::Er155 => None,
-            Self::Er156 => None,
-            Self::Er157 => None,
-            Self::Er158 => None,
-            Self::Er159 => None,
-            Self::Er160 => None,
-            Self::Er161 => None,
             Self::Er162 => Some(0.00139f64),
-            Self::Er163 => None,
             Self::Er164 => Some(0.01601f64),
-            Self::Er165 => None,
             Self::Er166 => Some(0.33503f64),
             Self::Er167 => Some(0.22869f64),
             Self::Er168 => Some(0.26978f64),
-            Self::Er169 => None,
             Self::Er170 => Some(0.1491f64),
-            Self::Er171 => None,
-            Self::Er172 => None,
-            Self::Er173 => None,
-            Self::Er174 => None,
-            Self::Er175 => None,
-            Self::Er176 => None,
-            Self::Er177 => None,
+            Self::Er142
+            | Self::Er143
+            | Self::Er144
+            | Self::Er145
+            | Self::Er146
+            | Self::Er147
+            | Self::Er148
+            | Self::Er149
+            | Self::Er150
+            | Self::Er151
+            | Self::Er152
+            | Self::Er153
+            | Self::Er154
+            | Self::Er155
+            | Self::Er156
+            | Self::Er157
+            | Self::Er158
+            | Self::Er159
+            | Self::Er160
+            | Self::Er161
+            | Self::Er163
+            | Self::Er165
+            | Self::Er169
+            | Self::Er171
+            | Self::Er172
+            | Self::Er173
+            | Self::Er174
+            | Self::Er175
+            | Self::Er176
+            | Self::Er177 => None,
         }
     }
 }

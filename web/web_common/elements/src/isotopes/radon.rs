@@ -1,45 +1,86 @@
+//! Isotopes of the element Radon
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Radon
 pub enum RadonIsotope {
+    /// Isotope Rn193 of Radon
     Rn193,
+    /// Isotope Rn194 of Radon
     Rn194,
+    /// Isotope Rn195 of Radon
     Rn195,
+    /// Isotope Rn196 of Radon
     Rn196,
+    /// Isotope Rn197 of Radon
     Rn197,
+    /// Isotope Rn198 of Radon
     Rn198,
+    /// Isotope Rn199 of Radon
     Rn199,
+    /// Isotope Rn200 of Radon
     Rn200,
+    /// Isotope Rn201 of Radon
     Rn201,
+    /// Isotope Rn202 of Radon
     Rn202,
+    /// Isotope Rn203 of Radon
     Rn203,
+    /// Isotope Rn204 of Radon
     Rn204,
+    /// Isotope Rn205 of Radon
     Rn205,
+    /// Isotope Rn206 of Radon
     Rn206,
+    /// Isotope Rn207 of Radon
     Rn207,
+    /// Isotope Rn208 of Radon
     Rn208,
+    /// Isotope Rn209 of Radon
     Rn209,
+    /// Isotope Rn210 of Radon
     Rn210,
+    /// Isotope Rn211 of Radon
     Rn211,
+    /// Isotope Rn212 of Radon
     Rn212,
+    /// Isotope Rn213 of Radon
     Rn213,
+    /// Isotope Rn214 of Radon
     Rn214,
+    /// Isotope Rn215 of Radon
     Rn215,
+    /// Isotope Rn216 of Radon
     Rn216,
+    /// Isotope Rn217 of Radon
     Rn217,
+    /// Isotope Rn218 of Radon
     Rn218,
+    /// Isotope Rn219 of Radon
     Rn219,
+    /// Isotope Rn220 of Radon
     Rn220,
+    /// Isotope Rn221 of Radon
     Rn221,
+    /// Isotope Rn222 of Radon
     Rn222,
+    /// Isotope Rn223 of Radon
     Rn223,
+    /// Isotope Rn224 of Radon
     Rn224,
+    /// Isotope Rn225 of Radon
     Rn225,
+    /// Isotope Rn226 of Radon
     Rn226,
+    /// Isotope Rn227 of Radon
     Rn227,
+    /// Isotope Rn228 of Radon
     Rn228,
+    /// Isotope Rn229 of Radon
     Rn229,
+    /// Isotope Rn230 of Radon
     Rn230,
+    /// Isotope Rn231 of Radon
     Rn231,
 }
 impl super::RelativeAtomicMass for RadonIsotope {
@@ -139,47 +180,7 @@ impl super::MassNumber for RadonIsotope {
 }
 impl super::IsotopicComposition for RadonIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Rn193 => None,
-            Self::Rn194 => None,
-            Self::Rn195 => None,
-            Self::Rn196 => None,
-            Self::Rn197 => None,
-            Self::Rn198 => None,
-            Self::Rn199 => None,
-            Self::Rn200 => None,
-            Self::Rn201 => None,
-            Self::Rn202 => None,
-            Self::Rn203 => None,
-            Self::Rn204 => None,
-            Self::Rn205 => None,
-            Self::Rn206 => None,
-            Self::Rn207 => None,
-            Self::Rn208 => None,
-            Self::Rn209 => None,
-            Self::Rn210 => None,
-            Self::Rn211 => None,
-            Self::Rn212 => None,
-            Self::Rn213 => None,
-            Self::Rn214 => None,
-            Self::Rn215 => None,
-            Self::Rn216 => None,
-            Self::Rn217 => None,
-            Self::Rn218 => None,
-            Self::Rn219 => None,
-            Self::Rn220 => None,
-            Self::Rn221 => None,
-            Self::Rn222 => None,
-            Self::Rn223 => None,
-            Self::Rn224 => None,
-            Self::Rn225 => None,
-            Self::Rn226 => None,
-            Self::Rn227 => None,
-            Self::Rn228 => None,
-            Self::Rn229 => None,
-            Self::Rn230 => None,
-            Self::Rn231 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for RadonIsotope {

@@ -1,30 +1,56 @@
+//! Isotopes of the element Sulfur
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Sulfur
 pub enum SulfurIsotope {
+    /// Isotope S26 of Sulfur
     S26,
+    /// Isotope S27 of Sulfur
     S27,
+    /// Isotope S28 of Sulfur
     S28,
+    /// Isotope S29 of Sulfur
     S29,
+    /// Isotope S30 of Sulfur
     S30,
+    /// Isotope S31 of Sulfur
     S31,
+    /// Isotope S32 of Sulfur
     S32,
+    /// Isotope S33 of Sulfur
     S33,
+    /// Isotope S34 of Sulfur
     S34,
+    /// Isotope S35 of Sulfur
     S35,
+    /// Isotope S36 of Sulfur
     S36,
+    /// Isotope S37 of Sulfur
     S37,
+    /// Isotope S38 of Sulfur
     S38,
+    /// Isotope S39 of Sulfur
     S39,
+    /// Isotope S40 of Sulfur
     S40,
+    /// Isotope S41 of Sulfur
     S41,
+    /// Isotope S42 of Sulfur
     S42,
+    /// Isotope S43 of Sulfur
     S43,
+    /// Isotope S44 of Sulfur
     S44,
+    /// Isotope S45 of Sulfur
     S45,
+    /// Isotope S46 of Sulfur
     S46,
+    /// Isotope S47 of Sulfur
     S47,
+    /// Isotope S48 of Sulfur
     S48,
+    /// Isotope S49 of Sulfur
     S49,
 }
 impl super::RelativeAtomicMass for SulfurIsotope {
@@ -95,30 +121,30 @@ impl super::MassNumber for SulfurIsotope {
 impl super::IsotopicComposition for SulfurIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::S26 => None,
-            Self::S27 => None,
-            Self::S28 => None,
-            Self::S29 => None,
-            Self::S30 => None,
-            Self::S31 => None,
             Self::S32 => Some(0.9499f64),
             Self::S33 => Some(0.0075f64),
             Self::S34 => Some(0.0425f64),
-            Self::S35 => None,
             Self::S36 => Some(0.0001f64),
-            Self::S37 => None,
-            Self::S38 => None,
-            Self::S39 => None,
-            Self::S40 => None,
-            Self::S41 => None,
-            Self::S42 => None,
-            Self::S43 => None,
-            Self::S44 => None,
-            Self::S45 => None,
-            Self::S46 => None,
-            Self::S47 => None,
-            Self::S48 => None,
-            Self::S49 => None,
+            Self::S26
+            | Self::S27
+            | Self::S28
+            | Self::S29
+            | Self::S30
+            | Self::S31
+            | Self::S35
+            | Self::S37
+            | Self::S38
+            | Self::S39
+            | Self::S40
+            | Self::S41
+            | Self::S42
+            | Self::S43
+            | Self::S44
+            | Self::S45
+            | Self::S46
+            | Self::S47
+            | Self::S48
+            | Self::S49 => None,
         }
     }
 }

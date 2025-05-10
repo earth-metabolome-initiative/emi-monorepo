@@ -1,42 +1,80 @@
+//! Isotopes of the element Technetium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Technetium
 pub enum TechnetiumIsotope {
+    /// Isotope Tc85 of Technetium
     Tc85,
+    /// Isotope Tc86 of Technetium
     Tc86,
+    /// Isotope Tc87 of Technetium
     Tc87,
+    /// Isotope Tc88 of Technetium
     Tc88,
+    /// Isotope Tc89 of Technetium
     Tc89,
+    /// Isotope Tc90 of Technetium
     Tc90,
+    /// Isotope Tc91 of Technetium
     Tc91,
+    /// Isotope Tc92 of Technetium
     Tc92,
+    /// Isotope Tc93 of Technetium
     Tc93,
+    /// Isotope Tc94 of Technetium
     Tc94,
+    /// Isotope Tc95 of Technetium
     Tc95,
+    /// Isotope Tc96 of Technetium
     Tc96,
+    /// Isotope Tc97 of Technetium
     Tc97,
+    /// Isotope Tc98 of Technetium
     Tc98,
+    /// Isotope Tc99 of Technetium
     Tc99,
+    /// Isotope Tc100 of Technetium
     Tc100,
+    /// Isotope Tc101 of Technetium
     Tc101,
+    /// Isotope Tc102 of Technetium
     Tc102,
+    /// Isotope Tc103 of Technetium
     Tc103,
+    /// Isotope Tc104 of Technetium
     Tc104,
+    /// Isotope Tc105 of Technetium
     Tc105,
+    /// Isotope Tc106 of Technetium
     Tc106,
+    /// Isotope Tc107 of Technetium
     Tc107,
+    /// Isotope Tc108 of Technetium
     Tc108,
+    /// Isotope Tc109 of Technetium
     Tc109,
+    /// Isotope Tc110 of Technetium
     Tc110,
+    /// Isotope Tc111 of Technetium
     Tc111,
+    /// Isotope Tc112 of Technetium
     Tc112,
+    /// Isotope Tc113 of Technetium
     Tc113,
+    /// Isotope Tc114 of Technetium
     Tc114,
+    /// Isotope Tc115 of Technetium
     Tc115,
+    /// Isotope Tc116 of Technetium
     Tc116,
+    /// Isotope Tc117 of Technetium
     Tc117,
+    /// Isotope Tc118 of Technetium
     Tc118,
+    /// Isotope Tc119 of Technetium
     Tc119,
+    /// Isotope Tc120 of Technetium
     Tc120,
 }
 impl super::RelativeAtomicMass for TechnetiumIsotope {
@@ -130,44 +168,7 @@ impl super::MassNumber for TechnetiumIsotope {
 }
 impl super::IsotopicComposition for TechnetiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Tc85 => None,
-            Self::Tc86 => None,
-            Self::Tc87 => None,
-            Self::Tc88 => None,
-            Self::Tc89 => None,
-            Self::Tc90 => None,
-            Self::Tc91 => None,
-            Self::Tc92 => None,
-            Self::Tc93 => None,
-            Self::Tc94 => None,
-            Self::Tc95 => None,
-            Self::Tc96 => None,
-            Self::Tc97 => None,
-            Self::Tc98 => None,
-            Self::Tc99 => None,
-            Self::Tc100 => None,
-            Self::Tc101 => None,
-            Self::Tc102 => None,
-            Self::Tc103 => None,
-            Self::Tc104 => None,
-            Self::Tc105 => None,
-            Self::Tc106 => None,
-            Self::Tc107 => None,
-            Self::Tc108 => None,
-            Self::Tc109 => None,
-            Self::Tc110 => None,
-            Self::Tc111 => None,
-            Self::Tc112 => None,
-            Self::Tc113 => None,
-            Self::Tc114 => None,
-            Self::Tc115 => None,
-            Self::Tc116 => None,
-            Self::Tc117 => None,
-            Self::Tc118 => None,
-            Self::Tc119 => None,
-            Self::Tc120 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for TechnetiumIsotope {

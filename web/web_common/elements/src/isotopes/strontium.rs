@@ -1,41 +1,78 @@
+//! Isotopes of the element Strontium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Strontium
 pub enum StrontiumIsotope {
+    /// Isotope Sr73 of Strontium
     Sr73,
+    /// Isotope Sr74 of Strontium
     Sr74,
+    /// Isotope Sr75 of Strontium
     Sr75,
+    /// Isotope Sr76 of Strontium
     Sr76,
+    /// Isotope Sr77 of Strontium
     Sr77,
+    /// Isotope Sr78 of Strontium
     Sr78,
+    /// Isotope Sr79 of Strontium
     Sr79,
+    /// Isotope Sr80 of Strontium
     Sr80,
+    /// Isotope Sr81 of Strontium
     Sr81,
+    /// Isotope Sr82 of Strontium
     Sr82,
+    /// Isotope Sr83 of Strontium
     Sr83,
+    /// Isotope Sr84 of Strontium
     Sr84,
+    /// Isotope Sr85 of Strontium
     Sr85,
+    /// Isotope Sr86 of Strontium
     Sr86,
+    /// Isotope Sr87 of Strontium
     Sr87,
+    /// Isotope Sr88 of Strontium
     Sr88,
+    /// Isotope Sr89 of Strontium
     Sr89,
+    /// Isotope Sr90 of Strontium
     Sr90,
+    /// Isotope Sr91 of Strontium
     Sr91,
+    /// Isotope Sr92 of Strontium
     Sr92,
+    /// Isotope Sr93 of Strontium
     Sr93,
+    /// Isotope Sr94 of Strontium
     Sr94,
+    /// Isotope Sr95 of Strontium
     Sr95,
+    /// Isotope Sr96 of Strontium
     Sr96,
+    /// Isotope Sr97 of Strontium
     Sr97,
+    /// Isotope Sr98 of Strontium
     Sr98,
+    /// Isotope Sr99 of Strontium
     Sr99,
+    /// Isotope Sr100 of Strontium
     Sr100,
+    /// Isotope Sr101 of Strontium
     Sr101,
+    /// Isotope Sr102 of Strontium
     Sr102,
+    /// Isotope Sr103 of Strontium
     Sr103,
+    /// Isotope Sr104 of Strontium
     Sr104,
+    /// Isotope Sr105 of Strontium
     Sr105,
+    /// Isotope Sr106 of Strontium
     Sr106,
+    /// Isotope Sr107 of Strontium
     Sr107,
 }
 impl super::RelativeAtomicMass for StrontiumIsotope {
@@ -128,41 +165,41 @@ impl super::MassNumber for StrontiumIsotope {
 impl super::IsotopicComposition for StrontiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Sr73 => None,
-            Self::Sr74 => None,
-            Self::Sr75 => None,
-            Self::Sr76 => None,
-            Self::Sr77 => None,
-            Self::Sr78 => None,
-            Self::Sr79 => None,
-            Self::Sr80 => None,
-            Self::Sr81 => None,
-            Self::Sr82 => None,
-            Self::Sr83 => None,
             Self::Sr84 => Some(0.0056f64),
-            Self::Sr85 => None,
             Self::Sr86 => Some(0.0986f64),
             Self::Sr87 => Some(0.07f64),
             Self::Sr88 => Some(0.8258f64),
-            Self::Sr89 => None,
-            Self::Sr90 => None,
-            Self::Sr91 => None,
-            Self::Sr92 => None,
-            Self::Sr93 => None,
-            Self::Sr94 => None,
-            Self::Sr95 => None,
-            Self::Sr96 => None,
-            Self::Sr97 => None,
-            Self::Sr98 => None,
-            Self::Sr99 => None,
-            Self::Sr100 => None,
-            Self::Sr101 => None,
-            Self::Sr102 => None,
-            Self::Sr103 => None,
-            Self::Sr104 => None,
-            Self::Sr105 => None,
-            Self::Sr106 => None,
-            Self::Sr107 => None,
+            Self::Sr73
+            | Self::Sr74
+            | Self::Sr75
+            | Self::Sr76
+            | Self::Sr77
+            | Self::Sr78
+            | Self::Sr79
+            | Self::Sr80
+            | Self::Sr81
+            | Self::Sr82
+            | Self::Sr83
+            | Self::Sr85
+            | Self::Sr89
+            | Self::Sr90
+            | Self::Sr91
+            | Self::Sr92
+            | Self::Sr93
+            | Self::Sr94
+            | Self::Sr95
+            | Self::Sr96
+            | Self::Sr97
+            | Self::Sr98
+            | Self::Sr99
+            | Self::Sr100
+            | Self::Sr101
+            | Self::Sr102
+            | Self::Sr103
+            | Self::Sr104
+            | Self::Sr105
+            | Self::Sr106
+            | Self::Sr107 => None,
         }
     }
 }

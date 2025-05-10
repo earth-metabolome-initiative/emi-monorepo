@@ -1,38 +1,72 @@
+//! Isotopes of the element Actinium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Actinium
 pub enum ActiniumIsotope {
+    /// Isotope Ac206 of Actinium
     Ac206,
+    /// Isotope Ac207 of Actinium
     Ac207,
+    /// Isotope Ac208 of Actinium
     Ac208,
+    /// Isotope Ac209 of Actinium
     Ac209,
+    /// Isotope Ac210 of Actinium
     Ac210,
+    /// Isotope Ac211 of Actinium
     Ac211,
+    /// Isotope Ac212 of Actinium
     Ac212,
+    /// Isotope Ac213 of Actinium
     Ac213,
+    /// Isotope Ac214 of Actinium
     Ac214,
+    /// Isotope Ac215 of Actinium
     Ac215,
+    /// Isotope Ac216 of Actinium
     Ac216,
+    /// Isotope Ac217 of Actinium
     Ac217,
+    /// Isotope Ac218 of Actinium
     Ac218,
+    /// Isotope Ac219 of Actinium
     Ac219,
+    /// Isotope Ac220 of Actinium
     Ac220,
+    /// Isotope Ac221 of Actinium
     Ac221,
+    /// Isotope Ac222 of Actinium
     Ac222,
+    /// Isotope Ac223 of Actinium
     Ac223,
+    /// Isotope Ac224 of Actinium
     Ac224,
+    /// Isotope Ac225 of Actinium
     Ac225,
+    /// Isotope Ac226 of Actinium
     Ac226,
+    /// Isotope Ac227 of Actinium
     Ac227,
+    /// Isotope Ac228 of Actinium
     Ac228,
+    /// Isotope Ac229 of Actinium
     Ac229,
+    /// Isotope Ac230 of Actinium
     Ac230,
+    /// Isotope Ac231 of Actinium
     Ac231,
+    /// Isotope Ac232 of Actinium
     Ac232,
+    /// Isotope Ac233 of Actinium
     Ac233,
+    /// Isotope Ac234 of Actinium
     Ac234,
+    /// Isotope Ac235 of Actinium
     Ac235,
+    /// Isotope Ac236 of Actinium
     Ac236,
+    /// Isotope Ac237 of Actinium
     Ac237,
 }
 impl super::RelativeAtomicMass for ActiniumIsotope {
@@ -118,40 +152,7 @@ impl super::MassNumber for ActiniumIsotope {
 }
 impl super::IsotopicComposition for ActiniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Ac206 => None,
-            Self::Ac207 => None,
-            Self::Ac208 => None,
-            Self::Ac209 => None,
-            Self::Ac210 => None,
-            Self::Ac211 => None,
-            Self::Ac212 => None,
-            Self::Ac213 => None,
-            Self::Ac214 => None,
-            Self::Ac215 => None,
-            Self::Ac216 => None,
-            Self::Ac217 => None,
-            Self::Ac218 => None,
-            Self::Ac219 => None,
-            Self::Ac220 => None,
-            Self::Ac221 => None,
-            Self::Ac222 => None,
-            Self::Ac223 => None,
-            Self::Ac224 => None,
-            Self::Ac225 => None,
-            Self::Ac226 => None,
-            Self::Ac227 => None,
-            Self::Ac228 => None,
-            Self::Ac229 => None,
-            Self::Ac230 => None,
-            Self::Ac231 => None,
-            Self::Ac232 => None,
-            Self::Ac233 => None,
-            Self::Ac234 => None,
-            Self::Ac235 => None,
-            Self::Ac236 => None,
-            Self::Ac237 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for ActiniumIsotope {

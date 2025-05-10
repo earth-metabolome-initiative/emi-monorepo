@@ -1,26 +1,48 @@
+//! Isotopes of the element Fermium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Fermium
 pub enum FermiumIsotope {
+    /// Isotope Fm241 of Fermium
     Fm241,
+    /// Isotope Fm242 of Fermium
     Fm242,
+    /// Isotope Fm243 of Fermium
     Fm243,
+    /// Isotope Fm244 of Fermium
     Fm244,
+    /// Isotope Fm245 of Fermium
     Fm245,
+    /// Isotope Fm246 of Fermium
     Fm246,
+    /// Isotope Fm247 of Fermium
     Fm247,
+    /// Isotope Fm248 of Fermium
     Fm248,
+    /// Isotope Fm249 of Fermium
     Fm249,
+    /// Isotope Fm250 of Fermium
     Fm250,
+    /// Isotope Fm251 of Fermium
     Fm251,
+    /// Isotope Fm252 of Fermium
     Fm252,
+    /// Isotope Fm253 of Fermium
     Fm253,
+    /// Isotope Fm254 of Fermium
     Fm254,
+    /// Isotope Fm255 of Fermium
     Fm255,
+    /// Isotope Fm256 of Fermium
     Fm256,
+    /// Isotope Fm257 of Fermium
     Fm257,
+    /// Isotope Fm258 of Fermium
     Fm258,
+    /// Isotope Fm259 of Fermium
     Fm259,
+    /// Isotope Fm260 of Fermium
     Fm260,
 }
 impl super::RelativeAtomicMass for FermiumIsotope {
@@ -82,28 +104,7 @@ impl super::MassNumber for FermiumIsotope {
 }
 impl super::IsotopicComposition for FermiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Fm241 => None,
-            Self::Fm242 => None,
-            Self::Fm243 => None,
-            Self::Fm244 => None,
-            Self::Fm245 => None,
-            Self::Fm246 => None,
-            Self::Fm247 => None,
-            Self::Fm248 => None,
-            Self::Fm249 => None,
-            Self::Fm250 => None,
-            Self::Fm251 => None,
-            Self::Fm252 => None,
-            Self::Fm253 => None,
-            Self::Fm254 => None,
-            Self::Fm255 => None,
-            Self::Fm256 => None,
-            Self::Fm257 => None,
-            Self::Fm258 => None,
-            Self::Fm259 => None,
-            Self::Fm260 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for FermiumIsotope {

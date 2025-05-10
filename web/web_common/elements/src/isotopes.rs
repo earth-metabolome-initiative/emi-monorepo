@@ -281,128 +281,248 @@ pub trait MostAbundantIsotope {
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
 /// Enumeration of all isotopes of the elements in the periodic table.
 pub enum Isotope {
+    /// Isotopes of `HydrogenIsotope`
     H(HydrogenIsotope),
+    /// Isotopes of Helium
     He(HeliumIsotope),
+    /// Isotopes of Lithium
     Li(LithiumIsotope),
+    /// Isotopes of Beryllium
     Be(BerylliumIsotope),
+    /// Isotopes of Boron
     B(BoronIsotope),
+    /// Isotopes of Carbon
     C(CarbonIsotope),
+    /// Isotopes of Nitrogen
     N(NitrogenIsotope),
+    /// Isotopes of Oxygen
     O(OxygenIsotope),
+    /// Isotopes of Fluorine
     F(FluorineIsotope),
+    /// Isotopes of Neon
     Ne(NeonIsotope),
+    /// Isotopes of Sodium
     Na(SodiumIsotope),
+    /// Isotopes of Magnesium
     Mg(MagnesiumIsotope),
+    /// Isotopes of Aluminium
     Al(AluminiumIsotope),
+    /// Isotopes of Silicon
     Si(SiliconIsotope),
+    /// Isotopes of Phosphorus
     P(PhosphorusIsotope),
+    /// Isotopes of Sulfur
     S(SulfurIsotope),
+    /// Isotopes of Chlorine
     Cl(ChlorineIsotope),
+    /// Isotopes of Argon
     Ar(ArgonIsotope),
+    /// Isotopes of Potassium
     K(PotassiumIsotope),
+    /// Isotopes of Calcium
     Ca(CalciumIsotope),
+    /// Isotopes of Scandium
     Sc(ScandiumIsotope),
+    /// Isotopes of Titanium
     Ti(TitaniumIsotope),
+    /// Isotopes of Vanadium
     V(VanadiumIsotope),
+    /// Isotopes of Chromium
     Cr(ChromiumIsotope),
+    /// Isotopes of Manganese
     Mn(ManganeseIsotope),
+    /// Isotopes of Iron
     Fe(IronIsotope),
+    /// Isotopes of Cobalt
     Co(CobaltIsotope),
+    /// Isotopes of Nickel
     Ni(NickelIsotope),
+    /// Isotopes of Copper
     Cu(CopperIsotope),
+    /// Isotopes of Zinc
     Zn(ZincIsotope),
+    /// Isotopes of Gallium
     Ga(GalliumIsotope),
+    /// Isotopes of Germanium
     Ge(GermaniumIsotope),
+    /// Isotopes of Arsenic
     As(ArsenicIsotope),
+    /// Isotopes of Selenium
     Se(SeleniumIsotope),
+    /// Isotopes of Bromine
     Br(BromineIsotope),
+    /// Isotopes of Krypton
     Kr(KryptonIsotope),
+    /// Isotopes of Rubidium
     Rb(RubidiumIsotope),
+    /// Isotopes of Strontium
     Sr(StrontiumIsotope),
+    /// Isotopes of Yttrium
     Y(YttriumIsotope),
+    /// Isotopes of Zirconium
     Zr(ZirconiumIsotope),
+    /// Isotopes of Niobium
     Nb(NiobiumIsotope),
+    /// Isotopes of Molybdenum
     Mo(MolybdenumIsotope),
+    /// Isotopes of Technetium
     Tc(TechnetiumIsotope),
+    /// Isotopes of Ruthenium
     Ru(RutheniumIsotope),
+    /// Isotopes of Rhodium
     Rh(RhodiumIsotope),
+    /// Isotopes of Palladium
     Pd(PalladiumIsotope),
+    /// Isotopes of Silver
     Ag(SilverIsotope),
+    /// Isotopes of Cadmium
     Cd(CadmiumIsotope),
+    /// Isotopes of Indium
     In(IndiumIsotope),
+    /// Isotopes of Tin
     Sn(TinIsotope),
+    /// Isotopes of Antimony
     Sb(AntimonyIsotope),
+    /// Isotopes of Tellurium
     Te(TelluriumIsotope),
+    /// Isotopes of Iodine
     I(IodineIsotope),
+    /// Isotopes of Xenon
     Xe(XenonIsotope),
+    /// Isotopes of Caesium
     Cs(CaesiumIsotope),
+    /// Isotopes of Barium
     Ba(BariumIsotope),
+    /// Isotopes of Lanthanum
     La(LanthanumIsotope),
+    /// Isotopes of Cerium
     Ce(CeriumIsotope),
+    /// Isotopes of Praseodymium
     Pr(PraseodymiumIsotope),
+    /// Isotopes of Neodymium
     Nd(NeodymiumIsotope),
+    /// Isotopes of Promethium
     Pm(PromethiumIsotope),
+    /// Isotopes of Samarium
     Sm(SamariumIsotope),
+    /// Isotopes of Europium
     Eu(EuropiumIsotope),
+    /// Isotopes of Gadolinium
     Gd(GadoliniumIsotope),
+    /// Isotopes of Terbium
     Tb(TerbiumIsotope),
+    /// Isotopes of Dysprosium
     Dy(DysprosiumIsotope),
+    /// Isotopes of Holmium
     Ho(HolmiumIsotope),
+    /// Isotopes of Erbium
     Er(ErbiumIsotope),
+    /// Isotopes of Thulium
     Tm(ThuliumIsotope),
+    /// Isotopes of Ytterbium
     Yb(YtterbiumIsotope),
+    /// Isotopes of Lutetium
     Lu(LutetiumIsotope),
+    /// Isotopes of Hafnium
     Hf(HafniumIsotope),
+    /// Isotopes of Tantalum
     Ta(TantalumIsotope),
+    /// Isotopes of Tungsten
     W(TungstenIsotope),
+    /// Isotopes of Rhenium
     Re(RheniumIsotope),
+    /// Isotopes of Osmium
     Os(OsmiumIsotope),
+    /// Isotopes of Iridium
     Ir(IridiumIsotope),
+    /// Isotopes of Platinum
     Pt(PlatinumIsotope),
+    /// Isotopes of Gold
     Au(GoldIsotope),
+    /// Isotopes of Mercury
     Hg(MercuryIsotope),
+    /// Isotopes of Thallium
     Tl(ThalliumIsotope),
+    /// Isotopes of Lead
     Pb(LeadIsotope),
+    /// Isotopes of Bismuth
     Bi(BismuthIsotope),
+    /// Isotopes of Polonium
     Po(PoloniumIsotope),
+    /// Isotopes of Astatine
     At(AstatineIsotope),
+    /// Isotopes of Radon
     Rn(RadonIsotope),
+    /// Isotopes of Francium
     Fr(FranciumIsotope),
+    /// Isotopes of Radium
     Ra(RadiumIsotope),
+    /// Isotopes of Actinium
     Ac(ActiniumIsotope),
+    /// Isotopes of Thorium
     Th(ThoriumIsotope),
+    /// Isotopes of Protactinium
     Pa(ProtactiniumIsotope),
+    /// Isotopes of Uranium
     U(UraniumIsotope),
+    /// Isotopes of Neptunium
     Np(NeptuniumIsotope),
+    /// Isotopes of Plutonium
     Pu(PlutoniumIsotope),
+    /// Isotopes of Americium
     Am(AmericiumIsotope),
+    /// Isotopes of Curium
     Cm(CuriumIsotope),
+    /// Isotopes of Berkelium
     Bk(BerkeliumIsotope),
+    /// Isotopes of Californium
     Cf(CaliforniumIsotope),
+    /// Isotopes of Einsteinium
     Es(EinsteiniumIsotope),
+    /// Isotopes of Fermium
     Fm(FermiumIsotope),
+    /// Isotopes of Mendelevium
     Md(MendeleviumIsotope),
+    /// Isotopes of Nobelium
     No(NobeliumIsotope),
+    /// Isotopes of Lawrencium
     Lr(LawrenciumIsotope),
+    /// Isotopes of Rutherfordium
     Rf(RutherfordiumIsotope),
+    /// Isotopes of Dubnium
     Db(DubniumIsotope),
+    /// Isotopes of Seaborgium
     Sg(SeaborgiumIsotope),
+    /// Isotopes of Bohrium
     Bh(BohriumIsotope),
+    /// Isotopes of Hassium
     Hs(HassiumIsotope),
+    /// Isotopes of Meitnerium
     Mt(MeitneriumIsotope),
+    /// Isotopes of Darmstadtium
     Ds(DarmstadtiumIsotope),
+    /// Isotopes of Roentgenium
     Rg(RoentgeniumIsotope),
+    /// Isotopes of Copernicium
     Cn(CoperniciumIsotope),
+    /// Isotopes of Nihonium
     Nh(NihoniumIsotope),
+    /// Isotopes of Flerovium
     Fl(FleroviumIsotope),
+    /// Isotopes of Moscovium
     Mc(MoscoviumIsotope),
+    /// Isotopes of Livermorium
     Lv(LivermoriumIsotope),
+    /// Isotopes of Tennessine
     Ts(TennessineIsotope),
+    /// Isotopes of Oganesson
     Og(OganessonIsotope),
 }
 
 impl crate::Element {
     /// Returns the most common isotope of the element.
+    #[must_use]
+    #[allow(clippy::too_many_lines)]
     pub fn most_abundant_isotope(&self) -> Isotope {
         match self {
             Self::H => Isotope::H(HydrogenIsotope::most_abundant_isotope()),
@@ -528,6 +648,7 @@ impl crate::Element {
 }
 
 impl crate::Element {
+    #[allow(clippy::too_many_lines)]
     /// Returns the isotopes of the element.
     pub fn isotopes(&self) -> Vec<Isotope> {
         match self {

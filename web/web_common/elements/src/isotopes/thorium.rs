@@ -1,38 +1,72 @@
+//! Isotopes of the element Thorium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Thorium
 pub enum ThoriumIsotope {
+    /// Isotope Th208 of Thorium
     Th208,
+    /// Isotope Th209 of Thorium
     Th209,
+    /// Isotope Th210 of Thorium
     Th210,
+    /// Isotope Th211 of Thorium
     Th211,
+    /// Isotope Th212 of Thorium
     Th212,
+    /// Isotope Th213 of Thorium
     Th213,
+    /// Isotope Th214 of Thorium
     Th214,
+    /// Isotope Th215 of Thorium
     Th215,
+    /// Isotope Th216 of Thorium
     Th216,
+    /// Isotope Th217 of Thorium
     Th217,
+    /// Isotope Th218 of Thorium
     Th218,
+    /// Isotope Th219 of Thorium
     Th219,
+    /// Isotope Th220 of Thorium
     Th220,
+    /// Isotope Th221 of Thorium
     Th221,
+    /// Isotope Th222 of Thorium
     Th222,
+    /// Isotope Th223 of Thorium
     Th223,
+    /// Isotope Th224 of Thorium
     Th224,
+    /// Isotope Th225 of Thorium
     Th225,
+    /// Isotope Th226 of Thorium
     Th226,
+    /// Isotope Th227 of Thorium
     Th227,
+    /// Isotope Th228 of Thorium
     Th228,
+    /// Isotope Th229 of Thorium
     Th229,
+    /// Isotope Th230 of Thorium
     Th230,
+    /// Isotope Th231 of Thorium
     Th231,
+    /// Isotope Th232 of Thorium
     Th232,
+    /// Isotope Th233 of Thorium
     Th233,
+    /// Isotope Th234 of Thorium
     Th234,
+    /// Isotope Th235 of Thorium
     Th235,
+    /// Isotope Th236 of Thorium
     Th236,
+    /// Isotope Th237 of Thorium
     Th237,
+    /// Isotope Th238 of Thorium
     Th238,
+    /// Isotope Th239 of Thorium
     Th239,
 }
 impl super::RelativeAtomicMass for ThoriumIsotope {
@@ -119,38 +153,38 @@ impl super::MassNumber for ThoriumIsotope {
 impl super::IsotopicComposition for ThoriumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Th208 => None,
-            Self::Th209 => None,
-            Self::Th210 => None,
-            Self::Th211 => None,
-            Self::Th212 => None,
-            Self::Th213 => None,
-            Self::Th214 => None,
-            Self::Th215 => None,
-            Self::Th216 => None,
-            Self::Th217 => None,
-            Self::Th218 => None,
-            Self::Th219 => None,
-            Self::Th220 => None,
-            Self::Th221 => None,
-            Self::Th222 => None,
-            Self::Th223 => None,
-            Self::Th224 => None,
-            Self::Th225 => None,
-            Self::Th226 => None,
-            Self::Th227 => None,
-            Self::Th228 => None,
-            Self::Th229 => None,
-            Self::Th230 => None,
-            Self::Th231 => None,
             Self::Th232 => Some(1f64),
-            Self::Th233 => None,
-            Self::Th234 => None,
-            Self::Th235 => None,
-            Self::Th236 => None,
-            Self::Th237 => None,
-            Self::Th238 => None,
-            Self::Th239 => None,
+            Self::Th208
+            | Self::Th209
+            | Self::Th210
+            | Self::Th211
+            | Self::Th212
+            | Self::Th213
+            | Self::Th214
+            | Self::Th215
+            | Self::Th216
+            | Self::Th217
+            | Self::Th218
+            | Self::Th219
+            | Self::Th220
+            | Self::Th221
+            | Self::Th222
+            | Self::Th223
+            | Self::Th224
+            | Self::Th225
+            | Self::Th226
+            | Self::Th227
+            | Self::Th228
+            | Self::Th229
+            | Self::Th230
+            | Self::Th231
+            | Self::Th233
+            | Self::Th234
+            | Self::Th235
+            | Self::Th236
+            | Self::Th237
+            | Self::Th238
+            | Self::Th239 => None,
         }
     }
 }

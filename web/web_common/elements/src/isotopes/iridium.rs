@@ -1,47 +1,90 @@
+//! Isotopes of the element Iridium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Iridium
 pub enum IridiumIsotope {
+    /// Isotope Ir164 of Iridium
     Ir164,
+    /// Isotope Ir165 of Iridium
     Ir165,
+    /// Isotope Ir166 of Iridium
     Ir166,
+    /// Isotope Ir167 of Iridium
     Ir167,
+    /// Isotope Ir168 of Iridium
     Ir168,
+    /// Isotope Ir169 of Iridium
     Ir169,
+    /// Isotope Ir170 of Iridium
     Ir170,
+    /// Isotope Ir171 of Iridium
     Ir171,
+    /// Isotope Ir172 of Iridium
     Ir172,
+    /// Isotope Ir173 of Iridium
     Ir173,
+    /// Isotope Ir174 of Iridium
     Ir174,
+    /// Isotope Ir175 of Iridium
     Ir175,
+    /// Isotope Ir176 of Iridium
     Ir176,
+    /// Isotope Ir177 of Iridium
     Ir177,
+    /// Isotope Ir178 of Iridium
     Ir178,
+    /// Isotope Ir179 of Iridium
     Ir179,
+    /// Isotope Ir180 of Iridium
     Ir180,
+    /// Isotope Ir181 of Iridium
     Ir181,
+    /// Isotope Ir182 of Iridium
     Ir182,
+    /// Isotope Ir183 of Iridium
     Ir183,
+    /// Isotope Ir184 of Iridium
     Ir184,
+    /// Isotope Ir185 of Iridium
     Ir185,
+    /// Isotope Ir186 of Iridium
     Ir186,
+    /// Isotope Ir187 of Iridium
     Ir187,
+    /// Isotope Ir188 of Iridium
     Ir188,
+    /// Isotope Ir189 of Iridium
     Ir189,
+    /// Isotope Ir190 of Iridium
     Ir190,
+    /// Isotope Ir191 of Iridium
     Ir191,
+    /// Isotope Ir192 of Iridium
     Ir192,
+    /// Isotope Ir193 of Iridium
     Ir193,
+    /// Isotope Ir194 of Iridium
     Ir194,
+    /// Isotope Ir195 of Iridium
     Ir195,
+    /// Isotope Ir196 of Iridium
     Ir196,
+    /// Isotope Ir197 of Iridium
     Ir197,
+    /// Isotope Ir198 of Iridium
     Ir198,
+    /// Isotope Ir199 of Iridium
     Ir199,
+    /// Isotope Ir200 of Iridium
     Ir200,
+    /// Isotope Ir201 of Iridium
     Ir201,
+    /// Isotope Ir202 of Iridium
     Ir202,
+    /// Isotope Ir203 of Iridium
     Ir203,
+    /// Isotope Ir204 of Iridium
     Ir204,
 }
 impl super::RelativeAtomicMass for IridiumIsotope {
@@ -146,47 +189,47 @@ impl super::MassNumber for IridiumIsotope {
 impl super::IsotopicComposition for IridiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Ir164 => None,
-            Self::Ir165 => None,
-            Self::Ir166 => None,
-            Self::Ir167 => None,
-            Self::Ir168 => None,
-            Self::Ir169 => None,
-            Self::Ir170 => None,
-            Self::Ir171 => None,
-            Self::Ir172 => None,
-            Self::Ir173 => None,
-            Self::Ir174 => None,
-            Self::Ir175 => None,
-            Self::Ir176 => None,
-            Self::Ir177 => None,
-            Self::Ir178 => None,
-            Self::Ir179 => None,
-            Self::Ir180 => None,
-            Self::Ir181 => None,
-            Self::Ir182 => None,
-            Self::Ir183 => None,
-            Self::Ir184 => None,
-            Self::Ir185 => None,
-            Self::Ir186 => None,
-            Self::Ir187 => None,
-            Self::Ir188 => None,
-            Self::Ir189 => None,
-            Self::Ir190 => None,
             Self::Ir191 => Some(0.373f64),
-            Self::Ir192 => None,
             Self::Ir193 => Some(0.627f64),
-            Self::Ir194 => None,
-            Self::Ir195 => None,
-            Self::Ir196 => None,
-            Self::Ir197 => None,
-            Self::Ir198 => None,
-            Self::Ir199 => None,
-            Self::Ir200 => None,
-            Self::Ir201 => None,
-            Self::Ir202 => None,
-            Self::Ir203 => None,
-            Self::Ir204 => None,
+            Self::Ir164
+            | Self::Ir165
+            | Self::Ir166
+            | Self::Ir167
+            | Self::Ir168
+            | Self::Ir169
+            | Self::Ir170
+            | Self::Ir171
+            | Self::Ir172
+            | Self::Ir173
+            | Self::Ir174
+            | Self::Ir175
+            | Self::Ir176
+            | Self::Ir177
+            | Self::Ir178
+            | Self::Ir179
+            | Self::Ir180
+            | Self::Ir181
+            | Self::Ir182
+            | Self::Ir183
+            | Self::Ir184
+            | Self::Ir185
+            | Self::Ir186
+            | Self::Ir187
+            | Self::Ir188
+            | Self::Ir189
+            | Self::Ir190
+            | Self::Ir192
+            | Self::Ir194
+            | Self::Ir195
+            | Self::Ir196
+            | Self::Ir197
+            | Self::Ir198
+            | Self::Ir199
+            | Self::Ir200
+            | Self::Ir201
+            | Self::Ir202
+            | Self::Ir203
+            | Self::Ir204 => None,
         }
     }
 }

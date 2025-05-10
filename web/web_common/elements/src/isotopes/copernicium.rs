@@ -1,16 +1,28 @@
+//! Isotopes of the element Copernicium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Copernicium
 pub enum CoperniciumIsotope {
+    /// Isotope Cn276 of Copernicium
     Cn276,
+    /// Isotope Cn277 of Copernicium
     Cn277,
+    /// Isotope Cn278 of Copernicium
     Cn278,
+    /// Isotope Cn279 of Copernicium
     Cn279,
+    /// Isotope Cn280 of Copernicium
     Cn280,
+    /// Isotope Cn281 of Copernicium
     Cn281,
+    /// Isotope Cn282 of Copernicium
     Cn282,
+    /// Isotope Cn283 of Copernicium
     Cn283,
+    /// Isotope Cn284 of Copernicium
     Cn284,
+    /// Isotope Cn285 of Copernicium
     Cn285,
 }
 impl super::RelativeAtomicMass for CoperniciumIsotope {
@@ -52,18 +64,7 @@ impl super::MassNumber for CoperniciumIsotope {
 }
 impl super::IsotopicComposition for CoperniciumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Cn276 => None,
-            Self::Cn277 => None,
-            Self::Cn278 => None,
-            Self::Cn279 => None,
-            Self::Cn280 => None,
-            Self::Cn281 => None,
-            Self::Cn282 => None,
-            Self::Cn283 => None,
-            Self::Cn284 => None,
-            Self::Cn285 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for CoperniciumIsotope {

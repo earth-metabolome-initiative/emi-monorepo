@@ -1,48 +1,92 @@
+//! Isotopes of the element Gold
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Gold
 pub enum GoldIsotope {
+    /// Isotope Au169 of Gold
     Au169,
+    /// Isotope Au170 of Gold
     Au170,
+    /// Isotope Au171 of Gold
     Au171,
+    /// Isotope Au172 of Gold
     Au172,
+    /// Isotope Au173 of Gold
     Au173,
+    /// Isotope Au174 of Gold
     Au174,
+    /// Isotope Au175 of Gold
     Au175,
+    /// Isotope Au176 of Gold
     Au176,
+    /// Isotope Au177 of Gold
     Au177,
+    /// Isotope Au178 of Gold
     Au178,
+    /// Isotope Au179 of Gold
     Au179,
+    /// Isotope Au180 of Gold
     Au180,
+    /// Isotope Au181 of Gold
     Au181,
+    /// Isotope Au182 of Gold
     Au182,
+    /// Isotope Au183 of Gold
     Au183,
+    /// Isotope Au184 of Gold
     Au184,
+    /// Isotope Au185 of Gold
     Au185,
+    /// Isotope Au186 of Gold
     Au186,
+    /// Isotope Au187 of Gold
     Au187,
+    /// Isotope Au188 of Gold
     Au188,
+    /// Isotope Au189 of Gold
     Au189,
+    /// Isotope Au190 of Gold
     Au190,
+    /// Isotope Au191 of Gold
     Au191,
+    /// Isotope Au192 of Gold
     Au192,
+    /// Isotope Au193 of Gold
     Au193,
+    /// Isotope Au194 of Gold
     Au194,
+    /// Isotope Au195 of Gold
     Au195,
+    /// Isotope Au196 of Gold
     Au196,
+    /// Isotope Au197 of Gold
     Au197,
+    /// Isotope Au198 of Gold
     Au198,
+    /// Isotope Au199 of Gold
     Au199,
+    /// Isotope Au200 of Gold
     Au200,
+    /// Isotope Au201 of Gold
     Au201,
+    /// Isotope Au202 of Gold
     Au202,
+    /// Isotope Au203 of Gold
     Au203,
+    /// Isotope Au204 of Gold
     Au204,
+    /// Isotope Au205 of Gold
     Au205,
+    /// Isotope Au206 of Gold
     Au206,
+    /// Isotope Au207 of Gold
     Au207,
+    /// Isotope Au208 of Gold
     Au208,
+    /// Isotope Au209 of Gold
     Au209,
+    /// Isotope Au210 of Gold
     Au210,
 }
 impl super::RelativeAtomicMass for GoldIsotope {
@@ -149,48 +193,48 @@ impl super::MassNumber for GoldIsotope {
 impl super::IsotopicComposition for GoldIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Au169 => None,
-            Self::Au170 => None,
-            Self::Au171 => None,
-            Self::Au172 => None,
-            Self::Au173 => None,
-            Self::Au174 => None,
-            Self::Au175 => None,
-            Self::Au176 => None,
-            Self::Au177 => None,
-            Self::Au178 => None,
-            Self::Au179 => None,
-            Self::Au180 => None,
-            Self::Au181 => None,
-            Self::Au182 => None,
-            Self::Au183 => None,
-            Self::Au184 => None,
-            Self::Au185 => None,
-            Self::Au186 => None,
-            Self::Au187 => None,
-            Self::Au188 => None,
-            Self::Au189 => None,
-            Self::Au190 => None,
-            Self::Au191 => None,
-            Self::Au192 => None,
-            Self::Au193 => None,
-            Self::Au194 => None,
-            Self::Au195 => None,
-            Self::Au196 => None,
             Self::Au197 => Some(1f64),
-            Self::Au198 => None,
-            Self::Au199 => None,
-            Self::Au200 => None,
-            Self::Au201 => None,
-            Self::Au202 => None,
-            Self::Au203 => None,
-            Self::Au204 => None,
-            Self::Au205 => None,
-            Self::Au206 => None,
-            Self::Au207 => None,
-            Self::Au208 => None,
-            Self::Au209 => None,
-            Self::Au210 => None,
+            Self::Au169
+            | Self::Au170
+            | Self::Au171
+            | Self::Au172
+            | Self::Au173
+            | Self::Au174
+            | Self::Au175
+            | Self::Au176
+            | Self::Au177
+            | Self::Au178
+            | Self::Au179
+            | Self::Au180
+            | Self::Au181
+            | Self::Au182
+            | Self::Au183
+            | Self::Au184
+            | Self::Au185
+            | Self::Au186
+            | Self::Au187
+            | Self::Au188
+            | Self::Au189
+            | Self::Au190
+            | Self::Au191
+            | Self::Au192
+            | Self::Au193
+            | Self::Au194
+            | Self::Au195
+            | Self::Au196
+            | Self::Au198
+            | Self::Au199
+            | Self::Au200
+            | Self::Au201
+            | Self::Au202
+            | Self::Au203
+            | Self::Au204
+            | Self::Au205
+            | Self::Au206
+            | Self::Au207
+            | Self::Au208
+            | Self::Au209
+            | Self::Au210 => None,
         }
     }
 }

@@ -1,36 +1,68 @@
+//! Isotopes of the element Cobalt
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Cobalt
 pub enum CobaltIsotope {
+    /// Isotope Co47 of Cobalt
     Co47,
+    /// Isotope Co48 of Cobalt
     Co48,
+    /// Isotope Co49 of Cobalt
     Co49,
+    /// Isotope Co50 of Cobalt
     Co50,
+    /// Isotope Co51 of Cobalt
     Co51,
+    /// Isotope Co52 of Cobalt
     Co52,
+    /// Isotope Co53 of Cobalt
     Co53,
+    /// Isotope Co54 of Cobalt
     Co54,
+    /// Isotope Co55 of Cobalt
     Co55,
+    /// Isotope Co56 of Cobalt
     Co56,
+    /// Isotope Co57 of Cobalt
     Co57,
+    /// Isotope Co58 of Cobalt
     Co58,
+    /// Isotope Co59 of Cobalt
     Co59,
+    /// Isotope Co60 of Cobalt
     Co60,
+    /// Isotope Co61 of Cobalt
     Co61,
+    /// Isotope Co62 of Cobalt
     Co62,
+    /// Isotope Co63 of Cobalt
     Co63,
+    /// Isotope Co64 of Cobalt
     Co64,
+    /// Isotope Co65 of Cobalt
     Co65,
+    /// Isotope Co66 of Cobalt
     Co66,
+    /// Isotope Co67 of Cobalt
     Co67,
+    /// Isotope Co68 of Cobalt
     Co68,
+    /// Isotope Co69 of Cobalt
     Co69,
+    /// Isotope Co70 of Cobalt
     Co70,
+    /// Isotope Co71 of Cobalt
     Co71,
+    /// Isotope Co72 of Cobalt
     Co72,
+    /// Isotope Co73 of Cobalt
     Co73,
+    /// Isotope Co74 of Cobalt
     Co74,
+    /// Isotope Co75 of Cobalt
     Co75,
+    /// Isotope Co76 of Cobalt
     Co76,
 }
 impl super::RelativeAtomicMass for CobaltIsotope {
@@ -113,36 +145,36 @@ impl super::MassNumber for CobaltIsotope {
 impl super::IsotopicComposition for CobaltIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Co47 => None,
-            Self::Co48 => None,
-            Self::Co49 => None,
-            Self::Co50 => None,
-            Self::Co51 => None,
-            Self::Co52 => None,
-            Self::Co53 => None,
-            Self::Co54 => None,
-            Self::Co55 => None,
-            Self::Co56 => None,
-            Self::Co57 => None,
-            Self::Co58 => None,
             Self::Co59 => Some(1f64),
-            Self::Co60 => None,
-            Self::Co61 => None,
-            Self::Co62 => None,
-            Self::Co63 => None,
-            Self::Co64 => None,
-            Self::Co65 => None,
-            Self::Co66 => None,
-            Self::Co67 => None,
-            Self::Co68 => None,
-            Self::Co69 => None,
-            Self::Co70 => None,
-            Self::Co71 => None,
-            Self::Co72 => None,
-            Self::Co73 => None,
-            Self::Co74 => None,
-            Self::Co75 => None,
-            Self::Co76 => None,
+            Self::Co47
+            | Self::Co48
+            | Self::Co49
+            | Self::Co50
+            | Self::Co51
+            | Self::Co52
+            | Self::Co53
+            | Self::Co54
+            | Self::Co55
+            | Self::Co56
+            | Self::Co57
+            | Self::Co58
+            | Self::Co60
+            | Self::Co61
+            | Self::Co62
+            | Self::Co63
+            | Self::Co64
+            | Self::Co65
+            | Self::Co66
+            | Self::Co67
+            | Self::Co68
+            | Self::Co69
+            | Self::Co70
+            | Self::Co71
+            | Self::Co72
+            | Self::Co73
+            | Self::Co74
+            | Self::Co75
+            | Self::Co76 => None,
         }
     }
 }

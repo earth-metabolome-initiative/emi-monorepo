@@ -1,49 +1,94 @@
+//! Isotopes of the element Lead
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Lead
 pub enum LeadIsotope {
+    /// Isotope Pb178 of Lead
     Pb178,
+    /// Isotope Pb179 of Lead
     Pb179,
+    /// Isotope Pb180 of Lead
     Pb180,
+    /// Isotope Pb181 of Lead
     Pb181,
+    /// Isotope Pb182 of Lead
     Pb182,
+    /// Isotope Pb183 of Lead
     Pb183,
+    /// Isotope Pb184 of Lead
     Pb184,
+    /// Isotope Pb185 of Lead
     Pb185,
+    /// Isotope Pb186 of Lead
     Pb186,
+    /// Isotope Pb187 of Lead
     Pb187,
+    /// Isotope Pb188 of Lead
     Pb188,
+    /// Isotope Pb189 of Lead
     Pb189,
+    /// Isotope Pb190 of Lead
     Pb190,
+    /// Isotope Pb191 of Lead
     Pb191,
+    /// Isotope Pb192 of Lead
     Pb192,
+    /// Isotope Pb193 of Lead
     Pb193,
+    /// Isotope Pb194 of Lead
     Pb194,
+    /// Isotope Pb195 of Lead
     Pb195,
+    /// Isotope Pb196 of Lead
     Pb196,
+    /// Isotope Pb197 of Lead
     Pb197,
+    /// Isotope Pb198 of Lead
     Pb198,
+    /// Isotope Pb199 of Lead
     Pb199,
+    /// Isotope Pb200 of Lead
     Pb200,
+    /// Isotope Pb201 of Lead
     Pb201,
+    /// Isotope Pb202 of Lead
     Pb202,
+    /// Isotope Pb203 of Lead
     Pb203,
+    /// Isotope Pb204 of Lead
     Pb204,
+    /// Isotope Pb205 of Lead
     Pb205,
+    /// Isotope Pb206 of Lead
     Pb206,
+    /// Isotope Pb207 of Lead
     Pb207,
+    /// Isotope Pb208 of Lead
     Pb208,
+    /// Isotope Pb209 of Lead
     Pb209,
+    /// Isotope Pb210 of Lead
     Pb210,
+    /// Isotope Pb211 of Lead
     Pb211,
+    /// Isotope Pb212 of Lead
     Pb212,
+    /// Isotope Pb213 of Lead
     Pb213,
+    /// Isotope Pb214 of Lead
     Pb214,
+    /// Isotope Pb215 of Lead
     Pb215,
+    /// Isotope Pb216 of Lead
     Pb216,
+    /// Isotope Pb217 of Lead
     Pb217,
+    /// Isotope Pb218 of Lead
     Pb218,
+    /// Isotope Pb219 of Lead
     Pb219,
+    /// Isotope Pb220 of Lead
     Pb220,
 }
 impl super::RelativeAtomicMass for LeadIsotope {
@@ -152,49 +197,49 @@ impl super::MassNumber for LeadIsotope {
 impl super::IsotopicComposition for LeadIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Pb178 => None,
-            Self::Pb179 => None,
-            Self::Pb180 => None,
-            Self::Pb181 => None,
-            Self::Pb182 => None,
-            Self::Pb183 => None,
-            Self::Pb184 => None,
-            Self::Pb185 => None,
-            Self::Pb186 => None,
-            Self::Pb187 => None,
-            Self::Pb188 => None,
-            Self::Pb189 => None,
-            Self::Pb190 => None,
-            Self::Pb191 => None,
-            Self::Pb192 => None,
-            Self::Pb193 => None,
-            Self::Pb194 => None,
-            Self::Pb195 => None,
-            Self::Pb196 => None,
-            Self::Pb197 => None,
-            Self::Pb198 => None,
-            Self::Pb199 => None,
-            Self::Pb200 => None,
-            Self::Pb201 => None,
-            Self::Pb202 => None,
-            Self::Pb203 => None,
             Self::Pb204 => Some(0.014f64),
-            Self::Pb205 => None,
             Self::Pb206 => Some(0.241f64),
             Self::Pb207 => Some(0.221f64),
             Self::Pb208 => Some(0.524f64),
-            Self::Pb209 => None,
-            Self::Pb210 => None,
-            Self::Pb211 => None,
-            Self::Pb212 => None,
-            Self::Pb213 => None,
-            Self::Pb214 => None,
-            Self::Pb215 => None,
-            Self::Pb216 => None,
-            Self::Pb217 => None,
-            Self::Pb218 => None,
-            Self::Pb219 => None,
-            Self::Pb220 => None,
+            Self::Pb178
+            | Self::Pb179
+            | Self::Pb180
+            | Self::Pb181
+            | Self::Pb182
+            | Self::Pb183
+            | Self::Pb184
+            | Self::Pb185
+            | Self::Pb186
+            | Self::Pb187
+            | Self::Pb188
+            | Self::Pb189
+            | Self::Pb190
+            | Self::Pb191
+            | Self::Pb192
+            | Self::Pb193
+            | Self::Pb194
+            | Self::Pb195
+            | Self::Pb196
+            | Self::Pb197
+            | Self::Pb198
+            | Self::Pb199
+            | Self::Pb200
+            | Self::Pb201
+            | Self::Pb202
+            | Self::Pb203
+            | Self::Pb205
+            | Self::Pb209
+            | Self::Pb210
+            | Self::Pb211
+            | Self::Pb212
+            | Self::Pb213
+            | Self::Pb214
+            | Self::Pb215
+            | Self::Pb216
+            | Self::Pb217
+            | Self::Pb218
+            | Self::Pb219
+            | Self::Pb220 => None,
         }
     }
 }

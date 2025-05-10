@@ -1,44 +1,84 @@
+//! Isotopes of the element Neodymium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Neodymium
 pub enum NeodymiumIsotope {
+    /// Isotope Nd124 of Neodymium
     Nd124,
+    /// Isotope Nd125 of Neodymium
     Nd125,
+    /// Isotope Nd126 of Neodymium
     Nd126,
+    /// Isotope Nd127 of Neodymium
     Nd127,
+    /// Isotope Nd128 of Neodymium
     Nd128,
+    /// Isotope Nd129 of Neodymium
     Nd129,
+    /// Isotope Nd130 of Neodymium
     Nd130,
+    /// Isotope Nd131 of Neodymium
     Nd131,
+    /// Isotope Nd132 of Neodymium
     Nd132,
+    /// Isotope Nd133 of Neodymium
     Nd133,
+    /// Isotope Nd134 of Neodymium
     Nd134,
+    /// Isotope Nd135 of Neodymium
     Nd135,
+    /// Isotope Nd136 of Neodymium
     Nd136,
+    /// Isotope Nd137 of Neodymium
     Nd137,
+    /// Isotope Nd138 of Neodymium
     Nd138,
+    /// Isotope Nd139 of Neodymium
     Nd139,
+    /// Isotope Nd140 of Neodymium
     Nd140,
+    /// Isotope Nd141 of Neodymium
     Nd141,
+    /// Isotope Nd142 of Neodymium
     Nd142,
+    /// Isotope Nd143 of Neodymium
     Nd143,
+    /// Isotope Nd144 of Neodymium
     Nd144,
+    /// Isotope Nd145 of Neodymium
     Nd145,
+    /// Isotope Nd146 of Neodymium
     Nd146,
+    /// Isotope Nd147 of Neodymium
     Nd147,
+    /// Isotope Nd148 of Neodymium
     Nd148,
+    /// Isotope Nd149 of Neodymium
     Nd149,
+    /// Isotope Nd150 of Neodymium
     Nd150,
+    /// Isotope Nd151 of Neodymium
     Nd151,
+    /// Isotope Nd152 of Neodymium
     Nd152,
+    /// Isotope Nd153 of Neodymium
     Nd153,
+    /// Isotope Nd154 of Neodymium
     Nd154,
+    /// Isotope Nd155 of Neodymium
     Nd155,
+    /// Isotope Nd156 of Neodymium
     Nd156,
+    /// Isotope Nd157 of Neodymium
     Nd157,
+    /// Isotope Nd158 of Neodymium
     Nd158,
+    /// Isotope Nd159 of Neodymium
     Nd159,
+    /// Isotope Nd160 of Neodymium
     Nd160,
+    /// Isotope Nd161 of Neodymium
     Nd161,
 }
 impl super::RelativeAtomicMass for NeodymiumIsotope {
@@ -137,44 +177,44 @@ impl super::MassNumber for NeodymiumIsotope {
 impl super::IsotopicComposition for NeodymiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Nd124 => None,
-            Self::Nd125 => None,
-            Self::Nd126 => None,
-            Self::Nd127 => None,
-            Self::Nd128 => None,
-            Self::Nd129 => None,
-            Self::Nd130 => None,
-            Self::Nd131 => None,
-            Self::Nd132 => None,
-            Self::Nd133 => None,
-            Self::Nd134 => None,
-            Self::Nd135 => None,
-            Self::Nd136 => None,
-            Self::Nd137 => None,
-            Self::Nd138 => None,
-            Self::Nd139 => None,
-            Self::Nd140 => None,
-            Self::Nd141 => None,
             Self::Nd142 => Some(0.27152f64),
             Self::Nd143 => Some(0.12174f64),
             Self::Nd144 => Some(0.23798f64),
             Self::Nd145 => Some(0.08293f64),
             Self::Nd146 => Some(0.17189f64),
-            Self::Nd147 => None,
             Self::Nd148 => Some(0.05756f64),
-            Self::Nd149 => None,
             Self::Nd150 => Some(0.05638f64),
-            Self::Nd151 => None,
-            Self::Nd152 => None,
-            Self::Nd153 => None,
-            Self::Nd154 => None,
-            Self::Nd155 => None,
-            Self::Nd156 => None,
-            Self::Nd157 => None,
-            Self::Nd158 => None,
-            Self::Nd159 => None,
-            Self::Nd160 => None,
-            Self::Nd161 => None,
+            Self::Nd124
+            | Self::Nd125
+            | Self::Nd126
+            | Self::Nd127
+            | Self::Nd128
+            | Self::Nd129
+            | Self::Nd130
+            | Self::Nd131
+            | Self::Nd132
+            | Self::Nd133
+            | Self::Nd134
+            | Self::Nd135
+            | Self::Nd136
+            | Self::Nd137
+            | Self::Nd138
+            | Self::Nd139
+            | Self::Nd140
+            | Self::Nd141
+            | Self::Nd147
+            | Self::Nd149
+            | Self::Nd151
+            | Self::Nd152
+            | Self::Nd153
+            | Self::Nd154
+            | Self::Nd155
+            | Self::Nd156
+            | Self::Nd157
+            | Self::Nd158
+            | Self::Nd159
+            | Self::Nd160
+            | Self::Nd161 => None,
         }
     }
 }

@@ -1,22 +1,40 @@
+//! Isotopes of the element Bohrium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Bohrium
 pub enum BohriumIsotope {
+    /// Isotope Bh260 of Bohrium
     Bh260,
+    /// Isotope Bh261 of Bohrium
     Bh261,
+    /// Isotope Bh262 of Bohrium
     Bh262,
+    /// Isotope Bh263 of Bohrium
     Bh263,
+    /// Isotope Bh264 of Bohrium
     Bh264,
+    /// Isotope Bh265 of Bohrium
     Bh265,
+    /// Isotope Bh266 of Bohrium
     Bh266,
+    /// Isotope Bh267 of Bohrium
     Bh267,
+    /// Isotope Bh268 of Bohrium
     Bh268,
+    /// Isotope Bh269 of Bohrium
     Bh269,
+    /// Isotope Bh270 of Bohrium
     Bh270,
+    /// Isotope Bh271 of Bohrium
     Bh271,
+    /// Isotope Bh272 of Bohrium
     Bh272,
+    /// Isotope Bh273 of Bohrium
     Bh273,
+    /// Isotope Bh274 of Bohrium
     Bh274,
+    /// Isotope Bh275 of Bohrium
     Bh275,
 }
 impl super::RelativeAtomicMass for BohriumIsotope {
@@ -70,24 +88,7 @@ impl super::MassNumber for BohriumIsotope {
 }
 impl super::IsotopicComposition for BohriumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Bh260 => None,
-            Self::Bh261 => None,
-            Self::Bh262 => None,
-            Self::Bh263 => None,
-            Self::Bh264 => None,
-            Self::Bh265 => None,
-            Self::Bh266 => None,
-            Self::Bh267 => None,
-            Self::Bh268 => None,
-            Self::Bh269 => None,
-            Self::Bh270 => None,
-            Self::Bh271 => None,
-            Self::Bh272 => None,
-            Self::Bh273 => None,
-            Self::Bh274 => None,
-            Self::Bh275 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for BohriumIsotope {

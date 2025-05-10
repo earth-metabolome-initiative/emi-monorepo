@@ -1,42 +1,80 @@
+//! Isotopes of the element Lutetium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Lutetium
 pub enum LutetiumIsotope {
+    /// Isotope Lu150 of Lutetium
     Lu150,
+    /// Isotope Lu151 of Lutetium
     Lu151,
+    /// Isotope Lu152 of Lutetium
     Lu152,
+    /// Isotope Lu153 of Lutetium
     Lu153,
+    /// Isotope Lu154 of Lutetium
     Lu154,
+    /// Isotope Lu155 of Lutetium
     Lu155,
+    /// Isotope Lu156 of Lutetium
     Lu156,
+    /// Isotope Lu157 of Lutetium
     Lu157,
+    /// Isotope Lu158 of Lutetium
     Lu158,
+    /// Isotope Lu159 of Lutetium
     Lu159,
+    /// Isotope Lu160 of Lutetium
     Lu160,
+    /// Isotope Lu161 of Lutetium
     Lu161,
+    /// Isotope Lu162 of Lutetium
     Lu162,
+    /// Isotope Lu163 of Lutetium
     Lu163,
+    /// Isotope Lu164 of Lutetium
     Lu164,
+    /// Isotope Lu165 of Lutetium
     Lu165,
+    /// Isotope Lu166 of Lutetium
     Lu166,
+    /// Isotope Lu167 of Lutetium
     Lu167,
+    /// Isotope Lu168 of Lutetium
     Lu168,
+    /// Isotope Lu169 of Lutetium
     Lu169,
+    /// Isotope Lu170 of Lutetium
     Lu170,
+    /// Isotope Lu171 of Lutetium
     Lu171,
+    /// Isotope Lu172 of Lutetium
     Lu172,
+    /// Isotope Lu173 of Lutetium
     Lu173,
+    /// Isotope Lu174 of Lutetium
     Lu174,
+    /// Isotope Lu175 of Lutetium
     Lu175,
+    /// Isotope Lu176 of Lutetium
     Lu176,
+    /// Isotope Lu177 of Lutetium
     Lu177,
+    /// Isotope Lu178 of Lutetium
     Lu178,
+    /// Isotope Lu179 of Lutetium
     Lu179,
+    /// Isotope Lu180 of Lutetium
     Lu180,
+    /// Isotope Lu181 of Lutetium
     Lu181,
+    /// Isotope Lu182 of Lutetium
     Lu182,
+    /// Isotope Lu183 of Lutetium
     Lu183,
+    /// Isotope Lu184 of Lutetium
     Lu184,
+    /// Isotope Lu185 of Lutetium
     Lu185,
 }
 impl super::RelativeAtomicMass for LutetiumIsotope {
@@ -131,42 +169,42 @@ impl super::MassNumber for LutetiumIsotope {
 impl super::IsotopicComposition for LutetiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Lu150 => None,
-            Self::Lu151 => None,
-            Self::Lu152 => None,
-            Self::Lu153 => None,
-            Self::Lu154 => None,
-            Self::Lu155 => None,
-            Self::Lu156 => None,
-            Self::Lu157 => None,
-            Self::Lu158 => None,
-            Self::Lu159 => None,
-            Self::Lu160 => None,
-            Self::Lu161 => None,
-            Self::Lu162 => None,
-            Self::Lu163 => None,
-            Self::Lu164 => None,
-            Self::Lu165 => None,
-            Self::Lu166 => None,
-            Self::Lu167 => None,
-            Self::Lu168 => None,
-            Self::Lu169 => None,
-            Self::Lu170 => None,
-            Self::Lu171 => None,
-            Self::Lu172 => None,
-            Self::Lu173 => None,
-            Self::Lu174 => None,
             Self::Lu175 => Some(0.97401f64),
             Self::Lu176 => Some(0.02599f64),
-            Self::Lu177 => None,
-            Self::Lu178 => None,
-            Self::Lu179 => None,
-            Self::Lu180 => None,
-            Self::Lu181 => None,
-            Self::Lu182 => None,
-            Self::Lu183 => None,
-            Self::Lu184 => None,
-            Self::Lu185 => None,
+            Self::Lu150
+            | Self::Lu151
+            | Self::Lu152
+            | Self::Lu153
+            | Self::Lu154
+            | Self::Lu155
+            | Self::Lu156
+            | Self::Lu157
+            | Self::Lu158
+            | Self::Lu159
+            | Self::Lu160
+            | Self::Lu161
+            | Self::Lu162
+            | Self::Lu163
+            | Self::Lu164
+            | Self::Lu165
+            | Self::Lu166
+            | Self::Lu167
+            | Self::Lu168
+            | Self::Lu169
+            | Self::Lu170
+            | Self::Lu171
+            | Self::Lu172
+            | Self::Lu173
+            | Self::Lu174
+            | Self::Lu177
+            | Self::Lu178
+            | Self::Lu179
+            | Self::Lu180
+            | Self::Lu181
+            | Self::Lu182
+            | Self::Lu183
+            | Self::Lu184
+            | Self::Lu185 => None,
         }
     }
 }

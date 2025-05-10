@@ -1,24 +1,44 @@
+//! Isotopes of the element Mendelevium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Mendelevium
 pub enum MendeleviumIsotope {
+    /// Isotope Md245 of Mendelevium
     Md245,
+    /// Isotope Md246 of Mendelevium
     Md246,
+    /// Isotope Md247 of Mendelevium
     Md247,
+    /// Isotope Md248 of Mendelevium
     Md248,
+    /// Isotope Md249 of Mendelevium
     Md249,
+    /// Isotope Md250 of Mendelevium
     Md250,
+    /// Isotope Md251 of Mendelevium
     Md251,
+    /// Isotope Md252 of Mendelevium
     Md252,
+    /// Isotope Md253 of Mendelevium
     Md253,
+    /// Isotope Md254 of Mendelevium
     Md254,
+    /// Isotope Md255 of Mendelevium
     Md255,
+    /// Isotope Md256 of Mendelevium
     Md256,
+    /// Isotope Md257 of Mendelevium
     Md257,
+    /// Isotope Md258 of Mendelevium
     Md258,
+    /// Isotope Md259 of Mendelevium
     Md259,
+    /// Isotope Md260 of Mendelevium
     Md260,
+    /// Isotope Md261 of Mendelevium
     Md261,
+    /// Isotope Md262 of Mendelevium
     Md262,
 }
 impl super::RelativeAtomicMass for MendeleviumIsotope {
@@ -76,26 +96,7 @@ impl super::MassNumber for MendeleviumIsotope {
 }
 impl super::IsotopicComposition for MendeleviumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Md245 => None,
-            Self::Md246 => None,
-            Self::Md247 => None,
-            Self::Md248 => None,
-            Self::Md249 => None,
-            Self::Md250 => None,
-            Self::Md251 => None,
-            Self::Md252 => None,
-            Self::Md253 => None,
-            Self::Md254 => None,
-            Self::Md255 => None,
-            Self::Md256 => None,
-            Self::Md257 => None,
-            Self::Md258 => None,
-            Self::Md259 => None,
-            Self::Md260 => None,
-            Self::Md261 => None,
-            Self::Md262 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for MendeleviumIsotope {

@@ -1,14 +1,24 @@
+//! Isotopes of the element Helium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Helium
 pub enum HeliumIsotope {
+    /// Isotope He3 of Helium
     He3,
+    /// Isotope He4 of Helium
     He4,
+    /// Isotope He5 of Helium
     He5,
+    /// Isotope He6 of Helium
     He6,
+    /// Isotope He7 of Helium
     He7,
+    /// Isotope He8 of Helium
     He8,
+    /// Isotope He9 of Helium
     He9,
+    /// Isotope He10 of Helium
     He10,
 }
 impl super::RelativeAtomicMass for HeliumIsotope {
@@ -49,12 +59,7 @@ impl super::IsotopicComposition for HeliumIsotope {
         match self {
             Self::He3 => Some(0.00000134f64),
             Self::He4 => Some(0.99999866f64),
-            Self::He5 => None,
-            Self::He6 => None,
-            Self::He7 => None,
-            Self::He8 => None,
-            Self::He9 => None,
-            Self::He10 => None,
+            Self::He5 | Self::He6 | Self::He7 | Self::He8 | Self::He9 | Self::He10 => None,
         }
     }
 }

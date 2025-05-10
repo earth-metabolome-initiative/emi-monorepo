@@ -1,46 +1,88 @@
+//! Isotopes of the element Tin
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Tin
 pub enum TinIsotope {
+    /// Isotope Sn99 of Tin
     Sn99,
+    /// Isotope Sn100 of Tin
     Sn100,
+    /// Isotope Sn101 of Tin
     Sn101,
+    /// Isotope Sn102 of Tin
     Sn102,
+    /// Isotope Sn103 of Tin
     Sn103,
+    /// Isotope Sn104 of Tin
     Sn104,
+    /// Isotope Sn105 of Tin
     Sn105,
+    /// Isotope Sn106 of Tin
     Sn106,
+    /// Isotope Sn107 of Tin
     Sn107,
+    /// Isotope Sn108 of Tin
     Sn108,
+    /// Isotope Sn109 of Tin
     Sn109,
+    /// Isotope Sn110 of Tin
     Sn110,
+    /// Isotope Sn111 of Tin
     Sn111,
+    /// Isotope Sn112 of Tin
     Sn112,
+    /// Isotope Sn113 of Tin
     Sn113,
+    /// Isotope Sn114 of Tin
     Sn114,
+    /// Isotope Sn115 of Tin
     Sn115,
+    /// Isotope Sn116 of Tin
     Sn116,
+    /// Isotope Sn117 of Tin
     Sn117,
+    /// Isotope Sn118 of Tin
     Sn118,
+    /// Isotope Sn119 of Tin
     Sn119,
+    /// Isotope Sn120 of Tin
     Sn120,
+    /// Isotope Sn121 of Tin
     Sn121,
+    /// Isotope Sn122 of Tin
     Sn122,
+    /// Isotope Sn123 of Tin
     Sn123,
+    /// Isotope Sn124 of Tin
     Sn124,
+    /// Isotope Sn125 of Tin
     Sn125,
+    /// Isotope Sn126 of Tin
     Sn126,
+    /// Isotope Sn127 of Tin
     Sn127,
+    /// Isotope Sn128 of Tin
     Sn128,
+    /// Isotope Sn129 of Tin
     Sn129,
+    /// Isotope Sn130 of Tin
     Sn130,
+    /// Isotope Sn131 of Tin
     Sn131,
+    /// Isotope Sn132 of Tin
     Sn132,
+    /// Isotope Sn133 of Tin
     Sn133,
+    /// Isotope Sn134 of Tin
     Sn134,
+    /// Isotope Sn135 of Tin
     Sn135,
+    /// Isotope Sn136 of Tin
     Sn136,
+    /// Isotope Sn137 of Tin
     Sn137,
+    /// Isotope Sn138 of Tin
     Sn138,
 }
 impl super::RelativeAtomicMass for TinIsotope {
@@ -143,21 +185,7 @@ impl super::MassNumber for TinIsotope {
 impl super::IsotopicComposition for TinIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Sn99 => None,
-            Self::Sn100 => None,
-            Self::Sn101 => None,
-            Self::Sn102 => None,
-            Self::Sn103 => None,
-            Self::Sn104 => None,
-            Self::Sn105 => None,
-            Self::Sn106 => None,
-            Self::Sn107 => None,
-            Self::Sn108 => None,
-            Self::Sn109 => None,
-            Self::Sn110 => None,
-            Self::Sn111 => None,
             Self::Sn112 => Some(0.0097f64),
-            Self::Sn113 => None,
             Self::Sn114 => Some(0.0066f64),
             Self::Sn115 => Some(0.0034f64),
             Self::Sn116 => Some(0.1454f64),
@@ -165,24 +193,38 @@ impl super::IsotopicComposition for TinIsotope {
             Self::Sn118 => Some(0.2422f64),
             Self::Sn119 => Some(0.0859f64),
             Self::Sn120 => Some(0.3258f64),
-            Self::Sn121 => None,
             Self::Sn122 => Some(0.0463f64),
-            Self::Sn123 => None,
             Self::Sn124 => Some(0.0579f64),
-            Self::Sn125 => None,
-            Self::Sn126 => None,
-            Self::Sn127 => None,
-            Self::Sn128 => None,
-            Self::Sn129 => None,
-            Self::Sn130 => None,
-            Self::Sn131 => None,
-            Self::Sn132 => None,
-            Self::Sn133 => None,
-            Self::Sn134 => None,
-            Self::Sn135 => None,
-            Self::Sn136 => None,
-            Self::Sn137 => None,
-            Self::Sn138 => None,
+            Self::Sn99
+            | Self::Sn100
+            | Self::Sn101
+            | Self::Sn102
+            | Self::Sn103
+            | Self::Sn104
+            | Self::Sn105
+            | Self::Sn106
+            | Self::Sn107
+            | Self::Sn108
+            | Self::Sn109
+            | Self::Sn110
+            | Self::Sn111
+            | Self::Sn113
+            | Self::Sn121
+            | Self::Sn123
+            | Self::Sn125
+            | Self::Sn126
+            | Self::Sn127
+            | Self::Sn128
+            | Self::Sn129
+            | Self::Sn130
+            | Self::Sn131
+            | Self::Sn132
+            | Self::Sn133
+            | Self::Sn134
+            | Self::Sn135
+            | Self::Sn136
+            | Self::Sn137
+            | Self::Sn138 => None,
         }
     }
 }

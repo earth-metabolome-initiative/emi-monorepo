@@ -1,38 +1,72 @@
+//! Isotopes of the element Gallium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Gallium
 pub enum GalliumIsotope {
+    /// Isotope Ga56 of Gallium
     Ga56,
+    /// Isotope Ga57 of Gallium
     Ga57,
+    /// Isotope Ga58 of Gallium
     Ga58,
+    /// Isotope Ga59 of Gallium
     Ga59,
+    /// Isotope Ga60 of Gallium
     Ga60,
+    /// Isotope Ga61 of Gallium
     Ga61,
+    /// Isotope Ga62 of Gallium
     Ga62,
+    /// Isotope Ga63 of Gallium
     Ga63,
+    /// Isotope Ga64 of Gallium
     Ga64,
+    /// Isotope Ga65 of Gallium
     Ga65,
+    /// Isotope Ga66 of Gallium
     Ga66,
+    /// Isotope Ga67 of Gallium
     Ga67,
+    /// Isotope Ga68 of Gallium
     Ga68,
+    /// Isotope Ga69 of Gallium
     Ga69,
+    /// Isotope Ga70 of Gallium
     Ga70,
+    /// Isotope Ga71 of Gallium
     Ga71,
+    /// Isotope Ga72 of Gallium
     Ga72,
+    /// Isotope Ga73 of Gallium
     Ga73,
+    /// Isotope Ga74 of Gallium
     Ga74,
+    /// Isotope Ga75 of Gallium
     Ga75,
+    /// Isotope Ga76 of Gallium
     Ga76,
+    /// Isotope Ga77 of Gallium
     Ga77,
+    /// Isotope Ga78 of Gallium
     Ga78,
+    /// Isotope Ga79 of Gallium
     Ga79,
+    /// Isotope Ga80 of Gallium
     Ga80,
+    /// Isotope Ga81 of Gallium
     Ga81,
+    /// Isotope Ga82 of Gallium
     Ga82,
+    /// Isotope Ga83 of Gallium
     Ga83,
+    /// Isotope Ga84 of Gallium
     Ga84,
+    /// Isotope Ga85 of Gallium
     Ga85,
+    /// Isotope Ga86 of Gallium
     Ga86,
+    /// Isotope Ga87 of Gallium
     Ga87,
 }
 impl super::RelativeAtomicMass for GalliumIsotope {
@@ -119,38 +153,38 @@ impl super::MassNumber for GalliumIsotope {
 impl super::IsotopicComposition for GalliumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Ga56 => None,
-            Self::Ga57 => None,
-            Self::Ga58 => None,
-            Self::Ga59 => None,
-            Self::Ga60 => None,
-            Self::Ga61 => None,
-            Self::Ga62 => None,
-            Self::Ga63 => None,
-            Self::Ga64 => None,
-            Self::Ga65 => None,
-            Self::Ga66 => None,
-            Self::Ga67 => None,
-            Self::Ga68 => None,
             Self::Ga69 => Some(0.60108f64),
-            Self::Ga70 => None,
             Self::Ga71 => Some(0.39892f64),
-            Self::Ga72 => None,
-            Self::Ga73 => None,
-            Self::Ga74 => None,
-            Self::Ga75 => None,
-            Self::Ga76 => None,
-            Self::Ga77 => None,
-            Self::Ga78 => None,
-            Self::Ga79 => None,
-            Self::Ga80 => None,
-            Self::Ga81 => None,
-            Self::Ga82 => None,
-            Self::Ga83 => None,
-            Self::Ga84 => None,
-            Self::Ga85 => None,
-            Self::Ga86 => None,
-            Self::Ga87 => None,
+            Self::Ga56
+            | Self::Ga57
+            | Self::Ga58
+            | Self::Ga59
+            | Self::Ga60
+            | Self::Ga61
+            | Self::Ga62
+            | Self::Ga63
+            | Self::Ga64
+            | Self::Ga65
+            | Self::Ga66
+            | Self::Ga67
+            | Self::Ga68
+            | Self::Ga70
+            | Self::Ga72
+            | Self::Ga73
+            | Self::Ga74
+            | Self::Ga75
+            | Self::Ga76
+            | Self::Ga77
+            | Self::Ga78
+            | Self::Ga79
+            | Self::Ga80
+            | Self::Ga81
+            | Self::Ga82
+            | Self::Ga83
+            | Self::Ga84
+            | Self::Ga85
+            | Self::Ga86
+            | Self::Ga87 => None,
         }
     }
 }

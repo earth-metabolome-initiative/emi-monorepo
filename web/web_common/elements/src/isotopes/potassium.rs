@@ -1,31 +1,58 @@
+//! Isotopes of the element Potassium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Potassium
 pub enum PotassiumIsotope {
+    /// Isotope K32 of Potassium
     K32,
+    /// Isotope K33 of Potassium
     K33,
+    /// Isotope K34 of Potassium
     K34,
+    /// Isotope K35 of Potassium
     K35,
+    /// Isotope K36 of Potassium
     K36,
+    /// Isotope K37 of Potassium
     K37,
+    /// Isotope K38 of Potassium
     K38,
+    /// Isotope K39 of Potassium
     K39,
+    /// Isotope K40 of Potassium
     K40,
+    /// Isotope K41 of Potassium
     K41,
+    /// Isotope K42 of Potassium
     K42,
+    /// Isotope K43 of Potassium
     K43,
+    /// Isotope K44 of Potassium
     K44,
+    /// Isotope K45 of Potassium
     K45,
+    /// Isotope K46 of Potassium
     K46,
+    /// Isotope K47 of Potassium
     K47,
+    /// Isotope K48 of Potassium
     K48,
+    /// Isotope K49 of Potassium
     K49,
+    /// Isotope K50 of Potassium
     K50,
+    /// Isotope K51 of Potassium
     K51,
+    /// Isotope K52 of Potassium
     K52,
+    /// Isotope K53 of Potassium
     K53,
+    /// Isotope K54 of Potassium
     K54,
+    /// Isotope K55 of Potassium
     K55,
+    /// Isotope K56 of Potassium
     K56,
 }
 impl super::RelativeAtomicMass for PotassiumIsotope {
@@ -98,31 +125,31 @@ impl super::MassNumber for PotassiumIsotope {
 impl super::IsotopicComposition for PotassiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::K32 => None,
-            Self::K33 => None,
-            Self::K34 => None,
-            Self::K35 => None,
-            Self::K36 => None,
-            Self::K37 => None,
-            Self::K38 => None,
             Self::K39 => Some(0.932581f64),
             Self::K40 => Some(0.000117f64),
             Self::K41 => Some(0.067302f64),
-            Self::K42 => None,
-            Self::K43 => None,
-            Self::K44 => None,
-            Self::K45 => None,
-            Self::K46 => None,
-            Self::K47 => None,
-            Self::K48 => None,
-            Self::K49 => None,
-            Self::K50 => None,
-            Self::K51 => None,
-            Self::K52 => None,
-            Self::K53 => None,
-            Self::K54 => None,
-            Self::K55 => None,
-            Self::K56 => None,
+            Self::K32
+            | Self::K33
+            | Self::K34
+            | Self::K35
+            | Self::K36
+            | Self::K37
+            | Self::K38
+            | Self::K42
+            | Self::K43
+            | Self::K44
+            | Self::K45
+            | Self::K46
+            | Self::K47
+            | Self::K48
+            | Self::K49
+            | Self::K50
+            | Self::K51
+            | Self::K52
+            | Self::K53
+            | Self::K54
+            | Self::K55
+            | Self::K56 => None,
         }
     }
 }

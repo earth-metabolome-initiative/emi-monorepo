@@ -1,18 +1,32 @@
+//! Isotopes of the element Roentgenium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Roentgenium
 pub enum RoentgeniumIsotope {
+    /// Isotope Rg272 of Roentgenium
     Rg272,
+    /// Isotope Rg273 of Roentgenium
     Rg273,
+    /// Isotope Rg274 of Roentgenium
     Rg274,
+    /// Isotope Rg275 of Roentgenium
     Rg275,
+    /// Isotope Rg276 of Roentgenium
     Rg276,
+    /// Isotope Rg277 of Roentgenium
     Rg277,
+    /// Isotope Rg278 of Roentgenium
     Rg278,
+    /// Isotope Rg279 of Roentgenium
     Rg279,
+    /// Isotope Rg280 of Roentgenium
     Rg280,
+    /// Isotope Rg281 of Roentgenium
     Rg281,
+    /// Isotope Rg282 of Roentgenium
     Rg282,
+    /// Isotope Rg283 of Roentgenium
     Rg283,
 }
 impl super::RelativeAtomicMass for RoentgeniumIsotope {
@@ -58,20 +72,7 @@ impl super::MassNumber for RoentgeniumIsotope {
 }
 impl super::IsotopicComposition for RoentgeniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Rg272 => None,
-            Self::Rg273 => None,
-            Self::Rg274 => None,
-            Self::Rg275 => None,
-            Self::Rg276 => None,
-            Self::Rg277 => None,
-            Self::Rg278 => None,
-            Self::Rg279 => None,
-            Self::Rg280 => None,
-            Self::Rg281 => None,
-            Self::Rg282 => None,
-            Self::Rg283 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for RoentgeniumIsotope {

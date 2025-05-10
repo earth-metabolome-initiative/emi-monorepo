@@ -30,6 +30,7 @@ impl TryFrom<char> for crate::Element {
 impl TryFrom<[char; 2]> for crate::Element {
     type Error = crate::errors::Error;
 
+    #[allow(clippy::too_many_lines)]
     fn try_from(value: [char; 2]) -> Result<Self, Self::Error> {
         Ok(match value {
             ['H', 'e'] => Self::He,

@@ -1,48 +1,92 @@
+//! Isotopes of the element Polonium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Polonium
 pub enum PoloniumIsotope {
+    /// Isotope Po186 of Polonium
     Po186,
+    /// Isotope Po187 of Polonium
     Po187,
+    /// Isotope Po188 of Polonium
     Po188,
+    /// Isotope Po189 of Polonium
     Po189,
+    /// Isotope Po190 of Polonium
     Po190,
+    /// Isotope Po191 of Polonium
     Po191,
+    /// Isotope Po192 of Polonium
     Po192,
+    /// Isotope Po193 of Polonium
     Po193,
+    /// Isotope Po194 of Polonium
     Po194,
+    /// Isotope Po195 of Polonium
     Po195,
+    /// Isotope Po196 of Polonium
     Po196,
+    /// Isotope Po197 of Polonium
     Po197,
+    /// Isotope Po198 of Polonium
     Po198,
+    /// Isotope Po199 of Polonium
     Po199,
+    /// Isotope Po200 of Polonium
     Po200,
+    /// Isotope Po201 of Polonium
     Po201,
+    /// Isotope Po202 of Polonium
     Po202,
+    /// Isotope Po203 of Polonium
     Po203,
+    /// Isotope Po204 of Polonium
     Po204,
+    /// Isotope Po205 of Polonium
     Po205,
+    /// Isotope Po206 of Polonium
     Po206,
+    /// Isotope Po207 of Polonium
     Po207,
+    /// Isotope Po208 of Polonium
     Po208,
+    /// Isotope Po209 of Polonium
     Po209,
+    /// Isotope Po210 of Polonium
     Po210,
+    /// Isotope Po211 of Polonium
     Po211,
+    /// Isotope Po212 of Polonium
     Po212,
+    /// Isotope Po213 of Polonium
     Po213,
+    /// Isotope Po214 of Polonium
     Po214,
+    /// Isotope Po215 of Polonium
     Po215,
+    /// Isotope Po216 of Polonium
     Po216,
+    /// Isotope Po217 of Polonium
     Po217,
+    /// Isotope Po218 of Polonium
     Po218,
+    /// Isotope Po219 of Polonium
     Po219,
+    /// Isotope Po220 of Polonium
     Po220,
+    /// Isotope Po221 of Polonium
     Po221,
+    /// Isotope Po222 of Polonium
     Po222,
+    /// Isotope Po223 of Polonium
     Po223,
+    /// Isotope Po224 of Polonium
     Po224,
+    /// Isotope Po225 of Polonium
     Po225,
+    /// Isotope Po226 of Polonium
     Po226,
+    /// Isotope Po227 of Polonium
     Po227,
 }
 impl super::RelativeAtomicMass for PoloniumIsotope {
@@ -148,50 +192,7 @@ impl super::MassNumber for PoloniumIsotope {
 }
 impl super::IsotopicComposition for PoloniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Po186 => None,
-            Self::Po187 => None,
-            Self::Po188 => None,
-            Self::Po189 => None,
-            Self::Po190 => None,
-            Self::Po191 => None,
-            Self::Po192 => None,
-            Self::Po193 => None,
-            Self::Po194 => None,
-            Self::Po195 => None,
-            Self::Po196 => None,
-            Self::Po197 => None,
-            Self::Po198 => None,
-            Self::Po199 => None,
-            Self::Po200 => None,
-            Self::Po201 => None,
-            Self::Po202 => None,
-            Self::Po203 => None,
-            Self::Po204 => None,
-            Self::Po205 => None,
-            Self::Po206 => None,
-            Self::Po207 => None,
-            Self::Po208 => None,
-            Self::Po209 => None,
-            Self::Po210 => None,
-            Self::Po211 => None,
-            Self::Po212 => None,
-            Self::Po213 => None,
-            Self::Po214 => None,
-            Self::Po215 => None,
-            Self::Po216 => None,
-            Self::Po217 => None,
-            Self::Po218 => None,
-            Self::Po219 => None,
-            Self::Po220 => None,
-            Self::Po221 => None,
-            Self::Po222 => None,
-            Self::Po223 => None,
-            Self::Po224 => None,
-            Self::Po225 => None,
-            Self::Po226 => None,
-            Self::Po227 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for PoloniumIsotope {

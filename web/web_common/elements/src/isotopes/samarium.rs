@@ -1,44 +1,84 @@
+//! Isotopes of the element Samarium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Samarium
 pub enum SamariumIsotope {
+    /// Isotope Sm128 of Samarium
     Sm128,
+    /// Isotope Sm129 of Samarium
     Sm129,
+    /// Isotope Sm130 of Samarium
     Sm130,
+    /// Isotope Sm131 of Samarium
     Sm131,
+    /// Isotope Sm132 of Samarium
     Sm132,
+    /// Isotope Sm133 of Samarium
     Sm133,
+    /// Isotope Sm134 of Samarium
     Sm134,
+    /// Isotope Sm135 of Samarium
     Sm135,
+    /// Isotope Sm136 of Samarium
     Sm136,
+    /// Isotope Sm137 of Samarium
     Sm137,
+    /// Isotope Sm138 of Samarium
     Sm138,
+    /// Isotope Sm139 of Samarium
     Sm139,
+    /// Isotope Sm140 of Samarium
     Sm140,
+    /// Isotope Sm141 of Samarium
     Sm141,
+    /// Isotope Sm142 of Samarium
     Sm142,
+    /// Isotope Sm143 of Samarium
     Sm143,
+    /// Isotope Sm144 of Samarium
     Sm144,
+    /// Isotope Sm145 of Samarium
     Sm145,
+    /// Isotope Sm146 of Samarium
     Sm146,
+    /// Isotope Sm147 of Samarium
     Sm147,
+    /// Isotope Sm148 of Samarium
     Sm148,
+    /// Isotope Sm149 of Samarium
     Sm149,
+    /// Isotope Sm150 of Samarium
     Sm150,
+    /// Isotope Sm151 of Samarium
     Sm151,
+    /// Isotope Sm152 of Samarium
     Sm152,
+    /// Isotope Sm153 of Samarium
     Sm153,
+    /// Isotope Sm154 of Samarium
     Sm154,
+    /// Isotope Sm155 of Samarium
     Sm155,
+    /// Isotope Sm156 of Samarium
     Sm156,
+    /// Isotope Sm157 of Samarium
     Sm157,
+    /// Isotope Sm158 of Samarium
     Sm158,
+    /// Isotope Sm159 of Samarium
     Sm159,
+    /// Isotope Sm160 of Samarium
     Sm160,
+    /// Isotope Sm161 of Samarium
     Sm161,
+    /// Isotope Sm162 of Samarium
     Sm162,
+    /// Isotope Sm163 of Samarium
     Sm163,
+    /// Isotope Sm164 of Samarium
     Sm164,
+    /// Isotope Sm165 of Samarium
     Sm165,
 }
 impl super::RelativeAtomicMass for SamariumIsotope {
@@ -137,44 +177,44 @@ impl super::MassNumber for SamariumIsotope {
 impl super::IsotopicComposition for SamariumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Sm128 => None,
-            Self::Sm129 => None,
-            Self::Sm130 => None,
-            Self::Sm131 => None,
-            Self::Sm132 => None,
-            Self::Sm133 => None,
-            Self::Sm134 => None,
-            Self::Sm135 => None,
-            Self::Sm136 => None,
-            Self::Sm137 => None,
-            Self::Sm138 => None,
-            Self::Sm139 => None,
-            Self::Sm140 => None,
-            Self::Sm141 => None,
-            Self::Sm142 => None,
-            Self::Sm143 => None,
             Self::Sm144 => Some(0.0307f64),
-            Self::Sm145 => None,
-            Self::Sm146 => None,
             Self::Sm147 => Some(0.1499f64),
             Self::Sm148 => Some(0.1124f64),
             Self::Sm149 => Some(0.1382f64),
             Self::Sm150 => Some(0.0738f64),
-            Self::Sm151 => None,
             Self::Sm152 => Some(0.2675f64),
-            Self::Sm153 => None,
             Self::Sm154 => Some(0.2275f64),
-            Self::Sm155 => None,
-            Self::Sm156 => None,
-            Self::Sm157 => None,
-            Self::Sm158 => None,
-            Self::Sm159 => None,
-            Self::Sm160 => None,
-            Self::Sm161 => None,
-            Self::Sm162 => None,
-            Self::Sm163 => None,
-            Self::Sm164 => None,
-            Self::Sm165 => None,
+            Self::Sm128
+            | Self::Sm129
+            | Self::Sm130
+            | Self::Sm131
+            | Self::Sm132
+            | Self::Sm133
+            | Self::Sm134
+            | Self::Sm135
+            | Self::Sm136
+            | Self::Sm137
+            | Self::Sm138
+            | Self::Sm139
+            | Self::Sm140
+            | Self::Sm141
+            | Self::Sm142
+            | Self::Sm143
+            | Self::Sm145
+            | Self::Sm146
+            | Self::Sm151
+            | Self::Sm153
+            | Self::Sm155
+            | Self::Sm156
+            | Self::Sm157
+            | Self::Sm158
+            | Self::Sm159
+            | Self::Sm160
+            | Self::Sm161
+            | Self::Sm162
+            | Self::Sm163
+            | Self::Sm164
+            | Self::Sm165 => None,
         }
     }
 }

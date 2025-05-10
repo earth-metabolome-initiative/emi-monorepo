@@ -1,44 +1,84 @@
+//! Isotopes of the element Rhodium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Rhodium
 pub enum RhodiumIsotope {
+    /// Isotope Rh89 of Rhodium
     Rh89,
+    /// Isotope Rh90 of Rhodium
     Rh90,
+    /// Isotope Rh91 of Rhodium
     Rh91,
+    /// Isotope Rh92 of Rhodium
     Rh92,
+    /// Isotope Rh93 of Rhodium
     Rh93,
+    /// Isotope Rh94 of Rhodium
     Rh94,
+    /// Isotope Rh95 of Rhodium
     Rh95,
+    /// Isotope Rh96 of Rhodium
     Rh96,
+    /// Isotope Rh97 of Rhodium
     Rh97,
+    /// Isotope Rh98 of Rhodium
     Rh98,
+    /// Isotope Rh99 of Rhodium
     Rh99,
+    /// Isotope Rh100 of Rhodium
     Rh100,
+    /// Isotope Rh101 of Rhodium
     Rh101,
+    /// Isotope Rh102 of Rhodium
     Rh102,
+    /// Isotope Rh103 of Rhodium
     Rh103,
+    /// Isotope Rh104 of Rhodium
     Rh104,
+    /// Isotope Rh105 of Rhodium
     Rh105,
+    /// Isotope Rh106 of Rhodium
     Rh106,
+    /// Isotope Rh107 of Rhodium
     Rh107,
+    /// Isotope Rh108 of Rhodium
     Rh108,
+    /// Isotope Rh109 of Rhodium
     Rh109,
+    /// Isotope Rh110 of Rhodium
     Rh110,
+    /// Isotope Rh111 of Rhodium
     Rh111,
+    /// Isotope Rh112 of Rhodium
     Rh112,
+    /// Isotope Rh113 of Rhodium
     Rh113,
+    /// Isotope Rh114 of Rhodium
     Rh114,
+    /// Isotope Rh115 of Rhodium
     Rh115,
+    /// Isotope Rh116 of Rhodium
     Rh116,
+    /// Isotope Rh117 of Rhodium
     Rh117,
+    /// Isotope Rh118 of Rhodium
     Rh118,
+    /// Isotope Rh119 of Rhodium
     Rh119,
+    /// Isotope Rh120 of Rhodium
     Rh120,
+    /// Isotope Rh121 of Rhodium
     Rh121,
+    /// Isotope Rh122 of Rhodium
     Rh122,
+    /// Isotope Rh123 of Rhodium
     Rh123,
+    /// Isotope Rh124 of Rhodium
     Rh124,
+    /// Isotope Rh125 of Rhodium
     Rh125,
+    /// Isotope Rh126 of Rhodium
     Rh126,
 }
 impl super::RelativeAtomicMass for RhodiumIsotope {
@@ -137,44 +177,44 @@ impl super::MassNumber for RhodiumIsotope {
 impl super::IsotopicComposition for RhodiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Rh89 => None,
-            Self::Rh90 => None,
-            Self::Rh91 => None,
-            Self::Rh92 => None,
-            Self::Rh93 => None,
-            Self::Rh94 => None,
-            Self::Rh95 => None,
-            Self::Rh96 => None,
-            Self::Rh97 => None,
-            Self::Rh98 => None,
-            Self::Rh99 => None,
-            Self::Rh100 => None,
-            Self::Rh101 => None,
-            Self::Rh102 => None,
             Self::Rh103 => Some(1f64),
-            Self::Rh104 => None,
-            Self::Rh105 => None,
-            Self::Rh106 => None,
-            Self::Rh107 => None,
-            Self::Rh108 => None,
-            Self::Rh109 => None,
-            Self::Rh110 => None,
-            Self::Rh111 => None,
-            Self::Rh112 => None,
-            Self::Rh113 => None,
-            Self::Rh114 => None,
-            Self::Rh115 => None,
-            Self::Rh116 => None,
-            Self::Rh117 => None,
-            Self::Rh118 => None,
-            Self::Rh119 => None,
-            Self::Rh120 => None,
-            Self::Rh121 => None,
-            Self::Rh122 => None,
-            Self::Rh123 => None,
-            Self::Rh124 => None,
-            Self::Rh125 => None,
-            Self::Rh126 => None,
+            Self::Rh89
+            | Self::Rh90
+            | Self::Rh91
+            | Self::Rh92
+            | Self::Rh93
+            | Self::Rh94
+            | Self::Rh95
+            | Self::Rh96
+            | Self::Rh97
+            | Self::Rh98
+            | Self::Rh99
+            | Self::Rh100
+            | Self::Rh101
+            | Self::Rh102
+            | Self::Rh104
+            | Self::Rh105
+            | Self::Rh106
+            | Self::Rh107
+            | Self::Rh108
+            | Self::Rh109
+            | Self::Rh110
+            | Self::Rh111
+            | Self::Rh112
+            | Self::Rh113
+            | Self::Rh114
+            | Self::Rh115
+            | Self::Rh116
+            | Self::Rh117
+            | Self::Rh118
+            | Self::Rh119
+            | Self::Rh120
+            | Self::Rh121
+            | Self::Rh122
+            | Self::Rh123
+            | Self::Rh124
+            | Self::Rh125
+            | Self::Rh126 => None,
         }
     }
 }

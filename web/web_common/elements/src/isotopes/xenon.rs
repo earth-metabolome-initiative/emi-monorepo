@@ -1,46 +1,88 @@
+//! Isotopes of the element Xenon
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Xenon
 pub enum XenonIsotope {
+    /// Isotope Xe109 of Xenon
     Xe109,
+    /// Isotope Xe110 of Xenon
     Xe110,
+    /// Isotope Xe111 of Xenon
     Xe111,
+    /// Isotope Xe112 of Xenon
     Xe112,
+    /// Isotope Xe113 of Xenon
     Xe113,
+    /// Isotope Xe114 of Xenon
     Xe114,
+    /// Isotope Xe115 of Xenon
     Xe115,
+    /// Isotope Xe116 of Xenon
     Xe116,
+    /// Isotope Xe117 of Xenon
     Xe117,
+    /// Isotope Xe118 of Xenon
     Xe118,
+    /// Isotope Xe119 of Xenon
     Xe119,
+    /// Isotope Xe120 of Xenon
     Xe120,
+    /// Isotope Xe121 of Xenon
     Xe121,
+    /// Isotope Xe122 of Xenon
     Xe122,
+    /// Isotope Xe123 of Xenon
     Xe123,
+    /// Isotope Xe124 of Xenon
     Xe124,
+    /// Isotope Xe125 of Xenon
     Xe125,
+    /// Isotope Xe126 of Xenon
     Xe126,
+    /// Isotope Xe127 of Xenon
     Xe127,
+    /// Isotope Xe128 of Xenon
     Xe128,
+    /// Isotope Xe129 of Xenon
     Xe129,
+    /// Isotope Xe130 of Xenon
     Xe130,
+    /// Isotope Xe131 of Xenon
     Xe131,
+    /// Isotope Xe132 of Xenon
     Xe132,
+    /// Isotope Xe133 of Xenon
     Xe133,
+    /// Isotope Xe134 of Xenon
     Xe134,
+    /// Isotope Xe135 of Xenon
     Xe135,
+    /// Isotope Xe136 of Xenon
     Xe136,
+    /// Isotope Xe137 of Xenon
     Xe137,
+    /// Isotope Xe138 of Xenon
     Xe138,
+    /// Isotope Xe139 of Xenon
     Xe139,
+    /// Isotope Xe140 of Xenon
     Xe140,
+    /// Isotope Xe141 of Xenon
     Xe141,
+    /// Isotope Xe142 of Xenon
     Xe142,
+    /// Isotope Xe143 of Xenon
     Xe143,
+    /// Isotope Xe144 of Xenon
     Xe144,
+    /// Isotope Xe145 of Xenon
     Xe145,
+    /// Isotope Xe146 of Xenon
     Xe146,
+    /// Isotope Xe147 of Xenon
     Xe147,
+    /// Isotope Xe148 of Xenon
     Xe148,
 }
 impl super::RelativeAtomicMass for XenonIsotope {
@@ -143,46 +185,46 @@ impl super::MassNumber for XenonIsotope {
 impl super::IsotopicComposition for XenonIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Xe109 => None,
-            Self::Xe110 => None,
-            Self::Xe111 => None,
-            Self::Xe112 => None,
-            Self::Xe113 => None,
-            Self::Xe114 => None,
-            Self::Xe115 => None,
-            Self::Xe116 => None,
-            Self::Xe117 => None,
-            Self::Xe118 => None,
-            Self::Xe119 => None,
-            Self::Xe120 => None,
-            Self::Xe121 => None,
-            Self::Xe122 => None,
-            Self::Xe123 => None,
             Self::Xe124 => Some(0.000952f64),
-            Self::Xe125 => None,
             Self::Xe126 => Some(0.00089f64),
-            Self::Xe127 => None,
             Self::Xe128 => Some(0.019102f64),
             Self::Xe129 => Some(0.264006f64),
             Self::Xe130 => Some(0.04071f64),
             Self::Xe131 => Some(0.212324f64),
             Self::Xe132 => Some(0.269086f64),
-            Self::Xe133 => None,
             Self::Xe134 => Some(0.104357f64),
-            Self::Xe135 => None,
             Self::Xe136 => Some(0.088573f64),
-            Self::Xe137 => None,
-            Self::Xe138 => None,
-            Self::Xe139 => None,
-            Self::Xe140 => None,
-            Self::Xe141 => None,
-            Self::Xe142 => None,
-            Self::Xe143 => None,
-            Self::Xe144 => None,
-            Self::Xe145 => None,
-            Self::Xe146 => None,
-            Self::Xe147 => None,
-            Self::Xe148 => None,
+            Self::Xe109
+            | Self::Xe110
+            | Self::Xe111
+            | Self::Xe112
+            | Self::Xe113
+            | Self::Xe114
+            | Self::Xe115
+            | Self::Xe116
+            | Self::Xe117
+            | Self::Xe118
+            | Self::Xe119
+            | Self::Xe120
+            | Self::Xe121
+            | Self::Xe122
+            | Self::Xe123
+            | Self::Xe125
+            | Self::Xe127
+            | Self::Xe133
+            | Self::Xe135
+            | Self::Xe137
+            | Self::Xe138
+            | Self::Xe139
+            | Self::Xe140
+            | Self::Xe141
+            | Self::Xe142
+            | Self::Xe143
+            | Self::Xe144
+            | Self::Xe145
+            | Self::Xe146
+            | Self::Xe147
+            | Self::Xe148 => None,
         }
     }
 }

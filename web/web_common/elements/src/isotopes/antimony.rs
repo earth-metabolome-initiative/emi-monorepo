@@ -1,44 +1,84 @@
+//! Isotopes of the element Antimony
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Antimony
 pub enum AntimonyIsotope {
+    /// Isotope Sb103 of Antimony
     Sb103,
+    /// Isotope Sb104 of Antimony
     Sb104,
+    /// Isotope Sb105 of Antimony
     Sb105,
+    /// Isotope Sb106 of Antimony
     Sb106,
+    /// Isotope Sb107 of Antimony
     Sb107,
+    /// Isotope Sb108 of Antimony
     Sb108,
+    /// Isotope Sb109 of Antimony
     Sb109,
+    /// Isotope Sb110 of Antimony
     Sb110,
+    /// Isotope Sb111 of Antimony
     Sb111,
+    /// Isotope Sb112 of Antimony
     Sb112,
+    /// Isotope Sb113 of Antimony
     Sb113,
+    /// Isotope Sb114 of Antimony
     Sb114,
+    /// Isotope Sb115 of Antimony
     Sb115,
+    /// Isotope Sb116 of Antimony
     Sb116,
+    /// Isotope Sb117 of Antimony
     Sb117,
+    /// Isotope Sb118 of Antimony
     Sb118,
+    /// Isotope Sb119 of Antimony
     Sb119,
+    /// Isotope Sb120 of Antimony
     Sb120,
+    /// Isotope Sb121 of Antimony
     Sb121,
+    /// Isotope Sb122 of Antimony
     Sb122,
+    /// Isotope Sb123 of Antimony
     Sb123,
+    /// Isotope Sb124 of Antimony
     Sb124,
+    /// Isotope Sb125 of Antimony
     Sb125,
+    /// Isotope Sb126 of Antimony
     Sb126,
+    /// Isotope Sb127 of Antimony
     Sb127,
+    /// Isotope Sb128 of Antimony
     Sb128,
+    /// Isotope Sb129 of Antimony
     Sb129,
+    /// Isotope Sb130 of Antimony
     Sb130,
+    /// Isotope Sb131 of Antimony
     Sb131,
+    /// Isotope Sb132 of Antimony
     Sb132,
+    /// Isotope Sb133 of Antimony
     Sb133,
+    /// Isotope Sb134 of Antimony
     Sb134,
+    /// Isotope Sb135 of Antimony
     Sb135,
+    /// Isotope Sb136 of Antimony
     Sb136,
+    /// Isotope Sb137 of Antimony
     Sb137,
+    /// Isotope Sb138 of Antimony
     Sb138,
+    /// Isotope Sb139 of Antimony
     Sb139,
+    /// Isotope Sb140 of Antimony
     Sb140,
 }
 impl super::RelativeAtomicMass for AntimonyIsotope {
@@ -137,44 +177,44 @@ impl super::MassNumber for AntimonyIsotope {
 impl super::IsotopicComposition for AntimonyIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::Sb103 => None,
-            Self::Sb104 => None,
-            Self::Sb105 => None,
-            Self::Sb106 => None,
-            Self::Sb107 => None,
-            Self::Sb108 => None,
-            Self::Sb109 => None,
-            Self::Sb110 => None,
-            Self::Sb111 => None,
-            Self::Sb112 => None,
-            Self::Sb113 => None,
-            Self::Sb114 => None,
-            Self::Sb115 => None,
-            Self::Sb116 => None,
-            Self::Sb117 => None,
-            Self::Sb118 => None,
-            Self::Sb119 => None,
-            Self::Sb120 => None,
             Self::Sb121 => Some(0.5721f64),
-            Self::Sb122 => None,
             Self::Sb123 => Some(0.4279f64),
-            Self::Sb124 => None,
-            Self::Sb125 => None,
-            Self::Sb126 => None,
-            Self::Sb127 => None,
-            Self::Sb128 => None,
-            Self::Sb129 => None,
-            Self::Sb130 => None,
-            Self::Sb131 => None,
-            Self::Sb132 => None,
-            Self::Sb133 => None,
-            Self::Sb134 => None,
-            Self::Sb135 => None,
-            Self::Sb136 => None,
-            Self::Sb137 => None,
-            Self::Sb138 => None,
-            Self::Sb139 => None,
-            Self::Sb140 => None,
+            Self::Sb103
+            | Self::Sb104
+            | Self::Sb105
+            | Self::Sb106
+            | Self::Sb107
+            | Self::Sb108
+            | Self::Sb109
+            | Self::Sb110
+            | Self::Sb111
+            | Self::Sb112
+            | Self::Sb113
+            | Self::Sb114
+            | Self::Sb115
+            | Self::Sb116
+            | Self::Sb117
+            | Self::Sb118
+            | Self::Sb119
+            | Self::Sb120
+            | Self::Sb122
+            | Self::Sb124
+            | Self::Sb125
+            | Self::Sb126
+            | Self::Sb127
+            | Self::Sb128
+            | Self::Sb129
+            | Self::Sb130
+            | Self::Sb131
+            | Self::Sb132
+            | Self::Sb133
+            | Self::Sb134
+            | Self::Sb135
+            | Self::Sb136
+            | Self::Sb137
+            | Self::Sb138
+            | Self::Sb139
+            | Self::Sb140 => None,
         }
     }
 }

@@ -1,22 +1,40 @@
+//! Isotopes of the element Dubnium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Dubnium
 pub enum DubniumIsotope {
+    /// Isotope Db255 of Dubnium
     Db255,
+    /// Isotope Db256 of Dubnium
     Db256,
+    /// Isotope Db257 of Dubnium
     Db257,
+    /// Isotope Db258 of Dubnium
     Db258,
+    /// Isotope Db259 of Dubnium
     Db259,
+    /// Isotope Db260 of Dubnium
     Db260,
+    /// Isotope Db261 of Dubnium
     Db261,
+    /// Isotope Db262 of Dubnium
     Db262,
+    /// Isotope Db263 of Dubnium
     Db263,
+    /// Isotope Db264 of Dubnium
     Db264,
+    /// Isotope Db265 of Dubnium
     Db265,
+    /// Isotope Db266 of Dubnium
     Db266,
+    /// Isotope Db267 of Dubnium
     Db267,
+    /// Isotope Db268 of Dubnium
     Db268,
+    /// Isotope Db269 of Dubnium
     Db269,
+    /// Isotope Db270 of Dubnium
     Db270,
 }
 impl super::RelativeAtomicMass for DubniumIsotope {
@@ -70,24 +88,7 @@ impl super::MassNumber for DubniumIsotope {
 }
 impl super::IsotopicComposition for DubniumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Db255 => None,
-            Self::Db256 => None,
-            Self::Db257 => None,
-            Self::Db258 => None,
-            Self::Db259 => None,
-            Self::Db260 => None,
-            Self::Db261 => None,
-            Self::Db262 => None,
-            Self::Db263 => None,
-            Self::Db264 => None,
-            Self::Db265 => None,
-            Self::Db266 => None,
-            Self::Db267 => None,
-            Self::Db268 => None,
-            Self::Db269 => None,
-            Self::Db270 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for DubniumIsotope {

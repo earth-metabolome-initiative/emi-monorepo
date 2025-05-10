@@ -1,45 +1,86 @@
+//! Isotopes of the element Iodine
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Iodine
 pub enum IodineIsotope {
+    /// Isotope I107 of Iodine
     I107,
+    /// Isotope I108 of Iodine
     I108,
+    /// Isotope I109 of Iodine
     I109,
+    /// Isotope I110 of Iodine
     I110,
+    /// Isotope I111 of Iodine
     I111,
+    /// Isotope I112 of Iodine
     I112,
+    /// Isotope I113 of Iodine
     I113,
+    /// Isotope I114 of Iodine
     I114,
+    /// Isotope I115 of Iodine
     I115,
+    /// Isotope I116 of Iodine
     I116,
+    /// Isotope I117 of Iodine
     I117,
+    /// Isotope I118 of Iodine
     I118,
+    /// Isotope I119 of Iodine
     I119,
+    /// Isotope I120 of Iodine
     I120,
+    /// Isotope I121 of Iodine
     I121,
+    /// Isotope I122 of Iodine
     I122,
+    /// Isotope I123 of Iodine
     I123,
+    /// Isotope I124 of Iodine
     I124,
+    /// Isotope I125 of Iodine
     I125,
+    /// Isotope I126 of Iodine
     I126,
+    /// Isotope I127 of Iodine
     I127,
+    /// Isotope I128 of Iodine
     I128,
+    /// Isotope I129 of Iodine
     I129,
+    /// Isotope I130 of Iodine
     I130,
+    /// Isotope I131 of Iodine
     I131,
+    /// Isotope I132 of Iodine
     I132,
+    /// Isotope I133 of Iodine
     I133,
+    /// Isotope I134 of Iodine
     I134,
+    /// Isotope I135 of Iodine
     I135,
+    /// Isotope I136 of Iodine
     I136,
+    /// Isotope I137 of Iodine
     I137,
+    /// Isotope I138 of Iodine
     I138,
+    /// Isotope I139 of Iodine
     I139,
+    /// Isotope I140 of Iodine
     I140,
+    /// Isotope I141 of Iodine
     I141,
+    /// Isotope I142 of Iodine
     I142,
+    /// Isotope I143 of Iodine
     I143,
+    /// Isotope I144 of Iodine
     I144,
+    /// Isotope I145 of Iodine
     I145,
 }
 impl super::RelativeAtomicMass for IodineIsotope {
@@ -140,45 +181,45 @@ impl super::MassNumber for IodineIsotope {
 impl super::IsotopicComposition for IodineIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
         match self {
-            Self::I107 => None,
-            Self::I108 => None,
-            Self::I109 => None,
-            Self::I110 => None,
-            Self::I111 => None,
-            Self::I112 => None,
-            Self::I113 => None,
-            Self::I114 => None,
-            Self::I115 => None,
-            Self::I116 => None,
-            Self::I117 => None,
-            Self::I118 => None,
-            Self::I119 => None,
-            Self::I120 => None,
-            Self::I121 => None,
-            Self::I122 => None,
-            Self::I123 => None,
-            Self::I124 => None,
-            Self::I125 => None,
-            Self::I126 => None,
             Self::I127 => Some(1f64),
-            Self::I128 => None,
-            Self::I129 => None,
-            Self::I130 => None,
-            Self::I131 => None,
-            Self::I132 => None,
-            Self::I133 => None,
-            Self::I134 => None,
-            Self::I135 => None,
-            Self::I136 => None,
-            Self::I137 => None,
-            Self::I138 => None,
-            Self::I139 => None,
-            Self::I140 => None,
-            Self::I141 => None,
-            Self::I142 => None,
-            Self::I143 => None,
-            Self::I144 => None,
-            Self::I145 => None,
+            Self::I107
+            | Self::I108
+            | Self::I109
+            | Self::I110
+            | Self::I111
+            | Self::I112
+            | Self::I113
+            | Self::I114
+            | Self::I115
+            | Self::I116
+            | Self::I117
+            | Self::I118
+            | Self::I119
+            | Self::I120
+            | Self::I121
+            | Self::I122
+            | Self::I123
+            | Self::I124
+            | Self::I125
+            | Self::I126
+            | Self::I128
+            | Self::I129
+            | Self::I130
+            | Self::I131
+            | Self::I132
+            | Self::I133
+            | Self::I134
+            | Self::I135
+            | Self::I136
+            | Self::I137
+            | Self::I138
+            | Self::I139
+            | Self::I140
+            | Self::I141
+            | Self::I142
+            | Self::I143
+            | Self::I144
+            | Self::I145 => None,
         }
     }
 }

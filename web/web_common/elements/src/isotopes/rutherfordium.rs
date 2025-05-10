@@ -1,22 +1,40 @@
+//! Isotopes of the element Rutherfordium
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, strum :: EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+/// Isotopes of the element Rutherfordium
 pub enum RutherfordiumIsotope {
+    /// Isotope Rf253 of Rutherfordium
     Rf253,
+    /// Isotope Rf254 of Rutherfordium
     Rf254,
+    /// Isotope Rf255 of Rutherfordium
     Rf255,
+    /// Isotope Rf256 of Rutherfordium
     Rf256,
+    /// Isotope Rf257 of Rutherfordium
     Rf257,
+    /// Isotope Rf258 of Rutherfordium
     Rf258,
+    /// Isotope Rf259 of Rutherfordium
     Rf259,
+    /// Isotope Rf260 of Rutherfordium
     Rf260,
+    /// Isotope Rf261 of Rutherfordium
     Rf261,
+    /// Isotope Rf262 of Rutherfordium
     Rf262,
+    /// Isotope Rf263 of Rutherfordium
     Rf263,
+    /// Isotope Rf264 of Rutherfordium
     Rf264,
+    /// Isotope Rf265 of Rutherfordium
     Rf265,
+    /// Isotope Rf266 of Rutherfordium
     Rf266,
+    /// Isotope Rf267 of Rutherfordium
     Rf267,
+    /// Isotope Rf268 of Rutherfordium
     Rf268,
 }
 impl super::RelativeAtomicMass for RutherfordiumIsotope {
@@ -70,24 +88,7 @@ impl super::MassNumber for RutherfordiumIsotope {
 }
 impl super::IsotopicComposition for RutherfordiumIsotope {
     fn isotopic_composition(&self) -> Option<f64> {
-        match self {
-            Self::Rf253 => None,
-            Self::Rf254 => None,
-            Self::Rf255 => None,
-            Self::Rf256 => None,
-            Self::Rf257 => None,
-            Self::Rf258 => None,
-            Self::Rf259 => None,
-            Self::Rf260 => None,
-            Self::Rf261 => None,
-            Self::Rf262 => None,
-            Self::Rf263 => None,
-            Self::Rf264 => None,
-            Self::Rf265 => None,
-            Self::Rf266 => None,
-            Self::Rf267 => None,
-            Self::Rf268 => None,
-        }
+        None
     }
 }
 impl super::MostAbundantIsotope for RutherfordiumIsotope {
