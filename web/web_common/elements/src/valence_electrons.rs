@@ -1,6 +1,8 @@
 //! Submodule proving the `ValenceElectrons` trait and its implementation for
 //! the `Element` enum.
 
+use crate::isotopes::ElementVariant;
+
 /// Trait providing the number of valence electrons for elements.
 pub trait ValenceElectrons {
     /// Returns the number of valence electrons for the element.
@@ -95,5 +97,11 @@ impl ValenceElectrons for crate::Element {
             Self::Tm | Self::Md => 15,
             Self::Yb | Self::No => 16,
         }
+    }
+}
+
+impl ValenceElectrons for crate::Isotope {
+    fn valence_electrons(&self) -> u8 {
+        self.element().valence_electrons()
     }
 }
