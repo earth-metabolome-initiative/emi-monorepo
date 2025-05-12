@@ -13,6 +13,11 @@ use crate::{
 ///
 /// * `database_name` - The name of the database.
 /// * `conn` - A mutable reference to the database connection.
+///
+/// # Errors
+///
+/// * If the connection cannot be established.
+/// * If the migrations cannot be applied.
 pub async fn init_database(
     database_name: &str,
     conn: &mut diesel_async::AsyncPgConnection,

@@ -35,8 +35,10 @@ pub enum Error {
     InvalidSuperscriptPosition,
     /// When an operation is not defined for residuals.
     InvalidOperationForResidual,
-    /// When an operation is not defined for mixtures.
+    /// When an operation is not defined for a mixture.
     InvalidOperationForMixture,
+    /// When an operation is only defined for diatomic formulas.
+    InvalidOperationForNonDiatomic,
     /// When an oxidation state is invalid.
     InvalidOxidationState(i16),
 }

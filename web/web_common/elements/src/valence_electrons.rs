@@ -4,8 +4,9 @@
 use crate::isotopes::ElementVariant;
 
 /// Trait providing the number of valence electrons for elements.
-pub trait ValenceElectrons {
-    /// Returns the number of valence electrons for the element.
+pub trait ValenceElectrons: Sized {
+    /// Returns the number of valence electrons for the element,
+    /// which is the number of electrons in the outermost shell of the atom.
     fn valence_electrons(&self) -> u8;
 }
 

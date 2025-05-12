@@ -179,6 +179,7 @@ unreadable_literal = "allow"
 missing_panics_doc = "allow"
 struct_excessive_bools = "allow"
 should_panic_without_expect = "allow"
+clone_on_copy = "forbid"
 pedantic = { level = "deny", priority = -1 }
 
 [profile.bench]

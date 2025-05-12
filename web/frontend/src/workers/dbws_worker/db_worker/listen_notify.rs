@@ -52,7 +52,7 @@ impl ListenNotify {
     /// returns the list of orphaned tables which have no listeners anymore.
     pub(crate) fn remove_table_listener(&mut self, subscriber_id: HandlerId) -> Vec<TableName> {
         let mut orphaned_tables = Vec::new();
-        for (table_name, listeners) in self.table_listeners.iter_mut() {
+        for (table_name, listeners) in &mut self.table_listeners {
             if let Some(pos) = listeners.iter().position(|id| *id == subscriber_id) {
                 listeners.remove(pos);
                 if listeners.is_empty() {
@@ -67,7 +67,7 @@ impl ListenNotify {
     /// returns the list of orphaned rows which have no listeners anymore.
     pub(crate) fn remove_row_listener(&mut self, subscriber_id: HandlerId) -> Vec<TablePrimaryKey> {
         let mut orphaned_rows = Vec::new();
-        for (table_primary_key, listeners) in self.row_listeners.iter_mut() {
+        for (table_primary_key, listeners) in &mut self.row_listeners {
             if let Some(pos) = listeners.iter().position(|id| *id == subscriber_id) {
                 listeners.remove(pos);
                 if listeners.is_empty() {

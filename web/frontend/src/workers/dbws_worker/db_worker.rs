@@ -116,7 +116,7 @@ impl DBWSWorker {
                     Err(err) => {
                         scope.send_message(err);
                     }
-                };
+                }
             }
             C2DBMessage::Table(operation) => {
                 // Secondly, we register the component as a listener
@@ -135,7 +135,7 @@ impl DBWSWorker {
                     Err(err) => {
                         scope.send_message(err);
                     }
-                };
+                }
             }
         }
     }

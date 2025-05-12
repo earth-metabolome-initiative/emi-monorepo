@@ -34,6 +34,7 @@ impl TryFrom<Token> for crate::MolecularFormula {
             | Token::Dot
             | Token::Minus
             | Token::Number(_)
+            | Token::Radical
             | Token::OpenRoundBracket
             | Token::OpenSquareBracket
             | Token::Plus

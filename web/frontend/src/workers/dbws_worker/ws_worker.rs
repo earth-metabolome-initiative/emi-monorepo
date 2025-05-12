@@ -91,7 +91,7 @@ impl super::DBWSWorker {
                                     scope.send_message(err);
                                     break;
                                 }
-                            };
+                            }
                         }
                         scope.send_message(WSInternalMessage::Connect);
                     });

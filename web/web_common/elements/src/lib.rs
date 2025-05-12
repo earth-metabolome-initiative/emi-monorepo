@@ -7,6 +7,7 @@
 use pgrx::FromDatum;
 
 mod as_ref;
+mod bonds_number;
 pub mod diesel_impls;
 mod display;
 pub mod errors;
@@ -14,14 +15,19 @@ mod from;
 mod from_str;
 pub mod isotopes;
 mod name;
+mod orbitals;
+pub use orbitals::{AtomicOrbital, AtomicOrbitalType};
 mod oxidation_states;
+mod principal_quantum_number;
 mod standard_atomic_weight;
 mod try_from;
 mod valence_electrons;
+pub use bonds_number::BondsNumber;
 pub use isotopes::{
     ElementVariant, Isotope, IsotopicComposition, MassNumber, MostAbundantIsotope,
     RelativeAtomicMass,
 };
+pub use principal_quantum_number::PrincipalQuantumNumber;
 pub use valence_electrons::ValenceElectrons;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, strum_macros::EnumIter)]

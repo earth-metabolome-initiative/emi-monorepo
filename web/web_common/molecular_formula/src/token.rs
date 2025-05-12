@@ -16,6 +16,8 @@ pub enum Token {
     Subscript(u16),
     /// A residual group
     Residual,
+    /// A Radical
+    Radical,
     /// An open round bracket
     OpenRoundBracket,
     /// A close round bracket
@@ -43,6 +45,36 @@ impl Token {
             self,
             Token::SuperscriptPlus | Token::SuperscriptMinus | Token::Plus | Token::Minus
         )
+    }
+
+    /// Returns the associated closing token for the given opening token.
+    ///
+    /// # Panics
+    ///
+    /// * If the token is not an opening bracket.
+    pub(crate) fn closing_token(&self) -> Token {
+        match self {
+            Token::OpenRoundBracket => Token::CloseRoundBracket,
+            Token::OpenSquareBracket => Token::CloseSquareBracket,
+            _ => panic!("Not an opening bracket"),
+        }
+    }
+
+    /// Dispatches the appropriate `MolecularFormula` from the current opening
+    /// token and the provided formula.
+    ///
+    /// # Panics
+    ///
+    /// * If the token is not an opening bracket.
+    pub(crate) fn dispatch_wrapped_formula(
+        &self,
+        formula: crate::MolecularFormula,
+    ) -> crate::MolecularFormula {
+        match self {
+            Token::OpenRoundBracket => crate::MolecularFormula::RepeatingUnit(formula.into()),
+            Token::OpenSquareBracket => crate::MolecularFormula::Complex(formula.into()),
+            _ => panic!("Not an opening bracket"),
+        }
     }
 }
 

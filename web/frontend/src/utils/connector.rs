@@ -62,7 +62,7 @@ impl<'a> From<&'a ConnectorProps> for Dispatch<AppState> {
     }
 }
 
-impl<'a> From<ConnectorProps> for Dispatch<AppState> {
+impl From<ConnectorProps> for Dispatch<AppState> {
     fn from(props: ConnectorProps) -> Self {
         props.dispatch
     }
@@ -165,7 +165,7 @@ impl Connector {
         for<'a> Dispatch<AppState>: From<&'a C::Properties>,
     {
         let dispatch: Dispatch<AppState> = ctx.props().into();
-        console::log_1(&format!("Creating connector").into());
+        console::log_1(&"Creating connector".to_string().into());
 
         Self {
             websocket: ctx.link().bridge_worker(Callback::from({

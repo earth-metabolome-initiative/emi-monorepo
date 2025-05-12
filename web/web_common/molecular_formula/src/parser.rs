@@ -28,6 +28,9 @@ impl Parser<'_> {
         token: Token,
     ) -> Result<(Self, Option<MolecularFormula>), crate::errors::Error> {
         let new_formula = match (token, formula) {
+            (Token::Radical, _) => {
+                unimplemented!("Radical not implemented yet");
+            }
             (Token::Number(_) | Token::Superscript(_), Some(MolecularFormula::Ion(_))) => {
                 return Err(crate::errors::Error::InvalidChargePosition);
             }
@@ -166,33 +169,17 @@ impl Parser<'_> {
                     Some(MolecularFormula::Mixture(vec![formula, inner_formula]))
                 }
             }
-            (Token::OpenRoundBracket, outer_formula) => {
+            (Token::OpenRoundBracket | Token::OpenSquareBracket, outer_formula) => {
                 let (parser, inner_formula, closing_token) = self.inner_parse()?;
-                if closing_token != Some(Token::CloseRoundBracket) {
+                let expected_closing_token = token.closing_token();
+                if closing_token != Some(expected_closing_token) {
                     return Err(crate::errors::Error::ClosingToken {
-                        expected: Some(Token::CloseRoundBracket),
+                        expected: Some(expected_closing_token),
                         found: closing_token,
                     });
                 }
                 self = parser;
-                let inner_formula = MolecularFormula::RepeatingUnit(inner_formula.into());
-
-                match outer_formula {
-                    None => Some(inner_formula),
-                    Some(outer_formula) => Some(outer_formula.chain(inner_formula)),
-                }
-            }
-
-            (Token::OpenSquareBracket, outer_formula) => {
-                let (parser, inner_formula, closing_token) = self.inner_parse()?;
-                if closing_token != Some(Token::CloseSquareBracket) {
-                    return Err(crate::errors::Error::ClosingToken {
-                        expected: Some(Token::CloseSquareBracket),
-                        found: closing_token,
-                    });
-                }
-                self = parser;
-                let inner_formula = MolecularFormula::Complex(inner_formula.into());
+                let inner_formula = token.dispatch_wrapped_formula(inner_formula.into());
 
                 match outer_formula {
                     None => Some(inner_formula),

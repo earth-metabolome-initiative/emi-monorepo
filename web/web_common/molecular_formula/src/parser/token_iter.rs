@@ -58,6 +58,7 @@ impl Iterator for TokenIter<'_> {
             '+' => Ok(crate::token::Token::Plus),
             '-' => Ok(crate::token::Token::Minus),
             '.' => Ok(crate::token::Token::Dot),
+            '•' | '⋅' => Ok(crate::token::Token::Radical),
             '\u{207A}' => Ok(crate::token::Token::SuperscriptPlus),
             '\u{207B}' => Ok(crate::token::Token::SuperscriptMinus),
             c if is_superscript_digit(c) => {

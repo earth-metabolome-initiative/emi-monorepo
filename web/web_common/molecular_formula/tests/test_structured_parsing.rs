@@ -8,7 +8,8 @@ use molecular_formula::{Ion, MolecularFormula};
 fn test_parse<M: Into<MolecularFormula>>(formula: &str, expected: M, simmetric: Option<&str>) {
     let expected = expected.into();
     let simmetric = simmetric.unwrap_or(formula);
-    let parsed_formula = MolecularFormula::from_str(formula).unwrap();
+    let parsed_formula = MolecularFormula::from_str(formula)
+        .unwrap_or_else(|err| panic!("Failed to parse formula: `{simmetric}`, error: {err:?}"));
     assert_eq!(parsed_formula, expected, "Failed to parse formula: {formula}");
     assert_eq!(simmetric, &format!("{}", parsed_formula), "Failed to serialize formula: {formula}");
 }
@@ -117,56 +118,25 @@ fn test_ion_h() {
         MolecularFormula::Ion(Ion::from_element(Element::H, -1).unwrap().into()),
         Some("H⁻"),
     );
+}
+
+#[test]
+fn test_molecular_hydrogen() {
+    test_parse("H2", MolecularFormula::Count(Element::H.into(), 2), Some("H₂"));
+}
+
+#[test]
+fn test_hydrogen_molecular_ion() {
     test_parse(
         "H2+",
         Ion::from_formula(MolecularFormula::Count(Element::H.into(), 2).into(), 1).unwrap(),
         Some("H₂⁺"),
     );
-    test_parse(
-        "MgSO4.H2O",
-        MolecularFormula::Mixture(vec![
-            MolecularFormula::Sequence(vec![
-                Element::Mg.into(),
-                Element::S.into(),
-                MolecularFormula::Count(Element::O.into(), 4),
-            ]),
-            MolecularFormula::Sequence(vec![
-                MolecularFormula::Count(Element::H.into(), 2),
-                Element::O.into(),
-            ]),
-        ]),
-        Some("MgSO₄.H₂O"),
-    );
-    test_parse(
-        "2(C17H23NO3).H2O.H2SO4",
-        MolecularFormula::Mixture(vec![
-            MolecularFormula::Count(
-                MolecularFormula::RepeatingUnit(
-                    MolecularFormula::Sequence(vec![
-                        MolecularFormula::Count(Element::C.into(), 17),
-                        MolecularFormula::Count(Element::H.into(), 23),
-                        Element::N.into(),
-                        MolecularFormula::Count(Element::O.into(), 3),
-                    ])
-                    .into(),
-                )
-                .into(),
-                2,
-            ),
-            MolecularFormula::Mixture(vec![
-                MolecularFormula::Sequence(vec![
-                    MolecularFormula::Count(Element::H.into(), 2),
-                    Element::O.into(),
-                ]),
-                MolecularFormula::Sequence(vec![
-                    MolecularFormula::Count(Element::H.into(), 2),
-                    Element::S.into(),
-                    MolecularFormula::Count(Element::O.into(), 4),
-                ]),
-            ]),
-        ]),
-        Some("(C₁₇H₂₃NO₃)₂.H₂O.H₂SO₄"),
-    );
+}
+
+#[test]
+fn test_triatomic_hidrogen() {
+    test_parse("H3", MolecularFormula::Count(Element::H.into(), 3), Some("H₃"));
 }
 
 #[test]
@@ -227,4 +197,144 @@ fn test_ion1() {
 #[test]
 fn test_ion2() {
     test_parse("C²⁺", Ion::from_element(Element::C, 2).unwrap(), Some("C⁺²"))
+}
+
+#[test]
+fn test_methanion() {
+    test_parse(
+        "CH5+",
+        Ion::from_formula(
+            MolecularFormula::Sequence(vec![
+                Element::C.into(),
+                MolecularFormula::Count(Element::H.into(), 5),
+            ]),
+            1,
+        )
+        .unwrap(),
+        Some("CH₅⁺"),
+    );
+}
+
+#[test]
+fn test_methane_cation() {
+    test_parse(
+        "CH4+",
+        Ion::from_formula(
+            MolecularFormula::Sequence(vec![
+                Element::C.into(),
+                MolecularFormula::Count(Element::H.into(), 4),
+            ]),
+            1,
+        )
+        .unwrap(),
+        Some("CH₄⁺"),
+    );
+}
+
+#[test]
+fn test_h2so4() {
+    test_parse(
+        "H2SO4",
+        MolecularFormula::Sequence(vec![
+            MolecularFormula::Count(Element::H.into(), 2),
+            Element::S.into(),
+            MolecularFormula::Count(Element::O.into(), 4),
+        ]),
+        Some("H₂SO₄"),
+    );
+}
+
+#[test]
+fn test_large_compound1() {
+    test_parse(
+        "MgSO4.H2O",
+        MolecularFormula::Mixture(vec![
+            MolecularFormula::Sequence(vec![
+                Element::Mg.into(),
+                Element::S.into(),
+                MolecularFormula::Count(Element::O.into(), 4),
+            ]),
+            MolecularFormula::Sequence(vec![
+                MolecularFormula::Count(Element::H.into(), 2),
+                Element::O.into(),
+            ]),
+        ]),
+        Some("MgSO₄.H₂O"),
+    );
+    test_parse(
+        "2(C17H23NO3).H2O.H2SO4",
+        MolecularFormula::Mixture(vec![
+            MolecularFormula::Count(
+                MolecularFormula::RepeatingUnit(
+                    MolecularFormula::Sequence(vec![
+                        MolecularFormula::Count(Element::C.into(), 17),
+                        MolecularFormula::Count(Element::H.into(), 23),
+                        Element::N.into(),
+                        MolecularFormula::Count(Element::O.into(), 3),
+                    ])
+                    .into(),
+                )
+                .into(),
+                2,
+            ),
+            MolecularFormula::Mixture(vec![
+                MolecularFormula::Sequence(vec![
+                    MolecularFormula::Count(Element::H.into(), 2),
+                    Element::O.into(),
+                ]),
+                MolecularFormula::Sequence(vec![
+                    MolecularFormula::Count(Element::H.into(), 2),
+                    Element::S.into(),
+                    MolecularFormula::Count(Element::O.into(), 4),
+                ]),
+            ]),
+        ]),
+        Some("(C₁₇H₂₃NO₃)₂.H₂O.H₂SO₄"),
+    );
+}
+
+#[test]
+fn test_atropine() {
+    test_parse(
+        "C17H23NO3",
+        MolecularFormula::Sequence(vec![
+            MolecularFormula::Count(Element::C.into(), 17),
+            MolecularFormula::Count(Element::H.into(), 23),
+            Element::N.into(),
+            MolecularFormula::Count(Element::O.into(), 3),
+        ]),
+        Some("C₁₇H₂₃NO₃"),
+    );
+
+    test_parse(
+        "(C17H23NO3)",
+        MolecularFormula::RepeatingUnit(
+            MolecularFormula::Sequence(vec![
+                MolecularFormula::Count(Element::C.into(), 17),
+                MolecularFormula::Count(Element::H.into(), 23),
+                Element::N.into(),
+                MolecularFormula::Count(Element::O.into(), 3),
+            ])
+            .into(),
+        ),
+        Some("(C₁₇H₂₃NO₃)"),
+    );
+
+    test_parse(
+        "2(C17H23NO3)",
+        MolecularFormula::Count(
+            MolecularFormula::RepeatingUnit(
+                MolecularFormula::Sequence(vec![
+                    MolecularFormula::Count(Element::C.into(), 17),
+                    MolecularFormula::Count(Element::H.into(), 23),
+                    Element::N.into(),
+                    MolecularFormula::Count(Element::O.into(), 3),
+                ])
+                .into(),
+            )
+            .into(),
+            2,
+        ),
+        Some("(C₁₇H₂₃NO₃)₂"),
+    );
 }
