@@ -84,21 +84,21 @@ impl super::MolecularFormula {
                 formula.is_valid_oxidation_state(oxidation_state)
             }
             Self::Count(formula, _) => {
-                Ok(if !formula.is_valid_oxidation_state(oxidation_state)? {
-                    self.oxidation_states()?.contains(&oxidation_state)
-                } else {
+                Ok(if formula.is_valid_oxidation_state(oxidation_state)? {
                     true
+                } else {
+                    self.oxidation_states()?.contains(&oxidation_state)
                 })
             }
             Self::Ion(ion) => Ok(ion.charge == oxidation_state),
             Self::Mixture(formulas) | Self::Sequence(formulas) => {
                 Ok(
-                    if !formulas.iter().any(|formula| {
+                    if formulas.iter().any(|formula| {
                         formula.is_valid_oxidation_state(oxidation_state).unwrap_or(false)
                     }) {
-                        self.oxidation_states()?.contains(&oxidation_state)
-                    } else {
                         true
+                    } else {
+                        self.oxidation_states()?.contains(&oxidation_state)
                     },
                 )
             }

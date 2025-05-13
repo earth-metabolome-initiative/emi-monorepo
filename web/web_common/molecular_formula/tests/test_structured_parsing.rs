@@ -8,10 +8,18 @@ use molecular_formula::{Ion, MolecularFormula};
 fn test_parse<M: Into<MolecularFormula>>(formula: &str, expected: M, simmetric: Option<&str>) {
     let expected = expected.into();
     let simmetric = simmetric.unwrap_or(formula);
-    let parsed_formula = MolecularFormula::from_str(formula)
-        .unwrap_or_else(|err| panic!("Failed to parse formula: `{simmetric}`, error: {err:?}"));
-    assert_eq!(parsed_formula, expected, "Failed to parse formula: {formula}");
-    assert_eq!(simmetric, &format!("{}", parsed_formula), "Failed to serialize formula: {formula}");
+    let parsed_formula = MolecularFormula::from_str(formula).unwrap_or_else(|err| {
+        panic!("Failed to parse formula: `{simmetric}` from `{formula}`, error: {err:?}")
+    });
+    assert_eq!(
+        parsed_formula, expected,
+        "Failed to parse formula to the expected output `{formula:#?}`, got `{parsed_formula:#?}`"
+    );
+    assert_eq!(
+        simmetric,
+        &format!("{}", parsed_formula),
+        "Failed to serialize formula: {formula}, got `{parsed_formula}`"
+    );
 }
 
 #[test]
@@ -336,5 +344,43 @@ fn test_atropine() {
             2,
         ),
         Some("(C₁₇H₂₃NO₃)₂"),
+    );
+}
+
+#[test]
+fn test_hexaamminecobalt_iii_chloride() {
+    test_parse(
+        "[Co(NH3)6]+3(Cl−)3",
+        MolecularFormula::Sequence(vec![
+            Ion::from_formula(
+                MolecularFormula::Complex(
+                    MolecularFormula::Sequence(vec![
+                        Element::Co.into(),
+                        MolecularFormula::Count(
+                            MolecularFormula::RepeatingUnit(
+                                MolecularFormula::Sequence(vec![
+                                    Element::N.into(),
+                                    MolecularFormula::Count(Element::H.into(), 3),
+                                ])
+                                .into(),
+                            )
+                            .into(),
+                            6,
+                        ),
+                    ])
+                    .into(),
+                )
+                .into(),
+                3,
+            )
+            .unwrap()
+            .into(),
+            MolecularFormula::Count(
+                MolecularFormula::RepeatingUnit(Ion::from_element(Element::Cl, -1).unwrap().into())
+                    .into(),
+                3,
+            ),
+        ]),
+        Some("[Co(NH₃)₆]⁺³(Cl⁻)₃"),
     );
 }

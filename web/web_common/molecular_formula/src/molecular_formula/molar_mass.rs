@@ -22,8 +22,9 @@ impl MolecularFormula {
             MolecularFormula::Mixture(formulas) | MolecularFormula::Sequence(formulas) => {
                 formulas.iter().map(MolecularFormula::molar_mass).sum()
             }
-            MolecularFormula::Complex(formula) => formula.molar_mass(),
-            MolecularFormula::RepeatingUnit(formula) => formula.molar_mass(),
+            MolecularFormula::RepeatingUnit(formula) | MolecularFormula::Complex(formula) => {
+                formula.molar_mass()
+            }
             MolecularFormula::Residual => None,
         }
     }

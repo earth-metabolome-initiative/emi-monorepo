@@ -3,6 +3,8 @@
 use super::{AtomicOrbital, AtomicOrbitalType};
 
 impl crate::Element {
+    #[must_use]
+    #[allow(clippy::too_many_lines)]
     /// Returns the orbitals associated to the element.
     pub fn orbitals(&self) -> Vec<AtomicOrbital> {
         match self {

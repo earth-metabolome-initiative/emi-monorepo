@@ -40,7 +40,7 @@ pub enum Token {
 
 impl Token {
     /// Returns whether the token represents a charge.
-    pub fn is_charge(&self) -> bool {
+    pub fn is_charge(self) -> bool {
         matches!(
             self,
             Token::SuperscriptPlus | Token::SuperscriptMinus | Token::Plus | Token::Minus
@@ -52,7 +52,7 @@ impl Token {
     /// # Panics
     ///
     /// * If the token is not an opening bracket.
-    pub(crate) fn closing_token(&self) -> Token {
+    pub(crate) fn closing_token(self) -> Token {
         match self {
             Token::OpenRoundBracket => Token::CloseRoundBracket,
             Token::OpenSquareBracket => Token::CloseSquareBracket,
@@ -67,7 +67,7 @@ impl Token {
     ///
     /// * If the token is not an opening bracket.
     pub(crate) fn dispatch_wrapped_formula(
-        &self,
+        self,
         formula: crate::MolecularFormula,
     ) -> crate::MolecularFormula {
         match self {

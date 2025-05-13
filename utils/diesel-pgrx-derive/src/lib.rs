@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 
 use quote::quote;
-use syn::{parse_macro_input, DeriveInput, Ident, Type};
+use syn::{DeriveInput, Ident, Type, parse_macro_input};
 
 #[proc_macro_derive(DieselPGRX)]
 /// Derives the `DieselPGRX` trait for the given struct or enum.
@@ -23,20 +23,23 @@ pub fn diesel_pgrx_derive(input: proc_macro::TokenStream) -> proc_macro::TokenSt
         panic!("DieselPGRX can only be derived for structs, not enums");
     };
 
-    let diesel_attribute_types: Vec<_> = attribute_types.iter().map(|ty| {
-        match ty {
-            syn::Type::Path(type_path) => {
-                let segment = &type_path.path.segments.last().unwrap().ident;
-                match segment.to_string().as_str() {
-                    "String" => quote! { diesel_pgrx::diesel::sql_types::Text },
-                    "i32" => quote! { diesel_pgrx::diesel::sql_types::Integer },
-                    "f64" => quote! { diesel_pgrx::diesel::sql_types::Double },
-                    _ => panic!("Unsupported type: {}", segment),
+    let diesel_attribute_types: Vec<_> = attribute_types
+        .iter()
+        .map(|ty| {
+            match ty {
+                syn::Type::Path(type_path) => {
+                    let segment = &type_path.path.segments.last().unwrap().ident;
+                    match segment.to_string().as_str() {
+                        "String" => quote! { diesel_pgrx::diesel::sql_types::Text },
+                        "i32" => quote! { diesel_pgrx::diesel::sql_types::Integer },
+                        "f64" => quote! { diesel_pgrx::diesel::sql_types::Double },
+                        _ => panic!("Unsupported type: {segment}"),
+                    }
                 }
-            },
-            _ => panic!("Unsupported type format"),
-        }
-    }).collect();
+                _ => panic!("Unsupported type format"),
+            }
+        })
+        .collect();
 
     quote! {
         impl diesel_pgrx::DieselPGRX for #ident {}
@@ -71,7 +74,7 @@ pub fn diesel_pgrx_derive(input: proc_macro::TokenStream) -> proc_macro::TokenSt
                         ),*
                     ),
                     out,
-                )?; 
+                )?;
                 Ok(diesel::serialize::IsNull::No)
             }
         }

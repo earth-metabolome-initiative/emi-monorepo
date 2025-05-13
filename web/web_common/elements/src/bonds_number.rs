@@ -15,6 +15,8 @@ pub trait BondsNumber {
 }
 
 impl BondsNumber for crate::Element {
+    #[allow(clippy::match_same_arms)]
+    #[allow(clippy::too_many_lines)]
     fn number_of_bonds(&self) -> (u8, u8) {
         match self {
             Self::H => (1, 1),

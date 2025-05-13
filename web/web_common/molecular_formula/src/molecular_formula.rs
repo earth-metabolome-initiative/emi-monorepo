@@ -59,6 +59,35 @@ impl MolecularFormula {
         }
     }
 
+    pub(crate) fn add_count_to_last_subformula(
+        self,
+        count: u16,
+    ) -> Result<Self, crate::errors::Error> {
+        match self {
+            Self::Sequence(mut formulas) => {
+                let last = formulas.pop().unwrap();
+                let last = last.add_count_to_last_subformula(count)?;
+                formulas.push(last);
+                Ok(Self::Sequence(formulas))
+            }
+            Self::Mixture(mut formulas) => {
+                let last = formulas.pop().unwrap();
+                let last = last.add_count_to_last_subformula(count)?;
+                formulas.push(last);
+                Ok(Self::Mixture(formulas))
+            }
+            Self::Isotope(_)
+            | Self::Element(_)
+            | Self::Ion(_)
+            | Self::Residual
+            | Self::Complex(_)
+            | Self::RepeatingUnit(_) => Ok(Self::Count(self.into(), count)),
+            Self::Count(_, _) => {
+                unreachable!("Count {self:?} should not be counted")
+            }
+        }
+    }
+
     pub(crate) fn add_count_to_first_subformula(
         self,
         count: u16,
@@ -80,11 +109,11 @@ impl MolecularFormula {
             | Self::Element(_)
             | Self::Ion(_)
             | Self::Complex(_)
+            | Self::Residual
             | Self::RepeatingUnit(_) => Ok(Self::Count(self.into(), count)),
             Self::Count(_, _) => {
                 unreachable!("Count {self:?} should not be counted")
             }
-            Self::Residual => Ok(Self::Count(self.into(), count)),
         }
     }
 }

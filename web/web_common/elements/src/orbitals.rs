@@ -35,17 +35,18 @@ impl AtomicOrbital {
     ) -> Self {
         Self { principal_quantum_number, orbital_type, number_of_electrons }
     }
-
+    #[must_use]
     /// Returns the orbitals for a given element.
     pub fn principal_quantum_number(&self) -> u8 {
         self.principal_quantum_number
     }
-
+    #[must_use]
     /// Returns the type of the orbital.
     pub fn orbital_type(&self) -> AtomicOrbitalType {
         self.orbital_type
     }
 
+    #[must_use]
     /// Returns the number of electrons in the orbital.
     pub fn number_of_electrons(&self) -> u8 {
         self.number_of_electrons

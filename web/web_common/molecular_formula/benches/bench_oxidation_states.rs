@@ -1,3 +1,4 @@
+#![allow(clippy::missing_docs)]
 //! Submodule benchmarking the computation of the oxidation states of the
 //! `MolecularFormula` struct.
 

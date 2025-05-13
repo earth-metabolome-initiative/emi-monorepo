@@ -8,6 +8,10 @@ use super::MolecularFormula;
 impl MolecularFormula {
     /// Returns the isotopologue mass of the molecular formula, including the
     /// charge.
+    ///
+    /// # Errors
+    ///
+    /// * If the `MolecularFormula` contains Residual.
     pub fn isotopologue_mass_with_charge(&self) -> Result<f64, crate::errors::Error> {
         match self {
             MolecularFormula::Element(element) => Ok(element.relative_atomic_mass()),
@@ -26,14 +30,19 @@ impl MolecularFormula {
             MolecularFormula::Mixture(formulas) | MolecularFormula::Sequence(formulas) => {
                 formulas.iter().map(MolecularFormula::isotopologue_mass_with_charge).sum()
             }
-            MolecularFormula::Complex(formula) => formula.isotopologue_mass_with_charge(),
-            MolecularFormula::RepeatingUnit(formula) => formula.isotopologue_mass_with_charge(),
+            MolecularFormula::RepeatingUnit(formula) | MolecularFormula::Complex(formula) => {
+                formula.isotopologue_mass_with_charge()
+            }
             MolecularFormula::Residual => Err(crate::errors::Error::InvalidOperationForResidual),
         }
     }
 
     /// Returns the isotopologue mass of the molecular formula, excluding the
     /// charge.
+    ///
+    /// # Errors
+    ///
+    /// * If the `MolecularFormula` contains Residual.
     pub fn isotopologue_mass_without_charge(&self) -> Result<f64, crate::errors::Error> {
         match self {
             MolecularFormula::Element(element) => Ok(element.relative_atomic_mass()),
@@ -47,8 +56,9 @@ impl MolecularFormula {
             MolecularFormula::Mixture(formulas) | MolecularFormula::Sequence(formulas) => {
                 formulas.iter().map(MolecularFormula::isotopologue_mass_without_charge).sum()
             }
-            MolecularFormula::Complex(formula) => formula.isotopologue_mass_without_charge(),
-            MolecularFormula::RepeatingUnit(formula) => formula.isotopologue_mass_without_charge(),
+            MolecularFormula::RepeatingUnit(formula) | MolecularFormula::Complex(formula) => {
+                formula.isotopologue_mass_without_charge()
+            }
             MolecularFormula::Residual => Err(crate::errors::Error::InvalidOperationForResidual),
         }
     }

@@ -5,7 +5,7 @@
 use elements::{Element, ElementVariant};
 
 impl crate::MolecularFormula {
-    fn _inner_is_homonuclear(
+    fn inner_is_homonuclear(
         &self,
         mut other: Option<elements::Element>,
     ) -> Result<(bool, Element), crate::errors::Error> {
@@ -19,18 +19,18 @@ impl crate::MolecularFormula {
             Self::Residual => {
                 return Err(crate::errors::Error::InvalidOperationForResidual);
             }
-            Self::Ion(ion) => ion.entry._inner_is_homonuclear(other)?,
-            Self::Count(formula, _) => formula._inner_is_homonuclear(other)?,
+            Self::Ion(ion) => ion.entry.inner_is_homonuclear(other)?,
+            Self::Count(formula, _) => formula.inner_is_homonuclear(other)?,
             Self::Complex(formula) | Self::RepeatingUnit(formula) => {
-                formula._inner_is_homonuclear(other)?
+                formula.inner_is_homonuclear(other)?
             }
             Self::Mixture(_) => {
-                unreachable!("Mixture should not be passed to _inner_is_homonuclear");
+                unreachable!("Mixture should not be passed to inner_is_homonuclear");
             }
             Self::Sequence(formulas) => {
                 let mut homonuclear = true;
                 for formula in formulas {
-                    let (this_homonuclear, element) = formula._inner_is_homonuclear(other)?;
+                    let (this_homonuclear, element) = formula.inner_is_homonuclear(other)?;
                     if other.is_none() {
                         other = Some(element);
                     }
@@ -73,7 +73,7 @@ impl crate::MolecularFormula {
             | Self::Count(_, _)
             | Self::Complex(_)
             | Self::RepeatingUnit(_)
-            | Self::Sequence(_) => self._inner_is_homonuclear(None)?.0,
+            | Self::Sequence(_) => self.inner_is_homonuclear(None)?.0,
             Self::Mixture(formulas) => {
                 let mut homonuclear = true;
                 for formula in formulas {

@@ -3,9 +3,13 @@
 
 impl super::MolecularFormula {
     /// Returns the isotopologue mass over charge for the given molecular
-    /// formula. Equivalent to `isotologue_mass_with_charge` divided by the
+    /// formula. Equivalent to `isotopologue_mass_with_charge` divided by the
     /// charge.
-    pub fn isotologue_mass_over_charge(&self) -> Result<f64, crate::errors::Error> {
-        todo!()
+    ///
+    /// # Errors
+    ///
+    /// * If the `MolecularFormula` contains Residual.
+    pub fn isotopologue_mass_over_charge(&self) -> Result<f64, crate::errors::Error> {
+        Ok(self.isotopologue_mass_with_charge()? / f64::from(self.charge()?))
     }
 }

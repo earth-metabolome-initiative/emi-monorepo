@@ -62,7 +62,7 @@ impl crate::MolecularFormula {
         Ok(self.number_of_elements()? == 2)
     }
 
-    fn _inner_diatomic(
+    fn inner_diatomic(
         &self,
         left: &mut Option<elements::Element>,
         right: &mut Option<elements::Element>,
@@ -88,24 +88,22 @@ impl crate::MolecularFormula {
             }
             Self::Count(formula, count) => {
                 if *count == 1 {
-                    formula._inner_diatomic(left, right);
+                    formula.inner_diatomic(left, right);
                 } else if *count == 2 {
-                    formula._inner_diatomic(left, &mut None);
-                    *right = left.clone();
+                    formula.inner_diatomic(left, &mut None);
+                    *right = *left;
                 } else {
                     unreachable!()
                 }
             }
-            Self::Ion(ion) => ion.entry._inner_diatomic(left, right),
+            Self::Ion(ion) => ion.entry.inner_diatomic(left, right),
             Self::Complex(formula) | Self::RepeatingUnit(formula) => {
-                formula._inner_diatomic(left, right)
+                formula.inner_diatomic(left, right);
             }
             Self::Sequence(formulas) => {
                 for formula in formulas {
-                    if left.is_none() {
-                        formula._inner_diatomic(left, right);
-                    } else if right.is_none() {
-                        formula._inner_diatomic(left, right);
+                    if left.is_none() || right.is_none() {
+                        formula.inner_diatomic(left, right);
                     } else {
                         unreachable!()
                     }
@@ -143,13 +141,13 @@ impl crate::MolecularFormula {
             _ => {
                 let mut left = None;
                 let mut right = None;
-                self._inner_diatomic(&mut left, &mut right);
+                self.inner_diatomic(&mut left, &mut right);
                 Some((left.unwrap(), right.unwrap()))
             }
         })
     }
 
-    fn _inner_diatomic_valence_electrons(&self, left: &mut Option<i16>, right: &mut Option<i16>) {
+    fn inner_diatomic_valence_electrons(&self, left: &mut Option<i16>, right: &mut Option<i16>) {
         match self {
             Self::Isotope(isotope) => {
                 if left.is_none() {
@@ -171,16 +169,16 @@ impl crate::MolecularFormula {
             }
             Self::Count(formula, count) => {
                 if *count == 1 {
-                    formula._inner_diatomic_valence_electrons(left, right);
+                    formula.inner_diatomic_valence_electrons(left, right);
                 } else if *count == 2 {
-                    formula._inner_diatomic_valence_electrons(left, &mut None);
-                    *right = left.clone();
+                    formula.inner_diatomic_valence_electrons(left, &mut None);
+                    *right = *left;
                 } else {
                     unreachable!()
                 }
             }
             Self::Ion(ion) => {
-                ion.entry._inner_diatomic_valence_electrons(left, right);
+                ion.entry.inner_diatomic_valence_electrons(left, right);
                 if let Some(left) = left {
                     *left -= ion.charge;
                 } else if let Some(right) = right {
@@ -190,14 +188,12 @@ impl crate::MolecularFormula {
                 }
             }
             Self::Complex(formula) | Self::RepeatingUnit(formula) => {
-                formula._inner_diatomic_valence_electrons(left, right)
+                formula.inner_diatomic_valence_electrons(left, right);
             }
             Self::Sequence(formulas) => {
                 for formula in formulas {
-                    if left.is_none() {
-                        formula._inner_diatomic_valence_electrons(left, right);
-                    } else if right.is_none() {
-                        formula._inner_diatomic_valence_electrons(left, right);
+                    if left.is_none() || right.is_none() {
+                        formula.inner_diatomic_valence_electrons(left, right);
                     } else {
                         unreachable!()
                     }
@@ -234,7 +230,7 @@ impl crate::MolecularFormula {
             _ => {
                 let mut left = None;
                 let mut right = None;
-                self._inner_diatomic_valence_electrons(&mut left, &mut right);
+                self.inner_diatomic_valence_electrons(&mut left, &mut right);
                 Some((left.unwrap(), right.unwrap()))
             }
         })

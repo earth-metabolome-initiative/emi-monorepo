@@ -87,7 +87,7 @@ impl From<Ion<MolecularFormula>> for Ion<Box<MolecularFormula>> {
 }
 
 /// Electron mass in amu
-pub const ELECTRON_MASS: f64 = 0.000_548_58;
+pub const ELECTRON_MASS: f64 = 0.000_548_579_91;
 
 impl<E> Display for Ion<E>
 where

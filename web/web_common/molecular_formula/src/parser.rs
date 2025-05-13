@@ -179,7 +179,7 @@ impl Parser<'_> {
                     });
                 }
                 self = parser;
-                let inner_formula = token.dispatch_wrapped_formula(inner_formula.into());
+                let inner_formula = token.dispatch_wrapped_formula(inner_formula);
 
                 match outer_formula {
                     None => Some(inner_formula),
@@ -195,14 +195,10 @@ impl Parser<'_> {
                 Some(MolecularFormula::Sequence(sequence))
             }
             (Token::Number(count), Some(formula)) => {
-                if matches!(formula, MolecularFormula::Ion(_)) {
-                    return Err(crate::errors::Error::InvalidChargePosition);
-                }
-
-                Some(MolecularFormula::Count(formula.into(), count))
+                Some(formula.add_count_to_last_subformula(count)?)
             }
             (Token::Subscript(count), Some(formula)) => {
-                Some(MolecularFormula::Count(formula.into(), count))
+                Some(formula.add_count_to_last_subformula(count)?)
             }
             (Token::CloseRoundBracket | Token::CloseSquareBracket, _) => {
                 unreachable!("This case should be handled in the `inner_parse` function")

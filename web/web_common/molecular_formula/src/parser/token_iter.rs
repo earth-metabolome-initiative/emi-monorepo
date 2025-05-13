@@ -25,6 +25,22 @@ fn is_superscript_digit(c: char) -> bool {
     )
 }
 
+fn is_subscript_digit(c: char) -> bool {
+    matches!(
+        c,
+        '\u{2080}' // ₀
+        | '\u{2081}' // ₁
+        | '\u{2082}' // ₂
+        | '\u{2083}' // ₃
+        | '\u{2084}' // ₄
+        | '\u{2085}' // ₅
+        | '\u{2086}' // ₆
+        | '\u{2087}' // ₇
+        | '\u{2088}' // ₈
+        | '\u{2089}' // ₉
+    )
+}
+
 /// Returns the digit corresponding to the superscript character.
 ///
 /// # Panics
@@ -46,6 +62,27 @@ fn superscript_to_digit(c: char) -> u8 {
     }
 }
 
+/// Returns the digit corresponding to the subscript character.
+///
+/// # Panics
+///
+/// * If the character is not a subscript digit.
+fn subscript_to_digit(c: char) -> u8 {
+    match c {
+        '\u{2080}' => 0,
+        '\u{2081}' => 1,
+        '\u{2082}' => 2,
+        '\u{2083}' => 3,
+        '\u{2084}' => 4,
+        '\u{2085}' => 5,
+        '\u{2086}' => 6,
+        '\u{2087}' => 7,
+        '\u{2088}' => 8,
+        '\u{2089}' => 9,
+        _ => unreachable!(),
+    }
+}
+
 impl Iterator for TokenIter<'_> {
     type Item = Result<crate::token::Token, crate::errors::Error>;
 
@@ -56,7 +93,7 @@ impl Iterator for TokenIter<'_> {
             '[' => Ok(crate::token::Token::OpenSquareBracket),
             ']' => Ok(crate::token::Token::CloseSquareBracket),
             '+' => Ok(crate::token::Token::Plus),
-            '-' => Ok(crate::token::Token::Minus),
+            '-' | '−' => Ok(crate::token::Token::Minus),
             '.' => Ok(crate::token::Token::Dot),
             '•' | '⋅' => Ok(crate::token::Token::Radical),
             '\u{207A}' => Ok(crate::token::Token::SuperscriptPlus),
@@ -75,11 +112,24 @@ impl Iterator for TokenIter<'_> {
                 }
                 Ok(crate::token::Token::Superscript(number))
             }
+            c if is_subscript_digit(c) => {
+                let number = subscript_to_digit(c);
+                let mut number = u16::from(number);
+                while let Some(&next) = self.chars.peek() {
+                    if is_subscript_digit(next) {
+                        let next = subscript_to_digit(next);
+                        number = number * 10 + u16::from(next);
+                        self.chars.next();
+                    } else {
+                        break;
+                    }
+                }
+                Ok(crate::token::Token::Subscript(number))
+            }
             c if c.is_ascii_digit() => {
                 let number = c.to_digit(10).unwrap();
-                let mut number = match u16::try_from(number) {
-                    Ok(number) => number,
-                    Err(_) => return Some(Err(crate::errors::Error::InvalidNumber)),
+                let Ok(mut number) = u16::try_from(number) else {
+                    return Some(Err(crate::errors::Error::InvalidNumber));
                 };
                 while let Some(&next) = self.chars.peek() {
                     if next.is_ascii_digit() {

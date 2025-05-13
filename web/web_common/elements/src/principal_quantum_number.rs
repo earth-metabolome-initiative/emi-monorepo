@@ -11,6 +11,7 @@ pub trait PrincipalQuantumNumber {
 }
 
 impl PrincipalQuantumNumber for crate::Element {
+    #[allow(clippy::too_many_lines)]
     fn principal_quantum_number(&self) -> u8 {
         match self {
             Self::H | Self::He => 1,
