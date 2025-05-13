@@ -36,15 +36,15 @@ struct InsertableField {
 
 async fn init_db(conn: &mut diesel_async::AsyncPgConnection) -> Result<(), diesel::result::Error> {
     // We load the extension which we have copied into the container.
-    conn.batch_execute("CREATE EXTENSION IF NOT EXISTS example_extension").await?;
+    conn.batch_execute("CREATE EXTENSION example_extension;").await?;
     // We create a table which will include a column with the custom type
     // `PositiveU32`, which also includes the validation function
     // `validate_positive_u32`.
     conn.batch_execute(
-        "CREATE TABLE IF NOT EXISTS fields (
-            id SERIAL PRIMARY KEY NOT NULL,
+        "CREATE TABLE fields (
+            id SERIAL PRIMARY KEY,
             field PositiveU32 NOT NULL CHECK (validate_positive_u32(field))
-        )",
+        );",
     )
     .await?;
     Ok(())
@@ -134,7 +134,7 @@ pub async fn test_diesel_pgrx_derive() {
     .expect("Failed to connect to database");
     if let Err(err) = init_db(&mut conn).await {
         docker.stop().await.expect("Failed to stop container");
-        panic!("Failed to initialize database: {err}");
+        panic!("Failed to initialize database: {err:?}");
     }
 
     // We attempt to insert a valid value into the table.

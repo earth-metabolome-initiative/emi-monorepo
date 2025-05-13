@@ -9,4 +9,4 @@ pub use diesel;
 #[doc(hidden)]
 pub use diesel_pgrx_derive::DieselPGRX;
 #[cfg(feature = "macro")]
-pub use serde_json;
+pub use serde_cbor;

@@ -30,11 +30,31 @@ LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'positiveu32_out_wrapper';
 
 -- utils/diesel-pgrx/example_extension/src/lib.rs:8
+-- example_extension::positiveu32_recv
+CREATE  FUNCTION "positiveu32_recv"(
+	"internal" internal /* pgrx::datum::internal::Internal */
+) RETURNS PositiveU32 /* example_extension::PositiveU32 */
+IMMUTABLE PARALLEL SAFE
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'positiveu32_recv_wrapper';
+
+-- utils/diesel-pgrx/example_extension/src/lib.rs:8
+-- example_extension::positiveu32_send
+CREATE  FUNCTION "positiveu32_send"(
+	"input" PositiveU32 /* example_extension::PositiveU32 */
+) RETURNS bytea /* alloc::vec::Vec<u8> */
+IMMUTABLE STRICT PARALLEL SAFE
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'positiveu32_send_wrapper';
+
+-- utils/diesel-pgrx/example_extension/src/lib.rs:8
 -- example_extension::PositiveU32
 CREATE TYPE PositiveU32 (
 	INTERNALLENGTH = variable,
 	INPUT = positiveu32_in, /* example_extension::positiveu32_in */
 	OUTPUT = positiveu32_out, /* example_extension::positiveu32_out */
+	RECEIVE = positiveu32_recv, /* example_extension::positiveu32_recv */
+	SEND = positiveu32_send, /* example_extension::positiveu32_send */
 	STORAGE = extended
 );
 /* </end connected objects> */
