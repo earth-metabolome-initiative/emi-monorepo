@@ -91,10 +91,10 @@ serde_json = "1.0"
 strum = { version = "0.27", features = ["derive"] }
 yew = { git = "https://github.com/LucaCappelletti94/yew.git", features = [
   "csr",
-], branch = "string-properties" }
-yew-router = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "string-properties" }
+], branch = "vendoring-yew-agent" }
+yew-router = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "vendoring-yew-agent" }
 yewdux = { git = "https://github.com/LucaCappelletti94/yewdux", branch = "custom-yew" }
-yew-agent = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "string-properties" }
+yew-agent = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "vendoring-yew-agent" }
 
 strum_macros = "0.27"
 zip = "2.6"
@@ -107,6 +107,7 @@ image = "0.25.6"
 rsa = { version = "0.9.8" }
 rand = { version = "0.8" }
 gloo = "0.11.0"
+gloo-timers = "0.3.0"
 criterion = { version = "0.5", features = ["html_reports"] }
 rosetta-uuid = { path = "data-structures/rosetta-uuid" }
 rosetta-timestamp = { path = "utils/rosetta-timestamp" }

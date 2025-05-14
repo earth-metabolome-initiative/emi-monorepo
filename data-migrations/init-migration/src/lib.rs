@@ -35,10 +35,10 @@ pub async fn init_migration(portal_conn: &mut AsyncPgConnection) -> Result<(), e
                 init_login_providers(portal_conn).await?;
                 let darwin = init_root_user(portal_conn).await?;
                 init_brands(&darwin, portal_conn).await?;
-                init_reagents(&darwin, portal_conn).await?;
-                init_commercial_products(&darwin, portal_conn).await?;
-                init_step_models(&darwin, portal_conn).await?;
-                init_procedure_models(&darwin, portal_conn).await?;
+                // init_reagents(&darwin, portal_conn).await?;
+                // init_commercial_products(&darwin, portal_conn).await?;
+                // init_step_models(&darwin, portal_conn).await?;
+                // init_procedure_models(&darwin, portal_conn).await?;
                 Ok(())
             })
         })

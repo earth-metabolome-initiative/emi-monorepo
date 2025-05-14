@@ -41,8 +41,7 @@ impl Worker for DBWSWorker {
 
     fn create(scope: &yew_agent::prelude::WorkerScope<Self>) -> Self {
         console::log_1(&"Creating DBWSWorker".into());
-        // scope.send_future(sqlite_wasm_rs::export::install_opfs_sahpool(None, true));
-        scope.send_future(sqlite_wasm_rs::relaxed_idb_vfs::install(None, false));
+        scope.send_future(sqlite_wasm_rs::export::install_opfs_sahpool(None, true));
         scope.send_message(WSInternalMessage::Connect);
         Self { websocket: None, conn: None, listen_notify: ListenNotify::default() }
     }
@@ -63,10 +62,10 @@ impl Worker for DBWSWorker {
                 self.update_websocket(scope, ws_message);
             }
             InternalMessage::DBError(err) => {
-                todo!("Handle DB error: {err:?}");
+                console::log_1(&format!("Database error: {err:?}").into());
             }
             InternalMessage::WSError(err) => {
-                todo!("Handle WS error: {err:?}");
+                console::log_1(&format!("WebSocket error: {err:?}").into());
             }
         }
     }

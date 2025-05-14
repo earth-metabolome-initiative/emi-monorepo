@@ -7,6 +7,7 @@ mod ball_mill_steps;
 mod brands;
 mod centrifuge_step_models;
 mod centrifuge_steps;
+mod chemical_entities;
 mod cities;
 mod colors;
 mod commercial_product_lots;
@@ -45,6 +46,7 @@ mod postgres_async_read_dispatch;
 mod procedure_model_container_categories;
 mod procedure_model_instrument_categories;
 mod procedure_model_nameplate_categories;
+mod procedure_model_reagents;
 mod procedure_model_tool_categories;
 mod procedure_models;
 mod procedure_step_models;
@@ -123,6 +125,9 @@ pub enum Row {
     ),
     CentrifugeStep(
         crate::codegen::structs_codegen::tables::centrifuge_steps::CentrifugeStep,
+    ),
+    ChemicalEntity(
+        crate::codegen::structs_codegen::tables::chemical_entities::ChemicalEntity,
     ),
     City(crate::codegen::structs_codegen::tables::cities::City),
     Color(crate::codegen::structs_codegen::tables::colors::Color),
@@ -211,6 +216,9 @@ pub enum Row {
     ),
     ProcedureModelNameplateCategory(
         crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory,
+    ),
+    ProcedureModelReagent(
+        crate::codegen::structs_codegen::tables::procedure_model_reagents::ProcedureModelReagent,
     ),
     ProcedureModelToolCategory(
         crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory,
@@ -346,6 +354,9 @@ impl Row {
                 centrifuge_step_models.upsert(conn)?.map(Row::from)
             }
             Row::CentrifugeStep(centrifuge_steps) => centrifuge_steps.upsert(conn)?.map(Row::from),
+            Row::ChemicalEntity(chemical_entities) => {
+                chemical_entities.upsert(conn)?.map(Row::from)
+            }
             Row::City(cities) => cities.upsert(conn)?.map(Row::from),
             Row::Color(colors) => colors.upsert(conn)?.map(Row::from),
             Row::CommercialProductLot(commercial_product_lots) => {
@@ -421,6 +432,9 @@ impl Row {
             }
             Row::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
                 procedure_model_nameplate_categories.upsert(conn)?.map(Row::from)
+            }
+            Row::ProcedureModelReagent(procedure_model_reagents) => {
+                procedure_model_reagents.upsert(conn)?.map(Row::from)
             }
             Row::ProcedureModelToolCategory(procedure_model_tool_categories) => {
                 procedure_model_tool_categories.upsert(conn)?.map(Row::from)
@@ -541,6 +555,7 @@ impl web_common_traits::prelude::Row for Row {
                 centrifuge_step_models.primary_key()
             }
             Row::CentrifugeStep(centrifuge_steps) => centrifuge_steps.primary_key(),
+            Row::ChemicalEntity(chemical_entities) => chemical_entities.primary_key(),
             Row::City(cities) => cities.primary_key(),
             Row::Color(colors) => colors.primary_key(),
             Row::CommercialProductLot(commercial_product_lots) => {
@@ -594,6 +609,9 @@ impl web_common_traits::prelude::Row for Row {
             }
             Row::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
                 procedure_model_nameplate_categories.primary_key()
+            }
+            Row::ProcedureModelReagent(procedure_model_reagents) => {
+                procedure_model_reagents.primary_key()
             }
             Row::ProcedureModelToolCategory(procedure_model_tool_categories) => {
                 procedure_model_tool_categories.primary_key()

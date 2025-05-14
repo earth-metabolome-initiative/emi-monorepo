@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(
     diesel::Selectable,
@@ -14,6 +14,8 @@ pub struct Reagent {
     pub id: i32,
     pub name: String,
     pub description: String,
+    pub purity: f32,
+    pub gram_per_mole: f32,
     pub created_by: i32,
     pub created_at: rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,

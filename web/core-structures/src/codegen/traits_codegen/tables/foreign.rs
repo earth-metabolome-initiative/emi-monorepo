@@ -37,6 +37,7 @@ mod permanence_categories;
 mod procedure_model_container_categories;
 mod procedure_model_instrument_categories;
 mod procedure_model_nameplate_categories;
+mod procedure_model_reagents;
 mod procedure_model_tool_categories;
 mod procedure_step_models;
 mod procedures;

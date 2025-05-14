@@ -62,6 +62,12 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
+            crate::codegen::tables::table_names::TableName::ChemicalEntity => {
+                <crate::codegen::structs_codegen::tables::chemical_entities::ChemicalEntity as web_common_traits::database::BoundedRead<
+                    diesel::SqliteConnection,
+                >>::bounded_read(offset, limit, conn)
+                    .map(super::Rows::from)
+            }
             crate::codegen::tables::table_names::TableName::City => {
                 <crate::codegen::structs_codegen::tables::cities::City as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
@@ -274,6 +280,12 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
             }
             crate::codegen::tables::table_names::TableName::ProcedureModelNameplateCategory => {
                 <crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory as web_common_traits::database::BoundedRead<
+                    diesel::SqliteConnection,
+                >>::bounded_read(offset, limit, conn)
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::ProcedureModelReagent => {
+                <crate::codegen::structs_codegen::tables::procedure_model_reagents::ProcedureModelReagent as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)

@@ -105,6 +105,17 @@ impl web_common_traits::prelude::AsyncReadDispatch<diesel_async::AsyncPgConnecti
                         .map(super::Row::from),
                 )
             }
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ChemicalEntity(
+                primary_key,
+            ) => {
+                Ok(
+                    <crate::codegen::structs_codegen::tables::chemical_entities::ChemicalEntity as web_common_traits::database::AsyncRead<
+                        diesel_async::AsyncPgConnection,
+                    >>::read_async(primary_key, conn)
+                        .await?
+                        .map(super::Row::from),
+                )
+            }
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::City(
                 primary_key,
             ) => {
@@ -495,6 +506,17 @@ impl web_common_traits::prelude::AsyncReadDispatch<diesel_async::AsyncPgConnecti
             ) => {
                 Ok(
                     <crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory as web_common_traits::database::AsyncRead<
+                        diesel_async::AsyncPgConnection,
+                    >>::read_async(primary_key, conn)
+                        .await?
+                        .map(super::Row::from),
+                )
+            }
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelReagent(
+                primary_key,
+            ) => {
+                Ok(
+                    <crate::codegen::structs_codegen::tables::procedure_model_reagents::ProcedureModelReagent as web_common_traits::database::AsyncRead<
                         diesel_async::AsyncPgConnection,
                     >>::read_async(primary_key, conn)
                         .await?

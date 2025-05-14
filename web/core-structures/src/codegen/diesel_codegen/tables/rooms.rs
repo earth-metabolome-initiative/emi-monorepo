@@ -1,5 +1,5 @@
 diesel::table! {
-    public.rooms(id) { id -> diesel::sql_types::Integer, name -> diesel::sql_types::Text,
+    rooms(id) { id -> diesel::sql_types::Integer, name -> diesel::sql_types::Text,
     description -> diesel::sql_types::Text, qrcode -> rosetta_uuid::diesel_impls::Uuid,
     addresses_id -> diesel::sql_types::Integer, geolocation ->
     postgis_diesel::sql_types::Geography, created_by -> diesel::sql_types::Integer,

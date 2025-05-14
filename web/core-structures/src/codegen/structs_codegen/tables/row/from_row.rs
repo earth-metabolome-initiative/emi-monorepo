@@ -24,6 +24,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::CentrifugeStep(centrifuge_steps) => {
                 crate::codegen::tables::rows::Rows::from(centrifuge_steps)
             }
+            super::Row::ChemicalEntity(chemical_entities) => {
+                crate::codegen::tables::rows::Rows::from(chemical_entities)
+            }
             super::Row::City(cities) => crate::codegen::tables::rows::Rows::from(cities),
             super::Row::Color(colors) => crate::codegen::tables::rows::Rows::from(colors),
             super::Row::CommercialProductLot(commercial_product_lots) => {
@@ -121,6 +124,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
                 crate::codegen::tables::rows::Rows::from(procedure_model_nameplate_categories)
+            }
+            super::Row::ProcedureModelReagent(procedure_model_reagents) => {
+                crate::codegen::tables::rows::Rows::from(procedure_model_reagents)
             }
             super::Row::ProcedureModelToolCategory(procedure_model_tool_categories) => {
                 crate::codegen::tables::rows::Rows::from(procedure_model_tool_categories)

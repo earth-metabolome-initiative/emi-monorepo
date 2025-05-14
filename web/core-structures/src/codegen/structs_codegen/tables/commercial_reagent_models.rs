@@ -14,7 +14,7 @@
 )]
 pub struct CommercialReagentModel {
     pub id: i32,
-    pub reagent_id: nameplate_categories::NameplateCategory,
+    pub reagent_id: i32,
     pub created_by: i32,
     pub created_at: rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,
@@ -45,6 +45,22 @@ impl CommercialReagentModel {
             .first::<
                 crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
             >(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn reagent(
+        &self,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::reagents::Reagent, diesel::result::Error>
+    {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        crate::codegen::structs_codegen::tables::reagents::Reagent::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::reagents::reagents::dsl::id
+                    .eq(&self.reagent_id),
+            )
+            .first::<crate::codegen::structs_codegen::tables::reagents::Reagent>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -88,6 +104,21 @@ impl CommercialReagentModel {
                     .eq(id.id),
             )
             .first::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_reagent_id(
+        conn: &mut diesel_async::AsyncPgConnection,
+        reagent_id: &crate::codegen::structs_codegen::tables::reagents::Reagent,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::commercial_reagent_models::commercial_reagent_models::dsl::reagent_id
+                    .eq(reagent_id.id),
+            )
+            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]

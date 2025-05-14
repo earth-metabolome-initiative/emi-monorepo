@@ -40,7 +40,7 @@ impl core::fmt::Display for InsertableCommercialReagentModelAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialReagentModel {
     id: i32,
-    reagent_id: nameplate_categories::NameplateCategory,
+    reagent_id: i32,
     created_by: i32,
     created_at: rosetta_timestamp::TimestampUTC,
     updated_by: i32,
@@ -65,6 +65,22 @@ impl InsertableCommercialReagentModel {
             .first::<
                 crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
             >(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn reagent(
+        &self,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::reagents::Reagent, diesel::result::Error>
+    {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        crate::codegen::structs_codegen::tables::reagents::Reagent::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::reagents::reagents::dsl::id
+                    .eq(&self.reagent_id),
+            )
+            .first::<crate::codegen::structs_codegen::tables::reagents::Reagent>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -98,7 +114,7 @@ impl InsertableCommercialReagentModel {
 }
 pub struct InsertableCommercialReagentModelBuilder {
     id: Option<i32>,
-    reagent_id: Option<nameplate_categories::NameplateCategory>,
+    reagent_id: Option<i32>,
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     updated_by: Option<i32>,
@@ -125,7 +141,7 @@ impl InsertableCommercialReagentModelBuilder {
         self.id = Some(id);
         Ok(self)
     }
-    pub fn reagent_id<P: Into<nameplate_categories::NameplateCategory>>(
+    pub fn reagent_id<P: Into<i32>>(
         mut self,
         reagent_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {

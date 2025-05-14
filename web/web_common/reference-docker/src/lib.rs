@@ -59,6 +59,13 @@ fn is_extension_crate<P>(directory: P) -> Result<bool, std::io::Error>
 where
     P: AsRef<std::path::Path>,
 {
+    // We temporarely exclude `cas_code` as a crate.
+    let excluded_crates = ["cas_code", "elements"];
+
+    if excluded_crates.iter().any(|&crate_name| directory.as_ref().ends_with(crate_name)) {
+        return Ok(false);
+    }
+
     let path = directory.as_ref().join("Cargo.toml");
     if !path.exists() {
         return Ok(false);
@@ -118,7 +125,7 @@ async fn reference_docker(
         );
     }
 
-    let mut container_builder = GenericImage::new("postgres", "17-bookworm")
+    let mut container_builder = GenericImage::new("mycustom/postgres-postgis", "17.4")
         .with_wait_for(WaitFor::message_on_stderr("database system is ready to accept connections"))
         .with_network("bridge")
         .with_env_var("DEBUG", "1")

@@ -117,6 +117,13 @@ where
             }
         }
 
+        // If there are any remaining sorted rows, we insert them into the vector.
+        self.extend(sorted_iter.inspect(|_| {
+            inserted += 1;
+        }));
+        // If there are any remaining current rows, we insert them into the vector.
+        self.extend(current_iter);
+
         debug_assert!(
             self.is_sorted_by(|a, b| a.primary_key() <= b.primary_key()),
             "The vector is not sorted after upsert. Please check the implementation of upsert_sorted_vec."

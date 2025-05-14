@@ -10,6 +10,7 @@ pub enum TablePrimaryKey {
     Brand(i32),
     CentrifugeStepModel(i32),
     CentrifugeStep(rosetta_uuid::Uuid),
+    ChemicalEntity(i32),
     City(i32),
     Color(i16),
     CommercialProductLot(i32),
@@ -46,6 +47,7 @@ pub enum TablePrimaryKey {
     ProcedureModelContainerCategory(i32),
     ProcedureModelInstrumentCategory(i32),
     ProcedureModelNameplateCategory(i32),
+    ProcedureModelReagent(i32),
     ProcedureModelToolCategory(i32),
     ProcedureModel(i32),
     ProcedureStepModel(i32),
@@ -126,6 +128,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::CentrifugeStep(_) => {
                 crate::codegen::tables::table_names::TableName::CentrifugeStep
+            }
+            TablePrimaryKey::ChemicalEntity(_) => {
+                crate::codegen::tables::table_names::TableName::ChemicalEntity
             }
             TablePrimaryKey::City(_) => crate::codegen::tables::table_names::TableName::City,
             TablePrimaryKey::Color(_) => crate::codegen::tables::table_names::TableName::Color,
@@ -228,6 +233,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::ProcedureModelNameplateCategory(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModelNameplateCategory
+            }
+            TablePrimaryKey::ProcedureModelReagent(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureModelReagent
             }
             TablePrimaryKey::ProcedureModelToolCategory(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModelToolCategory

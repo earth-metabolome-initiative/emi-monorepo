@@ -28,6 +28,9 @@ impl DBWSWorker {
         db_message: DBInternalMessage,
     ) {
         match db_message {
+            DBInternalMessage::Retry((component_message, subscriber_id)) => {
+                self.received_query(scope, component_message, subscriber_id);
+            }
             DBInternalMessage::DB(DBMessage::Row(row, crud)) => {
                 // We received a message with information regarding a table read,
                 // which we need to integrate into the SQLite database and then
@@ -35,9 +38,14 @@ impl DBWSWorker {
 
                 match crud {
                     CRUD::Update | CRUD::Create | CRUD::Read => {
-                        let updated_row = match row.sqlite_upsert(self.conn.as_mut().unwrap()) {
+                        let Some(conn) = self.conn.as_mut() else {
+                            console::log_1(&"No connection to SQLite database".into());
+                            return;
+                        };
+                        let updated_row = match row.sqlite_upsert(conn) {
                             Ok(rows) => rows,
                             Err(err) => {
+                                console::log_1(&format!("Error updating row: {err:?}").into());
                                 scope.send_message(err);
                                 return;
                             }
@@ -58,10 +66,16 @@ impl DBWSWorker {
                 // which we need to integrate into the SQLite database and then
                 // notify the components that are listening to this table.
 
+                let Some(conn) = self.conn.as_mut() else {
+                    console::log_1(&"No connection to SQLite database".into());
+                    return;
+                };
+
                 // TODO! Actually update according to CRUD!
-                let updated_rows = match rows.sqlite_upsert(self.conn.as_mut().unwrap()) {
+                let updated_rows = match rows.sqlite_upsert(conn) {
                     Ok(rows) => rows,
                     Err(err) => {
+                        console::log_1(&format!("Error updating rows: {err:?}").into());
                         scope.send_message(err);
                         return;
                     }
@@ -70,10 +84,8 @@ impl DBWSWorker {
                 self.listen_notify.notify_rows_listeners(&updated_rows, crud, scope);
             }
             DBInternalMessage::Connect => {
-                console::log_1(&"Connecting to SQLite database".into());
-                match SqliteConnection::establish("file:emi.db?vfs=relaxed-idb") {
+                match SqliteConnection::establish("file:emi.db?vfs=opfs-sahpool") {
                     Ok(mut conn) => {
-                        console::log_1(&"Connected to SQLite database".into());
                         if let Err(err) = conn.batch_execute(CSV_MIGRATIONS) {
                             scope.send_message(err);
                             return;
@@ -84,7 +96,9 @@ impl DBWSWorker {
                         }
                         self.conn = Some(conn);
                     }
-                    Err(err) => scope.send_message(err),
+                    Err(err) => {
+                        scope.send_message(err);
+                    }
                 }
             }
         }
@@ -98,17 +112,23 @@ impl DBWSWorker {
     ) {
         match component_message {
             C2DBMessage::Row(operation) => {
+                let Some(conn) = self.conn.as_mut() else {
+                    // If the connection is not established yet, we submit the
+                    // message to the future, waiting one second before trying again.
+                    scope.send_future(async move {
+                        gloo_timers::future::sleep(std::time::Duration::from_secs(5)).await;
+                        DBInternalMessage::Retry((C2DBMessage::Row(operation), subscriber_id))
+                    });
+                    return;
+                };
+
                 // We execute the query locally and send the result back to the component.
                 let operation_kind = *operation.as_ref();
                 // Secondly, we register the component as a listener
                 // for the modification of the table.
                 self.listen_notify.register_row_listener(subscriber_id, operation.primary_key());
 
-                // Finally, we also submit the query to the database
-                // via the WebSocket connection.
-                self.update_websocket(scope, operation.clone());
-
-                match operation.execute(self.conn.as_mut().unwrap()) {
+                match operation.clone().execute(conn) {
                     Ok(Some(row)) => {
                         scope.respond(subscriber_id, (row, operation_kind).into());
                     }
@@ -117,18 +137,29 @@ impl DBWSWorker {
                         scope.send_message(err);
                     }
                 }
+
+                // Finally, we also submit the query to the database
+                // via the WebSocket connection.
+                self.update_websocket(scope, operation);
             }
             C2DBMessage::Table(operation) => {
+                let Some(conn) = self.conn.as_mut() else {
+                    // If the connection is not established yet, we submit the
+                    // message to the future, waiting one second before trying again.
+                    scope.send_future(async move {
+                        gloo_timers::future::sleep(std::time::Duration::from_secs(5)).await;
+                        DBInternalMessage::Retry((C2DBMessage::Table(operation), subscriber_id))
+                    });
+                    return;
+                };
                 // Secondly, we register the component as a listener
                 // for the modification of the table.
                 self.listen_notify.register_table_listener(subscriber_id, operation.table_name());
 
-                // Finally, we also submit the query to the database
-                // via the WebSocket connection.
-                self.update_websocket(scope, operation.clone());
                 // We execute the query locally and send the result back to the component.
                 let operation_kind = *operation.as_ref();
-                match operation.execute(self.conn.as_mut().unwrap()) {
+
+                match operation.clone().execute(conn) {
                     Ok(rows) => {
                         scope.respond(subscriber_id, (rows, operation_kind).into());
                     }
@@ -136,6 +167,10 @@ impl DBWSWorker {
                         scope.send_message(err);
                     }
                 }
+
+                // Finally, we also submit the query to the database
+                // via the WebSocket connection.
+                self.update_websocket(scope, operation);
             }
         }
     }

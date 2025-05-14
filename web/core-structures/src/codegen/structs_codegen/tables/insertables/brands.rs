@@ -85,6 +85,8 @@ impl InsertableBrandBuilder {
         name: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
         let name = name.into();
+        pgrx_validation::must_be_paragraph(name.as_ref())
+            .map_err(|e| e.rename_field(InsertableBrandAttributes::Name))?;
         self.name = Some(name);
         Ok(self)
     }

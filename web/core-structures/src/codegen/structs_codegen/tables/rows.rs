@@ -7,6 +7,7 @@ mod ball_mill_steps;
 mod brands;
 mod centrifuge_step_models;
 mod centrifuge_steps;
+mod chemical_entities;
 mod cities;
 mod colors;
 mod commercial_product_lots;
@@ -46,6 +47,7 @@ mod postgres_async_bounded_read_dispatch;
 mod procedure_model_container_categories;
 mod procedure_model_instrument_categories;
 mod procedure_model_nameplate_categories;
+mod procedure_model_reagents;
 mod procedure_model_tool_categories;
 mod procedure_models;
 mod procedure_step_models;
@@ -134,6 +136,9 @@ pub enum Rows {
     ),
     CentrifugeStep(
         Vec<crate::codegen::structs_codegen::tables::centrifuge_steps::CentrifugeStep>,
+    ),
+    ChemicalEntity(
+        Vec<crate::codegen::structs_codegen::tables::chemical_entities::ChemicalEntity>,
     ),
     City(Vec<crate::codegen::structs_codegen::tables::cities::City>),
     Color(Vec<crate::codegen::structs_codegen::tables::colors::Color>),
@@ -261,6 +266,11 @@ pub enum Rows {
     ProcedureModelNameplateCategory(
         Vec<
             crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory,
+        >,
+    ),
+    ProcedureModelReagent(
+        Vec<
+            crate::codegen::structs_codegen::tables::procedure_model_reagents::ProcedureModelReagent,
         >,
     ),
     ProcedureModelToolCategory(
@@ -496,6 +506,13 @@ impl Rows {
             }
             Rows::CentrifugeStep(centrifuge_steps) => {
                 centrifuge_steps
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::ChemicalEntity(chemical_entities) => {
+                chemical_entities
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -748,6 +765,13 @@ impl Rows {
             }
             Rows::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
                 procedure_model_nameplate_categories
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::ProcedureModelReagent(procedure_model_reagents) => {
+                procedure_model_reagents
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -1145,6 +1169,7 @@ impl web_common_traits::prelude::Rows for Rows {
                 centrifuge_step_models.primary_keys()
             }
             Rows::CentrifugeStep(centrifuge_steps) => centrifuge_steps.primary_keys(),
+            Rows::ChemicalEntity(chemical_entities) => chemical_entities.primary_keys(),
             Rows::City(cities) => cities.primary_keys(),
             Rows::Color(colors) => colors.primary_keys(),
             Rows::CommercialProductLot(commercial_product_lots) => {
@@ -1200,6 +1225,9 @@ impl web_common_traits::prelude::Rows for Rows {
             }
             Rows::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
                 procedure_model_nameplate_categories.primary_keys()
+            }
+            Rows::ProcedureModelReagent(procedure_model_reagents) => {
+                procedure_model_reagents.primary_keys()
             }
             Rows::ProcedureModelToolCategory(procedure_model_tool_categories) => {
                 procedure_model_tool_categories.primary_keys()

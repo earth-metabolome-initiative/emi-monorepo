@@ -13,5 +13,5 @@ pub trait AssignedComponent:
     BaseComponent<Properties = AssignedConnectorProps<<Self as AssignedComponent>::Row>>
 {
     /// The assigned row type for the component.
-    type Row: Row + StaticTabular + Tabular<TableName = TableName>;
+    type Row: std::fmt::Debug + Row + StaticTabular + Tabular<TableName = TableName>;
 }

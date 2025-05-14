@@ -3,6 +3,8 @@
 pub enum InsertableReagentAttributes {
     Name,
     Description,
+    Purity,
+    GramPerMole,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -13,6 +15,8 @@ impl core::fmt::Display for InsertableReagentAttributes {
         match self {
             InsertableReagentAttributes::Name => write!(f, "name"),
             InsertableReagentAttributes::Description => write!(f, "description"),
+            InsertableReagentAttributes::Purity => write!(f, "purity"),
+            InsertableReagentAttributes::GramPerMole => write!(f, "gram_per_mole"),
             InsertableReagentAttributes::CreatedBy => write!(f, "created_by"),
             InsertableReagentAttributes::CreatedAt => write!(f, "created_at"),
             InsertableReagentAttributes::UpdatedBy => write!(f, "updated_by"),
@@ -29,6 +33,8 @@ impl core::fmt::Display for InsertableReagentAttributes {
 pub struct InsertableReagent {
     name: String,
     description: String,
+    purity: f32,
+    gram_per_mole: f32,
     created_by: i32,
     created_at: rosetta_timestamp::TimestampUTC,
     updated_by: i32,
@@ -67,6 +73,8 @@ impl InsertableReagent {
 pub struct InsertableReagentBuilder {
     name: Option<String>,
     description: Option<String>,
+    purity: Option<f32>,
+    gram_per_mole: Option<f32>,
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     updated_by: Option<i32>,
@@ -77,6 +85,8 @@ impl Default for InsertableReagentBuilder {
         Self {
             name: None,
             description: None,
+            purity: None,
+            gram_per_mole: None,
             created_by: None,
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             updated_by: None,
@@ -103,6 +113,30 @@ impl InsertableReagentBuilder {
         pgrx_validation::must_be_paragraph(description.as_ref())
             .map_err(|e| e.rename_field(InsertableReagentAttributes::Description))?;
         self.description = Some(description);
+        Ok(self)
+    }
+    pub fn purity<P: Into<f32>>(
+        mut self,
+        purity: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let purity = purity.into();
+        pgrx_validation::must_be_strictly_positive_f32(purity)
+            .map_err(|e| e.rename_field(InsertableReagentAttributes::Purity))
+            .and_then(|_| {
+                pgrx_validation::must_be_strictly_smaller_than_f32(purity, 100f32)
+                    .map_err(|e| e.rename_field(InsertableReagentAttributes::Purity))
+            })?;
+        self.purity = Some(purity);
+        Ok(self)
+    }
+    pub fn gram_per_mole<P: Into<f32>>(
+        mut self,
+        gram_per_mole: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        let gram_per_mole = gram_per_mole.into();
+        pgrx_validation::must_be_strictly_positive_f32(gram_per_mole)
+            .map_err(|e| e.rename_field(InsertableReagentAttributes::GramPerMole))?;
+        self.gram_per_mole = Some(gram_per_mole);
         Ok(self)
     }
     pub fn created_by<P: Into<i32>>(
@@ -153,6 +187,14 @@ impl common_traits::prelude::Builder for InsertableReagentBuilder {
                     InsertableReagentAttributes::Description,
                 ),
             )?,
+            purity: self.purity.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableReagentAttributes::Purity,
+            ))?,
+            gram_per_mole: self.gram_per_mole.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableReagentAttributes::GramPerMole,
+                ),
+            )?,
             created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableReagentAttributes::CreatedBy,
@@ -182,6 +224,8 @@ impl TryFrom<InsertableReagent> for InsertableReagentBuilder {
         Self::default()
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
+            .purity(insertable_variant.purity)?
+            .gram_per_mole(insertable_variant.gram_per_mole)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?

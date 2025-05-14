@@ -38,6 +38,26 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
+                crate::codegen::tables::row::Row::Organism(organisms),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if organisms.id == self.organism_id {
+                    foreign_keys.organism = Some(organisms);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Organism(organisms),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if organisms.id == self.organism_id {
+                    foreign_keys.organism = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::Taxon(taxa),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -74,26 +94,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if users.id == self.created_by {
                     foreign_keys.created_by = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Organism(organisms),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if organisms.id == self.organism_id {
-                    foreign_keys.organism = Some(organisms);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Organism(organisms),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if organisms.id == self.organism_id {
-                    foreign_keys.organism = None;
                     updated = true;
                 }
             }

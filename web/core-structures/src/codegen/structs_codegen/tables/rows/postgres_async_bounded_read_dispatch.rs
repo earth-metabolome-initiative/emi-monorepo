@@ -73,6 +73,13 @@ impl web_common_traits::prelude::AsyncBoundedReadDispatch<diesel_async::AsyncPgC
                     .await
                     .map(super::Rows::from)
             }
+            crate::codegen::tables::table_names::TableName::ChemicalEntity => {
+                <crate::codegen::structs_codegen::tables::chemical_entities::ChemicalEntity as web_common_traits::database::AsyncBoundedRead<
+                    diesel_async::AsyncPgConnection,
+                >>::bounded_read_async(offset, limit, conn)
+                    .await
+                    .map(super::Rows::from)
+            }
             crate::codegen::tables::table_names::TableName::City => {
                 <crate::codegen::structs_codegen::tables::cities::City as web_common_traits::database::AsyncBoundedRead<
                     diesel_async::AsyncPgConnection,
@@ -320,6 +327,13 @@ impl web_common_traits::prelude::AsyncBoundedReadDispatch<diesel_async::AsyncPgC
             }
             crate::codegen::tables::table_names::TableName::ProcedureModelNameplateCategory => {
                 <crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory as web_common_traits::database::AsyncBoundedRead<
+                    diesel_async::AsyncPgConnection,
+                >>::bounded_read_async(offset, limit, conn)
+                    .await
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::ProcedureModelReagent => {
+                <crate::codegen::structs_codegen::tables::procedure_model_reagents::ProcedureModelReagent as web_common_traits::database::AsyncBoundedRead<
                     diesel_async::AsyncPgConnection,
                 >>::bounded_read_async(offset, limit, conn)
                     .await

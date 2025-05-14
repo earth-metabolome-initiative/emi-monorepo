@@ -211,9 +211,10 @@ impl Connector {
                 false
             }
             ConnectorMessage::Worker(message) => {
-                unimplemented!(
-                    "The component should implement the `update` method to handle the worker message: `{message:?}`."
+                console::log_1(
+                    &format!("The component should implement the `update` method to handle the worker message: `{message:?}`.").into()
                 );
+                false
             }
         }
     }

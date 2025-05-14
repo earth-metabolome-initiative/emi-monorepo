@@ -67,16 +67,8 @@ pub(super) async fn portal_ws(
                 log::debug!("msg: {msg:?}");
 
                 match msg {
-                    AggregatedMessage::Ping(bytes) => {
+                    AggregatedMessage::Ping(_) | AggregatedMessage::Pong(_) => {
                         last_heartbeat = Instant::now();
-                        // unwrap:
-                        session.pong(&bytes).await.unwrap();
-                    }
-
-                    AggregatedMessage::Pong(bytes) => {
-                        last_heartbeat = Instant::now();
-                        // unwrap:
-                        session.ping(&bytes).await.unwrap();
                     }
 
                     AggregatedMessage::Text(_) => {

@@ -1,5 +1,5 @@
 diesel::table! {
-    public.container_models(id) { id -> diesel::sql_types::Integer, liters ->
+    container_models(id) { id -> diesel::sql_types::Integer, liters ->
     diesel::sql_types::Float, container_category ->
     container_categories::diesel_impls::ContainerCategory, created_by ->
     diesel::sql_types::Integer, created_at ->

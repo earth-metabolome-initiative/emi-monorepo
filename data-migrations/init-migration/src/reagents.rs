@@ -14,6 +14,7 @@ pub(crate) async fn init_reagents(
     let _ethanol = Reagent::new()
         .name("Ethanol, 99.8%")?
         .description("Ethanol, 99.8%, Analytical reagent grade")?
+        .purity(99.8)?
         .created_by(user.id)?
         .build()?
         .backend_insert(portal_conn)
@@ -22,6 +23,7 @@ pub(crate) async fn init_reagents(
     let _methanol = Reagent::new()
         .name("Methanol, >= 99.8%")?
         .description("Methanol, >= 99.8%, HPLC grade")?
+        .purity(99.8)?
         .created_by(user.id)?
         .build()?
         .backend_insert(portal_conn)
@@ -30,6 +32,7 @@ pub(crate) async fn init_reagents(
     let _formic_acid = Reagent::new()
         .name("Formic acid, 98+%")?
         .description("Formic acid, 98+%, pure")?
+        .purity(98.0)?
         .created_by(user.id)?
         .build()?
         .backend_insert(portal_conn)
@@ -38,6 +41,7 @@ pub(crate) async fn init_reagents(
     let _distilled_water = Reagent::new()
         .name("Distilled water")?
         .description("Distilled water, pure")?
+        .purity(100.0)?
         .created_by(user.id)?
         .build()?
         .backend_insert(portal_conn)

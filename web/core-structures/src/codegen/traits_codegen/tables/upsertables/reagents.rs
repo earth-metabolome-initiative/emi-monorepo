@@ -20,16 +20,32 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                         diesel::BoolExpressionMethods::and(
                             diesel::BoolExpressionMethods::and(
                                 diesel::BoolExpressionMethods::and(
-                                    crate::codegen::diesel_codegen::tables::reagents::reagents::name
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::reagents::reagents::name,
-                                            ),
+                                    diesel::BoolExpressionMethods::and(
+                                        diesel::BoolExpressionMethods::and(
+                                            crate::codegen::diesel_codegen::tables::reagents::reagents::name
+                                                .ne(
+                                                    diesel::upsert::excluded(
+                                                        crate::codegen::diesel_codegen::tables::reagents::reagents::name,
+                                                    ),
+                                                ),
+                                            crate::codegen::diesel_codegen::tables::reagents::reagents::description
+                                                .ne(
+                                                    diesel::upsert::excluded(
+                                                        crate::codegen::diesel_codegen::tables::reagents::reagents::description,
+                                                    ),
+                                                ),
                                         ),
-                                    crate::codegen::diesel_codegen::tables::reagents::reagents::description
+                                        crate::codegen::diesel_codegen::tables::reagents::reagents::purity
+                                            .ne(
+                                                diesel::upsert::excluded(
+                                                    crate::codegen::diesel_codegen::tables::reagents::reagents::purity,
+                                                ),
+                                            ),
+                                    ),
+                                    crate::codegen::diesel_codegen::tables::reagents::reagents::gram_per_mole
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::reagents::reagents::description,
+                                                crate::codegen::diesel_codegen::tables::reagents::reagents::gram_per_mole,
                                             ),
                                         ),
                                 ),
@@ -88,16 +104,32 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                         diesel::BoolExpressionMethods::and(
                             diesel::BoolExpressionMethods::and(
                                 diesel::BoolExpressionMethods::and(
-                                    crate::codegen::diesel_codegen::tables::reagents::reagents::name
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::reagents::reagents::name,
-                                            ),
+                                    diesel::BoolExpressionMethods::and(
+                                        diesel::BoolExpressionMethods::and(
+                                            crate::codegen::diesel_codegen::tables::reagents::reagents::name
+                                                .ne(
+                                                    diesel::upsert::excluded(
+                                                        crate::codegen::diesel_codegen::tables::reagents::reagents::name,
+                                                    ),
+                                                ),
+                                            crate::codegen::diesel_codegen::tables::reagents::reagents::description
+                                                .ne(
+                                                    diesel::upsert::excluded(
+                                                        crate::codegen::diesel_codegen::tables::reagents::reagents::description,
+                                                    ),
+                                                ),
                                         ),
-                                    crate::codegen::diesel_codegen::tables::reagents::reagents::description
+                                        crate::codegen::diesel_codegen::tables::reagents::reagents::purity
+                                            .ne(
+                                                diesel::upsert::excluded(
+                                                    crate::codegen::diesel_codegen::tables::reagents::reagents::purity,
+                                                ),
+                                            ),
+                                    ),
+                                    crate::codegen::diesel_codegen::tables::reagents::reagents::gram_per_mole
                                         .ne(
                                             diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::reagents::reagents::description,
+                                                crate::codegen::diesel_codegen::tables::reagents::reagents::gram_per_mole,
                                             ),
                                         ),
                                 ),

@@ -4,10 +4,13 @@
 use api_path::api::ws::FULL_ENDPOINT;
 use futures::{SinkExt, StreamExt, channel::mpsc::channel};
 use gloo::net::websocket::futures::WebSocket;
+use web_sys::console;
 use ws_messages::{B2FMessage, F2BMessage};
 use yew::platform::spawn_local;
 
-use super::internal_message::ws_internal_message::WSInternalMessage;
+use super::internal_message::{
+    db_internal_message::DBInternalMessage, ws_internal_message::WSInternalMessage,
+};
 
 const DOMAIN: Option<&str> = option_env!("DOMAIN");
 
@@ -23,7 +26,7 @@ impl super::DBWSWorker {
             WSInternalMessage::B2F(message) => {
                 match message {
                     B2FMessage::DB(db_message) => {
-                        scope.send_message(db_message);
+                        scope.send_message(DBInternalMessage::DB(db_message));
                     }
                 }
             }
@@ -45,7 +48,8 @@ impl super::DBWSWorker {
                 let websocket = match WebSocket::open(&format!("wss://{domain}{FULL_ENDPOINT}")) {
                     Ok(websocket) => websocket,
                     Err(err) => {
-                        unimplemented!("Error opening WebSocket: {:?}", err);
+                        console::log_1(&format!("WebSocket error: {err:?}").into());
+                        return;
                     }
                 };
 

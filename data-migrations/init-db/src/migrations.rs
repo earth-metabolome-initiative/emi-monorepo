@@ -1,6 +1,5 @@
 use std::path::Path;
 
-use diesel::result::DatabaseErrorKind;
 use diesel_migrations_utils::prelude::*;
 
 pub(crate) async fn init_migrations(
@@ -39,30 +38,7 @@ pub(crate) async fn init_migrations(
     }
 
     // We execute the migrations
-    match extension_migrations.execute_ups(conn).await {
-        Ok(()) => {}
-        Err(MigrationError::ExecutingMigrationFailed(
-            _,
-            MigrationKind::Up,
-            diesel::result::Error::DatabaseError(DatabaseErrorKind::Unknown, error),
-        )) => {
-            // This error is expected when the database is empty and the
-            // migration is not the first one.
-            if error.message() == "extension \"pgrx_validation\" is not available" {
-                panic!(concat!(
-                    "You have forgotten to build the pgrx_validation extension. ",
-                    "Please navigate to the `/web/web_common/pgrx_validation` crate and read the ",
-                    "README.md file to build the extension. Do remember to copy the ",
-                    "extension to the `core-structures` directory as at this time the ",
-                    "Docker is not able to load the extension from the `pgrx_validation` ",
-                    "directory."
-                ));
-            } else {
-                panic!("{error:?}");
-            }
-        }
-        error => error.unwrap(),
-    }
+    extension_migrations.execute_ups(conn).await?;
     migrations.execute_ups(conn).await?;
 
     Ok(())

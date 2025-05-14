@@ -4,6 +4,9 @@
 use core_structures::tables::{row::Row, rows::Rows};
 use web_common_traits::crud::CRUD;
 use ws_messages::DBMessage;
+use yew_agent::worker::HandlerId;
+
+use crate::workers::dbws_worker::C2DBMessage;
 
 #[derive(Debug, Clone)]
 /// Enumeration of internal messages used for the DB portion of the DB/WebSocket
@@ -11,6 +14,9 @@ use ws_messages::DBMessage;
 pub enum DBInternalMessage {
     /// Indicates that a new connection to the database has been requested.
     Connect,
+    /// Indicates that a message from the frontend should be attempted
+    /// to be processed once again.
+    Retry((C2DBMessage, HandlerId)),
     /// Message from the backend database involving several rows.
     DB(DBMessage),
 }

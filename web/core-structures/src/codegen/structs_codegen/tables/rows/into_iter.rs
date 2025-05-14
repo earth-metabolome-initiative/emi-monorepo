@@ -42,6 +42,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::CentrifugeStep)
                     .collect::<Vec<_>>()
             }
+            super::Rows::ChemicalEntity(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::ChemicalEntity)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::City(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::City).collect::<Vec<_>>()
             }
@@ -210,6 +215,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::ProcedureModelNameplateCategory(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::ProcedureModelNameplateCategory)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::ProcedureModelReagent(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::ProcedureModelReagent)
                     .collect::<Vec<_>>()
             }
             super::Rows::ProcedureModelToolCategory(rows) => {

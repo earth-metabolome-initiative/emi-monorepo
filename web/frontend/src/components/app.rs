@@ -47,7 +47,7 @@ fn Root() -> Html {
 pub fn App() -> Html {
     html! {
         <YewduxRoot>
-            <WorkerProvider<DBWSWorker> path="/dbws_worker.js">
+            <WorkerProvider<DBWSWorker> path="/dbws_worker.js" lazy={false} module={true}>
                 <Root />
             </WorkerProvider<DBWSWorker>>
         </YewduxRoot>

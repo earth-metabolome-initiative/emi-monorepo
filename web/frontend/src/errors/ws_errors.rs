@@ -5,6 +5,7 @@ use std::fmt::Display;
 
 use futures::channel::mpsc::{SendError, TrySendError};
 use gloo::net::websocket::WebSocketError;
+use web_sys::console;
 use ws_messages::F2BMessage;
 
 #[derive(Debug, Clone, PartialEq, Hash, PartialOrd, Eq, Ord)]
@@ -26,10 +27,12 @@ impl From<WebSocketError> for WSError {
             WebSocketError::ConnectionError => WSError::Connection,
             WebSocketError::ConnectionClose(_close_event) => WSError::ConnectionClose,
             WebSocketError::MessageSendError(js_error) => {
-                unimplemented!("MessageSendError: {:?}", js_error)
+                console::log_1(&format!("WebSocketError: {js_error:?}").into());
+                WSError::Connection
             }
             err => {
-                unimplemented!("WebSocketError: {err:?}")
+                console::log_1(&format!("WebSocketError: {err:?}").into());
+                WSError::Connection
             }
         }
     }

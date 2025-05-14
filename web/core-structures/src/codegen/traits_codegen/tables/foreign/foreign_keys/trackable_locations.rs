@@ -45,23 +45,27 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::User(users),
+                crate::codegen::tables::row::Row::StorageContainer(storage_containers),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = Some(users);
-                    updated = true;
+                if let Some(storage_container_id) = self.storage_container_id {
+                    if storage_containers.id == storage_container_id {
+                        foreign_keys.storage_container = Some(storage_containers);
+                        updated = true;
+                    }
                 }
             }
             (
-                crate::codegen::tables::row::Row::User(users),
+                crate::codegen::tables::row::Row::StorageContainer(storage_containers),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = None;
-                    updated = true;
+                if let Some(storage_container_id) = self.storage_container_id {
+                    if storage_containers.id == storage_container_id {
+                        foreign_keys.storage_container = None;
+                        updated = true;
+                    }
                 }
             }
             (
@@ -85,27 +89,23 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::StorageContainer(storage_containers),
+                crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if let Some(storage_container_id) = self.storage_container_id {
-                    if storage_containers.id == storage_container_id {
-                        foreign_keys.storage_container = Some(storage_containers);
-                        updated = true;
-                    }
+                if users.id == self.created_by {
+                    foreign_keys.created_by = Some(users);
+                    updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::StorageContainer(storage_containers),
+                crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if let Some(storage_container_id) = self.storage_container_id {
-                    if storage_containers.id == storage_container_id {
-                        foreign_keys.storage_container = None;
-                        updated = true;
-                    }
+                if users.id == self.created_by {
+                    foreign_keys.created_by = None;
+                    updated = true;
                 }
             }
             (_, crud) => {

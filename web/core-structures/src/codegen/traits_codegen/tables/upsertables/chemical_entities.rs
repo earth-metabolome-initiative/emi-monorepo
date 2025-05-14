@@ -1,0 +1,172 @@
+#[cfg(feature = "postgres")]
+impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
+    for crate::codegen::structs_codegen::tables::chemical_entities::ChemicalEntity
+{
+    fn upsert(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
+        diesel::insert_into(
+                crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::table,
+            )
+            .values(self)
+            .on_conflict(
+                crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::id,
+            )
+            .do_update()
+            .set(self)
+            .filter(
+                diesel::BoolExpressionMethods::and(
+                    diesel::BoolExpressionMethods::and(
+                        diesel::BoolExpressionMethods::and(
+                            diesel::BoolExpressionMethods::and(
+                                diesel::BoolExpressionMethods::and(
+                                    diesel::BoolExpressionMethods::and(
+                                        diesel::BoolExpressionMethods::and(
+                                            crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::name
+                                                .ne(
+                                                    diesel::upsert::excluded(
+                                                        crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::name,
+                                                    ),
+                                                ),
+                                            crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::description
+                                                .ne(
+                                                    diesel::upsert::excluded(
+                                                        crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::description,
+                                                    ),
+                                                ),
+                                        ),
+                                        crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::purity
+                                            .ne(
+                                                diesel::upsert::excluded(
+                                                    crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::purity,
+                                                ),
+                                            ),
+                                    ),
+                                    crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::gram_per_mole
+                                        .ne(
+                                            diesel::upsert::excluded(
+                                                crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::gram_per_mole,
+                                            ),
+                                        ),
+                                ),
+                                crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::created_by
+                                    .ne(
+                                        diesel::upsert::excluded(
+                                            crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::created_by,
+                                        ),
+                                    ),
+                            ),
+                            crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::created_at
+                                .ne(
+                                    diesel::upsert::excluded(
+                                        crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::created_at,
+                                    ),
+                                ),
+                        ),
+                        crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::updated_by
+                            .ne(
+                                diesel::upsert::excluded(
+                                    crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::updated_by,
+                                ),
+                            ),
+                    ),
+                    crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::updated_at
+                        .ne(
+                            diesel::upsert::excluded(
+                                crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::updated_at,
+                            ),
+                        ),
+                ),
+            )
+            .get_results(conn)
+            .map(|mut result| { result.pop() })
+    }
+}
+#[cfg(feature = "sqlite")]
+impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
+    for crate::codegen::structs_codegen::tables::chemical_entities::ChemicalEntity
+{
+    fn upsert(
+        &self,
+        conn: &mut diesel::SqliteConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
+        diesel::insert_into(
+                crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::table,
+            )
+            .values(self)
+            .on_conflict(
+                crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::id,
+            )
+            .do_update()
+            .set(self)
+            .filter(
+                diesel::BoolExpressionMethods::and(
+                    diesel::BoolExpressionMethods::and(
+                        diesel::BoolExpressionMethods::and(
+                            diesel::BoolExpressionMethods::and(
+                                diesel::BoolExpressionMethods::and(
+                                    diesel::BoolExpressionMethods::and(
+                                        diesel::BoolExpressionMethods::and(
+                                            crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::name
+                                                .ne(
+                                                    diesel::upsert::excluded(
+                                                        crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::name,
+                                                    ),
+                                                ),
+                                            crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::description
+                                                .ne(
+                                                    diesel::upsert::excluded(
+                                                        crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::description,
+                                                    ),
+                                                ),
+                                        ),
+                                        crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::purity
+                                            .ne(
+                                                diesel::upsert::excluded(
+                                                    crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::purity,
+                                                ),
+                                            ),
+                                    ),
+                                    crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::gram_per_mole
+                                        .ne(
+                                            diesel::upsert::excluded(
+                                                crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::gram_per_mole,
+                                            ),
+                                        ),
+                                ),
+                                crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::created_by
+                                    .ne(
+                                        diesel::upsert::excluded(
+                                            crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::created_by,
+                                        ),
+                                    ),
+                            ),
+                            crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::created_at
+                                .ne(
+                                    diesel::upsert::excluded(
+                                        crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::created_at,
+                                    ),
+                                ),
+                        ),
+                        crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::updated_by
+                            .ne(
+                                diesel::upsert::excluded(
+                                    crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::updated_by,
+                                ),
+                            ),
+                    ),
+                    crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::updated_at
+                        .ne(
+                            diesel::upsert::excluded(
+                                crate::codegen::diesel_codegen::tables::chemical_entities::chemical_entities::updated_at,
+                            ),
+                        ),
+                ),
+            )
+            .get_results(conn)
+            .map(|mut result| { result.pop() })
+    }
+}

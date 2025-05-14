@@ -34,6 +34,10 @@ mod centrifuge_steps;
 pub use centrifuge_steps::{
     InsertableCentrifugeStep, InsertableCentrifugeStepAttributes, InsertableCentrifugeStepBuilder,
 };
+mod chemical_entities;
+pub use chemical_entities::{
+    InsertableChemicalEntity, InsertableChemicalEntityAttributes, InsertableChemicalEntityBuilder,
+};
 mod cities;
 pub use cities::{InsertableCity, InsertableCityAttributes, InsertableCityBuilder};
 mod colors;
@@ -188,6 +192,11 @@ mod procedure_model_nameplate_categories;
 pub use procedure_model_nameplate_categories::{
     InsertableProcedureModelNameplateCategory, InsertableProcedureModelNameplateCategoryAttributes,
     InsertableProcedureModelNameplateCategoryBuilder,
+};
+mod procedure_model_reagents;
+pub use procedure_model_reagents::{
+    InsertableProcedureModelReagent, InsertableProcedureModelReagentAttributes,
+    InsertableProcedureModelReagentBuilder,
 };
 mod procedure_model_tool_categories;
 pub use procedure_model_tool_categories::{

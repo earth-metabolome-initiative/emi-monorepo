@@ -25,6 +25,9 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::CentrifugeStep(_) => {
                 crate::codegen::tables::table_names::TableName::CentrifugeStep
             }
+            super::Row::ChemicalEntity(_) => {
+                crate::codegen::tables::table_names::TableName::ChemicalEntity
+            }
             super::Row::City(_) => crate::codegen::tables::table_names::TableName::City,
             super::Row::Color(_) => crate::codegen::tables::table_names::TableName::Color,
             super::Row::CommercialProductLot(_) => {
@@ -118,6 +121,9 @@ impl web_common_traits::prelude::Tabular for super::Row {
             }
             super::Row::ProcedureModelNameplateCategory(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModelNameplateCategory
+            }
+            super::Row::ProcedureModelReagent(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureModelReagent
             }
             super::Row::ProcedureModelToolCategory(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModelToolCategory

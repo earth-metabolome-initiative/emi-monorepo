@@ -10,6 +10,7 @@ pub enum TableName {
     Brand,
     CentrifugeStepModel,
     CentrifugeStep,
+    ChemicalEntity,
     City,
     Color,
     CommercialProductLot,
@@ -46,6 +47,7 @@ pub enum TableName {
     ProcedureModelContainerCategory,
     ProcedureModelInstrumentCategory,
     ProcedureModelNameplateCategory,
+    ProcedureModelReagent,
     ProcedureModelToolCategory,
     ProcedureModel,
     ProcedureStepModel,
@@ -114,6 +116,7 @@ impl core::fmt::Display for TableName {
             TableName::Brand => write!(f, stringify!(Brand)),
             TableName::CentrifugeStepModel => write!(f, stringify!(CentrifugeStepModel)),
             TableName::CentrifugeStep => write!(f, stringify!(CentrifugeStep)),
+            TableName::ChemicalEntity => write!(f, stringify!(ChemicalEntity)),
             TableName::City => write!(f, stringify!(City)),
             TableName::Color => write!(f, stringify!(Color)),
             TableName::CommercialProductLot => {
@@ -167,6 +170,9 @@ impl core::fmt::Display for TableName {
             }
             TableName::ProcedureModelNameplateCategory => {
                 write!(f, stringify!(ProcedureModelNameplateCategory))
+            }
+            TableName::ProcedureModelReagent => {
+                write!(f, stringify!(ProcedureModelReagent))
             }
             TableName::ProcedureModelToolCategory => {
                 write!(f, stringify!(ProcedureModelToolCategory))
