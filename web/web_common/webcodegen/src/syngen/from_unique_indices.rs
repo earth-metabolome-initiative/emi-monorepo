@@ -68,6 +68,7 @@ impl crate::Table {
                 let column_type = column.rust_ref_data_type(conn).await?;
                 method_arguments.push(quote! { #column_name: #column_type });
             }
+            let mut include_bool_expression_methods = false;
             let filter = columns
                     .iter()
                     .map(|column| {
@@ -79,9 +80,18 @@ impl crate::Table {
                         Ok::<TokenStream, WebCodeGenError>(if acc.is_empty() {
                             filter
                         } else {
-                            quote! {diesel::BoolExpressionMethods::and(#acc, #filter) }
+                            include_bool_expression_methods = true;
+                            quote! {#acc.and(#filter) }
                         })
                     })?;
+
+            let bool_expression_methods = if include_bool_expression_methods {
+                quote! {
+                    , diesel::BoolExpressionMethods
+                }
+            } else {
+                TokenStream::new()
+            };
 
             unique_indices.extend(quote! {
                 #syntax_flag
@@ -91,7 +101,7 @@ impl crate::Table {
                 ) -> Result<Option<Self>, diesel::result::Error> {
                     use diesel_async::RunQueryDsl;
                     use diesel::associations::HasTable;
-                    use diesel::{QueryDsl, OptionalExtension};
+                    use diesel::{QueryDsl, OptionalExtension #bool_expression_methods};
                     Self::table()
                         .filter(#filter)
                         .first::<Self>(conn)

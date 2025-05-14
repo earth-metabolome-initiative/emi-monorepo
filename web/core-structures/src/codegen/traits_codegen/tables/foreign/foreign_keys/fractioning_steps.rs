@@ -56,30 +56,22 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Processable(processables),
+                crate::codegen::tables::row::Row::Step(steps),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if processables.id == self.source_processable_id {
-                    foreign_keys.source_processable = Some(processables);
-                    updated = true;
-                }
-                if processables.id == self.destination_processable_id {
-                    foreign_keys.destination_processable = Some(processables);
+                if steps.id == self.id {
+                    foreign_keys.id = Some(steps);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::Processable(processables),
+                crate::codegen::tables::row::Row::Step(steps),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if processables.id == self.source_processable_id {
-                    foreign_keys.source_processable = None;
-                    updated = true;
-                }
-                if processables.id == self.destination_processable_id {
-                    foreign_keys.destination_processable = None;
+                if steps.id == self.id {
+                    foreign_keys.id = None;
                     updated = true;
                 }
             }
@@ -104,22 +96,30 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::Step(steps),
+                crate::codegen::tables::row::Row::Processable(processables),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if steps.id == self.id {
-                    foreign_keys.id = Some(steps);
+                if processables.id == self.source_processable_id {
+                    foreign_keys.source_processable = Some(processables);
+                    updated = true;
+                }
+                if processables.id == self.destination_processable_id {
+                    foreign_keys.destination_processable = Some(processables);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::Step(steps),
+                crate::codegen::tables::row::Row::Processable(processables),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if steps.id == self.id {
-                    foreign_keys.id = None;
+                if processables.id == self.source_processable_id {
+                    foreign_keys.source_processable = None;
+                    updated = true;
+                }
+                if processables.id == self.destination_processable_id {
+                    foreign_keys.destination_processable = None;
                     updated = true;
                 }
             }

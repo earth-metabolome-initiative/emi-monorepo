@@ -6,38 +6,24 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(crate::codegen::diesel_codegen::tables::users::users::table)
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::users::users::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::users::users::id)
+            .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(diesel::BoolExpressionMethods::and(
-                diesel::BoolExpressionMethods::and(
-                    diesel::BoolExpressionMethods::and(
-                        crate::codegen::diesel_codegen::tables::users::users::first_name.ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::users::users::first_name,
-                            ),
-                        ),
-                        crate::codegen::diesel_codegen::tables::users::users::last_name.ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::users::users::last_name,
-                            ),
-                        ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::users::users::created_at.ne(
-                        diesel::upsert::excluded(
-                            crate::codegen::diesel_codegen::tables::users::users::created_at,
-                        ),
-                    ),
-                ),
-                crate::codegen::diesel_codegen::tables::users::users::updated_at.ne(
-                    diesel::upsert::excluded(
-                        crate::codegen::diesel_codegen::tables::users::users::updated_at,
-                    ),
-                ),
-            ))
+            .filter(
+                first_name
+                    .ne(excluded(first_name))
+                    .or(last_name.ne(excluded(last_name)))
+                    .or(created_at.ne(excluded(created_at)))
+                    .or(updated_at.ne(excluded(updated_at))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -50,38 +36,24 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(crate::codegen::diesel_codegen::tables::users::users::table)
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::users::users::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::users::users::id)
+            .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(diesel::BoolExpressionMethods::and(
-                diesel::BoolExpressionMethods::and(
-                    diesel::BoolExpressionMethods::and(
-                        crate::codegen::diesel_codegen::tables::users::users::first_name.ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::users::users::first_name,
-                            ),
-                        ),
-                        crate::codegen::diesel_codegen::tables::users::users::last_name.ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::users::users::last_name,
-                            ),
-                        ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::users::users::created_at.ne(
-                        diesel::upsert::excluded(
-                            crate::codegen::diesel_codegen::tables::users::users::created_at,
-                        ),
-                    ),
-                ),
-                crate::codegen::diesel_codegen::tables::users::users::updated_at.ne(
-                    diesel::upsert::excluded(
-                        crate::codegen::diesel_codegen::tables::users::users::updated_at,
-                    ),
-                ),
-            ))
+            .filter(
+                first_name
+                    .ne(excluded(first_name))
+                    .or(last_name.ne(excluded(last_name)))
+                    .or(created_at.ne(excluded(created_at)))
+                    .or(updated_at.ne(excluded(updated_at))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }

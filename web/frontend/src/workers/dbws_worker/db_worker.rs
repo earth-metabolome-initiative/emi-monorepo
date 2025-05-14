@@ -11,7 +11,10 @@ use web_sys::console;
 use ws_messages::DBMessage;
 use yew_agent::worker::HandlerId;
 
-use super::{C2DBMessage, DBWSWorker, internal_message::db_internal_message::DBInternalMessage};
+use super::{
+    C2DBMessage, DBWSWorker, InternalMessage,
+    internal_message::db_internal_message::DBInternalMessage,
+};
 
 pub mod listen_notify;
 
@@ -28,9 +31,6 @@ impl DBWSWorker {
         db_message: DBInternalMessage,
     ) {
         match db_message {
-            DBInternalMessage::Retry((component_message, subscriber_id)) => {
-                self.received_query(scope, component_message, subscriber_id);
-            }
             DBInternalMessage::DB(DBMessage::Row(row, crud)) => {
                 // We received a message with information regarding a table read,
                 // which we need to integrate into the SQLite database and then
@@ -39,9 +39,16 @@ impl DBWSWorker {
                 match crud {
                     CRUD::Update | CRUD::Create | CRUD::Read => {
                         let Some(conn) = self.conn.as_mut() else {
-                            console::log_1(&"No connection to SQLite database".into());
+                            scope.send_future(async move {
+                                gloo_timers::future::sleep(std::time::Duration::from_millis(500))
+                                    .await;
+                                DBInternalMessage::DB(DBMessage::Row(row, crud))
+                            });
                             return;
                         };
+
+                        console::log_1(&format!("Executing upsert on row: {row:?}").into());
+
                         let updated_row = match row.sqlite_upsert(conn) {
                             Ok(rows) => rows,
                             Err(err) => {
@@ -50,6 +57,8 @@ impl DBWSWorker {
                                 return;
                             }
                         };
+
+                        console::log_1(&format!("Updated row: {updated_row:?}").into());
 
                         if let Some(updated_row) = updated_row {
                             self.listen_notify.notify_row_listeners(&updated_row, crud, scope);
@@ -61,15 +70,19 @@ impl DBWSWorker {
                 }
             }
             DBInternalMessage::DB(DBMessage::Rows(rows, crud)) => {
-                console::log_1(&format!("Received rows: {rows:?} for crud: {crud}").into());
                 // We received a message with information regarding a table read,
                 // which we need to integrate into the SQLite database and then
                 // notify the components that are listening to this table.
 
                 let Some(conn) = self.conn.as_mut() else {
-                    console::log_1(&"No connection to SQLite database".into());
+                    scope.send_future(async move {
+                        gloo_timers::future::sleep(std::time::Duration::from_millis(500)).await;
+                        DBInternalMessage::DB(DBMessage::Rows(rows, crud))
+                    });
                     return;
                 };
+
+                console::log_1(&format!("Executing upsert on row: {rows:?}").into());
 
                 // TODO! Actually update according to CRUD!
                 let updated_rows = match rows.sqlite_upsert(conn) {
@@ -80,6 +93,8 @@ impl DBWSWorker {
                         return;
                     }
                 };
+
+                console::log_1(&format!("Updated rows: {updated_rows:?}").into());
 
                 self.listen_notify.notify_rows_listeners(&updated_rows, crud, scope);
             }
@@ -116,8 +131,11 @@ impl DBWSWorker {
                     // If the connection is not established yet, we submit the
                     // message to the future, waiting one second before trying again.
                     scope.send_future(async move {
-                        gloo_timers::future::sleep(std::time::Duration::from_secs(5)).await;
-                        DBInternalMessage::Retry((C2DBMessage::Row(operation), subscriber_id))
+                        gloo_timers::future::sleep(std::time::Duration::from_millis(500)).await;
+                        InternalMessage::RetryC2DB((
+                            C2DBMessage::Row(operation).into(),
+                            subscriber_id,
+                        ))
                     });
                     return;
                 };
@@ -147,8 +165,11 @@ impl DBWSWorker {
                     // If the connection is not established yet, we submit the
                     // message to the future, waiting one second before trying again.
                     scope.send_future(async move {
-                        gloo_timers::future::sleep(std::time::Duration::from_secs(5)).await;
-                        DBInternalMessage::Retry((C2DBMessage::Table(operation), subscriber_id))
+                        gloo_timers::future::sleep(std::time::Duration::from_millis(500)).await;
+                        InternalMessage::RetryC2DB((
+                            C2DBMessage::Table(operation).into(),
+                            subscriber_id,
+                        ))
                     });
                     return;
                 };

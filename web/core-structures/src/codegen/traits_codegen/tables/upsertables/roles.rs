@@ -6,38 +6,23 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(crate::codegen::diesel_codegen::tables::roles::roles::table)
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::roles::roles::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::roles::roles::id)
+            .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(diesel::BoolExpressionMethods::and(
-                diesel::BoolExpressionMethods::and(
-                    diesel::BoolExpressionMethods::and(
-                        crate::codegen::diesel_codegen::tables::roles::roles::name.ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::roles::roles::name,
-                            ),
-                        ),
-                        crate::codegen::diesel_codegen::tables::roles::roles::description.ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::roles::roles::description,
-                            ),
-                        ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::roles::roles::icon.ne(
-                        diesel::upsert::excluded(
-                            crate::codegen::diesel_codegen::tables::roles::roles::icon,
-                        ),
-                    ),
-                ),
-                crate::codegen::diesel_codegen::tables::roles::roles::color_id.ne(
-                    diesel::upsert::excluded(
-                        crate::codegen::diesel_codegen::tables::roles::roles::color_id,
-                    ),
-                ),
-            ))
+            .filter(
+                name.ne(excluded(name))
+                    .or(description.ne(excluded(description)))
+                    .or(icon.ne(excluded(icon)))
+                    .or(color_id.ne(excluded(color_id))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -50,38 +35,23 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(crate::codegen::diesel_codegen::tables::roles::roles::table)
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::roles::roles::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::roles::roles::id)
+            .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(diesel::BoolExpressionMethods::and(
-                diesel::BoolExpressionMethods::and(
-                    diesel::BoolExpressionMethods::and(
-                        crate::codegen::diesel_codegen::tables::roles::roles::name.ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::roles::roles::name,
-                            ),
-                        ),
-                        crate::codegen::diesel_codegen::tables::roles::roles::description.ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::roles::roles::description,
-                            ),
-                        ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::roles::roles::icon.ne(
-                        diesel::upsert::excluded(
-                            crate::codegen::diesel_codegen::tables::roles::roles::icon,
-                        ),
-                    ),
-                ),
-                crate::codegen::diesel_codegen::tables::roles::roles::color_id.ne(
-                    diesel::upsert::excluded(
-                        crate::codegen::diesel_codegen::tables::roles::roles::color_id,
-                    ),
-                ),
-            ))
+            .filter(
+                name.ne(excluded(name))
+                    .or(description.ne(excluded(description)))
+                    .or(icon.ne(excluded(icon)))
+                    .or(color_id.ne(excluded(color_id))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }

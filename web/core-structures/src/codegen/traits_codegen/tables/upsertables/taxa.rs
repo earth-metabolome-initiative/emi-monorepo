@@ -6,31 +6,22 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(crate::codegen::diesel_codegen::tables::taxa::taxa::table)
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::taxa::taxa::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::taxa::taxa::id)
+            .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(diesel::BoolExpressionMethods::and(
-                diesel::BoolExpressionMethods::and(
-                    crate::codegen::diesel_codegen::tables::taxa::taxa::name.ne(
-                        diesel::upsert::excluded(
-                            crate::codegen::diesel_codegen::tables::taxa::taxa::name,
-                        ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::taxa::taxa::parent_id.ne(
-                        diesel::upsert::excluded(
-                            crate::codegen::diesel_codegen::tables::taxa::taxa::parent_id,
-                        ),
-                    ),
-                ),
-                crate::codegen::diesel_codegen::tables::taxa::taxa::rank_id.ne(
-                    diesel::upsert::excluded(
-                        crate::codegen::diesel_codegen::tables::taxa::taxa::rank_id,
-                    ),
-                ),
-            ))
+            .filter(
+                name.ne(excluded(name))
+                    .or(parent_id.ne(excluded(parent_id)))
+                    .or(rank_id.ne(excluded(rank_id))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -43,31 +34,22 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(crate::codegen::diesel_codegen::tables::taxa::taxa::table)
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::taxa::taxa::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::taxa::taxa::id)
+            .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(diesel::BoolExpressionMethods::and(
-                diesel::BoolExpressionMethods::and(
-                    crate::codegen::diesel_codegen::tables::taxa::taxa::name.ne(
-                        diesel::upsert::excluded(
-                            crate::codegen::diesel_codegen::tables::taxa::taxa::name,
-                        ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::taxa::taxa::parent_id.ne(
-                        diesel::upsert::excluded(
-                            crate::codegen::diesel_codegen::tables::taxa::taxa::parent_id,
-                        ),
-                    ),
-                ),
-                crate::codegen::diesel_codegen::tables::taxa::taxa::rank_id.ne(
-                    diesel::upsert::excluded(
-                        crate::codegen::diesel_codegen::tables::taxa::taxa::rank_id,
-                    ),
-                ),
-            ))
+            .filter(
+                name.ne(excluded(name))
+                    .or(parent_id.ne(excluded(parent_id)))
+                    .or(rank_id.ne(excluded(rank_id))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }

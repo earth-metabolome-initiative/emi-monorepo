@@ -75,16 +75,16 @@ bytes = "1.10.0"
 bincode = { version = "2", features = ["serde"] }
 sqlparser = { git = "https://github.com/apache/datafusion-sqlparser-rs.git", branch = "main" }
 arbitrary = { version = "1", features = ["derive"] }
-diesel = { version = "2.2.10", features = [
+diesel = { git = "https://github.com/LucaCappelletti94/diesel.git", branch = "supports_on_conflict_clause_where", features = [
   "extras",
 ] }
-diesel-async = "0.5.2"
+diesel-async = { git = "https://github.com/LucaCappelletti94/diesel_async", branch = "custom-diesel" }
 diesel_full_text_search = "2.2"
 diesel-pgrx = { path = "utils/diesel-pgrx" }
 diesel-pgrx-derive = { path = "utils/diesel-pgrx-derive" }
 example_extension = { path = "utils/diesel-pgrx/example_extension" }
 redis = { version = "0.30", features = ["tokio-comp"] }
-postgis_diesel = { version="3.0", default-features = false }
+postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel.git", default-features = false, branch = "custom-diesel" }
 chrono = { version = "0.4.39", features = ["serde"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"

@@ -53,12 +53,13 @@ impl Worker for DBWSWorker {
     ) {
         console::log_1(&format!("Received internal message: {internal_message:?}").into());
         match internal_message {
+            InternalMessage::RetryC2DB((component_message, subscriber_id)) => {
+                self.received(scope, component_message, subscriber_id);
+            }
             InternalMessage::DB(db_message) => {
-                console::log_1(&format!("Received database message: {db_message:?}").into());
                 self.update_database(scope, db_message);
             }
             InternalMessage::WS(ws_message) => {
-                console::log_1(&format!("Received websocket message: {ws_message:?}").into());
                 self.update_websocket(scope, ws_message);
             }
             InternalMessage::DBError(err) => {

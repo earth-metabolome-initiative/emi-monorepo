@@ -6,66 +6,27 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(
-                crate::codegen::diesel_codegen::tables::organizations::organizations::table,
-            )
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::organizations::organizations::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(
-                crate::codegen::diesel_codegen::tables::organizations::organizations::id,
-            )
+            .on_conflict(id)
             .do_update()
             .set(self)
             .filter(
-                diesel::BoolExpressionMethods::and(
-                    diesel::BoolExpressionMethods::and(
-                        diesel::BoolExpressionMethods::and(
-                            diesel::BoolExpressionMethods::and(
-                                diesel::BoolExpressionMethods::and(
-                                    crate::codegen::diesel_codegen::tables::organizations::organizations::name
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::organizations::organizations::name,
-                                            ),
-                                        ),
-                                    crate::codegen::diesel_codegen::tables::organizations::organizations::url
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::organizations::organizations::url,
-                                            ),
-                                        ),
-                                ),
-                                crate::codegen::diesel_codegen::tables::organizations::organizations::country
-                                    .ne(
-                                        diesel::upsert::excluded(
-                                            crate::codegen::diesel_codegen::tables::organizations::organizations::country,
-                                        ),
-                                    ),
-                            ),
-                            crate::codegen::diesel_codegen::tables::organizations::organizations::alpha_two_code
-                                .ne(
-                                    diesel::upsert::excluded(
-                                        crate::codegen::diesel_codegen::tables::organizations::organizations::alpha_two_code,
-                                    ),
-                                ),
-                        ),
-                        crate::codegen::diesel_codegen::tables::organizations::organizations::state_province
-                            .ne(
-                                diesel::upsert::excluded(
-                                    crate::codegen::diesel_codegen::tables::organizations::organizations::state_province,
-                                ),
-                            ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::organizations::organizations::domain
-                        .ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::organizations::organizations::domain,
-                            ),
-                        ),
-                ),
+                name.ne(excluded(name))
+                    .or(url.ne(excluded(url)))
+                    .or(country.ne(excluded(country)))
+                    .or(alpha_two_code.ne(excluded(alpha_two_code)))
+                    .or(state_province.ne(excluded(state_province)))
+                    .or(domain.ne(excluded(domain))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }
 #[cfg(feature = "sqlite")]
@@ -76,65 +37,26 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(
-                crate::codegen::diesel_codegen::tables::organizations::organizations::table,
-            )
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::organizations::organizations::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(
-                crate::codegen::diesel_codegen::tables::organizations::organizations::id,
-            )
+            .on_conflict(id)
             .do_update()
             .set(self)
             .filter(
-                diesel::BoolExpressionMethods::and(
-                    diesel::BoolExpressionMethods::and(
-                        diesel::BoolExpressionMethods::and(
-                            diesel::BoolExpressionMethods::and(
-                                diesel::BoolExpressionMethods::and(
-                                    crate::codegen::diesel_codegen::tables::organizations::organizations::name
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::organizations::organizations::name,
-                                            ),
-                                        ),
-                                    crate::codegen::diesel_codegen::tables::organizations::organizations::url
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::organizations::organizations::url,
-                                            ),
-                                        ),
-                                ),
-                                crate::codegen::diesel_codegen::tables::organizations::organizations::country
-                                    .ne(
-                                        diesel::upsert::excluded(
-                                            crate::codegen::diesel_codegen::tables::organizations::organizations::country,
-                                        ),
-                                    ),
-                            ),
-                            crate::codegen::diesel_codegen::tables::organizations::organizations::alpha_two_code
-                                .ne(
-                                    diesel::upsert::excluded(
-                                        crate::codegen::diesel_codegen::tables::organizations::organizations::alpha_two_code,
-                                    ),
-                                ),
-                        ),
-                        crate::codegen::diesel_codegen::tables::organizations::organizations::state_province
-                            .ne(
-                                diesel::upsert::excluded(
-                                    crate::codegen::diesel_codegen::tables::organizations::organizations::state_province,
-                                ),
-                            ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::organizations::organizations::domain
-                        .ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::organizations::organizations::domain,
-                            ),
-                        ),
-                ),
+                name.ne(excluded(name))
+                    .or(url.ne(excluded(url)))
+                    .or(country.ne(excluded(country)))
+                    .or(alpha_two_code.ne(excluded(alpha_two_code)))
+                    .or(state_province.ne(excluded(state_province)))
+                    .or(domain.ne(excluded(domain))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }

@@ -52,7 +52,7 @@ impl Codegen<'_> {
                 .map(|primary_key| {
                     let snake_case_column_ident = primary_key.snake_case_ident()?;
                     Ok(quote! {
-                        #diesel_table_path::#snake_case_column_ident
+                        #snake_case_column_ident
                     })
                 })
                 .collect::<Result<_, WebCodeGenError>>()?;
@@ -68,27 +68,35 @@ impl Codegen<'_> {
             };
 
             let non_primary_key_columns = table.non_primary_key_columns(conn).await?;
+            let mut include_bool_expression_methods = false;
 
             let conflict_clause: TokenStream = if non_primary_key_columns.is_empty() {
                 quote! {
                     .do_nothing()
                 }
             } else {
-                let filter_ops: TokenStream = non_primary_key_columns.iter().map(|column|{
-					let snake_case_column_ident = column.snake_case_ident()?;
-					Ok(quote! {
-						#diesel_table_path::#snake_case_column_ident.ne(
-							diesel::upsert::excluded(#diesel_table_path::#snake_case_column_ident)
-						)
-					})
-				}).try_fold(quote! {}, |acc: TokenStream, filter: Result<TokenStream, WebCodeGenError>| {
-					let filter = filter?;
-					Ok::<TokenStream, WebCodeGenError>(if acc.is_empty() {
-						filter
-					} else {
-						quote! {diesel::BoolExpressionMethods::and(#acc, #filter) }
-					})
-				})?;
+                let filter_ops: TokenStream = non_primary_key_columns
+                    .iter()
+                    .map(|column| {
+                        let snake_case_column_ident = column.snake_case_ident()?;
+                        Ok(quote! {
+                            #snake_case_column_ident.ne(
+                                excluded(#snake_case_column_ident)
+                            )
+                        })
+                    })
+                    .try_fold(
+                        quote! {},
+                        |acc: TokenStream, filter: Result<TokenStream, WebCodeGenError>| {
+                            let filter = filter?;
+                            Ok::<TokenStream, WebCodeGenError>(if acc.is_empty() {
+                                filter
+                            } else {
+                                include_bool_expression_methods = true;
+                                quote! {#acc.or(#filter) }
+                            })
+                        },
+                    )?;
 
                 quote! {
                     .do_update()
@@ -97,14 +105,21 @@ impl Codegen<'_> {
                 }
             };
 
-            let expression_methods = if non_primary_key_columns.is_empty() {
+            let mut expression_methods = if non_primary_key_columns.is_empty() {
                 TokenStream::new()
             } else {
                 quote! {
                     use diesel::ExpressionMethods;
                     use diesel::query_dsl::methods::FilterDsl;
+                    use diesel::upsert::excluded;
                 }
             };
+
+            if include_bool_expression_methods {
+                expression_methods.extend(quote! {
+                    use diesel::BoolExpressionMethods;
+                });
+            }
 
             // impl Deletable for struct_ident
             std::fs::write(&table_file, self.beautify_code(&Syntax::iter().map(|syntax| {
@@ -119,7 +134,8 @@ impl Codegen<'_> {
 					) -> Result<Option<Self>, diesel::result::Error> {
 						#expression_methods
 						use #run_query_dsl;
-						diesel::insert_into(#diesel_table_path::table)
+                        use #diesel_table_path::*;
+						diesel::insert_into(table)
 							.values(self)
 							.on_conflict(#formatted_primary_key_columns)
 							#conflict_clause

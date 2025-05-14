@@ -4,7 +4,9 @@
 use futures::channel::mpsc::TrySendError;
 use gloo::net::websocket::WebSocketError;
 use ws_messages::{B2FMessage, F2BMessage, frontend::Subscription};
+use yew_agent::worker::HandlerId;
 
+use super::ComponentMessage;
 use crate::errors::{db_errors::DBError, ws_errors::WSError};
 
 pub mod db_internal_message;
@@ -21,6 +23,9 @@ pub enum InternalMessage {
     DBError(DBError),
     /// Message indicating an error related to the WebSocket.
     WSError(WSError),
+    /// Indicates that a message from the frontend should be attempted
+    /// to be processed once again.
+    RetryC2DB((ComponentMessage, HandlerId)),
 }
 
 impl From<Result<sqlite_wasm_rs::export::OpfsSAHPoolUtil, sqlite_wasm_rs::export::OpfsSAHError>>
