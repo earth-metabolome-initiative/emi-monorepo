@@ -1,10 +1,9 @@
-#![allow(clippy::missing_docs)]
 //! Submodule benchmarking the computation of the oxidation states of the
 //! `MolecularFormula` struct.
 
 use std::str::FromStr;
 
-use criterion::{Criterion, black_box, criterion_group, criterion_main};
+use criterion::{Criterion, black_box};
 use molecular_formula::MolecularFormula;
 
 /// Benchmark for the `oxidation_states` method.
@@ -50,5 +49,15 @@ fn bench_oxidation_states(c: &mut Criterion) {
     epimeloscine_group.finish();
 }
 
-criterion_group!(benches, bench_oxidation_states);
-criterion_main!(benches);
+/// Function to run all benchmarks.
+pub fn benches() {
+    let mut criterion: ::criterion::Criterion<_> =
+        ::criterion::Criterion::default().configure_from_args();
+    bench_oxidation_states(&mut criterion);
+}
+
+/// Main function to run the benchmarks.
+fn main() {
+    benches();
+    ::criterion::Criterion::default().configure_from_args().final_summary();
+}
