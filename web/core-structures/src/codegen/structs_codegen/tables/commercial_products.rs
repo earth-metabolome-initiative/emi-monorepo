@@ -156,14 +156,12 @@ impl CommercialProduct {
         name: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(
-                diesel::ExpressionMethods::eq(
-                    crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::name,
-                    name,
-                ),
+                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::name
+                    .eq(name),
             )
             .first::<Self>(conn)
             .await

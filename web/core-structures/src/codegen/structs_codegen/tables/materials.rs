@@ -58,13 +58,10 @@ impl Material {
         name: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::materials::materials::name,
-                name,
-            ))
+            .filter(crate::codegen::diesel_codegen::tables::materials::materials::name.eq(name))
             .first::<Self>(conn)
             .await
             .optional()
@@ -74,13 +71,13 @@ impl Material {
         description: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::materials::materials::description,
-                description,
-            ))
+            .filter(
+                crate::codegen::diesel_codegen::tables::materials::materials::description
+                    .eq(description),
+            )
             .first::<Self>(conn)
             .await
             .optional()
@@ -90,13 +87,10 @@ impl Material {
         icon: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::materials::materials::icon,
-                icon,
-            ))
+            .filter(crate::codegen::diesel_codegen::tables::materials::materials::icon.eq(icon))
             .first::<Self>(conn)
             .await
             .optional()

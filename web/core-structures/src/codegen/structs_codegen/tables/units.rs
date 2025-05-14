@@ -57,13 +57,10 @@ impl Unit {
         name: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::units::units::name,
-                name,
-            ))
+            .filter(crate::codegen::diesel_codegen::tables::units::units::name.eq(name))
             .first::<Self>(conn)
             .await
             .optional()
@@ -73,13 +70,10 @@ impl Unit {
         unit: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::units::units::unit,
-                unit,
-            ))
+            .filter(crate::codegen::diesel_codegen::tables::units::units::unit.eq(unit))
             .first::<Self>(conn)
             .await
             .optional()

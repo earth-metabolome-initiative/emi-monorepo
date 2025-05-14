@@ -42,22 +42,22 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::User(users),
+                crate::codegen::tables::row::Row::Procedure(procedures),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = Some(users);
+                if procedures.id == self.procedure_id {
+                    foreign_keys.procedure = Some(procedures);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::User(users),
+                crate::codegen::tables::row::Row::Procedure(procedures),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = None;
+                if procedures.id == self.procedure_id {
+                    foreign_keys.procedure = None;
                     updated = true;
                 }
             }
@@ -82,22 +82,22 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::Procedure(procedures),
+                crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if procedures.id == self.procedure_id {
-                    foreign_keys.procedure = Some(procedures);
+                if users.id == self.created_by {
+                    foreign_keys.created_by = Some(users);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::Procedure(procedures),
+                crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if procedures.id == self.procedure_id {
-                    foreign_keys.procedure = None;
+                if users.id == self.created_by {
+                    foreign_keys.created_by = None;
                     updated = true;
                 }
             }

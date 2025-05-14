@@ -70,12 +70,14 @@ impl crate::Table {
             }
             let mut include_bool_expression_methods = false;
             let filter = columns
-                    .iter()
-                    .map(|column| {
-                        let column_name = column.snake_case_ident()?;
-                        Ok(quote! { diesel::ExpressionMethods::eq(#table_name_ident::#column_name, #column_name) })
-                    })
-                    .try_fold(quote! {}, |acc: TokenStream, filter: Result<TokenStream, WebCodeGenError>| {
+                .iter()
+                .map(|column| {
+                    let column_name = column.snake_case_ident()?;
+                    Ok(quote! { #table_name_ident::#column_name.eq(#column_name) })
+                })
+                .try_fold(
+                    quote! {},
+                    |acc: TokenStream, filter: Result<TokenStream, WebCodeGenError>| {
                         let filter = filter?;
                         Ok::<TokenStream, WebCodeGenError>(if acc.is_empty() {
                             filter
@@ -83,11 +85,12 @@ impl crate::Table {
                             include_bool_expression_methods = true;
                             quote! {#acc.and(#filter) }
                         })
-                    })?;
+                    },
+                )?;
 
             let bool_expression_methods = if include_bool_expression_methods {
                 quote! {
-                    , diesel::BoolExpressionMethods
+                    , BoolExpressionMethods
                 }
             } else {
                 TokenStream::new()
@@ -101,7 +104,7 @@ impl crate::Table {
                 ) -> Result<Option<Self>, diesel::result::Error> {
                     use diesel_async::RunQueryDsl;
                     use diesel::associations::HasTable;
-                    use diesel::{QueryDsl, OptionalExtension #bool_expression_methods};
+                    use diesel::{QueryDsl, ExpressionMethods, OptionalExtension #bool_expression_methods};
                     Self::table()
                         .filter(#filter)
                         .first::<Self>(conn)

@@ -58,13 +58,12 @@ impl UserEmail {
         email: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::user_emails::user_emails::email,
-                email,
-            ))
+            .filter(
+                crate::codegen::diesel_codegen::tables::user_emails::user_emails::email.eq(email),
+            )
             .first::<Self>(conn)
             .await
             .optional()

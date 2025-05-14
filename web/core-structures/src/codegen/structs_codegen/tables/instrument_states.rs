@@ -60,13 +60,13 @@ impl InstrumentState {
         name: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::instrument_states::instrument_states::name,
-                name,
-            ))
+            .filter(
+                crate::codegen::diesel_codegen::tables::instrument_states::instrument_states::name
+                    .eq(name),
+            )
             .first::<Self>(conn)
             .await
             .optional()
@@ -76,14 +76,12 @@ impl InstrumentState {
         description: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(
-                diesel::ExpressionMethods::eq(
-                    crate::codegen::diesel_codegen::tables::instrument_states::instrument_states::description,
-                    description,
-                ),
+                crate::codegen::diesel_codegen::tables::instrument_states::instrument_states::description
+                    .eq(description),
             )
             .first::<Self>(conn)
             .await
@@ -94,13 +92,13 @@ impl InstrumentState {
         icon: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::instrument_states::instrument_states::icon,
-                icon,
-            ))
+            .filter(
+                crate::codegen::diesel_codegen::tables::instrument_states::instrument_states::icon
+                    .eq(icon),
+            )
             .first::<Self>(conn)
             .await
             .optional()

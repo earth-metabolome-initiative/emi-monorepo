@@ -66,20 +66,17 @@ impl CommercialProductLot {
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
         use diesel::{
-            OptionalExtension, QueryDsl, associations::HasTable, diesel::BoolExpressionMethods,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl,
+            associations::HasTable,
         };
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(
-                diesel::ExpressionMethods::eq(
-                        crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots::lot,
-                        lot,
-                    )
+                crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots::lot
+                    .eq(lot)
                     .and(
-                        diesel::ExpressionMethods::eq(
-                            crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots::product_model_id,
-                            product_model_id,
-                        ),
+                        crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots::product_model_id
+                            .eq(product_model_id),
                     ),
             )
             .first::<Self>(conn)

@@ -62,23 +62,22 @@ impl Address {
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
         use diesel::{
-            OptionalExtension, QueryDsl, associations::HasTable, diesel::BoolExpressionMethods,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl,
+            associations::HasTable,
         };
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(
-                diesel::ExpressionMethods::eq(
-                    crate::codegen::diesel_codegen::tables::addresses::addresses::city_id,
-                    city_id,
-                )
-                .and(diesel::ExpressionMethods::eq(
-                    crate::codegen::diesel_codegen::tables::addresses::addresses::street_name,
-                    street_name,
-                ))
-                .and(diesel::ExpressionMethods::eq(
-                    crate::codegen::diesel_codegen::tables::addresses::addresses::street_number,
-                    street_number,
-                )),
+                crate::codegen::diesel_codegen::tables::addresses::addresses::city_id
+                    .eq(city_id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::addresses::addresses::street_name
+                            .eq(street_name),
+                    )
+                    .and(
+                        crate::codegen::diesel_codegen::tables::addresses::addresses::street_number
+                            .eq(street_number),
+                    ),
             )
             .first::<Self>(conn)
             .await

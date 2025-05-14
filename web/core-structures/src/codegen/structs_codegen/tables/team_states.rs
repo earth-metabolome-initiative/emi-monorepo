@@ -58,13 +58,10 @@ impl TeamState {
         name: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::team_states::team_states::name,
-                name,
-            ))
+            .filter(crate::codegen::diesel_codegen::tables::team_states::team_states::name.eq(name))
             .first::<Self>(conn)
             .await
             .optional()
@@ -74,13 +71,13 @@ impl TeamState {
         description: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::team_states::team_states::description,
-                description,
-            ))
+            .filter(
+                crate::codegen::diesel_codegen::tables::team_states::team_states::description
+                    .eq(description),
+            )
             .first::<Self>(conn)
             .await
             .optional()
@@ -90,13 +87,10 @@ impl TeamState {
         icon: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::team_states::team_states::icon,
-                icon,
-            ))
+            .filter(crate::codegen::diesel_codegen::tables::team_states::team_states::icon.eq(icon))
             .first::<Self>(conn)
             .await
             .optional()

@@ -70,30 +70,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::Team(teams),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if let Some(parent_team_id) = self.parent_team_id {
-                    if teams.id == parent_team_id {
-                        foreign_keys.parent_team = Some(teams);
-                        updated = true;
-                    }
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Team(teams),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if let Some(parent_team_id) = self.parent_team_id {
-                    if teams.id == parent_team_id {
-                        foreign_keys.parent_team = None;
-                        updated = true;
-                    }
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::Color(colors),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -139,6 +115,30 @@ impl web_common_traits::prelude::HasForeignKeys
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
                     updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Team(teams),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if let Some(parent_team_id) = self.parent_team_id {
+                    if teams.id == parent_team_id {
+                        foreign_keys.parent_team = Some(teams);
+                        updated = true;
+                    }
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Team(teams),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if let Some(parent_team_id) = self.parent_team_id {
+                    if teams.id == parent_team_id {
+                        foreign_keys.parent_team = None;
+                        updated = true;
+                    }
                 }
             }
             (_, crud) => {

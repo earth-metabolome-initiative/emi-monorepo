@@ -40,26 +40,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Step(steps),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if steps.id == self.step_id {
-                    foreign_keys.step = Some(steps);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Step(steps),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if steps.id == self.step_id {
-                    foreign_keys.step = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::Instrument(instruments),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -76,6 +56,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if instruments.id == self.instrument_id {
                     foreign_keys.instrument = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Step(steps),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if steps.id == self.step_id {
+                    foreign_keys.step = Some(steps);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Step(steps),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if steps.id == self.step_id {
+                    foreign_keys.step = None;
                     updated = true;
                 }
             }

@@ -55,26 +55,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Processable(processables),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if processables.id == self.processable_id {
-                    foreign_keys.processable = Some(processables);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Processable(processables),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if processables.id == self.processable_id {
-                    foreign_keys.processable = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::WeighingStepModel(weighing_step_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -115,6 +95,26 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
+                crate::codegen::tables::row::Row::Instrument(instruments),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if instruments.id == self.instrument_id {
+                    foreign_keys.instrument = Some(instruments);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Instrument(instruments),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if instruments.id == self.instrument_id {
+                    foreign_keys.instrument = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::Step(steps),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -135,22 +135,22 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::Instrument(instruments),
+                crate::codegen::tables::row::Row::Processable(processables),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if instruments.id == self.instrument_id {
-                    foreign_keys.instrument = Some(instruments);
+                if processables.id == self.processable_id {
+                    foreign_keys.processable = Some(processables);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::Instrument(instruments),
+                crate::codegen::tables::row::Row::Processable(processables),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if instruments.id == self.instrument_id {
-                    foreign_keys.instrument = None;
+                if processables.id == self.processable_id {
+                    foreign_keys.processable = None;
                     updated = true;
                 }
             }
