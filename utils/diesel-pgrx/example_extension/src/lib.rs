@@ -6,7 +6,7 @@
 #[derive(diesel_pgrx::DieselPGRX)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "pgrx", derive(pgrx::PostgresType))]
-#[derive(Debug, PartialEq, Eq, diesel::FromSqlRow, diesel::AsExpression)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, diesel::FromSqlRow, diesel::AsExpression)]
 #[diesel(sql_type = diesel_impls::PositiveU32)]
 pub struct PositiveU32 {
     pub field: i32,

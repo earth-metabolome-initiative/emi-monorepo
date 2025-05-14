@@ -32,9 +32,11 @@ AS 'MODULE_PATHNAME', 'positiveu32_out_wrapper';
 -- utils/diesel-pgrx/example_extension/src/lib.rs:8
 -- example_extension::positiveu32_recv
 CREATE  FUNCTION "positiveu32_recv"(
-	"internal" internal /* pgrx::datum::internal::Internal */
+	"internal" internal, /* pgrx::datum::internal::Internal */
+	"oid" oid, /* pgrx_pg_sys::submodules::oids::Oid */
+	"typmod" INT /* i32 */
 ) RETURNS PositiveU32 /* example_extension::PositiveU32 */
-IMMUTABLE PARALLEL SAFE
+IMMUTABLE STRICT PARALLEL SAFE
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'positiveu32_recv_wrapper';
 

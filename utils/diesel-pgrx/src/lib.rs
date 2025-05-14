@@ -10,3 +10,5 @@ pub use diesel;
 pub use diesel_pgrx_derive::DieselPGRX;
 #[cfg(feature = "macro")]
 pub use serde_cbor;
+#[cfg(feature = "macro")]
+pub use byteorder;

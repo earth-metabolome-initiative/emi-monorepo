@@ -61,20 +61,25 @@ pub fn diesel_pgrx_derive(input: proc_macro::TokenStream) -> proc_macro::TokenSt
         {
             fn to_sql<'b>(&'b self, out: &mut diesel_pgrx::diesel::serialize::Output<'b, '_, diesel_pgrx::diesel::pg::Pg>) -> diesel_pgrx::diesel::serialize::Result {
                 use std::io::Write;
+                use diesel_pgrx::byteorder::WriteBytesExt;
 
-                <
-                    (#(#attribute_types),*) as diesel_pgrx::diesel::serialize::ToSql<
-                        (#(#diesel_attribute_types),*),
-                        diesel_pgrx::diesel::pg::Pg
-                    >
-                >::to_sql(
-                    &(
-                        #(
-                            self.#attribute_names
-                        ),*
-                    ),
-                    out,
-                )?;
+                // We add a 4 byte varlena header to the output
+                out.write_u32::<diesel_pgrx::byteorder::BigEndian>(8 << 2)?;
+                out.write_i32::<diesel_pgrx::byteorder::BigEndian>(self.field)?;
+
+                // <
+                //     (#(#attribute_types),*) as diesel_pgrx::diesel::serialize::ToSql<
+                //         (#(#diesel_attribute_types),*),
+                //         diesel_pgrx::diesel::pg::Pg
+                //     >
+                // >::to_sql(
+                //     &(
+                //         #(
+                //             self.#attribute_names
+                //         ),*
+                //     ),
+                //     out,
+                // )?;
                 Ok(diesel::serialize::IsNull::No)
             }
         }

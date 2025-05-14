@@ -43,7 +43,7 @@ async fn init_db(conn: &mut diesel_async::AsyncPgConnection) -> Result<(), diese
     conn.batch_execute(
         "CREATE TABLE fields (
             id SERIAL PRIMARY KEY,
-            field PositiveU32 NOT NULL CHECK (validate_positive_u32(field))
+            field PositiveU32 NOT NULL
         );",
     )
     .await?;
