@@ -149,51 +149,94 @@ impl Default for InsertableAliquotingStepBuilder {
     }
 }
 impl InsertableAliquotingStepBuilder {
-    pub fn id<P: Into<rosetta_uuid::Uuid>>(
-        mut self,
-        id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let id = id.into();
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+            Into::into(err).rename_field(InsertableAliquotingStepAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn source_processable_id<P: Into<rosetta_uuid::Uuid>>(
+    pub fn source_processable_id<P>(
         mut self,
         source_processable_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let source_processable_id = source_processable_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let source_processable_id = source_processable_id.try_into().map_err(
+            |err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableAliquotingStepAttributes::SourceProcessableId)
+            },
+        )?;
         self.source_processable_id = Some(source_processable_id);
         Ok(self)
     }
-    pub fn destination_processable_id<P: Into<rosetta_uuid::Uuid>>(
+    pub fn destination_processable_id<P>(
         mut self,
         destination_processable_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let destination_processable_id = destination_processable_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let destination_processable_id = destination_processable_id.try_into().map_err(
+            |err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableAliquotingStepAttributes::DestinationProcessableId)
+            },
+        )?;
         self.destination_processable_id = Some(destination_processable_id);
         Ok(self)
     }
-    pub fn instrument_id<P: Into<i32>>(
+    pub fn instrument_id<P>(
         mut self,
         instrument_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let instrument_id = instrument_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let instrument_id =
+            instrument_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(InsertableAliquotingStepAttributes::InstrumentId)
+            })?;
         self.instrument_id = Some(instrument_id);
         Ok(self)
     }
-    pub fn created_by<P: Into<i32>>(
+    pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_by = created_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableAliquotingStepAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
-    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_at = created_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableAliquotingStepAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }

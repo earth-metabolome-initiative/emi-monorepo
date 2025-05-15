@@ -51,26 +51,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Project(projects),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if projects.id == self.project_id {
-                    foreign_keys.project = Some(projects);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Project(projects),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if projects.id == self.project_id {
-                    foreign_keys.project = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::Organism(organisms),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -135,6 +115,26 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Project(projects),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if projects.id == self.project_id {
+                    foreign_keys.project = Some(projects);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Project(projects),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if projects.id == self.project_id {
+                    foreign_keys.project = None;
                     updated = true;
                 }
             }

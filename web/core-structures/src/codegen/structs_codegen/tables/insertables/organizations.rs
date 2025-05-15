@@ -49,51 +49,90 @@ pub struct InsertableOrganizationBuilder {
     domain: Option<String>,
 }
 impl InsertableOrganizationBuilder {
-    pub fn name<P: Into<String>>(
+    pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let name = name.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableOrganizationAttributes::Name)
+        })?;
         self.name = Some(name);
         Ok(self)
     }
-    pub fn url<P: Into<String>>(
+    pub fn url<P>(
         mut self,
         url: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let url = url.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let url = url.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableOrganizationAttributes::Url)
+        })?;
         self.url = Some(url);
         Ok(self)
     }
-    pub fn country<P: Into<String>>(
+    pub fn country<P>(
         mut self,
         country: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let country = country.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let country = country.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableOrganizationAttributes::Country)
+        })?;
         self.country = Some(country);
         Ok(self)
     }
-    pub fn alpha_two_code<P: Into<iso_codes::CountryCode>>(
+    pub fn alpha_two_code<P>(
         mut self,
         alpha_two_code: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let alpha_two_code = alpha_two_code.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<iso_codes::CountryCode>,
+        <P as TryInto<iso_codes::CountryCode>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let alpha_two_code = alpha_two_code.try_into().map_err(
+            |err: <P as TryInto<iso_codes::CountryCode>>::Error| {
+                Into::into(err).rename_field(InsertableOrganizationAttributes::AlphaTwoCode)
+            },
+        )?;
         self.alpha_two_code = Some(alpha_two_code);
         Ok(self)
     }
-    pub fn state_province<P: Into<Option<String>>>(
+    pub fn state_province<P>(
         mut self,
         state_province: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let state_province = state_province.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let state_province =
+            state_province.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
+                Into::into(err).rename_field(InsertableOrganizationAttributes::StateProvince)
+            })?;
         self.state_province = state_province;
         Ok(self)
     }
-    pub fn domain<P: Into<String>>(
+    pub fn domain<P>(
         mut self,
         domain: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let domain = domain.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let domain = domain.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableOrganizationAttributes::Domain)
+        })?;
         self.domain = Some(domain);
         Ok(self)
     }

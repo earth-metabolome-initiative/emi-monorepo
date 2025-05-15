@@ -131,19 +131,30 @@ impl Default for InsertableWeighingInstrumentModelBuilder {
     }
 }
 impl InsertableWeighingInstrumentModelBuilder {
-    pub fn id<P: Into<i32>>(
-        mut self,
-        id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let id = id.into();
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableWeighingInstrumentModelAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn error_kilograms<P: Into<f32>>(
+    pub fn error_kilograms<P>(
         mut self,
         error_kilograms: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let error_kilograms = error_kilograms.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let error_kilograms =
+            error_kilograms.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableWeighingInstrumentModelAttributes::ErrorKilograms)
+            })?;
         if let Some(minimum_measurable_kilograms) = self.minimum_measurable_kilograms {
             pgrx_validation::must_be_strictly_smaller_than_f32(
                 error_kilograms,
@@ -162,11 +173,21 @@ impl InsertableWeighingInstrumentModelBuilder {
         self.error_kilograms = Some(error_kilograms);
         Ok(self)
     }
-    pub fn minimum_measurable_kilograms<P: Into<f32>>(
+    pub fn minimum_measurable_kilograms<P>(
         mut self,
         minimum_measurable_kilograms: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let minimum_measurable_kilograms = minimum_measurable_kilograms.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let minimum_measurable_kilograms = minimum_measurable_kilograms.try_into().map_err(
+            |err: <P as TryInto<f32>>::Error| {
+                Into::into(err).rename_field(
+                    InsertableWeighingInstrumentModelAttributes::MinimumMeasurableKilograms,
+                )
+            },
+        )?;
         if let Some(error_kilograms) = self.error_kilograms {
             pgrx_validation::must_be_strictly_smaller_than_f32(
                 error_kilograms,
@@ -201,11 +222,21 @@ impl InsertableWeighingInstrumentModelBuilder {
         self.minimum_measurable_kilograms = Some(minimum_measurable_kilograms);
         Ok(self)
     }
-    pub fn maximum_measurable_kilograms<P: Into<f32>>(
+    pub fn maximum_measurable_kilograms<P>(
         mut self,
         maximum_measurable_kilograms: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let maximum_measurable_kilograms = maximum_measurable_kilograms.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let maximum_measurable_kilograms = maximum_measurable_kilograms.try_into().map_err(
+            |err: <P as TryInto<f32>>::Error| {
+                Into::into(err).rename_field(
+                    InsertableWeighingInstrumentModelAttributes::MaximumMeasurableKilograms,
+                )
+            },
+        )?;
         if let Some(minimum_measurable_kilograms) = self.minimum_measurable_kilograms {
             pgrx_validation::must_be_strictly_smaller_than_f32(
                 minimum_measurable_kilograms,
@@ -228,36 +259,66 @@ impl InsertableWeighingInstrumentModelBuilder {
         self.maximum_measurable_kilograms = Some(maximum_measurable_kilograms);
         Ok(self)
     }
-    pub fn created_by<P: Into<i32>>(
+    pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_by = created_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableWeighingInstrumentModelAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_at = created_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableWeighingInstrumentModelAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by<P: Into<i32>>(
+    pub fn updated_by<P>(
         mut self,
         updated_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_by = updated_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableWeighingInstrumentModelAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_at = updated_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableWeighingInstrumentModelAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }

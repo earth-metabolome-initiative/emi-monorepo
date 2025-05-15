@@ -91,35 +91,63 @@ impl Default for InsertableOrganismTaxonBuilder {
     }
 }
 impl InsertableOrganismTaxonBuilder {
-    pub fn created_by<P: Into<i32>>(
+    pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_by = created_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableOrganismTaxonAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
-    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_at = created_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableOrganismTaxonAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn organism_id<P: Into<rosetta_uuid::Uuid>>(
+    pub fn organism_id<P>(
         mut self,
         organism_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let organism_id = organism_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let organism_id =
+            organism_id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+                Into::into(err).rename_field(InsertableOrganismTaxonAttributes::OrganismId)
+            })?;
         self.organism_id = Some(organism_id);
         Ok(self)
     }
-    pub fn taxon_id<P: Into<i32>>(
+    pub fn taxon_id<P>(
         mut self,
         taxon_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let taxon_id = taxon_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let taxon_id = taxon_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableOrganismTaxonAttributes::TaxonId)
+        })?;
         self.taxon_id = Some(taxon_id);
         Ok(self)
     }

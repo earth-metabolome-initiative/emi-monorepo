@@ -52,19 +52,29 @@ pub struct InsertableSpectrumBuilder {
     spectra_collection_id: Option<i32>,
 }
 impl InsertableSpectrumBuilder {
-    pub fn id<P: Into<i32>>(
-        mut self,
-        id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let id = id.into();
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableSpectrumAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn spectra_collection_id<P: Into<i32>>(
+    pub fn spectra_collection_id<P>(
         mut self,
         spectra_collection_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let spectra_collection_id = spectra_collection_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let spectra_collection_id =
+            spectra_collection_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(InsertableSpectrumAttributes::SpectraCollectionId)
+            })?;
         self.spectra_collection_id = Some(spectra_collection_id);
         Ok(self)
     }

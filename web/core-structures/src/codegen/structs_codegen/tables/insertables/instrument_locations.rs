@@ -95,35 +95,63 @@ impl Default for InsertableInstrumentLocationBuilder {
     }
 }
 impl InsertableInstrumentLocationBuilder {
-    pub fn instrument_id<P: Into<i32>>(
+    pub fn instrument_id<P>(
         mut self,
         instrument_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let instrument_id = instrument_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let instrument_id =
+            instrument_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(InsertableInstrumentLocationAttributes::InstrumentId)
+            })?;
         self.instrument_id = Some(instrument_id);
         Ok(self)
     }
-    pub fn room_id<P: Into<i32>>(
+    pub fn room_id<P>(
         mut self,
         room_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let room_id = room_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let room_id = room_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableInstrumentLocationAttributes::RoomId)
+        })?;
         self.room_id = Some(room_id);
         Ok(self)
     }
-    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_at = created_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableInstrumentLocationAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn created_by<P: Into<i32>>(
+    pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_by = created_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableInstrumentLocationAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }

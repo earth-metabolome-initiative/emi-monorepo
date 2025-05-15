@@ -60,19 +60,31 @@ pub struct InsertableTeamProjectBuilder {
     project_id: Option<i32>,
 }
 impl InsertableTeamProjectBuilder {
-    pub fn team_id<P: Into<i32>>(
+    pub fn team_id<P>(
         mut self,
         team_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let team_id = team_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let team_id = team_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableTeamProjectAttributes::TeamId)
+        })?;
         self.team_id = Some(team_id);
         Ok(self)
     }
-    pub fn project_id<P: Into<i32>>(
+    pub fn project_id<P>(
         mut self,
         project_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let project_id = project_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let project_id = project_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableTeamProjectAttributes::ProjectId)
+        })?;
         self.project_id = Some(project_id);
         Ok(self)
     }

@@ -150,61 +150,107 @@ impl Default for InsertableWeighingStepBuilder {
     }
 }
 impl InsertableWeighingStepBuilder {
-    pub fn id<P: Into<rosetta_uuid::Uuid>>(
-        mut self,
-        id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let id = id.into();
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+            Into::into(err).rename_field(InsertableWeighingStepAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn processable_id<P: Into<rosetta_uuid::Uuid>>(
+    pub fn processable_id<P>(
         mut self,
         processable_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let processable_id = processable_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let processable_id = processable_id.try_into().map_err(
+            |err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+                Into::into(err).rename_field(InsertableWeighingStepAttributes::ProcessableId)
+            },
+        )?;
         self.processable_id = Some(processable_id);
         Ok(self)
     }
-    pub fn weighing_step_model_id<P: Into<i32>>(
+    pub fn weighing_step_model_id<P>(
         mut self,
         weighing_step_model_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let weighing_step_model_id = weighing_step_model_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let weighing_step_model_id =
+            weighing_step_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(InsertableWeighingStepAttributes::WeighingStepModelId)
+            })?;
         self.weighing_step_model_id = Some(weighing_step_model_id);
         Ok(self)
     }
-    pub fn instrument_id<P: Into<i32>>(
+    pub fn instrument_id<P>(
         mut self,
         instrument_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let instrument_id = instrument_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let instrument_id =
+            instrument_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(InsertableWeighingStepAttributes::InstrumentId)
+            })?;
         self.instrument_id = Some(instrument_id);
         Ok(self)
     }
-    pub fn kilograms<P: Into<f32>>(
+    pub fn kilograms<P>(
         mut self,
         kilograms: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let kilograms = kilograms.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let kilograms = kilograms.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+            Into::into(err).rename_field(InsertableWeighingStepAttributes::Kilograms)
+        })?;
         pgrx_validation::must_be_strictly_positive_f32(kilograms)
             .map_err(|e| e.rename_field(InsertableWeighingStepAttributes::Kilograms))?;
         self.kilograms = Some(kilograms);
         Ok(self)
     }
-    pub fn created_by<P: Into<i32>>(
+    pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_by = created_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableWeighingStepAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
-    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_at = created_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableWeighingStepAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }

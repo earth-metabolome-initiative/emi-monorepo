@@ -4,6 +4,7 @@
 use core_structures::{
     Brand as PortalBrand, CommercialProduct as PortalCommercialProduct,
     InstrumentModel as PortalInstrumentModel,
+    InstrumentModelCategory as PortalInstrumentModelCategory,
 };
 use diesel_async::AsyncPgConnection;
 use web_common_traits::{
@@ -83,10 +84,25 @@ pub(crate) async fn insert_missing_instrument_models(
         let directus_instrument_type =
             directus_instrument_model.instrument_type(directus_conn).await?;
 
-        todo!("Register the instrument model categories!");
-
         let _portal_instrument_model = PortalInstrumentModel::new()
             .id(portal_product.id)?
+            .created_by(portal_product.created_by)?
+            .updated_by(portal_product.updated_by)?
+            .updated_at(portal_product.updated_at)?
+            .created_at(portal_product.created_at)?
+            .build()?
+            .insert(&portal_product.created_by, portal_conn)
+            .await?;
+
+        let _portal_instrument_category = PortalInstrumentModelCategory::new()
+            .instrument_model_id(portal_product.id)?
+            .instrument_category(directus_instrument_type.instrument_type.as_ref().ok_or_else(
+                || {
+                    crate::error::Error::MissingInstrumentTypeName(Box::from(
+                        directus_instrument_type.clone(),
+                    ))
+                },
+            )?)?
             .created_by(portal_product.created_by)?
             .updated_by(portal_product.updated_by)?
             .updated_at(portal_product.updated_at)?

@@ -47,57 +47,94 @@ pub struct InsertableLoginProviderBuilder {
     scope: Option<String>,
 }
 impl InsertableLoginProviderBuilder {
-    pub fn name<P: Into<String>>(
+    pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let name = name.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableLoginProviderAttributes::Name)
+        })?;
         pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::Name))?;
         self.name = Some(name);
         Ok(self)
     }
-    pub fn icon<P: Into<String>>(
+    pub fn icon<P>(
         mut self,
         icon: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let icon = icon.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableLoginProviderAttributes::Icon)
+        })?;
         pgrx_validation::must_be_font_awesome_class(icon.as_ref())
             .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::Icon))?;
         self.icon = Some(icon);
         Ok(self)
     }
-    pub fn client_id<P: Into<String>>(
+    pub fn client_id<P>(
         mut self,
         client_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let client_id = client_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let client_id = client_id.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableLoginProviderAttributes::ClientId)
+        })?;
         pgrx_validation::must_be_paragraph(client_id.as_ref())
             .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::ClientId))?;
         self.client_id = Some(client_id);
         Ok(self)
     }
-    pub fn redirect_uri<P: Into<String>>(
+    pub fn redirect_uri<P>(
         mut self,
         redirect_uri: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let redirect_uri = redirect_uri.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let redirect_uri =
+            redirect_uri.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableLoginProviderAttributes::RedirectUri)
+            })?;
         self.redirect_uri = Some(redirect_uri);
         Ok(self)
     }
-    pub fn oauth_url<P: Into<String>>(
+    pub fn oauth_url<P>(
         mut self,
         oauth_url: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let oauth_url = oauth_url.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let oauth_url = oauth_url.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableLoginProviderAttributes::OauthUrl)
+        })?;
         self.oauth_url = Some(oauth_url);
         Ok(self)
     }
-    pub fn scope<P: Into<String>>(
+    pub fn scope<P>(
         mut self,
         scope: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let scope = scope.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let scope = scope.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableLoginProviderAttributes::Scope)
+        })?;
         pgrx_validation::must_be_paragraph(scope.as_ref())
             .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::Scope))?;
         self.scope = Some(scope);

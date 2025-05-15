@@ -43,30 +43,22 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::User(users),
+                crate::codegen::tables::row::Row::CommercialProduct(commercial_products),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = Some(users.clone());
-                    updated = true;
-                }
-                if users.id == self.updated_by {
-                    foreign_keys.updated_by = Some(users.clone());
+                if commercial_products.id == self.id {
+                    foreign_keys.id = Some(commercial_products);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::User(users),
+                crate::codegen::tables::row::Row::CommercialProduct(commercial_products),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = None;
-                    updated = true;
-                }
-                if users.id == self.updated_by {
-                    foreign_keys.updated_by = None;
+                if commercial_products.id == self.id {
+                    foreign_keys.id = None;
                     updated = true;
                 }
             }
@@ -91,22 +83,30 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::CommercialProduct(commercial_products),
+                crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if commercial_products.id == self.id {
-                    foreign_keys.id = Some(commercial_products);
+                if users.id == self.created_by {
+                    foreign_keys.created_by = Some(users.clone());
+                    updated = true;
+                }
+                if users.id == self.updated_by {
+                    foreign_keys.updated_by = Some(users.clone());
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::CommercialProduct(commercial_products),
+                crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if commercial_products.id == self.id {
-                    foreign_keys.id = None;
+                if users.id == self.created_by {
+                    foreign_keys.created_by = None;
+                    updated = true;
+                }
+                if users.id == self.updated_by {
+                    foreign_keys.updated_by = None;
                     updated = true;
                 }
             }

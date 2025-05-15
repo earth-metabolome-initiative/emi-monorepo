@@ -29,19 +29,32 @@ pub struct InsertableRankBuilder {
     description: Option<String>,
 }
 impl InsertableRankBuilder {
-    pub fn name<P: Into<String>>(
+    pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let name = name.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableRankAttributes::Name)
+        })?;
         self.name = Some(name);
         Ok(self)
     }
-    pub fn description<P: Into<String>>(
+    pub fn description<P>(
         mut self,
         description: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let description = description.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let description =
+            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableRankAttributes::Description)
+            })?;
         self.description = Some(description);
         Ok(self)
     }

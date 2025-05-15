@@ -92,11 +92,17 @@ impl Default for InsertableProcedureModelBuilder {
     }
 }
 impl InsertableProcedureModelBuilder {
-    pub fn name<P: Into<String>>(
+    pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let name = name.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableProcedureModelAttributes::Name)
+        })?;
         if let Some(description) = self.description.as_ref() {
             pgrx_validation::must_be_distinct(name.as_ref(), description).map_err(|e| {
                 e.rename_fields(
@@ -110,11 +116,18 @@ impl InsertableProcedureModelBuilder {
         self.name = Some(name);
         Ok(self)
     }
-    pub fn description<P: Into<String>>(
+    pub fn description<P>(
         mut self,
         description: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let description = description.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let description =
+            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableProcedureModelAttributes::Description)
+            })?;
         if let Some(name) = self.name.as_ref() {
             pgrx_validation::must_be_distinct(name, description.as_ref()).map_err(|e| {
                 e.rename_fields(
@@ -128,46 +141,82 @@ impl InsertableProcedureModelBuilder {
         self.description = Some(description);
         Ok(self)
     }
-    pub fn icon<P: Into<String>>(
+    pub fn icon<P>(
         mut self,
         icon: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let icon = icon.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableProcedureModelAttributes::Icon)
+        })?;
         pgrx_validation::must_be_font_awesome_class(icon.as_ref())
             .map_err(|e| e.rename_field(InsertableProcedureModelAttributes::Icon))?;
         self.icon = Some(icon);
         Ok(self)
     }
-    pub fn created_by<P: Into<i32>>(
+    pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_by = created_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableProcedureModelAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_at = created_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProcedureModelAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by<P: Into<i32>>(
+    pub fn updated_by<P>(
         mut self,
         updated_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_by = updated_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableProcedureModelAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_at = updated_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProcedureModelAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }

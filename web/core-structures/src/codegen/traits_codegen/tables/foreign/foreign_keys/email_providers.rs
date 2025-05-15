@@ -35,26 +35,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::LoginProvider(login_providers),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if login_providers.id == self.login_provider_id {
-                    foreign_keys.login_provider = Some(login_providers);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::LoginProvider(login_providers),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if login_providers.id == self.login_provider_id {
-                    foreign_keys.login_provider = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::UserEmail(user_emails),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -71,6 +51,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if user_emails.id == self.email_id {
                     foreign_keys.email = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::LoginProvider(login_providers),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if login_providers.id == self.login_provider_id {
+                    foreign_keys.login_provider = Some(login_providers);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::LoginProvider(login_providers),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if login_providers.id == self.login_provider_id {
+                    foreign_keys.login_provider = None;
                     updated = true;
                 }
             }

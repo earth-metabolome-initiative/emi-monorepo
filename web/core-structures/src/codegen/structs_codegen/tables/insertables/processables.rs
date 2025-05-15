@@ -48,19 +48,28 @@ pub struct InsertableProcessableBuilder {
     kilograms: Option<f32>,
 }
 impl InsertableProcessableBuilder {
-    pub fn id<P: Into<rosetta_uuid::Uuid>>(
-        mut self,
-        id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let id = id.into();
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+            Into::into(err).rename_field(InsertableProcessableAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn kilograms<P: Into<f32>>(
+    pub fn kilograms<P>(
         mut self,
         kilograms: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let kilograms = kilograms.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let kilograms = kilograms.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+            Into::into(err).rename_field(InsertableProcessableAttributes::Kilograms)
+        })?;
         pgrx_validation::must_be_strictly_positive_f32(kilograms)
             .map_err(|e| e.rename_field(InsertableProcessableAttributes::Kilograms))?;
         self.kilograms = Some(kilograms);

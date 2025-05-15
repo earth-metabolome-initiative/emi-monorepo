@@ -89,4 +89,19 @@ impl StorageContainer {
             .load::<Self>(conn)
             .await
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_created_at(
+        created_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::storage_containers::storage_containers;
+        Self::table()
+            .filter(storage_containers::created_at.eq(created_at))
+            .order_by(storage_containers::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
 }

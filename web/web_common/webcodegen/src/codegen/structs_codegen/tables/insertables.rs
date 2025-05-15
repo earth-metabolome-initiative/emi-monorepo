@@ -263,9 +263,25 @@ impl Codegen<'_> {
                     TokenStream::new()
                 };
 
+                let attribute = {
+                    let camel_cased = column.camel_case_ident()?;
+                    quote::quote! { #insertable_enum::#camel_cased }
+                };
+
                 insertable_builder_methods.push(quote::quote! {
-                    pub fn #column_name<P: Into<#column_type>>(mut self, #column_name: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-                        let #column_name = #column_name.into();
+                    pub fn #column_name<P>(
+                        mut self, #column_name: P
+                    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+                    where
+                        P: TryInto<#column_type>,
+                        <P as TryInto<#column_type>>::Error: Into<validation_errors::SingleFieldError>,
+                    {
+                        let #column_name = #column_name
+                            .try_into()
+                            .map_err(|err: <P as TryInto<#column_type>>::Error| {
+                                Into::into(err)
+                                    .rename_field(#attribute)
+                            })?;
                         #check_constraints
                         #column_assignment
                         #updated_by_exception

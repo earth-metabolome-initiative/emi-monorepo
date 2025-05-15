@@ -59,4 +59,64 @@ impl Organization {
             .await
             .optional()
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_name(
+        name: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::organizations::organizations;
+        Self::table()
+            .filter(organizations::name.eq(name))
+            .order_by(organizations::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_country(
+        country: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::organizations::organizations;
+        Self::table()
+            .filter(organizations::country.eq(country))
+            .order_by(organizations::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_alpha_two_code(
+        alpha_two_code: &iso_codes::CountryCode,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::organizations::organizations;
+        Self::table()
+            .filter(organizations::alpha_two_code.eq(alpha_two_code))
+            .order_by(organizations::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_state_province(
+        state_province: &Option<String>,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::organizations::organizations;
+        Self::table()
+            .filter(organizations::state_province.eq(state_province))
+            .order_by(organizations::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
 }

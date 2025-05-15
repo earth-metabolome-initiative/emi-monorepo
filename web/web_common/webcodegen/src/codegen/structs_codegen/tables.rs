@@ -47,6 +47,7 @@ impl Codegen<'_> {
                 TokenStream::new()
             };
             let from_unique_indices = table.from_unique_indices(conn, &syntax).await?;
+            let from_attributes = table.from_attributes(conn, &syntax).await?;
 
             std::fs::write(
                 &table_file,
@@ -56,6 +57,7 @@ impl Codegen<'_> {
                         #foreign_key_methods
                         #from_foreign_key_methods
                         #from_unique_indices
+                        #from_attributes
                     }
                 })?,
             )?;

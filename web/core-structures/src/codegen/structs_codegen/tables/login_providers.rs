@@ -44,4 +44,79 @@ impl LoginProvider {
             .await
             .optional()
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_icon(
+        icon: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::login_providers::login_providers;
+        Self::table()
+            .filter(login_providers::icon.eq(icon))
+            .order_by(login_providers::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_client_id(
+        client_id: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::login_providers::login_providers;
+        Self::table()
+            .filter(login_providers::client_id.eq(client_id))
+            .order_by(login_providers::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_redirect_uri(
+        redirect_uri: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::login_providers::login_providers;
+        Self::table()
+            .filter(login_providers::redirect_uri.eq(redirect_uri))
+            .order_by(login_providers::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_oauth_url(
+        oauth_url: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::login_providers::login_providers;
+        Self::table()
+            .filter(login_providers::oauth_url.eq(oauth_url))
+            .order_by(login_providers::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_scope(
+        scope: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::login_providers::login_providers;
+        Self::table()
+            .filter(login_providers::scope.eq(scope))
+            .order_by(login_providers::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
 }

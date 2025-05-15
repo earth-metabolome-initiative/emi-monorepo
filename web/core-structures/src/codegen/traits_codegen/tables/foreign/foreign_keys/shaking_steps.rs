@@ -40,26 +40,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Processable(processables),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if processables.id == self.processable_id {
-                    foreign_keys.processable = Some(processables);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Processable(processables),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if processables.id == self.processable_id {
-                    foreign_keys.processable = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -96,6 +76,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if steps.id == self.id {
                     foreign_keys.id = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Processable(processables),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if processables.id == self.processable_id {
+                    foreign_keys.processable = Some(processables);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Processable(processables),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if processables.id == self.processable_id {
+                    foreign_keys.processable = None;
                     updated = true;
                 }
             }

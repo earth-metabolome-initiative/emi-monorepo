@@ -52,19 +52,28 @@ pub struct InsertableOrganismBuilder {
     nameplate_category: Option<nameplate_categories::NameplateCategory>,
 }
 impl InsertableOrganismBuilder {
-    pub fn id<P: Into<rosetta_uuid::Uuid>>(
-        mut self,
-        id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let id = id.into();
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+            Into::into(err).rename_field(InsertableOrganismAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn name<P: Into<Option<String>>>(
+    pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let name = name.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
+            Into::into(err).rename_field(InsertableOrganismAttributes::Name)
+        })?;
         if let Some(name) = name.as_ref() {
             pgrx_validation::must_be_paragraph(name)
                 .map_err(|e| e.rename_field(InsertableOrganismAttributes::Name))?;
@@ -72,11 +81,20 @@ impl InsertableOrganismBuilder {
         self.name = name;
         Ok(self)
     }
-    pub fn nameplate_category<P: Into<nameplate_categories::NameplateCategory>>(
+    pub fn nameplate_category<P>(
         mut self,
         nameplate_category: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let nameplate_category = nameplate_category.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<nameplate_categories::NameplateCategory>,
+        <P as TryInto<nameplate_categories::NameplateCategory>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let nameplate_category = nameplate_category.try_into().map_err(
+            |err: <P as TryInto<nameplate_categories::NameplateCategory>>::Error| {
+                Into::into(err).rename_field(InsertableOrganismAttributes::NameplateCategory)
+            },
+        )?;
         self.nameplate_category = Some(nameplate_category);
         Ok(self)
     }

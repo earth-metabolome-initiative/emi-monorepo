@@ -43,43 +43,76 @@ pub struct InsertableSpatialRefSyBuilder {
     proj4text: Option<String>,
 }
 impl InsertableSpatialRefSyBuilder {
-    pub fn srid<P: Into<i32>>(
+    pub fn srid<P>(
         mut self,
         srid: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let srid = srid.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let srid = srid.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableSpatialRefSyAttributes::Srid)
+        })?;
         self.srid = Some(srid);
         Ok(self)
     }
-    pub fn auth_name<P: Into<Option<String>>>(
+    pub fn auth_name<P>(
         mut self,
         auth_name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let auth_name = auth_name.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let auth_name =
+            auth_name.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
+                Into::into(err).rename_field(InsertableSpatialRefSyAttributes::AuthName)
+            })?;
         self.auth_name = auth_name;
         Ok(self)
     }
-    pub fn auth_srid<P: Into<Option<i32>>>(
+    pub fn auth_srid<P>(
         mut self,
         auth_srid: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let auth_srid = auth_srid.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<i32>>,
+        <P as TryInto<Option<i32>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let auth_srid =
+            auth_srid.try_into().map_err(|err: <P as TryInto<Option<i32>>>::Error| {
+                Into::into(err).rename_field(InsertableSpatialRefSyAttributes::AuthSrid)
+            })?;
         self.auth_srid = auth_srid;
         Ok(self)
     }
-    pub fn srtext<P: Into<Option<String>>>(
+    pub fn srtext<P>(
         mut self,
         srtext: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let srtext = srtext.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let srtext = srtext.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
+            Into::into(err).rename_field(InsertableSpatialRefSyAttributes::Srtext)
+        })?;
         self.srtext = srtext;
         Ok(self)
     }
-    pub fn proj4text<P: Into<Option<String>>>(
+    pub fn proj4text<P>(
         mut self,
         proj4text: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let proj4text = proj4text.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let proj4text =
+            proj4text.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
+                Into::into(err).rename_field(InsertableSpatialRefSyAttributes::Proj4text)
+            })?;
         self.proj4text = proj4text;
         Ok(self)
     }

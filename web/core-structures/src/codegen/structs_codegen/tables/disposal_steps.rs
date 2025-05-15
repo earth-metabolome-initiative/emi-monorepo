@@ -114,4 +114,19 @@ impl DisposalStep {
             .load::<Self>(conn)
             .await
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_created_at(
+        created_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::disposal_steps::disposal_steps;
+        Self::table()
+            .filter(disposal_steps::created_at.eq(created_at))
+            .order_by(disposal_steps::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
 }

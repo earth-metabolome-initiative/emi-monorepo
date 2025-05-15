@@ -44,7 +44,7 @@ impl crate::Table {
 
             let mut all_columns_are_foreign_keys = true;
             for column in &columns {
-                if !column.is_foreign_key(conn).await {
+                if !column.is_foreign_key(conn).await? {
                     all_columns_are_foreign_keys = false;
                     break;
                 }

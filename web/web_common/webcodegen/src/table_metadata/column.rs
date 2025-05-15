@@ -866,9 +866,16 @@ impl Column {
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    pub async fn is_foreign_key(&self, conn: &mut AsyncPgConnection) -> bool {
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub async fn is_foreign_key(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         use crate::schema::{key_column_usage, referential_constraints};
-        key_column_usage::table
+        Ok(key_column_usage::table
             .inner_join(
                 referential_constraints::table.on(key_column_usage::constraint_name
                     .eq(referential_constraints::constraint_name)
@@ -888,7 +895,8 @@ impl Column {
             .select(KeyColumnUsage::as_select())
             .first::<KeyColumnUsage>(conn)
             .await
-            .is_ok()
+            .optional()?
+            .is_some())
     }
 
     /// Returns the foreign table of the column if it is a foreign key.

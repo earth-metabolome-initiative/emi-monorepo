@@ -122,4 +122,64 @@ impl ProcedureModelToolCategory {
             .load::<Self>(conn)
             .await
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_quantity(
+        quantity: &i32,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::procedure_model_tool_categories::procedure_model_tool_categories;
+        Self::table()
+            .filter(procedure_model_tool_categories::quantity.eq(quantity))
+            .order_by(procedure_model_tool_categories::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_tool_category(
+        tool_category: &tool_categories::ToolCategory,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::procedure_model_tool_categories::procedure_model_tool_categories;
+        Self::table()
+            .filter(procedure_model_tool_categories::tool_category.eq(tool_category))
+            .order_by(procedure_model_tool_categories::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_created_at(
+        created_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::procedure_model_tool_categories::procedure_model_tool_categories;
+        Self::table()
+            .filter(procedure_model_tool_categories::created_at.eq(created_at))
+            .order_by(procedure_model_tool_categories::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_updated_at(
+        updated_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::procedure_model_tool_categories::procedure_model_tool_categories;
+        Self::table()
+            .filter(procedure_model_tool_categories::updated_at.eq(updated_at))
+            .order_by(procedure_model_tool_categories::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
 }

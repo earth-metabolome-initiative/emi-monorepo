@@ -114,62 +114,110 @@ impl Default for InsertableContainerModelBuilder {
     }
 }
 impl InsertableContainerModelBuilder {
-    pub fn id<P: Into<i32>>(
-        mut self,
-        id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let id = id.into();
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableContainerModelAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn liters<P: Into<f32>>(
+    pub fn liters<P>(
         mut self,
         liters: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let liters = liters.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let liters = liters.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+            Into::into(err).rename_field(InsertableContainerModelAttributes::Liters)
+        })?;
         pgrx_validation::must_be_strictly_positive_f32(liters)
             .map_err(|e| e.rename_field(InsertableContainerModelAttributes::Liters))?;
         self.liters = Some(liters);
         Ok(self)
     }
-    pub fn container_category<P: Into<container_categories::ContainerCategory>>(
+    pub fn container_category<P>(
         mut self,
         container_category: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let container_category = container_category.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<container_categories::ContainerCategory>,
+        <P as TryInto<container_categories::ContainerCategory>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let container_category = container_category.try_into().map_err(
+            |err: <P as TryInto<container_categories::ContainerCategory>>::Error| {
+                Into::into(err).rename_field(InsertableContainerModelAttributes::ContainerCategory)
+            },
+        )?;
         self.container_category = Some(container_category);
         Ok(self)
     }
-    pub fn created_by<P: Into<i32>>(
+    pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_by = created_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableContainerModelAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_at = created_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableContainerModelAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by<P: Into<i32>>(
+    pub fn updated_by<P>(
         mut self,
         updated_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_by = updated_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableContainerModelAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_at = updated_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableContainerModelAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }

@@ -50,4 +50,34 @@ impl Organism {
             .first::<Self>(conn)
             .await
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_name(
+        name: &Option<String>,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::organisms::organisms;
+        Self::table()
+            .filter(organisms::name.eq(name))
+            .order_by(organisms::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_nameplate_category(
+        nameplate_category: &nameplate_categories::NameplateCategory,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::organisms::organisms;
+        Self::table()
+            .filter(organisms::nameplate_category.eq(nameplate_category))
+            .order_by(organisms::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
 }

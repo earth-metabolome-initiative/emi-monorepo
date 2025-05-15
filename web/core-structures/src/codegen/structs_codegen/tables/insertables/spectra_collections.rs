@@ -110,60 +110,106 @@ impl Default for InsertableSpectraCollectionBuilder {
     }
 }
 impl InsertableSpectraCollectionBuilder {
-    pub fn id<P: Into<i32>>(
-        mut self,
-        id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let id = id.into();
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableSpectraCollectionAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn notes<P: Into<Option<String>>>(
+    pub fn notes<P>(
         mut self,
         notes: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let notes = notes.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let notes = notes.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
+            Into::into(err).rename_field(InsertableSpectraCollectionAttributes::Notes)
+        })?;
         self.notes = notes;
         Ok(self)
     }
-    pub fn trackable_id<P: Into<rosetta_uuid::Uuid>>(
+    pub fn trackable_id<P>(
         mut self,
         trackable_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let trackable_id = trackable_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let trackable_id =
+            trackable_id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+                Into::into(err).rename_field(InsertableSpectraCollectionAttributes::TrackableId)
+            })?;
         self.trackable_id = Some(trackable_id);
         Ok(self)
     }
-    pub fn created_by<P: Into<i32>>(
+    pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_by = created_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableSpectraCollectionAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_at = created_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableSpectraCollectionAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by<P: Into<i32>>(
+    pub fn updated_by<P>(
         mut self,
         updated_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_by = updated_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableSpectraCollectionAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_at = updated_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableSpectraCollectionAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }

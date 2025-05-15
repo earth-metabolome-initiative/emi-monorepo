@@ -41,26 +41,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::PackagingModel(packaging_models),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if packaging_models.id == self.packaging_model_id {
-                    foreign_keys.packaging_model = Some(packaging_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::PackagingModel(packaging_models),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if packaging_models.id == self.packaging_model_id {
-                    foreign_keys.packaging_model = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -85,6 +65,26 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::PackagingModel(packaging_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if packaging_models.id == self.packaging_model_id {
+                    foreign_keys.packaging_model = Some(packaging_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::PackagingModel(packaging_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if packaging_models.id == self.packaging_model_id {
+                    foreign_keys.packaging_model = None;
                     updated = true;
                 }
             }

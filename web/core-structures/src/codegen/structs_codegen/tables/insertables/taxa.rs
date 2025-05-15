@@ -50,35 +50,57 @@ pub struct InsertableTaxonBuilder {
     rank_id: Option<i16>,
 }
 impl InsertableTaxonBuilder {
-    pub fn id<P: Into<i32>>(
-        mut self,
-        id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let id = id.into();
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableTaxonAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn name<P: Into<String>>(
+    pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let name = name.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableTaxonAttributes::Name)
+        })?;
         self.name = Some(name);
         Ok(self)
     }
-    pub fn parent_id<P: Into<Option<i32>>>(
+    pub fn parent_id<P>(
         mut self,
         parent_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let parent_id = parent_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<i32>>,
+        <P as TryInto<Option<i32>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let parent_id =
+            parent_id.try_into().map_err(|err: <P as TryInto<Option<i32>>>::Error| {
+                Into::into(err).rename_field(InsertableTaxonAttributes::ParentId)
+            })?;
         self.parent_id = parent_id;
         Ok(self)
     }
-    pub fn rank_id<P: Into<i16>>(
+    pub fn rank_id<P>(
         mut self,
         rank_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let rank_id = rank_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i16>,
+        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let rank_id = rank_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
+            Into::into(err).rename_field(InsertableTaxonAttributes::RankId)
+        })?;
         self.rank_id = Some(rank_id);
         Ok(self)
     }

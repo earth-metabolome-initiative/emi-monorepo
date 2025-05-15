@@ -56,35 +56,60 @@ pub struct InsertableObservationSubjectBuilder {
     color_id: Option<i16>,
 }
 impl InsertableObservationSubjectBuilder {
-    pub fn name<P: Into<String>>(
+    pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let name = name.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableObservationSubjectAttributes::Name)
+        })?;
         self.name = Some(name);
         Ok(self)
     }
-    pub fn description<P: Into<String>>(
+    pub fn description<P>(
         mut self,
         description: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let description = description.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let description =
+            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableObservationSubjectAttributes::Description)
+            })?;
         self.description = Some(description);
         Ok(self)
     }
-    pub fn icon<P: Into<String>>(
+    pub fn icon<P>(
         mut self,
         icon: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let icon = icon.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableObservationSubjectAttributes::Icon)
+        })?;
         self.icon = Some(icon);
         Ok(self)
     }
-    pub fn color_id<P: Into<i16>>(
+    pub fn color_id<P>(
         mut self,
         color_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let color_id = color_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i16>,
+        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let color_id = color_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
+            Into::into(err).rename_field(InsertableObservationSubjectAttributes::ColorId)
+        })?;
         self.color_id = Some(color_id);
         Ok(self)
     }

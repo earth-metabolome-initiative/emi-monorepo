@@ -29,19 +29,32 @@ pub struct InsertableCountryBuilder {
     name: Option<String>,
 }
 impl InsertableCountryBuilder {
-    pub fn iso<P: Into<iso_codes::CountryCode>>(
+    pub fn iso<P>(
         mut self,
         iso: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let iso = iso.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<iso_codes::CountryCode>,
+        <P as TryInto<iso_codes::CountryCode>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let iso =
+            iso.try_into().map_err(|err: <P as TryInto<iso_codes::CountryCode>>::Error| {
+                Into::into(err).rename_field(InsertableCountryAttributes::Iso)
+            })?;
         self.iso = Some(iso);
         Ok(self)
     }
-    pub fn name<P: Into<String>>(
+    pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let name = name.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableCountryAttributes::Name)
+        })?;
         self.name = Some(name);
         Ok(self)
     }

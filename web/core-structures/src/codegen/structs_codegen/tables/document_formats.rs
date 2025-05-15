@@ -43,4 +43,64 @@ impl DocumentFormat {
             .await
             .optional()
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_mime_type(
+        mime_type: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::document_formats::document_formats;
+        Self::table()
+            .filter(document_formats::mime_type.eq(mime_type))
+            .order_by(document_formats::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_description(
+        description: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::document_formats::document_formats;
+        Self::table()
+            .filter(document_formats::description.eq(description))
+            .order_by(document_formats::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_icon(
+        icon: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::document_formats::document_formats;
+        Self::table()
+            .filter(document_formats::icon.eq(icon))
+            .order_by(document_formats::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_color(
+        color: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::document_formats::document_formats;
+        Self::table()
+            .filter(document_formats::color.eq(color))
+            .order_by(document_formats::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
 }

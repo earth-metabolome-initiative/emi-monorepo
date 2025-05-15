@@ -1,5 +1,7 @@
 //! Submodule defining traits regarding tables that can be extended with new
 //! rows.
+use std::convert::Infallible;
+
 use backend_request_errors::BackendRequestError;
 use common_traits::prelude::BuilderError;
 
@@ -193,5 +195,11 @@ impl<FieldName> From<diesel::result::Error> for InsertError<FieldName> {
 impl<FieldName> From<BackendRequestError> for InsertError<FieldName> {
     fn from(error: BackendRequestError) -> Self {
         InsertError::ServerError(error)
+    }
+}
+
+impl<FieldName> From<Infallible> for InsertError<FieldName> {
+    fn from(_error: Infallible) -> Self {
+        unreachable!()
     }
 }

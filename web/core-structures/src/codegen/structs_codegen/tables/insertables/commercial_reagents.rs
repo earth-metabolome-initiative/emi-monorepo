@@ -72,19 +72,30 @@ pub struct InsertableCommercialReagentBuilder {
     commercial_product_lot_id: Option<i32>,
 }
 impl InsertableCommercialReagentBuilder {
-    pub fn id<P: Into<rosetta_uuid::Uuid>>(
-        mut self,
-        id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let id = id.into();
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+            Into::into(err).rename_field(InsertableCommercialReagentAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn commercial_product_lot_id<P: Into<i32>>(
+    pub fn commercial_product_lot_id<P>(
         mut self,
         commercial_product_lot_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let commercial_product_lot_id = commercial_product_lot_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let commercial_product_lot_id =
+            commercial_product_lot_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableCommercialReagentAttributes::CommercialProductLotId)
+            })?;
         self.commercial_product_lot_id = Some(commercial_product_lot_id);
         Ok(self)
     }

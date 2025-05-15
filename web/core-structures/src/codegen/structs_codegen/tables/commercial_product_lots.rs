@@ -83,4 +83,19 @@ impl CommercialProductLot {
             .await
             .optional()
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_lot(
+        lot: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
+        Self::table()
+            .filter(commercial_product_lots::lot.eq(lot))
+            .order_by(commercial_product_lots::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
 }

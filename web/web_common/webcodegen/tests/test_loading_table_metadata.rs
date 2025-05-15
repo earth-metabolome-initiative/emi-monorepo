@@ -95,7 +95,7 @@ async fn test_user_table() {
 
     let primary_id_column = composite_users.column_by_name(&mut conn, "primary_id").await.unwrap();
     assert_eq!(primary_id_column.column_name, "primary_id");
-    assert!(primary_id_column.is_foreign_key(&mut conn).await);
+    assert!(primary_id_column.is_foreign_key(&mut conn).await.unwrap());
 
     let (foreign_table, user_id_column) =
         primary_id_column.foreign_table(&mut conn).await.unwrap().unwrap();
@@ -105,7 +105,7 @@ async fn test_user_table() {
     let secondary_id_column =
         composite_users.column_by_name(&mut conn, "secondary_id").await.unwrap();
     assert_eq!(secondary_id_column.column_name, "secondary_id");
-    assert!(secondary_id_column.is_foreign_key(&mut conn).await);
+    assert!(secondary_id_column.is_foreign_key(&mut conn).await.unwrap());
 
     let (foreign_table, user_id_column) =
         secondary_id_column.foreign_table(&mut conn).await.unwrap().unwrap();
@@ -114,7 +114,7 @@ async fn test_user_table() {
 
     let username_column = composite_users.column_by_name(&mut conn, "username").await.unwrap();
     assert_eq!(username_column.column_name, "username");
-    assert!(!username_column.is_foreign_key(&mut conn).await);
+    assert!(!username_column.is_foreign_key(&mut conn).await.unwrap());
 
     assert!(username_column.foreign_table(&mut conn).await.unwrap().is_none());
 

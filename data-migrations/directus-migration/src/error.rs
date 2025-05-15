@@ -6,7 +6,8 @@ use core_structures::{
         InsertableAddressAttributes, InsertableBrandAttributes, InsertableCityAttributes,
         InsertableCommercialProductAttributes, InsertableInstrumentAttributes,
         InsertableInstrumentLocationAttributes, InsertableInstrumentModelAttributes,
-        InsertableRoomAttributes, InsertableUserEmailAttributes,
+        InsertableInstrumentModelCategoryAttributes, InsertableRoomAttributes,
+        InsertableUserEmailAttributes,
     },
 };
 use web_common_traits::database::InsertError;
@@ -77,6 +78,8 @@ pub enum Error {
     RoomInsert(InsertError<InsertableRoomAttributes>),
     /// Failed to insert a new instrument location.
     InstrumentLocationInsert(InsertError<InsertableInstrumentLocationAttributes>),
+    /// Failed to insert a new instrument model category.
+    InstrumentModelCategoryInsert(InsertError<InsertableInstrumentModelCategoryAttributes>),
     /// User never logged in
     UserNeverLoggedIn(Box<DirectusUser>),
 }
@@ -150,5 +153,11 @@ impl From<InsertError<InsertableInstrumentLocationAttributes>> for Error {
 impl From<InsertError<InsertableCommercialProductAttributes>> for Error {
     fn from(value: InsertError<InsertableCommercialProductAttributes>) -> Self {
         Error::ProductInsert(value)
+    }
+}
+
+impl From<InsertError<InsertableInstrumentModelCategoryAttributes>> for Error {
+    fn from(value: InsertError<InsertableInstrumentModelCategoryAttributes>) -> Self {
+        Error::InstrumentModelCategoryInsert(value)
     }
 }

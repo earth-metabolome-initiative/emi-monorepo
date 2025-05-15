@@ -11,11 +11,12 @@ diesel-async = { workspace = true, optional = true }
 common-traits = { workspace = true, features = ["serde"] }
 validation-errors.workspace = true
 backend-request-errors.workspace = true
+instrument_categories.workspace = true
 
 [features]
-sqlite = ["diesel/sqlite"]
+sqlite = ["diesel/sqlite", "instrument_categories/sqlite"]
 diesel-async = ["dep:diesel-async"]
-postgres = ["diesel/postgres", "diesel-async", "diesel-async/postgres"]
+postgres = ["diesel/postgres", "diesel-async", "diesel-async/postgres", "instrument_categories/postgres"]
 frontend = ["sqlite"]
 backend = ["postgres"]
 

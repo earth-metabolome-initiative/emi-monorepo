@@ -155,68 +155,121 @@ impl Default for InsertableTrackableBuilder {
     }
 }
 impl InsertableTrackableBuilder {
-    pub fn id<P: Into<rosetta_uuid::Uuid>>(
-        mut self,
-        id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let id = id.into();
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+            Into::into(err).rename_field(InsertableTrackableAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn container_model_id<P: Into<i32>>(
+    pub fn container_model_id<P>(
         mut self,
         container_model_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let container_model_id = container_model_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let container_model_id =
+            container_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(InsertableTrackableAttributes::ContainerModelId)
+            })?;
         self.container_model_id = Some(container_model_id);
         Ok(self)
     }
-    pub fn project_id<P: Into<i32>>(
+    pub fn project_id<P>(
         mut self,
         project_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let project_id = project_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let project_id = project_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableTrackableAttributes::ProjectId)
+        })?;
         self.project_id = Some(project_id);
         Ok(self)
     }
-    pub fn trackable_state_id<P: Into<i16>>(
+    pub fn trackable_state_id<P>(
         mut self,
         trackable_state_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let trackable_state_id = trackable_state_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i16>,
+        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let trackable_state_id =
+            trackable_state_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
+                Into::into(err).rename_field(InsertableTrackableAttributes::TrackableStateId)
+            })?;
         self.trackable_state_id = Some(trackable_state_id);
         Ok(self)
     }
-    pub fn created_by<P: Into<i32>>(
+    pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_by = created_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableTrackableAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_at = created_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableTrackableAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by<P: Into<i32>>(
+    pub fn updated_by<P>(
         mut self,
         updated_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_by = updated_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableTrackableAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_at = updated_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableTrackableAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }

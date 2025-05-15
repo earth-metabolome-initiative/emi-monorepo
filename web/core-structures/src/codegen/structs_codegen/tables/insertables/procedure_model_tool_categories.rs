@@ -126,63 +126,119 @@ impl Default for InsertableProcedureModelToolCategoryBuilder {
     }
 }
 impl InsertableProcedureModelToolCategoryBuilder {
-    pub fn quantity<P: Into<i32>>(
+    pub fn quantity<P>(
         mut self,
         quantity: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let quantity = quantity.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let quantity = quantity.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableProcedureModelToolCategoryAttributes::Quantity)
+        })?;
         pgrx_validation::must_be_strictly_positive_i32(quantity).map_err(|e| {
             e.rename_field(InsertableProcedureModelToolCategoryAttributes::Quantity)
         })?;
         self.quantity = Some(quantity);
         Ok(self)
     }
-    pub fn procedure_model_id<P: Into<i32>>(
+    pub fn procedure_model_id<P>(
         mut self,
         procedure_model_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let procedure_model_id = procedure_model_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let procedure_model_id =
+            procedure_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableProcedureModelToolCategoryAttributes::ProcedureModelId)
+            })?;
         self.procedure_model_id = Some(procedure_model_id);
         Ok(self)
     }
-    pub fn tool_category<P: Into<tool_categories::ToolCategory>>(
+    pub fn tool_category<P>(
         mut self,
         tool_category: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let tool_category = tool_category.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<tool_categories::ToolCategory>,
+        <P as TryInto<tool_categories::ToolCategory>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let tool_category = tool_category.try_into().map_err(
+            |err: <P as TryInto<tool_categories::ToolCategory>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableProcedureModelToolCategoryAttributes::ToolCategory)
+            },
+        )?;
         self.tool_category = Some(tool_category);
         Ok(self)
     }
-    pub fn created_by<P: Into<i32>>(
+    pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_by = created_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableProcedureModelToolCategoryAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_at = created_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableProcedureModelToolCategoryAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by<P: Into<i32>>(
+    pub fn updated_by<P>(
         mut self,
         updated_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_by = updated_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableProcedureModelToolCategoryAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_at = updated_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableProcedureModelToolCategoryAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }

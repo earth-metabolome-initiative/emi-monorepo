@@ -57,4 +57,19 @@ impl StepModelCategory {
             .await
             .optional()
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_icon(
+        icon: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::step_model_categories::step_model_categories;
+        Self::table()
+            .filter(step_model_categories::icon.eq(icon))
+            .order_by(step_model_categories::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
 }

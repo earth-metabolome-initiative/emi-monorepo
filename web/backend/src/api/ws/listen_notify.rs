@@ -16,6 +16,7 @@ pub enum LNCommand {
     Disconnect(u64, oneshot::Sender<()>),
 }
 
+#[allow(clippy::type_complexity)]
 pub struct ListenNotifyServer {
     sessions: HashMap<
         u64,

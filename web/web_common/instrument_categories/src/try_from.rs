@@ -29,3 +29,11 @@ impl TryFrom<String> for crate::InstrumentCategory {
         Self::try_from(value.as_str())
     }
 }
+
+impl TryFrom<&String> for crate::InstrumentCategory {
+    type Error = crate::errors::UnknownInstrumentCategory;
+
+    fn try_from(value: &String) -> Result<Self, Self::Error> {
+        Self::try_from(value.as_str())
+    }
+}

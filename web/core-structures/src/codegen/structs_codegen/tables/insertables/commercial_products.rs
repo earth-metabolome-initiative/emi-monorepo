@@ -140,80 +140,146 @@ impl Default for InsertableCommercialProductBuilder {
     }
 }
 impl InsertableCommercialProductBuilder {
-    pub fn name<P: Into<String>>(
+    pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let name = name.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableCommercialProductAttributes::Name)
+        })?;
         pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| e.rename_field(InsertableCommercialProductAttributes::Name))?;
         self.name = Some(name);
         Ok(self)
     }
-    pub fn description<P: Into<String>>(
+    pub fn description<P>(
         mut self,
         description: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let description = description.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let description =
+            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableCommercialProductAttributes::Description)
+            })?;
         pgrx_validation::must_be_paragraph(description.as_ref())
             .map_err(|e| e.rename_field(InsertableCommercialProductAttributes::Description))?;
         self.description = Some(description);
         Ok(self)
     }
-    pub fn photograph_id<P: Into<rosetta_uuid::Uuid>>(
+    pub fn photograph_id<P>(
         mut self,
         photograph_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let photograph_id = photograph_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let photograph_id = photograph_id.try_into().map_err(
+            |err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+                Into::into(err).rename_field(InsertableCommercialProductAttributes::PhotographId)
+            },
+        )?;
         self.photograph_id = Some(photograph_id);
         Ok(self)
     }
-    pub fn deprecation_date<P: Into<Option<rosetta_timestamp::TimestampUTC>>>(
+    pub fn deprecation_date<P>(
         mut self,
         deprecation_date: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let deprecation_date = deprecation_date.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<rosetta_timestamp::TimestampUTC>>,
+        <P as TryInto<Option<rosetta_timestamp::TimestampUTC>>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let deprecation_date = deprecation_date.try_into().map_err(
+            |err: <P as TryInto<Option<rosetta_timestamp::TimestampUTC>>>::Error| {
+                Into::into(err).rename_field(InsertableCommercialProductAttributes::DeprecationDate)
+            },
+        )?;
         self.deprecation_date = deprecation_date;
         Ok(self)
     }
-    pub fn brand_id<P: Into<i32>>(
+    pub fn brand_id<P>(
         mut self,
         brand_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let brand_id = brand_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let brand_id = brand_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableCommercialProductAttributes::BrandId)
+        })?;
         self.brand_id = Some(brand_id);
         Ok(self)
     }
-    pub fn created_by<P: Into<i32>>(
+    pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_by = created_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableCommercialProductAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_at = created_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableCommercialProductAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by<P: Into<i32>>(
+    pub fn updated_by<P>(
         mut self,
         updated_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_by = updated_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableCommercialProductAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_at = updated_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableCommercialProductAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }

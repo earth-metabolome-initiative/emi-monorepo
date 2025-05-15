@@ -50,4 +50,19 @@ impl City {
             .load::<Self>(conn)
             .await
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_name(
+        name: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::cities::cities;
+        Self::table()
+            .filter(cities::name.eq(name))
+            .order_by(cities::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
 }

@@ -64,19 +64,32 @@ pub struct InsertableUserOrganizationBuilder {
     organization_id: Option<i16>,
 }
 impl InsertableUserOrganizationBuilder {
-    pub fn user_id<P: Into<i32>>(
+    pub fn user_id<P>(
         mut self,
         user_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let user_id = user_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let user_id = user_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableUserOrganizationAttributes::UserId)
+        })?;
         self.user_id = Some(user_id);
         Ok(self)
     }
-    pub fn organization_id<P: Into<i16>>(
+    pub fn organization_id<P>(
         mut self,
         organization_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let organization_id = organization_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i16>,
+        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let organization_id =
+            organization_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
+                Into::into(err).rename_field(InsertableUserOrganizationAttributes::OrganizationId)
+            })?;
         self.organization_id = Some(organization_id);
         Ok(self)
     }

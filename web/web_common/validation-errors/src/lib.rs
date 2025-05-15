@@ -1,5 +1,7 @@
 //! Crate providing common validation errors.
 
+use std::convert::Infallible;
+
 #[derive(Debug, Clone, PartialEq)]
 /// Enumeration of errors that can occur during validation.
 pub enum Error<FieldName = ()> {
@@ -44,6 +46,8 @@ pub enum SingleFieldError<FieldName = ()> {
     MustBeSmallerThan(FieldName, f64),
     /// The float is not strictly smaller than the expected amount.
     MustBeGreaterThan(FieldName, f64),
+    /// The provided text is not a valid instrument category.
+    UnknownInstrumentCategory(FieldName),
 }
 
 impl SingleFieldError {
@@ -70,6 +74,9 @@ impl SingleFieldError {
             }
             SingleFieldError::MustBeGreaterThan(_, expected_value) => {
                 SingleFieldError::MustBeGreaterThan(field_name, expected_value)
+            }
+            SingleFieldError::UnknownInstrumentCategory(_) => {
+                SingleFieldError::UnknownInstrumentCategory(field_name)
             }
         }
     }
@@ -98,6 +105,7 @@ impl SingleFieldError {
             | SingleFieldError::ControlCharacters(_)
             | SingleFieldError::InvalidFontAwesomeClass(_)
             | SingleFieldError::InvalidMail(_)
+            | SingleFieldError::UnknownInstrumentCategory(_)
             | SingleFieldError::UnexpectedNegativeOrZeroValue(_) => {
                 unimplemented!("Cannot convert the variant error into a double field error.")
             }
@@ -169,6 +177,9 @@ impl<A: core::fmt::Display> core::fmt::Display for SingleFieldError<A> {
             SingleFieldError::MustBeGreaterThan(field_name, expected_value) => {
                 write!(f, "The {field_name} field must be greater than {expected_value}.")
             }
+            SingleFieldError::UnknownInstrumentCategory(field_name) => {
+                write!(f, "The {field_name} field must be a valid instrument category.")
+            }
         }
     }
 }
@@ -213,5 +224,35 @@ impl TryFrom<diesel::result::Error> for Error {
 
     fn try_from(_error: diesel::result::Error) -> Result<Self, Self::Error> {
         todo!()
+    }
+}
+
+impl From<Infallible> for Error {
+    fn from(_error: Infallible) -> Self {
+        unreachable!("Infallible cannot be converted to Error.")
+    }
+}
+
+impl From<Infallible> for SingleFieldError {
+    fn from(_error: Infallible) -> Self {
+        unreachable!("Infallible cannot be converted to SingleFieldError.")
+    }
+}
+
+impl From<Infallible> for DoubleFieldError {
+    fn from(_error: Infallible) -> Self {
+        unreachable!("Infallible cannot be converted to DoubleFieldError.")
+    }
+}
+
+impl From<instrument_categories::errors::UnknownInstrumentCategory> for Error {
+    fn from(error: instrument_categories::errors::UnknownInstrumentCategory) -> Self {
+        Self::SingleField(error.into())
+    }
+}
+
+impl From<instrument_categories::errors::UnknownInstrumentCategory> for SingleFieldError {
+    fn from(_error: instrument_categories::errors::UnknownInstrumentCategory) -> Self {
+        Self::UnknownInstrumentCategory(())
     }
 }

@@ -54,19 +54,33 @@ pub struct InsertableCommercialProductLotBuilder {
     product_model_id: Option<i32>,
 }
 impl InsertableCommercialProductLotBuilder {
-    pub fn lot<P: Into<String>>(
+    pub fn lot<P>(
         mut self,
         lot: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let lot = lot.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let lot = lot.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableCommercialProductLotAttributes::Lot)
+        })?;
         self.lot = Some(lot);
         Ok(self)
     }
-    pub fn product_model_id<P: Into<i32>>(
+    pub fn product_model_id<P>(
         mut self,
         product_model_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let product_model_id = product_model_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let product_model_id =
+            product_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableCommercialProductLotAttributes::ProductModelId)
+            })?;
         self.product_model_id = Some(product_model_id);
         Ok(self)
     }

@@ -188,11 +188,14 @@ impl Default for InsertableProjectBuilder {
     }
 }
 impl InsertableProjectBuilder {
-    pub fn id<P: Into<i32>>(
-        mut self,
-        id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let id = id.into();
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableProjectAttributes::Id)
+        })?;
         if let Some(parent_project_id) = self.parent_project_id {
             pgrx_validation::must_be_distinct_i32(parent_project_id, id).map_err(|e| {
                 e.rename_fields(
@@ -204,11 +207,17 @@ impl InsertableProjectBuilder {
         self.id = Some(id);
         Ok(self)
     }
-    pub fn name<P: Into<String>>(
+    pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let name = name.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableProjectAttributes::Name)
+        })?;
         if let Some(description) = self.description.as_ref() {
             pgrx_validation::must_be_distinct(name.as_ref(), description).map_err(|e| {
                 e.rename_fields(
@@ -222,11 +231,18 @@ impl InsertableProjectBuilder {
         self.name = Some(name);
         Ok(self)
     }
-    pub fn description<P: Into<String>>(
+    pub fn description<P>(
         mut self,
         description: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let description = description.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let description =
+            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableProjectAttributes::Description)
+            })?;
         if let Some(name) = self.name.as_ref() {
             pgrx_validation::must_be_distinct(name, description.as_ref()).map_err(|e| {
                 e.rename_fields(
@@ -240,37 +256,62 @@ impl InsertableProjectBuilder {
         self.description = Some(description);
         Ok(self)
     }
-    pub fn state_id<P: Into<i16>>(
+    pub fn state_id<P>(
         mut self,
         state_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let state_id = state_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i16>,
+        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let state_id = state_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
+            Into::into(err).rename_field(InsertableProjectAttributes::StateId)
+        })?;
         self.state_id = Some(state_id);
         Ok(self)
     }
-    pub fn icon<P: Into<String>>(
+    pub fn icon<P>(
         mut self,
         icon: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let icon = icon.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableProjectAttributes::Icon)
+        })?;
         pgrx_validation::must_be_font_awesome_class(icon.as_ref())
             .map_err(|e| e.rename_field(InsertableProjectAttributes::Icon))?;
         self.icon = Some(icon);
         Ok(self)
     }
-    pub fn color_id<P: Into<i16>>(
+    pub fn color_id<P>(
         mut self,
         color_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let color_id = color_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i16>,
+        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let color_id = color_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
+            Into::into(err).rename_field(InsertableProjectAttributes::ColorId)
+        })?;
         self.color_id = Some(color_id);
         Ok(self)
     }
-    pub fn parent_project_id<P: Into<Option<i32>>>(
+    pub fn parent_project_id<P>(
         mut self,
         parent_project_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let parent_project_id = parent_project_id.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<i32>>,
+        <P as TryInto<Option<i32>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let parent_project_id =
+            parent_project_id.try_into().map_err(|err: <P as TryInto<Option<i32>>>::Error| {
+                Into::into(err).rename_field(InsertableProjectAttributes::ParentProjectId)
+            })?;
         if let (Some(id), Some(parent_project_id)) = (self.id, parent_project_id) {
             pgrx_validation::must_be_distinct_i32(parent_project_id, id).map_err(|e| {
                 e.rename_fields(
@@ -282,68 +323,128 @@ impl InsertableProjectBuilder {
         self.parent_project_id = parent_project_id;
         Ok(self)
     }
-    pub fn budget<P: Into<Option<f64>>>(
+    pub fn budget<P>(
         mut self,
         budget: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let budget = budget.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<f64>>,
+        <P as TryInto<Option<f64>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let budget = budget.try_into().map_err(|err: <P as TryInto<Option<f64>>>::Error| {
+            Into::into(err).rename_field(InsertableProjectAttributes::Budget)
+        })?;
         self.budget = budget;
         Ok(self)
     }
-    pub fn expenses<P: Into<Option<f64>>>(
+    pub fn expenses<P>(
         mut self,
         expenses: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let expenses = expenses.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<f64>>,
+        <P as TryInto<Option<f64>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let expenses = expenses.try_into().map_err(|err: <P as TryInto<Option<f64>>>::Error| {
+            Into::into(err).rename_field(InsertableProjectAttributes::Expenses)
+        })?;
         self.expenses = expenses;
         Ok(self)
     }
-    pub fn created_by<P: Into<i32>>(
+    pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_by = created_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableProjectAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let created_at = created_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProjectAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by<P: Into<i32>>(
+    pub fn updated_by<P>(
         mut self,
         updated_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_by = updated_by.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableProjectAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let updated_at = updated_at.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProjectAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }
-    pub fn expected_end_date<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn expected_end_date<P>(
         mut self,
         expected_end_date: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let expected_end_date = expected_end_date.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let expected_end_date = expected_end_date.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProjectAttributes::ExpectedEndDate)
+            },
+        )?;
         self.expected_end_date = Some(expected_end_date);
         Ok(self)
     }
-    pub fn end_date<P: Into<rosetta_timestamp::TimestampUTC>>(
+    pub fn end_date<P>(
         mut self,
         end_date: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let end_date = end_date.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let end_date = end_date.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProjectAttributes::EndDate)
+            },
+        )?;
         self.end_date = Some(end_date);
         Ok(self)
     }

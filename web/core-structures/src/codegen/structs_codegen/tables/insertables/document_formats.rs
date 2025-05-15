@@ -43,43 +43,74 @@ pub struct InsertableDocumentFormatBuilder {
     color: Option<String>,
 }
 impl InsertableDocumentFormatBuilder {
-    pub fn extension<P: Into<String>>(
+    pub fn extension<P>(
         mut self,
         extension: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let extension = extension.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let extension = extension.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableDocumentFormatAttributes::Extension)
+        })?;
         self.extension = Some(extension);
         Ok(self)
     }
-    pub fn mime_type<P: Into<String>>(
+    pub fn mime_type<P>(
         mut self,
         mime_type: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let mime_type = mime_type.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let mime_type = mime_type.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableDocumentFormatAttributes::MimeType)
+        })?;
         self.mime_type = Some(mime_type);
         Ok(self)
     }
-    pub fn description<P: Into<String>>(
+    pub fn description<P>(
         mut self,
         description: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let description = description.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let description =
+            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableDocumentFormatAttributes::Description)
+            })?;
         self.description = Some(description);
         Ok(self)
     }
-    pub fn icon<P: Into<String>>(
+    pub fn icon<P>(
         mut self,
         icon: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let icon = icon.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableDocumentFormatAttributes::Icon)
+        })?;
         self.icon = Some(icon);
         Ok(self)
     }
-    pub fn color<P: Into<String>>(
+    pub fn color<P>(
         mut self,
         color: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        let color = color.into();
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let color = color.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableDocumentFormatAttributes::Color)
+        })?;
         self.color = Some(color);
         Ok(self)
     }

@@ -10,14 +10,14 @@ The slowest task was `Code generation` which took a minute (100.00% of all time)
 ## Time Report for Code generation
 
 The total time spent on all tasks was a minute.
-The slowest task was `Generate Structs` which took 41 seconds (51.25% of all time).
+The slowest task was `Generate Structs` which took 45 seconds (53.57% of all time).
 
 | name                       | time       | percentage | comment |
 |----------------------------|------------|------------|---------|
 | Retrieving tables          | now        | 0.00%      |         |
-| Generating Diesel code     | now        | 11.25%     |         |
-| Generate Structs           | 41 seconds | 51.25%     |         |
-| Generate Web Common Traits | 29 seconds | 36.25%     |         |
+| Generating Diesel code     | now        | 10.71%     |         |
+| Generate Structs           | 45 seconds | 53.57%     |         |
+| Generate Web Common Traits | 29 seconds | 34.52%     |         |
 
 ### Time Report for Generating Diesel code
 
@@ -32,13 +32,13 @@ The slowest task was `Generating allow tables to appear in same query schema` wh
 
 ### Time Report for Generate Structs
 
-The total time spent on all tasks was 41 seconds.
-The slowest task was `Generate Table Structs` which took 41 seconds (100.00% of all time).
+The total time spent on all tasks was 45 seconds.
+The slowest task was `Generate Table Structs` which took 45 seconds (100.00% of all time).
 
 | name                   | time       | percentage | comment |
 |------------------------|------------|------------|---------|
 | Generate Types Structs | now        | 0.00%      |         |
-| Generate Table Structs | 41 seconds | 100.00%    |         |
+| Generate Table Structs | 45 seconds | 100.00%    |         |
 
 ### Time Report for Generate Web Common Traits
 

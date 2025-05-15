@@ -12,6 +12,7 @@ use strum::IntoEnumIterator;
 use crate::{Codegen, Table, codegen::Syntax, errors::WebCodeGenError};
 
 impl Codegen<'_> {
+    #[allow(clippy::too_many_lines)]
     /// Generates the [`Upsertable`](web_common_traits::prelude::Upsertable)
     /// trait implementation for the tables
     ///
