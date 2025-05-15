@@ -31,6 +31,13 @@ impl Translator for ColumnOptionDef {
                                 option: ColumnOption::Default(Expr::Function(func.clone())),
                             }));
                         }
+                        // SQLite does not support methods such as `gen_random_uuid()`, therefore
+                        // we return `None` if we encounter such a function.
+                        if func.name.0.first().and_then(|s| Some(s.as_ident()?.value.as_str()))
+                            == Some("gen_random_uuid")
+                        {
+                            return Ok(None);
+                        }
                         unimplemented!("The default expression function {func:?} is not supported",)
                     }
                     Expr::Value(value) => {

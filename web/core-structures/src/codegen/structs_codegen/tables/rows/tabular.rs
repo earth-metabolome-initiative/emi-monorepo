@@ -228,6 +228,9 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             }
             super::Rows::TeamState(_) => crate::codegen::tables::table_names::TableName::TeamState,
             super::Rows::Team(_) => crate::codegen::tables::table_names::TableName::Team,
+            super::Rows::TemporaryUserEmail(_) => {
+                crate::codegen::tables::table_names::TableName::TemporaryUserEmail
+            }
             super::Rows::ToolModel(_) => crate::codegen::tables::table_names::TableName::ToolModel,
             super::Rows::TrackableLocation(_) => {
                 crate::codegen::tables::table_names::TableName::TrackableLocation

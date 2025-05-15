@@ -749,9 +749,10 @@ impl Column {
                     #value.to_owned()
                 }
             }
+            ("rosetta_uuid::Uuid", DefaultTypes::Uuid(value)) => value,
             (r#type, default) => {
                 unimplemented!(
-                    "Default value `{default}` for column \"{}\".\"{}\" of type `{}` is not implemented!",
+                    "Default value `{default:?}` for column \"{}\".\"{}\" of type `{}` is not implemented!",
                     self.table_name,
                     self.column_name,
                     r#type

@@ -405,7 +405,9 @@ impl Table {
                 tables.insert(foreign_table);
             }
         }
-        Ok(tables.into_iter().collect())
+        let mut tables = tables.into_iter().collect::<Vec<Table>>();
+        tables.sort_unstable();
+        Ok(tables)
     }
 
     /// Returns the set of children tables of the table.

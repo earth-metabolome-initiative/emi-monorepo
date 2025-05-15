@@ -409,6 +409,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::Team(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Team).collect::<Vec<_>>()
             }
+            super::Rows::TemporaryUserEmail(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::TemporaryUserEmail)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::ToolModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::ToolModel)

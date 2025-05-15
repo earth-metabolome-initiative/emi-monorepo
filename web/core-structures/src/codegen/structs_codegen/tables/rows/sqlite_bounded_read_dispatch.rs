@@ -536,6 +536,12 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
+            crate::codegen::tables::table_names::TableName::TemporaryUserEmail => {
+                <crate::codegen::structs_codegen::tables::temporary_user_emails::TemporaryUserEmail as web_common_traits::database::BoundedRead<
+                    diesel::SqliteConnection,
+                >>::bounded_read(offset, limit, conn)
+                    .map(super::Rows::from)
+            }
             crate::codegen::tables::table_names::TableName::ToolModel => {
                 <crate::codegen::structs_codegen::tables::tool_models::ToolModel as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,

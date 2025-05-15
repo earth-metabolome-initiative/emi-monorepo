@@ -1,8 +1,11 @@
 //! Submodule defining an enumeration of the possible default types for a
 //! column.
 
+use proc_macro2::TokenStream;
+
 use crate::errors::WebCodeGenError;
 
+#[derive(Debug, Clone)]
 /// Enumeration of the possible default types for a column.
 pub enum DefaultTypes {
     /// When the default value is the current timestamp.
@@ -17,19 +20,8 @@ pub enum DefaultTypes {
     Bool(bool),
     /// When the default value is a string.
     String(String),
-}
-
-impl core::fmt::Display for DefaultTypes {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            DefaultTypes::CurrentTimestamp => write!(f, "CURRENT_TIMESTAMP"),
-            DefaultTypes::I16(value) => write!(f, "{value}_i16"),
-            DefaultTypes::I32(value) => write!(f, "{value}_i32"),
-            DefaultTypes::I64(value) => write!(f, "{value}_i64"),
-            DefaultTypes::Bool(value) => write!(f, "{value}"),
-            DefaultTypes::String(value) => write!(f, "{value}"),
-        }
-    }
+    /// When the default value is a UUID.
+    Uuid(TokenStream),
 }
 
 impl DefaultTypes {
@@ -63,6 +55,18 @@ impl DefaultTypes {
                     unimplemented!(
                         "Default type `{default_value}` for column type `{column_rust_type}` is not implemented",
                     );
+                }
+            }
+            "rosetta_uuid::Uuid" => {
+                match default_value {
+                    "gen_random_uuid()" => {
+                        Ok(DefaultTypes::Uuid(quote::quote! {rosetta_uuid::Uuid::new_v4()}))
+                    }
+                    _ => {
+                        unimplemented!(
+                            "Default type `{default_value}` for column type `{column_rust_type}` is not implemented",
+                        )
+                    }
                 }
             }
             _ => {

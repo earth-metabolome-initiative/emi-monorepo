@@ -46,22 +46,22 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Reagent(reagents),
+                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if reagents.id == self.reagent_id {
-                    foreign_keys.reagent = Some(reagents);
+                if procedure_models.id == self.procedure_model_id {
+                    foreign_keys.procedure_model = Some(procedure_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::Reagent(reagents),
+                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if reagents.id == self.reagent_id {
-                    foreign_keys.reagent = None;
+                if procedure_models.id == self.procedure_model_id {
+                    foreign_keys.procedure_model = None;
                     updated = true;
                 }
             }
@@ -94,22 +94,22 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
+                crate::codegen::tables::row::Row::Reagent(reagents),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if procedure_models.id == self.procedure_model_id {
-                    foreign_keys.procedure_model = Some(procedure_models);
+                if reagents.id == self.reagent_id {
+                    foreign_keys.reagent = Some(reagents);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
+                crate::codegen::tables::row::Row::Reagent(reagents),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if procedure_models.id == self.procedure_model_id {
-                    foreign_keys.procedure_model = None;
+                if reagents.id == self.reagent_id {
+                    foreign_keys.reagent = None;
                     updated = true;
                 }
             }

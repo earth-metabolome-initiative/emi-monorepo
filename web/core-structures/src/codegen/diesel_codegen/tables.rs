@@ -86,6 +86,7 @@ pub mod team_members;
 pub mod team_projects;
 pub mod team_states;
 pub mod teams;
+pub mod temporary_user_emails;
 pub mod tool_models;
 pub mod trackable_locations;
 pub mod trackable_states;

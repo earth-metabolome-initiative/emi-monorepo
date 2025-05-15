@@ -233,6 +233,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
                 crate::codegen::tables::rows::Rows::from(team_states)
             }
             super::Row::Team(teams) => crate::codegen::tables::rows::Rows::from(teams),
+            super::Row::TemporaryUserEmail(temporary_user_emails) => {
+                crate::codegen::tables::rows::Rows::from(temporary_user_emails)
+            }
             super::Row::ToolModel(tool_models) => {
                 crate::codegen::tables::rows::Rows::from(tool_models)
             }

@@ -9,12 +9,12 @@ fn test_translator() {
     let translated_migrations = Pg2Sqlite::default()
         .remove_unsupported_check_constraints()
         .verbose()
-        .ups("../../core-structures/migrations")
+        .ups("../../../data-migrations/init-db/migrations")
         .expect("Failed to load the migrations")
         .translate()
         .expect("Failed to translate the migrations");
 
-    assert_eq!(translated_migrations.len(), 69);
+    assert_eq!(translated_migrations.len(), 84);
 
     // We try to parse the translated migrations using the `sqlparser` crate,
     // for the `SQLite` dialect.

@@ -35,26 +35,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::ContainerModel(container_models),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if container_models.id == self.container_model_id {
-                    foreign_keys.container_model = Some(container_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ContainerModel(container_models),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if container_models.id == self.container_model_id {
-                    foreign_keys.container_model = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -71,6 +51,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if users.id == self.created_by {
                     foreign_keys.created_by = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ContainerModel(container_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if container_models.id == self.container_model_id {
+                    foreign_keys.container_model = Some(container_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ContainerModel(container_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if container_models.id == self.container_model_id {
+                    foreign_keys.container_model = None;
                     updated = true;
                 }
             }

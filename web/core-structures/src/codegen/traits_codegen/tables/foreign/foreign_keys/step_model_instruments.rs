@@ -51,6 +51,26 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
+                crate::codegen::tables::row::Row::Instrument(instruments),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if instruments.id == self.instrument_id {
+                    foreign_keys.instrument = Some(instruments);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Instrument(instruments),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if instruments.id == self.instrument_id {
+                    foreign_keys.instrument = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::StepModelInstrumentModel(
                     step_model_instrument_models,
                 ),
@@ -99,26 +119,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Instrument(instruments),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if instruments.id == self.instrument_id {
-                    foreign_keys.instrument = Some(instruments);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Instrument(instruments),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if instruments.id == self.instrument_id {
-                    foreign_keys.instrument = None;
                     updated = true;
                 }
             }

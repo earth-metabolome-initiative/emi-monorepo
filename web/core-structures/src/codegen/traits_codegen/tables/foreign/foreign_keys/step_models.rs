@@ -48,22 +48,22 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::StepModelCategory(step_model_categories),
+                crate::codegen::tables::row::Row::Photograph(photographs),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if step_model_categories.id == self.step_model_category_id {
-                    foreign_keys.step_model_category = Some(step_model_categories);
+                if photographs.id == self.photograph_id {
+                    foreign_keys.photograph = Some(photographs);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::StepModelCategory(step_model_categories),
+                crate::codegen::tables::row::Row::Photograph(photographs),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if step_model_categories.id == self.step_model_category_id {
-                    foreign_keys.step_model_category = None;
+                if photographs.id == self.photograph_id {
+                    foreign_keys.photograph = None;
                     updated = true;
                 }
             }
@@ -96,22 +96,22 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::Photograph(photographs),
+                crate::codegen::tables::row::Row::StepModelCategory(step_model_categories),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if photographs.id == self.photograph_id {
-                    foreign_keys.photograph = Some(photographs);
+                if step_model_categories.id == self.step_model_category_id {
+                    foreign_keys.step_model_category = Some(step_model_categories);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::Photograph(photographs),
+                crate::codegen::tables::row::Row::StepModelCategory(step_model_categories),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if photographs.id == self.photograph_id {
-                    foreign_keys.photograph = None;
+                if step_model_categories.id == self.step_model_category_id {
+                    foreign_keys.step_model_category = None;
                     updated = true;
                 }
             }
