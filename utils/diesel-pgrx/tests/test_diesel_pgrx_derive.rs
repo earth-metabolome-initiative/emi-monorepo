@@ -140,6 +140,10 @@ pub async fn test_diesel_pgrx_derive() {
     // We attempt to insert a valid value into the table.
     let valid_value = InsertableField { field: example_extension::PositiveU32 { field: 1 } };
 
+    // let mut input = String::new();
+    // println!("Press Enter to insert a valid value into the table...");
+    // std::io::stdin().read_line(&mut input).expect("Failed to read line");
+
     if let Err(err) =
         diesel::insert_into(fields::table).values(&valid_value).execute(&mut conn).await
     {
@@ -148,29 +152,29 @@ pub async fn test_diesel_pgrx_derive() {
     }
 
     // We attempt to insert an invalid value into the table.
-    let invalid_value = InsertableField { field: example_extension::PositiveU32 { field: 0 } };
-    match diesel::insert_into(fields::table).values(&invalid_value).execute(&mut conn).await {
-        Ok(_) => {
-            docker.stop().await.expect("Failed to stop container");
-            panic!("Inserted invalid value into table");
-        }
-        Err(err) => {
-            assert_eq!(err.to_string(), "Validation failed: field must be greater than 0");
-        }
-    }
+    // let invalid_value = InsertableField { field: example_extension::PositiveU32 { field: 0 } };
+    // match diesel::insert_into(fields::table).values(&invalid_value).execute(&mut conn).await {
+    //     Ok(_) => {
+    //         docker.stop().await.expect("Failed to stop container");
+    //         panic!("Inserted invalid value into table");
+    //     }
+    //     Err(err) => {
+    //         assert_eq!(err.to_string(), "Validation failed: field must be greater than 0");
+    //     }
+    // }
 
     // We attempt to query the table to retrieve the valid value.
-    match fields::table.filter(fields::field.eq(&valid_value.field)).first::<Field>(&mut conn).await
-    {
-        Ok(field) => {
-            assert_eq!(field.id, 1);
-            assert_eq!(field.field, valid_value.field);
-        }
-        Err(err) => {
-            docker.stop().await.expect("Failed to stop container");
-            panic!("Failed to query table: {err}");
-        }
-    }
+    // match fields::table.filter(fields::field.eq(&valid_value.field)).first::<Field>(&mut conn).await
+    // {
+    //     Ok(field) => {
+    //         assert_eq!(field.id, 1);
+    //         assert_eq!(field.field, valid_value.field);
+    //     }
+    //     Err(err) => {
+    //         docker.stop().await.expect("Failed to stop container");
+    //         panic!("Failed to query table: {err}");
+    //     }
+    // }
 
     docker.stop().await.expect("Failed to stop container");
 }

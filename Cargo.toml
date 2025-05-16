@@ -97,7 +97,7 @@ yewdux = { git = "https://github.com/LucaCappelletti94/yewdux", branch = "custom
 yew-agent = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "vendoring-yew-agent" }
 
 strum_macros = "0.27"
-zip = "2.6"
+zip = "3.0"
 reference-docker = { path = "web/web_common/reference-docker" }
 async-trait = "0.1.88"
 pgrx = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }

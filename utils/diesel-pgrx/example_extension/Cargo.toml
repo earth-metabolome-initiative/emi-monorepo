@@ -13,11 +13,8 @@ path = "./src/bin/pgrx_embed.rs"
 [dependencies]
 serde = { workspace = true, features = ["derive"], optional = true }
 pgrx = { workspace = true, optional = true }
-serde_cbor = { workspace = true }
-byteorder = { workspace = true }
 diesel.workspace = true
 diesel-pgrx.workspace = true
-diesel-pgrx-derive.workspace = true
 
 [features]
 default = ["serde"]
