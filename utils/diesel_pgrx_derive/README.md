@@ -1,1 +1,1 @@
-README.md
+../diesel_pgrx/README.md
