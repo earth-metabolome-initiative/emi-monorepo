@@ -48,10 +48,10 @@ members = [
   "web/web_common/container_categories",
   "web/web_common/nameplate_categories",
   "web/web_common/cas_code",
-  "utils/diesel-pgrx-derive",
-  "utils/diesel-pgrx",
+  "utils/diesel_pgrx_derive",
+  "utils/diesel_pgrx",
   "web/web_common/elements",
-  "utils/diesel-pgrx/example_extension",
+  "utils/diesel_pgrx/example_extension",
   "web/web_common/molecular_formula",
 ]
 
@@ -80,9 +80,9 @@ diesel = { git = "https://github.com/LucaCappelletti94/diesel.git", branch = "su
 ] }
 diesel-async = { git = "https://github.com/LucaCappelletti94/diesel_async", branch = "custom-diesel" }
 diesel_full_text_search = "2.2"
-diesel-pgrx = { path = "utils/diesel-pgrx" }
-diesel-pgrx-derive = { path = "utils/diesel-pgrx-derive" }
-example_extension = { path = "utils/diesel-pgrx/example_extension" }
+diesel_pgrx = { path = "utils/diesel_pgrx" }
+diesel_pgrx_derive = { path = "utils/diesel_pgrx_derive" }
+example_extension = { path = "utils/diesel_pgrx/example_extension" }
 redis = { version = "0.30", features = ["tokio-comp"] }
 postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel.git", default-features = false, branch = "custom-diesel" }
 chrono = { version = "0.4.39", features = ["serde"] }

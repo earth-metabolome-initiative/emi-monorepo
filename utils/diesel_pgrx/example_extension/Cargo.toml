@@ -11,19 +11,17 @@ name = "pgrx_embed_example_extension"
 path = "./src/bin/pgrx_embed.rs"
 
 [dependencies]
-serde = { workspace = true, features = ["derive"], optional = true }
+serde.workspace = true
+diesel = { workspace = true, features = ["postgres"] }
 pgrx = { workspace = true, optional = true }
-diesel.workspace = true
-diesel-pgrx.workspace = true
+diesel_pgrx = { workspace = true, features = ["postgres"] }
 
 [features]
-default = ["serde"]
-serde = ["dep:serde"]
-sqlite = ["diesel/sqlite"]
-postgres = ["diesel/postgres"]
+default = []
 pgrx = ["dep:pgrx"]
 pg13 = ["pgrx", "pgrx/pg13"]
 pg14 = ["pgrx", "pgrx/pg14"]
 pg15 = ["pgrx", "pgrx/pg15"]
 pg16 = ["pgrx", "pgrx/pg16"]
 pg17 = ["pgrx", "pgrx/pg17"]
+sqlite = ["diesel/sqlite", "diesel_pgrx/sqlite"]

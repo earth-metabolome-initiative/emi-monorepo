@@ -13,6 +13,6 @@ services:
     volumes:
       - ../../../:/workspace  # Mount the entire monorepo
       - ./extension:/home/appuser/extension # Output directory
-    working_dir: /workspace/utils/diesel-pgrx/example_extension
-    entrypoint: ["/workspace/utils/diesel-pgrx/example_extension/build.sh"]
+    working_dir: /workspace/utils/diesel_pgrx/example_extension
+    entrypoint: ["/workspace/utils/diesel_pgrx/example_extension/build.sh"]
     user: "${USER_ID}:${GROUP_ID}"

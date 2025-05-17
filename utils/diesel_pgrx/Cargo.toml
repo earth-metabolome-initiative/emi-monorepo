@@ -1,0 +1,24 @@
+[package]
+name = "diesel_pgrx"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+diesel_pgrx_derive.workspace = true
+serde.workspace = true
+serde_cbor = { workspace = true, features = ["unsealed_read_write"] }
+diesel.workspace = true
+
+[dev-dependencies]
+testcontainers.workspace = true
+tokio.workspace = true
+diesel = { workspace = true, features = ["postgres", "sqlite"] }
+diesel_pgrx_derive = { workspace = true, features = ["postgres", "sqlite"] }
+example_extension.workspace = true
+
+[features]
+default = []
+postgres = ["diesel_pgrx_derive/postgres", "diesel/postgres"]
+sqlite = ["diesel_pgrx_derive/sqlite", "diesel/sqlite"]
+# The pgrx feature is solely used in the doctest.
+pgrx = []

@@ -4,9 +4,24 @@
 ::pgrx::pg_module_magic!();
 
 #[derive(diesel_pgrx::DieselPGRX)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresType))]
-#[derive(Debug, Copy, Clone, PartialEq, Eq, diesel::FromSqlRow, diesel::AsExpression)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[cfg_attr(
+    feature = "pgrx",
+    derive(pgrx::PostgresType, pgrx::PostgresEq, pgrx::PostgresOrd, pgrx::PostgresHash)
+)]
+#[cfg_attr(feature = "pgrx", pg_binary_protocol)]
+#[derive(
+    Debug,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    diesel::FromSqlRow,
+    diesel::AsExpression,
+)]
 #[diesel(sql_type = diesel_impls::PositiveU32)]
 pub struct PositiveU32 {
     pub field: i32,

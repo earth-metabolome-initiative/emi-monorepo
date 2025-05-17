@@ -18,6 +18,7 @@
 		"pgrx",
 		"pychache",
 		"rustc",
+		"serde",
 		"Tarjan",
 		"trybuild",
 		"yewdux"

@@ -1,5 +1,5 @@
 [package]
-name = "diesel-pgrx-derive"
+name = "diesel_pgrx_derive"
 version = "0.1.0"
 edition = "2024"
 
@@ -11,8 +11,10 @@ syn.workspace = true
 quote.workspace = true
 proc-macro2.workspace = true
 
-[dev-dependencies]
-trybuild.workspace = true
+[features]
+default = []
+postgres = []
+sqlite = []
 
 [lints]
 workspace = true
