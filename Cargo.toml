@@ -167,6 +167,7 @@ sophia_api = "0.9.0"
 sophia_sparql_client = "0.9.0"
 fmtastic = "0.2.1"
 byteorder = "1.5.0"
+molecular_formula = { path = "web/web_common/molecular_formula" }
 
 [workspace.lints.rust]
 missing_docs = "forbid"
