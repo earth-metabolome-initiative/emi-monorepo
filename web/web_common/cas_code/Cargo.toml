@@ -11,19 +11,18 @@ name = "pgrx_embed_cas_code"
 path = "./src/bin/pgrx_embed.rs"
 
 [dependencies]
-serde = { workspace = true, features = ["derive"], optional = true }
+serde.workspace = true
 pgrx = { workspace = true, optional = true }
-diesel = { workspace = true, optional = true }
+diesel.workspace = true
 strum_macros.workspace = true
 strum.workspace = true
+diesel_pgrx.workspace = true
 
 [features]
-default = ["serde"]
-serde = ["dep:serde"]
-diesel = ["dep:diesel"]
-sqlite = ["diesel", "diesel/sqlite"]
-postgres = ["diesel", "diesel/postgres"]
-diesel-pgrx = ["diesel"]
+default = []
+sqlite = ["diesel/sqlite", "diesel_pgrx/sqlite"]
+postgres = ["diesel/postgres", "diesel_pgrx/postgres"]
+
 pgrx = ["dep:pgrx"]
 pg13 = ["pgrx", "pgrx/pg13"]
 pg14 = ["pgrx", "pgrx/pg14"]

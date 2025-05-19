@@ -42,6 +42,26 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
+                crate::codegen::tables::row::Row::Procedure(procedures),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if procedures.id == self.procedure_id {
+                    foreign_keys.procedure = Some(procedures);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Procedure(procedures),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if procedures.id == self.procedure_id {
+                    foreign_keys.procedure = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::StepModel(step_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -78,26 +98,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if users.id == self.created_by {
                     foreign_keys.created_by = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Procedure(procedures),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if procedures.id == self.procedure_id {
-                    foreign_keys.procedure = Some(procedures);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Procedure(procedures),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if procedures.id == self.procedure_id {
-                    foreign_keys.procedure = None;
                     updated = true;
                 }
             }

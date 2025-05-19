@@ -49,11 +49,11 @@ impl crate::Table {
                     break;
                 }
             }
-            if all_columns_are_foreign_keys {
+            if all_columns_are_foreign_keys && columns.len() == 1 {
                 continue;
             }
 
-            if columns.iter().all(|c| primary_keys.contains(c)) {
+            if columns.iter().all(|c| primary_keys.contains(c)) && primary_keys.len() == 1 {
                 continue;
             }
 

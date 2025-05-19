@@ -7,7 +7,8 @@ use fmtastic::Superscript;
 
 use crate::MolecularFormula;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Ion struct representing an ion with a specific element and charge.
 pub struct Ion<E> {
     /// Can be an element or a molecular formula

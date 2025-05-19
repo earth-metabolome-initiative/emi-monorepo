@@ -73,4 +73,28 @@ impl TeamMember {
             .load::<Self>(conn)
             .await
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_team_id_and_member_id(
+        team_id: &i32,
+        member_id: &i32,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl,
+            associations::HasTable,
+        };
+        use diesel_async::RunQueryDsl;
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::team_members::team_members::team_id
+                    .eq(team_id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::team_members::team_members::member_id
+                            .eq(member_id),
+                    ),
+            )
+            .first::<Self>(conn)
+            .await
+            .optional()
+    }
 }

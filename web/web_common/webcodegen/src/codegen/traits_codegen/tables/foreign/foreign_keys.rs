@@ -1,7 +1,7 @@
 //! Submodule implementing the
 //! [`ForeignKeys`](web_common_traits::prelude::ForeignKeys) trait for a struct.
 
-use std::{collections::HashSet, path::Path};
+use std::path::Path;
 
 use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
@@ -56,6 +56,7 @@ impl Codegen<'_> {
                 let foreign_table = foreign_key.foreign_table(conn).await?.unwrap().0;
                 foreign_tables.push(foreign_table);
             }
+
             let foreign_keys_struct_ident = Self::foreign_keys_struct_ident(table)?;
             let attributes = foreign_keys
                 .iter()
@@ -142,7 +143,9 @@ impl Codegen<'_> {
                 })
                 .collect::<Result<TokenStream, WebCodeGenError>>()?;
 
-            let unique_table_types = foreign_tables.iter().collect::<HashSet<_>>();
+            let mut unique_table_types = foreign_tables.clone();
+            unique_table_types.sort_unstable();
+            unique_table_types.dedup();
             let mut update_impls: Vec<TokenStream> = Vec::new();
 
             for unique_foreign_table in unique_table_types {
@@ -151,7 +154,7 @@ impl Codegen<'_> {
                 for foreign_key in &foreign_keys {
                     let (foreign_table, column_in_foreign_table) =
                         foreign_key.foreign_table(conn).await?.unwrap();
-                    if &foreign_table == unique_foreign_table {
+                    if foreign_table == unique_foreign_table {
                         grouped_columns.push((foreign_key, column_in_foreign_table));
                     }
                 }

@@ -278,7 +278,6 @@ pub trait MostAbundantIsotope {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
 /// Enumeration of all isotopes of the elements in the periodic table.
 pub enum Isotope {
     /// Isotopes of `HydrogenIsotope`

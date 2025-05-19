@@ -45,26 +45,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Trackable(trackables),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if trackables.id == self.trackable_id {
-                    foreign_keys.trackable = Some(trackables);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Trackable(trackables),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if trackables.id == self.trackable_id {
-                    foreign_keys.trackable = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::StorageContainer(storage_containers),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -86,6 +66,26 @@ impl web_common_traits::prelude::HasForeignKeys
                         foreign_keys.storage_container = None;
                         updated = true;
                     }
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Trackable(trackables),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if trackables.id == self.trackable_id {
+                    foreign_keys.trackable = Some(trackables);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Trackable(trackables),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if trackables.id == self.trackable_id {
+                    foreign_keys.trackable = None;
+                    updated = true;
                 }
             }
             (

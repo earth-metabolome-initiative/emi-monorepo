@@ -70,22 +70,22 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::StepModel(step_models),
+                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if step_models.id == self.step_model_id {
-                    foreign_keys.step_model = Some(step_models);
+                if procedure_models.id == self.procedure_model_id {
+                    foreign_keys.procedure_model = Some(procedure_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::StepModel(step_models),
+                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if step_models.id == self.step_model_id {
-                    foreign_keys.step_model = None;
+                if procedure_models.id == self.procedure_model_id {
+                    foreign_keys.procedure_model = None;
                     updated = true;
                 }
             }
@@ -126,22 +126,22 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
+                crate::codegen::tables::row::Row::StepModel(step_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if procedure_models.id == self.procedure_model_id {
-                    foreign_keys.procedure_model = Some(procedure_models);
+                if step_models.id == self.step_model_id {
+                    foreign_keys.step_model = Some(step_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
+                crate::codegen::tables::row::Row::StepModel(step_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if procedure_models.id == self.procedure_model_id {
-                    foreign_keys.procedure_model = None;
+                if step_models.id == self.step_model_id {
+                    foreign_keys.step_model = None;
                     updated = true;
                 }
             }

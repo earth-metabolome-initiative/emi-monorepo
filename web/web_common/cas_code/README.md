@@ -2,6 +2,10 @@
 
 Rust crate providing a structured representation of [CAS Registry Numbers (CAS RN)](https://en.wikipedia.org/wiki/CAS_Registry_Number) and related functionality.
 
-It provides optional integration with [`serde`](https://docs.rs/serde/latest/serde/) for serialization and deserialization, [`diesel`](https://github.com/diesel-rs/diesel)'s [`ToSql`](https://docs.rs/diesel/latest/diesel/serialize/trait.ToSql.html) and [`FromSql`](https://docs.rs/diesel/latest/diesel/deserialize/trait.FromSql.html) traits for the [`PostgreSQL`](https://www.postgresql.org/) and [`SQLite`](https://sqlite.org/index.html) backends, and [`pgrx`](https://github.com/pgcentralfoundation/pgrx) integration to generate a [`PostgreSQL`](https://www.postgresql.org/) extension providing a custom type for CAS.
+To build this extension, just run the following docker build command:
 
-Depending on whether you enable `diesel-pgrx` or not, the crate will either use `BYTEA` (for [`PostgreSQL`](https://www.postgresql.org/)) or `BLOB` (for [`SQLite`](https://sqlite.org/index.html)), or the [`pgrx`](https://github.com/pgcentralfoundation/pgrx) type which is serialized and deserialized using into the `CAS` type [`CBOR`](https://en.wikipedia.org/wiki/CBOR) using [`serde_cbor`](https://docs.rs/serde_cbor/latest/serde_cbor/), which is the serialization format used by [`pgrx`](https://github.com/pgcentralfoundation/pgrx). In order to avoid potentially incompatible changes in the future, the same serialization is used also when `diesel-pgrx` is not enabled, but the expected backend type will be `BYTEA` (or `BLOB`) and not `CAS`.
+```bash
+USER_ID=$(id -u) GROUP_ID=$(id -g) docker compose up
+```
+
+Note that the `USER_ID` and `GROUP_ID` environment variables are used to set the user and group IDs inside the Docker container to match those of the host system. This is important for file permissions when mounting volumes and avoid writing out files with root permissions.

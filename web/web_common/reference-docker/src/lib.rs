@@ -59,13 +59,6 @@ fn is_extension_crate<P>(directory: P) -> Result<bool, std::io::Error>
 where
     P: AsRef<std::path::Path>,
 {
-    // We temporarely exclude `cas_code` as a crate.
-    let excluded_crates = ["cas_code", "elements"];
-
-    if excluded_crates.iter().any(|&crate_name| directory.as_ref().ends_with(crate_name)) {
-        return Ok(false);
-    }
-
     let path = directory.as_ref().join("Cargo.toml");
     if !path.exists() {
         return Ok(false);

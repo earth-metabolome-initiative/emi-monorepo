@@ -36,26 +36,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Processable(processables),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if processables.id == self.id {
-                    foreign_keys.id = Some(processables);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Processable(processables),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if processables.id == self.id {
-                    foreign_keys.id = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::CommercialProductLot(commercial_product_lots),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -72,6 +52,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if commercial_product_lots.id == self.commercial_product_lot_id {
                     foreign_keys.commercial_product_lot = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Processable(processables),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if processables.id == self.id {
+                    foreign_keys.id = Some(processables);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Processable(processables),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if processables.id == self.id {
+                    foreign_keys.id = None;
                     updated = true;
                 }
             }

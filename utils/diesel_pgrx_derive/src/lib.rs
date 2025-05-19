@@ -13,7 +13,11 @@ mod sqlite;
 pub fn diesel_pgrx_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let DeriveInput { ident, .. } = parse_macro_input!(input);
 
+    #[cfg(any(feature = "postgres", feature = "sqlite"))]
     let mut backends: Vec<Box<dyn Backend>> = Vec::new();
+    #[cfg(not(any(feature = "postgres", feature = "sqlite")))]
+    let backends: Vec<Box<dyn Backend>> = Vec::new();
+
     let name = ident.to_string();
 
     #[cfg(feature = "postgres")]

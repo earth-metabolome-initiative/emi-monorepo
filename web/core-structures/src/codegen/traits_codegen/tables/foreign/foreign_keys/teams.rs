@@ -50,6 +50,26 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
+                crate::codegen::tables::row::Row::Color(colors),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if colors.id == self.color_id {
+                    foreign_keys.color = Some(colors);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Color(colors),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if colors.id == self.color_id {
+                    foreign_keys.color = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::TeamState(team_states),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -118,26 +138,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Color(colors),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if colors.id == self.color_id {
-                    foreign_keys.color = Some(colors);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Color(colors),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if colors.id == self.color_id {
-                    foreign_keys.color = None;
                     updated = true;
                 }
             }

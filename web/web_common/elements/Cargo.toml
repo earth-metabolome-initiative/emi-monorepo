@@ -10,8 +10,8 @@ include = [
   "isotopes_data.json",
 ]
 
-# [lib]
-# crate-type = ["cdylib", "lib"]
+[lib]
+crate-type = ["cdylib", "lib"]
 
 [[bin]]
 name = "pgrx_embed_iso_codes"
@@ -23,6 +23,7 @@ pgrx = { workspace = true, optional = true }
 diesel = { workspace = true, optional = true }
 strum_macros.workspace = true
 strum.workspace = true
+diesel_pgrx = { workspace = true, optional = true }
 
 [build-dependencies]
 syn.workspace = true
@@ -35,9 +36,9 @@ serde_json.workspace = true
 default = ["serde"]
 serde = ["dep:serde"]
 diesel = ["dep:diesel"]
-sqlite = ["diesel", "diesel/sqlite"]
-postgres = ["diesel", "diesel/postgres"]
-diesel-pgrx = ["diesel"]
+sqlite = ["diesel", "diesel/sqlite", "diesel_pgrx/sqlite"]
+postgres = ["diesel", "diesel/postgres", "diesel_pgrx/postgres"]
+diesel_pgrx = ["diesel", "dep:diesel_pgrx"]
 pgrx = ["dep:pgrx"]
 pg13 = ["pgrx", "pgrx/pg13"]
 pg14 = ["pgrx", "pgrx/pg14"]

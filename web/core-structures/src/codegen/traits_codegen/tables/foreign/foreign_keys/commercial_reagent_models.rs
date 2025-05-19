@@ -43,26 +43,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Reagent(reagents),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if reagents.id == self.reagent_id {
-                    foreign_keys.reagent = Some(reagents);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Reagent(reagents),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if reagents.id == self.reagent_id {
-                    foreign_keys.reagent = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::CommercialProduct(commercial_products),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -79,6 +59,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if commercial_products.id == self.id {
                     foreign_keys.id = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Reagent(reagents),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if reagents.id == self.reagent_id {
+                    foreign_keys.reagent = Some(reagents);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Reagent(reagents),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if reagents.id == self.reagent_id {
+                    foreign_keys.reagent = None;
                     updated = true;
                 }
             }

@@ -3,8 +3,6 @@
 #[cfg(feature = "pgrx")]
 ::pgrx::pg_module_magic!();
 
-#[cfg(feature = "pgrx")]
-use pgrx::FromDatum;
 
 mod as_ref;
 mod bonds_number;
@@ -32,7 +30,6 @@ pub use valence_electrons::ValenceElectrons;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, strum_macros::EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
 #[cfg_attr(feature = "diesel", derive(diesel::FromSqlRow, diesel::AsExpression))]
 #[cfg_attr(
 	feature = "diesel",

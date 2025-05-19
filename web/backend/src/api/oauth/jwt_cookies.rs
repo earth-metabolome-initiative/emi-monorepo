@@ -13,7 +13,8 @@ use actix_web_httpauth::extractors::bearer::BearerAuth;
 use api_path::api::oauth::jwt_cookies::USER_ONLINE_COOKIE_NAME;
 use base64::prelude::*;
 use chrono::{Duration, Utc};
-use core_structures::User;
+use core_structures::{EmailProvider, LoginProvider, User, UserEmail};
+use diesel_async::AsyncPgConnection;
 use futures::Future;
 use jsonwebtoken::{
     Algorithm, DecodingKey, EncodingKey, Header, TokenData, Validation, decode, encode,
@@ -386,14 +387,51 @@ fn encode_user_online_cookie<'a>() -> Result<Cookie<'a>, BackendError> {
 /// Function to build the overall response for a successful login.
 ///
 /// # Arguments
-/// * `user_id` - The ID of the user that has logged in.
+/// * `emails` - The emails of the user.
+/// * `provider` - The provider to use for the login.
 /// * `state` - The state to redirect to after the login.
 /// * `redis_client` - The redis client to use for the login.
+/// * `conn` - The database connection to use for the login.
 pub(crate) async fn build_login_response(
-    user_id: i32,
+    emails: &[String],
+    provider: &LoginProvider,
     state: &str,
     redis_client: &redis::Client,
+    conn: &mut AsyncPgConnection,
 ) -> HttpResponse {
+    // We check whether any of the emails are already present in the database.
+    let mut primary_user_email = None;
+    let mut unknown_emails = Vec::new();
+    let mut unknown_emails_for_provider = Vec::new();
+
+    for email in emails {
+        match UserEmail::from_email(email, conn).await {
+            Ok(Some(user_email)) => {
+                primary_user_email = Some(user_email);
+                match EmailProvider::from_email_id_and_login_provider_id(
+                    &user_email.id,
+                    &provider.id,
+                    conn,
+                )
+                .await
+                {
+                    Err(err) => {
+                        return BackendError::from(err).into();
+                    }
+                    Ok(Some(email_provider)) => {}
+                    Ok(None) => {}
+                }
+            }
+            Ok(None) => {
+                // We need to insert the email into the database.
+                unknown_emails.push(email.clone());
+            }
+            Err(err) => {
+                return BackendError::from(err).into();
+            }
+        }
+    }
+
     let refresh_cookie = match encode_jwt_refresh_cookie(user_id, redis_client).await {
         Ok(cookie) => cookie,
         Err(error) => {

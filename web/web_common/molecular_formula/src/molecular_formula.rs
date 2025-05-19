@@ -22,7 +22,15 @@ mod number_of_bonds;
 mod oxidation_states;
 mod try_from;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "diesel_pgrx", derive(diesel_pgrx::DieselPGRX))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(
+    feature = "pgrx",
+    derive(pgrx::PostgresType, pgrx::PostgresEq, pgrx::PostgresOrd, pgrx::PostgresHash)
+)]
+#[cfg_attr(feature = "diesel", derive(diesel::FromSqlRow, diesel::AsExpression))]
+#[cfg_attr(feature = "pgrx", pg_binary_protocol)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Represents a molecular formula, which can be an element, an ion, a solvate,
 /// or a count of molecules.
 pub enum MolecularFormula {

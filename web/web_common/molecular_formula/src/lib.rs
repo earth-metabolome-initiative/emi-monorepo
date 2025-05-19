@@ -1,5 +1,8 @@
 #![doc = include_str!("../README.md")]
 
+#[cfg(feature = "pgrx")]
+::pgrx::pg_module_magic!();
+
 mod ion;
 mod molecular_formula;
 pub mod parser;

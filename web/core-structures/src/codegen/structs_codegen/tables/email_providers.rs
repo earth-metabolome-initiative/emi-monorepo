@@ -83,4 +83,28 @@ impl EmailProvider {
             .load::<Self>(conn)
             .await
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_email_id_and_login_provider_id(
+        email_id: &i32,
+        login_provider_id: &i16,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl,
+            associations::HasTable,
+        };
+        use diesel_async::RunQueryDsl;
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::email_providers::email_providers::email_id
+                    .eq(email_id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::email_providers::email_providers::login_provider_id
+                            .eq(login_provider_id),
+                    ),
+            )
+            .first::<Self>(conn)
+            .await
+            .optional()
+    }
 }

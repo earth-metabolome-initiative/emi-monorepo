@@ -66,6 +66,26 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
+                crate::codegen::tables::row::Row::Reagent(reagents),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if reagents.id == self.reagent_id {
+                    foreign_keys.reagent = Some(reagents);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Reagent(reagents),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if reagents.id == self.reagent_id {
+                    foreign_keys.reagent = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -90,26 +110,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Reagent(reagents),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if reagents.id == self.reagent_id {
-                    foreign_keys.reagent = Some(reagents);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Reagent(reagents),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if reagents.id == self.reagent_id {
-                    foreign_keys.reagent = None;
                     updated = true;
                 }
             }

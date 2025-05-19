@@ -1,6 +1,6 @@
-# diesel_pgrx
+# Diesel PGRX
 
-A crate providing the [`DieselPGRX`] trait to derive all that is needed to use rust-defined types decorated with [`pgrx`](https://github.com/pgcentralfoundation/pgrx)'s [PostgresType](https://docs.rs/pgrx/latest/pgrx/datum/trait.PostgresType.html) and `#[pg_binary_protocol]` in [`diesel`](https://github.com/diesel-rs/diesel) queries using Postgres's binary protocol.
+A crate providing the `DieselPGRX` trait to derive all that is needed to use rust-defined types decorated with [`pgrx`](https://github.com/pgcentralfoundation/pgrx)'s [PostgresType](https://docs.rs/pgrx/latest/pgrx/datum/trait.PostgresType.html) and `#[pg_binary_protocol]` in [`diesel`](https://github.com/diesel-rs/diesel) queries using Postgres's binary protocol.
 
 This is achieved via a derive macro to derive the [`diesel`](https://github.com/diesel-rs/diesel) [`ToSql`](https://docs.rs/diesel/latest/diesel/serialize/trait.ToSql.html) and [`FromSql`](https://docs.rs/diesel/latest/diesel/deserialize/trait.FromSql.html) traits so that the struct is compatible with the [`pgrx`](https://github.com/pgcentralfoundation/pgrx) serialization, which uses [`CBOR`](https://en.wikipedia.org/wiki/CBOR) using [`serde_cbor`](https://docs.rs/serde_cbor/latest/serde_cbor/).
 
@@ -40,7 +40,7 @@ pub struct MyCustomType {
 
 ### Additional `pgrx` goodies
 
-The [`pgrx`](https://github.com/pgcentralfoundation/pgrx) crate provides several additional **optional** derive macros which you may want to use, so here is a more complete example which includes all of the ones we frequently use. These include [`PostgresEq`](https://docs.rs/pgrx/latest/pgrx/trait.PostgresEq.html), [`PostgresOrd`](https://docs.rs/pgrx/latest/pgrx/trait.PostgresOrd.html), and [`PostgresHash`](https://docs.rs/pgrx/latest/pgrx/trait.PostgresHash.html). These are used to implement the `=` and `<` operators for the type, as well as the `hash` function. Do note that these traits require you to also implement the `PartialEq`, `Eq`, `PartialOrd`, `Ord`, and `Hash` traits for your struct. This is done by adding the `#[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]` attributes to your struct.
+The [`pgrx`](https://github.com/pgcentralfoundation/pgrx) crate provides several additional **optional** derive macros which you may want to use, so here is a more complete example which includes all of the ones we frequently use. These include [`PostgresEq`](https://docs.rs/pgrx/latest/pgrx/derive.PostgresEq.html), [`PostgresOrd`](https://docs.rs/pgrx/latest/pgrx/derive.PostgresOrd.html), and [`PostgresHash`](https://docs.rs/pgrx/latest/pgrx/derive.PostgresHash.html). These are used to implement the `=` and `<` operators for the type, as well as the `hash` function. Do note that these traits require you to also implement the `PartialEq`, `Eq`, `PartialOrd`, `Ord`, and `Hash` traits for your struct. This is done by adding the `#[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]` attributes to your struct.
 
 ```rust
 #[derive(serde::Serialize, serde::Deserialize, diesel_pgrx::DieselPGRX)]

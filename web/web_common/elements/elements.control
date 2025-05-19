@@ -1,6 +1,6 @@
-comment = 'iso_codes:  Created by pgrx'
+comment = 'elements:  Created by pgrx'
 default_version = '@CARGO_VERSION@'
-module_pathname = '$libdir/iso_codes'
+module_pathname = '$libdir/elements'
 relocatable = false
 superuser = true
 trusted = false

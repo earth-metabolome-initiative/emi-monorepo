@@ -7,7 +7,10 @@ use redis::Client as RedisClient;
 use reqwest::Client;
 use serde::Deserialize;
 
-use crate::{api::oauth::*, errors::BackendError};
+use crate::{
+    api::oauth::{jwt_cookies::build_login_response, *},
+    errors::BackendError,
+};
 
 /// Struct representing the GitHub OAuth2 configuration.
 struct GitHubConfig {
@@ -63,7 +66,21 @@ async fn github_oauth_handler(
         return BackendError::Unauthorized.into();
     }
 
-    let token_response = match get_github_oauth_token(code.as_str(), &pool).await {
+    let mut connection = match pool.get().await.map_err(BackendError::from) {
+        Ok(connection) => connection,
+        Err(error) => {
+            return error.into();
+        }
+    };
+
+    let github_config = match GitHubConfig::from_env(&mut connection).await {
+        Ok(config) => config,
+        Err(error) => {
+            return error.into();
+        }
+    };
+
+    let token_response = match get_github_oauth_token(code.as_str(), &github_config).await {
         Ok(token_response) => token_response,
         Err(error) => {
             return error.into();
@@ -78,43 +95,44 @@ async fn github_oauth_handler(
         }
     };
 
-    let mut connection = match pool.get().await.map_err(BackendError::from) {
-        Ok(connection) => connection,
-        Err(error) => {
-            return error.into();
-        }
-    };
-    let github_config = match GitHubConfig::from_env(&mut connection).await {
-        Ok(config) => config,
-        Err(error) => {
-            return error.into();
-        }
-    };
+    let emails = emails
+        .into_iter()
+        .filter(|email| email.verified)
+        .map(|email| email.email)
+        .collect::<Vec<String>>();
 
-    todo!("Build the user from the emails and the GitHubConfig");
+    if emails.is_empty() {
+        return BackendError::Unauthorized.into();
+    }
 
-    // build_login_response(user.id, state, &redis_client).await
+    build_login_response(
+        emails.as_slice(),
+        &github_config.provider,
+        state,
+        &redis_client,
+        &mut connection,
+    )
+    .await
 }
 
 pub async fn get_github_oauth_token(
     authorization_code: &str,
-    pool: &web::Data<crate::DBPool>,
+    github_config: &GitHubConfig,
 ) -> Result<GitHubOauthToken, BackendError> {
-    let mut connection = pool.get().await?;
-    let github_config = GitHubConfig::from_env(&mut connection).await?;
-
     let root_url = "https://github.com/login/oauth/access_token";
 
     let client = Client::new();
 
-    let params = [
-        ("client_id", github_config.provider.client_id.as_str()),
-        ("code", authorization_code),
-        ("client_secret", github_config.client_secret.as_str()),
-    ];
-
-    let response =
-        client.post(root_url).header("Accept", "application/json").form(&params).send().await?;
+    let response = client
+        .post(root_url)
+        .header("Accept", "application/json")
+        .form(&[
+            ("client_id", github_config.provider.client_id.as_str()),
+            ("code", authorization_code),
+            ("client_secret", github_config.client_secret.as_str()),
+        ])
+        .send()
+        .await?;
 
     Ok(response.json::<GitHubOauthToken>().await?)
 }
