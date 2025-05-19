@@ -4,13 +4,13 @@ use pgrx_validation_derive::validation;
 
 #[validation]
 /// Control that the float is strictly positive (0, ...].
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * `value` a f32
-/// 
+///
 /// # Errors
-/// 
+///
 /// * `validation_errors::SingleFieldError::UnexpectedNegativeOrZeroValue(())`
 ///   if the value is negative or zero.
 pub fn must_be_strictly_positive_f32(

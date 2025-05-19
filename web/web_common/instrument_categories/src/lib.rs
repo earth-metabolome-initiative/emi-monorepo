@@ -74,7 +74,7 @@ impl InstrumentCategory {
             InstrumentCategory::Shaker => "A device used to mix or agitate a sample.",
         }
     }
-    
+
     #[must_use]
     /// Returns the icon of the instrument category
     pub fn icon(&self) -> &'static str {

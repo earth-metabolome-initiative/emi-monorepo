@@ -9,8 +9,8 @@ mod sqlite;
 /// # Implementation details
 ///
 /// The `CountryCode` type is used to represent the `country_code` type in
-/// `PostgreSQL` and `SQLite` databases. In `PostgreSQL`, it uses as backend type
-/// the `VARCHAR` type with a length of 2. Unfortunately, we cannot enforce
+/// `PostgreSQL` and `SQLite` databases. In `PostgreSQL`, it uses as backend
+/// type the `VARCHAR` type with a length of 2. Unfortunately, we cannot enforce
 /// the length `2` in the type definition, and as such we will have to check
 /// for this in the conversion.
 ///

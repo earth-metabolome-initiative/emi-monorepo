@@ -19,6 +19,10 @@ Here follows a table with the crates, and the badges illustrating their status.
 
 ### Chemistry-related crates
 
+| Crate | Description | Status | Crates.io |
+|-------|-------------|--------|-----------|
+| [`cas_codes`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/cas_codes) | CAS codes for chemical compounds | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-cas_codes.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-cas_codes.yml) | [Tracking issue](https://github.com/earth-metabolome-initiative/emi-monorepo/issues/80) |
+
 ### Data structures
 
 ## How to contribute
