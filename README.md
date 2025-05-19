@@ -21,6 +21,7 @@ Here follows a table with the crates, and the badges illustrating their status.
 
 | Crate | Description | Status | Crates.io |
 |-------|-------------|--------|-----------|
+| [`molecular_formula`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/molecular_formula) | [Molecular formula](https://en.wikipedia.org/wiki/Molecular_formula) parser | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-molecular_formula.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-molecular_formula.yml) | [Tracking issue](https://github.com/earth-metabolome-initiative/emi-monorepo/issues/81) |
 | [`cas_codes`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/cas_codes) | [CAS codes](https://en.wikipedia.org/wiki/CAS_Registry_Number) for chemical compounds | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-cas_codes.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-cas_codes.yml) | [Tracking issue](https://github.com/earth-metabolome-initiative/emi-monorepo/issues/80) |
 
 ### Data structures
