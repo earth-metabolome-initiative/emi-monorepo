@@ -40,7 +40,7 @@ where
 
     fn table_name(&self) -> Self::TableName {
         match self {
-            Self::Read { table_name, .. } => table_name.clone(),
+            Self::Read { table_name, .. } => *table_name,
         }
     }
 }

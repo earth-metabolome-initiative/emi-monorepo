@@ -1,12 +1,8 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AliquotingStepModelForeignKeys {
-    pub id: Option<
-        crate::codegen::structs_codegen::tables::sampling_step_models::SamplingStepModel,
-    >,
-    pub step_model_instrument_category: Option<
-        crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
-    >,
+    pub id:
+        Option<crate::codegen::structs_codegen::tables::sampling_step_models::SamplingStepModel>,
     pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
     pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
@@ -22,14 +18,6 @@ impl web_common_traits::prelude::HasForeignKeys
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::SamplingStepModel(self.id),
         ));
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepModelInstrumentCategory(
-                        self.step_model_instrument_category_id,
-                    ),
-                ),
-            );
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
         ));
@@ -39,7 +27,6 @@ impl web_common_traits::prelude::HasForeignKeys
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.id.is_some()
-            && foreign_keys.step_model_instrument_category.is_some()
             && foreign_keys.created_by.is_some()
             && foreign_keys.updated_by.is_some()
     }
@@ -96,31 +83,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::StepModelInstrumentCategory(
-                    step_model_instrument_categories,
-                ),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if step_model_instrument_categories.id == self.step_model_instrument_category_id {
-                    foreign_keys.step_model_instrument_category =
-                        Some(step_model_instrument_categories);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::StepModelInstrumentCategory(
-                    step_model_instrument_categories,
-                ),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if step_model_instrument_categories.id == self.step_model_instrument_category_id {
-                    foreign_keys.step_model_instrument_category = None;
                     updated = true;
                 }
             }

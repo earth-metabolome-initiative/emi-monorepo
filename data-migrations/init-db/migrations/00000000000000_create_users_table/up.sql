@@ -1,8 +1,8 @@
 -- We need to create a table to store users
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL,
+    first_name TEXT NOT NULL CHECK (must_be_paragraph(first_name)),
+    last_name TEXT NOT NULL CHECK (must_be_paragraph(last_name)),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

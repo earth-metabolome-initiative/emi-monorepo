@@ -7,12 +7,12 @@ use taxonomy_fetcher::{
 };
 
 async fn retrieve_csvs(csv_directory: &Path) -> Result<(), crate::errors::Error> {
-    NCBIRank::to_csv(&csv_directory.join("ranks.csv"))?;
+    NCBIRank::to_csv(csv_directory.join("ranks.csv"))?;
 
     // We retrieve and build the latest version of the NCBI taxonomy
     if !Path::new(&csv_directory.join("taxa.csv")).exists() {
         let taxonomy: NCBITaxonomy = NCBITaxonomyBuilder::latest().build().await?;
-        taxonomy.to_csv(&csv_directory.join("taxa.csv"))?;
+        taxonomy.to_csv(csv_directory.join("taxa.csv"))?;
     }
 
     Ok(())

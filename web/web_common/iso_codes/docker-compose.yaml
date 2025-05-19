@@ -2,7 +2,7 @@ services:
   iso_codes:
     build:
       context: .
-      dockerfile: ../../../shared_docker_files/Dockerfile
+      dockerfile: ../../../shared_docker_files/PGRXDocker
       args:
         HOST_UID: ${USER_ID}
         HOST_GID: ${GROUP_ID}

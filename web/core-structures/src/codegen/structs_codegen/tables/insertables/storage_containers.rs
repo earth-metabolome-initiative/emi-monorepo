@@ -68,39 +68,77 @@ impl InsertableStorageContainer {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableStorageContainerBuilder {
     id: Option<rosetta_uuid::Uuid>,
     container_model_id: Option<i32>,
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableStorageContainerBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            container_model_id: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableStorageContainerBuilder {
-    pub fn id(
-        mut self,
-        id: rosetta_uuid::Uuid,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+            Into::into(err).rename_field(InsertableStorageContainerAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn container_model_id(
+    pub fn container_model_id<P>(
         mut self,
-        container_model_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        container_model_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let container_model_id =
+            container_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(InsertableStorageContainerAttributes::ContainerModelId)
+            })?;
         self.container_model_id = Some(container_model_id);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableStorageContainerAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableStorageContainerAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }

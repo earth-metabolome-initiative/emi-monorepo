@@ -29,39 +29,86 @@ pub struct InsertableUser {
     updated_at: rosetta_timestamp::TimestampUTC,
 }
 impl InsertableUser {}
-#[derive(Default)]
 pub struct InsertableUserBuilder {
     first_name: Option<String>,
     last_name: Option<String>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableUserBuilder {
+    fn default() -> Self {
+        Self {
+            first_name: None,
+            last_name: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableUserBuilder {
-    pub fn first_name(
+    pub fn first_name<P>(
         mut self,
-        first_name: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        first_name: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let first_name = first_name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableUserAttributes::FirstName)
+        })?;
+        pgrx_validation::must_be_paragraph(first_name.as_ref())
+            .map_err(|e| e.rename_field(InsertableUserAttributes::FirstName))?;
         self.first_name = Some(first_name);
         Ok(self)
     }
-    pub fn last_name(
+    pub fn last_name<P>(
         mut self,
-        last_name: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        last_name: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let last_name = last_name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableUserAttributes::LastName)
+        })?;
+        pgrx_validation::must_be_paragraph(last_name.as_ref())
+            .map_err(|e| e.rename_field(InsertableUserAttributes::LastName))?;
         self.last_name = Some(last_name);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableUserAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableUserAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }

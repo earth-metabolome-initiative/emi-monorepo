@@ -74,34 +74,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = Some(users.clone());
-                    updated = true;
-                }
-                if users.id == self.updated_by {
-                    foreign_keys.updated_by = Some(users.clone());
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = None;
-                    updated = true;
-                }
-                if users.id == self.updated_by {
-                    foreign_keys.updated_by = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::ProjectState(project_states),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -143,6 +115,34 @@ impl web_common_traits::prelude::HasForeignKeys
                         foreign_keys.parent_project = None;
                         updated = true;
                     }
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if users.id == self.created_by {
+                    foreign_keys.created_by = Some(users.clone());
+                    updated = true;
+                }
+                if users.id == self.updated_by {
+                    foreign_keys.updated_by = Some(users.clone());
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if users.id == self.created_by {
+                    foreign_keys.created_by = None;
+                    updated = true;
+                }
+                if users.id == self.updated_by {
+                    foreign_keys.updated_by = None;
+                    updated = true;
                 }
             }
             (_, crud) => {

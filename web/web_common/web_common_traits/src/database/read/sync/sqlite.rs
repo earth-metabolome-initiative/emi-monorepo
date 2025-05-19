@@ -1,5 +1,5 @@
 #![cfg(feature = "sqlite")]
-//! Blanked implementations of the `Read` and `BoundedRead` traits for SQLite.
+//! Blanked implementations of the `Read` and `BoundedRead` traits for `SQLite`.
 
 use diesel::{
     Identifiable, OptionalExtension, QueryDsl, RunQueryDsl, SqliteConnection,
@@ -40,7 +40,7 @@ where
         conn: &mut SqliteConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         RunQueryDsl::load(
-            LimitDsl::limit(OffsetDsl::offset(T::table(), offset as i64), limit as i64),
+            LimitDsl::limit(OffsetDsl::offset(T::table(), i64::from(offset)), i64::from(limit)),
             conn,
         )
     }

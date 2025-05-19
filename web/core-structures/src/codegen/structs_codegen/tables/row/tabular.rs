@@ -12,23 +12,46 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::AliquotingStep(_) => {
                 crate::codegen::tables::table_names::TableName::AliquotingStep
             }
-            super::Row::BrandState(_) => crate::codegen::tables::table_names::TableName::BrandState,
+            super::Row::BallMillStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::BallMillStepModel
+            }
+            super::Row::BallMillStep(_) => {
+                crate::codegen::tables::table_names::TableName::BallMillStep
+            }
             super::Row::Brand(_) => crate::codegen::tables::table_names::TableName::Brand,
+            super::Row::CentrifugeStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::CentrifugeStepModel
+            }
+            super::Row::CentrifugeStep(_) => {
+                crate::codegen::tables::table_names::TableName::CentrifugeStep
+            }
+            super::Row::ChemicalEntity(_) => {
+                crate::codegen::tables::table_names::TableName::ChemicalEntity
+            }
             super::Row::City(_) => crate::codegen::tables::table_names::TableName::City,
             super::Row::Color(_) => crate::codegen::tables::table_names::TableName::Color,
+            super::Row::CommercialProductLot(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialProductLot
+            }
             super::Row::CommercialProduct(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialProduct
             }
             super::Row::CommercialReagentModel(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialReagentModel
             }
-            super::Row::ContainerCategory(_) => {
-                crate::codegen::tables::table_names::TableName::ContainerCategory
+            super::Row::CommercialReagent(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialReagent
             }
             super::Row::ContainerModel(_) => {
                 crate::codegen::tables::table_names::TableName::ContainerModel
             }
             super::Row::Country(_) => crate::codegen::tables::table_names::TableName::Country,
+            super::Row::DisposalStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::DisposalStepModel
+            }
+            super::Row::DisposalStep(_) => {
+                crate::codegen::tables::table_names::TableName::DisposalStep
+            }
             super::Row::DocumentFormat(_) => {
                 crate::codegen::tables::table_names::TableName::DocumentFormat
             }
@@ -43,12 +66,6 @@ impl web_common_traits::prelude::Tabular for super::Row {
             }
             super::Row::FreezeDryingStepModel(_) => {
                 crate::codegen::tables::table_names::TableName::FreezeDryingStepModel
-            }
-            super::Row::GrindingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::GrindingStepModel
-            }
-            super::Row::InstrumentCategory(_) => {
-                crate::codegen::tables::table_names::TableName::InstrumentCategory
             }
             super::Row::InstrumentLocation(_) => {
                 crate::codegen::tables::table_names::TableName::InstrumentLocation
@@ -67,9 +84,6 @@ impl web_common_traits::prelude::Tabular for super::Row {
                 crate::codegen::tables::table_names::TableName::LoginProvider
             }
             super::Row::Material(_) => crate::codegen::tables::table_names::TableName::Material,
-            super::Row::NameplateCategory(_) => {
-                crate::codegen::tables::table_names::TableName::NameplateCategory
-            }
             super::Row::NameplateModel(_) => {
                 crate::codegen::tables::table_names::TableName::NameplateModel
             }
@@ -108,6 +122,9 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::ProcedureModelNameplateCategory(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModelNameplateCategory
             }
+            super::Row::ProcedureModelReagent(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureModelReagent
+            }
             super::Row::ProcedureModelToolCategory(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModelToolCategory
             }
@@ -132,6 +149,7 @@ impl web_common_traits::prelude::Tabular for super::Row {
             }
             super::Row::Project(_) => crate::codegen::tables::table_names::TableName::Project,
             super::Row::Rank(_) => crate::codegen::tables::table_names::TableName::Rank,
+            super::Row::Reagent(_) => crate::codegen::tables::table_names::TableName::Reagent,
             super::Row::Role(_) => crate::codegen::tables::table_names::TableName::Role,
             super::Row::Room(_) => crate::codegen::tables::table_names::TableName::Room,
             super::Row::SampleState(_) => {
@@ -142,6 +160,12 @@ impl web_common_traits::prelude::Tabular for super::Row {
             }
             super::Row::SamplingStep(_) => {
                 crate::codegen::tables::table_names::TableName::SamplingStep
+            }
+            super::Row::ShakingStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::ShakingStepModel
+            }
+            super::Row::ShakingStep(_) => {
+                crate::codegen::tables::table_names::TableName::ShakingStep
             }
             super::Row::SpatialRefSy(_) => {
                 crate::codegen::tables::table_names::TableName::SpatialRefSy
@@ -198,8 +222,8 @@ impl web_common_traits::prelude::Tabular for super::Row {
             }
             super::Row::TeamState(_) => crate::codegen::tables::table_names::TableName::TeamState,
             super::Row::Team(_) => crate::codegen::tables::table_names::TableName::Team,
-            super::Row::ToolCategory(_) => {
-                crate::codegen::tables::table_names::TableName::ToolCategory
+            super::Row::TemporaryUserEmail(_) => {
+                crate::codegen::tables::table_names::TableName::TemporaryUserEmail
             }
             super::Row::ToolModel(_) => crate::codegen::tables::table_names::TableName::ToolModel,
             super::Row::TrackableLocation(_) => {
@@ -215,6 +239,9 @@ impl web_common_traits::prelude::Tabular for super::Row {
                 crate::codegen::tables::table_names::TableName::UserOrganization
             }
             super::Row::User(_) => crate::codegen::tables::table_names::TableName::User,
+            super::Row::VolumetricProcessable(_) => {
+                crate::codegen::tables::table_names::TableName::VolumetricProcessable
+            }
             super::Row::WeighingInstrumentModel(_) => {
                 crate::codegen::tables::table_names::TableName::WeighingInstrumentModel
             }

@@ -2,8 +2,6 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ContainerModelForeignKeys {
     pub id: Option<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct>,
-    pub container_category:
-        Option<crate::codegen::structs_codegen::tables::container_categories::ContainerCategory>,
     pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
     pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
@@ -20,11 +18,6 @@ impl web_common_traits::prelude::HasForeignKeys
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialProduct(self.id),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerCategory(
-                self.container_category_id,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -33,7 +26,6 @@ impl web_common_traits::prelude::HasForeignKeys
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.id.is_some()
-            && foreign_keys.container_category.is_some()
             && foreign_keys.created_by.is_some()
             && foreign_keys.updated_by.is_some()
     }
@@ -62,26 +54,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if commercial_products.id == self.id {
                     foreign_keys.id = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ContainerCategory(container_categories),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if container_categories.id == self.container_category_id {
-                    foreign_keys.container_category = Some(container_categories);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ContainerCategory(container_categories),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if container_categories.id == self.container_category_id {
-                    foreign_keys.container_category = None;
                     updated = true;
                 }
             }

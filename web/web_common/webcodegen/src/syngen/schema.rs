@@ -30,7 +30,6 @@ impl Table {
         &self,
         conn: &mut AsyncPgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
-        let table_schema = Ident::new(&self.table_schema, proc_macro2::Span::call_site());
         let original_table_name = &self.table_name;
         let sanitized_table_name_ident =
             Ident::new(&self.snake_case_name()?, proc_macro2::Span::call_site());
@@ -49,7 +48,7 @@ impl Table {
                     #[sql_name = #original_column_name]
                     #column_attribute -> #column_type
                 }
-            })
+            });
         }
         let primary_key_names = self
             .primary_key_columns(conn)
@@ -75,7 +74,7 @@ impl Table {
         Ok(quote! {
             diesel::table! {
                 #sql_name
-                #table_schema.#sanitized_table_name_ident #primary_key_names {
+                #sanitized_table_name_ident #primary_key_names {
                     #(#columns),*
                 }
             }

@@ -70,17 +70,32 @@ pub struct InsertableEmailProviderBuilder {
     login_provider_id: Option<i16>,
 }
 impl InsertableEmailProviderBuilder {
-    pub fn email_id(
+    pub fn email_id<P>(
         mut self,
-        email_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        email_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let email_id = email_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableEmailProviderAttributes::EmailId)
+        })?;
         self.email_id = Some(email_id);
         Ok(self)
     }
-    pub fn login_provider_id(
+    pub fn login_provider_id<P>(
         mut self,
-        login_provider_id: i16,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        login_provider_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i16>,
+        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let login_provider_id =
+            login_provider_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
+                Into::into(err).rename_field(InsertableEmailProviderAttributes::LoginProviderId)
+            })?;
         self.login_provider_id = Some(login_provider_id);
         Ok(self)
     }

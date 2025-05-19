@@ -13,7 +13,7 @@ pub enum Syntax {
 
 impl Syntax {
     /// Returns whether the syntax is `SQLite`.
-    pub fn is_sqlite(&self) -> bool {
+    pub fn is_sqlite(self) -> bool {
         matches!(self, Syntax::SQLite)
     }
 
@@ -39,9 +39,10 @@ impl Syntax {
     ///
     /// * `r#async` - If true, returns the async `RunQueryDsl` type.
     pub fn as_run_query_dsl(r#async: bool) -> syn::Type {
-        match r#async {
-            true => syn::parse_quote! { diesel_async::RunQueryDsl },
-            false => syn::parse_quote! { diesel::RunQueryDsl },
+        if r#async {
+            syn::parse_quote! { diesel_async::RunQueryDsl }
+        } else {
+            syn::parse_quote! { diesel::RunQueryDsl }
         }
     }
 

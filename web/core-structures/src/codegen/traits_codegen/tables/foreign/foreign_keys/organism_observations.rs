@@ -51,22 +51,22 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Project(projects),
+                crate::codegen::tables::row::Row::ObservationSubject(observation_subjects),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if projects.id == self.project_id {
-                    foreign_keys.project = Some(projects);
+                if observation_subjects.id == self.subject_id {
+                    foreign_keys.subject = Some(observation_subjects);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::Project(projects),
+                crate::codegen::tables::row::Row::ObservationSubject(observation_subjects),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if projects.id == self.project_id {
-                    foreign_keys.project = None;
+                if observation_subjects.id == self.subject_id {
+                    foreign_keys.subject = None;
                     updated = true;
                 }
             }
@@ -91,22 +91,22 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::ObservationSubject(observation_subjects),
+                crate::codegen::tables::row::Row::Project(projects),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if observation_subjects.id == self.subject_id {
-                    foreign_keys.subject = Some(observation_subjects);
+                if projects.id == self.project_id {
+                    foreign_keys.project = Some(projects);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ObservationSubject(observation_subjects),
+                crate::codegen::tables::row::Row::Project(projects),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if observation_subjects.id == self.subject_id {
-                    foreign_keys.subject = None;
+                if projects.id == self.project_id {
+                    foreign_keys.project = None;
                     updated = true;
                 }
             }

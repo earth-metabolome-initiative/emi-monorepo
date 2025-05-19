@@ -58,17 +58,31 @@ pub struct InsertableTeamMemberBuilder {
     member_id: Option<i32>,
 }
 impl InsertableTeamMemberBuilder {
-    pub fn team_id(
+    pub fn team_id<P>(
         mut self,
-        team_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        team_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let team_id = team_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableTeamMemberAttributes::TeamId)
+        })?;
         self.team_id = Some(team_id);
         Ok(self)
     }
-    pub fn member_id(
+    pub fn member_id<P>(
         mut self,
-        member_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        member_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let member_id = member_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableTeamMemberAttributes::MemberId)
+        })?;
         self.member_id = Some(member_id);
         Ok(self)
     }

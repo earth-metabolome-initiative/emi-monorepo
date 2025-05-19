@@ -5,6 +5,7 @@ use core_structures::tables::{row::Row, rows::Rows};
 use web_common_traits::crud::CRUD;
 use ws_messages::DBMessage;
 
+#[derive(Debug, Clone)]
 /// Enumeration of internal messages used for the DB portion of the DB/WebSocket
 /// worker.
 pub enum DBInternalMessage {

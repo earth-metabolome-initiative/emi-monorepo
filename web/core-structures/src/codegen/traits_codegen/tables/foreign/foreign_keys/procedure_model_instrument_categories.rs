@@ -3,8 +3,6 @@
 pub struct ProcedureModelInstrumentCategoryForeignKeys {
     pub procedure_model:
         Option<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
-    pub instrument_category:
-        Option<crate::codegen::structs_codegen::tables::instrument_categories::InstrumentCategory>,
     pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
     pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
@@ -27,14 +25,6 @@ for crate::codegen::structs_codegen::tables::procedure_model_instrument_categori
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::InstrumentCategory(
-                        self.instrument_category_id,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(
                         self.created_by,
                     ),
@@ -50,9 +40,8 @@ for crate::codegen::structs_codegen::tables::procedure_model_instrument_categori
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure_model.is_some()
-            && foreign_keys.instrument_category.is_some()
-            && foreign_keys.created_by.is_some() && foreign_keys.updated_by.is_some()
+        foreign_keys.procedure_model.is_some() && foreign_keys.created_by.is_some()
+            && foreign_keys.updated_by.is_some()
     }
     fn update(
         &self,
@@ -79,30 +68,6 @@ for crate::codegen::structs_codegen::tables::procedure_model_instrument_categori
             ) => {
                 if procedure_models.id == self.procedure_model_id {
                     foreign_keys.procedure_model = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::InstrumentCategory(
-                    instrument_categories,
-                ),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if instrument_categories.id == self.instrument_category_id {
-                    foreign_keys.instrument_category = Some(instrument_categories);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::InstrumentCategory(
-                    instrument_categories,
-                ),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if instrument_categories.id == self.instrument_category_id {
-                    foreign_keys.instrument_category = None;
                     updated = true;
                 }
             }

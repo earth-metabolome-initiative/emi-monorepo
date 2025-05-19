@@ -39,7 +39,6 @@ impl DispatchableProperties for () {
         _dispatch: Dispatch<AppState>,
         _partial_properties: &Self::PartialProperties,
     ) -> Self {
-        ()
     }
 }
 

@@ -130,7 +130,6 @@ impl InsertableTeam {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableTeamBuilder {
     id: Option<i32>,
     name: Option<String>,
@@ -144,8 +143,32 @@ pub struct InsertableTeamBuilder {
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableTeamBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            name: None,
+            description: None,
+            icon: None,
+            color_id: Some(15i16),
+            state_id: Some(1i16),
+            parent_team_id: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableTeamBuilder {
-    pub fn id(mut self, id: i32) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableTeamAttributes::Id)
+        })?;
         if let Some(parent_team_id) = self.parent_team_id {
             pgrx_validation::must_be_distinct_i32(parent_team_id, id).map_err(|e| {
                 e.rename_fields(
@@ -157,49 +180,93 @@ impl InsertableTeamBuilder {
         self.id = Some(id);
         Ok(self)
     }
-    pub fn name(
+    pub fn name<P>(
         mut self,
-        name: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        pgrx_validation::must_not_be_empty(name.as_ref())
+        name: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableTeamAttributes::Name)
+        })?;
+        pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| e.rename_field(InsertableTeamAttributes::Name))?;
         self.name = Some(name);
         Ok(self)
     }
-    pub fn description(
+    pub fn description<P>(
         mut self,
-        description: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        description: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let description =
+            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableTeamAttributes::Description)
+            })?;
         self.description = Some(description);
         Ok(self)
     }
-    pub fn icon(
+    pub fn icon<P>(
         mut self,
-        icon: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        icon: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableTeamAttributes::Icon)
+        })?;
         pgrx_validation::must_be_font_awesome_class(icon.as_ref())
             .map_err(|e| e.rename_field(InsertableTeamAttributes::Icon))?;
         self.icon = Some(icon);
         Ok(self)
     }
-    pub fn color_id(
+    pub fn color_id<P>(
         mut self,
-        color_id: i16,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        color_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i16>,
+        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let color_id = color_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
+            Into::into(err).rename_field(InsertableTeamAttributes::ColorId)
+        })?;
         self.color_id = Some(color_id);
         Ok(self)
     }
-    pub fn state_id(
+    pub fn state_id<P>(
         mut self,
-        state_id: i16,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        state_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i16>,
+        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let state_id = state_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
+            Into::into(err).rename_field(InsertableTeamAttributes::StateId)
+        })?;
         self.state_id = Some(state_id);
         Ok(self)
     }
-    pub fn parent_team_id(
+    pub fn parent_team_id<P>(
         mut self,
-        parent_team_id: Option<i32>,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        parent_team_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<i32>>,
+        <P as TryInto<Option<i32>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let parent_team_id =
+            parent_team_id.try_into().map_err(|err: <P as TryInto<Option<i32>>>::Error| {
+                Into::into(err).rename_field(InsertableTeamAttributes::ParentTeamId)
+            })?;
         if let (Some(id), Some(parent_team_id)) = (self.id, parent_team_id) {
             pgrx_validation::must_be_distinct_i32(parent_team_id, id).map_err(|e| {
                 e.rename_fields(
@@ -211,31 +278,66 @@ impl InsertableTeamBuilder {
         self.parent_team_id = parent_team_id;
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableTeamAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableTeamAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableTeamAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableTeamAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }

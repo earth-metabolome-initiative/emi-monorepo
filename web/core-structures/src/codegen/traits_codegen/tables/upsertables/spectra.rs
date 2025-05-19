@@ -6,18 +6,17 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(crate::codegen::diesel_codegen::tables::spectra::spectra::table)
+        use diesel::{
+            ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl, upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::spectra::spectra::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::spectra::spectra::id)
+            .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(
-                crate::codegen::diesel_codegen::tables::spectra::spectra::spectra_collection_id
-                    .ne(diesel::upsert::excluded(
-                    crate::codegen::diesel_codegen::tables::spectra::spectra::spectra_collection_id,
-                )),
-            )
+            .filter(spectra_collection_id.ne(excluded(spectra_collection_id)))
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -30,18 +29,17 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(crate::codegen::diesel_codegen::tables::spectra::spectra::table)
+        use diesel::{
+            ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl, upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::spectra::spectra::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::spectra::spectra::id)
+            .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(
-                crate::codegen::diesel_codegen::tables::spectra::spectra::spectra_collection_id
-                    .ne(diesel::upsert::excluded(
-                    crate::codegen::diesel_codegen::tables::spectra::spectra::spectra_collection_id,
-                )),
-            )
+            .filter(spectra_collection_id.ne(excluded(spectra_collection_id)))
             .get_results(conn)
             .map(|mut result| result.pop())
     }

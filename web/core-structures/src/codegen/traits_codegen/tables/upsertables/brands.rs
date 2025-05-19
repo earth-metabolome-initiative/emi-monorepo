@@ -6,64 +6,26 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(
-                crate::codegen::diesel_codegen::tables::brands::brands::table,
-            )
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::brands::brands::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::brands::brands::id)
+            .on_conflict(id)
             .do_update()
             .set(self)
             .filter(
-                diesel::BoolExpressionMethods::and(
-                    diesel::BoolExpressionMethods::and(
-                        diesel::BoolExpressionMethods::and(
-                            diesel::BoolExpressionMethods::and(
-                                diesel::BoolExpressionMethods::and(
-                                    crate::codegen::diesel_codegen::tables::brands::brands::name
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::brands::brands::name,
-                                            ),
-                                        ),
-                                    crate::codegen::diesel_codegen::tables::brands::brands::created_by
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::brands::brands::created_by,
-                                            ),
-                                        ),
-                                ),
-                                crate::codegen::diesel_codegen::tables::brands::brands::created_at
-                                    .ne(
-                                        diesel::upsert::excluded(
-                                            crate::codegen::diesel_codegen::tables::brands::brands::created_at,
-                                        ),
-                                    ),
-                            ),
-                            crate::codegen::diesel_codegen::tables::brands::brands::updated_by
-                                .ne(
-                                    diesel::upsert::excluded(
-                                        crate::codegen::diesel_codegen::tables::brands::brands::updated_by,
-                                    ),
-                                ),
-                        ),
-                        crate::codegen::diesel_codegen::tables::brands::brands::updated_at
-                            .ne(
-                                diesel::upsert::excluded(
-                                    crate::codegen::diesel_codegen::tables::brands::brands::updated_at,
-                                ),
-                            ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::brands::brands::brand_state_id
-                        .ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::brands::brands::brand_state_id,
-                            ),
-                        ),
-                ),
+                name.ne(excluded(name))
+                    .or(created_by.ne(excluded(created_by)))
+                    .or(created_at.ne(excluded(created_at)))
+                    .or(updated_by.ne(excluded(updated_by)))
+                    .or(updated_at.ne(excluded(updated_at))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }
 #[cfg(feature = "sqlite")]
@@ -74,63 +36,25 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(
-                crate::codegen::diesel_codegen::tables::brands::brands::table,
-            )
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::brands::brands::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::brands::brands::id)
+            .on_conflict(id)
             .do_update()
             .set(self)
             .filter(
-                diesel::BoolExpressionMethods::and(
-                    diesel::BoolExpressionMethods::and(
-                        diesel::BoolExpressionMethods::and(
-                            diesel::BoolExpressionMethods::and(
-                                diesel::BoolExpressionMethods::and(
-                                    crate::codegen::diesel_codegen::tables::brands::brands::name
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::brands::brands::name,
-                                            ),
-                                        ),
-                                    crate::codegen::diesel_codegen::tables::brands::brands::created_by
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::brands::brands::created_by,
-                                            ),
-                                        ),
-                                ),
-                                crate::codegen::diesel_codegen::tables::brands::brands::created_at
-                                    .ne(
-                                        diesel::upsert::excluded(
-                                            crate::codegen::diesel_codegen::tables::brands::brands::created_at,
-                                        ),
-                                    ),
-                            ),
-                            crate::codegen::diesel_codegen::tables::brands::brands::updated_by
-                                .ne(
-                                    diesel::upsert::excluded(
-                                        crate::codegen::diesel_codegen::tables::brands::brands::updated_by,
-                                    ),
-                                ),
-                        ),
-                        crate::codegen::diesel_codegen::tables::brands::brands::updated_at
-                            .ne(
-                                diesel::upsert::excluded(
-                                    crate::codegen::diesel_codegen::tables::brands::brands::updated_at,
-                                ),
-                            ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::brands::brands::brand_state_id
-                        .ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::brands::brands::brand_state_id,
-                            ),
-                        ),
-                ),
+                name.ne(excluded(name))
+                    .or(created_by.ne(excluded(created_by)))
+                    .or(created_at.ne(excluded(created_at)))
+                    .or(updated_by.ne(excluded(updated_by)))
+                    .or(updated_at.ne(excluded(updated_at))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }

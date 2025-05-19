@@ -2,7 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableStepModelToolCategoryAttributes {
     StepModelId,
-    ToolCategoryId,
+    ToolCategory,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -14,8 +14,8 @@ impl core::fmt::Display for InsertableStepModelToolCategoryAttributes {
             InsertableStepModelToolCategoryAttributes::StepModelId => {
                 write!(f, "step_model_id")
             }
-            InsertableStepModelToolCategoryAttributes::ToolCategoryId => {
-                write!(f, "tool_category_id")
+            InsertableStepModelToolCategoryAttributes::ToolCategory => {
+                write!(f, "tool_category")
             }
             InsertableStepModelToolCategoryAttributes::CreatedBy => {
                 write!(f, "created_by")
@@ -42,7 +42,7 @@ impl core::fmt::Display for InsertableStepModelToolCategoryAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableStepModelToolCategory {
     step_model_id: i32,
-    tool_category_id: i16,
+    tool_category: tool_categories::ToolCategory,
     created_by: i32,
     created_at: rosetta_timestamp::TimestampUTC,
     updated_by: i32,
@@ -65,24 +65,6 @@ impl InsertableStepModelToolCategory {
                     .eq(&self.step_model_id),
             )
             .first::<crate::codegen::structs_codegen::tables::step_models::StepModel>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn tool_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::tool_categories::ToolCategory,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::tool_categories::ToolCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::tool_categories::tool_categories::dsl::id
-                    .eq(&self.tool_category_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::tool_categories::ToolCategory>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -114,55 +96,120 @@ impl InsertableStepModelToolCategory {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableStepModelToolCategoryBuilder {
     step_model_id: Option<i32>,
-    tool_category_id: Option<i16>,
+    tool_category: Option<tool_categories::ToolCategory>,
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableStepModelToolCategoryBuilder {
+    fn default() -> Self {
+        Self {
+            step_model_id: None,
+            tool_category: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableStepModelToolCategoryBuilder {
-    pub fn step_model_id(
+    pub fn step_model_id<P>(
         mut self,
-        step_model_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        step_model_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let step_model_id =
+            step_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(InsertableStepModelToolCategoryAttributes::StepModelId)
+            })?;
         self.step_model_id = Some(step_model_id);
         Ok(self)
     }
-    pub fn tool_category_id(
+    pub fn tool_category<P>(
         mut self,
-        tool_category_id: i16,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.tool_category_id = Some(tool_category_id);
+        tool_category: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<tool_categories::ToolCategory>,
+        <P as TryInto<tool_categories::ToolCategory>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let tool_category = tool_category.try_into().map_err(
+            |err: <P as TryInto<tool_categories::ToolCategory>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableStepModelToolCategoryAttributes::ToolCategory)
+            },
+        )?;
+        self.tool_category = Some(tool_category);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableStepModelToolCategoryAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableStepModelToolCategoryAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableStepModelToolCategoryAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableStepModelToolCategoryAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }
@@ -179,9 +226,9 @@ impl common_traits::prelude::Builder for InsertableStepModelToolCategoryBuilder 
                     InsertableStepModelToolCategoryAttributes::StepModelId,
                 ),
             )?,
-            tool_category_id: self.tool_category_id.ok_or(
+            tool_category: self.tool_category.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepModelToolCategoryAttributes::ToolCategoryId,
+                    InsertableStepModelToolCategoryAttributes::ToolCategory,
                 ),
             )?,
             created_by: self.created_by.ok_or(
@@ -212,7 +259,7 @@ impl TryFrom<InsertableStepModelToolCategory> for InsertableStepModelToolCategor
     fn try_from(insertable_variant: InsertableStepModelToolCategory) -> Result<Self, Self::Error> {
         Self::default()
             .step_model_id(insertable_variant.step_model_id)?
-            .tool_category_id(insertable_variant.tool_category_id)?
+            .tool_category(insertable_variant.tool_category)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?

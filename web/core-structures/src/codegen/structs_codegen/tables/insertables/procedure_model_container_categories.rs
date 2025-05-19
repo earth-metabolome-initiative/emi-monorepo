@@ -2,7 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableProcedureModelContainerCategoryAttributes {
     ProcedureModelId,
-    ContainerCategoryId,
+    ContainerCategory,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -14,8 +14,8 @@ impl core::fmt::Display for InsertableProcedureModelContainerCategoryAttributes 
             InsertableProcedureModelContainerCategoryAttributes::ProcedureModelId => {
                 write!(f, "procedure_model_id")
             }
-            InsertableProcedureModelContainerCategoryAttributes::ContainerCategoryId => {
-                write!(f, "container_category_id")
+            InsertableProcedureModelContainerCategoryAttributes::ContainerCategory => {
+                write!(f, "container_category")
             }
             InsertableProcedureModelContainerCategoryAttributes::CreatedBy => {
                 write!(f, "created_by")
@@ -42,7 +42,7 @@ impl core::fmt::Display for InsertableProcedureModelContainerCategoryAttributes 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureModelContainerCategory {
     procedure_model_id: i32,
-    container_category_id: i16,
+    container_category: container_categories::ContainerCategory,
     created_by: i32,
     created_at: rosetta_timestamp::TimestampUTC,
     updated_by: i32,
@@ -67,26 +67,6 @@ impl InsertableProcedureModelContainerCategory {
             .first::<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>(
                 conn,
             )
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn container_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::container_categories::ContainerCategory,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::container_categories::ContainerCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::container_categories::container_categories::dsl::id
-                    .eq(&self.container_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::container_categories::ContainerCategory,
-            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -118,55 +98,127 @@ impl InsertableProcedureModelContainerCategory {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableProcedureModelContainerCategoryBuilder {
     procedure_model_id: Option<i32>,
-    container_category_id: Option<i16>,
+    container_category: Option<container_categories::ContainerCategory>,
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableProcedureModelContainerCategoryBuilder {
+    fn default() -> Self {
+        Self {
+            procedure_model_id: None,
+            container_category: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableProcedureModelContainerCategoryBuilder {
-    pub fn procedure_model_id(
+    pub fn procedure_model_id<P>(
         mut self,
-        procedure_model_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        procedure_model_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let procedure_model_id =
+            procedure_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(
+                    InsertableProcedureModelContainerCategoryAttributes::ProcedureModelId,
+                )
+            })?;
         self.procedure_model_id = Some(procedure_model_id);
         Ok(self)
     }
-    pub fn container_category_id(
+    pub fn container_category<P>(
         mut self,
-        container_category_id: i16,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.container_category_id = Some(container_category_id);
+        container_category: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<container_categories::ContainerCategory>,
+        <P as TryInto<container_categories::ContainerCategory>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let container_category = container_category.try_into().map_err(
+            |err: <P as TryInto<container_categories::ContainerCategory>>::Error| {
+                Into::into(err).rename_field(
+                    InsertableProcedureModelContainerCategoryAttributes::ContainerCategory,
+                )
+            },
+        )?;
+        self.container_category = Some(container_category);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err)
+                .rename_field(InsertableProcedureModelContainerCategoryAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableProcedureModelContainerCategoryAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err)
+                .rename_field(InsertableProcedureModelContainerCategoryAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableProcedureModelContainerCategoryAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }
@@ -184,9 +236,9 @@ impl common_traits::prelude::Builder for InsertableProcedureModelContainerCatego
                     InsertableProcedureModelContainerCategoryAttributes::ProcedureModelId,
                 ),
             )?,
-            container_category_id: self.container_category_id.ok_or(
+            container_category: self.container_category.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureModelContainerCategoryAttributes::ContainerCategoryId,
+                    InsertableProcedureModelContainerCategoryAttributes::ContainerCategory,
                 ),
             )?,
             created_by: self.created_by.ok_or(
@@ -221,7 +273,7 @@ impl TryFrom<InsertableProcedureModelContainerCategory>
     ) -> Result<Self, Self::Error> {
         Self::default()
             .procedure_model_id(insertable_variant.procedure_model_id)?
-            .container_category_id(insertable_variant.container_category_id)?
+            .container_category(insertable_variant.container_category)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?

@@ -18,51 +18,71 @@ use crate::{
 };
 
 /// Constant listing types supporting `Copy`.
-pub(crate) const COPY_TYPES: [&str; 8] = [
-    "i32",
+pub(crate) const COPY_TYPES: [&str; 13] = [
     "i16",
+    "i32",
     "i64",
     "f32",
     "f64",
     "bool",
     "rosetta_uuid::Uuid",
     "rosetta_timestamp::TimestampUTC",
+    "iso_codes::CountryCode",
+    "instrument_categories::InstrumentCategory",
+    "tool_categories::ToolCategory",
+    "nameplate_categories::NameplateCategory",
+    "container_categories::ContainerCategory",
 ];
 
 /// Constant listing types supporting `Eq`.
-pub(crate) const EQ_TYPES: [&str; 8] = [
-    "i32",
+pub(crate) const EQ_TYPES: [&str; 13] = [
     "i16",
+    "i32",
     "i64",
     "bool",
     "String",
     "chrono::NaiveDateTime",
     "rosetta_uuid::Uuid",
     "rosetta_timestamp::TimestampUTC",
+    "iso_codes::CountryCode",
+    "instrument_categories::InstrumentCategory",
+    "tool_categories::ToolCategory",
+    "nameplate_categories::NameplateCategory",
+    "container_categories::ContainerCategory",
 ];
 
 /// Constant listing types supporting `Ord`.
-pub(crate) const ORD_TYPES: [&str; 8] = [
-    "i32",
+pub(crate) const ORD_TYPES: [&str; 13] = [
     "i16",
+    "i32",
     "i64",
     "bool",
     "String",
     "chrono::NaiveDateTime",
     "rosetta_uuid::Uuid",
     "rosetta_timestamp::TimestampUTC",
+    "iso_codes::CountryCode",
+    "instrument_categories::InstrumentCategory",
+    "tool_categories::ToolCategory",
+    "nameplate_categories::NameplateCategory",
+    "container_categories::ContainerCategory",
 ];
 
 /// Constant listing types supporting `Hash`.
-pub(crate) const HASH_TYPES: [&str; 8] = [
-    "i32",
+pub(crate) const HASH_TYPES: [&str; 13] = [
     "i16",
+    "i32",
     "i64",
     "bool",
     "String",
     "chrono::NaiveDateTime",
     "rosetta_uuid::Uuid",
     "rosetta_timestamp::TimestampUTC",
+    "iso_codes::CountryCode",
+    "instrument_categories::InstrumentCategory",
+    "tool_categories::ToolCategory",
+    "nameplate_categories::NameplateCategory",
+    "container_categories::ContainerCategory",
 ];
 
 /// Represents a `PostgreSQL` type.
@@ -205,6 +225,12 @@ pub async fn rust_type_str<S: AsRef<str>>(
         // ISO Codes
         "countrycode" | "CountryCode" => "iso_codes::CountryCode",
 
+        // Instrument and Tool Categories
+        "instrumentcategory" | "InstrumentCategory" => "instrument_categories::InstrumentCategory",
+        "toolcategory" | "ToolCategory" => "tool_categories::ToolCategory",
+        "nameplatecategory" | "NameplateCategory" => "nameplate_categories::NameplateCategory",
+        "containercategory" | "ContainerCategory" => "container_categories::ContainerCategory",
+
         other => return Err(WebCodeGenError::UnknownPostgresRustType(other.to_owned())),
     })
 }
@@ -286,6 +312,18 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<String, WebCod
 
         // ISO Codes
         "countrycode" | "CountryCode" => "iso_codes::country_codes::diesel_impls::CountryCode",
+
+        // Instrument and Tool Categories
+        "instrumentcategory" | "InstrumentCategory" => {
+            "instrument_categories::diesel_impls::InstrumentCategory"
+        }
+        "toolcategory" | "ToolCategory" => "tool_categories::diesel_impls::ToolCategory",
+        "nameplatecategory" | "NameplateCategory" => {
+            "nameplate_categories::diesel_impls::NameplateCategory"
+        }
+        "containercategory" | "ContainerCategory" => {
+            "container_categories::diesel_impls::ContainerCategory"
+        }
 
         _ => {
             return Err(WebCodeGenError::UnknownDieselPostgresType(postgres_type.to_owned()));
@@ -428,6 +466,10 @@ impl PgType {
     ///
     /// An option containing the `PgExtension` of the `PgType`,
     /// or None if the type is not from an extension.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
     pub async fn extension(
         &self,
         conn: &mut AsyncPgConnection,

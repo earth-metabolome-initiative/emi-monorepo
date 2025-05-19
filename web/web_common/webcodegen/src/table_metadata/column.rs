@@ -3,7 +3,11 @@ use diesel::{
     QueryableByName, Selectable, SelectableHelper, result::Error as DieselError,
 };
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
+use proc_macro2::TokenStream;
 use syn::{Ident, Type};
+
+mod default_types;
+pub use default_types::DefaultTypes;
 
 use super::{
     check_constraint::CheckConstraint,
@@ -691,6 +695,72 @@ impl Column {
         self.column_default.is_some()
     }
 
+    /// Returns the rust `TokenStream` to create the default value of the column
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub async fn rust_default_value(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<TokenStream, WebCodeGenError> {
+        let Some(column_default) = &self.column_default else {
+            return Err(WebCodeGenError::ColumnDoesNotHaveDefaultValue(Box::new(self.clone())));
+        };
+        let rust_str_data_type = self.str_rust_data_type(conn).await?;
+        let default = DefaultTypes::new(&rust_str_data_type, column_default)?;
+        Ok(match (rust_str_data_type.as_str(), default) {
+            ("chrono::NaiveDateTime", DefaultTypes::CurrentTimestamp) => {
+                quote::quote! {
+                    chrono::Local::now().naive_local()
+                }
+            }
+            ("rosetta_timestamp::TimestampUTC", DefaultTypes::CurrentTimestamp) => {
+                quote::quote! {
+                    rosetta_timestamp::TimestampUTC::default()
+                }
+            }
+            ("i16", DefaultTypes::I16(value)) => {
+                quote::quote! {
+                    #value
+                }
+            }
+            ("i32", DefaultTypes::I32(value)) => {
+                quote::quote! {
+                    #value
+                }
+            }
+            ("i64", DefaultTypes::I64(value)) => {
+                quote::quote! {
+                    #value
+                }
+            }
+            ("bool", DefaultTypes::Bool(value)) => {
+                quote::quote! {
+                    #value
+                }
+            }
+            ("String", DefaultTypes::String(value)) => {
+                quote::quote! {
+                    #value.to_owned()
+                }
+            }
+            ("rosetta_uuid::Uuid", DefaultTypes::Uuid(value)) => value,
+            (r#type, default) => {
+                unimplemented!(
+                    "Default value `{default:?}` for column \"{}\".\"{}\" of type `{}` is not implemented!",
+                    self.table_name,
+                    self.column_name,
+                    r#type
+                )
+            }
+        })
+    }
+
     /// Returns whether the column contains the update user and is defined by
     /// the SESSION user
     pub async fn is_updated_by(&self, conn: &mut AsyncPgConnection) -> bool {
@@ -797,9 +867,16 @@ impl Column {
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    pub async fn is_foreign_key(&self, conn: &mut AsyncPgConnection) -> bool {
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub async fn is_foreign_key(
+        &self,
+        conn: &mut AsyncPgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         use crate::schema::{key_column_usage, referential_constraints};
-        key_column_usage::table
+        Ok(key_column_usage::table
             .inner_join(
                 referential_constraints::table.on(key_column_usage::constraint_name
                     .eq(referential_constraints::constraint_name)
@@ -819,7 +896,8 @@ impl Column {
             .select(KeyColumnUsage::as_select())
             .first::<KeyColumnUsage>(conn)
             .await
-            .is_ok()
+            .optional()?
+            .is_some())
     }
 
     /// Returns the foreign table of the column if it is a foreign key.

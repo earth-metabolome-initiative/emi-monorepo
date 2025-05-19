@@ -44,39 +44,80 @@ impl InsertableUserEmail {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableUserEmailBuilder {
     email: Option<String>,
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     primary_email: Option<bool>,
 }
+impl Default for InsertableUserEmailBuilder {
+    fn default() -> Self {
+        Self {
+            email: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            primary_email: Some(true),
+        }
+    }
+}
 impl InsertableUserEmailBuilder {
-    pub fn email(
+    pub fn email<P>(
         mut self,
-        email: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        email: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let email = email.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableUserEmailAttributes::Email)
+        })?;
         self.email = Some(email);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableUserEmailAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableUserEmailAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn primary_email(
+    pub fn primary_email<P>(
         mut self,
-        primary_email: bool,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        primary_email: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let primary_email =
+            primary_email.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
+                Into::into(err).rename_field(InsertableUserEmailAttributes::PrimaryEmail)
+            })?;
         self.primary_email = Some(primary_email);
         Ok(self)
     }

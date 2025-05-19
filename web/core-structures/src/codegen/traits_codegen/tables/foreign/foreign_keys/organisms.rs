@@ -2,8 +2,6 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OrganismForeignKeys {
     pub id: Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
-    pub nameplate_category:
-        Option<crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::organisms::Organism
@@ -17,14 +15,9 @@ impl web_common_traits::prelude::HasForeignKeys
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Trackable(self.id),
         ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::NameplateCategory(
-                self.nameplate_category_id,
-            ),
-        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.id.is_some() && foreign_keys.nameplate_category.is_some()
+        foreign_keys.id.is_some()
     }
     fn update(
         &self,
@@ -34,26 +27,6 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
-            (
-                crate::codegen::tables::row::Row::NameplateCategory(nameplate_categories),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if nameplate_categories.id == self.nameplate_category_id {
-                    foreign_keys.nameplate_category = Some(nameplate_categories);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::NameplateCategory(nameplate_categories),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if nameplate_categories.id == self.nameplate_category_id {
-                    foreign_keys.nameplate_category = None;
-                    updated = true;
-                }
-            }
             (
                 crate::codegen::tables::row::Row::Trackable(trackables),
                 web_common_traits::crud::CRUD::Read

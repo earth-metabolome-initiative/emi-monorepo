@@ -3,7 +3,7 @@
 pub enum InsertableContainerModelAttributes {
     Id,
     Liters,
-    ContainerCategoryId,
+    ContainerCategory,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -14,8 +14,8 @@ impl core::fmt::Display for InsertableContainerModelAttributes {
         match self {
             InsertableContainerModelAttributes::Id => write!(f, "id"),
             InsertableContainerModelAttributes::Liters => write!(f, "liters"),
-            InsertableContainerModelAttributes::ContainerCategoryId => {
-                write!(f, "container_category_id")
+            InsertableContainerModelAttributes::ContainerCategory => {
+                write!(f, "container_category")
             }
             InsertableContainerModelAttributes::CreatedBy => write!(f, "created_by"),
             InsertableContainerModelAttributes::CreatedAt => write!(f, "created_at"),
@@ -35,7 +35,7 @@ impl core::fmt::Display for InsertableContainerModelAttributes {
 pub struct InsertableContainerModel {
     id: i32,
     liters: f32,
-    container_category_id: i16,
+    container_category: container_categories::ContainerCategory,
     created_by: i32,
     created_at: rosetta_timestamp::TimestampUTC,
     updated_by: i32,
@@ -59,26 +59,6 @@ impl InsertableContainerModel {
             )
             .first::<
                 crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-            >(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn container_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::container_categories::ContainerCategory,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::container_categories::ContainerCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::container_categories::container_categories::dsl::id
-                    .eq(&self.container_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::container_categories::ContainerCategory,
             >(conn)
             .await
     }
@@ -111,62 +91,133 @@ impl InsertableContainerModel {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableContainerModelBuilder {
     id: Option<i32>,
     liters: Option<f32>,
-    container_category_id: Option<i16>,
+    container_category: Option<container_categories::ContainerCategory>,
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableContainerModelBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            liters: None,
+            container_category: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableContainerModelBuilder {
-    pub fn id(mut self, id: i32) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableContainerModelAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn liters(
+    pub fn liters<P>(
         mut self,
-        liters: f32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        liters: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let liters = liters.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+            Into::into(err).rename_field(InsertableContainerModelAttributes::Liters)
+        })?;
         pgrx_validation::must_be_strictly_positive_f32(liters)
             .map_err(|e| e.rename_field(InsertableContainerModelAttributes::Liters))?;
         self.liters = Some(liters);
         Ok(self)
     }
-    pub fn container_category_id(
+    pub fn container_category<P>(
         mut self,
-        container_category_id: i16,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.container_category_id = Some(container_category_id);
+        container_category: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<container_categories::ContainerCategory>,
+        <P as TryInto<container_categories::ContainerCategory>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let container_category = container_category.try_into().map_err(
+            |err: <P as TryInto<container_categories::ContainerCategory>>::Error| {
+                Into::into(err).rename_field(InsertableContainerModelAttributes::ContainerCategory)
+            },
+        )?;
+        self.container_category = Some(container_category);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableContainerModelAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableContainerModelAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableContainerModelAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableContainerModelAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }
@@ -183,9 +234,9 @@ impl common_traits::prelude::Builder for InsertableContainerModelBuilder {
             liters: self.liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableContainerModelAttributes::Liters,
             ))?,
-            container_category_id: self.container_category_id.ok_or(
+            container_category: self.container_category.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableContainerModelAttributes::ContainerCategoryId,
+                    InsertableContainerModelAttributes::ContainerCategory,
                 ),
             )?,
             created_by: self.created_by.ok_or(
@@ -217,7 +268,7 @@ impl TryFrom<InsertableContainerModel> for InsertableContainerModelBuilder {
         Self::default()
             .id(insertable_variant.id)?
             .liters(insertable_variant.liters)?
-            .container_category_id(insertable_variant.container_category_id)?
+            .container_category(insertable_variant.container_category)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?

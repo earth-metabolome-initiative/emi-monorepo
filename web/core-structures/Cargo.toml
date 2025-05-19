@@ -16,6 +16,10 @@ common-traits.workspace = true
 backend-request-errors.workspace = true
 pgrx_validation.workspace = true
 iso_codes.workspace = true
+tool_categories.workspace = true
+instrument_categories.workspace = true
+nameplate_categories.workspace = true
+container_categories.workspace = true
 validation-errors.workspace = true
 yew = { workspace = true, optional = true }
 
@@ -27,6 +31,10 @@ serde = [
   "rosetta-uuid/serde",
   "rosetta-timestamp/serde",
   "iso_codes/serde",
+  "tool_categories/serde",
+  "instrument_categories/serde",
+  "nameplate_categories/serde",
+  "container_categories/serde",
 ]
 yew = ["dep:yew"]
 postgres = [
@@ -36,7 +44,15 @@ postgres = [
   "rosetta-uuid/postgres",
   "rosetta-timestamp/postgres",
   "iso_codes/postgres",
-  "iso_codes/diesel-pgrx",
+  "iso_codes/diesel_pgrx",
+  "tool_categories/postgres",
+  "instrument_categories/postgres",
+  "tool_categories/diesel_pgrx",
+  "instrument_categories/diesel_pgrx",
+  "nameplate_categories/postgres",
+  "container_categories/postgres",
+  "nameplate_categories/diesel_pgrx",
+  "container_categories/diesel_pgrx",
 ]
 sqlite = [
   "diesel/sqlite",
@@ -45,7 +61,15 @@ sqlite = [
   "rosetta-uuid/sqlite",
   "rosetta-timestamp/sqlite",
   "iso_codes/sqlite",
-  "iso_codes/diesel-pgrx",
+  "iso_codes/diesel_pgrx",
+  "tool_categories/sqlite",
+  "instrument_categories/sqlite",
+  "tool_categories/diesel_pgrx",
+  "instrument_categories/diesel_pgrx",
+  "nameplate_categories/sqlite",
+  "container_categories/sqlite",
+  "nameplate_categories/diesel_pgrx",
+  "container_categories/diesel_pgrx",
 ]
 backend = ["postgres", "web_common_traits/backend"]
 frontend = ["sqlite", "yew", "web_common_traits/frontend"]

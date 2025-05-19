@@ -44,16 +44,16 @@ impl crate::Table {
 
             let mut all_columns_are_foreign_keys = true;
             for column in &columns {
-                if !column.is_foreign_key(conn).await {
+                if !column.is_foreign_key(conn).await? {
                     all_columns_are_foreign_keys = false;
                     break;
                 }
             }
-            if all_columns_are_foreign_keys {
+            if all_columns_are_foreign_keys && columns.len() == 1 {
                 continue;
             }
 
-            if columns.iter().all(|c| primary_keys.contains(c)) {
+            if columns.iter().all(|c| primary_keys.contains(c)) && primary_keys.len() == 1 {
                 continue;
             }
 
@@ -66,22 +66,35 @@ impl crate::Table {
             for column in &columns {
                 let column_name = column.snake_case_ident()?;
                 let column_type = column.rust_ref_data_type(conn).await?;
-                method_arguments.push(quote! { #column_name: #column_type })
+                method_arguments.push(quote! { #column_name: #column_type });
             }
+            let mut include_bool_expression_methods = false;
             let filter = columns
-                    .iter()
-                    .map(|column| {
-                        let column_name = column.snake_case_ident()?;
-                        Ok(quote! { diesel::ExpressionMethods::eq(#table_name_ident::#column_name, #column_name) })
-                    })
-                    .try_fold(quote! {}, |acc: TokenStream, filter: Result<TokenStream, WebCodeGenError>| {
+                .iter()
+                .map(|column| {
+                    let column_name = column.snake_case_ident()?;
+                    Ok(quote! { #table_name_ident::#column_name.eq(#column_name) })
+                })
+                .try_fold(
+                    quote! {},
+                    |acc: TokenStream, filter: Result<TokenStream, WebCodeGenError>| {
                         let filter = filter?;
                         Ok::<TokenStream, WebCodeGenError>(if acc.is_empty() {
                             filter
                         } else {
-                            quote! {diesel::BoolExpressionMethods::and(#acc, #filter) }
+                            include_bool_expression_methods = true;
+                            quote! {#acc.and(#filter) }
                         })
-                    })?;
+                    },
+                )?;
+
+            let bool_expression_methods = if include_bool_expression_methods {
+                quote! {
+                    , BoolExpressionMethods
+                }
+            } else {
+                TokenStream::new()
+            };
 
             unique_indices.extend(quote! {
                 #syntax_flag
@@ -91,14 +104,14 @@ impl crate::Table {
                 ) -> Result<Option<Self>, diesel::result::Error> {
                     use diesel_async::RunQueryDsl;
                     use diesel::associations::HasTable;
-                    use diesel::{QueryDsl, OptionalExtension};
+                    use diesel::{QueryDsl, ExpressionMethods, OptionalExtension #bool_expression_methods};
                     Self::table()
                         .filter(#filter)
                         .first::<Self>(conn)
                         .await
                         .optional()
                 }
-            })
+            });
         }
 
         Ok(unique_indices)

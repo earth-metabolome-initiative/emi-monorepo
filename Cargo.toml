@@ -43,7 +43,16 @@ members = [
   "web/web_common/rosetta-url",
   "data-migrations/init-db",
   "web/web_common/reference-docker",
-
+  "web/web_common/tool_categories",
+  "web/web_common/instrument_categories",
+  "web/web_common/container_categories",
+  "web/web_common/nameplate_categories",
+  "web/web_common/cas_code",
+  "utils/diesel_pgrx_derive",
+  "utils/diesel_pgrx",
+  "web/web_common/elements",
+  "utils/diesel_pgrx/example_extension",
+  "web/web_common/molecular_formula",
 ]
 
 [workspace.dependencies]
@@ -71,6 +80,9 @@ diesel = { git = "https://github.com/LucaCappelletti94/diesel.git", branch = "su
 ] }
 diesel-async = { git = "https://github.com/LucaCappelletti94/diesel_async", branch = "custom-diesel" }
 diesel_full_text_search = "2.2"
+diesel_pgrx = { path = "utils/diesel_pgrx" }
+diesel_pgrx_derive = { path = "utils/diesel_pgrx_derive" }
+example_extension = { path = "utils/diesel_pgrx/example_extension" }
 redis = { version = "0.30", features = ["tokio-comp"] }
 postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel.git", default-features = false, branch = "custom-diesel" }
 chrono = { version = "0.4.39", features = ["serde"] }
@@ -79,28 +91,34 @@ serde_json = "1.0"
 strum = { version = "0.27", features = ["derive"] }
 yew = { git = "https://github.com/LucaCappelletti94/yew.git", features = [
   "csr",
-], branch = "string-properties" }
-yew-router = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "string-properties" }
+], branch = "vendoring-yew-agent" }
+yew-router = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "vendoring-yew-agent" }
 yewdux = { git = "https://github.com/LucaCappelletti94/yewdux", branch = "custom-yew" }
-yew-agent = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "string-properties" }
+yew-agent = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "vendoring-yew-agent" }
 
 strum_macros = "0.27"
-zip = "2.6"
+zip = "3.0"
 reference-docker = { path = "web/web_common/reference-docker" }
 async-trait = "0.1.88"
-pgrx = "0.14.1"
-pgrx-tests = "0.14.1"
+pgrx = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }
+pgrx-tests = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }
+pgrx-sql-entity-graph = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }
 image = "0.25.6"
 rsa = { version = "0.9.8" }
 rand = { version = "0.8" }
-pgrx-sql-entity-graph = "0.14.1"
 gloo = "0.11.0"
+gloo-timers = "0.3.0"
 criterion = { version = "0.5", features = ["html_reports"] }
 rosetta-uuid = { path = "data-structures/rosetta-uuid" }
 rosetta-timestamp = { path = "utils/rosetta-timestamp" }
 taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
 csqlv = { path = "web/web_common/csqlv", default-features = false }
 iso_codes = { path = "web/web_common/iso_codes" }
+elements = { path = "web/web_common/elements" }
+tool_categories = { path = "web/web_common/tool_categories" }
+instrument_categories = { path = "web/web_common/instrument_categories" }
+nameplate_categories = { path = "web/web_common/nameplate_categories" }
+container_categories = { path = "web/web_common/container_categories" }
 testcontainers = { version = "0.24.0" }
 web_common_traits = { path = "web/web_common/web_common_traits" }
 webcodegen = { path = "web/web_common/webcodegen" }
@@ -144,6 +162,11 @@ validator = { version = "0.20", features = ["derive"] }
 web-sys = { version = "0.3.77" }
 cached = "0.55"
 dotenvy = "0.15.7"
+serde_cbor = "0.11.2"
+sophia_api = "0.9.0"
+sophia_sparql_client = "0.9.0"
+fmtastic = "0.2.1"
+byteorder = "1.5.0"
 
 [workspace.lints.rust]
 missing_docs = "forbid"
@@ -154,8 +177,11 @@ unused_import_braces = "forbid"
 unused_must_use = "forbid"
 
 [workspace.lints.clippy]
+unreadable_literal = "allow"
 missing_panics_doc = "allow"
 struct_excessive_bools = "allow"
+should_panic_without_expect = "allow"
+clone_on_copy = "forbid"
 pedantic = { level = "deny", priority = -1 }
 
 [profile.bench]

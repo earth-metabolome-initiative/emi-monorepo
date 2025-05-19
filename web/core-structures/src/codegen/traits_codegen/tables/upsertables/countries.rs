@@ -6,17 +6,17 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(crate::codegen::diesel_codegen::tables::countries::countries::table)
+        use diesel::{
+            ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl, upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::countries::countries::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::countries::countries::iso)
+            .on_conflict(iso)
             .do_update()
             .set(self)
-            .filter(crate::codegen::diesel_codegen::tables::countries::countries::name.ne(
-                diesel::upsert::excluded(
-                    crate::codegen::diesel_codegen::tables::countries::countries::name,
-                ),
-            ))
+            .filter(name.ne(excluded(name)))
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -29,17 +29,17 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(crate::codegen::diesel_codegen::tables::countries::countries::table)
+        use diesel::{
+            ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl, upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::countries::countries::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::countries::countries::iso)
+            .on_conflict(iso)
             .do_update()
             .set(self)
-            .filter(crate::codegen::diesel_codegen::tables::countries::countries::name.ne(
-                diesel::upsert::excluded(
-                    crate::codegen::diesel_codegen::tables::countries::countries::name,
-                ),
-            ))
+            .filter(name.ne(excluded(name)))
             .get_results(conn)
             .map(|mut result| result.pop())
     }

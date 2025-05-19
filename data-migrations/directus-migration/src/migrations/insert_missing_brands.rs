@@ -1,7 +1,7 @@
 //! Submodule providing a method to migrate the brands from the Directus
 //! database to the new database.
 
-use core_structures::{Brand as PortalBrand, BrandState as PortalBrandState};
+use core_structures::Brand as PortalBrand;
 use diesel_async::AsyncPgConnection;
 use web_common_traits::{
     database::{AsyncBoundedRead, Insertable, InsertableVariant},
@@ -32,10 +32,6 @@ pub async fn insert_missing_brands(
             continue;
         }
 
-        let brand_state =
-            PortalBrandState::from_name(&directus_brand.status, portal_conn)
-                .await?
-                .ok_or(crate::error::Error::UnknownBrandStatus(directus_brand.status.clone()))?;
         let directus_created_by =
             directus_brand.user_created(directus_conn).await?.ok_or_else(|| {
                 crate::error::Error::BrandWithMissingUser(Box::from(directus_brand.clone()))
@@ -73,7 +69,6 @@ pub async fn insert_missing_brands(
         })?;
 
         let _portal_brand = PortalBrand::new()
-            .brand_state_id(brand_state.id)?
             .created_by(portal_created_by.id)?
             .created_at(created_at)?
             .updated_at(directus_brand.date_updated.unwrap_or(created_at))?

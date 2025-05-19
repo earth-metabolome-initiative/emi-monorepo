@@ -6,66 +6,27 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(
-                crate::codegen::diesel_codegen::tables::login_providers::login_providers::table,
-            )
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::login_providers::login_providers::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(
-                crate::codegen::diesel_codegen::tables::login_providers::login_providers::id,
-            )
+            .on_conflict(id)
             .do_update()
             .set(self)
             .filter(
-                diesel::BoolExpressionMethods::and(
-                    diesel::BoolExpressionMethods::and(
-                        diesel::BoolExpressionMethods::and(
-                            diesel::BoolExpressionMethods::and(
-                                diesel::BoolExpressionMethods::and(
-                                    crate::codegen::diesel_codegen::tables::login_providers::login_providers::name
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::login_providers::login_providers::name,
-                                            ),
-                                        ),
-                                    crate::codegen::diesel_codegen::tables::login_providers::login_providers::icon
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::login_providers::login_providers::icon,
-                                            ),
-                                        ),
-                                ),
-                                crate::codegen::diesel_codegen::tables::login_providers::login_providers::client_id
-                                    .ne(
-                                        diesel::upsert::excluded(
-                                            crate::codegen::diesel_codegen::tables::login_providers::login_providers::client_id,
-                                        ),
-                                    ),
-                            ),
-                            crate::codegen::diesel_codegen::tables::login_providers::login_providers::redirect_uri
-                                .ne(
-                                    diesel::upsert::excluded(
-                                        crate::codegen::diesel_codegen::tables::login_providers::login_providers::redirect_uri,
-                                    ),
-                                ),
-                        ),
-                        crate::codegen::diesel_codegen::tables::login_providers::login_providers::oauth_url
-                            .ne(
-                                diesel::upsert::excluded(
-                                    crate::codegen::diesel_codegen::tables::login_providers::login_providers::oauth_url,
-                                ),
-                            ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::login_providers::login_providers::scope
-                        .ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::login_providers::login_providers::scope,
-                            ),
-                        ),
-                ),
+                name.ne(excluded(name))
+                    .or(icon.ne(excluded(icon)))
+                    .or(client_id.ne(excluded(client_id)))
+                    .or(redirect_uri.ne(excluded(redirect_uri)))
+                    .or(oauth_url.ne(excluded(oauth_url)))
+                    .or(scope.ne(excluded(scope))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }
 #[cfg(feature = "sqlite")]
@@ -76,65 +37,26 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(
-                crate::codegen::diesel_codegen::tables::login_providers::login_providers::table,
-            )
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::login_providers::login_providers::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(
-                crate::codegen::diesel_codegen::tables::login_providers::login_providers::id,
-            )
+            .on_conflict(id)
             .do_update()
             .set(self)
             .filter(
-                diesel::BoolExpressionMethods::and(
-                    diesel::BoolExpressionMethods::and(
-                        diesel::BoolExpressionMethods::and(
-                            diesel::BoolExpressionMethods::and(
-                                diesel::BoolExpressionMethods::and(
-                                    crate::codegen::diesel_codegen::tables::login_providers::login_providers::name
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::login_providers::login_providers::name,
-                                            ),
-                                        ),
-                                    crate::codegen::diesel_codegen::tables::login_providers::login_providers::icon
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::login_providers::login_providers::icon,
-                                            ),
-                                        ),
-                                ),
-                                crate::codegen::diesel_codegen::tables::login_providers::login_providers::client_id
-                                    .ne(
-                                        diesel::upsert::excluded(
-                                            crate::codegen::diesel_codegen::tables::login_providers::login_providers::client_id,
-                                        ),
-                                    ),
-                            ),
-                            crate::codegen::diesel_codegen::tables::login_providers::login_providers::redirect_uri
-                                .ne(
-                                    diesel::upsert::excluded(
-                                        crate::codegen::diesel_codegen::tables::login_providers::login_providers::redirect_uri,
-                                    ),
-                                ),
-                        ),
-                        crate::codegen::diesel_codegen::tables::login_providers::login_providers::oauth_url
-                            .ne(
-                                diesel::upsert::excluded(
-                                    crate::codegen::diesel_codegen::tables::login_providers::login_providers::oauth_url,
-                                ),
-                            ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::login_providers::login_providers::scope
-                        .ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::login_providers::login_providers::scope,
-                            ),
-                        ),
-                ),
+                name.ne(excluded(name))
+                    .or(icon.ne(excluded(icon)))
+                    .or(client_id.ne(excluded(client_id)))
+                    .or(redirect_uri.ne(excluded(redirect_uri)))
+                    .or(oauth_url.ne(excluded(oauth_url)))
+                    .or(scope.ne(excluded(scope))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }

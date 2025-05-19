@@ -303,7 +303,7 @@ impl Table {
         let columns = self.columns(conn).await?;
         let mut foreign_keys = Vec::new();
         for column in columns {
-            if column.is_foreign_key(conn).await {
+            if column.is_foreign_key(conn).await? {
                 foreign_keys.push(column);
             }
         }
@@ -405,7 +405,9 @@ impl Table {
                 tables.insert(foreign_table);
             }
         }
-        Ok(tables.into_iter().collect())
+        let mut tables = tables.into_iter().collect::<Vec<Table>>();
+        tables.sort_unstable();
+        Ok(tables)
     }
 
     /// Returns the set of children tables of the table.
@@ -825,6 +827,7 @@ impl Table {
             .filter(columns::table_name.eq(&self.table_name))
             .filter(columns::table_schema.eq(&self.table_schema))
             .filter(columns::table_catalog.eq(&self.table_catalog))
+            .order_by(columns::ordinal_position)
             .load::<Column>(conn)
             .await?)
     }

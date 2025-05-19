@@ -101,7 +101,6 @@ impl InsertableTrackableLocation {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableTrackableLocationBuilder {
     id: Option<rosetta_uuid::Uuid>,
     trackable_id: Option<rosetta_uuid::Uuid>,
@@ -111,53 +110,123 @@ pub struct InsertableTrackableLocationBuilder {
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     created_by: Option<i32>,
 }
+impl Default for InsertableTrackableLocationBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            trackable_id: None,
+            storage_container_id: None,
+            geolocation: None,
+            inferred: Some(false),
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            created_by: None,
+        }
+    }
+}
 impl InsertableTrackableLocationBuilder {
-    pub fn id(
-        mut self,
-        id: rosetta_uuid::Uuid,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+            Into::into(err).rename_field(InsertableTrackableLocationAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn trackable_id(
+    pub fn trackable_id<P>(
         mut self,
-        trackable_id: rosetta_uuid::Uuid,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        trackable_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let trackable_id =
+            trackable_id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+                Into::into(err).rename_field(InsertableTrackableLocationAttributes::TrackableId)
+            })?;
         self.trackable_id = Some(trackable_id);
         Ok(self)
     }
-    pub fn storage_container_id(
+    pub fn storage_container_id<P>(
         mut self,
-        storage_container_id: Option<rosetta_uuid::Uuid>,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        storage_container_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<rosetta_uuid::Uuid>>,
+        <P as TryInto<Option<rosetta_uuid::Uuid>>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let storage_container_id = storage_container_id.try_into().map_err(
+            |err: <P as TryInto<Option<rosetta_uuid::Uuid>>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableTrackableLocationAttributes::StorageContainerId)
+            },
+        )?;
         self.storage_container_id = storage_container_id;
         Ok(self)
     }
-    pub fn geolocation(
+    pub fn geolocation<P>(
         mut self,
-        geolocation: postgis_diesel::types::Point,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        geolocation: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<postgis_diesel::types::Point>,
+        <P as TryInto<postgis_diesel::types::Point>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let geolocation = geolocation.try_into().map_err(
+            |err: <P as TryInto<postgis_diesel::types::Point>>::Error| {
+                Into::into(err).rename_field(InsertableTrackableLocationAttributes::Geolocation)
+            },
+        )?;
         self.geolocation = Some(geolocation);
         Ok(self)
     }
-    pub fn inferred(
+    pub fn inferred<P>(
         mut self,
-        inferred: bool,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        inferred: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let inferred = inferred.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
+            Into::into(err).rename_field(InsertableTrackableLocationAttributes::Inferred)
+        })?;
         self.inferred = Some(inferred);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableTrackableLocationAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableTrackableLocationAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }

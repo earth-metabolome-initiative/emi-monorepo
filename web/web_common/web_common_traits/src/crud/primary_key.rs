@@ -33,8 +33,9 @@ impl<R: Row> Tabular for CrudPrimaryKeyOperation<R> {
 
     fn table_name(&self) -> Self::TableName {
         match self {
-            CrudPrimaryKeyOperation::Read(pk) => pk.table_name(),
-            CrudPrimaryKeyOperation::Delete(pk) => pk.table_name(),
+            CrudPrimaryKeyOperation::Read(pk) | CrudPrimaryKeyOperation::Delete(pk) => {
+                pk.table_name()
+            }
         }
     }
 }
@@ -44,8 +45,7 @@ impl<R: Row> Row for CrudPrimaryKeyOperation<R> {
 
     fn primary_key(&self) -> Self::PrimaryKey {
         match self {
-            CrudPrimaryKeyOperation::Read(pk) => pk.clone(),
-            CrudPrimaryKeyOperation::Delete(pk) => pk.clone(),
+            CrudPrimaryKeyOperation::Read(pk) | CrudPrimaryKeyOperation::Delete(pk) => *pk,
         }
     }
 }

@@ -1,16 +1,20 @@
 #![doc = include_str!("../README.md")]
 
-use lazy_static::lazy_static;
+use std::sync::LazyLock;
+
 use regex::Regex;
 
-lazy_static! {
-    static ref SPECTRUM_PLURAL: Regex = Regex::new("(?i)(spectr|append)um$").unwrap();
-    static ref SPECTRUM_SINGULAR: Regex = Regex::new("(?i)(spectr|append)a$").unwrap();
-    static ref MATRIX_PLURAL: Regex = Regex::new("(?i)(matr|append)ix$").unwrap();
-    static ref MATRIX_SINGULAR: Regex = Regex::new("(?i)(matr|append)ices$").unwrap();
-    static ref TAXON_PLURAL: Regex = Regex::new("(?i)(tax|append)on$").unwrap();
-    static ref TAXON_SINGULAR: Regex = Regex::new("(?i)(tax|append)a$").unwrap();
-}
+static SPECTRUM_PLURAL: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new("(?i)(spectr|append)um$").unwrap());
+static SPECTRUM_SINGULAR: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new("(?i)(spectr|append)a$").unwrap());
+static MATRIX_PLURAL: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new("(?i)(matr|append)ix$").unwrap());
+static MATRIX_SINGULAR: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new("(?i)(matr|append)ices$").unwrap());
+static TAXON_PLURAL: LazyLock<Regex> = LazyLock::new(|| Regex::new("(?i)(tax|append)on$").unwrap());
+static TAXON_SINGULAR: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new("(?i)(tax|append)a$").unwrap());
 
 #[derive(Debug, Clone, Copy)]
 /// A struct that provides methods to pluralize and singularize words.

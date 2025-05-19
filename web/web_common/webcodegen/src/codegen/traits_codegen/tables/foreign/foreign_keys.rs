@@ -1,7 +1,7 @@
 //! Submodule implementing the
 //! [`ForeignKeys`](web_common_traits::prelude::ForeignKeys) trait for a struct.
 
-use std::{collections::HashSet, path::Path};
+use std::path::Path;
 
 use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
@@ -12,14 +12,12 @@ use crate::{Codegen, Column, Table, errors::WebCodeGenError};
 impl Codegen<'_> {
     /// Returns the identifier for the struct which implements the `ForeignKeys`
     /// trait.
-    pub(crate) fn foreign_keys_struct_ident(
-        &self,
-        table: &Table,
-    ) -> Result<Ident, WebCodeGenError> {
+    pub(crate) fn foreign_keys_struct_ident(table: &Table) -> Result<Ident, WebCodeGenError> {
         let table_name = table.struct_name()?;
-        Ok(Ident::new(&format!("{}ForeignKeys", table_name), proc_macro2::Span::call_site()))
+        Ok(Ident::new(&format!("{table_name}ForeignKeys"), proc_macro2::Span::call_site()))
     }
 
+    #[allow(clippy::too_many_lines)]
     /// Generates the [`ForeignKeys`](web_common_traits::prelude::ForeignKeys)
     /// traits implementation for the tables
     ///
@@ -36,8 +34,8 @@ impl Codegen<'_> {
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
         let mut table_foreign_main_module = TokenStream::new();
-        let table_primary_keys_enum_path = self.table_primary_keys_enum_path();
-        let row_enum_path = self.row_enum_path();
+        let table_primary_keys_enum_path = Self::table_primary_keys_enum_path();
+        let row_enum_path = Self::row_enum_path();
         for table in tables {
             let table_path = table.import_struct_path()?;
             let foreign_keys_trait_file = root.join(format!("{}.rs", table.snake_case_name()?));
@@ -58,7 +56,8 @@ impl Codegen<'_> {
                 let foreign_table = foreign_key.foreign_table(conn).await?.unwrap().0;
                 foreign_tables.push(foreign_table);
             }
-            let foreign_keys_struct_ident = self.foreign_keys_struct_ident(table)?;
+
+            let foreign_keys_struct_ident = Self::foreign_keys_struct_ident(table)?;
             let attributes = foreign_keys
                 .iter()
                 .zip(foreign_tables.iter())
@@ -78,12 +77,12 @@ impl Codegen<'_> {
                     let attribute = foreign_key.snake_case_ident()?;
                     let getter_ident = foreign_key.getter_ident()?;
                     if foreign_key.is_nullable() {
-                        return Ok((
+                        Ok((
                             quote::quote! {
                                 foreign_keys.#getter_ident.is_some() || self.#attribute.is_none()
                             },
                             true,
-                        ));
+                        ))
                     } else {
                         Ok((
                             quote::quote! {
@@ -107,15 +106,13 @@ impl Codegen<'_> {
                                     #foreign_key
                                 }
                             }
+                        } else if or_joined {
+                            quote::quote! {
+                                #acc && (#foreign_key)
+                            }
                         } else {
-                            if or_joined {
-                                quote::quote! {
-                                    #acc && (#foreign_key)
-                                }
-                            } else {
-                                quote::quote! {
-                                    #acc && #foreign_key
-                                }
+                            quote::quote! {
+                                #acc && #foreign_key
                             }
                         })
                     },
@@ -146,7 +143,9 @@ impl Codegen<'_> {
                 })
                 .collect::<Result<TokenStream, WebCodeGenError>>()?;
 
-            let unique_table_types = foreign_tables.iter().collect::<HashSet<_>>();
+            let mut unique_table_types = foreign_tables.clone();
+            unique_table_types.sort_unstable();
+            unique_table_types.dedup();
             let mut update_impls: Vec<TokenStream> = Vec::new();
 
             for unique_foreign_table in unique_table_types {
@@ -155,7 +154,7 @@ impl Codegen<'_> {
                 for foreign_key in &foreign_keys {
                     let (foreign_table, column_in_foreign_table) =
                         foreign_key.foreign_table(conn).await?.unwrap();
-                    if &foreign_table == unique_foreign_table {
+                    if foreign_table == unique_foreign_table {
                         grouped_columns.push((foreign_key, column_in_foreign_table));
                     }
                 }
@@ -163,7 +162,9 @@ impl Codegen<'_> {
                 let foreign_table_snake_case_ident = unique_foreign_table.snake_case_ident()?;
                 let foreign_table_struct_ident = unique_foreign_table.struct_ident()?;
 
-                let maybe_cloned = if grouped_columns.len() > 1 {
+                let maybe_cloned = if grouped_columns.len() > 1
+                    && !unique_foreign_table.supports_copy(conn).await?
+                {
                     quote::quote! {
                         #foreign_table_snake_case_ident.clone()
                     }
@@ -264,7 +265,7 @@ impl Codegen<'_> {
                         (#row_enum_path::#foreign_table_struct_ident(#foreign_table_snake_case_ident), web_common_traits::crud::CRUD::Delete) => {
                             #delete_foreign_keys_dispatch
                         }
-                    })
+                    });
             }
 
             let mut derives = vec![

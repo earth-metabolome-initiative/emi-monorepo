@@ -14,7 +14,6 @@
 )]
 pub struct WeighingStepModel {
     pub id: i32,
-    pub step_model_instrument_category_id: i32,
     pub created_by: i32,
     pub created_at: rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,
@@ -43,26 +42,6 @@ impl WeighingStepModel {
                     .eq(&self.id),
             )
             .first::<crate::codegen::structs_codegen::tables::step_models::StepModel>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn step_model_instrument_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
-        diesel::result::Error,
-    >{
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::step_model_instrument_categories::step_model_instrument_categories::dsl::id
-                    .eq(&self.step_model_instrument_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
-            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -109,21 +88,6 @@ impl WeighingStepModel {
             .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_step_model_instrument_category_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        step_model_instrument_category_id: &crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::dsl::step_model_instrument_category_id
-                    .eq(step_model_instrument_category_id.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn from_created_by(
         conn: &mut diesel_async::AsyncPgConnection,
         created_by: &crate::codegen::structs_codegen::tables::users::User,
@@ -150,6 +114,36 @@ impl WeighingStepModel {
                 crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models::dsl::updated_by
                     .eq(updated_by.id),
             )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_created_at(
+        created_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models;
+        Self::table()
+            .filter(weighing_step_models::created_at.eq(created_at))
+            .order_by(weighing_step_models::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_updated_at(
+        updated_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::weighing_step_models::weighing_step_models;
+        Self::table()
+            .filter(weighing_step_models::updated_at.eq(updated_at))
+            .order_by(weighing_step_models::id.asc())
             .load::<Self>(conn)
             .await
     }

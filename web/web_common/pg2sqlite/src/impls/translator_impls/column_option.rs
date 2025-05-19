@@ -1,9 +1,9 @@
 //! Implementation of the [`Translator`] trait for the
 //! [`Column`](sqlparser::ast::Column) type.
 
-use sqlparser::ast::{ColumnOption, ColumnOptionDef, Expr, Function};
+use sqlparser::ast::{ColumnOption, ColumnOptionDef, Expr};
 
-use crate::prelude::{Pg2Sqlite, Schema, Translator};
+use crate::prelude::{Pg2Sqlite, Translator};
 
 impl Translator for ColumnOptionDef {
     type Schema = Pg2Sqlite;
@@ -31,6 +31,13 @@ impl Translator for ColumnOptionDef {
                                 option: ColumnOption::Default(Expr::Function(func.clone())),
                             }));
                         }
+                        // SQLite does not support methods such as `gen_random_uuid()`, therefore
+                        // we return `None` if we encounter such a function.
+                        if func.name.0.first().and_then(|s| Some(s.as_ident()?.value.as_str()))
+                            == Some("gen_random_uuid")
+                        {
+                            return Ok(None);
+                        }
                         unimplemented!("The default expression function {func:?} is not supported",)
                     }
                     Expr::Value(value) => {
@@ -48,23 +55,7 @@ impl Translator for ColumnOptionDef {
                 }
             }
             ColumnOption::NotNull => Ok(Some(self.clone())),
-            ColumnOption::Check(check) => {
-                match check {
-                    Expr::Function(Function { name, .. }) => {
-                        let function_name = name.to_string();
-                        if schema.has_function(&function_name) {
-                            Ok(Some(self.clone()))
-                        } else if schema.should_remove_unsupported_check_constraints() {
-                            Ok(None)
-                        } else {
-                            Err(crate::errors::Error::UndefinedFunction(function_name))
-                        }
-                    }
-                    unimplemented => {
-                        unimplemented!("The check expression {unimplemented:?} is not supported")
-                    }
-                }
-            }
+            ColumnOption::Check(_) => Ok(None),
             ColumnOption::ForeignKey {
                 foreign_table,
                 referred_columns,

@@ -1,6 +1,6 @@
 #![cfg(feature = "postgres")]
 //! Blanked implementations of the `Read` and `BoundedRead` traits for
-//! PostgreSQL.
+//! `PostgreSQL`.
 
 use diesel::{
     Identifiable, OptionalExtension, QueryDsl,

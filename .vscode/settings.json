@@ -9,6 +9,8 @@
 		"Hopcroft",
 		"httpauth",
 		"impls",
+		"internallength",
+		"isotopologue",
 		"jsonwebtoken",
 		"Karp",
 		"lapmod",
@@ -17,6 +19,7 @@
 		"pgrx",
 		"pychache",
 		"rustc",
+		"serde",
 		"Tarjan",
 		"trybuild",
 		"yewdux"

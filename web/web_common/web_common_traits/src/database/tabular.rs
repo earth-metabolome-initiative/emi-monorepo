@@ -97,6 +97,6 @@ where
     type PrimaryKey = R::PrimaryKey;
 
     fn primary_keys(&self) -> Vec<Self::PrimaryKey> {
-        self.iter().map(|row| row.primary_key()).collect()
+        self.iter().map(Row::primary_key).collect()
     }
 }

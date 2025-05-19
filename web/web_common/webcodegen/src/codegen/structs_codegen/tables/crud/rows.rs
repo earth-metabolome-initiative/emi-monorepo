@@ -14,7 +14,7 @@ use crate::{
 };
 
 impl Codegen<'_> {
-    pub(crate) fn rows_enum_path(&self) -> TokenStream {
+    pub(crate) fn rows_enum_path() -> TokenStream {
         let codegen_ident = Ident::new(CODEGEN_DIRECTORY, proc_macro2::Span::call_site());
         let tables_module_ident = Ident::new(CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());
         quote::quote! {
@@ -35,16 +35,16 @@ impl Codegen<'_> {
     ///
     /// * If the database connection fails.
     /// * If the file system fails.
-    pub(crate) async fn generate_rows_enumeration(
+    pub(crate) fn generate_rows_enumeration(
         &self,
         root: &Path,
         tables: &[Table],
         _conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
-        let table_name_enum_path = self.table_names_enum_path();
-        let table_primary_keys_path = self.table_primary_keys_enum_path();
-        let row_enum_path = self.row_enum_path();
+        let table_name_enum_path = Self::table_names_enum_path();
+        let table_primary_keys_path = Self::table_primary_keys_enum_path();
+        let row_enum_path = Self::row_enum_path();
         let sqlite_upsert: Vec<TokenStream> = tables
             .iter()
             .map(|table| {
@@ -76,7 +76,7 @@ impl Codegen<'_> {
                 let struct_ident = table.struct_ident()?;
                 let struct_name_ident = table.snake_case_ident()?;
                 Ok(quote::quote! {
-                    super::Rows::#struct_ident(#struct_name_ident) => #struct_name_ident.primary_keys(),
+                    Rows::#struct_ident(#struct_name_ident) => #struct_name_ident.primary_keys(),
                 })
             })
             .collect::<Result<Vec<_>, crate::errors::WebCodeGenError>>()?;
@@ -207,32 +207,14 @@ impl Codegen<'_> {
             },
         ));
 
-        trait_modules.push((
-            "rows",
-            quote::quote! {
-                impl web_common_traits::prelude::Rows for super::Rows {
-                    type PrimaryKey = #table_primary_keys_path;
-
-                    fn primary_keys(&self) -> Vec<Self::PrimaryKey> {
-                        match self {
-                            #(
-                                #rows_primary_keys
-                            )*
-                        }
-                    }
-                }
-            },
-        ));
-
         let from_rows_to_row_vec_impls: Vec<TokenStream> = tables
             .iter()
             .map(|table| {
                 let struct_ident = table.struct_ident()?;
                 Ok(quote::quote! {
                     super::Rows::#struct_ident(rows) => {
-                        rows.iter()
-                            .cloned()
-                            .map(|row| #row_enum_path::#struct_ident(row))
+                        rows.into_iter()
+                            .map(#row_enum_path::#struct_ident)
                             .collect::<Vec<_>>()
                     }
                 })
@@ -346,7 +328,7 @@ impl Codegen<'_> {
             })?;
 
         for (trait_module_name, trait_impl) in trait_modules {
-            let trait_file = root.join(format!("{}.rs", trait_module_name));
+            let trait_file = root.join(format!("{trait_module_name}.rs"));
             let trait_module_ident = Ident::new(trait_module_name, proc_macro2::Span::call_site());
             std::fs::write(
                 &trait_file,
@@ -371,6 +353,18 @@ impl Codegen<'_> {
 
                 impl Rows {
                     #include_upsert
+                }
+
+                impl web_common_traits::prelude::Rows for Rows {
+                    type PrimaryKey = #table_primary_keys_path;
+
+                    fn primary_keys(&self) -> Vec<Self::PrimaryKey> {
+                        match self {
+                            #(
+                                #rows_primary_keys
+                            )*
+                        }
+                    }
                 }
             })?,
         )?;

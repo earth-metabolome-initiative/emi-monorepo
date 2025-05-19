@@ -58,15 +58,44 @@ impl UserEmail {
         email: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::user_emails::user_emails::email,
-                email,
-            ))
+            .filter(
+                crate::codegen::diesel_codegen::tables::user_emails::user_emails::email.eq(email),
+            )
             .first::<Self>(conn)
             .await
             .optional()
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_created_at(
+        created_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
+        Self::table()
+            .filter(user_emails::created_at.eq(created_at))
+            .order_by(user_emails::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_primary_email(
+        primary_email: &bool,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
+        Self::table()
+            .filter(user_emails::primary_email.eq(primary_email))
+            .order_by(user_emails::id.asc())
+            .load::<Self>(conn)
+            .await
     }
 }

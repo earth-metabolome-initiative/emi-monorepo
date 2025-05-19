@@ -1,6 +1,12 @@
-#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+)]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -8,6 +14,7 @@
 )]
 pub struct Processable {
     pub id: rosetta_uuid::Uuid,
+    pub kilograms: f32,
 }
 impl diesel::Identifiable for Processable {
     type Id = rosetta_uuid::Uuid;

@@ -101,7 +101,6 @@ impl InsertableProcessingStep {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableProcessingStepBuilder {
     id: Option<rosetta_uuid::Uuid>,
     processable_id: Option<rosetta_uuid::Uuid>,
@@ -109,39 +108,88 @@ pub struct InsertableProcessingStepBuilder {
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableProcessingStepBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            processable_id: None,
+            instrument_id: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableProcessingStepBuilder {
-    pub fn id(
-        mut self,
-        id: rosetta_uuid::Uuid,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+            Into::into(err).rename_field(InsertableProcessingStepAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn processable_id(
+    pub fn processable_id<P>(
         mut self,
-        processable_id: rosetta_uuid::Uuid,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        processable_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let processable_id = processable_id.try_into().map_err(
+            |err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+                Into::into(err).rename_field(InsertableProcessingStepAttributes::ProcessableId)
+            },
+        )?;
         self.processable_id = Some(processable_id);
         Ok(self)
     }
-    pub fn instrument_id(
+    pub fn instrument_id<P>(
         mut self,
-        instrument_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        instrument_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let instrument_id =
+            instrument_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(InsertableProcessingStepAttributes::InstrumentId)
+            })?;
         self.instrument_id = Some(instrument_id);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableProcessingStepAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProcessingStepAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }

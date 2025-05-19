@@ -1445,7 +1445,7 @@ static FONT_AWESOME_CLASSES: Set<&'static str> = phf_set! {
 ///
 /// * `validation_errors::SingleFieldError::EmptyText` if the string is empty.
 pub fn must_be_font_awesome_class(value: &str) -> Result<(), validation_errors::SingleFieldError> {
-    if !FONT_AWESOME_CLASSES.contains(&value) {
+    if !FONT_AWESOME_CLASSES.contains(value) {
         return Err(validation_errors::SingleFieldError::InvalidFontAwesomeClass(()));
     }
     Ok(())

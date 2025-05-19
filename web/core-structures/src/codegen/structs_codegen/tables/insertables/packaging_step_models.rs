@@ -85,7 +85,6 @@ impl InsertablePackagingStepModel {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertablePackagingStepModelBuilder {
     packaging_model_id: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
@@ -93,39 +92,94 @@ pub struct InsertablePackagingStepModelBuilder {
     created_by: Option<i32>,
     updated_by: Option<i32>,
 }
+impl Default for InsertablePackagingStepModelBuilder {
+    fn default() -> Self {
+        Self {
+            packaging_model_id: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            created_by: None,
+            updated_by: None,
+        }
+    }
+}
 impl InsertablePackagingStepModelBuilder {
-    pub fn packaging_model_id(
+    pub fn packaging_model_id<P>(
         mut self,
-        packaging_model_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        packaging_model_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let packaging_model_id =
+            packaging_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertablePackagingStepModelAttributes::PackagingModelId)
+            })?;
         self.packaging_model_id = Some(packaging_model_id);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertablePackagingStepModelAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertablePackagingStepModelAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertablePackagingStepModelAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertablePackagingStepModelAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }

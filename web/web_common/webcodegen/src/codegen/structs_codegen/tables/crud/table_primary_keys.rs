@@ -12,7 +12,7 @@ use crate::{
 };
 
 impl Codegen<'_> {
-    pub(crate) fn table_primary_keys_enum_path(&self) -> TokenStream {
+    pub(crate) fn table_primary_keys_enum_path() -> TokenStream {
         let codegen_ident = Ident::new(CODEGEN_DIRECTORY, proc_macro2::Span::call_site());
         let tables_module_ident = Ident::new(CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());
         quote::quote! {
@@ -39,7 +39,7 @@ impl Codegen<'_> {
         conn: &mut AsyncPgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
-        let table_name_enum_path = self.table_names_enum_path();
+        let table_name_enum_path = Self::table_names_enum_path();
 
         let mut table_idents = Vec::new();
 
@@ -49,7 +49,7 @@ impl Codegen<'_> {
 
             table_idents.push(quote::quote! {
                 #struct_ident(#primary_key)
-            })
+            });
         }
 
         let table_name_impls: Vec<TokenStream> = tables

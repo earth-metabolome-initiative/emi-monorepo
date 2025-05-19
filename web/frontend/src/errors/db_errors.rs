@@ -10,6 +10,8 @@ pub enum DBError {
     Connection,
     /// When installing `SAHPool` fails.
     InstallSAHPool,
+    /// When installing `RelaxedIdb` fails.
+    InstallRelaxedIdb,
     /// When a query fails.
     QueryFailed,
 }
@@ -20,6 +22,7 @@ impl Display for DBError {
             DBError::Connection => write!(f, "Failed to connect to the database."),
             DBError::QueryFailed => write!(f, "Query failed."),
             DBError::InstallSAHPool => write!(f, "Failed to install SAHPool."),
+            DBError::InstallRelaxedIdb => write!(f, "Failed to install RelaxedIdb."),
         }
     }
 }
@@ -27,6 +30,12 @@ impl Display for DBError {
 impl From<sqlite_wasm_rs::export::OpfsSAHError> for DBError {
     fn from(_err: sqlite_wasm_rs::export::OpfsSAHError) -> Self {
         DBError::InstallSAHPool
+    }
+}
+
+impl From<sqlite_wasm_rs::relaxed_idb_vfs::RelaxedIdbError> for DBError {
+    fn from(_err: sqlite_wasm_rs::relaxed_idb_vfs::RelaxedIdbError) -> Self {
+        DBError::InstallRelaxedIdb
     }
 }
 

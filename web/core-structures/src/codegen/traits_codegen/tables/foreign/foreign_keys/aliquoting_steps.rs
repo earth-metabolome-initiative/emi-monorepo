@@ -1,11 +1,13 @@
-#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AliquotingStepForeignKeys {
     pub id: Option<crate::codegen::structs_codegen::tables::steps::Step>,
-    pub source_processable:
-        Option<crate::codegen::structs_codegen::tables::processables::Processable>,
-    pub destination_processable:
-        Option<crate::codegen::structs_codegen::tables::processables::Processable>,
+    pub source_processable: Option<
+        crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
+    >,
+    pub destination_processable: Option<
+        crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
+    >,
     pub instrument: Option<crate::codegen::structs_codegen::tables::instruments::Instrument>,
     pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
@@ -22,12 +24,12 @@ impl web_common_traits::prelude::HasForeignKeys
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Step(self.id),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Processable(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricProcessable(
                 self.source_processable_id,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Processable(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricProcessable(
                 self.destination_processable_id,
             ),
         ));
@@ -76,34 +78,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::Processable(processables),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if processables.id == self.source_processable_id {
-                    foreign_keys.source_processable = Some(processables.clone());
-                    updated = true;
-                }
-                if processables.id == self.destination_processable_id {
-                    foreign_keys.destination_processable = Some(processables.clone());
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Processable(processables),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if processables.id == self.source_processable_id {
-                    foreign_keys.source_processable = None;
-                    updated = true;
-                }
-                if processables.id == self.destination_processable_id {
-                    foreign_keys.destination_processable = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::Step(steps),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -140,6 +114,34 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if users.id == self.created_by {
                     foreign_keys.created_by = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::VolumetricProcessable(volumetric_processables),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if volumetric_processables.id == self.source_processable_id {
+                    foreign_keys.source_processable = Some(volumetric_processables);
+                    updated = true;
+                }
+                if volumetric_processables.id == self.destination_processable_id {
+                    foreign_keys.destination_processable = Some(volumetric_processables);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::VolumetricProcessable(volumetric_processables),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if volumetric_processables.id == self.source_processable_id {
+                    foreign_keys.source_processable = None;
+                    updated = true;
+                }
+                if volumetric_processables.id == self.destination_processable_id {
+                    foreign_keys.destination_processable = None;
                     updated = true;
                 }
             }

@@ -156,4 +156,94 @@ impl StepModel {
             .load::<Self>(conn)
             .await
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_name(
+        name: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::step_models::step_models;
+        Self::table()
+            .filter(step_models::name.eq(name))
+            .order_by(step_models::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_description(
+        description: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::step_models::step_models;
+        Self::table()
+            .filter(step_models::description.eq(description))
+            .order_by(step_models::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_snoozable(
+        snoozable: &bool,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::step_models::step_models;
+        Self::table()
+            .filter(step_models::snoozable.eq(snoozable))
+            .order_by(step_models::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_copiable(
+        copiable: &Option<bool>,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::step_models::step_models;
+        Self::table()
+            .filter(step_models::copiable.eq(copiable))
+            .order_by(step_models::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_created_at(
+        created_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::step_models::step_models;
+        Self::table()
+            .filter(step_models::created_at.eq(created_at))
+            .order_by(step_models::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_updated_at(
+        updated_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::step_models::step_models;
+        Self::table()
+            .filter(step_models::updated_at.eq(updated_at))
+            .order_by(step_models::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
 }

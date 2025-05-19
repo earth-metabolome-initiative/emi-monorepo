@@ -39,6 +39,7 @@ postgis_diesel = { workspace = true, default-features = false, features = [
 ] }
 
 gloo.workspace = true
+gloo-timers.workspace = true
 wasm-bindgen.workspace = true
 rosetta-uuid.workspace = true
 wasm-bindgen-futures.workspace = true

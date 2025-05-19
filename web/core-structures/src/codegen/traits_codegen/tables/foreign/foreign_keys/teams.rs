@@ -70,6 +70,26 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
+                crate::codegen::tables::row::Row::TeamState(team_states),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if team_states.id == self.state_id {
+                    foreign_keys.state = Some(team_states);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::TeamState(team_states),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if team_states.id == self.state_id {
+                    foreign_keys.state = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::Team(teams),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -118,26 +138,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::TeamState(team_states),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if team_states.id == self.state_id {
-                    foreign_keys.state = Some(team_states);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::TeamState(team_states),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if team_states.id == self.state_id {
-                    foreign_keys.state = None;
                     updated = true;
                 }
             }

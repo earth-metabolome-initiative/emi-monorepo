@@ -77,4 +77,28 @@ impl UserOrganization {
             .load::<Self>(conn)
             .await
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_user_id_and_organization_id(
+        user_id: &i32,
+        organization_id: &i16,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl,
+            associations::HasTable,
+        };
+        use diesel_async::RunQueryDsl;
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::user_id
+                    .eq(user_id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::organization_id
+                            .eq(organization_id),
+                    ),
+            )
+            .first::<Self>(conn)
+            .await
+            .optional()
+    }
 }

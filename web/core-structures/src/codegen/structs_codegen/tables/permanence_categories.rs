@@ -60,14 +60,12 @@ impl PermanenceCategory {
         name: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(
-                diesel::ExpressionMethods::eq(
-                    crate::codegen::diesel_codegen::tables::permanence_categories::permanence_categories::name,
-                    name,
-                ),
+                crate::codegen::diesel_codegen::tables::permanence_categories::permanence_categories::name
+                    .eq(name),
             )
             .first::<Self>(conn)
             .await
@@ -78,14 +76,12 @@ impl PermanenceCategory {
         description: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(
-                diesel::ExpressionMethods::eq(
-                    crate::codegen::diesel_codegen::tables::permanence_categories::permanence_categories::description,
-                    description,
-                ),
+                crate::codegen::diesel_codegen::tables::permanence_categories::permanence_categories::description
+                    .eq(description),
             )
             .first::<Self>(conn)
             .await
@@ -96,14 +92,12 @@ impl PermanenceCategory {
         icon: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(
-                diesel::ExpressionMethods::eq(
-                    crate::codegen::diesel_codegen::tables::permanence_categories::permanence_categories::icon,
-                    icon,
-                ),
+                crate::codegen::diesel_codegen::tables::permanence_categories::permanence_categories::icon
+                    .eq(icon),
             )
             .first::<Self>(conn)
             .await

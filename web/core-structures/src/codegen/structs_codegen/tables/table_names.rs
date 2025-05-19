@@ -5,22 +5,27 @@ pub enum TableName {
     AliquotingInstrumentModel,
     AliquotingStepModel,
     AliquotingStep,
-    BrandState,
+    BallMillStepModel,
+    BallMillStep,
     Brand,
+    CentrifugeStepModel,
+    CentrifugeStep,
+    ChemicalEntity,
     City,
     Color,
+    CommercialProductLot,
     CommercialProduct,
     CommercialReagentModel,
-    ContainerCategory,
+    CommercialReagent,
     ContainerModel,
     Country,
+    DisposalStepModel,
+    DisposalStep,
     DocumentFormat,
     EmailProvider,
     FractioningStepModel,
     FractioningStep,
     FreezeDryingStepModel,
-    GrindingStepModel,
-    InstrumentCategory,
     InstrumentLocation,
     InstrumentModelCategory,
     InstrumentModel,
@@ -28,7 +33,6 @@ pub enum TableName {
     Instrument,
     LoginProvider,
     Material,
-    NameplateCategory,
     NameplateModel,
     ObservationSubject,
     OrganismObservation,
@@ -43,6 +47,7 @@ pub enum TableName {
     ProcedureModelContainerCategory,
     ProcedureModelInstrumentCategory,
     ProcedureModelNameplateCategory,
+    ProcedureModelReagent,
     ProcedureModelToolCategory,
     ProcedureModel,
     ProcedureStepModel,
@@ -53,11 +58,14 @@ pub enum TableName {
     ProjectWorkflowModel,
     Project,
     Rank,
+    Reagent,
     Role,
     Room,
     SampleState,
     SamplingStepModel,
     SamplingStep,
+    ShakingStepModel,
+    ShakingStep,
     SpatialRefSy,
     Spectrum,
     SpectraCollection,
@@ -81,7 +89,7 @@ pub enum TableName {
     TeamProject,
     TeamState,
     Team,
-    ToolCategory,
+    TemporaryUserEmail,
     ToolModel,
     TrackableLocation,
     TrackableState,
@@ -90,6 +98,7 @@ pub enum TableName {
     UserEmail,
     UserOrganization,
     User,
+    VolumetricProcessable,
     WeighingInstrumentModel,
     WeighingStepModel,
     WeighingStep,
@@ -103,17 +112,26 @@ impl core::fmt::Display for TableName {
             }
             TableName::AliquotingStepModel => write!(f, stringify!(AliquotingStepModel)),
             TableName::AliquotingStep => write!(f, stringify!(AliquotingStep)),
-            TableName::BrandState => write!(f, stringify!(BrandState)),
+            TableName::BallMillStepModel => write!(f, stringify!(BallMillStepModel)),
+            TableName::BallMillStep => write!(f, stringify!(BallMillStep)),
             TableName::Brand => write!(f, stringify!(Brand)),
+            TableName::CentrifugeStepModel => write!(f, stringify!(CentrifugeStepModel)),
+            TableName::CentrifugeStep => write!(f, stringify!(CentrifugeStep)),
+            TableName::ChemicalEntity => write!(f, stringify!(ChemicalEntity)),
             TableName::City => write!(f, stringify!(City)),
             TableName::Color => write!(f, stringify!(Color)),
+            TableName::CommercialProductLot => {
+                write!(f, stringify!(CommercialProductLot))
+            }
             TableName::CommercialProduct => write!(f, stringify!(CommercialProduct)),
             TableName::CommercialReagentModel => {
                 write!(f, stringify!(CommercialReagentModel))
             }
-            TableName::ContainerCategory => write!(f, stringify!(ContainerCategory)),
+            TableName::CommercialReagent => write!(f, stringify!(CommercialReagent)),
             TableName::ContainerModel => write!(f, stringify!(ContainerModel)),
             TableName::Country => write!(f, stringify!(Country)),
+            TableName::DisposalStepModel => write!(f, stringify!(DisposalStepModel)),
+            TableName::DisposalStep => write!(f, stringify!(DisposalStep)),
             TableName::DocumentFormat => write!(f, stringify!(DocumentFormat)),
             TableName::EmailProvider => write!(f, stringify!(EmailProvider)),
             TableName::FractioningStepModel => {
@@ -123,8 +141,6 @@ impl core::fmt::Display for TableName {
             TableName::FreezeDryingStepModel => {
                 write!(f, stringify!(FreezeDryingStepModel))
             }
-            TableName::GrindingStepModel => write!(f, stringify!(GrindingStepModel)),
-            TableName::InstrumentCategory => write!(f, stringify!(InstrumentCategory)),
             TableName::InstrumentLocation => write!(f, stringify!(InstrumentLocation)),
             TableName::InstrumentModelCategory => {
                 write!(f, stringify!(InstrumentModelCategory))
@@ -134,7 +150,6 @@ impl core::fmt::Display for TableName {
             TableName::Instrument => write!(f, stringify!(Instrument)),
             TableName::LoginProvider => write!(f, stringify!(LoginProvider)),
             TableName::Material => write!(f, stringify!(Material)),
-            TableName::NameplateCategory => write!(f, stringify!(NameplateCategory)),
             TableName::NameplateModel => write!(f, stringify!(NameplateModel)),
             TableName::ObservationSubject => write!(f, stringify!(ObservationSubject)),
             TableName::OrganismObservation => write!(f, stringify!(OrganismObservation)),
@@ -157,6 +172,9 @@ impl core::fmt::Display for TableName {
             TableName::ProcedureModelNameplateCategory => {
                 write!(f, stringify!(ProcedureModelNameplateCategory))
             }
+            TableName::ProcedureModelReagent => {
+                write!(f, stringify!(ProcedureModelReagent))
+            }
             TableName::ProcedureModelToolCategory => {
                 write!(f, stringify!(ProcedureModelToolCategory))
             }
@@ -171,11 +189,14 @@ impl core::fmt::Display for TableName {
             }
             TableName::Project => write!(f, stringify!(Project)),
             TableName::Rank => write!(f, stringify!(Rank)),
+            TableName::Reagent => write!(f, stringify!(Reagent)),
             TableName::Role => write!(f, stringify!(Role)),
             TableName::Room => write!(f, stringify!(Room)),
             TableName::SampleState => write!(f, stringify!(SampleState)),
             TableName::SamplingStepModel => write!(f, stringify!(SamplingStepModel)),
             TableName::SamplingStep => write!(f, stringify!(SamplingStep)),
+            TableName::ShakingStepModel => write!(f, stringify!(ShakingStepModel)),
+            TableName::ShakingStep => write!(f, stringify!(ShakingStep)),
             TableName::SpatialRefSy => write!(f, stringify!(SpatialRefSy)),
             TableName::Spectrum => write!(f, stringify!(Spectrum)),
             TableName::SpectraCollection => write!(f, stringify!(SpectraCollection)),
@@ -211,7 +232,7 @@ impl core::fmt::Display for TableName {
             TableName::TeamProject => write!(f, stringify!(TeamProject)),
             TableName::TeamState => write!(f, stringify!(TeamState)),
             TableName::Team => write!(f, stringify!(Team)),
-            TableName::ToolCategory => write!(f, stringify!(ToolCategory)),
+            TableName::TemporaryUserEmail => write!(f, stringify!(TemporaryUserEmail)),
             TableName::ToolModel => write!(f, stringify!(ToolModel)),
             TableName::TrackableLocation => write!(f, stringify!(TrackableLocation)),
             TableName::TrackableState => write!(f, stringify!(TrackableState)),
@@ -220,6 +241,9 @@ impl core::fmt::Display for TableName {
             TableName::UserEmail => write!(f, stringify!(UserEmail)),
             TableName::UserOrganization => write!(f, stringify!(UserOrganization)),
             TableName::User => write!(f, stringify!(User)),
+            TableName::VolumetricProcessable => {
+                write!(f, stringify!(VolumetricProcessable))
+            }
             TableName::WeighingInstrumentModel => {
                 write!(f, stringify!(WeighingInstrumentModel))
             }

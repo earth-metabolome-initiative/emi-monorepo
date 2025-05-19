@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AddressForeignKeys {
     pub city: Option<crate::codegen::structs_codegen::tables::cities::City>,

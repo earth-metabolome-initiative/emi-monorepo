@@ -2,7 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableStepModelNameplateCategoryAttributes {
     StepModelId,
-    NameplateCategoryId,
+    NameplateCategory,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -14,8 +14,8 @@ impl core::fmt::Display for InsertableStepModelNameplateCategoryAttributes {
             InsertableStepModelNameplateCategoryAttributes::StepModelId => {
                 write!(f, "step_model_id")
             }
-            InsertableStepModelNameplateCategoryAttributes::NameplateCategoryId => {
-                write!(f, "nameplate_category_id")
+            InsertableStepModelNameplateCategoryAttributes::NameplateCategory => {
+                write!(f, "nameplate_category")
             }
             InsertableStepModelNameplateCategoryAttributes::CreatedBy => {
                 write!(f, "created_by")
@@ -42,7 +42,7 @@ impl core::fmt::Display for InsertableStepModelNameplateCategoryAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableStepModelNameplateCategory {
     step_model_id: i32,
-    nameplate_category_id: i16,
+    nameplate_category: nameplate_categories::NameplateCategory,
     created_by: i32,
     created_at: rosetta_timestamp::TimestampUTC,
     updated_by: i32,
@@ -65,26 +65,6 @@ impl InsertableStepModelNameplateCategory {
                     .eq(&self.step_model_id),
             )
             .first::<crate::codegen::structs_codegen::tables::step_models::StepModel>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn nameplate_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::nameplate_categories::nameplate_categories::dsl::id
-                    .eq(&self.nameplate_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -116,55 +96,123 @@ impl InsertableStepModelNameplateCategory {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableStepModelNameplateCategoryBuilder {
     step_model_id: Option<i32>,
-    nameplate_category_id: Option<i16>,
+    nameplate_category: Option<nameplate_categories::NameplateCategory>,
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableStepModelNameplateCategoryBuilder {
+    fn default() -> Self {
+        Self {
+            step_model_id: None,
+            nameplate_category: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableStepModelNameplateCategoryBuilder {
-    pub fn step_model_id(
+    pub fn step_model_id<P>(
         mut self,
-        step_model_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        step_model_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let step_model_id =
+            step_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableStepModelNameplateCategoryAttributes::StepModelId)
+            })?;
         self.step_model_id = Some(step_model_id);
         Ok(self)
     }
-    pub fn nameplate_category_id(
+    pub fn nameplate_category<P>(
         mut self,
-        nameplate_category_id: i16,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.nameplate_category_id = Some(nameplate_category_id);
+        nameplate_category: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<nameplate_categories::NameplateCategory>,
+        <P as TryInto<nameplate_categories::NameplateCategory>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let nameplate_category = nameplate_category.try_into().map_err(
+            |err: <P as TryInto<nameplate_categories::NameplateCategory>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableStepModelNameplateCategoryAttributes::NameplateCategory)
+            },
+        )?;
+        self.nameplate_category = Some(nameplate_category);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableStepModelNameplateCategoryAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableStepModelNameplateCategoryAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableStepModelNameplateCategoryAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableStepModelNameplateCategoryAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }
@@ -181,9 +229,9 @@ impl common_traits::prelude::Builder for InsertableStepModelNameplateCategoryBui
                     InsertableStepModelNameplateCategoryAttributes::StepModelId,
                 ),
             )?,
-            nameplate_category_id: self.nameplate_category_id.ok_or(
+            nameplate_category: self.nameplate_category.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepModelNameplateCategoryAttributes::NameplateCategoryId,
+                    InsertableStepModelNameplateCategoryAttributes::NameplateCategory,
                 ),
             )?,
             created_by: self.created_by.ok_or(
@@ -216,7 +264,7 @@ impl TryFrom<InsertableStepModelNameplateCategory> for InsertableStepModelNamepl
     ) -> Result<Self, Self::Error> {
         Self::default()
             .step_model_id(insertable_variant.step_model_id)?
-            .nameplate_category_id(insertable_variant.nameplate_category_id)?
+            .nameplate_category(insertable_variant.nameplate_category)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?

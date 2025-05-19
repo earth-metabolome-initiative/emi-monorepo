@@ -81,7 +81,6 @@ impl InsertableStepInstrument {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableStepInstrumentBuilder {
     id: Option<rosetta_uuid::Uuid>,
     step_id: Option<rosetta_uuid::Uuid>,
@@ -89,39 +88,87 @@ pub struct InsertableStepInstrumentBuilder {
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableStepInstrumentBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            step_id: None,
+            instrument_id: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableStepInstrumentBuilder {
-    pub fn id(
-        mut self,
-        id: rosetta_uuid::Uuid,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+            Into::into(err).rename_field(InsertableStepInstrumentAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn step_id(
+    pub fn step_id<P>(
         mut self,
-        step_id: rosetta_uuid::Uuid,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        step_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let step_id =
+            step_id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+                Into::into(err).rename_field(InsertableStepInstrumentAttributes::StepId)
+            })?;
         self.step_id = Some(step_id);
         Ok(self)
     }
-    pub fn instrument_id(
+    pub fn instrument_id<P>(
         mut self,
-        instrument_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        instrument_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let instrument_id =
+            instrument_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(InsertableStepInstrumentAttributes::InstrumentId)
+            })?;
         self.instrument_id = Some(instrument_id);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableStepInstrumentAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableStepInstrumentAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }

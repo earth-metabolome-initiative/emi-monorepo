@@ -19,11 +19,11 @@ mod sqlite;
     Debug, Clone, Copy, Default, diesel::query_builder::QueryId, diesel::sql_types::SqlType,
 )]
 #[cfg_attr(
-    all(feature = "postgres", not(feature = "diesel-pgrx")),
+    all(feature = "postgres", not(feature = "diesel_pgrx")),
     diesel(postgres_type(oid = 1043, array_oid = 1015))
 )]
 #[cfg_attr(
-    all(feature = "postgres", feature = "diesel-pgrx"),
+    all(feature = "postgres", feature = "diesel_pgrx"),
     diesel(postgres_type(name = "CountryCode"))
 )]
 #[cfg_attr(feature = "sqlite", diesel(sqlite_type(name = "Text")))]

@@ -106,7 +106,6 @@ impl InsertableAliquotingInstrumentModel {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableAliquotingInstrumentModelBuilder {
     id: Option<i32>,
     error_liters: Option<f32>,
@@ -117,15 +116,43 @@ pub struct InsertableAliquotingInstrumentModelBuilder {
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableAliquotingInstrumentModelBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            error_liters: None,
+            minimum_measurable_liters: None,
+            maximum_measurable_liters: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableAliquotingInstrumentModelBuilder {
-    pub fn id(mut self, id: i32) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableAliquotingInstrumentModelAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn error_liters(
+    pub fn error_liters<P>(
         mut self,
-        error_liters: f32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        error_liters: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let error_liters = error_liters.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+            Into::into(err).rename_field(InsertableAliquotingInstrumentModelAttributes::ErrorLiters)
+        })?;
         if let Some(minimum_measurable_liters) = self.minimum_measurable_liters {
             pgrx_validation::must_be_strictly_smaller_than_f32(
                 error_liters,
@@ -144,10 +171,20 @@ impl InsertableAliquotingInstrumentModelBuilder {
         self.error_liters = Some(error_liters);
         Ok(self)
     }
-    pub fn minimum_measurable_liters(
+    pub fn minimum_measurable_liters<P>(
         mut self,
-        minimum_measurable_liters: f32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        minimum_measurable_liters: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let minimum_measurable_liters =
+            minimum_measurable_liters.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+                Into::into(err).rename_field(
+                    InsertableAliquotingInstrumentModelAttributes::MinimumMeasurableLiters,
+                )
+            })?;
         if let Some(error_liters) = self.error_liters {
             pgrx_validation::must_be_strictly_smaller_than_f32(
                 error_liters,
@@ -178,10 +215,20 @@ impl InsertableAliquotingInstrumentModelBuilder {
         self.minimum_measurable_liters = Some(minimum_measurable_liters);
         Ok(self)
     }
-    pub fn maximum_measurable_liters(
+    pub fn maximum_measurable_liters<P>(
         mut self,
-        maximum_measurable_liters: f32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        maximum_measurable_liters: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let maximum_measurable_liters =
+            maximum_measurable_liters.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+                Into::into(err).rename_field(
+                    InsertableAliquotingInstrumentModelAttributes::MaximumMeasurableLiters,
+                )
+            })?;
         if let Some(minimum_measurable_liters) = self.minimum_measurable_liters {
             pgrx_validation::must_be_strictly_smaller_than_f32(
                 minimum_measurable_liters,
@@ -200,31 +247,68 @@ impl InsertableAliquotingInstrumentModelBuilder {
         self.maximum_measurable_liters = Some(maximum_measurable_liters);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableAliquotingInstrumentModelAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableAliquotingInstrumentModelAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableAliquotingInstrumentModelAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableAliquotingInstrumentModelAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }

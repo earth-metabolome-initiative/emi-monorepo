@@ -90,7 +90,11 @@ impl PgProc {
         &self,
         conn: &mut AsyncPgConnection,
     ) -> Result<bool, WebCodeGenError> {
-        if self.proname.starts_with("must_be_") || self.proname.starts_with("must_not_be_") {
+        if self.proname.starts_with("must_be_")
+            || self.proname.starts_with("must_not_be_")
+            || self.proname.starts_with("must_contain_")
+            || self.proname.starts_with("must_not_contain_")
+        {
             Ok(self.return_type(conn).await?.is_boolean(conn).await?)
         } else {
             Ok(false)

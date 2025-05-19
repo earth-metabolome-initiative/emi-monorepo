@@ -70,26 +70,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::StepModel(step_models),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if step_models.id == self.step_model_id {
-                    foreign_keys.step_model = Some(step_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::StepModel(step_models),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if step_models.id == self.step_model_id {
-                    foreign_keys.step_model = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -106,6 +86,62 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if procedure_models.id == self.procedure_model_id {
                     foreign_keys.procedure_model = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureStepModel(procedure_step_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if let Some(next_procedure_step_model_id) = self.next_procedure_step_model_id {
+                    if procedure_step_models.id == next_procedure_step_model_id {
+                        foreign_keys.next_procedure_step_model = Some(procedure_step_models);
+                        updated = true;
+                    }
+                }
+                if let Some(prev_procedure_step_model_id) = self.prev_procedure_step_model_id {
+                    if procedure_step_models.id == prev_procedure_step_model_id {
+                        foreign_keys.prev_procedure_step_model = Some(procedure_step_models);
+                        updated = true;
+                    }
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureStepModel(procedure_step_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if let Some(next_procedure_step_model_id) = self.next_procedure_step_model_id {
+                    if procedure_step_models.id == next_procedure_step_model_id {
+                        foreign_keys.next_procedure_step_model = None;
+                        updated = true;
+                    }
+                }
+                if let Some(prev_procedure_step_model_id) = self.prev_procedure_step_model_id {
+                    if procedure_step_models.id == prev_procedure_step_model_id {
+                        foreign_keys.prev_procedure_step_model = None;
+                        updated = true;
+                    }
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::StepModel(step_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if step_models.id == self.step_model_id {
+                    foreign_keys.step_model = Some(step_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::StepModel(step_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if step_models.id == self.step_model_id {
+                    foreign_keys.step_model = None;
                     updated = true;
                 }
             }
@@ -135,44 +171,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 if users.id == self.updated_by {
                     foreign_keys.updated_by = None;
                     updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ProcedureStepModel(procedure_step_models),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if let Some(next_procedure_step_model_id) = self.next_procedure_step_model_id {
-                    if procedure_step_models.id == next_procedure_step_model_id {
-                        foreign_keys.next_procedure_step_model =
-                            Some(procedure_step_models.clone());
-                        updated = true;
-                    }
-                }
-                if let Some(prev_procedure_step_model_id) = self.prev_procedure_step_model_id {
-                    if procedure_step_models.id == prev_procedure_step_model_id {
-                        foreign_keys.prev_procedure_step_model =
-                            Some(procedure_step_models.clone());
-                        updated = true;
-                    }
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ProcedureStepModel(procedure_step_models),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if let Some(next_procedure_step_model_id) = self.next_procedure_step_model_id {
-                    if procedure_step_models.id == next_procedure_step_model_id {
-                        foreign_keys.next_procedure_step_model = None;
-                        updated = true;
-                    }
-                }
-                if let Some(prev_procedure_step_model_id) = self.prev_procedure_step_model_id {
-                    if procedure_step_models.id == prev_procedure_step_model_id {
-                        foreign_keys.prev_procedure_step_model = None;
-                        updated = true;
-                    }
                 }
             }
             (_, crud) => {

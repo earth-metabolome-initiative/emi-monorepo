@@ -45,37 +45,18 @@ pub(crate) fn struct_name(name: &str) -> Result<String, WebCodeGenError> {
         .include_defaults()
         .remove_leading_underscores()
         .remove_trailing_underscores();
-    Ok(sanitizer.to_camel_case(singular_name(name)?)?)
+    Ok(sanitizer.to_camel_case(singular_name(name))?)
 }
 
 #[cached(
-    result = true,
     ty = "UnboundCache<String, String>",
     create = "{ UnboundCache::new() }",
     convert = r#"{ name.to_owned() }"#
 )]
-fn singular_name(name: &str) -> Result<String, WebCodeGenError> {
+fn singular_name(name: &str) -> String {
     // We split the table name by underscores and remove the last element.
     let mut parts = name.split('_').map(std::string::ToString::to_string).collect::<Vec<String>>();
-    let last_element = parts.pop().unwrap();
-    // We convert to singular form the last element and join the parts back
-    // together.
-    parts.push(Inflector::default().singularize(&last_element));
-    Ok(parts.join("_"))
-}
-
-#[cached(
-    result = true,
-    ty = "UnboundCache<String, String>",
-    create = "{ UnboundCache::new() }",
-    convert = r#"{ name.to_owned() }"#
-)]
-fn plural_name(name: &str) -> Result<String, WebCodeGenError> {
-    // We split the table name by underscores and remove the last element.
-    let mut parts = name.split('_').map(std::string::ToString::to_string).collect::<Vec<String>>();
-    let last_element = parts.pop().unwrap();
-    // We convert to singular form the last element and join the parts back
-    // together.
-    parts.push(Inflector::default().pluralize(&last_element));
-    Ok(parts.join("_"))
+    let last = parts.pop().map(|last| Inflector::default().singularize(&last));
+    parts.extend(last);
+    parts.join("_")
 }

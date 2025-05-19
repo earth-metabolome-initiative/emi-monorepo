@@ -29,8 +29,8 @@ impl Codegen<'_> {
         // We generate each table in a separate document under the provided root, and we
         // collect all of the imported modules in a public one.
         let mut table_tabular_main_module = TokenStream::new();
-        let table_name_enum_path = self.table_names_enum_path();
-        let table_primary_keys_enum_path = self.table_primary_keys_enum_path();
+        let table_name_enum_path = Self::table_names_enum_path();
+        let table_primary_keys_enum_path = Self::table_primary_keys_enum_path();
         for table in tables {
             let table_struct = table.import_struct_path()?;
             let struct_ident = table.struct_ident()?;

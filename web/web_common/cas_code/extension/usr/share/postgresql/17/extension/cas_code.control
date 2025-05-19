@@ -1,0 +1,6 @@
+comment = 'cas_code:  Created by pgrx'
+default_version = '0.1.0'
+module_pathname = '$libdir/cas_code'
+relocatable = false
+superuser = true
+trusted = false

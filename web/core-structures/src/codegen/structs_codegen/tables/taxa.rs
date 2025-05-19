@@ -47,4 +47,30 @@ impl Taxon {
             .load::<Self>(conn)
             .await
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_name(
+        name: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::taxa::taxa;
+        Self::table().filter(taxa::name.eq(name)).order_by(taxa::id.asc()).load::<Self>(conn).await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_parent_id(
+        parent_id: &Option<i32>,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::taxa::taxa;
+        Self::table()
+            .filter(taxa::parent_id.eq(parent_id))
+            .order_by(taxa::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
 }

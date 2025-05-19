@@ -5,22 +5,27 @@ pub enum TablePrimaryKey {
     AliquotingInstrumentModel(i32),
     AliquotingStepModel(i32),
     AliquotingStep(rosetta_uuid::Uuid),
-    BrandState(i16),
+    BallMillStepModel(i32),
+    BallMillStep(rosetta_uuid::Uuid),
     Brand(i32),
+    CentrifugeStepModel(i32),
+    CentrifugeStep(rosetta_uuid::Uuid),
+    ChemicalEntity(i32),
     City(i32),
     Color(i16),
+    CommercialProductLot(i32),
     CommercialProduct(i32),
     CommercialReagentModel(i32),
-    ContainerCategory(i16),
+    CommercialReagent(rosetta_uuid::Uuid),
     ContainerModel(i32),
     Country(iso_codes::CountryCode),
+    DisposalStepModel(i32),
+    DisposalStep(rosetta_uuid::Uuid),
     DocumentFormat(i16),
     EmailProvider((i32, i16)),
     FractioningStepModel(i32),
     FractioningStep(rosetta_uuid::Uuid),
     FreezeDryingStepModel(i32),
-    GrindingStepModel(i32),
-    InstrumentCategory(i16),
     InstrumentLocation(i32),
     InstrumentModelCategory(i32),
     InstrumentModel(i32),
@@ -28,7 +33,6 @@ pub enum TablePrimaryKey {
     Instrument(i32),
     LoginProvider(i16),
     Material(i16),
-    NameplateCategory(i16),
     NameplateModel(i32),
     ObservationSubject(i16),
     OrganismObservation(rosetta_uuid::Uuid),
@@ -43,6 +47,7 @@ pub enum TablePrimaryKey {
     ProcedureModelContainerCategory(i32),
     ProcedureModelInstrumentCategory(i32),
     ProcedureModelNameplateCategory(i32),
+    ProcedureModelReagent(i32),
     ProcedureModelToolCategory(i32),
     ProcedureModel(i32),
     ProcedureStepModel(i32),
@@ -53,11 +58,14 @@ pub enum TablePrimaryKey {
     ProjectWorkflowModel(i32),
     Project(i32),
     Rank(i16),
+    Reagent(i32),
     Role(i16),
     Room(i32),
     SampleState(i16),
     SamplingStepModel(i32),
     SamplingStep(rosetta_uuid::Uuid),
+    ShakingStepModel(i32),
+    ShakingStep(rosetta_uuid::Uuid),
     SpatialRefSy(i32),
     Spectrum(i32),
     SpectraCollection(i32),
@@ -81,7 +89,7 @@ pub enum TablePrimaryKey {
     TeamProject((i32, i32)),
     TeamState(i16),
     Team(i32),
-    ToolCategory(i16),
+    TemporaryUserEmail(rosetta_uuid::Uuid),
     ToolModel(i32),
     TrackableLocation(rosetta_uuid::Uuid),
     TrackableState(i16),
@@ -90,6 +98,7 @@ pub enum TablePrimaryKey {
     UserEmail(i32),
     UserOrganization((i32, i16)),
     User(i32),
+    VolumetricProcessable(rosetta_uuid::Uuid),
     WeighingInstrumentModel(i32),
     WeighingStepModel(i32),
     WeighingStep(rosetta_uuid::Uuid),
@@ -108,25 +117,46 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::AliquotingStep(_) => {
                 crate::codegen::tables::table_names::TableName::AliquotingStep
             }
-            TablePrimaryKey::BrandState(_) => {
-                crate::codegen::tables::table_names::TableName::BrandState
+            TablePrimaryKey::BallMillStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::BallMillStepModel
+            }
+            TablePrimaryKey::BallMillStep(_) => {
+                crate::codegen::tables::table_names::TableName::BallMillStep
             }
             TablePrimaryKey::Brand(_) => crate::codegen::tables::table_names::TableName::Brand,
+            TablePrimaryKey::CentrifugeStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::CentrifugeStepModel
+            }
+            TablePrimaryKey::CentrifugeStep(_) => {
+                crate::codegen::tables::table_names::TableName::CentrifugeStep
+            }
+            TablePrimaryKey::ChemicalEntity(_) => {
+                crate::codegen::tables::table_names::TableName::ChemicalEntity
+            }
             TablePrimaryKey::City(_) => crate::codegen::tables::table_names::TableName::City,
             TablePrimaryKey::Color(_) => crate::codegen::tables::table_names::TableName::Color,
+            TablePrimaryKey::CommercialProductLot(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialProductLot
+            }
             TablePrimaryKey::CommercialProduct(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialProduct
             }
             TablePrimaryKey::CommercialReagentModel(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialReagentModel
             }
-            TablePrimaryKey::ContainerCategory(_) => {
-                crate::codegen::tables::table_names::TableName::ContainerCategory
+            TablePrimaryKey::CommercialReagent(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialReagent
             }
             TablePrimaryKey::ContainerModel(_) => {
                 crate::codegen::tables::table_names::TableName::ContainerModel
             }
             TablePrimaryKey::Country(_) => crate::codegen::tables::table_names::TableName::Country,
+            TablePrimaryKey::DisposalStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::DisposalStepModel
+            }
+            TablePrimaryKey::DisposalStep(_) => {
+                crate::codegen::tables::table_names::TableName::DisposalStep
+            }
             TablePrimaryKey::DocumentFormat(_) => {
                 crate::codegen::tables::table_names::TableName::DocumentFormat
             }
@@ -141,12 +171,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::FreezeDryingStepModel(_) => {
                 crate::codegen::tables::table_names::TableName::FreezeDryingStepModel
-            }
-            TablePrimaryKey::GrindingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::GrindingStepModel
-            }
-            TablePrimaryKey::InstrumentCategory(_) => {
-                crate::codegen::tables::table_names::TableName::InstrumentCategory
             }
             TablePrimaryKey::InstrumentLocation(_) => {
                 crate::codegen::tables::table_names::TableName::InstrumentLocation
@@ -168,9 +192,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::Material(_) => {
                 crate::codegen::tables::table_names::TableName::Material
-            }
-            TablePrimaryKey::NameplateCategory(_) => {
-                crate::codegen::tables::table_names::TableName::NameplateCategory
             }
             TablePrimaryKey::NameplateModel(_) => {
                 crate::codegen::tables::table_names::TableName::NameplateModel
@@ -214,6 +235,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::ProcedureModelNameplateCategory(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModelNameplateCategory
             }
+            TablePrimaryKey::ProcedureModelReagent(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureModelReagent
+            }
             TablePrimaryKey::ProcedureModelToolCategory(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModelToolCategory
             }
@@ -240,6 +264,7 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::Project(_) => crate::codegen::tables::table_names::TableName::Project,
             TablePrimaryKey::Rank(_) => crate::codegen::tables::table_names::TableName::Rank,
+            TablePrimaryKey::Reagent(_) => crate::codegen::tables::table_names::TableName::Reagent,
             TablePrimaryKey::Role(_) => crate::codegen::tables::table_names::TableName::Role,
             TablePrimaryKey::Room(_) => crate::codegen::tables::table_names::TableName::Room,
             TablePrimaryKey::SampleState(_) => {
@@ -250,6 +275,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::SamplingStep(_) => {
                 crate::codegen::tables::table_names::TableName::SamplingStep
+            }
+            TablePrimaryKey::ShakingStepModel(_) => {
+                crate::codegen::tables::table_names::TableName::ShakingStepModel
+            }
+            TablePrimaryKey::ShakingStep(_) => {
+                crate::codegen::tables::table_names::TableName::ShakingStep
             }
             TablePrimaryKey::SpatialRefSy(_) => {
                 crate::codegen::tables::table_names::TableName::SpatialRefSy
@@ -314,8 +345,8 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
                 crate::codegen::tables::table_names::TableName::TeamState
             }
             TablePrimaryKey::Team(_) => crate::codegen::tables::table_names::TableName::Team,
-            TablePrimaryKey::ToolCategory(_) => {
-                crate::codegen::tables::table_names::TableName::ToolCategory
+            TablePrimaryKey::TemporaryUserEmail(_) => {
+                crate::codegen::tables::table_names::TableName::TemporaryUserEmail
             }
             TablePrimaryKey::ToolModel(_) => {
                 crate::codegen::tables::table_names::TableName::ToolModel
@@ -337,6 +368,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
                 crate::codegen::tables::table_names::TableName::UserOrganization
             }
             TablePrimaryKey::User(_) => crate::codegen::tables::table_names::TableName::User,
+            TablePrimaryKey::VolumetricProcessable(_) => {
+                crate::codegen::tables::table_names::TableName::VolumetricProcessable
+            }
             TablePrimaryKey::WeighingInstrumentModel(_) => {
                 crate::codegen::tables::table_names::TableName::WeighingInstrumentModel
             }

@@ -1,4 +1,0 @@
-name,description,icon
-sample container,"A container appropriate for samples, such as leafs or roots",FlaskVial
-sample container rack,"A rack for sample containers, such as leafs or roots",Vials
-container box,"A box for sample containers, or sample container racks",Box

@@ -117,4 +117,34 @@ impl OrganismSamplingStepModel {
             .load::<Self>(conn)
             .await
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_created_at(
+        created_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::organism_sampling_step_models::organism_sampling_step_models;
+        Self::table()
+            .filter(organism_sampling_step_models::created_at.eq(created_at))
+            .order_by(organism_sampling_step_models::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_updated_at(
+        updated_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::organism_sampling_step_models::organism_sampling_step_models;
+        Self::table()
+            .filter(organism_sampling_step_models::updated_at.eq(updated_at))
+            .order_by(organism_sampling_step_models::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
 }

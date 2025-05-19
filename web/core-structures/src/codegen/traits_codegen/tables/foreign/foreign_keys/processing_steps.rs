@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProcessingStepForeignKeys {
     pub id: Option<crate::codegen::structs_codegen::tables::steps::Step>,
@@ -87,26 +87,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = Some(users);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::Step(steps),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -123,6 +103,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if steps.id == self.id {
                     foreign_keys.id = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if users.id == self.created_by {
+                    foreign_keys.created_by = Some(users);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::User(users),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if users.id == self.created_by {
+                    foreign_keys.created_by = None;
                     updated = true;
                 }
             }

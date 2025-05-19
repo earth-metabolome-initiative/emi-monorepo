@@ -89,6 +89,7 @@ impl CSVSchema {
         Ok(CSVTable { schema: self, table_metadata })
     }
 
+    #[must_use]
     /// Returns whether any column of any table has a given type.
     pub fn has_column_type(&self, column_type: DataType) -> bool {
         self.table_metadata
@@ -348,7 +349,7 @@ impl CSVSchemaBuilder {
                 CSVTableMetadata::from_csv(
                     dir.as_ref(),
                     path.as_ref(),
-                    &container_directory,
+                    container_directory,
                     self.singularize,
                 )
             })

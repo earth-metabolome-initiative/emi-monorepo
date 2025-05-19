@@ -16,6 +16,7 @@ pub enum LNCommand {
     Disconnect(u64, oneshot::Sender<()>),
 }
 
+#[allow(clippy::type_complexity)]
 pub struct ListenNotifyServer {
     sessions: HashMap<
         u64,
@@ -82,13 +83,13 @@ impl ListenNotifyServer {
         match subscription {
             Subscription::Table(table_name) => {
                 if let Some((_, table_listeners, _)) = self.sessions.get_mut(&session_id) {
-                    table_listeners.push(table_name.clone());
+                    table_listeners.push(table_name);
                     self.table_listeners.entry(table_name).or_default().push(session_id);
                 }
             }
             Subscription::Row(row_key) => {
                 if let Some((_, _, row_listeners)) = self.sessions.get_mut(&session_id) {
-                    row_listeners.push(row_key.clone());
+                    row_listeners.push(row_key);
                     self.row_listeners.entry(row_key).or_default().push(session_id);
                 }
             }

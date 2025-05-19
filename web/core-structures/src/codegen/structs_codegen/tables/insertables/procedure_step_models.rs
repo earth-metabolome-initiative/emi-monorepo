@@ -166,7 +166,6 @@ impl InsertableProcedureStepModel {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableProcedureStepModelBuilder {
     procedure_model_id: Option<i32>,
     step_model_id: Option<i32>,
@@ -177,25 +176,66 @@ pub struct InsertableProcedureStepModelBuilder {
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableProcedureStepModelBuilder {
+    fn default() -> Self {
+        Self {
+            procedure_model_id: None,
+            step_model_id: None,
+            next_procedure_step_model_id: None,
+            prev_procedure_step_model_id: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableProcedureStepModelBuilder {
-    pub fn procedure_model_id(
+    pub fn procedure_model_id<P>(
         mut self,
-        procedure_model_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        procedure_model_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let procedure_model_id =
+            procedure_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableProcedureStepModelAttributes::ProcedureModelId)
+            })?;
         self.procedure_model_id = Some(procedure_model_id);
         Ok(self)
     }
-    pub fn step_model_id(
+    pub fn step_model_id<P>(
         mut self,
-        step_model_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        step_model_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let step_model_id =
+            step_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(InsertableProcedureStepModelAttributes::StepModelId)
+            })?;
         self.step_model_id = Some(step_model_id);
         Ok(self)
     }
-    pub fn next_procedure_step_model_id(
+    pub fn next_procedure_step_model_id<P>(
         mut self,
-        next_procedure_step_model_id: Option<i32>,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        next_procedure_step_model_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<i32>>,
+        <P as TryInto<Option<i32>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let next_procedure_step_model_id = next_procedure_step_model_id.try_into().map_err(
+            |err: <P as TryInto<Option<i32>>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableProcedureStepModelAttributes::NextProcedureStepModelId)
+            },
+        )?;
         if let (Some(next_procedure_step_model_id), Some(prev_procedure_step_model_id)) =
             (next_procedure_step_model_id, self.prev_procedure_step_model_id)
         {
@@ -213,10 +253,20 @@ impl InsertableProcedureStepModelBuilder {
         self.next_procedure_step_model_id = next_procedure_step_model_id;
         Ok(self)
     }
-    pub fn prev_procedure_step_model_id(
+    pub fn prev_procedure_step_model_id<P>(
         mut self,
-        prev_procedure_step_model_id: Option<i32>,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        prev_procedure_step_model_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Option<i32>>,
+        <P as TryInto<Option<i32>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let prev_procedure_step_model_id = prev_procedure_step_model_id.try_into().map_err(
+            |err: <P as TryInto<Option<i32>>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableProcedureStepModelAttributes::PrevProcedureStepModelId)
+            },
+        )?;
         if let (Some(next_procedure_step_model_id), Some(prev_procedure_step_model_id)) =
             (self.next_procedure_step_model_id, prev_procedure_step_model_id)
         {
@@ -234,31 +284,66 @@ impl InsertableProcedureStepModelBuilder {
         self.prev_procedure_step_model_id = prev_procedure_step_model_id;
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableProcedureStepModelAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProcedureStepModelAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableProcedureStepModelAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProcedureStepModelAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }

@@ -1,5 +1,5 @@
 diesel::table! {
-    public.teams(id) { id -> diesel::sql_types::Integer, name -> diesel::sql_types::Text,
+    teams(id) { id -> diesel::sql_types::Integer, name -> diesel::sql_types::Text,
     description -> diesel::sql_types::Text, icon -> diesel::sql_types::Text, color_id ->
     diesel::sql_types::SmallInt, state_id -> diesel::sql_types::SmallInt, parent_team_id
     -> diesel::sql_types::Nullable < diesel::sql_types::Integer >, created_by ->

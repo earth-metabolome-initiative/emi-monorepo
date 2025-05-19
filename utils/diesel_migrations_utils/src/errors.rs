@@ -50,7 +50,7 @@ impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Error::InvalidMigration(num, kind, path) => {
-                write!(f, "Invalid migration {num:?} (kind: {kind:?}) in {path:?}")
+                write!(f, "Invalid migration {num:?} (kind: {kind:?}) in {}", path.display())
             }
             Error::MissingUpMigration(num) => write!(f, "Missing up migration: {num}"),
             Error::MissingDownMigration(num) => write!(f, "Missing down migration: {num}"),

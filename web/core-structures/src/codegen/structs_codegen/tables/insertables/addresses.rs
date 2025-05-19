@@ -56,38 +56,79 @@ pub struct InsertableAddressBuilder {
     geolocation: Option<postgis_diesel::types::Point>,
 }
 impl InsertableAddressBuilder {
-    pub fn city_id(
+    pub fn city_id<P>(
         mut self,
-        city_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        city_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let city_id = city_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableAddressAttributes::CityId)
+        })?;
         self.city_id = Some(city_id);
         Ok(self)
     }
-    pub fn street_name(
+    pub fn street_name<P>(
         mut self,
-        street_name: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        street_name: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let street_name =
+            street_name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableAddressAttributes::StreetName)
+            })?;
         self.street_name = Some(street_name);
         Ok(self)
     }
-    pub fn street_number(
+    pub fn street_number<P>(
         mut self,
-        street_number: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        street_number: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let street_number =
+            street_number.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableAddressAttributes::StreetNumber)
+            })?;
         self.street_number = Some(street_number);
         Ok(self)
     }
-    pub fn postal_code(
+    pub fn postal_code<P>(
         mut self,
-        postal_code: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        postal_code: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let postal_code =
+            postal_code.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableAddressAttributes::PostalCode)
+            })?;
         self.postal_code = Some(postal_code);
         Ok(self)
     }
-    pub fn geolocation(
+    pub fn geolocation<P>(
         mut self,
-        geolocation: postgis_diesel::types::Point,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        geolocation: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<postgis_diesel::types::Point>,
+        <P as TryInto<postgis_diesel::types::Point>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let geolocation = geolocation.try_into().map_err(
+            |err: <P as TryInto<postgis_diesel::types::Point>>::Error| {
+                Into::into(err).rename_field(InsertableAddressAttributes::Geolocation)
+            },
+        )?;
         self.geolocation = Some(geolocation);
         Ok(self)
     }

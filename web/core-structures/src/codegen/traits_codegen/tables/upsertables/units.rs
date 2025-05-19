@@ -6,38 +6,23 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(crate::codegen::diesel_codegen::tables::units::units::table)
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::units::units::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::units::units::id)
+            .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(diesel::BoolExpressionMethods::and(
-                diesel::BoolExpressionMethods::and(
-                    diesel::BoolExpressionMethods::and(
-                        crate::codegen::diesel_codegen::tables::units::units::name.ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::units::units::name,
-                            ),
-                        ),
-                        crate::codegen::diesel_codegen::tables::units::units::unit.ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::units::units::unit,
-                            ),
-                        ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::units::units::icon.ne(
-                        diesel::upsert::excluded(
-                            crate::codegen::diesel_codegen::tables::units::units::icon,
-                        ),
-                    ),
-                ),
-                crate::codegen::diesel_codegen::tables::units::units::color_id.ne(
-                    diesel::upsert::excluded(
-                        crate::codegen::diesel_codegen::tables::units::units::color_id,
-                    ),
-                ),
-            ))
+            .filter(
+                name.ne(excluded(name))
+                    .or(unit.ne(excluded(unit)))
+                    .or(icon.ne(excluded(icon)))
+                    .or(color_id.ne(excluded(color_id))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -50,38 +35,23 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(crate::codegen::diesel_codegen::tables::units::units::table)
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::units::units::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::units::units::id)
+            .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(diesel::BoolExpressionMethods::and(
-                diesel::BoolExpressionMethods::and(
-                    diesel::BoolExpressionMethods::and(
-                        crate::codegen::diesel_codegen::tables::units::units::name.ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::units::units::name,
-                            ),
-                        ),
-                        crate::codegen::diesel_codegen::tables::units::units::unit.ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::units::units::unit,
-                            ),
-                        ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::units::units::icon.ne(
-                        diesel::upsert::excluded(
-                            crate::codegen::diesel_codegen::tables::units::units::icon,
-                        ),
-                    ),
-                ),
-                crate::codegen::diesel_codegen::tables::units::units::color_id.ne(
-                    diesel::upsert::excluded(
-                        crate::codegen::diesel_codegen::tables::units::units::color_id,
-                    ),
-                ),
-            ))
+            .filter(
+                name.ne(excluded(name))
+                    .or(unit.ne(excluded(unit)))
+                    .or(icon.ne(excluded(icon)))
+                    .or(color_id.ne(excluded(color_id))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }

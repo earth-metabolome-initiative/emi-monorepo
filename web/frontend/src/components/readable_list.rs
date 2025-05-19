@@ -6,6 +6,7 @@ use web_common_traits::{
     database::{DeleteFromVec, UpsertVec},
     prelude::StaticTabular,
 };
+use web_sys::console;
 use ws_messages::DBMessage;
 use yew::{Component, Context, Properties, html};
 use yewdux::Dispatch;
@@ -74,6 +75,14 @@ where
 
     fn create(ctx: &Context<Self>) -> Self {
         let connector: Connector = ctx.into();
+        console::log_1(
+            &format!(
+                "Creating ReadableList with offset: {}, limit: {}",
+                ctx.props().offset,
+                ctx.props().limit
+            )
+            .into(),
+        );
         connector.send(CrudTableOperation::Read {
             table_name: <C::Row as StaticTabular>::static_table_name(),
             offset: ctx.props().offset,

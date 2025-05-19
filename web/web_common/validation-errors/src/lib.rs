@@ -1,5 +1,7 @@
 //! Crate providing common validation errors.
 
+use std::convert::Infallible;
+
 #[derive(Debug, Clone, PartialEq)]
 /// Enumeration of errors that can occur during validation.
 pub enum Error<FieldName = ()> {
@@ -28,6 +30,12 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for Error<FieldName> {
 pub enum SingleFieldError<FieldName = ()> {
     /// The provided text is empty.
     EmptyText(FieldName),
+    /// The provided text is padded with spaces.
+    PaddedText(FieldName),
+    /// The provided text contains control characters.
+    ControlCharacters(FieldName),
+    /// The provided text contains consecutive whitespace characters.
+    ConsecutiveWhitespace(FieldName),
     /// The provided mail address is invalid.
     InvalidMail(FieldName),
     /// The provided text is not a valid font awesome class.
@@ -38,6 +46,8 @@ pub enum SingleFieldError<FieldName = ()> {
     MustBeSmallerThan(FieldName, f64),
     /// The float is not strictly smaller than the expected amount.
     MustBeGreaterThan(FieldName, f64),
+    /// The provided text is not a valid instrument category.
+    UnknownInstrumentCategory(FieldName),
 }
 
 impl SingleFieldError {
@@ -45,6 +55,13 @@ impl SingleFieldError {
     pub fn rename_field<FieldName>(self, field_name: FieldName) -> SingleFieldError<FieldName> {
         match self {
             SingleFieldError::EmptyText(_) => SingleFieldError::EmptyText(field_name),
+            SingleFieldError::PaddedText(_) => SingleFieldError::PaddedText(field_name),
+            SingleFieldError::ConsecutiveWhitespace(_) => {
+                SingleFieldError::ConsecutiveWhitespace(field_name)
+            }
+            SingleFieldError::ControlCharacters(_) => {
+                SingleFieldError::ControlCharacters(field_name)
+            }
             SingleFieldError::InvalidMail(_) => SingleFieldError::InvalidMail(field_name),
             SingleFieldError::InvalidFontAwesomeClass(_) => {
                 SingleFieldError::InvalidFontAwesomeClass(field_name)
@@ -57,6 +74,9 @@ impl SingleFieldError {
             }
             SingleFieldError::MustBeGreaterThan(_, expected_value) => {
                 SingleFieldError::MustBeGreaterThan(field_name, expected_value)
+            }
+            SingleFieldError::UnknownInstrumentCategory(_) => {
+                SingleFieldError::UnknownInstrumentCategory(field_name)
             }
         }
     }
@@ -80,8 +100,12 @@ impl SingleFieldError {
                 DoubleFieldError::MustBeGreaterThan(left, right)
             }
             SingleFieldError::EmptyText(_)
+            | SingleFieldError::PaddedText(_)
+            | SingleFieldError::ConsecutiveWhitespace(_)
+            | SingleFieldError::ControlCharacters(_)
             | SingleFieldError::InvalidFontAwesomeClass(_)
             | SingleFieldError::InvalidMail(_)
+            | SingleFieldError::UnknownInstrumentCategory(_)
             | SingleFieldError::UnexpectedNegativeOrZeroValue(_) => {
                 unimplemented!("Cannot convert the variant error into a double field error.")
             }
@@ -117,6 +141,21 @@ impl<A: core::fmt::Display> core::fmt::Display for SingleFieldError<A> {
             SingleFieldError::EmptyText(field_name) => {
                 write!(f, "Please provide a value for the {field_name} field.")
             }
+            SingleFieldError::PaddedText(field_name) => {
+                write!(
+                    f,
+                    "The {field_name} field contains leading or trailing spaces. Please remove them."
+                )
+            }
+            SingleFieldError::ConsecutiveWhitespace(field_name) => {
+                write!(
+                    f,
+                    "The {field_name} field contains consecutive whitespace characters. Please remove them."
+                )
+            }
+            SingleFieldError::ControlCharacters(field_name) => {
+                write!(f, "The {field_name} field contains control characters. Please remove them.")
+            }
             SingleFieldError::InvalidMail(field_name) => {
                 write!(
                     f,
@@ -137,6 +176,9 @@ impl<A: core::fmt::Display> core::fmt::Display for SingleFieldError<A> {
             }
             SingleFieldError::MustBeGreaterThan(field_name, expected_value) => {
                 write!(f, "The {field_name} field must be greater than {expected_value}.")
+            }
+            SingleFieldError::UnknownInstrumentCategory(field_name) => {
+                write!(f, "The {field_name} field must be a valid instrument category.")
             }
         }
     }
@@ -182,5 +224,35 @@ impl TryFrom<diesel::result::Error> for Error {
 
     fn try_from(_error: diesel::result::Error) -> Result<Self, Self::Error> {
         todo!()
+    }
+}
+
+impl From<Infallible> for Error {
+    fn from(_error: Infallible) -> Self {
+        unreachable!("Infallible cannot be converted to Error.")
+    }
+}
+
+impl From<Infallible> for SingleFieldError {
+    fn from(_error: Infallible) -> Self {
+        unreachable!("Infallible cannot be converted to SingleFieldError.")
+    }
+}
+
+impl From<Infallible> for DoubleFieldError {
+    fn from(_error: Infallible) -> Self {
+        unreachable!("Infallible cannot be converted to DoubleFieldError.")
+    }
+}
+
+impl From<instrument_categories::errors::UnknownInstrumentCategory> for Error {
+    fn from(error: instrument_categories::errors::UnknownInstrumentCategory) -> Self {
+        Self::SingleField(error.into())
+    }
+}
+
+impl From<instrument_categories::errors::UnknownInstrumentCategory> for SingleFieldError {
+    fn from(_error: instrument_categories::errors::UnknownInstrumentCategory) -> Self {
+        Self::UnknownInstrumentCategory(())
     }
 }

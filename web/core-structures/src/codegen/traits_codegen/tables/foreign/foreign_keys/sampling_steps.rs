@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SamplingStepForeignKeys {
     pub id: Option<crate::codegen::structs_codegen::tables::steps::Step>,
@@ -67,26 +67,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::Trackable(trackables),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if trackables.id == self.trackable_id {
-                    foreign_keys.trackable = Some(trackables);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Trackable(trackables),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if trackables.id == self.trackable_id {
-                    foreign_keys.trackable = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::Step(steps),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -103,6 +83,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if steps.id == self.id {
                     foreign_keys.id = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Trackable(trackables),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if trackables.id == self.trackable_id {
+                    foreign_keys.trackable = Some(trackables);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Trackable(trackables),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if trackables.id == self.trackable_id {
+                    foreign_keys.trackable = None;
                     updated = true;
                 }
             }

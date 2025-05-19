@@ -6,94 +6,31 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(crate::codegen::diesel_codegen::tables::teams::teams::table)
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::teams::teams::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::teams::teams::id)
+            .on_conflict(id)
             .do_update()
             .set(self)
             .filter(
-                diesel::BoolExpressionMethods::and(
-                    diesel::BoolExpressionMethods::and(
-                        diesel::BoolExpressionMethods::and(
-                            diesel::BoolExpressionMethods::and(
-                                diesel::BoolExpressionMethods::and(
-                                    diesel::BoolExpressionMethods::and(
-                                        diesel::BoolExpressionMethods::and(
-                                            diesel::BoolExpressionMethods::and(
-                                                diesel::BoolExpressionMethods::and(
-                                                    crate::codegen::diesel_codegen::tables::teams::teams::name
-                                                        .ne(
-                                                            diesel::upsert::excluded(
-                                                                crate::codegen::diesel_codegen::tables::teams::teams::name,
-                                                            ),
-                                                        ),
-                                                    crate::codegen::diesel_codegen::tables::teams::teams::description
-                                                        .ne(
-                                                            diesel::upsert::excluded(
-                                                                crate::codegen::diesel_codegen::tables::teams::teams::description,
-                                                            ),
-                                                        ),
-                                                ),
-                                                crate::codegen::diesel_codegen::tables::teams::teams::icon
-                                                    .ne(
-                                                        diesel::upsert::excluded(
-                                                            crate::codegen::diesel_codegen::tables::teams::teams::icon,
-                                                        ),
-                                                    ),
-                                            ),
-                                            crate::codegen::diesel_codegen::tables::teams::teams::color_id
-                                                .ne(
-                                                    diesel::upsert::excluded(
-                                                        crate::codegen::diesel_codegen::tables::teams::teams::color_id,
-                                                    ),
-                                                ),
-                                        ),
-                                        crate::codegen::diesel_codegen::tables::teams::teams::state_id
-                                            .ne(
-                                                diesel::upsert::excluded(
-                                                    crate::codegen::diesel_codegen::tables::teams::teams::state_id,
-                                                ),
-                                            ),
-                                    ),
-                                    crate::codegen::diesel_codegen::tables::teams::teams::parent_team_id
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::teams::teams::parent_team_id,
-                                            ),
-                                        ),
-                                ),
-                                crate::codegen::diesel_codegen::tables::teams::teams::created_by
-                                    .ne(
-                                        diesel::upsert::excluded(
-                                            crate::codegen::diesel_codegen::tables::teams::teams::created_by,
-                                        ),
-                                    ),
-                            ),
-                            crate::codegen::diesel_codegen::tables::teams::teams::created_at
-                                .ne(
-                                    diesel::upsert::excluded(
-                                        crate::codegen::diesel_codegen::tables::teams::teams::created_at,
-                                    ),
-                                ),
-                        ),
-                        crate::codegen::diesel_codegen::tables::teams::teams::updated_by
-                            .ne(
-                                diesel::upsert::excluded(
-                                    crate::codegen::diesel_codegen::tables::teams::teams::updated_by,
-                                ),
-                            ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::teams::teams::updated_at
-                        .ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::teams::teams::updated_at,
-                            ),
-                        ),
-                ),
+                name.ne(excluded(name))
+                    .or(description.ne(excluded(description)))
+                    .or(icon.ne(excluded(icon)))
+                    .or(color_id.ne(excluded(color_id)))
+                    .or(state_id.ne(excluded(state_id)))
+                    .or(parent_team_id.ne(excluded(parent_team_id)))
+                    .or(created_by.ne(excluded(created_by)))
+                    .or(created_at.ne(excluded(created_at)))
+                    .or(updated_by.ne(excluded(updated_by)))
+                    .or(updated_at.ne(excluded(updated_at))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }
 #[cfg(feature = "sqlite")]
@@ -104,93 +41,30 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
-        diesel::insert_into(crate::codegen::diesel_codegen::tables::teams::teams::table)
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
+        use crate::codegen::diesel_codegen::tables::teams::teams::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict(crate::codegen::diesel_codegen::tables::teams::teams::id)
+            .on_conflict(id)
             .do_update()
             .set(self)
             .filter(
-                diesel::BoolExpressionMethods::and(
-                    diesel::BoolExpressionMethods::and(
-                        diesel::BoolExpressionMethods::and(
-                            diesel::BoolExpressionMethods::and(
-                                diesel::BoolExpressionMethods::and(
-                                    diesel::BoolExpressionMethods::and(
-                                        diesel::BoolExpressionMethods::and(
-                                            diesel::BoolExpressionMethods::and(
-                                                diesel::BoolExpressionMethods::and(
-                                                    crate::codegen::diesel_codegen::tables::teams::teams::name
-                                                        .ne(
-                                                            diesel::upsert::excluded(
-                                                                crate::codegen::diesel_codegen::tables::teams::teams::name,
-                                                            ),
-                                                        ),
-                                                    crate::codegen::diesel_codegen::tables::teams::teams::description
-                                                        .ne(
-                                                            diesel::upsert::excluded(
-                                                                crate::codegen::diesel_codegen::tables::teams::teams::description,
-                                                            ),
-                                                        ),
-                                                ),
-                                                crate::codegen::diesel_codegen::tables::teams::teams::icon
-                                                    .ne(
-                                                        diesel::upsert::excluded(
-                                                            crate::codegen::diesel_codegen::tables::teams::teams::icon,
-                                                        ),
-                                                    ),
-                                            ),
-                                            crate::codegen::diesel_codegen::tables::teams::teams::color_id
-                                                .ne(
-                                                    diesel::upsert::excluded(
-                                                        crate::codegen::diesel_codegen::tables::teams::teams::color_id,
-                                                    ),
-                                                ),
-                                        ),
-                                        crate::codegen::diesel_codegen::tables::teams::teams::state_id
-                                            .ne(
-                                                diesel::upsert::excluded(
-                                                    crate::codegen::diesel_codegen::tables::teams::teams::state_id,
-                                                ),
-                                            ),
-                                    ),
-                                    crate::codegen::diesel_codegen::tables::teams::teams::parent_team_id
-                                        .ne(
-                                            diesel::upsert::excluded(
-                                                crate::codegen::diesel_codegen::tables::teams::teams::parent_team_id,
-                                            ),
-                                        ),
-                                ),
-                                crate::codegen::diesel_codegen::tables::teams::teams::created_by
-                                    .ne(
-                                        diesel::upsert::excluded(
-                                            crate::codegen::diesel_codegen::tables::teams::teams::created_by,
-                                        ),
-                                    ),
-                            ),
-                            crate::codegen::diesel_codegen::tables::teams::teams::created_at
-                                .ne(
-                                    diesel::upsert::excluded(
-                                        crate::codegen::diesel_codegen::tables::teams::teams::created_at,
-                                    ),
-                                ),
-                        ),
-                        crate::codegen::diesel_codegen::tables::teams::teams::updated_by
-                            .ne(
-                                diesel::upsert::excluded(
-                                    crate::codegen::diesel_codegen::tables::teams::teams::updated_by,
-                                ),
-                            ),
-                    ),
-                    crate::codegen::diesel_codegen::tables::teams::teams::updated_at
-                        .ne(
-                            diesel::upsert::excluded(
-                                crate::codegen::diesel_codegen::tables::teams::teams::updated_at,
-                            ),
-                        ),
-                ),
+                name.ne(excluded(name))
+                    .or(description.ne(excluded(description)))
+                    .or(icon.ne(excluded(icon)))
+                    .or(color_id.ne(excluded(color_id)))
+                    .or(state_id.ne(excluded(state_id)))
+                    .or(parent_team_id.ne(excluded(parent_team_id)))
+                    .or(created_by.ne(excluded(created_by)))
+                    .or(created_at.ne(excluded(created_at)))
+                    .or(updated_by.ne(excluded(updated_by)))
+                    .or(updated_at.ne(excluded(updated_at))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }

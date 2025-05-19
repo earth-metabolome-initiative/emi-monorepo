@@ -173,7 +173,7 @@ impl Codegen<'_> {
                 let column_type = column.rust_data_type(conn).await?;
                 insertable_attributes.push(quote::quote! {
                     #column_name: #column_type
-                })
+                });
             }
 
             let insertable_variant_methods = table.foreign_key_methods(conn, &syntax).await?;
@@ -185,7 +185,7 @@ impl Codegen<'_> {
                 let column_type = column.rust_data_type(conn).await?;
                 insertable_builder_attributes.push(quote::quote! {
                     #column_name: #column_type
-                })
+                });
             }
             let populating_product = insertable_columns.iter().map(|column| {
                     let column_ident = column.snake_case_ident()?;
@@ -249,10 +249,42 @@ impl Codegen<'_> {
                         self.#column_name = Some(#column_name);
                     }
                 };
+
+                // If the current table has both `created_by` and `updated_by`, and
+                // we are currently assigning the `created_by` column, we need to
+                // assign the `updated_by` column as well.
+                let updated_by_exception = if column.is_created_by(conn).await
+                    && table.has_updated_by_column(conn).await?
+                {
+                    quote::quote! {
+                        self = self.updated_by(#column_name)?;
+                    }
+                } else {
+                    TokenStream::new()
+                };
+
+                let attribute = {
+                    let camel_cased = column.camel_case_ident()?;
+                    quote::quote! { #insertable_enum::#camel_cased }
+                };
+
                 insertable_builder_methods.push(quote::quote! {
-                    pub fn #column_name(mut self, #column_name: #column_type) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+                    pub fn #column_name<P>(
+                        mut self, #column_name: P
+                    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+                    where
+                        P: TryInto<#column_type>,
+                        <P as TryInto<#column_type>>::Error: Into<validation_errors::SingleFieldError>,
+                    {
+                        let #column_name = #column_name
+                            .try_into()
+                            .map_err(|err: <P as TryInto<#column_type>>::Error| {
+                                Into::into(err)
+                                    .rename_field(#attribute)
+                            })?;
                         #check_constraints
                         #column_assignment
+                        #updated_by_exception
                         Ok(self)
                     }
                 });
@@ -269,6 +301,49 @@ impl Codegen<'_> {
                     })
                 })
                 .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+
+            let has_default_types = insertable_columns.iter().any(|column| column.has_default());
+
+            let insertable_builder_default_derive = if has_default_types {
+                // We need to manually implement Default for the insertable variant
+                TokenStream::new()
+            } else {
+                // Since no column has some special default type, we can
+                // derive Default for the insertable variant
+                quote::quote! {
+                    #[derive(Default)]
+                }
+            };
+
+            let insertable_builder_default_impl = if has_default_types {
+                let mut default_impl_attributes = Vec::new();
+
+                for insertable_column in &insertable_columns {
+                    let column_name = insertable_column.snake_case_ident()?;
+                    if insertable_column.has_default() {
+                        let default_value = insertable_column.rust_default_value(conn).await?;
+                        default_impl_attributes.push(quote::quote! {
+                            #column_name: Some(#default_value)
+                        });
+                    } else {
+                        default_impl_attributes.push(quote::quote! {
+                            #column_name: None
+                        });
+                    }
+                }
+
+                quote::quote! {
+                    impl Default for #insertable_builder_ident {
+                        fn default() -> Self {
+                            Self {
+                                #(#default_impl_attributes),*
+                            }
+                        }
+                    }
+                }
+            } else {
+                TokenStream::new()
+            };
 
             let ifv_file = root.join(format!("{}.rs", table.snake_case_name()?));
             std::fs::write(
@@ -299,10 +374,12 @@ impl Codegen<'_> {
                             #insertable_variant_methods
                         }
 
-                        #[derive(Default)]
+                        #insertable_builder_default_derive
                         pub struct #insertable_builder_ident {
                             #(#insertable_builder_attributes),*
                         }
+
+                        #insertable_builder_default_impl
 
                         impl #insertable_builder_ident {
                             #(#insertable_builder_methods)*

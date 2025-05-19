@@ -7,17 +7,14 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
         use diesel::RunQueryDsl;
-        diesel::insert_into(
-                crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::table,
-            )
+
+        use crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict((
-                crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::user_id,
-                crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::organization_id,
-            ))
+            .on_conflict((user_id, organization_id))
             .do_nothing()
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }
 #[cfg(feature = "sqlite")]
@@ -29,16 +26,13 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
         use diesel::RunQueryDsl;
-        diesel::insert_into(
-                crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::table,
-            )
+
+        use crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::*;
+        diesel::insert_into(table)
             .values(self)
-            .on_conflict((
-                crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::user_id,
-                crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::organization_id,
-            ))
+            .on_conflict((user_id, organization_id))
             .do_nothing()
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }

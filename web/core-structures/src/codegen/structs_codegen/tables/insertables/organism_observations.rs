@@ -132,7 +132,6 @@ impl InsertableOrganismObservation {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableOrganismObservationBuilder {
     id: Option<rosetta_uuid::Uuid>,
     wild: Option<bool>,
@@ -145,74 +144,165 @@ pub struct InsertableOrganismObservationBuilder {
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableOrganismObservationBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            wild: Some(true),
+            project_id: None,
+            organism_id: None,
+            subject_id: None,
+            picture: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableOrganismObservationBuilder {
-    pub fn id(
-        mut self,
-        id: rosetta_uuid::Uuid,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+            Into::into(err).rename_field(InsertableOrganismObservationAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn wild(
+    pub fn wild<P>(
         mut self,
-        wild: bool,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        wild: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let wild = wild.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
+            Into::into(err).rename_field(InsertableOrganismObservationAttributes::Wild)
+        })?;
         self.wild = Some(wild);
         Ok(self)
     }
-    pub fn project_id(
+    pub fn project_id<P>(
         mut self,
-        project_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        project_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let project_id = project_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableOrganismObservationAttributes::ProjectId)
+        })?;
         self.project_id = Some(project_id);
         Ok(self)
     }
-    pub fn organism_id(
+    pub fn organism_id<P>(
         mut self,
-        organism_id: rosetta_uuid::Uuid,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        organism_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let organism_id =
+            organism_id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+                Into::into(err).rename_field(InsertableOrganismObservationAttributes::OrganismId)
+            })?;
         self.organism_id = Some(organism_id);
         Ok(self)
     }
-    pub fn subject_id(
+    pub fn subject_id<P>(
         mut self,
-        subject_id: i16,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        subject_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i16>,
+        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let subject_id = subject_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
+            Into::into(err).rename_field(InsertableOrganismObservationAttributes::SubjectId)
+        })?;
         self.subject_id = Some(subject_id);
         Ok(self)
     }
-    pub fn picture(
+    pub fn picture<P>(
         mut self,
-        picture: Vec<u8>,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        picture: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<Vec<u8>>,
+        <P as TryInto<Vec<u8>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let picture = picture.try_into().map_err(|err: <P as TryInto<Vec<u8>>>::Error| {
+            Into::into(err).rename_field(InsertableOrganismObservationAttributes::Picture)
+        })?;
         self.picture = Some(picture);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableOrganismObservationAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableOrganismObservationAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableOrganismObservationAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableOrganismObservationAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }

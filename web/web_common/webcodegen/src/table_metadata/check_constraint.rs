@@ -4,7 +4,7 @@ use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
     Selectable, SelectableHelper,
 };
-use diesel_async::{AsyncPgConnection, RunQueryDsl};
+use diesel_async::AsyncPgConnection;
 use proc_macro2::TokenStream;
 use sqlparser::{
     ast::{
@@ -289,7 +289,7 @@ where
                     )
                     .into());
                 }
-                Ok((token_stream, scoped_columns.get(0).copied()))
+                Ok((token_stream, scoped_columns.first().copied()))
             }
             FunctionArgExpr::QualifiedWildcard(_) => {
                 unimplemented!("QualifiedWildcard not supported");
@@ -925,6 +925,8 @@ impl CheckConstraint {
         &self,
         conn: &mut AsyncPgConnection,
     ) -> Result<PgConstraint, WebCodeGenError> {
+        use diesel_async::RunQueryDsl;
+
         use crate::schema::{pg_constraint, pg_namespace};
         pg_constraint::table
             .inner_join(pg_namespace::table.on(pg_constraint::connamespace.eq(pg_namespace::oid)))
@@ -953,6 +955,8 @@ impl CheckConstraint {
         &self,
         conn: &mut AsyncPgConnection,
     ) -> Result<Vec<Column>, WebCodeGenError> {
+        use diesel_async::RunQueryDsl;
+
         use crate::schema::{columns, constraint_column_usage};
         Ok(columns::table
             .inner_join(constraint_column_usage::table.on(

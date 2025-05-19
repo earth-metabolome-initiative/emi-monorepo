@@ -52,31 +52,59 @@ pub struct InsertableUnitBuilder {
     color_id: Option<i16>,
 }
 impl InsertableUnitBuilder {
-    pub fn name(
+    pub fn name<P>(
         mut self,
-        name: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        name: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableUnitAttributes::Name)
+        })?;
         self.name = Some(name);
         Ok(self)
     }
-    pub fn unit(
+    pub fn unit<P>(
         mut self,
-        unit: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        unit: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let unit = unit.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableUnitAttributes::Unit)
+        })?;
         self.unit = Some(unit);
         Ok(self)
     }
-    pub fn icon(
+    pub fn icon<P>(
         mut self,
-        icon: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        icon: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableUnitAttributes::Icon)
+        })?;
         self.icon = Some(icon);
         Ok(self)
     }
-    pub fn color_id(
+    pub fn color_id<P>(
         mut self,
-        color_id: i16,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        color_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i16>,
+        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let color_id = color_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
+            Into::into(err).rename_field(InsertableUnitAttributes::ColorId)
+        })?;
         self.color_id = Some(color_id);
         Ok(self)
     }

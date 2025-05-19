@@ -44,17 +44,19 @@ impl AliquotingStep {
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::processables::Processable,
+        crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
         diesel::result::Error,
     > {
         use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::processables::Processable::table()
+        crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::processables::processables::dsl::id
+                crate::codegen::diesel_codegen::tables::volumetric_processables::volumetric_processables::dsl::id
                     .eq(&self.source_processable_id),
             )
-            .first::<crate::codegen::structs_codegen::tables::processables::Processable>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
+            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -62,17 +64,19 @@ impl AliquotingStep {
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::processables::Processable,
+        crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
         diesel::result::Error,
     > {
         use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::processables::Processable::table()
+        crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::processables::processables::dsl::id
+                crate::codegen::diesel_codegen::tables::volumetric_processables::volumetric_processables::dsl::id
                     .eq(&self.destination_processable_id),
             )
-            .first::<crate::codegen::structs_codegen::tables::processables::Processable>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
+            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -125,7 +129,7 @@ impl AliquotingStep {
     #[cfg(feature = "postgres")]
     pub async fn from_source_processable_id(
         conn: &mut diesel_async::AsyncPgConnection,
-        source_processable_id: &crate::codegen::structs_codegen::tables::processables::Processable,
+        source_processable_id: &crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
@@ -140,7 +144,7 @@ impl AliquotingStep {
     #[cfg(feature = "postgres")]
     pub async fn from_destination_processable_id(
         conn: &mut diesel_async::AsyncPgConnection,
-        destination_processable_id: &crate::codegen::structs_codegen::tables::processables::Processable,
+        destination_processable_id: &crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
@@ -179,6 +183,21 @@ impl AliquotingStep {
                 crate::codegen::diesel_codegen::tables::aliquoting_steps::aliquoting_steps::dsl::created_by
                     .eq(created_by.id),
             )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_created_at(
+        created_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::aliquoting_steps::aliquoting_steps;
+        Self::table()
+            .filter(aliquoting_steps::created_at.eq(created_at))
+            .order_by(aliquoting_steps::id.asc())
             .load::<Self>(conn)
             .await
     }

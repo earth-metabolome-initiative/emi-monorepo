@@ -3,7 +3,7 @@
 use super::Row;
 
 /// The `Upsertable` trait, which provides a method for upserting records in a
-/// SQLite database.
+/// `SQLite` database.
 pub trait Upsertable<C: diesel::Connection>: Sized + diesel::associations::HasTable {
     /// The `upsert` method is used to insert a new record or update an existing
     /// one in the database.
@@ -92,25 +92,37 @@ where
 
         while let (Some(sorted_row), Some(current_row)) = (sorted_iter.peek(), current_iter.peek())
         {
-            if sorted_row.primary_key() == current_row.primary_key() {
-                // If the primary keys are equal, and the rows are not equal,
-                // we update the current row and insert it into the vector.
-                if sorted_row != current_row {
-                    updated += 1;
+            match sorted_row.primary_key().cmp(&current_row.primary_key()) {
+                // If the primary keys are equal, we check if the rows are equal.
+                std::cmp::Ordering::Equal => {
+                    // If the primary keys are equal, and the rows are not equal,
+                    // we update the current row and insert it into the vector.
+                    if sorted_row != current_row {
+                        updated += 1;
+                    }
+                    self.push(sorted_iter.next().unwrap());
+                    current_iter.next();
                 }
-                self.push(sorted_iter.next().unwrap());
-                current_iter.next();
-            } else if sorted_row.primary_key() < current_row.primary_key() {
-                // If the sorted row's primary key is less than the current
-                // row's primary key, we insert the sorted row into the vector.
-                inserted += 1;
-                self.push(sorted_iter.next().unwrap());
-            } else {
-                // If the sorted row's primary key is greater than the current
-                // row's primary key, we insert the current row into the vector.
-                self.push(current_iter.next().unwrap());
+                std::cmp::Ordering::Less => {
+                    // If the sorted row's primary key is less than the current
+                    // row's primary key, we insert the sorted row into the vector.
+                    inserted += 1;
+                    self.push(sorted_iter.next().unwrap());
+                }
+                std::cmp::Ordering::Greater => {
+                    // If the sorted row's primary key is greater than the current
+                    // row's primary key, we insert the current row into the vector.
+                    self.push(current_iter.next().unwrap());
+                }
             }
         }
+
+        // If there are any remaining sorted rows, we insert them into the vector.
+        self.extend(sorted_iter.inspect(|_| {
+            inserted += 1;
+        }));
+        // If there are any remaining current rows, we insert them into the vector.
+        self.extend(current_iter);
 
         debug_assert!(
             self.is_sorted_by(|a, b| a.primary_key() <= b.primary_key()),

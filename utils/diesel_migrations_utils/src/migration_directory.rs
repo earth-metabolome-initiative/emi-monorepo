@@ -187,6 +187,27 @@ impl MigrationDirectory {
         Ok(graph.is_topologically_sorted())
     }
 
+    /// Returns the list of tuples of migrations which are not topologically
+    /// sorted.
+    ///
+    /// # Errors
+    ///
+    /// * If the up migrations cannot be parsed with `sqlparser`
+    /// * If the dependencies of the migrations cannot be determined
+    /// * If the graph cannot be created
+    pub fn not_topologically_sorted(&self) -> Result<Vec<(&Migration, &Migration)>, Error> {
+        let graph = self.graph()?;
+        Ok(graph
+            .sparse_coordinates()
+            .filter(|(src, dst)| src >= dst)
+            .map(|(src, dst)| {
+                let src_migration = &self.migrations[src];
+                let dst_migration = &self.migrations[dst];
+                (src_migration, dst_migration)
+            })
+            .collect())
+    }
+
     /// Iterates on the up migrations.
     pub fn ups(&self) -> impl Iterator<Item = Result<String, Error>> + '_ {
         let path: &Path = Path::new(&self.directory);

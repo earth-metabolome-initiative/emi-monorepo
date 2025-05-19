@@ -11,26 +11,24 @@ use web_common_traits::prelude::*;
 ///
 /// # Arguments
 ///
-/// * `portal_conn` - A mutable reference to an asynchronous PostgreSQL
+/// * `portal_conn` - A mutable reference to an asynchronous `PostgreSQL`
 ///   connection.
 ///
 /// # Errors
 ///
-/// * If the login provider cannot be created or inserted into the database,
-///  an error is returned.
+/// * If the login provider cannot be created or inserted into the database, an
+///   error is returned.
 async fn init_github_login_provider(
     portal_conn: &mut AsyncPgConnection,
 ) -> Result<(), crate::error::Error> {
     if LoginProvider::from_name("GitHub", portal_conn).await?.is_none() {
         let _provider = LoginProvider::new()
-            .icon("github".to_owned())?
-            .name("GitHub".to_owned())?
-            .oauth_url("https://github.com/login/oauth/authorize".to_owned())?
-            .client_id(std::env::var("GITHUB_CLIENT_ID").expect("GITHUB_CLIENT_ID").to_owned())?
-            .redirect_uri(
-                std::env::var("GITHUB_REDIRECT_URI").expect("GITHUB_REDIRECT_URI").to_owned(),
-            )?
-            .scope("read:user,user:email".to_owned())?
+            .icon("github")?
+            .name("GitHub")?
+            .oauth_url("https://github.com/login/oauth/authorize")?
+            .client_id(std::env::var("GITHUB_CLIENT_ID").expect("GITHUB_CLIENT_ID"))?
+            .redirect_uri(std::env::var("GITHUB_REDIRECT_URI").expect("GITHUB_REDIRECT_URI"))?
+            .scope("read:user,user:email")?
             .build()?
             .backend_insert(portal_conn)
             .await?;
@@ -42,13 +40,13 @@ async fn init_github_login_provider(
 ///
 /// # Arguments
 ///
-/// * `portal_conn` - A mutable reference to an asynchronous PostgreSQL
+/// * `portal_conn` - A mutable reference to an asynchronous `PostgreSQL`
 ///   connection.
 ///
 /// # Errors
 ///
-/// * If the login provider cannot be created or inserted into the database,
-///  an error is returned.
+/// * If the login provider cannot be created or inserted into the database, an
+///   error is returned.
 pub(crate) async fn init_login_providers(
     portal_conn: &mut AsyncPgConnection,
 ) -> Result<(), crate::error::Error> {

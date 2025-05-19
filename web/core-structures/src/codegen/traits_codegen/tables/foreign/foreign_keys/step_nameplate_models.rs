@@ -41,22 +41,22 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::User(users),
+                crate::codegen::tables::row::Row::NameplateModel(nameplate_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = Some(users);
+                if nameplate_models.id == self.nameplate_model_id {
+                    foreign_keys.nameplate_model = Some(nameplate_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::User(users),
+                crate::codegen::tables::row::Row::NameplateModel(nameplate_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = None;
+                if nameplate_models.id == self.nameplate_model_id {
+                    foreign_keys.nameplate_model = None;
                     updated = true;
                 }
             }
@@ -81,22 +81,22 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::NameplateModel(nameplate_models),
+                crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if nameplate_models.id == self.nameplate_model_id {
-                    foreign_keys.nameplate_model = Some(nameplate_models);
+                if users.id == self.created_by {
+                    foreign_keys.created_by = Some(users);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::NameplateModel(nameplate_models),
+                crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if nameplate_models.id == self.nameplate_model_id {
-                    foreign_keys.nameplate_model = None;
+                if users.id == self.created_by {
+                    foreign_keys.created_by = None;
                     updated = true;
                 }
             }

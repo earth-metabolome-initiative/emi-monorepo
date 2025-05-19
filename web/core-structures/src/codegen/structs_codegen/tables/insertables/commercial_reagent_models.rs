@@ -2,6 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableCommercialReagentModelAttributes {
     Id,
+    ReagentId,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -11,6 +12,9 @@ impl core::fmt::Display for InsertableCommercialReagentModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertableCommercialReagentModelAttributes::Id => write!(f, "id"),
+            InsertableCommercialReagentModelAttributes::ReagentId => {
+                write!(f, "reagent_id")
+            }
             InsertableCommercialReagentModelAttributes::CreatedBy => {
                 write!(f, "created_by")
             }
@@ -36,6 +40,7 @@ impl core::fmt::Display for InsertableCommercialReagentModelAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialReagentModel {
     id: i32,
+    reagent_id: i32,
     created_by: i32,
     created_at: rosetta_timestamp::TimestampUTC,
     updated_by: i32,
@@ -60,6 +65,22 @@ impl InsertableCommercialReagentModel {
             .first::<
                 crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
             >(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn reagent(
+        &self,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::reagents::Reagent, diesel::result::Error>
+    {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        crate::codegen::structs_codegen::tables::reagents::Reagent::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::reagents::reagents::dsl::id
+                    .eq(&self.reagent_id),
+            )
+            .first::<crate::codegen::structs_codegen::tables::reagents::Reagent>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -91,44 +112,112 @@ impl InsertableCommercialReagentModel {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableCommercialReagentModelBuilder {
     id: Option<i32>,
+    reagent_id: Option<i32>,
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableCommercialReagentModelBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            reagent_id: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableCommercialReagentModelBuilder {
-    pub fn id(mut self, id: i32) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableCommercialReagentModelAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn reagent_id<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.created_by = Some(created_by);
+        reagent_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let reagent_id = reagent_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableCommercialReagentModelAttributes::ReagentId)
+        })?;
+        self.reagent_id = Some(reagent_id);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_by<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableCommercialReagentModelAttributes::CreatedBy)
+        })?;
+        self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableCommercialReagentModelAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableCommercialReagentModelAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableCommercialReagentModelAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }
@@ -143,6 +232,11 @@ impl common_traits::prelude::Builder for InsertableCommercialReagentModelBuilder
             id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableCommercialReagentModelAttributes::Id,
             ))?,
+            reagent_id: self.reagent_id.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableCommercialReagentModelAttributes::ReagentId,
+                ),
+            )?,
             created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableCommercialReagentModelAttributes::CreatedBy,
@@ -171,6 +265,7 @@ impl TryFrom<InsertableCommercialReagentModel> for InsertableCommercialReagentMo
     fn try_from(insertable_variant: InsertableCommercialReagentModel) -> Result<Self, Self::Error> {
         Self::default()
             .id(insertable_variant.id)?
+            .reagent_id(insertable_variant.reagent_id)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?

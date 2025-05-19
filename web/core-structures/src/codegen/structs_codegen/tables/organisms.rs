@@ -13,7 +13,7 @@
 pub struct Organism {
     pub id: rosetta_uuid::Uuid,
     pub name: Option<String>,
-    pub nameplate_category_id: i16,
+    pub nameplate_category: nameplate_categories::NameplateCategory,
 }
 impl diesel::Identifiable for Organism {
     type Id = rosetta_uuid::Uuid;
@@ -39,26 +39,6 @@ impl Organism {
             .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn nameplate_category(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::nameplate_categories::nameplate_categories::dsl::id
-                    .eq(&self.nameplate_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
-            >(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn from_id(
         conn: &mut diesel_async::AsyncPgConnection,
         id: &crate::codegen::structs_codegen::tables::trackables::Trackable,
@@ -71,17 +51,32 @@ impl Organism {
             .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_nameplate_category_id(
+    pub async fn from_name(
+        name: &Option<String>,
         conn: &mut diesel_async::AsyncPgConnection,
-        nameplate_category_id: &crate::codegen::structs_codegen::tables::nameplate_categories::NameplateCategory,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::organisms::organisms;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::organisms::organisms::dsl::nameplate_category_id
-                    .eq(nameplate_category_id.id),
-            )
+            .filter(organisms::name.eq(name))
+            .order_by(organisms::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_nameplate_category(
+        nameplate_category: &nameplate_categories::NameplateCategory,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::organisms::organisms;
+        Self::table()
+            .filter(organisms::nameplate_category.eq(nameplate_category))
+            .order_by(organisms::id.asc())
             .load::<Self>(conn)
             .await
     }

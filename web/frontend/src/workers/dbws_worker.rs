@@ -13,6 +13,7 @@
 use db_worker::listen_notify::ListenNotify;
 use diesel::SqliteConnection;
 use internal_message::ws_internal_message::WSInternalMessage;
+use web_sys::console;
 use ws_messages::{DBMessage, F2BMessage, frontend::Subscription};
 use yew_agent::worker::{HandlerId, Worker};
 
@@ -39,6 +40,7 @@ impl Worker for DBWSWorker {
     type Output = DBMessage;
 
     fn create(scope: &yew_agent::prelude::WorkerScope<Self>) -> Self {
+        console::log_1(&"Creating DBWSWorker".into());
         scope.send_future(sqlite_wasm_rs::export::install_opfs_sahpool(None, true));
         scope.send_message(WSInternalMessage::Connect);
         Self { websocket: None, conn: None, listen_notify: ListenNotify::default() }
@@ -49,7 +51,11 @@ impl Worker for DBWSWorker {
         scope: &yew_agent::prelude::WorkerScope<Self>,
         internal_message: Self::Message,
     ) {
+        console::log_1(&format!("Received internal message: {internal_message:?}").into());
         match internal_message {
+            InternalMessage::RetryC2DB((component_message, subscriber_id)) => {
+                self.received(scope, component_message, subscriber_id);
+            }
             InternalMessage::DB(db_message) => {
                 self.update_database(scope, db_message);
             }
@@ -57,10 +63,10 @@ impl Worker for DBWSWorker {
                 self.update_websocket(scope, ws_message);
             }
             InternalMessage::DBError(err) => {
-                todo!("Handle DB error: {err:?}");
+                console::log_1(&format!("Database error: {err:?}").into());
             }
             InternalMessage::WSError(err) => {
-                todo!("Handle WS error: {err:?}");
+                console::log_1(&format!("WebSocket error: {err:?}").into());
             }
         }
     }
@@ -74,12 +80,17 @@ impl Worker for DBWSWorker {
         }
     }
 
+    fn connected(&mut self, _scope: &yew_agent::prelude::WorkerScope<Self>, id: HandlerId) {
+        console::log_1(&format!("Connected to worker with id: {id:?}").into());
+    }
+
     fn received(
         &mut self,
         scope: &yew_agent::prelude::WorkerScope<Self>,
         frontend_message: Self::Input,
         subscriber_id: HandlerId,
     ) {
+        console::log_1(&format!("Received component message: {frontend_message:?}").into());
         match frontend_message {
             ComponentMessage::DB(db_message) => {
                 self.received_query(scope, db_message, subscriber_id);

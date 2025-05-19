@@ -67,16 +67,8 @@ pub(super) async fn portal_ws(
                 log::debug!("msg: {msg:?}");
 
                 match msg {
-                    AggregatedMessage::Ping(bytes) => {
+                    AggregatedMessage::Ping(_) | AggregatedMessage::Pong(_) => {
                         last_heartbeat = Instant::now();
-                        // unwrap:
-                        session.pong(&bytes).await.unwrap();
-                    }
-
-                    AggregatedMessage::Pong(bytes) => {
-                        last_heartbeat = Instant::now();
-                        // unwrap:
-                        session.ping(&bytes).await.unwrap();
                     }
 
                     AggregatedMessage::Text(_) => {
@@ -112,7 +104,7 @@ pub(super) async fn portal_ws(
                                             .await
                                             .unwrap();
                                     }
-                                    Err(error) => {
+                                    Err(_error) => {
                                         todo!("Handle ops error");
                                     }
                                 }
@@ -138,7 +130,7 @@ pub(super) async fn portal_ws(
                                                 .unwrap();
                                         }
                                     }
-                                    Err(error) => {
+                                    Err(_error) => {
                                         todo!("Handle ops error");
                                     }
                                 }
@@ -155,7 +147,7 @@ pub(super) async fn portal_ws(
 
             // client WebSocket stream error
             Either::Left((Either::Left((Some(Err(err)), _)), _)) => {
-                log::error!("{}", err);
+                log::error!("{err}");
                 break None;
             }
 

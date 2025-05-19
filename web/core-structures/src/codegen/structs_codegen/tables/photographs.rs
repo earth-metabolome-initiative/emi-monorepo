@@ -88,15 +88,42 @@ impl Photograph {
         path: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
-            .filter(diesel::ExpressionMethods::eq(
-                crate::codegen::diesel_codegen::tables::photographs::photographs::path,
-                path,
-            ))
+            .filter(crate::codegen::diesel_codegen::tables::photographs::photographs::path.eq(path))
             .first::<Self>(conn)
             .await
             .optional()
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_created_at(
+        created_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::photographs::photographs;
+        Self::table()
+            .filter(photographs::created_at.eq(created_at))
+            .order_by(photographs::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_updated_at(
+        updated_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::photographs::photographs;
+        Self::table()
+            .filter(photographs::updated_at.eq(updated_at))
+            .order_by(photographs::id.asc())
+            .load::<Self>(conn)
+            .await
     }
 }

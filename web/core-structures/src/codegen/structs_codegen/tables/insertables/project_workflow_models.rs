@@ -76,7 +76,6 @@ impl InsertableProjectWorkflowModel {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableProjectWorkflowModelBuilder {
     name: Option<String>,
     description: Option<String>,
@@ -85,50 +84,112 @@ pub struct InsertableProjectWorkflowModelBuilder {
     created_by: Option<i32>,
     updated_by: Option<i32>,
 }
+impl Default for InsertableProjectWorkflowModelBuilder {
+    fn default() -> Self {
+        Self {
+            name: None,
+            description: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            created_by: None,
+            updated_by: None,
+        }
+    }
+}
 impl InsertableProjectWorkflowModelBuilder {
-    pub fn name(
+    pub fn name<P>(
         mut self,
-        name: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        pgrx_validation::must_not_be_empty(name.as_ref())
+        name: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableProjectWorkflowModelAttributes::Name)
+        })?;
+        pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| e.rename_field(InsertableProjectWorkflowModelAttributes::Name))?;
         self.name = Some(name);
         Ok(self)
     }
-    pub fn description(
+    pub fn description<P>(
         mut self,
-        description: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        pgrx_validation::must_not_be_empty(description.as_ref())
+        description: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let description =
+            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableProjectWorkflowModelAttributes::Description)
+            })?;
+        pgrx_validation::must_be_paragraph(description.as_ref())
             .map_err(|e| e.rename_field(InsertableProjectWorkflowModelAttributes::Description))?;
         self.description = Some(description);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProjectWorkflowModelAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProjectWorkflowModelAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableProjectWorkflowModelAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableProjectWorkflowModelAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }

@@ -47,6 +47,7 @@ impl Codegen<'_> {
                 TokenStream::new()
             };
             let from_unique_indices = table.from_unique_indices(conn, &syntax).await?;
+            let from_attributes = table.from_attributes(conn, &syntax).await?;
 
             std::fs::write(
                 &table_file,
@@ -56,6 +57,7 @@ impl Codegen<'_> {
                         #foreign_key_methods
                         #from_foreign_key_methods
                         #from_unique_indices
+                        #from_attributes
                     }
                 })?,
             )?;
@@ -86,12 +88,12 @@ impl Codegen<'_> {
                 pub mod table_primary_keys;
             });
 
-            self.generate_rows_enumeration(&root.join("rows"), tables, conn).await?;
+            self.generate_rows_enumeration(&root.join("rows"), tables, conn)?;
             table_main_module.extend(quote::quote! {
                 pub mod rows;
             });
 
-            self.generate_row_enumeration(&root.join("row"), tables, conn).await?;
+            self.generate_row_enumeration(&root.join("row"), tables, conn)?;
             table_main_module.extend(quote::quote! {
                 pub mod row;
             });

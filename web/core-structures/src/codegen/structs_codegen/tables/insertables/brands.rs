@@ -6,7 +6,6 @@ pub enum InsertableBrandAttributes {
     CreatedAt,
     UpdatedBy,
     UpdatedAt,
-    BrandStateId,
 }
 impl core::fmt::Display for InsertableBrandAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -16,7 +15,6 @@ impl core::fmt::Display for InsertableBrandAttributes {
             InsertableBrandAttributes::CreatedAt => write!(f, "created_at"),
             InsertableBrandAttributes::UpdatedBy => write!(f, "updated_by"),
             InsertableBrandAttributes::UpdatedAt => write!(f, "updated_at"),
-            InsertableBrandAttributes::BrandStateId => write!(f, "brand_state_id"),
         }
     }
 }
@@ -32,7 +30,6 @@ pub struct InsertableBrand {
     created_at: rosetta_timestamp::TimestampUTC,
     updated_by: i32,
     updated_at: rosetta_timestamp::TimestampUTC,
-    brand_state_id: i16,
 }
 impl InsertableBrand {
     #[cfg(feature = "postgres")]
@@ -63,75 +60,103 @@ impl InsertableBrand {
             .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
             .await
     }
-    #[cfg(feature = "postgres")]
-    pub async fn brand_state(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::brand_states::BrandState,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::brand_states::BrandState::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::brand_states::brand_states::dsl::id
-                    .eq(&self.brand_state_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::brand_states::BrandState>(conn)
-            .await
-    }
 }
-#[derive(Default)]
 pub struct InsertableBrandBuilder {
     name: Option<String>,
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
     updated_by: Option<i32>,
     updated_at: Option<rosetta_timestamp::TimestampUTC>,
-    brand_state_id: Option<i16>,
+}
+impl Default for InsertableBrandBuilder {
+    fn default() -> Self {
+        Self {
+            name: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: None,
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
 }
 impl InsertableBrandBuilder {
-    pub fn name(
+    pub fn name<P>(
         mut self,
-        name: String,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        name: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableBrandAttributes::Name)
+        })?;
+        pgrx_validation::must_be_paragraph(name.as_ref())
+            .map_err(|e| e.rename_field(InsertableBrandAttributes::Name))?;
         self.name = Some(name);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableBrandAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableBrandAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by(
+    pub fn updated_by<P>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableBrandAttributes::UpdatedBy)
+        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    pub fn updated_at(
+    pub fn updated_at<P>(
         mut self,
-        updated_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        updated_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let updated_at = updated_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableBrandAttributes::UpdatedAt)
+            },
+        )?;
         self.updated_at = Some(updated_at);
-        Ok(self)
-    }
-    pub fn brand_state_id(
-        mut self,
-        brand_state_id: i16,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.brand_state_id = Some(brand_state_id);
         Ok(self)
     }
 }
@@ -164,11 +189,6 @@ impl common_traits::prelude::Builder for InsertableBrandBuilder {
                     InsertableBrandAttributes::UpdatedAt,
                 ),
             )?,
-            brand_state_id: self.brand_state_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableBrandAttributes::BrandStateId,
-                ),
-            )?,
         })
     }
 }
@@ -180,7 +200,6 @@ impl TryFrom<InsertableBrand> for InsertableBrandBuilder {
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?
-            .brand_state_id(insertable_variant.brand_state_id)
+            .updated_at(insertable_variant.updated_at)
     }
 }

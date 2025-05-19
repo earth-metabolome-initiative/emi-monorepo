@@ -11,25 +11,46 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::AliquotingStep(aliquoting_steps) => {
                 crate::codegen::tables::rows::Rows::from(aliquoting_steps)
             }
-            super::Row::BrandState(brand_states) => {
-                crate::codegen::tables::rows::Rows::from(brand_states)
+            super::Row::BallMillStepModel(ball_mill_step_models) => {
+                crate::codegen::tables::rows::Rows::from(ball_mill_step_models)
+            }
+            super::Row::BallMillStep(ball_mill_steps) => {
+                crate::codegen::tables::rows::Rows::from(ball_mill_steps)
             }
             super::Row::Brand(brands) => crate::codegen::tables::rows::Rows::from(brands),
+            super::Row::CentrifugeStepModel(centrifuge_step_models) => {
+                crate::codegen::tables::rows::Rows::from(centrifuge_step_models)
+            }
+            super::Row::CentrifugeStep(centrifuge_steps) => {
+                crate::codegen::tables::rows::Rows::from(centrifuge_steps)
+            }
+            super::Row::ChemicalEntity(chemical_entities) => {
+                crate::codegen::tables::rows::Rows::from(chemical_entities)
+            }
             super::Row::City(cities) => crate::codegen::tables::rows::Rows::from(cities),
             super::Row::Color(colors) => crate::codegen::tables::rows::Rows::from(colors),
+            super::Row::CommercialProductLot(commercial_product_lots) => {
+                crate::codegen::tables::rows::Rows::from(commercial_product_lots)
+            }
             super::Row::CommercialProduct(commercial_products) => {
                 crate::codegen::tables::rows::Rows::from(commercial_products)
             }
             super::Row::CommercialReagentModel(commercial_reagent_models) => {
                 crate::codegen::tables::rows::Rows::from(commercial_reagent_models)
             }
-            super::Row::ContainerCategory(container_categories) => {
-                crate::codegen::tables::rows::Rows::from(container_categories)
+            super::Row::CommercialReagent(commercial_reagents) => {
+                crate::codegen::tables::rows::Rows::from(commercial_reagents)
             }
             super::Row::ContainerModel(container_models) => {
                 crate::codegen::tables::rows::Rows::from(container_models)
             }
             super::Row::Country(countries) => crate::codegen::tables::rows::Rows::from(countries),
+            super::Row::DisposalStepModel(disposal_step_models) => {
+                crate::codegen::tables::rows::Rows::from(disposal_step_models)
+            }
+            super::Row::DisposalStep(disposal_steps) => {
+                crate::codegen::tables::rows::Rows::from(disposal_steps)
+            }
             super::Row::DocumentFormat(document_formats) => {
                 crate::codegen::tables::rows::Rows::from(document_formats)
             }
@@ -44,12 +65,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::FreezeDryingStepModel(freeze_drying_step_models) => {
                 crate::codegen::tables::rows::Rows::from(freeze_drying_step_models)
-            }
-            super::Row::GrindingStepModel(grinding_step_models) => {
-                crate::codegen::tables::rows::Rows::from(grinding_step_models)
-            }
-            super::Row::InstrumentCategory(instrument_categories) => {
-                crate::codegen::tables::rows::Rows::from(instrument_categories)
             }
             super::Row::InstrumentLocation(instrument_locations) => {
                 crate::codegen::tables::rows::Rows::from(instrument_locations)
@@ -70,9 +85,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
                 crate::codegen::tables::rows::Rows::from(login_providers)
             }
             super::Row::Material(materials) => crate::codegen::tables::rows::Rows::from(materials),
-            super::Row::NameplateCategory(nameplate_categories) => {
-                crate::codegen::tables::rows::Rows::from(nameplate_categories)
-            }
             super::Row::NameplateModel(nameplate_models) => {
                 crate::codegen::tables::rows::Rows::from(nameplate_models)
             }
@@ -113,6 +125,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
                 crate::codegen::tables::rows::Rows::from(procedure_model_nameplate_categories)
             }
+            super::Row::ProcedureModelReagent(procedure_model_reagents) => {
+                crate::codegen::tables::rows::Rows::from(procedure_model_reagents)
+            }
             super::Row::ProcedureModelToolCategory(procedure_model_tool_categories) => {
                 crate::codegen::tables::rows::Rows::from(procedure_model_tool_categories)
             }
@@ -139,6 +154,7 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::Project(projects) => crate::codegen::tables::rows::Rows::from(projects),
             super::Row::Rank(ranks) => crate::codegen::tables::rows::Rows::from(ranks),
+            super::Row::Reagent(reagents) => crate::codegen::tables::rows::Rows::from(reagents),
             super::Row::Role(roles) => crate::codegen::tables::rows::Rows::from(roles),
             super::Row::Room(rooms) => crate::codegen::tables::rows::Rows::from(rooms),
             super::Row::SampleState(sample_states) => {
@@ -149,6 +165,12 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::SamplingStep(sampling_steps) => {
                 crate::codegen::tables::rows::Rows::from(sampling_steps)
+            }
+            super::Row::ShakingStepModel(shaking_step_models) => {
+                crate::codegen::tables::rows::Rows::from(shaking_step_models)
+            }
+            super::Row::ShakingStep(shaking_steps) => {
+                crate::codegen::tables::rows::Rows::from(shaking_steps)
             }
             super::Row::SpatialRefSy(spatial_ref_sys) => {
                 crate::codegen::tables::rows::Rows::from(spatial_ref_sys)
@@ -211,8 +233,8 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
                 crate::codegen::tables::rows::Rows::from(team_states)
             }
             super::Row::Team(teams) => crate::codegen::tables::rows::Rows::from(teams),
-            super::Row::ToolCategory(tool_categories) => {
-                crate::codegen::tables::rows::Rows::from(tool_categories)
+            super::Row::TemporaryUserEmail(temporary_user_emails) => {
+                crate::codegen::tables::rows::Rows::from(temporary_user_emails)
             }
             super::Row::ToolModel(tool_models) => {
                 crate::codegen::tables::rows::Rows::from(tool_models)
@@ -234,6 +256,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
                 crate::codegen::tables::rows::Rows::from(user_organizations)
             }
             super::Row::User(users) => crate::codegen::tables::rows::Rows::from(users),
+            super::Row::VolumetricProcessable(volumetric_processables) => {
+                crate::codegen::tables::rows::Rows::from(volumetric_processables)
+            }
             super::Row::WeighingInstrumentModel(weighing_instrument_models) => {
                 crate::codegen::tables::rows::Rows::from(weighing_instrument_models)
             }

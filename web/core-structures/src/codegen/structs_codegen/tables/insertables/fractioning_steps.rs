@@ -4,7 +4,6 @@ pub enum InsertableFractioningStepAttributes {
     Id,
     SourceProcessableId,
     DestinationProcessableId,
-    FractioningStepModelId,
     InstrumentId,
     Kilograms,
     CreatedBy,
@@ -19,9 +18,6 @@ impl core::fmt::Display for InsertableFractioningStepAttributes {
             }
             InsertableFractioningStepAttributes::DestinationProcessableId => {
                 write!(f, "destination_processable_id")
-            }
-            InsertableFractioningStepAttributes::FractioningStepModelId => {
-                write!(f, "fractioning_step_model_id")
             }
             InsertableFractioningStepAttributes::InstrumentId => {
                 write!(f, "instrument_id")
@@ -44,7 +40,6 @@ pub struct InsertableFractioningStep {
     id: rosetta_uuid::Uuid,
     source_processable_id: rosetta_uuid::Uuid,
     destination_processable_id: rosetta_uuid::Uuid,
-    fractioning_step_model_id: i32,
     instrument_id: i32,
     kilograms: f32,
     created_by: i32,
@@ -100,26 +95,6 @@ impl InsertableFractioningStep {
             .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn fractioning_step_model(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::fractioning_step_models::fractioning_step_models::dsl::id
-                    .eq(&self.fractioning_step_model_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
-            >(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn instrument(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -152,73 +127,133 @@ impl InsertableFractioningStep {
             .await
     }
 }
-#[derive(Default)]
 pub struct InsertableFractioningStepBuilder {
     id: Option<rosetta_uuid::Uuid>,
     source_processable_id: Option<rosetta_uuid::Uuid>,
     destination_processable_id: Option<rosetta_uuid::Uuid>,
-    fractioning_step_model_id: Option<i32>,
     instrument_id: Option<i32>,
     kilograms: Option<f32>,
     created_by: Option<i32>,
     created_at: Option<rosetta_timestamp::TimestampUTC>,
 }
+impl Default for InsertableFractioningStepBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            source_processable_id: None,
+            destination_processable_id: None,
+            instrument_id: None,
+            kilograms: None,
+            created_by: None,
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
+}
 impl InsertableFractioningStepBuilder {
-    pub fn id(
-        mut self,
-        id: rosetta_uuid::Uuid,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+            Into::into(err).rename_field(InsertableFractioningStepAttributes::Id)
+        })?;
         self.id = Some(id);
         Ok(self)
     }
-    pub fn source_processable_id(
+    pub fn source_processable_id<P>(
         mut self,
-        source_processable_id: rosetta_uuid::Uuid,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        source_processable_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let source_processable_id = source_processable_id.try_into().map_err(
+            |err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableFractioningStepAttributes::SourceProcessableId)
+            },
+        )?;
         self.source_processable_id = Some(source_processable_id);
         Ok(self)
     }
-    pub fn destination_processable_id(
+    pub fn destination_processable_id<P>(
         mut self,
-        destination_processable_id: rosetta_uuid::Uuid,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        destination_processable_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_uuid::Uuid>,
+        <P as TryInto<rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let destination_processable_id = destination_processable_id.try_into().map_err(
+            |err: <P as TryInto<rosetta_uuid::Uuid>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableFractioningStepAttributes::DestinationProcessableId)
+            },
+        )?;
         self.destination_processable_id = Some(destination_processable_id);
         Ok(self)
     }
-    pub fn fractioning_step_model_id(
+    pub fn instrument_id<P>(
         mut self,
-        fractioning_step_model_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
-        self.fractioning_step_model_id = Some(fractioning_step_model_id);
-        Ok(self)
-    }
-    pub fn instrument_id(
-        mut self,
-        instrument_id: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        instrument_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let instrument_id =
+            instrument_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(InsertableFractioningStepAttributes::InstrumentId)
+            })?;
         self.instrument_id = Some(instrument_id);
         Ok(self)
     }
-    pub fn kilograms(
+    pub fn kilograms<P>(
         mut self,
-        kilograms: f32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        kilograms: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let kilograms = kilograms.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+            Into::into(err).rename_field(InsertableFractioningStepAttributes::Kilograms)
+        })?;
         pgrx_validation::must_be_strictly_positive_f32(kilograms)
             .map_err(|e| e.rename_field(InsertableFractioningStepAttributes::Kilograms))?;
         self.kilograms = Some(kilograms);
         Ok(self)
     }
-    pub fn created_by(
+    pub fn created_by<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_by: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableFractioningStepAttributes::CreatedBy)
+        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
-    pub fn created_at(
+    pub fn created_at<P>(
         mut self,
-        created_at: rosetta_timestamp::TimestampUTC,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error> {
+        created_at: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableFractioningStepAttributes::CreatedAt)
+            },
+        )?;
         self.created_at = Some(created_at);
         Ok(self)
     }
@@ -240,11 +275,6 @@ impl common_traits::prelude::Builder for InsertableFractioningStepBuilder {
             destination_processable_id: self.destination_processable_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableFractioningStepAttributes::DestinationProcessableId,
-                ),
-            )?,
-            fractioning_step_model_id: self.fractioning_step_model_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableFractioningStepAttributes::FractioningStepModelId,
                 ),
             )?,
             instrument_id: self.instrument_id.ok_or(
@@ -277,7 +307,6 @@ impl TryFrom<InsertableFractioningStep> for InsertableFractioningStepBuilder {
             .id(insertable_variant.id)?
             .source_processable_id(insertable_variant.source_processable_id)?
             .destination_processable_id(insertable_variant.destination_processable_id)?
-            .fractioning_step_model_id(insertable_variant.fractioning_step_model_id)?
             .instrument_id(insertable_variant.instrument_id)?
             .kilograms(insertable_variant.kilograms)?
             .created_by(insertable_variant.created_by)?

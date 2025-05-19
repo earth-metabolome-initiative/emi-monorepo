@@ -156,17 +156,75 @@ impl CommercialProduct {
         name: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
         Self::table()
             .filter(
-                diesel::ExpressionMethods::eq(
-                    crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::name,
-                    name,
-                ),
+                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::name
+                    .eq(name),
             )
             .first::<Self>(conn)
             .await
             .optional()
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_description(
+        description: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::commercial_products::commercial_products;
+        Self::table()
+            .filter(commercial_products::description.eq(description))
+            .order_by(commercial_products::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_deprecation_date(
+        deprecation_date: &Option<rosetta_timestamp::TimestampUTC>,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::commercial_products::commercial_products;
+        Self::table()
+            .filter(commercial_products::deprecation_date.eq(deprecation_date))
+            .order_by(commercial_products::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_created_at(
+        created_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::commercial_products::commercial_products;
+        Self::table()
+            .filter(commercial_products::created_at.eq(created_at))
+            .order_by(commercial_products::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_updated_at(
+        updated_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::commercial_products::commercial_products;
+        Self::table()
+            .filter(commercial_products::updated_at.eq(updated_at))
+            .order_by(commercial_products::id.asc())
+            .load::<Self>(conn)
+            .await
     }
 }

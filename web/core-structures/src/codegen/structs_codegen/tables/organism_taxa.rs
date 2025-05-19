@@ -112,4 +112,43 @@ impl OrganismTaxon {
             .load::<Self>(conn)
             .await
     }
+    #[cfg(feature = "postgres")]
+    pub async fn from_organism_id_and_taxon_id(
+        organism_id: &rosetta_uuid::Uuid,
+        taxon_id: &i32,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl,
+            associations::HasTable,
+        };
+        use diesel_async::RunQueryDsl;
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa::organism_id
+                    .eq(organism_id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa::taxon_id
+                            .eq(taxon_id),
+                    ),
+            )
+            .first::<Self>(conn)
+            .await
+            .optional()
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_created_at(
+        created_at: &rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa;
+        Self::table()
+            .filter(organism_taxa::created_at.eq(created_at))
+            .order_by((organism_taxa::organism_id.asc(), organism_taxa::taxon_id.asc()))
+            .load::<Self>(conn)
+            .await
+    }
 }

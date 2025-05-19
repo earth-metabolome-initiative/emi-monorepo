@@ -1,9 +1,10 @@
 //! Submodule providing the `Connector` struct and its associated methods.
 
-use std::rc::Rc;
+use std::{fmt::Debug, rc::Rc};
 
 use core_structures::tables::{row::Row, rows::Rows};
 use web_common_traits::crud::{CrudPrimaryKeyOperation, CrudTableOperation};
+use web_sys::console;
 use ws_messages::DBMessage;
 use yew::{Callback, Component, Context, Properties};
 use yew_agent::{prelude::WorkerBridgeHandle, scope_ext::AgentScopeExt, worker::Worker};
@@ -61,7 +62,7 @@ impl<'a> From<&'a ConnectorProps> for Dispatch<AppState> {
     }
 }
 
-impl<'a> From<ConnectorProps> for Dispatch<AppState> {
+impl From<ConnectorProps> for Dispatch<AppState> {
     fn from(props: ConnectorProps) -> Self {
         props.dispatch
     }
@@ -164,6 +165,7 @@ impl Connector {
         for<'a> Dispatch<AppState>: From<&'a C::Properties>,
     {
         let dispatch: Dispatch<AppState> = ctx.props().into();
+        console::log_1(&"Creating connector".to_string().into());
 
         Self {
             websocket: ctx.link().bridge_worker(Callback::from({
@@ -186,8 +188,9 @@ impl Connector {
     /// * `message` - The message to send to the worker.
     pub(crate) fn send<M>(&self, message: M)
     where
-        M: Into<<DBWSWorker as Worker>::Input>,
+        M: Into<<DBWSWorker as Worker>::Input> + Debug,
     {
+        console::log_1(&format!("Sending message: {message:?}").into());
         self.websocket.send(message.into());
     }
 
@@ -208,9 +211,10 @@ impl Connector {
                 false
             }
             ConnectorMessage::Worker(message) => {
-                unimplemented!(
-                    "The component should implement the `update` method to handle the worker message: `{message:?}`."
+                console::log_1(
+                    &format!("The component should implement the `update` method to handle the worker message: `{message:?}`.").into()
                 );
+                false
             }
         }
     }
