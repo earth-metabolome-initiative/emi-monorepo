@@ -3,14 +3,8 @@ name = "pgrx_validation"
 version = "0.0.0"
 edition = "2024"
 
-[lib]
+# [lib]
 # crate-type = ["cdylib", "lib"]
-# Commented out to avoid building a shared library for the generic compilation targets,
-# and unfortunately it is not possible (to my knowledge) to conditionally set the crate-type
-# based on the target or features in Cargo.toml. Therefore, there is in this directory instead
-# a DockerCargo.toml file that is used to build the shared library for the pgrx validation
-# library in the Docker container.
-crate-type = ["lib"]
 
 [[bin]]
 name = "pgrx_embed_pgrx_validation"
