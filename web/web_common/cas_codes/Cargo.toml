@@ -27,7 +27,7 @@ diesel_pgrx = ["dep:diesel_pgrx", "diesel"]
 sqlite = ["diesel/sqlite", "diesel_pgrx/sqlite", "diesel_pgrx"]
 postgres = ["diesel/postgres", "diesel_pgrx/postgres", "diesel_pgrx"]
 
-pgrx = ["dep:pgrx"]
+pgrx = ["dep:pgrx", "serde"]
 pg13 = ["pgrx", "pgrx/pg13"]
 pg14 = ["pgrx", "pgrx/pg14"]
 pg15 = ["pgrx", "pgrx/pg15"]
