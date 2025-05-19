@@ -1,5 +1,7 @@
 # Chemical Abstracts Service (CAS) code
 
+[![PGRX Build](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-build-cas_codes.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-build-cas_codes.yml)
+
 Rust crate providing a structured representation of [CAS Registry Numbers (CAS RN)](https://en.wikipedia.org/wiki/CAS_Registry_Number) and related functionality.
 
 To build this extension, just run the following docker build command:

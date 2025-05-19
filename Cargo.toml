@@ -47,7 +47,7 @@ members = [
   "web/web_common/instrument_categories",
   "web/web_common/container_categories",
   "web/web_common/nameplate_categories",
-  "web/web_common/cas_code",
+  "web/web_common/cas_codes",
   "utils/diesel_pgrx_derive",
   "utils/diesel_pgrx",
   "web/web_common/elements",

@@ -6,5 +6,5 @@
 #[cfg(not(feature = "pgrx"))]
 /// Stub function to allow compilation without pgrx
 fn main() {
-    println!("Hello, cas_code!");
+    println!("Hello, cas_codes!");
 }

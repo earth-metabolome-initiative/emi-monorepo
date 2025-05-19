@@ -1,5 +1,9 @@
 # Elements
 
+[![PGRX Build](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-build-elements.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-build-elements.yml)
+[![Clippy](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-clippy-elements.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-clippy-elements.yml)
+[![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-elements.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-elements.yml)
+
 Crate proving an enumeration and metadata for the elements of the periodic table.
 
 ## Compiling the PGRX extension

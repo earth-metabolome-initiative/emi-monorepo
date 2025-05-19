@@ -1,5 +1,9 @@
 # Molecular formula
 
+[![PGRX Build](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-build-molecular_formula.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-build-molecular_formula.yml)
+[![Clippy](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-clippy-molecular_formula.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-clippy-molecular_formula.yml)
+[![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-molecular_formula.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-molecular_formula.yml)
+
 Crate proving a parser, structs and utilities for molecular formulas.
 
 ## Compiling the PGRX extension

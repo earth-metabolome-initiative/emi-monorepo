@@ -1,6 +1,6 @@
-comment = 'cas_code:  Created by pgrx'
+comment = 'cas_codes:  Created by pgrx'
 default_version = '@CARGO_VERSION@'
-module_pathname = '$libdir/cas_code'
+module_pathname = '$libdir/cas_codes'
 relocatable = false
 superuser = true
 trusted = false

@@ -7,65 +7,65 @@ The ordering of items is not stable, it is driven by a dependency graph.
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::CAS
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::CAS
 CREATE TYPE CAS;
 
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_in
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_in
 CREATE  FUNCTION "cas_in"(
 	"input" cstring /* core::option::Option<&core::ffi::c_str::CStr> */
-) RETURNS CAS /* core::option::Option<cas_code::CAS> */
+) RETURNS CAS /* core::option::Option<cas_codes::CAS> */
 IMMUTABLE PARALLEL SAFE
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'cas_in_wrapper';
 
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_out
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_out
 CREATE  FUNCTION "cas_out"(
-	"input" CAS /* cas_code::CAS */
+	"input" CAS /* cas_codes::CAS */
 ) RETURNS cstring /* alloc::ffi::c_str::CString */
 IMMUTABLE STRICT PARALLEL SAFE
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'cas_out_wrapper';
 
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_recv
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_recv
 CREATE  FUNCTION "cas_recv"(
 	"internal" internal /* pgrx::datum::internal::Internal */
-) RETURNS CAS /* cas_code::CAS */
+) RETURNS CAS /* cas_codes::CAS */
 IMMUTABLE STRICT PARALLEL SAFE
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'cas_recv_wrapper';
 
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_send
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_send
 CREATE  FUNCTION "cas_send"(
-	"input" CAS /* cas_code::CAS */
+	"input" CAS /* cas_codes::CAS */
 ) RETURNS bytea /* alloc::vec::Vec<u8> */
 IMMUTABLE STRICT PARALLEL SAFE
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'cas_send_wrapper';
 
 
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::CAS
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::CAS
 CREATE TYPE CAS (
 	INTERNALLENGTH = variable,
-	INPUT = cas_in, /* cas_code::cas_in */
-	OUTPUT = cas_out, /* cas_code::cas_out */
-	RECEIVE = cas_recv, /* cas_code::cas_recv */
-	SEND = cas_send, /* cas_code::cas_send */
+	INPUT = cas_in, /* cas_codes::cas_in */
+	OUTPUT = cas_out, /* cas_codes::cas_out */
+	RECEIVE = cas_recv, /* cas_codes::cas_recv */
+	SEND = cas_send, /* cas_codes::cas_send */
 	STORAGE = extended
 );
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_cmp
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_cmp
 CREATE  FUNCTION "cas_cmp"(
-	"left" CAS, /* cas_code::CAS */
-	"right" CAS /* cas_code::CAS */
+	"left" CAS, /* cas_codes::CAS */
+	"right" CAS /* cas_codes::CAS */
 ) RETURNS INT /* i32 */
 IMMUTABLE STRICT PARALLEL SAFE
 LANGUAGE c /* Rust */
@@ -73,22 +73,22 @@ AS 'MODULE_PATHNAME', 'cas_cmp_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_eq
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_eq
 CREATE  FUNCTION "cas_eq"(
-	"left" CAS, /* cas_code::CAS */
-	"right" CAS /* cas_code::CAS */
+	"left" CAS, /* cas_codes::CAS */
+	"right" CAS /* cas_codes::CAS */
 ) RETURNS bool /* bool */
 IMMUTABLE STRICT PARALLEL SAFE
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'cas_eq_wrapper';
 
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_eq
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_eq
 CREATE OPERATOR = (
 	PROCEDURE="cas_eq",
-	LEFTARG=CAS, /* cas_code::CAS */
-	RIGHTARG=CAS, /* cas_code::CAS */
+	LEFTARG=CAS, /* cas_codes::CAS */
+	RIGHTARG=CAS, /* cas_codes::CAS */
 	COMMUTATOR = =,
 	NEGATOR = <>,
 	RESTRICT = eqsel,
@@ -99,22 +99,22 @@ CREATE OPERATOR = (
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_ge
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_ge
 CREATE  FUNCTION "cas_ge"(
-	"left" CAS, /* cas_code::CAS */
-	"right" CAS /* cas_code::CAS */
+	"left" CAS, /* cas_codes::CAS */
+	"right" CAS /* cas_codes::CAS */
 ) RETURNS bool /* bool */
 IMMUTABLE STRICT PARALLEL SAFE
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'cas_ge_wrapper';
 
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_ge
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_ge
 CREATE OPERATOR >= (
 	PROCEDURE="cas_ge",
-	LEFTARG=CAS, /* cas_code::CAS */
-	RIGHTARG=CAS, /* cas_code::CAS */
+	LEFTARG=CAS, /* cas_codes::CAS */
+	RIGHTARG=CAS, /* cas_codes::CAS */
 	COMMUTATOR = <=,
 	NEGATOR = <,
 	RESTRICT = scalargesel,
@@ -123,22 +123,22 @@ CREATE OPERATOR >= (
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_gt
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_gt
 CREATE  FUNCTION "cas_gt"(
-	"left" CAS, /* cas_code::CAS */
-	"right" CAS /* cas_code::CAS */
+	"left" CAS, /* cas_codes::CAS */
+	"right" CAS /* cas_codes::CAS */
 ) RETURNS bool /* bool */
 IMMUTABLE STRICT PARALLEL SAFE
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'cas_gt_wrapper';
 
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_gt
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_gt
 CREATE OPERATOR > (
 	PROCEDURE="cas_gt",
-	LEFTARG=CAS, /* cas_code::CAS */
-	RIGHTARG=CAS, /* cas_code::CAS */
+	LEFTARG=CAS, /* cas_codes::CAS */
+	RIGHTARG=CAS, /* cas_codes::CAS */
 	COMMUTATOR = <,
 	NEGATOR = <=,
 	RESTRICT = scalargtsel,
@@ -147,10 +147,10 @@ CREATE OPERATOR > (
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_hash
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_hash
 CREATE  FUNCTION "cas_hash"(
-	"value" CAS /* cas_code::CAS */
+	"value" CAS /* cas_codes::CAS */
 ) RETURNS INT /* i32 */
 IMMUTABLE STRICT PARALLEL SAFE
 LANGUAGE c /* Rust */
@@ -158,22 +158,22 @@ AS 'MODULE_PATHNAME', 'cas_hash_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_le
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_le
 CREATE  FUNCTION "cas_le"(
-	"left" CAS, /* cas_code::CAS */
-	"right" CAS /* cas_code::CAS */
+	"left" CAS, /* cas_codes::CAS */
+	"right" CAS /* cas_codes::CAS */
 ) RETURNS bool /* bool */
 IMMUTABLE STRICT PARALLEL SAFE
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'cas_le_wrapper';
 
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_le
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_le
 CREATE OPERATOR <= (
 	PROCEDURE="cas_le",
-	LEFTARG=CAS, /* cas_code::CAS */
-	RIGHTARG=CAS, /* cas_code::CAS */
+	LEFTARG=CAS, /* cas_codes::CAS */
+	RIGHTARG=CAS, /* cas_codes::CAS */
 	COMMUTATOR = >=,
 	NEGATOR = >,
 	RESTRICT = scalarlesel,
@@ -182,22 +182,22 @@ CREATE OPERATOR <= (
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_lt
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_lt
 CREATE  FUNCTION "cas_lt"(
-	"left" CAS, /* cas_code::CAS */
-	"right" CAS /* cas_code::CAS */
+	"left" CAS, /* cas_codes::CAS */
+	"right" CAS /* cas_codes::CAS */
 ) RETURNS bool /* bool */
 IMMUTABLE STRICT PARALLEL SAFE
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'cas_lt_wrapper';
 
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_lt
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_lt
 CREATE OPERATOR < (
 	PROCEDURE="cas_lt",
-	LEFTARG=CAS, /* cas_code::CAS */
-	RIGHTARG=CAS, /* cas_code::CAS */
+	LEFTARG=CAS, /* cas_codes::CAS */
+	RIGHTARG=CAS, /* cas_codes::CAS */
 	COMMUTATOR = >,
 	NEGATOR = >=,
 	RESTRICT = scalarltsel,
@@ -206,22 +206,22 @@ CREATE OPERATOR < (
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_ne
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_ne
 CREATE  FUNCTION "cas_ne"(
-	"left" CAS, /* cas_code::CAS */
-	"right" CAS /* cas_code::CAS */
+	"left" CAS, /* cas_codes::CAS */
+	"right" CAS /* cas_codes::CAS */
 ) RETURNS bool /* bool */
 IMMUTABLE STRICT PARALLEL SAFE
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'cas_ne_wrapper';
 
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::cas_ne
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::cas_ne
 CREATE OPERATOR <> (
 	PROCEDURE="cas_ne",
-	LEFTARG=CAS, /* cas_code::CAS */
-	RIGHTARG=CAS, /* cas_code::CAS */
+	LEFTARG=CAS, /* cas_codes::CAS */
+	RIGHTARG=CAS, /* cas_codes::CAS */
 	COMMUTATOR = <>,
 	NEGATOR = =,
 	RESTRICT = neqsel,
@@ -230,8 +230,8 @@ CREATE OPERATOR <> (
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::CAS
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::CAS
 CREATE OPERATOR FAMILY CAS_btree_ops USING btree;
 CREATE OPERATOR CLASS CAS_btree_ops DEFAULT FOR TYPE CAS USING btree FAMILY CAS_btree_ops AS
 	OPERATOR 1 <,
@@ -243,8 +243,8 @@ CREATE OPERATOR CLASS CAS_btree_ops DEFAULT FOR TYPE CAS USING btree FAMILY CAS_
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/cas_code/src/lib.rs:26
--- cas_code::CAS
+-- web/web_common/cas_codes/src/lib.rs:26
+-- cas_codes::CAS
 CREATE OPERATOR FAMILY CAS_hash_ops USING hash;
 CREATE OPERATOR CLASS CAS_hash_ops DEFAULT FOR TYPE CAS USING hash FAMILY CAS_hash_ops AS
 	OPERATOR    1   =  (CAS, CAS),

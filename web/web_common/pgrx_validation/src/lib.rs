@@ -21,5 +21,3 @@ pub use str::{
     must_not_contain_consecutive_whitespace, must_not_contain_control_characters,
 };
 pub use uuid::must_be_distinct_uuid;
-
-pub const EXTENSION_NAME: &str = "pgrx_validation";

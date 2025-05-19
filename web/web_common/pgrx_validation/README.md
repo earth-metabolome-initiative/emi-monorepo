@@ -1,5 +1,7 @@
 # PGRX Validation
 
+[![PGRX Build](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-build-pgrx_validation.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-build-pgrx_validation.yml)
+
 Cross-compile target validation of common web components.
 
 ## Overview

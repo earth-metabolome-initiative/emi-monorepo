@@ -1,5 +1,5 @@
 services:
-  cas_code:
+  cas_codes:
     build:
       context: .
       dockerfile: ../../../shared_docker_files/PGRXDocker
@@ -9,10 +9,10 @@ services:
     environment:
       - HOST_UID=${USER_ID}
       - HOST_GID=${GROUP_ID}
-    container_name: cas_code_builder
+    container_name: cas_codes_builder
     volumes:
       - ../../..:/workspace  # Mount the entire monorepo
       - ./extension:/home/appuser/extension # Output directory
-    working_dir: /workspace/web/web_common/cas_code
+    working_dir: /workspace/web/web_common/cas_codes
     entrypoint: ["/workspace/shared_docker_files/pgrx_build.sh"]
     user: "${USER_ID}:${GROUP_ID}"
