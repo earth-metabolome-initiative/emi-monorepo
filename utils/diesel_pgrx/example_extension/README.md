@@ -1,6 +1,7 @@
 # Example extension
 
-[![Build Example Extension](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-example-extension.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-example-extension.yml)
+[![Cargo Clippy](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-clippy-example-extension.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-clippy-example-extension.yml)
+[![PGRX Build](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-example-extension.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-example-extension.yml)
 
 To build this example extension, just run the following docker build command:
 

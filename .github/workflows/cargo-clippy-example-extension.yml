@@ -1,4 +1,4 @@
-name: Cargo Clippy Example Extension
+name: Clippy
 
 on:
   push:

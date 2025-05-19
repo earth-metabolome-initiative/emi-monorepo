@@ -1,0 +1,15 @@
+name: Test
+
+on:
+  push:
+    paths:
+      - 'utils/diesel_pgrx/**'
+  pull_request:
+    paths:
+      - 'utils/diesel_pgrx/**'
+
+jobs:
+  test:
+    uses: ./.github/workflows/cargo-test-template.yml
+    with:
+      path: 'utils/diesel_pgrx'

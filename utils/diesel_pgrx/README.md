@@ -1,5 +1,8 @@
 # Diesel PGRX
 
+[![Clippy](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-clippy-diesel-pgrx.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-clippy-diesel-pgrx.yml)
+[![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml)
+
 A crate providing the `DieselPGRX` trait to derive all that is needed to use rust-defined types decorated with [`pgrx`](https://github.com/pgcentralfoundation/pgrx)'s [PostgresType](https://docs.rs/pgrx/latest/pgrx/datum/trait.PostgresType.html) and `#[pg_binary_protocol]` in [`diesel`](https://github.com/diesel-rs/diesel) queries using Postgres's binary protocol.
 
 This is achieved via a derive macro to derive the [`diesel`](https://github.com/diesel-rs/diesel) [`ToSql`](https://docs.rs/diesel/latest/diesel/serialize/trait.ToSql.html) and [`FromSql`](https://docs.rs/diesel/latest/diesel/deserialize/trait.FromSql.html) traits so that the struct is compatible with the [`pgrx`](https://github.com/pgcentralfoundation/pgrx) serialization, which uses [`CBOR`](https://en.wikipedia.org/wiki/CBOR) using [`serde_cbor`](https://docs.rs/serde_cbor/latest/serde_cbor/).
