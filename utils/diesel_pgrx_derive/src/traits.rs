@@ -17,6 +17,7 @@ pub(crate) trait Backend {
     /// * `ident` - The ident of the type.
     fn to_sql_impl(&self, ident: &Ident) -> proc_macro2::TokenStream;
 
+    #[allow(clippy::wrong_self_convention)]
     /// Returns the `FromSql` implementation for the given backend.
     ///
     /// ## Arguments
