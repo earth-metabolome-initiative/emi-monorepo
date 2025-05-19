@@ -50,9 +50,9 @@ We try to keep the dependencies centralized in the [`Cargo.toml`](Cargo.toml) fi
 
 ```toml
 [dependencies]
-crate_name.workspace = true
+your_crate_name.workspace = true
 # And if the dependency is optional
-another_crate { workspace = true, optional = true }
+another_crate = { workspace = true, optional = true }
 ```
 
 ### Performance analysis
