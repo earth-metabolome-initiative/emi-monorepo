@@ -1,5 +1,9 @@
 # Monorepo for the Earth Metabolome Initiative
 
+[![Cargo Format](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/global-cargo-fmt.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/global-cargo-fmt.yml)
+[![Cargo Check](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/global-check.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/global-check.yml)
+[![TOML Format](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/global-toml-fmt.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/global-toml-fmt.yml)
+
 Monorepo for the Earth Metabolome Initiative.
 
 ## Crates
