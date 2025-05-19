@@ -63,10 +63,7 @@ One of the best tools available for a rough primary performance analysis is the 
 sudo perf top
 ```
 
-## Contributing to the backend
+## Making a Pull Request
 
-The main backend code is found in [`web/backend`](web/backend). You will find therein another [`CONTRIB.md`](web/backend/CONTRIB.md) file with instructions on how to contribute to the backend.
+We try to follow the [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) for making pull requests. This means that you should create a new branch for your changes, and then create a pull request from that branch to the main branch. Here follows a simple illustration of the process:
 
-## Contributing to the frontend
-
-The main frontend code is found in [`web/frontend`](web/frontend). You will find therein another [`CONTRIB.md`](web/frontend/CONTRIB.md) file with instructions on how to contribute to the frontend.
