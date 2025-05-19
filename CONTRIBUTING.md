@@ -67,3 +67,4 @@ sudo perf top
 
 We try to follow the [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) for making pull requests. This means that you should create a new branch for your changes, and then create a pull request from that branch to the main branch. Here follows a simple illustration of the process:
 
+![Making a pull request](making_a_pr.jpg)
