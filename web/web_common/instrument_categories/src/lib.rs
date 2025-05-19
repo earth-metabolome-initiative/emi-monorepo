@@ -39,6 +39,7 @@ pub enum InstrumentCategory {
 }
 
 impl InstrumentCategory {
+    #[must_use]
     /// Returns the name of the instrument category
     pub fn name(&self) -> &'static str {
         match self {
@@ -52,6 +53,7 @@ impl InstrumentCategory {
         }
     }
 
+    #[must_use]
     /// Returns the description of the instrument category
     pub fn description(&self) -> &'static str {
         match self {
@@ -72,15 +74,15 @@ impl InstrumentCategory {
             InstrumentCategory::Shaker => "A device used to mix or agitate a sample.",
         }
     }
-
+    
+    #[must_use]
     /// Returns the icon of the instrument category
     pub fn icon(&self) -> &'static str {
         match self {
-            InstrumentCategory::MassSpectrometer => "microscope",
+            InstrumentCategory::MassSpectrometer | InstrumentCategory::Centrifuge => "microscope",
             InstrumentCategory::WeightScale => "weight-scale",
             InstrumentCategory::FreezeDryer => "snowflake",
             InstrumentCategory::BallMill => "mortar-pestle",
-            InstrumentCategory::Centrifuge => "microscope",
             InstrumentCategory::Dispenser => "eye-dropper",
             InstrumentCategory::Shaker => "vial",
         }

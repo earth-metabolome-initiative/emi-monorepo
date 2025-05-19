@@ -3,6 +3,7 @@
 use crate::country_codes::CountryCode;
 
 impl AsRef<str> for CountryCode {
+    #[allow(clippy::too_many_lines)]
     fn as_ref(&self) -> &str {
         match self {
             CountryCode::AD => "AD",

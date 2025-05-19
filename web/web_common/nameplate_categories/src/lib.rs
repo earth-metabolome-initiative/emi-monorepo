@@ -26,6 +26,7 @@ pub enum NameplateCategory {
 }
 
 impl NameplateCategory {
+    #[must_use]
     /// Returns the name of the nameplate category.
     pub fn name(&self) -> &'static str {
         match self {
@@ -33,6 +34,7 @@ impl NameplateCategory {
         }
     }
 
+    #[must_use]
     /// Returns the description of the nameplate category.
     pub fn description(&self) -> &'static str {
         match self {
@@ -44,6 +46,7 @@ impl NameplateCategory {
         }
     }
 
+    #[must_use]
     /// Returns the icon of the nameplate category.
     pub fn icon(&self) -> &'static str {
         match self {

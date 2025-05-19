@@ -3,6 +3,8 @@
 use super::CountryCode;
 
 impl CountryCode {
+    #[must_use]
+    #[allow(clippy::too_many_lines)]
     /// Returns the name of the country code.
     pub fn name(&self) -> &'static str {
         match self {

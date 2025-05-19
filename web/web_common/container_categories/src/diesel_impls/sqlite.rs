@@ -1,6 +1,6 @@
 #![cfg(feature = "sqlite")]
 //! Submodule providing the diesel implementations for instrument models for the
-//! SQLite backend.
+//! `SQLite` backend.
 
 impl diesel::deserialize::FromSql<crate::diesel_impls::ContainerCategory, diesel::sqlite::Sqlite>
     for crate::ContainerCategory

@@ -114,7 +114,7 @@ pub fn must_not_contain_consecutive_whitespace(
 pub fn must_not_contain_control_characters(
     value: &str,
 ) -> Result<(), validation_errors::SingleFieldError> {
-    if value.chars().any(|c| c.is_control()) {
+    if value.chars().any(char::is_control) {
         Err(validation_errors::SingleFieldError::ControlCharacters(()))
     } else {
         Ok(())

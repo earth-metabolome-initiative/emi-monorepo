@@ -3,6 +3,8 @@
 use super::CountryCode;
 
 impl CountryCode {
+    #[must_use]
+    #[allow(clippy::too_many_lines)]
     /// Returns the emoji of the flag corresponding to the country code.
     pub fn emoji(&self) -> &'static str {
         match self {

@@ -4,6 +4,15 @@ use pgrx_validation_derive::validation;
 
 #[validation]
 /// Control that the float is strictly positive (0, ...].
+/// 
+/// # Arguments
+/// 
+/// * `value` a f32
+/// 
+/// # Errors
+/// 
+/// * `validation_errors::SingleFieldError::UnexpectedNegativeOrZeroValue(())`
+///   if the value is negative or zero.
 pub fn must_be_strictly_positive_f32(
     value: f32,
 ) -> Result<(), validation_errors::SingleFieldError> {
@@ -54,7 +63,7 @@ pub fn must_be_greater_than_f32(
     if value >= lower_bound {
         Ok(())
     } else {
-        Err(validation_errors::SingleFieldError::MustBeGreaterThan((), lower_bound as f64))
+        Err(validation_errors::SingleFieldError::MustBeGreaterThan((), f64::from(lower_bound)))
     }
 }
 
@@ -77,7 +86,7 @@ pub fn must_be_smaller_than_f32(
     if value <= lower_bound {
         Ok(())
     } else {
-        Err(validation_errors::SingleFieldError::MustBeSmallerThan((), lower_bound as f64))
+        Err(validation_errors::SingleFieldError::MustBeSmallerThan((), f64::from(lower_bound)))
     }
 }
 
@@ -100,7 +109,7 @@ pub fn must_be_strictly_greater_than_f32(
     if value > lower_bound {
         Ok(())
     } else {
-        Err(validation_errors::SingleFieldError::MustBeGreaterThan((), lower_bound as f64))
+        Err(validation_errors::SingleFieldError::MustBeGreaterThan((), f64::from(lower_bound)))
     }
 }
 
@@ -123,7 +132,7 @@ pub fn must_be_strictly_smaller_than_f32(
     if value < lower_bound {
         Ok(())
     } else {
-        Err(validation_errors::SingleFieldError::MustBeSmallerThan((), lower_bound as f64))
+        Err(validation_errors::SingleFieldError::MustBeSmallerThan((), f64::from(lower_bound)))
     }
 }
 

@@ -31,6 +31,7 @@ pub enum ContainerCategory {
 }
 
 impl ContainerCategory {
+    #[must_use]
     /// Returns the name of the instrument category
     pub fn name(&self) -> &'static str {
         match self {
@@ -40,6 +41,7 @@ impl ContainerCategory {
         }
     }
 
+    #[must_use]
     /// Returns the description of the instrument category
     pub fn description(&self) -> &'static str {
         match self {
@@ -55,6 +57,7 @@ impl ContainerCategory {
         }
     }
 
+    #[must_use]
     /// Returns the icon of the instrument category
     pub fn icon(&self) -> &'static str {
         match self {

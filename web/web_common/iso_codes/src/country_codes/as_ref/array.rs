@@ -4,6 +4,7 @@
 use crate::country_codes::CountryCode;
 
 impl AsRef<[char; 2]> for CountryCode {
+    #[allow(clippy::too_many_lines)]
     fn as_ref(&self) -> &[char; 2] {
         match self {
             CountryCode::AD => &['A', 'D'],
@@ -261,6 +262,7 @@ impl AsRef<[char; 2]> for CountryCode {
 }
 
 impl AsRef<[u8; 2]> for CountryCode {
+    #[allow(clippy::too_many_lines)]
     fn as_ref(&self) -> &[u8; 2] {
         match self {
             CountryCode::AD => b"AD",

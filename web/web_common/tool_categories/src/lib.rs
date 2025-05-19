@@ -49,6 +49,7 @@ pub enum ToolCategory {
 }
 
 impl ToolCategory {
+    #[must_use]
     /// Returns the name of the tool category.
     pub fn name(&self) -> &'static str {
         match self {
@@ -65,6 +66,7 @@ impl ToolCategory {
         }
     }
 
+    #[must_use]
     /// Returns the description of the tool category.
     pub fn description(&self) -> &'static str {
         match self {
@@ -97,6 +99,7 @@ impl ToolCategory {
         }
     }
 
+    #[must_use]
     /// Returns the icon of the tool category.
     pub fn icon(&self) -> &'static str {
         match self {
