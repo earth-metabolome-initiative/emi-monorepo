@@ -26,17 +26,11 @@ pub fn diesel_pgrx_derive(input: proc_macro::TokenStream) -> proc_macro::TokenSt
     #[cfg(feature = "sqlite")]
     backends.push(Box::new(sqlite::SQLite));
 
-    let attributes = backends.iter().map(|backend| {
-        backend.sql_type_attribute(&name)
-    });
+    let attributes = backends.iter().map(|backend| backend.sql_type_attribute(&name));
 
-    let to_sql_impls = backends.iter().map(|backend| {
-        backend.to_sql_impl(&ident)
-    });
+    let to_sql_impls = backends.iter().map(|backend| backend.to_sql_impl(&ident));
 
-    let from_sql_impls = backends.iter().map(|backend| {
-        backend.from_sql_impl(&ident)
-    });
+    let from_sql_impls = backends.iter().map(|backend| backend.from_sql_impl(&ident));
 
     quote! {
         impl ::diesel_pgrx::DieselPGRX for #ident {}

@@ -3,8 +3,7 @@
 #[cfg(feature = "pgrx")]
 ::pgrx::pg_module_magic!();
 
-#[derive(diesel_pgrx::DieselPGRX)]
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(diesel_pgrx::DieselPGRX, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(
     feature = "pgrx",
     derive(pgrx::PostgresType, pgrx::PostgresEq, pgrx::PostgresOrd, pgrx::PostgresHash)
