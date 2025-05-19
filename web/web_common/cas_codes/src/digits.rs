@@ -31,7 +31,7 @@ impl Iterator for Digits {
 mod tests {
     #[test]
     fn test_digits() {
-        let cas = crate::CAS(7732_18_5);
+        let cas = crate::CAS(7_732_185);
         let digits: Vec<u8> = cas.digits().collect();
         assert_eq!(digits, vec![5, 8, 1, 2, 3, 7, 7]);
     }
