@@ -4,7 +4,7 @@ How to get started working on the [`pgrx`-based extensions](https://github.com/p
 
 ## Prerequisites
 
-The installation procedure, [other than the Rust toolchain](https://www.rust-lang.org/tools/install), requires also a number of additional requirements, which include the [`readline`](https://tiswww.cwru.edu/php/chet/readline/rltop.html) library, the [`bison`](https://www.gnu.org/software/bison/) parser generator, and the [`flex`](https://github.com/westes/flex) lexical analyzer.
+The installation procedure, [other than the Rust toolchain](https://www.rust-lang.org/tools/install), requires also a number of additional requirements, which include the [`readline`](https://tiswww.cwru.edu/php/chet/readline/rltop.html) library, the `bison` parser generator, and the [`flex`](https://github.com/westes/flex) lexical analyzer.
 
 On Ubuntu, this can be done with:
 
