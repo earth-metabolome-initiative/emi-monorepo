@@ -1,5 +1,7 @@
 # Example extension
 
+[![Build Example Extension](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-example-extension.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-example-extension.yml)
+
 To build this example extension, just run the following docker build command:
 
 ```bash

@@ -3,6 +3,7 @@
 		"actix",
 		"certbot",
 		"chrono",
+		"clippy",
 		"DBWS",
 		"directus",
 		"honggfuzz",
