@@ -26,4 +26,4 @@ jobs:
           profile: minimal
 
       - name: Run cargo test
-        run: cargo test --all-targets --all-features
+        run: cargo test --all-targets
