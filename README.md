@@ -9,6 +9,10 @@ Here follows a table with the crates, and the badges illustrating their status.
 
 ### Database-related crates
 
+| Crate | Description | Status | Crates.io |
+|-------|-------------|--------|-----------|
+| [`diesel_pgrx`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/utils/diesel_pgrx) | [Diesel](https://docs.rs/diesel/latest/diesel/) integration for [PGRX](https://github.com/pgcentralfoundation/pgrx) | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml) | [Tracking issue](https://github.com/earth-metabolome-initiative/emi-monorepo/issues/78) |
+
 ### Chemistry-related crates
 
 ### Data structures
