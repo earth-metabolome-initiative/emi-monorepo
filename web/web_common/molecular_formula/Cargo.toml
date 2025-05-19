@@ -39,3 +39,6 @@ pg17 = ["pgrx", "pgrx/pg17"]
 [[bench]]
 name = "bench_oxidation_states"
 harness = false
+
+[lints]
+workspace = true

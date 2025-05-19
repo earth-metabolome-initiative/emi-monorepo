@@ -14,7 +14,7 @@ include = [
 crate-type = ["cdylib", "lib"]
 
 [[bin]]
-name = "pgrx_embed_iso_codes"
+name = "pgrx_embed_elements"
 path = "./src/bin/pgrx_embed.rs"
 
 [dependencies]

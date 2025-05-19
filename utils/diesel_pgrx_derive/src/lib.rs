@@ -41,6 +41,7 @@ pub fn diesel_pgrx_derive(input: proc_macro::TokenStream) -> proc_macro::TokenSt
     quote! {
         impl ::diesel_pgrx::DieselPGRX for #ident {}
 
+        #[doc(hidden)]
         pub mod diesel_impls {
             #[derive(
                 Debug, Clone, Copy, Default, ::diesel_pgrx::diesel::query_builder::QueryId, ::diesel_pgrx::diesel::sql_types::SqlType,

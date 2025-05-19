@@ -1,3 +1,10 @@
+CREATE TABLE IF NOT EXISTS temporary_user (
+    id SERIAL PRIMARY KEY,
+    email text NOT NULL,
+    login_provider_id SMALLINT NOT NULL REFERENCES login_providers (id) ON DELETE CASCADE,
+    UNIQUE (email, login_provider_id)
+);
+
 -- We need to create a table to store users
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,

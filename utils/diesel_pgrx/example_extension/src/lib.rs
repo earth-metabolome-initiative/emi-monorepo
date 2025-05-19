@@ -23,7 +23,9 @@
     diesel::AsExpression,
 )]
 #[diesel(sql_type = diesel_impls::PositiveU32)]
+/// A struct representing a positive 32-bit unsigned integer.
 pub struct PositiveU32 {
+    /// The field that holds the positive 32-bit unsigned integer value.
     pub field: i32,
 }
 
