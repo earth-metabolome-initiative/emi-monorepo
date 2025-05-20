@@ -626,8 +626,8 @@ impl web_common_traits::prelude::AsyncBoundedReadDispatch<diesel_async::AsyncPgC
                     .await
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::TemporaryUserEmail => {
-                <crate::codegen::structs_codegen::tables::temporary_user_emails::TemporaryUserEmail as web_common_traits::database::AsyncBoundedRead<
+            crate::codegen::tables::table_names::TableName::TemporaryUser => {
+                <crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser as web_common_traits::database::AsyncBoundedRead<
                     diesel_async::AsyncPgConnection,
                 >>::bounded_read_async(offset, limit, conn)
                     .await

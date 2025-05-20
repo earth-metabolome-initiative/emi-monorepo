@@ -1,12 +1,11 @@
-extern crate diesel;
+//! Main entrypoint for the web server
 
 use std::path::PathBuf;
 
 use actix_cors::Cors;
 use actix_files::NamedFile;
-use actix_web::{
-    App, HttpRequest, HttpServer, Responder, get, http::header, middleware::Logger, web,
-};
+use actix_web::{App, HttpRequest, HttpServer, Responder, http::header, middleware::Logger, web};
+use actix_web_codegen::get;
 use backend::ListenNotifyServer;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use redis::Client;

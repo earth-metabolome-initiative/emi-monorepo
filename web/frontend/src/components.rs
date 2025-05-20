@@ -20,5 +20,5 @@ pub use error_page::ErrorPage;
 pub use footer::Footer;
 pub use navigator::*;
 pub use readable_list::ReadableList;
-// pub mod font_awesome_icon;
-// pub use font_awesome_icon::FAIcon;
+pub mod font_awesome_icon;
+pub use font_awesome_icon::BrandIcon;

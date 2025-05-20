@@ -13,7 +13,7 @@ diesel-async.workspace = true
 web_common_traits.workspace = true
 serde = { workspace = true, optional = true }
 common-traits.workspace = true
-backend-request-errors.workspace = true
+generic-backend-request-errors.workspace = true
 pgrx_validation.workspace = true
 iso_codes.workspace = true
 tool_categories.workspace = true

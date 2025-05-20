@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 diesel.workspace = true
 instrument_categories.workspace = true
+serde.workspace = true

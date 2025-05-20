@@ -64,14 +64,14 @@ impl Codegen<'_> {
                         quote::quote! {
                             if let Some(parent) = self.#parent_key_method(conn).await? {
                                 if !parent.can_update(user_id, conn).await? {
-                                    return Err(backend_request_errors::BackendRequestError::Unauthorized.into());
+                                    return Err(generic_backend_request_errors::GenericBackendRequestError::Unauthorized.into());
                                 }
                             }
                         }
                     } else {
                         quote::quote! {
                             if !self.#parent_key_method(conn).await?.can_update(user_id, conn).await? {
-                                return Err(backend_request_errors::BackendRequestError::Unauthorized.into());
+                                return Err(generic_backend_request_errors::GenericBackendRequestError::Unauthorized.into());
                             }
                         }
                     });

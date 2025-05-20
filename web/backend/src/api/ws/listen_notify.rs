@@ -8,7 +8,10 @@ use ws_messages::{DBMessage, Subscription};
 
 use crate::errors::BackendError;
 
-pub enum LNCommand {
+/// Listen Notify command messages.
+///
+/// These are commands sent from the sessions to the listen notify server.
+pub(crate) enum LNCommand {
     Subscribe(Subscription, u64, oneshot::Sender<()>),
     Unsubscribe(Subscription, u64, oneshot::Sender<()>),
     DB(DBMessage, oneshot::Sender<()>),
@@ -17,6 +20,7 @@ pub enum LNCommand {
 }
 
 #[allow(clippy::type_complexity)]
+/// Listen Notify server.
 pub struct ListenNotifyServer {
     sessions: HashMap<
         u64,
@@ -29,6 +33,7 @@ pub struct ListenNotifyServer {
 }
 
 impl ListenNotifyServer {
+    /// Create a new Listen Notify server.
     pub fn new() -> (Self, ListenNotifyHandle) {
         let (subscriptions_sender, subscriptions_receiver) = tokio::sync::mpsc::unbounded_channel();
 
@@ -172,6 +177,7 @@ impl ListenNotifyServer {
         }
     }
 
+    /// Run the listen notify server.
     pub async fn run(mut self) -> std::io::Result<()> {
         while let Some(cmd) = self.subscriptions_receiver.recv().await {
             match cmd {
@@ -262,6 +268,17 @@ impl ListenNotifyHandle {
         Ok(receiver.await?)
     }
 
+    /// Registers a new subscription to the given table / row.
+    ///
+    /// # Arguments
+    ///
+    /// * `subscription` - The subscription to register.
+    /// * `session_id` - The session ID of the user to register the subscription
+    ///   for.
+    ///
+    /// # Errors
+    ///
+    /// * `BackendError` - If the subscription could not be registered.
     pub async fn unsubscribe(
         &self,
         subscription: Subscription,
@@ -276,6 +293,15 @@ impl ListenNotifyHandle {
         Ok(receiver.await?)
     }
 
+    /// Send a message to the chat server.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `message` - The message to send.
+    /// 
+    /// # Errors
+    /// 
+    /// * `BackendError` - If the message could not be sent.
     pub async fn notify(&self, message: DBMessage) -> Result<(), BackendError> {
         let (sender, receiver) = oneshot::channel();
 

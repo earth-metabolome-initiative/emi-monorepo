@@ -16,7 +16,7 @@ snake-case-sanitizer = { path = "../snake-case-sanitizer" }
 common-traits.workspace = true
 inflector.workspace = true
 futures.workspace = true
-backend-request-errors.workspace = true
+generic-backend-request-errors.workspace = true
 time-requirements.workspace = true
 sqlparser.workspace = true
 strum.workspace = true

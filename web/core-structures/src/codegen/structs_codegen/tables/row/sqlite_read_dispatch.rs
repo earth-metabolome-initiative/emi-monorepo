@@ -886,11 +886,11 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::TemporaryUserEmail(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::TemporaryUser(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::temporary_user_emails::TemporaryUserEmail as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),

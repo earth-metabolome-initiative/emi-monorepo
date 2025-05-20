@@ -20,7 +20,8 @@ pub trait Builder: Default {
     fn build(self) -> Result<Self::Object, Self::Error>;
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 /// Errors that can commonly occur during building.
 pub enum BuilderError<A> {
     /// An attribute was not set.

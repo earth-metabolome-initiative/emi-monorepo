@@ -73,7 +73,7 @@ mod team_members;
 mod team_projects;
 mod team_states;
 mod teams;
-mod temporary_user_emails;
+mod temporary_user;
 mod tool_models;
 mod trackable_locations;
 mod trackable_states;

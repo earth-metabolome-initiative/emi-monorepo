@@ -1,4 +1,4 @@
-#[derive(Clone, core::fmt::Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableStepModelCategoryAttributes {
     Name,

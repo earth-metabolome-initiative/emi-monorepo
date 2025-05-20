@@ -1,6 +1,12 @@
 //! Submodule defining the error enumeration that may be happen within the
 //! server.
 
+use core_structures::tables::insertables::{
+    InsertableEmailProviderAttributes, InsertableTemporaryUserAttributes,
+    InsertableUserEmailAttributes,
+};
+use web_common_traits::database::InsertError;
+
 mod from_impls;
 
 #[derive(Debug)]
@@ -30,8 +36,16 @@ pub enum BackendError {
     FromUtf8Error(std::string::FromUtf8Error),
     /// An error occurred while encoding or decoding a JSONWebToken.
     JWTError(jsonwebtoken::errors::Error),
+    /// When inserting a new user email failed.
+    UserEmailInsert(InsertError<InsertableUserEmailAttributes>),
+    /// When inserting a new email provider failed.
+    EmailProviderInsert(InsertError<InsertableEmailProviderAttributes>),
+    /// When inserting a temporary user failed.
+    TemporaryUserInsert(InsertError<InsertableTemporaryUserAttributes>),
     /// When a login provider is not found in the database.
     UnknownLoginProvider(String),
     /// When there is a failure in the ListenNotify server.
     ListenNotify,
+    /// When there is a collision between two users.
+    LoginCollision,
 }

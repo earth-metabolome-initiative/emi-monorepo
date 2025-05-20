@@ -2,7 +2,7 @@
 
 use std::convert::Infallible;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]
 /// Enumeration of errors that can occur during validation.
 pub enum Error<FieldName = ()> {
     /// Single field errors.
@@ -26,7 +26,7 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for Error<FieldName> {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]
 pub enum SingleFieldError<FieldName = ()> {
     /// The provided text is empty.
     EmptyText(FieldName),
@@ -119,7 +119,7 @@ impl<A> From<SingleFieldError<A>> for Error<A> {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]
 pub enum DoubleFieldError<FieldName = ()> {
     /// The provided entries should be distinct.
     NotDistinct(FieldName, FieldName),

@@ -10,7 +10,7 @@ diesel.workspace = true
 diesel-async = { workspace = true, optional = true }
 common-traits = { workspace = true, features = ["serde"] }
 validation-errors.workspace = true
-backend-request-errors.workspace = true
+generic-backend-request-errors.workspace = true
 instrument_categories.workspace = true
 
 [features]

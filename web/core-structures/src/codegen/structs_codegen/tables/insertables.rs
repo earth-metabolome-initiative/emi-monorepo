@@ -361,10 +361,9 @@ pub use team_states::{
 };
 mod teams;
 pub use teams::{InsertableTeam, InsertableTeamAttributes, InsertableTeamBuilder};
-mod temporary_user_emails;
-pub use temporary_user_emails::{
-    InsertableTemporaryUserEmail, InsertableTemporaryUserEmailAttributes,
-    InsertableTemporaryUserEmailBuilder,
+mod temporary_user;
+pub use temporary_user::{
+    InsertableTemporaryUser, InsertableTemporaryUserAttributes, InsertableTemporaryUserBuilder,
 };
 mod tool_models;
 pub use tool_models::{

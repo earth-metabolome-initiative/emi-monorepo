@@ -1,10 +1,12 @@
 //! Submodule providing websocket services post-authentication.
-use actix_web::{Error, HttpRequest, HttpResponse, get, web};
+use actix_web::{Error, HttpRequest, HttpResponse, web};
 
 mod portal;
 use portal::portal_ws;
 mod listen_notify;
-pub use listen_notify::{LNCommand, ListenNotifyHandle, ListenNotifyServer};
+use actix_web_codegen::get;
+pub(crate) use listen_notify::LNCommand;
+pub use listen_notify::{ListenNotifyHandle, ListenNotifyServer};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(start_websocket);

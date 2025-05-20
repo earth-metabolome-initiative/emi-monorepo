@@ -2,8 +2,8 @@
 //! rows.
 use std::convert::Infallible;
 
-use backend_request_errors::BackendRequestError;
 use common_traits::prelude::BuilderError;
+use generic_backend_request_errors::GenericBackendRequestError;
 
 /// A trait for types that can be inserted into the database.
 pub trait Insertable {
@@ -104,6 +104,7 @@ pub trait InsertableBuilder:
         + TryInto<Self, Error = Self::Error>;
 }
 
+#[derive(Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]
 /// Enumeration of the possible errors associated to the frontend insert
 /// operations.
 pub enum InsertError<FieldName> {
@@ -112,9 +113,9 @@ pub enum InsertError<FieldName> {
     /// A validation error occurred.
     ValidationError(validation_errors::Error<FieldName>),
     /// A diesel error occurred.
-    DieselError(diesel::result::Error),
+    DieselError(String),
     /// A server error occurred.
-    ServerError(BackendRequestError),
+    ServerError(GenericBackendRequestError),
 }
 
 impl<FieldName: core::fmt::Debug + core::fmt::Display> core::error::Error
@@ -132,10 +133,10 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName
                 <validation_errors::Error<FieldName> as core::fmt::Display>::fmt(error, f)
             }
             InsertError::DieselError(error) => {
-                <diesel::result::Error as core::fmt::Display>::fmt(error, f)
+                write!(f, "Diesel error: {error}")
             }
             InsertError::ServerError(error) => {
-                <BackendRequestError as core::fmt::Display>::fmt(error, f)
+                <GenericBackendRequestError as core::fmt::Display>::fmt(error, f)
             }
         }
     }
@@ -151,10 +152,10 @@ impl<FieldName: core::fmt::Debug> core::fmt::Debug for InsertError<FieldName> {
                 <validation_errors::Error<FieldName> as core::fmt::Debug>::fmt(error, f)
             }
             InsertError::DieselError(error) => {
-                <diesel::result::Error as core::fmt::Debug>::fmt(error, f)
+                write!(f, "Diesel error: {error:?}")
             }
             InsertError::ServerError(error) => {
-                <BackendRequestError as core::fmt::Debug>::fmt(error, f)
+                <GenericBackendRequestError as core::fmt::Debug>::fmt(error, f)
             }
         }
     }
@@ -188,12 +189,12 @@ impl<FieldName> From<validation_errors::DoubleFieldError<FieldName>> for InsertE
 
 impl<FieldName> From<diesel::result::Error> for InsertError<FieldName> {
     fn from(error: diesel::result::Error) -> Self {
-        InsertError::DieselError(error)
+        InsertError::DieselError(error.to_string())
     }
 }
 
-impl<FieldName> From<BackendRequestError> for InsertError<FieldName> {
-    fn from(error: BackendRequestError) -> Self {
+impl<FieldName> From<GenericBackendRequestError> for InsertError<FieldName> {
+    fn from(error: GenericBackendRequestError) -> Self {
         InsertError::ServerError(error)
     }
 }

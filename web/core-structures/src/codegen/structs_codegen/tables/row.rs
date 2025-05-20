@@ -90,7 +90,7 @@ mod team_members;
 mod team_projects;
 mod team_states;
 mod teams;
-mod temporary_user_emails;
+mod temporary_user;
 mod tool_models;
 mod trackable_locations;
 mod trackable_states;
@@ -304,8 +304,8 @@ pub enum Row {
     TeamProject(crate::codegen::structs_codegen::tables::team_projects::TeamProject),
     TeamState(crate::codegen::structs_codegen::tables::team_states::TeamState),
     Team(crate::codegen::structs_codegen::tables::teams::Team),
-    TemporaryUserEmail(
-        crate::codegen::structs_codegen::tables::temporary_user_emails::TemporaryUserEmail,
+    TemporaryUser(
+        crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser,
     ),
     ToolModel(crate::codegen::structs_codegen::tables::tool_models::ToolModel),
     TrackableLocation(
@@ -515,9 +515,7 @@ impl Row {
             Row::TeamProject(team_projects) => team_projects.upsert(conn)?.map(Row::from),
             Row::TeamState(team_states) => team_states.upsert(conn)?.map(Row::from),
             Row::Team(teams) => teams.upsert(conn)?.map(Row::from),
-            Row::TemporaryUserEmail(temporary_user_emails) => {
-                temporary_user_emails.upsert(conn)?.map(Row::from)
-            }
+            Row::TemporaryUser(temporary_user) => temporary_user.upsert(conn)?.map(Row::from),
             Row::ToolModel(tool_models) => tool_models.upsert(conn)?.map(Row::from),
             Row::TrackableLocation(trackable_locations) => {
                 trackable_locations.upsert(conn)?.map(Row::from)
@@ -679,7 +677,7 @@ impl web_common_traits::prelude::Row for Row {
             Row::TeamProject(team_projects) => team_projects.primary_key(),
             Row::TeamState(team_states) => team_states.primary_key(),
             Row::Team(teams) => teams.primary_key(),
-            Row::TemporaryUserEmail(temporary_user_emails) => temporary_user_emails.primary_key(),
+            Row::TemporaryUser(temporary_user) => temporary_user.primary_key(),
             Row::ToolModel(tool_models) => tool_models.primary_key(),
             Row::TrackableLocation(trackable_locations) => trackable_locations.primary_key(),
             Row::TrackableState(trackable_states) => trackable_states.primary_key(),

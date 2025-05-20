@@ -2,8 +2,11 @@
 
 use actix_web::HttpResponse;
 use backend_request_errors::BackendRequestError;
+use core_structures::tables::insertables::{InsertableEmailProviderAttributes, InsertableTemporaryUserAttributes, InsertableUserEmailAttributes};
 use diesel_async::pooled_connection::{PoolError, bb8::RunError};
+use generic_backend_request_errors::GenericBackendRequestError;
 use tokio::sync::{mpsc::error::SendError, oneshot::error::RecvError};
+use web_common_traits::database::InsertError;
 
 use super::BackendError;
 use crate::{LNCommand, api::oauth::jwt_cookies::eliminate_cookies};
@@ -90,8 +93,15 @@ impl From<BackendError> for BackendRequestError {
             | BackendError::JWTError(_)
             | BackendError::UnknownLoginProvider(_)
             | BackendError::ListenNotify
-            | BackendError::RequestError(_) => BackendRequestError::InternalServerError,
-            BackendError::Unauthorized => BackendRequestError::Unauthorized,
+            | BackendError::EmailProviderInsert(_)
+            | BackendError::TemporaryUserInsert(_)
+            | BackendError::RequestError(_) => {
+                BackendRequestError::Generic(GenericBackendRequestError::InternalServerError)
+            }
+            BackendError::Unauthorized | BackendError::LoginCollision => {
+                BackendRequestError::Generic(GenericBackendRequestError::Unauthorized)
+            }
+            BackendError::UserEmailInsert(error) => BackendRequestError::UserEmailInsert(error),
         }
     }
 }
@@ -100,11 +110,16 @@ impl From<BackendError> for HttpResponse {
     fn from(error: BackendError) -> Self {
         let backend_request_error = BackendRequestError::from(error);
         match backend_request_error {
-            BackendRequestError::InternalServerError => {
+            BackendRequestError::Generic(GenericBackendRequestError::InternalServerError)
+            | BackendRequestError::UserEmailInsert(_) => {
                 eliminate_cookies(HttpResponse::InternalServerError())
             }
-            BackendRequestError::NotFound => HttpResponse::NotFound().finish(),
-            BackendRequestError::Unauthorized => eliminate_cookies(HttpResponse::Unauthorized()),
+            BackendRequestError::Generic(GenericBackendRequestError::NotFound) => {
+                HttpResponse::NotFound().finish()
+            }
+            BackendRequestError::Generic(GenericBackendRequestError::Unauthorized) => {
+                eliminate_cookies(HttpResponse::Unauthorized())
+            }
         }
     }
 }
@@ -113,17 +128,18 @@ impl From<BackendError> for actix_web::error::Error {
     fn from(error: BackendError) -> Self {
         let backend_request_error = BackendRequestError::from(error);
         match backend_request_error {
-            BackendRequestError::InternalServerError => {
+            BackendRequestError::Generic(GenericBackendRequestError::InternalServerError)
+            | BackendRequestError::UserEmailInsert(_) => {
                 actix_web::error::ErrorInternalServerError(
                     serde_json::json!({"status": "fail", "message": "Internal server error"}),
                 )
             }
-            BackendRequestError::NotFound => {
+            BackendRequestError::Generic(GenericBackendRequestError::NotFound) => {
                 actix_web::error::ErrorNotFound(
                     serde_json::json!({"status": "fail", "message": "Not found"}),
                 )
             }
-            BackendRequestError::Unauthorized => {
+            BackendRequestError::Generic(GenericBackendRequestError::Unauthorized) => {
                 actix_web::error::ErrorUnauthorized(
                     serde_json::json!({"status": "fail", "message": "Unauthorized"}),
                 )
@@ -141,5 +157,23 @@ impl From<SendError<LNCommand>> for BackendError {
 impl From<RecvError> for BackendError {
     fn from(_error: RecvError) -> Self {
         Self::ListenNotify
+    }
+}
+
+impl From<InsertError<InsertableUserEmailAttributes>> for BackendError {
+    fn from(error: InsertError<InsertableUserEmailAttributes>) -> Self {
+        BackendError::UserEmailInsert(error)
+    }
+}
+
+impl From<InsertError<InsertableEmailProviderAttributes>> for BackendError {
+    fn from(error: InsertError<InsertableEmailProviderAttributes>) -> Self {
+        BackendError::EmailProviderInsert(error)
+    }
+}
+
+impl From<InsertError<InsertableTemporaryUserAttributes>> for BackendError {
+    fn from(error: InsertError<InsertableTemporaryUserAttributes>) -> Self {
+        BackendError::TemporaryUserInsert(error)
     }
 }

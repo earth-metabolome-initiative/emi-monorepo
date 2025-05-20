@@ -89,7 +89,7 @@ impl super::Rows {
             super::Rows::TeamProject(rows) => rows.len(),
             super::Rows::TeamState(rows) => rows.len(),
             super::Rows::Team(rows) => rows.len(),
-            super::Rows::TemporaryUserEmail(rows) => rows.len(),
+            super::Rows::TemporaryUser(rows) => rows.len(),
             super::Rows::ToolModel(rows) => rows.len(),
             super::Rows::TrackableLocation(rows) => rows.len(),
             super::Rows::TrackableState(rows) => rows.len(),

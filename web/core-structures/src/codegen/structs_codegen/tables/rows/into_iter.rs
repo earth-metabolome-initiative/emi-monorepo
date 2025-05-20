@@ -409,9 +409,9 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::Team(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Team).collect::<Vec<_>>()
             }
-            super::Rows::TemporaryUserEmail(rows) => {
+            super::Rows::TemporaryUser(rows) => {
                 rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::TemporaryUserEmail)
+                    .map(crate::codegen::tables::row::Row::TemporaryUser)
                     .collect::<Vec<_>>()
             }
             super::Rows::ToolModel(rows) => {

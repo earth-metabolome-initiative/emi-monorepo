@@ -69,6 +69,54 @@ impl UserEmail {
             .optional()
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_email_and_created_by(
+        email: &str,
+        created_by: &i32,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl,
+            associations::HasTable,
+        };
+        use diesel_async::RunQueryDsl;
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::user_emails::user_emails::email
+                    .eq(email)
+                    .and(
+                    crate::codegen::diesel_codegen::tables::user_emails::user_emails::created_by
+                        .eq(created_by),
+                ),
+            )
+            .first::<Self>(conn)
+            .await
+            .optional()
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_created_by_and_primary_email(
+        created_by: &i32,
+        primary_email: &bool,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl,
+            associations::HasTable,
+        };
+        use diesel_async::RunQueryDsl;
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::user_emails::user_emails::created_by
+                    .eq(created_by)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::user_emails::user_emails::primary_email
+                            .eq(primary_email),
+                    ),
+            )
+            .first::<Self>(conn)
+            .await
+            .optional()
+    }
+    #[cfg(feature = "postgres")]
     pub async fn from_created_at(
         created_at: &rosetta_timestamp::TimestampUTC,
         conn: &mut diesel_async::AsyncPgConnection,

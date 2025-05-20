@@ -974,11 +974,11 @@ impl web_common_traits::prelude::AsyncReadDispatch<diesel_async::AsyncPgConnecti
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::TemporaryUserEmail(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::TemporaryUser(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::temporary_user_emails::TemporaryUserEmail as web_common_traits::database::AsyncRead<
+                    <crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser as web_common_traits::database::AsyncRead<
                         diesel_async::AsyncPgConnection,
                     >>::read_async(primary_key, conn)
                         .await?

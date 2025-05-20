@@ -91,7 +91,7 @@ mod team_members;
 mod team_projects;
 mod team_states;
 mod teams;
-mod temporary_user_emails;
+mod temporary_user;
 mod tool_models;
 mod trackable_locations;
 mod trackable_states;
@@ -403,10 +403,8 @@ pub enum Rows {
     ),
     TeamState(Vec<crate::codegen::structs_codegen::tables::team_states::TeamState>),
     Team(Vec<crate::codegen::structs_codegen::tables::teams::Team>),
-    TemporaryUserEmail(
-        Vec<
-            crate::codegen::structs_codegen::tables::temporary_user_emails::TemporaryUserEmail,
-        >,
+    TemporaryUser(
+        Vec<crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser>,
     ),
     ToolModel(Vec<crate::codegen::structs_codegen::tables::tool_models::ToolModel>),
     TrackableLocation(
@@ -1069,8 +1067,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::TemporaryUserEmail(temporary_user_emails) => {
-                temporary_user_emails
+            Rows::TemporaryUser(temporary_user) => {
+                temporary_user
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -1301,7 +1299,7 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::TeamProject(team_projects) => team_projects.primary_keys(),
             Rows::TeamState(team_states) => team_states.primary_keys(),
             Rows::Team(teams) => teams.primary_keys(),
-            Rows::TemporaryUserEmail(temporary_user_emails) => temporary_user_emails.primary_keys(),
+            Rows::TemporaryUser(temporary_user) => temporary_user.primary_keys(),
             Rows::ToolModel(tool_models) => tool_models.primary_keys(),
             Rows::TrackableLocation(trackable_locations) => trackable_locations.primary_keys(),
             Rows::TrackableState(trackable_states) => trackable_states.primary_keys(),

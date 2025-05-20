@@ -13,6 +13,7 @@ members = [
   "web/web_common/pgrx_validation_derive",
   "web/web_common/validation-errors",
   "web/web_common/backend-request-errors",
+  "web/web_common/generic-backend-request-errors",
   "web/web_common/pg2sqlite",
   "data-retrieval/taxonomy-fetcher",
   "data-retrieval/downloader",
@@ -57,7 +58,12 @@ members = [
 
 [workspace.dependencies]
 actix-web = { version = "4.10", features = ["cookies", "openssl"] }
-actix-ws = "0.3.0"
+actix-http = { version = "3.11.0" }
+actix-files = { version = "0.6.6" }
+actix-web-codegen = {version = "4.3.0", git = "https://github.com/LucaCappelletti94/actix-web.git", branch = "macro-doc"}
+actix-web-httpauth = { version = "0.8.2" }
+actix-cors = { version = "0.7.1" }
+actix-ws = { version = "0.3.0" }
 init-migration = { path = "data-migrations/init-migration" }
 init-db = { path = "data-migrations/init-db" }
 syn = { version = "2.0", features = ["full", "visit-mut"] }
@@ -83,7 +89,7 @@ diesel_full_text_search = "2.2"
 diesel_pgrx = { path = "utils/diesel_pgrx" }
 diesel_pgrx_derive = { path = "utils/diesel_pgrx_derive" }
 example_extension = { path = "utils/diesel_pgrx/example_extension" }
-redis = { version = "0.30", features = ["tokio-comp"] }
+redis = { version = "0.31", features = ["tokio-comp"] }
 postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel.git", default-features = false, branch = "custom-diesel" }
 chrono = { version = "0.4.39", features = ["serde"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
@@ -91,11 +97,10 @@ serde_json = "1.0"
 strum = { version = "0.27", features = ["derive"] }
 yew = { git = "https://github.com/LucaCappelletti94/yew.git", features = [
   "csr",
-], branch = "vendoring-yew-agent" }
-yew-router = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "vendoring-yew-agent" }
+], branch = "string-properties" }
+yew-router = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "string-properties" }
 yewdux = { git = "https://github.com/LucaCappelletti94/yewdux", branch = "custom-yew" }
-yew-agent = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "vendoring-yew-agent" }
-
+yew-agent = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "string-properties" }
 strum_macros = "0.27"
 zip = "3.0"
 reference-docker = { path = "web/web_common/reference-docker" }
@@ -108,7 +113,7 @@ rsa = { version = "0.9.8" }
 rand = { version = "0.8" }
 gloo = "0.11.0"
 gloo-timers = "0.3.0"
-criterion = { version = "0.5", features = ["html_reports"] }
+criterion = { version = "0.6", features = ["html_reports"] }
 rosetta-uuid = { path = "data-structures/rosetta-uuid" }
 rosetta-timestamp = { path = "utils/rosetta-timestamp" }
 taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
@@ -155,6 +160,7 @@ pg2sqlite = { path = "web/web_common/pg2sqlite" }
 sqlite-migration-generator = { path = "web/web_common/sqlite-migration-generator" }
 validation-errors = { path = "web/web_common/validation-errors" }
 backend-request-errors = { path = "web/web_common/backend-request-errors" }
+generic-backend-request-errors = { path = "web/web_common/generic-backend-request-errors" }
 downloader = { path = "data-retrieval/downloader" }
 macro-utils = { path = "utils/macro-utils" }
 lazy_static = { version = "1.5.0" }

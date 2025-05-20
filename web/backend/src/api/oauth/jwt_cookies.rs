@@ -13,7 +13,7 @@ use actix_web_httpauth::extractors::bearer::BearerAuth;
 use api_path::api::oauth::jwt_cookies::USER_ONLINE_COOKIE_NAME;
 use base64::prelude::*;
 use chrono::{Duration, Utc};
-use core_structures::{EmailProvider, LoginProvider, User, UserEmail};
+use core_structures::{LoginProvider, TemporaryUser, User};
 use diesel_async::AsyncPgConnection;
 use futures::Future;
 use jsonwebtoken::{
@@ -27,8 +27,14 @@ use web_common_traits::database::AsyncRead;
 
 use crate::errors::BackendError;
 
+mod known_user;
+use known_user::handle_known_user;
+mod unknown_user;
+use unknown_user::handle_unknown_user;
+
 /// Set a const with the expected cookie name.
 pub(crate) const REFRESH_COOKIE_NAME: &str = "refresh_token";
+pub(crate) const TEMPORARY_COOKIE_NAME: &str = "temporary_refresh_token";
 
 pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpResponse {
     log::info!("Eliminating cookies");
@@ -113,19 +119,20 @@ impl JWTConfig {
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 struct JsonWebToken {
-    sub: i32,
+    user_id: i32,
     token_id: Uuid,
     exp: usize,
     created_at: usize,
+    temporary: bool,
 }
 
 impl JsonWebToken {
-    fn new(user_id: i32, minutes: i64) -> JsonWebToken {
+    fn new(user_id: i32, temporary: bool, minutes: i64) -> JsonWebToken {
         let token_id = Uuid::new_v4();
         let now = Utc::now();
         let created_at = now.timestamp() as usize;
         let expires_in = (now + Duration::try_minutes(minutes).unwrap()).timestamp() as usize;
-        JsonWebToken { sub: user_id, token_id, exp: expires_in, created_at }
+        JsonWebToken { user_id, token_id, exp: expires_in, created_at, temporary }
     }
 
     /// Function to insert the token into the redis database.
@@ -179,7 +186,7 @@ impl JsonWebToken {
     }
 
     fn user_id(&self) -> i32 {
-        self.sub
+        self.user_id
     }
 
     fn is_expired(&self) -> bool {
@@ -213,9 +220,13 @@ pub(crate) struct JsonRefreshToken {
 }
 
 impl JsonRefreshToken {
-    pub(crate) fn new(user_id: i32) -> Result<JsonRefreshToken, BackendError> {
+    pub(crate) fn new(user_id: i32, temporary: bool) -> Result<JsonRefreshToken, BackendError> {
         Ok(JsonRefreshToken {
-            web_token: JsonWebToken::new(user_id, JWTConfig::from_env()?.refresh_token_minutes()),
+            web_token: JsonWebToken::new(
+                user_id,
+                temporary,
+                JWTConfig::from_env()?.refresh_token_minutes(),
+            ),
         })
     }
 
@@ -280,9 +291,11 @@ pub(crate) struct JsonAccessToken {
 }
 
 impl JsonAccessToken {
-    pub fn new(user_id: i32) -> Result<JsonAccessToken, BackendError> {
+    pub fn new(user_id: i32, temporary: bool) -> Result<JsonAccessToken, BackendError> {
         let config = JWTConfig::from_env()?;
-        Ok(JsonAccessToken { web_token: JsonWebToken::new(user_id, config.access_token_minutes()) })
+        Ok(JsonAccessToken {
+            web_token: JsonWebToken::new(user_id, temporary, config.access_token_minutes()),
+        })
     }
 
     /// Function to insert the token into the redis database.
@@ -328,6 +341,10 @@ impl JsonAccessToken {
         self.web_token.is_expired()
     }
 
+    fn is_temporary(&self) -> bool {
+        self.web_token.temporary
+    }
+
     pub fn encode(&self) -> Result<String, BackendError> {
         let config = JWTConfig::from_env()?;
         Ok(self.web_token.encode(config.access_token_private_key()?)?)
@@ -346,18 +363,22 @@ impl JsonAccessToken {
 /// # Arguments
 /// * `user_id` - The ID of the user to create the JWT for.
 /// * `redis_client` - The redis client to use for the login.
+/// * `cookie_name` - The name of the cookie to create.
+/// * `temporary` - Whether the cookie is temporary or not.
 async fn encode_jwt_refresh_cookie<'a>(
     user_id: i32,
     redis_client: &redis::Client,
+    cookie_name: &'a str,
+    temporary: bool,
 ) -> Result<Cookie<'a>, BackendError> {
     log::info!("Creating refresh token");
     let config = JWTConfig::from_env()?;
 
-    let token = JsonRefreshToken::new(user_id)?;
+    let token = JsonRefreshToken::new(user_id, temporary)?;
 
     token.insert_into_redis(redis_client).await?;
 
-    let cookie = Cookie::build(REFRESH_COOKIE_NAME, token.encode()?)
+    let cookie = Cookie::build(cookie_name, token.encode()?)
         .same_site(actix_web::cookie::SameSite::Strict)
         .secure(true)
         .path("/")
@@ -388,65 +409,28 @@ fn encode_user_online_cookie<'a>() -> Result<Cookie<'a>, BackendError> {
 ///
 /// # Arguments
 /// * `emails` - The emails of the user.
+/// * `primary_email` - The primary email of the user.
 /// * `provider` - The provider to use for the login.
 /// * `state` - The state to redirect to after the login.
 /// * `redis_client` - The redis client to use for the login.
 /// * `conn` - The database connection to use for the login.
 pub(crate) async fn build_login_response(
-    emails: &[String],
+    emails: &[&str],
+    primary_email: &str,
     provider: &LoginProvider,
     state: &str,
     redis_client: &redis::Client,
     conn: &mut AsyncPgConnection,
-) -> HttpResponse {
-    // We check whether any of the emails are already present in the database.
-    let mut primary_user_email = None;
-    let mut unknown_emails = Vec::new();
-    let mut unknown_emails_for_provider = Vec::new();
-
-    for email in emails {
-        match UserEmail::from_email(email, conn).await {
-            Ok(Some(user_email)) => {
-                primary_user_email = Some(user_email);
-                match EmailProvider::from_email_id_and_login_provider_id(
-                    &user_email.id,
-                    &provider.id,
-                    conn,
-                )
-                .await
-                {
-                    Err(err) => {
-                        return BackendError::from(err).into();
-                    }
-                    Ok(Some(email_provider)) => {}
-                    Ok(None) => {}
-                }
-            }
-            Ok(None) => {
-                // We need to insert the email into the database.
-                unknown_emails.push(email.clone());
-            }
-            Err(err) => {
-                return BackendError::from(err).into();
-            }
-        }
-    }
-
-    let refresh_cookie = match encode_jwt_refresh_cookie(user_id, redis_client).await {
-        Ok(cookie) => cookie,
-        Err(error) => {
-            return error.into();
-        }
+) -> Result<HttpResponse, BackendError> {
+    let refresh_cookie = if let Some(user) = handle_known_user(emails, provider, conn).await? {
+        encode_jwt_refresh_cookie(user.id, redis_client, REFRESH_COOKIE_NAME, false).await?
+    } else {
+        let temporary_user = handle_unknown_user(primary_email, provider, conn).await?;
+        encode_jwt_refresh_cookie(temporary_user.id, redis_client, TEMPORARY_COOKIE_NAME, true)
+            .await?
     };
 
-    let login_cookie = match encode_user_online_cookie() {
-        Ok(cookie) => cookie,
-        Err(error) => {
-            return error.into();
-        }
-    };
-
-    log::info!("Created login token");
+    let login_cookie = encode_user_online_cookie()?;
 
     let response = HttpResponse::Found()
         .append_header((LOCATION, state.to_string()))
@@ -456,7 +440,7 @@ pub(crate) async fn build_login_response(
 
     log::info!("Returning login response");
 
-    response
+    Ok(response)
 }
 
 pub(crate) async fn access_token_validator(
@@ -474,23 +458,46 @@ pub(crate) async fn access_token_validator(
     }
 }
 
-pub struct UserWrapper {
-    pub user: User,
+pub enum MaybeTemporaryUser {
+    TemporaryUser(TemporaryUser),
+    User(User),
 }
 
-impl From<User> for UserWrapper {
+impl From<User> for MaybeTemporaryUser {
     fn from(user: User) -> Self {
-        UserWrapper { user }
+        MaybeTemporaryUser::User(user)
     }
 }
 
-impl From<UserWrapper> for User {
-    fn from(wrapper: UserWrapper) -> Self {
-        wrapper.user
+impl From<TemporaryUser> for MaybeTemporaryUser {
+    fn from(user: TemporaryUser) -> Self {
+        MaybeTemporaryUser::TemporaryUser(user)
     }
 }
 
-impl FromRequest for UserWrapper {
+impl TryFrom<MaybeTemporaryUser> for User {
+    type Error = BackendError;
+
+    fn try_from(value: MaybeTemporaryUser) -> Result<Self, Self::Error> {
+        match value {
+            MaybeTemporaryUser::User(user) => Ok(user),
+            MaybeTemporaryUser::TemporaryUser(_) => Err(BackendError::Unauthorized),
+        }
+    }
+}
+
+impl TryFrom<MaybeTemporaryUser> for TemporaryUser {
+    type Error = BackendError;
+
+    fn try_from(value: MaybeTemporaryUser) -> Result<Self, Self::Error> {
+        match value {
+            MaybeTemporaryUser::TemporaryUser(user) => Ok(user),
+            MaybeTemporaryUser::User(_) => Err(BackendError::Unauthorized),
+        }
+    }
+}
+
+impl FromRequest for MaybeTemporaryUser {
     type Error = ActixError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
@@ -580,18 +587,29 @@ impl FromRequest for UserWrapper {
                 ));
             }
 
-            // If the user doesn't exist, we return an error, otherwise we return the user.
-            let Ok(user) = User::read_async(access_token.user_id(), &mut conn).await else {
-                return Err(ErrorInternalServerError(
-                    json!({"status": "fail", "message": "Internal server error"}),
-                ));
+            let user_wrapper: MaybeTemporaryUser = if access_token.is_temporary() {
+                match TemporaryUser::read_async(access_token.user_id(), &mut conn)
+                    .await
+                    .map_err(BackendError::from)?
+                {
+                    None => {
+                        return Err(BackendError::Unauthorized.into());
+                    }
+                    Some(user) => user.into(),
+                }
+            } else {
+                match User::read_async(access_token.user_id(), &mut conn)
+                    .await
+                    .map_err(BackendError::from)?
+                {
+                    None => {
+                        return Err(BackendError::Unauthorized.into());
+                    }
+                    Some(user) => user.into(),
+                }
             };
 
-            user.map(Into::into).ok_or_else(|| {
-                ErrorUnauthorized(
-                    json!({"status": "fail", "message": "Invalid token or user doesn't exists"}),
-                )
-            })
+            Ok(user_wrapper)
         })
     }
 }

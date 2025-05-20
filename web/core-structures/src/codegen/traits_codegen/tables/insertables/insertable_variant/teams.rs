@@ -22,7 +22,9 @@ impl web_common_traits::database::InsertableVariant
         use web_common_traits::database::Updatable;
         if let Some(parent) = self.parent_team(conn).await? {
             if !parent.can_update(user_id, conn).await? {
-                return Err(backend_request_errors::BackendRequestError::Unauthorized.into());
+                return Err(
+                    generic_backend_request_errors::GenericBackendRequestError::Unauthorized.into(),
+                );
             }
         }
         Ok(diesel::insert_into(Self::Row::table()).values(self).get_result(conn).await?)

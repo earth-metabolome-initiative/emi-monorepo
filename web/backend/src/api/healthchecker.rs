@@ -1,7 +1,9 @@
-use actix_web::{HttpResponse, Responder, get};
+use actix_web::{HttpResponse, Responder};
 use serde_json::json;
+use actix_web_codegen::get;
 
 #[get("/healthchecker")]
+/// Health checker endpoint to verify if the server is running.
 async fn health_checker_handler() -> impl Responder {
     const MESSAGE: &str = "Build API with Rust, Diesel, Postgres,and Actix Web";
 

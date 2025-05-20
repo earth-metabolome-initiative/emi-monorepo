@@ -3,7 +3,11 @@ CREATE TABLE IF NOT EXISTS user_emails (
     email text NOT NULL UNIQUE,
     created_by INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    primary_email BOOLEAN NOT NULL DEFAULT TRUE
+    primary_email BOOLEAN NOT NULL DEFAULT TRUE,
+    -- There can only be one user associated with an email address
+    UNIQUE (email, created_by),
+    -- There can only be one primary email address per user
+    UNIQUE (created_by, primary_email)
 );
 
 CREATE TABLE IF NOT EXISTS email_providers (

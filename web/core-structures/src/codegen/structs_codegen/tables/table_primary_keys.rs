@@ -89,7 +89,7 @@ pub enum TablePrimaryKey {
     TeamProject((i32, i32)),
     TeamState(i16),
     Team(i32),
-    TemporaryUserEmail(rosetta_uuid::Uuid),
+    TemporaryUser(i32),
     ToolModel(i32),
     TrackableLocation(rosetta_uuid::Uuid),
     TrackableState(i16),
@@ -345,8 +345,8 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
                 crate::codegen::tables::table_names::TableName::TeamState
             }
             TablePrimaryKey::Team(_) => crate::codegen::tables::table_names::TableName::Team,
-            TablePrimaryKey::TemporaryUserEmail(_) => {
-                crate::codegen::tables::table_names::TableName::TemporaryUserEmail
+            TablePrimaryKey::TemporaryUser(_) => {
+                crate::codegen::tables::table_names::TableName::TemporaryUser
             }
             TablePrimaryKey::ToolModel(_) => {
                 crate::codegen::tables::table_names::TableName::ToolModel

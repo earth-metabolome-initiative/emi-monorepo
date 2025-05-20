@@ -1,7 +1,8 @@
 //! Login API for GitHub OAuth
 use std::env;
 
-use actix_web::{HttpResponse, get};
+use actix_web::HttpResponse;
+use actix_web_codegen::get;
 use core_structures::LoginProvider;
 use redis::Client as RedisClient;
 use reqwest::Client;
@@ -95,27 +96,32 @@ async fn github_oauth_handler(
         }
     };
 
-    let emails = emails
-        .into_iter()
-        .filter(|email| email.verified)
-        .map(|email| email.email)
-        .collect::<Vec<String>>();
-
-    if emails.is_empty() {
+    let Some(primary_email) = emails.iter().find(|email| email.primary) else {
         return BackendError::Unauthorized.into();
-    }
+    };
 
-    build_login_response(
+    let emails = emails
+        .iter()
+        .filter(|email| email.verified)
+        .map(|email| email.email.as_str())
+        .collect::<Vec<&str>>();
+
+    match build_login_response(
         emails.as_slice(),
+        primary_email.email.as_str(),
         &github_config.provider,
         state,
         &redis_client,
         &mut connection,
     )
     .await
+    {
+        Ok(response) => response,
+        Err(error) => error.into(),
+    }
 }
 
-pub async fn get_github_oauth_token(
+async fn get_github_oauth_token(
     authorization_code: &str,
     github_config: &GitHubConfig,
 ) -> Result<GitHubOauthToken, BackendError> {

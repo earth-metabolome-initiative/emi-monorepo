@@ -19,7 +19,7 @@ pub use tables::{
     StepModelContainerCategory, StepModelInstrument, StepModelInstrumentCategory,
     StepModelInstrumentModel, StepModelNameplateCategory, StepModelToolCategory,
     StepNameplateModel, StepStorageContainer, StepToolModel, StorageContainer, Taxon, Team,
-    TeamMember, TeamProject, TeamState, TemporaryUserEmail, ToolModel, Trackable,
-    TrackableLocation, TrackableState, Unit, User, UserEmail, UserOrganization,
-    VolumetricProcessable, WeighingInstrumentModel, WeighingStep, WeighingStepModel,
+    TeamMember, TeamProject, TeamState, TemporaryUser, ToolModel, Trackable, TrackableLocation,
+    TrackableState, Unit, User, UserEmail, UserOrganization, VolumetricProcessable,
+    WeighingInstrumentModel, WeighingStep, WeighingStepModel,
 };

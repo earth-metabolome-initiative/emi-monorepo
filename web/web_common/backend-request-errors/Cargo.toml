@@ -5,6 +5,9 @@ edition = "2024"
 
 [dependencies]
 serde.workspace = true
+generic-backend-request-errors.workspace = true
+core-structures = { workspace = true, features = ["serde"] }
+web_common_traits.workspace = true
 
 [lints]
 workspace = true

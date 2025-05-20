@@ -1,8 +1,9 @@
 //! API endpoint to refresh the access token.
-use actix_web::{HttpRequest, HttpResponse, get, web};
+use actix_web::{HttpRequest, HttpResponse, web};
 use api_path::api::oauth::jwt_cookies::AccessToken;
 use core_structures::User;
 use web_common_traits::database::AsyncRead;
+use actix_web_codegen::get;
 
 use crate::{
     api::oauth::jwt_cookies::{JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME},
@@ -60,7 +61,7 @@ pub(crate) async fn refresh_access_token(
         .ok_or(BackendError::Unauthorized)?;
 
     // If the user exists, we create a new access token and return it.
-    let access_token = JsonAccessToken::new(refresh_token.user_id())?;
+    let access_token = JsonAccessToken::new(refresh_token.user_id(), false)?;
 
     access_token.insert_into_redis(redis_client).await?;
 

@@ -13,7 +13,10 @@ for crate::codegen::structs_codegen::tables::procedure_model_instrument_categori
         use diesel::associations::HasTable;
         use web_common_traits::database::Updatable;
         if !self.can_update(user_id, conn).await? {
-            return Err(backend_request_errors::BackendRequestError::Unauthorized.into());
+            return Err(
+                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
+                    .into(),
+            );
         }
         Ok(
             diesel::delete(Self::table().find(<&Self as Identifiable>::id(self)))
