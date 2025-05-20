@@ -2,8 +2,8 @@
 use std::future::{Ready, ready};
 
 use actix_web::{FromRequest, HttpRequest, HttpResponse, dev::Payload, error::Error, web};
-use actix_web_httpauth::extractors::bearer::BearerAuth;
 use actix_web_codegen::get;
+use actix_web_httpauth::extractors::bearer::BearerAuth;
 
 use crate::{
     api::oauth::jwt_cookies::{

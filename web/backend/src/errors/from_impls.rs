@@ -2,7 +2,10 @@
 
 use actix_web::HttpResponse;
 use backend_request_errors::BackendRequestError;
-use core_structures::tables::insertables::{InsertableEmailProviderAttributes, InsertableTemporaryUserAttributes, InsertableUserEmailAttributes};
+use core_structures::tables::insertables::{
+    InsertableEmailProviderAttributes, InsertableTemporaryUserAttributes,
+    InsertableUserEmailAttributes,
+};
 use diesel_async::pooled_connection::{PoolError, bb8::RunError};
 use generic_backend_request_errors::GenericBackendRequestError;
 use tokio::sync::{mpsc::error::SendError, oneshot::error::RecvError};

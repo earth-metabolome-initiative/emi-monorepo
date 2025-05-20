@@ -1,9 +1,9 @@
 //! API endpoint to refresh the access token.
 use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web_codegen::get;
 use api_path::api::oauth::jwt_cookies::AccessToken;
 use core_structures::User;
 use web_common_traits::database::AsyncRead;
-use actix_web_codegen::get;
 
 use crate::{
     api::oauth::jwt_cookies::{JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME},

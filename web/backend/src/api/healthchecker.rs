@@ -1,6 +1,6 @@
 use actix_web::{HttpResponse, Responder};
-use serde_json::json;
 use actix_web_codegen::get;
+use serde_json::json;
 
 #[get("/healthchecker")]
 /// Health checker endpoint to verify if the server is running.

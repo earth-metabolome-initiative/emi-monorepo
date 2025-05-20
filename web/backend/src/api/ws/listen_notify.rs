@@ -294,13 +294,13 @@ impl ListenNotifyHandle {
     }
 
     /// Send a message to the chat server.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `message` - The message to send.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * `BackendError` - If the message could not be sent.
     pub async fn notify(&self, message: DBMessage) -> Result<(), BackendError> {
         let (sender, receiver) = oneshot::channel();

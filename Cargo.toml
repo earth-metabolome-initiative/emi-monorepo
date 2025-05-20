@@ -60,7 +60,7 @@ members = [
 actix-web = { version = "4.10", features = ["cookies", "openssl"] }
 actix-http = { version = "3.11.0" }
 actix-files = { version = "0.6.6" }
-actix-web-codegen = {version = "4.3.0", git = "https://github.com/LucaCappelletti94/actix-web.git", branch = "macro-doc"}
+actix-web-codegen = { version = "4.3.0", git = "https://github.com/LucaCappelletti94/actix-web.git", branch = "macro-doc" }
 actix-web-httpauth = { version = "0.8.2" }
 actix-cors = { version = "0.7.1" }
 actix-ws = { version = "0.3.0" }
