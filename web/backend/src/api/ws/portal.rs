@@ -24,6 +24,7 @@ const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 /// How long before lack of client response causes a timeout
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
 
+#[allow(clippy::too_many_lines)]
 /// Echo text & binary messages received from the client, respond to ping
 /// messages, and monitor connection health to detect network issues and free up
 /// resources.
@@ -179,7 +180,7 @@ pub(super) async fn portal_ws(
                 // send heartbeat ping
                 let _ = session.ping(b"").await;
             }
-        };
+        }
     };
 
     let _ = listen_notify_handle.disconnect(session_id).await;

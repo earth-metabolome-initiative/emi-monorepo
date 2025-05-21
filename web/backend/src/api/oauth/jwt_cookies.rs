@@ -194,7 +194,7 @@ impl JsonWebToken {
         now > self.exp
     }
 
-    fn encode(&self, private_key: String) -> Result<String, jsonwebtoken::errors::Error> {
+    fn encode(&self, private_key: &str) -> Result<String, jsonwebtoken::errors::Error> {
         encode(
             &Header::new(Algorithm::RS256),
             &self,
@@ -204,7 +204,7 @@ impl JsonWebToken {
 
     fn decode(
         token: &str,
-        public_key: String,
+        public_key: &str,
     ) -> Result<TokenData<JsonWebToken>, jsonwebtoken::errors::Error> {
         decode::<JsonWebToken>(
             token,
@@ -240,7 +240,7 @@ impl JsonRefreshToken {
     }
 
     /// Checks whether the token is still present in the redis database and has
-    /// the same user_id.
+    /// the same `user_id`.
     ///
     /// # Arguments
     /// * `redis_client` - The redis client to use for the login.
@@ -271,14 +271,14 @@ impl JsonRefreshToken {
     }
 
     pub(crate) fn encode(&self) -> Result<String, BackendError> {
-        Ok(self.web_token.encode(JWTConfig::from_env()?.refresh_token_private_key()?)?)
+        Ok(self.web_token.encode(&JWTConfig::from_env()?.refresh_token_private_key()?)?)
     }
 
     pub(crate) fn decode(token: &str) -> Result<JsonRefreshToken, BackendError> {
         Ok(JsonRefreshToken {
             web_token: JsonWebToken::decode(
                 token,
-                JWTConfig::from_env()?.refresh_token_public_key()?,
+                &JWTConfig::from_env()?.refresh_token_public_key()?,
             )?
             .claims,
         })
@@ -311,7 +311,7 @@ impl JsonAccessToken {
     }
 
     /// Checks whether the token is still present in the redis database and has
-    /// the same user_id.
+    /// the same `user_id`.
     ///
     /// # Arguments
     /// * `redis_client` - The redis client to use for the login.
@@ -347,13 +347,13 @@ impl JsonAccessToken {
 
     pub fn encode(&self) -> Result<String, BackendError> {
         let config = JWTConfig::from_env()?;
-        Ok(self.web_token.encode(config.access_token_private_key()?)?)
+        Ok(self.web_token.encode(&config.access_token_private_key()?)?)
     }
 
     pub fn decode(token: &str) -> Result<JsonAccessToken, BackendError> {
         let config = JWTConfig::from_env()?;
         Ok(JsonAccessToken {
-            web_token: JsonWebToken::decode(token, config.access_token_public_key()?)?.claims,
+            web_token: JsonWebToken::decode(token, &config.access_token_public_key()?)?.claims,
         })
     }
 }
@@ -507,66 +507,41 @@ impl FromRequest for MaybeTemporaryUser {
         // of the form:
         // Authorization: Bearer <token here>
         //
-        let bearer = match BearerAuth::from_request(req, payload).into_inner() {
-            Ok(bearer) => bearer,
-            Err(_) => {
-                log::debug!("Bearer token not present in request");
-                return Box::pin(ready(Err(ErrorUnauthorized(
-                    json!({"status": "fail", "message": "Invalid token"}),
-                ))));
-            }
+        let Ok(bearer) = BearerAuth::from_request(req, payload).into_inner() else {
+            log::debug!("Bearer token not present in request");
+            return Box::pin(ready(Err(ErrorUnauthorized(
+                json!({"status": "fail", "message": "Invalid token"}),
+            ))));
         };
 
         // Next up, we check whether the token is still present in the redis database.
-        let redis_client = match req.app_data::<web::Data<redis::Client>>() {
-            Some(client) => client.clone(),
-            None => {
-                log::error!("Redis client not present in request");
-                return Box::pin(ready(Err(ErrorInternalServerError(
-                    json!({"status": "fail", "message": "Internal server error"}),
-                ))));
-            }
-        }
-        .get_ref()
-        .clone();
+        let redis_client = if let Some(client) = req.app_data::<web::Data<redis::Client>>() {
+            client.get_ref().clone()
+        } else {
+            log::error!("Redis client not present in request");
+            return Box::pin(ready(Err(ErrorInternalServerError(
+                json!({"status": "fail", "message": "Internal server error"}),
+            ))));
+        };
 
         // Finally, we get the user from the database, as while the user indeed seems
         // to be authenticated and it still exists in the redis database, we still need
         // to check whether the user exists in the database, as it may have been deleted
         // in the meantime.
-        let diesel_pool = match req.app_data::<web::Data<crate::DBPool>>() {
-            Some(pool) => pool.clone(),
-            None => {
-                log::error!("Database pool not present in request");
-                return Box::pin(ready(Err(ErrorInternalServerError(
-                    json!({"status": "fail", "message": "Internal server error"}),
-                ))));
-            }
-        }
-        .get_ref()
-        .clone();
+        let diesel_pool = if let Some(pool) = req.app_data::<web::Data<crate::DBPool>>() {
+            pool.get_ref().clone()
+        } else {
+            log::error!("Database pool not present in request");
+            return Box::pin(ready(Err(ErrorInternalServerError(
+                json!({"status": "fail", "message": "Internal server error"}),
+            ))));
+        };
 
         Box::pin(async move {
             let token = bearer.token();
-            let access_token = match JsonAccessToken::decode(token) {
-                Ok(token) => token,
-                Err(_) => {
-                    log::debug!("Unable to decode access token");
-                    return Err(ErrorUnauthorized(
-                        json!({"status": "fail", "message": "Invalid token"}),
-                    ));
-                }
-            };
+            let access_token = JsonAccessToken::decode(token)?;
 
-            let mut conn = match diesel_pool.get().await {
-                Ok(conn) => conn,
-                Err(_) => {
-                    log::error!("Unable to get connection from pool.");
-                    return Err(ErrorInternalServerError(
-                        json!({"status": "fail", "message": "Internal server error"}),
-                    ));
-                }
-            };
+            let mut conn = diesel_pool.get().await.map_err(BackendError::from)?;
 
             // If the token is expired, we return an error.
             if access_token.is_expired() {

@@ -1,9 +1,9 @@
 //! Submodule benchmarking the computation of the oxidation states of the
 //! `MolecularFormula` struct.
 
-use std::str::FromStr;
+use std::{hint::black_box, str::FromStr};
 
-use criterion::{Criterion, black_box};
+use criterion::Criterion;
 use molecular_formula::MolecularFormula;
 
 /// Benchmark for the `oxidation_states` method.

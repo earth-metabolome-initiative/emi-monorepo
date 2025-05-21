@@ -34,7 +34,7 @@ pub enum BackendError {
     Base64DecodeError(base64::DecodeError),
     /// An error happened while trying to decode a JSON value.
     FromUtf8Error(std::string::FromUtf8Error),
-    /// An error occurred while encoding or decoding a JSONWebToken.
+    /// An error occurred while encoding or decoding a `JSONWebToken`.
     JWTError(jsonwebtoken::errors::Error),
     /// When inserting a new user email failed.
     UserEmailInsert(InsertError<InsertableUserEmailAttributes>),
@@ -44,7 +44,7 @@ pub enum BackendError {
     TemporaryUserInsert(InsertError<InsertableTemporaryUserAttributes>),
     /// When a login provider is not found in the database.
     UnknownLoginProvider(String),
-    /// When there is a failure in the ListenNotify server.
+    /// When there is a failure in the `ListenNotify` server.
     ListenNotify,
     /// When there is a collision between two users.
     LoginCollision,
