@@ -6,7 +6,7 @@
 
 [A media type](https://en.wikipedia.org/wiki/Media_type) (formerly known as MIME type) is a standardized way to indicate the nature and format of a file or data. It is used in protocols like HTTP, email (MIME), and others to tell clients (e.g., browsers) how to handle the content.
 
-The [media_types]() crate provides strongly typed structs and methods to operate on mime types, with integration with [`serde`](https://docs.rs/serde/latest/serde/index.html), [`diesel`](https://github.com/diesel-rs/diesel) with both `SQLite` and `PostgreSQL` backends, and additionally support for [`pgrx`](https://github.com/pgcentralfoundation/pgrx).
+The [media_types](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/media_types) crate provides strongly typed structs and methods to operate on mime types, with integration with [`serde`](https://docs.rs/serde/latest/serde/index.html), [`diesel`](https://github.com/diesel-rs/diesel) with both `SQLite` and `PostgreSQL` backends, and additionally support for [`pgrx`](https://github.com/pgcentralfoundation/pgrx).
 
 ## Usage examples
 
