@@ -47,16 +47,19 @@ pub struct MediaType {
 }
 
 impl MediaType {
+    #[must_use]
     /// Returns the root type of the media type.
     pub fn root(&self) -> RootMediaType {
         self.root
     }
 
+    #[must_use]
     /// Returns the subtype of the media type.
     pub fn subtype(&self) -> &SubMediaType {
         &self.subtype
     }
 
+    #[must_use]
     /// Returns the parameters associated with the media type.
     pub fn params(&self) -> &[(String, String)] {
         &self.params

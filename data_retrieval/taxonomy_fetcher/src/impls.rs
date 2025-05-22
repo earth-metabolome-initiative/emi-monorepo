@@ -1,4 +1,4 @@
-//! Submodule collecting the concrete implementations of the taxonomy_fetcher
+//! Submodule collecting the concrete implementations of the `taxonomy_fetcher`
 //! crate.
 
 pub mod catalog_of_life;

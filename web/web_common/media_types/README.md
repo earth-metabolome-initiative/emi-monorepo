@@ -80,7 +80,7 @@ This means that when you try to use a media type constant which has been depreca
 
 ## Using with `PostgreSQL`
 
-The `media_types` crate provides a custom `PostgreSQL` extension that allows you to use the `media_types` crate in your PostgreSQL database. This extension provides a custom data type for media types, which seamlessly integrates with the `diesel` ORM. Do note that the binary serialization used for `pgrx` extension is [CBOR](https://en.wikipedia.org/wiki/CBOR) based, which is the default serialization format for `pgrx` extensions.
+The `media_types` crate provides a custom `PostgreSQL` extension that allows you to use the `media_types` crate in your `PostgreSQL` database. This extension provides a custom data type for media types, which seamlessly integrates with the `diesel` ORM. Do note that the binary serialization used for `pgrx` extension is [CBOR](https://en.wikipedia.org/wiki/CBOR) based, which is the default serialization format for `pgrx` extensions.
 
 ### Compiling the PGRX extension
 
@@ -94,7 +94,7 @@ Note that the `USER_ID` and `GROUP_ID` environment variables are used to set the
 
 ### Installing the PGRX extension
 
-As with any other postgres extension, you can install the `media_types` extension by first copying the `*.so`, `*.sql`, and `*.control` files to the `postgres` extension directory. This is usually located at `/usr/share/postgresql/extension/` or `/usr/local/share/postgresql/extension/`. You can then run the following command in your PostgreSQL database:
+As with any other postgres extension, you can install the `media_types` extension by first copying the `*.so`, `*.sql`, and `*.control` files to the `postgres` extension directory. This is usually located at `/usr/share/postgresql/extension/` or `/usr/local/share/postgresql/extension/`. You can then run the following command in your `PostgreSQL` database:
 
 ```sql
 CREATE EXTENSION "media_types";
@@ -102,7 +102,7 @@ CREATE EXTENSION "media_types";
 
 ### Using in a table
 
-Now that you have installed the `media_types` extension, you can use it in your PostgreSQL database. You can create a table with a column of type `media_type` as follows:
+Now that you have installed the `media_types` extension, you can use it in your `PostgreSQL` database. You can create a table with a column of type `media_type` as follows:
 
 ```sql
 CREATE TABLE my_table (
@@ -113,7 +113,7 @@ CREATE TABLE my_table (
 
 ### Using with Diesel
 
-The `media_types` crate provides a custom `Diesel` type that allows you to use the `media_types` crate in your PostgreSQL database. This type is called `MediaType`, and it is used to represent media types in your database. Remember to enable the `diesel_pgrx` feature in your `Cargo.toml` file for the `media_types` crate, alongside your desidered database backend, which can either be `sqlite` or `postgres`.
+The `media_types` crate provides a custom `Diesel` type that allows you to use the `media_types` crate in your `PostgreSQL` database. This type is called `MediaType`, and it is used to represent media types in your database. Remember to enable the `diesel_pgrx` feature in your `Cargo.toml` file for the `media_types` crate, alongside your desired database backend, which can either be `sqlite` or `postgres`.
 
 Next, to use the `MediaType` type in your `Diesel` schema, you need to add the following line to your `schema.rs` file:
 

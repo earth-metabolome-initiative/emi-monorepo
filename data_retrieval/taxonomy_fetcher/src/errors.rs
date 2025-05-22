@@ -1,4 +1,4 @@
-//! Submodule defining the errors used across the taxonomy_fetcher crate.
+//! Submodule defining the errors used across the `taxonomy_fetcher` crate.
 
 use std::io::Error as IoError;
 

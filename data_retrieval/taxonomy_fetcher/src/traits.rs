@@ -1,4 +1,4 @@
-//! Submodule providing the traits used across the taxonomy_fetcher crate.
+//! Submodule providing the traits used across the `taxonomy_fetcher` crate.
 
 pub mod rank;
 pub mod taxon;

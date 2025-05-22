@@ -6,7 +6,7 @@ pub mod error;
 pub mod sorted_array;
 pub mod sorted_vec;
 
-/// Prelude module for the sorted_vec crate.
+/// Prelude module for the `sorted_vec` crate.
 pub mod prelude {
     pub use crate::{sorted_array::*, sorted_vec::*};
 }

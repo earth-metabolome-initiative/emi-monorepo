@@ -84,7 +84,7 @@ impl From<jsonwebtoken::errors::Error> for BackendError {
 
 impl From<BackendError> for BackendRequestError {
     fn from(error: BackendError) -> Self {
-        log::debug!("BackendError: {:?}", error);
+        log::debug!("BackendError: {error:?}");
         match error {
             BackendError::PostgresConnectionError(_)
             | BackendError::EnvironmentError(_)
