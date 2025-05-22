@@ -1,0 +1,19 @@
+[package]
+name = "sqlite_migration_generator"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+pg2sqlite.workspace = true
+quote.workspace = true
+syn.workspace = true
+sql_minifier.workspace = true
+csqlv = { workspace = true, default-features = false }
+sqlparser.workspace = true
+macro_utils.workspace = true
+
+[lints]
+workspace = true

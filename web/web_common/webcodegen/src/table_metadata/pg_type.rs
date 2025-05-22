@@ -25,64 +25,67 @@ pub(crate) const COPY_TYPES: [&str; 13] = [
     "f32",
     "f64",
     "bool",
-    "rosetta_uuid::Uuid",
-    "rosetta_timestamp::TimestampUTC",
-    "iso_codes::CountryCode",
-    "instrument_categories::InstrumentCategory",
-    "tool_categories::ToolCategory",
-    "nameplate_categories::NameplateCategory",
-    "container_categories::ContainerCategory",
+    "::rosetta_uuid::Uuid",
+    "::rosetta_timestamp::TimestampUTC",
+    "::iso_codes::CountryCode",
+    "::instrument_categories::InstrumentCategory",
+    "::tool_categories::ToolCategory",
+    "::nameplate_categories::NameplateCategory",
+    "::container_categories::ContainerCategory",
 ];
 
 /// Constant listing types supporting `Eq`.
-pub(crate) const EQ_TYPES: [&str; 13] = [
+pub(crate) const EQ_TYPES: [&str; 14] = [
     "i16",
     "i32",
     "i64",
     "bool",
     "String",
-    "chrono::NaiveDateTime",
-    "rosetta_uuid::Uuid",
-    "rosetta_timestamp::TimestampUTC",
-    "iso_codes::CountryCode",
-    "instrument_categories::InstrumentCategory",
-    "tool_categories::ToolCategory",
-    "nameplate_categories::NameplateCategory",
-    "container_categories::ContainerCategory",
+    "::chrono::NaiveDateTime",
+    "::rosetta_uuid::Uuid",
+    "::rosetta_timestamp::TimestampUTC",
+    "::iso_codes::CountryCode",
+    "::instrument_categories::InstrumentCategory",
+    "::tool_categories::ToolCategory",
+    "::nameplate_categories::NameplateCategory",
+    "::container_categories::ContainerCategory",
+    "::media_types::MediaType",
 ];
 
 /// Constant listing types supporting `Ord`.
-pub(crate) const ORD_TYPES: [&str; 13] = [
+pub(crate) const ORD_TYPES: [&str; 14] = [
     "i16",
     "i32",
     "i64",
     "bool",
     "String",
-    "chrono::NaiveDateTime",
-    "rosetta_uuid::Uuid",
-    "rosetta_timestamp::TimestampUTC",
-    "iso_codes::CountryCode",
-    "instrument_categories::InstrumentCategory",
-    "tool_categories::ToolCategory",
-    "nameplate_categories::NameplateCategory",
-    "container_categories::ContainerCategory",
+    "::chrono::NaiveDateTime",
+    "::rosetta_uuid::Uuid",
+    "::rosetta_timestamp::TimestampUTC",
+    "::iso_codes::CountryCode",
+    "::instrument_categories::InstrumentCategory",
+    "::tool_categories::ToolCategory",
+    "::nameplate_categories::NameplateCategory",
+    "::container_categories::ContainerCategory",
+    "::media_types::MediaType",
 ];
 
 /// Constant listing types supporting `Hash`.
-pub(crate) const HASH_TYPES: [&str; 13] = [
+pub(crate) const HASH_TYPES: [&str; 14] = [
     "i16",
     "i32",
     "i64",
     "bool",
     "String",
-    "chrono::NaiveDateTime",
-    "rosetta_uuid::Uuid",
-    "rosetta_timestamp::TimestampUTC",
-    "iso_codes::CountryCode",
-    "instrument_categories::InstrumentCategory",
-    "tool_categories::ToolCategory",
-    "nameplate_categories::NameplateCategory",
-    "container_categories::ContainerCategory",
+    "::chrono::NaiveDateTime",
+    "::rosetta_uuid::Uuid",
+    "::rosetta_timestamp::TimestampUTC",
+    "::iso_codes::CountryCode",
+    "::instrument_categories::InstrumentCategory",
+    "::tool_categories::ToolCategory",
+    "::nameplate_categories::NameplateCategory",
+    "::container_categories::ContainerCategory",
+    "::media_types::MediaType",
 ];
 
 /// Represents a `PostgreSQL` type.
@@ -192,44 +195,52 @@ pub async fn rust_type_str<S: AsRef<str>>(
         "boolean" | "bool" => "bool",
 
         // Temporal types
-        "timestamp without time zone" => "chrono::NaiveDateTime",
+        "timestamp without time zone" => "::chrono::NaiveDateTime",
         "timestamp with time zone" => {
             let time_zone = PgSetting::time_zone(conn).await?;
             match time_zone.setting.as_str() {
-                "UTC" => "rosetta_timestamp::TimestampUTC",
+                "UTC" => "::rosetta_timestamp::TimestampUTC",
                 unknown_time_zone => {
                     unimplemented!("Time zone `{unknown_time_zone}` not supported")
                 }
             }
         }
-        "date" => "chrono::NaiveDate",
-        "interval" => "chrono::Duration",
+        "date" => "::chrono::NaiveDate",
+        "interval" => "::chrono::Duration",
 
         // Binary types
         "bytea" | "bit" | "bit varying" => "Vec<u8>",
 
         // JSON types
-        "json" | "jsonb" => "serde_json::Value",
+        "json" | "jsonb" => "::serde_json::Value",
 
         // Network address types
         "inet" | "cidr" => "std::net::IpAddr",
         "macaddr" | "macaddr8" => "std::net::MacAddr",
 
         // GIS types
-        "point" => "postgis_diesel::types::Point",
+        "point" => "::postgis_diesel::types::Point",
         "geometry" => panic!("Geometry type not supported"),
 
         // UUID type
-        "uuid" => "rosetta_uuid::Uuid",
+        "uuid" => "::rosetta_uuid::Uuid",
 
         // ISO Codes
-        "countrycode" | "CountryCode" => "iso_codes::CountryCode",
+        "countrycode" | "CountryCode" => "::iso_codes::CountryCode",
 
         // Instrument and Tool Categories
-        "instrumentcategory" | "InstrumentCategory" => "instrument_categories::InstrumentCategory",
-        "toolcategory" | "ToolCategory" => "tool_categories::ToolCategory",
-        "nameplatecategory" | "NameplateCategory" => "nameplate_categories::NameplateCategory",
-        "containercategory" | "ContainerCategory" => "container_categories::ContainerCategory",
+        "instrumentcategory" | "InstrumentCategory" => {
+            "::instrument_categories::InstrumentCategory"
+        }
+        "toolcategory" | "ToolCategory" => "::tool_categories::ToolCategory",
+        "stepmodelcategory" | "StepModelCategory" => "::step_model_categories::StepModelCategory",
+        "nameplatecategory" | "NameplateCategory" => "::nameplate_categories::NameplateCategory",
+        "containercategory" | "ContainerCategory" => "::container_categories::ContainerCategory",
+
+        "cas" => "::cas_codes::CAS",
+        "molecularformula" => "::molecular_formula::MolecularFormula",
+
+        "mediatype" | "MediaType" => "::media_types::MediaType",
 
         other => return Err(WebCodeGenError::UnknownPostgresRustType(other.to_owned())),
     })
@@ -303,26 +314,35 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<String, WebCod
 
         // GIS types
         "geometry" | "point" | "polygon" | "geometry(Point,4326)" | "line" => {
-            "postgis_diesel::sql_types::Geometry"
+            "::postgis_diesel::sql_types::Geometry"
         }
-        "geography" => "postgis_diesel::sql_types::Geography",
+        "geography" => "::postgis_diesel::sql_types::Geography",
 
         // Other
-        "uuid" => "rosetta_uuid::diesel_impls::Uuid",
+        "uuid" => "::rosetta_uuid::diesel_impls::Uuid",
 
         // ISO Codes
-        "countrycode" | "CountryCode" => "iso_codes::country_codes::diesel_impls::CountryCode",
+        "countrycode" | "CountryCode" => "::iso_codes::country_codes::diesel_impls::CountryCode",
 
         // Instrument and Tool Categories
         "instrumentcategory" | "InstrumentCategory" => {
             "instrument_categories::diesel_impls::InstrumentCategory"
         }
-        "toolcategory" | "ToolCategory" => "tool_categories::diesel_impls::ToolCategory",
+        "toolcategory" | "ToolCategory" => "::tool_categories::diesel_impls::ToolCategory",
+        "stepmodelcategory" | "StepModelCategory" => {
+            "::step_model_categories::diesel_impls::StepModelCategory"
+        }
         "nameplatecategory" | "NameplateCategory" => {
-            "nameplate_categories::diesel_impls::NameplateCategory"
+            "::nameplate_categories::diesel_impls::NameplateCategory"
         }
         "containercategory" | "ContainerCategory" => {
-            "container_categories::diesel_impls::ContainerCategory"
+            "::container_categories::diesel_impls::ContainerCategory"
+        }
+        "mediatype" | "MediaType" => "::media_types::diesel_impls::MediaType",
+
+        "cas" => "::cas_codes::diesel_impls::CAS",
+        "molecularformula" => {
+            "::molecular_formula::molecular_formula::diesel_impls::MolecularFormula"
         }
 
         _ => {

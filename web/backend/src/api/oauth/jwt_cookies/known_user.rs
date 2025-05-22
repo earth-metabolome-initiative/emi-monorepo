@@ -22,7 +22,7 @@ use crate::BackendError;
 ///
 /// * If there is a collision between two users, an error is returned.
 /// * If there is an error while inserting a new email or email provider, an
-/// error is returned.
+///   error is returned.
 pub(super) async fn handle_known_user(
     emails: &[&str],
     provider: &LoginProvider,

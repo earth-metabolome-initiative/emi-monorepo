@@ -18,6 +18,8 @@ use web_common_traits::{
 };
 use ws_messages::{B2FMessage, F2BMessage};
 
+use crate::api::oauth::jwt_cookies::MaybeUser;
+
 /// How often heartbeat pings are sent
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 
@@ -31,12 +33,10 @@ const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
 pub(super) async fn portal_ws(
     mut session: actix_ws::Session,
     diesel_pool: web::Data<crate::DBPool>,
-    redis_client: web::Data<redis::Client>,
     listen_notify_handle: crate::ListenNotifyHandle,
     msg_stream: actix_ws::MessageStream,
+    _user: MaybeUser,
 ) {
-    log::info!("connected");
-
     // let mut name = None;
     let mut last_heartbeat = Instant::now();
     let mut interval = interval(HEARTBEAT_INTERVAL);

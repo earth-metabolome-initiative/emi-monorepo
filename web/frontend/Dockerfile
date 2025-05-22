@@ -23,6 +23,7 @@ WORKDIR /home/appuser/app/web/frontend
 ENV PATH="/home/appuser/.cargo/bin:${PATH}"
 
 RUN rustup target add wasm32-unknown-unknown
+RUN rustup component add rustfmt
 RUN cargo install --locked trunk
 
 # Command to run the Yew frontend application

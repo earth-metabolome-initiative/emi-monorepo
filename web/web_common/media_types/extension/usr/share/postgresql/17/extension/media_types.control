@@ -1,0 +1,6 @@
+comment = 'media_types:  Created by pgrx'
+default_version = '0.1.0'
+module_pathname = '$libdir/media_types'
+relocatable = false
+superuser = true
+trusted = false

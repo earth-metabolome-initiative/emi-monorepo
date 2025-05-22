@@ -217,7 +217,7 @@ where
 
                     if !Data::FORMATS
                         .iter()
-                        .any(|format| format.mime_types().contains(&mime_type.as_str()))
+                        .any(|format| format.media_types().contains(&mime_type.as_str()))
                     {
                         ctx.link().send_message(MultiFileInputMessage::AddError(
                             ApiError::InvalidFileFormat(format!(

@@ -1,1 +1,0 @@
-DROP EXTENSION IF EXISTS nameplate_categories;

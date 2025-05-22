@@ -4,7 +4,7 @@ services:
     container_name: ${POSTGRES_DOCKER_NAME}
     build:
       context: ../
-      dockerfile: ./core-structures/Dockerfile
+      dockerfile: ./core_structures/Dockerfile
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}

@@ -379,4 +379,6 @@ pub fn main() {
             .expect("Failed to run rustfmt");
         assert!(status.success(), "rustfmt failed with status: {status}");
     }
+
+    println!("cargo:rerun-if-changed=isotopes_data.json");
 }

@@ -1,7 +1,8 @@
 //! Submodule providing the error enumeration for the errors which may occur
 //! when parsing a CAS number.
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Error enumeration for CAS number parsing errors.
 pub enum Error {
     /// When the provided string is not a valid CAS number.

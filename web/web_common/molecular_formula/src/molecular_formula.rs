@@ -29,6 +29,8 @@ mod try_from;
     derive(pgrx::PostgresType, pgrx::PostgresEq, pgrx::PostgresOrd, pgrx::PostgresHash)
 )]
 #[cfg_attr(feature = "diesel", derive(diesel::FromSqlRow, diesel::AsExpression))]
+#[
+    cfg_attr(feature = "diesel", diesel(sql_type = crate::molecular_formula::diesel_impls::MolecularFormula))]
 #[cfg_attr(feature = "pgrx", pg_binary_protocol)]
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Represents a molecular formula, which can be an element, an ion, a solvate,

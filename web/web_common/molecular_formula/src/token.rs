@@ -3,7 +3,8 @@
 
 use elements::Element;
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Represents a token in a molecular formula.
 pub enum Token {
     /// An element

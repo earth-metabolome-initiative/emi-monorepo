@@ -9,7 +9,7 @@ diesel = { workspace = true, optional = true }
 diesel-async = { workspace = true, optional = true }
 flate2 = "1.0.35"
 indicatif = "0.17.11"
-rosetta-uuid.workspace = true
+rosetta_uuid.workspace = true
 inflector.workspace = true
 const_format.workspace = true
 sqlparser.workspace = true

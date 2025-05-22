@@ -42,7 +42,7 @@ As in any project, and especially any project involving web development, there i
 
 There are two genres of code generation: either simple [procedural macros](https://doc.rust-lang.org/reference/procedural-macros.html), as happens when you simply have a trait that you can often implement automatically, or more complex code generation, as happens when you have a pattern that is repeated in the codebase like in the case of code inferred from the PostgreSQL schema, for instance methods that generate queries for foreign keys of a table, or methods which use available table indices to execute search queries.
 
-The second kind of code generation, both for Rust and SQL, is primarily handled in the [`webcodegen`](`web/web_common/webcodegen/README.md`) crate. Whenever you identify a pattern that is repeated in the codebase, please consider whether it can be automated. If you are unsure, please open an issue on the GitHub repository and we will discuss it together.
+The second kind of code generation, both for Rust and SQL, is primarily handled in the [`webcodegen`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/webcodegen) crate. Whenever you identify a pattern that is repeated in the codebase, please consider whether it can be automated. If you are unsure, please open an issue on the GitHub repository and we will discuss it together.
 
 ### Dependency centralization
 

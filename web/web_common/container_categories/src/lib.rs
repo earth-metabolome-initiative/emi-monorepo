@@ -3,9 +3,6 @@
 #[cfg(feature = "pgrx")]
 ::pgrx::pg_module_magic!();
 
-#[cfg(feature = "pgrx")]
-use pgrx::FromDatum;
-
 mod as_ref;
 pub mod diesel_impls;
 mod display;

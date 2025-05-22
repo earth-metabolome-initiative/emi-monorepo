@@ -1,0 +1,17 @@
+[package]
+name = "mass_spectrometry"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+algebra.workspace = true
+functional_properties.workspace = true
+common_traits.workspace = true
+sorted_vec.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true
+
+[[bench]]
+name = "exact_cosine"
+harness = false

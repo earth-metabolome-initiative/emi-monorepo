@@ -714,12 +714,18 @@ impl Column {
         let rust_str_data_type = self.str_rust_data_type(conn).await?;
         let default = DefaultTypes::new(&rust_str_data_type, column_default)?;
         Ok(match (rust_str_data_type.as_str(), default) {
-            ("chrono::NaiveDateTime", DefaultTypes::CurrentTimestamp) => {
+            (
+                "::chrono::NaiveDateTime" | "chrono::NaiveDateTime",
+                DefaultTypes::CurrentTimestamp,
+            ) => {
                 quote::quote! {
                     chrono::Local::now().naive_local()
                 }
             }
-            ("rosetta_timestamp::TimestampUTC", DefaultTypes::CurrentTimestamp) => {
+            (
+                "::rosetta_timestamp::TimestampUTC" | "rosetta_timestamp::TimestampUTC",
+                DefaultTypes::CurrentTimestamp,
+            ) => {
                 quote::quote! {
                     rosetta_timestamp::TimestampUTC::default()
                 }
@@ -749,7 +755,7 @@ impl Column {
                     #value.to_owned()
                 }
             }
-            ("rosetta_uuid::Uuid", DefaultTypes::Uuid(value)) => value,
+            ("::rosetta_uuid::Uuid" | "rosetta_uuid::Uuid", DefaultTypes::Uuid(value)) => value,
             (r#type, default) => {
                 unimplemented!(
                     "Default value `{default:?}` for column \"{}\".\"{}\" of type `{}` is not implemented!",

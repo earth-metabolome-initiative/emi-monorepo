@@ -1,0 +1,13 @@
+[package]
+name = "common_traits"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde = { workspace = true, optional = true }
+
+[lints]
+workspace = true
+
+[features]
+serde = ["dep:serde"]

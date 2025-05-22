@@ -17,6 +17,12 @@ Here follows a table with the crates, and the badges illustrating their status.
 |-------|-------------|--------|-----------|
 | [`diesel_pgrx`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/utils/diesel_pgrx) | [Diesel](https://docs.rs/diesel/latest/diesel/) integration for [PGRX](https://github.com/pgcentralfoundation/pgrx) | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml) | [Tracking issue](https://github.com/earth-metabolome-initiative/emi-monorepo/issues/78) |
 
+### Web-related crates
+
+| Crate | Description | Status | Crates.io |
+|-------|-------------|--------|-----------|
+| [`media_types`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/media_types) | [Media types](https://en.wikipedia.org/wiki/Media_type) parser | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-media_types.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-media_types.yml) | Create issue |
+
 ### Chemistry-related crates
 
 | Crate | Description | Status | Crates.io |

@@ -14,7 +14,7 @@ pub mod errors;
 pub mod utils;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "diesel_pgrx", derive(diesel_pgrx::DieselPgrx))]
+#[cfg_attr(feature = "diesel_pgrx", derive(diesel_pgrx::DieselPGRX))]
 #[cfg_attr(feature = "diesel", derive(diesel::AsExpression, diesel::FromSqlRow))]
 #[
     cfg_attr(feature = "diesel", diesel(sql_type = crate::diesel_impls::CAS))]

@@ -61,7 +61,7 @@ impl crate::Table {
             // the method generation is already taken care of elsewhere.
             if column.is_unique(conn).await?
                 || column.is_foreign_key(conn).await?
-                || !self.supports_eq(conn).await?
+                || !column.supports_eq(conn).await?
             {
                 continue;
             }

@@ -1,0 +1,22 @@
+[package]
+name = "taxonomy_fetcher"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+zip.workspace = true
+openssl = { version = "0.10", features = ["vendored"] }
+tar = "0.4"
+downloader.workspace = true
+chrono.workspace = true
+tokio.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+strum.workspace = true
+strum_macros.workspace = true
+indicatif.workspace = true
+csv.workspace = true
+flate2.workspace = true
+
+[lints]
+workspace = true

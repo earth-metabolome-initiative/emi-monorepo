@@ -4,13 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-rosetta-uuid = { workspace = true, features = ["serde"] }
+rosetta_uuid = { workspace = true, features = ["serde"] }
 serde.workspace = true
 diesel.workspace = true
 diesel-async = { workspace = true, optional = true }
-common-traits = { workspace = true, features = ["serde"] }
-validation-errors.workspace = true
-generic-backend-request-errors.workspace = true
+common_traits = { workspace = true, features = ["serde"] }
+validation_errors.workspace = true
+generic_backend_request_errors.workspace = true
 instrument_categories.workspace = true
 
 [features]

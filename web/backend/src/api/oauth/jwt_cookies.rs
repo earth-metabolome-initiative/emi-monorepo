@@ -1,4 +1,4 @@
-//! Functions and APIs dealing with JWT cookies necessary for OAuth2 logins.
+//! Functions and APIs dealing with JWT cookies necessary for `OAuth2` logins.
 use std::{future::ready, pin::Pin};
 
 use actix_web::{
@@ -121,8 +121,8 @@ impl JWTConfig {
 struct JsonWebToken {
     user_id: i32,
     token_id: Uuid,
-    exp: usize,
-    created_at: usize,
+    exp: i64,
+    created_at: i64,
     temporary: bool,
 }
 
@@ -130,8 +130,8 @@ impl JsonWebToken {
     fn new(user_id: i32, temporary: bool, minutes: i64) -> JsonWebToken {
         let token_id = Uuid::new_v4();
         let now = Utc::now();
-        let created_at = now.timestamp() as usize;
-        let expires_in = (now + Duration::try_minutes(minutes).unwrap()).timestamp() as usize;
+        let created_at = now.timestamp();
+        let expires_in = (now + Duration::try_minutes(minutes).unwrap()).timestamp();
         JsonWebToken { user_id, token_id, exp: expires_in, created_at, temporary }
     }
 
@@ -143,20 +143,18 @@ impl JsonWebToken {
     async fn insert_into_redis(
         &self,
         redis_client: &redis::Client,
-        minutes: i64,
+        minutes: u64,
     ) -> Result<(), BackendError> {
-        // We insert the token: user_id pair into the redis database,
+        // We insert the token: `user_id` pair into the redis database,
         // with as duration the same as the duration of the token.
 
         let mut con = redis_client.get_multiplexed_async_connection().await?;
 
-        Ok(con
-            .set_ex(self.token_id.to_string(), self.user_id().to_string(), (minutes * 60) as u64)
-            .await?)
+        Ok(con.set_ex(self.token_id.to_string(), self.user_id().to_string(), minutes * 60).await?)
     }
 
     /// Checks whether the token is still present in the redis database and has
-    /// the same user_id.
+    /// the same `user_id`.
     ///
     /// # Arguments
     /// * `redis_client` - The redis client to use for the login.
@@ -167,7 +165,7 @@ impl JsonWebToken {
         let mut con = redis_client.get_multiplexed_async_connection().await?;
 
         // While extremely unlikely, it is possible that the token is still present in
-        // the redis database with a different user_id. This may happen due to a
+        // the redis database with a different `user_id`. This may happen due to a
         // collision, or more likely, if some potentially malicious action is
         // taking place.
         let user_id: String = con.get(self.token_id.to_string()).await?;
@@ -190,8 +188,7 @@ impl JsonWebToken {
     }
 
     fn is_expired(&self) -> bool {
-        let now = Utc::now().timestamp() as usize;
-        now > self.exp
+        Utc::now().timestamp() > self.exp
     }
 
     fn encode(&self, private_key: &str) -> Result<String, jsonwebtoken::errors::Error> {
@@ -236,7 +233,9 @@ impl JsonRefreshToken {
     /// * `redis_client` - The redis client to use for the login.
     async fn insert_into_redis(&self, redis_client: &redis::Client) -> Result<(), BackendError> {
         let config = JWTConfig::from_env()?;
-        self.web_token.insert_into_redis(redis_client, config.refresh_token_minutes()).await
+        self.web_token
+            .insert_into_redis(redis_client, u64::try_from(config.refresh_token_minutes()).unwrap())
+            .await
     }
 
     /// Checks whether the token is still present in the redis database and has
@@ -292,9 +291,12 @@ pub(crate) struct JsonAccessToken {
 
 impl JsonAccessToken {
     pub fn new(user_id: i32, temporary: bool) -> Result<JsonAccessToken, BackendError> {
-        let config = JWTConfig::from_env()?;
         Ok(JsonAccessToken {
-            web_token: JsonWebToken::new(user_id, temporary, config.access_token_minutes()),
+            web_token: JsonWebToken::new(
+                user_id,
+                temporary,
+                JWTConfig::from_env()?.access_token_minutes(),
+            ),
         })
     }
 
@@ -307,7 +309,9 @@ impl JsonAccessToken {
         redis_client: &redis::Client,
     ) -> Result<(), BackendError> {
         let config = JWTConfig::from_env()?;
-        self.web_token.insert_into_redis(redis_client, config.access_token_minutes()).await
+        self.web_token
+            .insert_into_redis(redis_client, u64::try_from(config.access_token_minutes()).unwrap())
+            .await
     }
 
     /// Checks whether the token is still present in the redis database and has
@@ -458,46 +462,47 @@ pub(crate) async fn access_token_validator(
     }
 }
 
-pub enum MaybeTemporaryUser {
+pub enum MaybeUser {
     TemporaryUser(TemporaryUser),
     User(User),
+    Anonymous,
 }
 
-impl From<User> for MaybeTemporaryUser {
+impl From<User> for MaybeUser {
     fn from(user: User) -> Self {
-        MaybeTemporaryUser::User(user)
+        MaybeUser::User(user)
     }
 }
 
-impl From<TemporaryUser> for MaybeTemporaryUser {
+impl From<TemporaryUser> for MaybeUser {
     fn from(user: TemporaryUser) -> Self {
-        MaybeTemporaryUser::TemporaryUser(user)
+        MaybeUser::TemporaryUser(user)
     }
 }
 
-impl TryFrom<MaybeTemporaryUser> for User {
+impl TryFrom<MaybeUser> for User {
     type Error = BackendError;
 
-    fn try_from(value: MaybeTemporaryUser) -> Result<Self, Self::Error> {
+    fn try_from(value: MaybeUser) -> Result<Self, Self::Error> {
         match value {
-            MaybeTemporaryUser::User(user) => Ok(user),
-            MaybeTemporaryUser::TemporaryUser(_) => Err(BackendError::Unauthorized),
+            MaybeUser::User(user) => Ok(user),
+            MaybeUser::TemporaryUser(_) | MaybeUser::Anonymous => Err(BackendError::Unauthorized),
         }
     }
 }
 
-impl TryFrom<MaybeTemporaryUser> for TemporaryUser {
+impl TryFrom<MaybeUser> for TemporaryUser {
     type Error = BackendError;
 
-    fn try_from(value: MaybeTemporaryUser) -> Result<Self, Self::Error> {
+    fn try_from(value: MaybeUser) -> Result<Self, Self::Error> {
         match value {
-            MaybeTemporaryUser::TemporaryUser(user) => Ok(user),
-            MaybeTemporaryUser::User(_) => Err(BackendError::Unauthorized),
+            MaybeUser::TemporaryUser(user) => Ok(user),
+            MaybeUser::User(_) | MaybeUser::Anonymous => Err(BackendError::Unauthorized),
         }
     }
 }
 
-impl FromRequest for MaybeTemporaryUser {
+impl FromRequest for MaybeUser {
     type Error = ActixError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
@@ -508,10 +513,7 @@ impl FromRequest for MaybeTemporaryUser {
         // Authorization: Bearer <token here>
         //
         let Ok(bearer) = BearerAuth::from_request(req, payload).into_inner() else {
-            log::debug!("Bearer token not present in request");
-            return Box::pin(ready(Err(ErrorUnauthorized(
-                json!({"status": "fail", "message": "Invalid token"}),
-            ))));
+            return Box::pin(ready(Ok(MaybeUser::Anonymous)));
         };
 
         // Next up, we check whether the token is still present in the redis database.
@@ -562,7 +564,7 @@ impl FromRequest for MaybeTemporaryUser {
                 ));
             }
 
-            let user_wrapper: MaybeTemporaryUser = if access_token.is_temporary() {
+            let user_wrapper: MaybeUser = if access_token.is_temporary() {
                 match TemporaryUser::read_async(access_token.user_id(), &mut conn)
                     .await
                     .map_err(BackendError::from)?

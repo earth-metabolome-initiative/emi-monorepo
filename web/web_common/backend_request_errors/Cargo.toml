@@ -1,0 +1,13 @@
+[package]
+name = "backend_request_errors"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde.workspace = true
+generic_backend_request_errors.workspace = true
+core_structures = { workspace = true, features = ["serde"] }
+web_common_traits.workspace = true
+
+[lints]
+workspace = true

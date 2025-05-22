@@ -1,0 +1,47 @@
+[package]
+name = "media_types"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[[bin]]
+name = "pgrx_embed_media_types"
+path = "./src/bin/pgrx_embed.rs"
+
+[dependencies]
+serde = { workspace = true, features = ["derive"], optional = true }
+pgrx = { workspace = true, optional = true }
+diesel = { workspace = true, optional = true }
+diesel_pgrx = { workspace = true, optional = true }
+strum_macros.workspace = true
+strum.workspace = true
+phf.workspace = true
+
+[build-dependencies]
+tokio.workspace = true
+syn.workspace = true
+quote.workspace = true
+serde.workspace = true
+proc-macro2.workspace = true
+serde_json.workspace = true
+downloader.workspace = true
+csv.workspace = true
+
+[features]
+default = ["serde"]
+serde = ["dep:serde"]
+diesel = ["dep:diesel"]
+sqlite = ["diesel_pgrx", "diesel/sqlite", "diesel_pgrx/sqlite"]
+postgres = ["diesel_pgrx", "diesel/postgres", "diesel_pgrx/postgres"]
+diesel_pgrx = ["diesel", "dep:diesel_pgrx"]
+pgrx = ["dep:pgrx"]
+pg13 = ["pgrx", "pgrx/pg13"]
+pg14 = ["pgrx", "pgrx/pg14"]
+pg15 = ["pgrx", "pgrx/pg15"]
+pg16 = ["pgrx", "pgrx/pg16"]
+pg17 = ["pgrx", "pgrx/pg17"]
+
+[lints]
+workspace = true

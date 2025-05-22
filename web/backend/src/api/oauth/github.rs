@@ -1,7 +1,7 @@
 //! Login API for GitHub OAuth
 use std::env;
 
-use actix_web::HttpResponse;
+use actix_web::{HttpResponse, web};
 use actix_web_codegen::get;
 use core_structures::LoginProvider;
 use redis::Client as RedisClient;
@@ -9,18 +9,18 @@ use reqwest::Client;
 use serde::Deserialize;
 
 use crate::{
-    api::oauth::{jwt_cookies::build_login_response, *},
+    api::oauth::{QueryCode, jwt_cookies::build_login_response},
     errors::BackendError,
 };
 
-/// Struct representing the GitHub OAuth2 configuration.
+/// Struct representing the GitHub `OAuth2` configuration.
 struct GitHubConfig {
     client_secret: String,
     provider: LoginProvider,
 }
 
 impl GitHubConfig {
-    /// Function to retrieve the GitHub OAuth2 configuration from the
+    /// Function to retrieve the GitHub `OAuth2` configuration from the
     /// environment.
     ///
     /// # Returns

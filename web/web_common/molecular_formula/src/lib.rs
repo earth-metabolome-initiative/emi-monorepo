@@ -4,7 +4,7 @@
 ::pgrx::pg_module_magic!();
 
 mod ion;
-mod molecular_formula;
+pub mod molecular_formula;
 pub mod parser;
 mod token;
 pub use ion::Ion;

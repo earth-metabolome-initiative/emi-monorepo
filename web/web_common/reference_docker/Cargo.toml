@@ -1,0 +1,16 @@
+[package]
+name = "reference_docker"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+testcontainers.workspace = true
+diesel-async.workspace = true
+diesel.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true
+diesel-async = { workspace = true, features = ["postgres"] }
+
+[lints]
+workspace = true

@@ -1,4 +1,4 @@
-//! Submodule for OAuth2 authentication.
+//! Submodule for `OAuth2` authentication.
 
 mod github;
 pub(crate) mod jwt_cookies;
