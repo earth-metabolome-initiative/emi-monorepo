@@ -52,6 +52,8 @@ pub enum SingleFieldError<FieldName = ()> {
     InvalidCasCode(FieldName, cas_codes::errors::Error),
     /// The provided text is not a valid Molecular Formula.
     InvalidMolecularFormula(FieldName, molecular_formula::errors::Error),
+    /// The provided text is not a valid media type.
+    InvalidMediaType(FieldName, media_types::errors::Error),
 }
 
 impl SingleFieldError {
@@ -88,6 +90,9 @@ impl SingleFieldError {
             SingleFieldError::InvalidMolecularFormula(_, error) => {
                 SingleFieldError::InvalidMolecularFormula(field_name, error)
             }
+            SingleFieldError::InvalidMediaType(_, error) => {
+                SingleFieldError::InvalidMediaType(field_name, error)
+            }
         }
     }
 
@@ -118,6 +123,7 @@ impl SingleFieldError {
             | SingleFieldError::UnknownInstrumentCategory(_)
             | SingleFieldError::InvalidCasCode(_, _)
             | SingleFieldError::InvalidMolecularFormula(_, _)
+            | SingleFieldError::InvalidMediaType(_, _)
             | SingleFieldError::UnexpectedNegativeOrZeroValue(_) => {
                 unimplemented!("Cannot convert the variant error into a double field error.")
             }
@@ -199,6 +205,12 @@ impl<A: core::fmt::Display> core::fmt::Display for SingleFieldError<A> {
                 write!(
                     f,
                     "The {field_name} field must be a valid molecular formula. Error: {error}"
+                )
+            }
+            SingleFieldError::InvalidMediaType(field_name, error) => {
+                write!(
+                    f,
+                    "The {field_name} field must be a valid media type. Error: {error}"
                 )
             }
         }

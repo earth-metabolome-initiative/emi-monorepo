@@ -1,6 +1,6 @@
 //! Submodule defining the init migrations for the step models.
 
-use core_structures::{StepModel, User};
+use core_structures::{StepModel, User, create_photograph};
 use diesel_async::AsyncPgConnection;
 use step_model_categories::StepModelCategory;
 use web_common_traits::{
@@ -12,10 +12,14 @@ pub(super) async fn init_cleaning_step_model_95(
     darwin: &User,
     portal_conn: &mut AsyncPgConnection,
 ) -> Result<(), crate::error::Error> {
+    let cleaning_materials_photograph =
+        create_photograph(include_bytes!("../../images/cleaning.jpg"), darwin, portal_conn).await?;
+
     let _cleaning_materials_step_model = StepModel::new()
         .name("Cleaning materials")?
         .description("Cleaning materials used in the EMI project with >95% ethanol.")?
         .icon("spray-can-sparkles")?
+        .photograph_id(cleaning_materials_photograph.id)?
         .created_by(darwin.id)?
         .snoozable(true)?
         .copiable(true)?

@@ -14,7 +14,7 @@ mod sqlite;
 )]
 #[cfg_attr(
     all(feature = "postgres", feature = "diesel_pgrx"),
-    diesel(postgres_type(name = "StepModelCategory"))
+    diesel(postgres_type(name = "stepmodelcategory"))
 )]
 #[cfg_attr(feature = "sqlite", diesel(sqlite_type(name = "Text")))]
 pub struct StepModelCategory;

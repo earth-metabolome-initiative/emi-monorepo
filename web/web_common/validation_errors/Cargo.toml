@@ -9,3 +9,4 @@ instrument_categories.workspace = true
 serde.workspace = true
 cas_codes.workspace = true
 molecular_formula.workspace = true
+media_types.workspace = true

@@ -1,12 +1,7 @@
 //! Submodule providing the errors enumeration.
 
 use core_structures::tables::insertables::{
-    InsertableAliquotingStepModelAttributes, InsertableBrandAttributes,
-    InsertableCommercialProductAttributes, InsertableLoginProviderAttributes,
-    InsertableProcedureModelAttributes, InsertableProcedureModelContainerCategoryAttributes,
-    InsertableProcedureModelReagentAttributes, InsertableProcedureModelToolCategoryAttributes,
-    InsertableProcedureStepModelAttributes, InsertableReagentAttributes,
-    InsertableStepModelAttributes, InsertableUserAttributes,
+    InsertableAliquotingStepModelAttributes, InsertableBrandAttributes, InsertableCommercialProductAttributes, InsertableDocumentAttributes, InsertableLoginProviderAttributes, InsertableProcedureModelAttributes, InsertableProcedureModelContainerCategoryAttributes, InsertableProcedureModelReagentAttributes, InsertableProcedureModelToolCategoryAttributes, InsertableProcedureStepModelAttributes, InsertableReagentAttributes, InsertableStepModelAttributes, InsertableUserAttributes
 };
 use web_common_traits::database::InsertError;
 
@@ -44,6 +39,8 @@ pub enum Error {
     ProcedureModelStepModel(InsertError<InsertableProcedureStepModelAttributes>),
     /// Failed to insert a new aliquoting step model
     AliquotingStepModel(InsertError<InsertableAliquotingStepModelAttributes>),
+    /// Failed to insert a new document
+    Document(InsertError<InsertableDocumentAttributes>)
 }
 
 impl From<diesel::ConnectionError> for Error {
@@ -127,5 +124,11 @@ impl From<InsertError<InsertableProcedureStepModelAttributes>> for Error {
 impl From<InsertError<InsertableAliquotingStepModelAttributes>> for Error {
     fn from(value: InsertError<InsertableAliquotingStepModelAttributes>) -> Self {
         Error::AliquotingStepModel(value)
+    }
+}
+
+impl From<InsertError<InsertableDocumentAttributes>> for Error {
+    fn from(value: InsertError<InsertableDocumentAttributes>) -> Self {
+        Error::Document(value)
     }
 }

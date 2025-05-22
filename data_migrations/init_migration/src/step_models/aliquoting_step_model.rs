@@ -12,11 +12,19 @@ pub(super) async fn init_aliquoting_step_model(
     darwin: &User,
     portal_conn: &mut AsyncPgConnection,
 ) -> Result<(), crate::error::Error> {
+    let aliquoting_materials_photograph = core_structures::create_photograph(
+        include_bytes!("../../images/cleaning.jpg"),
+        darwin,
+        portal_conn,
+    )
+    .await?;
+
     let aliquoting_materials_step_model = StepModel::new()
         .name("Aliquoting materials")?
         .description("Aliquoting materials used in the EMI project")?
         // https://fontawesome.com/icons/flask-vial?f=classic&s=solid
         .icon("flask-vial")?
+        .photograph_id(aliquoting_materials_photograph.id)?
         .snoozable(true)?
         .copiable(true)?
         .step_model_category(StepModelCategory::Aliquoting)?

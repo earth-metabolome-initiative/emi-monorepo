@@ -57,3 +57,9 @@ impl From<molecular_formula::errors::Error> for Error {
         Self::SingleField(error.into())
     }
 }
+
+impl From<media_types::errors::Error> for SingleFieldError {
+    fn from(error: media_types::errors::Error) -> Self {
+        Self::InvalidMediaType((), error)
+    }
+}
