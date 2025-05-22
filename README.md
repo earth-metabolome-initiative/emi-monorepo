@@ -21,7 +21,7 @@ Here follows a table with the crates, and the badges illustrating their status.
 
 | Crate | Description | Status | Crates.io |
 |-------|-------------|--------|-----------|
-| [`media_types`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/media_types) | [Media types](https://en.wikipedia.org/wiki/Media_type) parser | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-media_types.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-media_types.yml) | Create issue |
+| [`media_types`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/media_types) | [Media types](https://en.wikipedia.org/wiki/Media_type) parser | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-media_types.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-media_types.yml) | [Tracking issue](https://github.com/earth-metabolome-initiative/emi-monorepo/issues/84) |
 
 ### Chemistry-related crates
 

@@ -139,7 +139,7 @@ fn parse_deprecation_messages<'a>(
         return Ok(Some(Deprecation::CompletelyDeprecated));
     }
 
-    let trimmed_name = name.trim_end_matches(")");
+    let trimmed_name = name.trim_end_matches(')');
 
     let parts: Vec<&str> = trimmed_name.split(" in favor of ").collect();
 
