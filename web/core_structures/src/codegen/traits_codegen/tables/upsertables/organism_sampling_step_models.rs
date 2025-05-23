@@ -8,7 +8,6 @@ for crate::codegen::structs_codegen::tables::organism_sampling_step_models::Orga
         use diesel::ExpressionMethods;
         use diesel::query_dsl::methods::FilterDsl;
         use diesel::upsert::excluded;
-        use diesel::BoolExpressionMethods;
         use diesel::RunQueryDsl;
         use crate::codegen::diesel_codegen::tables::organism_sampling_step_models::organism_sampling_step_models::*;
         diesel::insert_into(table)
@@ -16,13 +15,7 @@ for crate::codegen::structs_codegen::tables::organism_sampling_step_models::Orga
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(
-                created_by
-                    .ne(excluded(created_by))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
-            )
+            .filter(organism_id.ne(excluded(organism_id)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }
@@ -37,7 +30,6 @@ for crate::codegen::structs_codegen::tables::organism_sampling_step_models::Orga
         use diesel::ExpressionMethods;
         use diesel::query_dsl::methods::FilterDsl;
         use diesel::upsert::excluded;
-        use diesel::BoolExpressionMethods;
         use diesel::RunQueryDsl;
         use crate::codegen::diesel_codegen::tables::organism_sampling_step_models::organism_sampling_step_models::*;
         diesel::insert_into(table)
@@ -45,13 +37,7 @@ for crate::codegen::structs_codegen::tables::organism_sampling_step_models::Orga
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(
-                created_by
-                    .ne(excluded(created_by))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
-            )
+            .filter(organism_id.ne(excluded(organism_id)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }

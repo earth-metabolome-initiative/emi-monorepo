@@ -19,7 +19,10 @@ for crate::codegen::structs_codegen::tables::step_model_nameplate_categories::St
             .filter(
                 step_model_id
                     .ne(excluded(step_model_id))
-                    .or(nameplate_category.ne(excluded(nameplate_category)))
+                    .or(
+                        procedure_model_nameplate_category_id
+                            .ne(excluded(procedure_model_nameplate_category_id)),
+                    )
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))
@@ -50,7 +53,10 @@ for crate::codegen::structs_codegen::tables::step_model_nameplate_categories::St
             .filter(
                 step_model_id
                     .ne(excluded(step_model_id))
-                    .or(nameplate_category.ne(excluded(nameplate_category)))
+                    .or(
+                        procedure_model_nameplate_category_id
+                            .ne(excluded(procedure_model_nameplate_category_id)),
+                    )
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))

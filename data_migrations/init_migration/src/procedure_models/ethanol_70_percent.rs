@@ -1,14 +1,18 @@
 use container_categories::ContainerCategory;
 use core_structures::{
-    ProcedureModel, ProcedureModelContainerCategory, ProcedureModelReagent,
-    ProcedureModelToolCategory, ProcedureStepModel, Reagent, StepModel, User,
+    ProcedureModel, ProcedureModelContainerCategory, ProcedureModelNameplateCategory, User,
 };
 use diesel_async::AsyncPgConnection;
-use tool_categories::ToolCategory;
+use nameplate_categories::NameplateCategory;
 use web_common_traits::{
     database::{BackendInsertableVariant, Insertable, InsertableVariant},
     prelude::Builder,
 };
+
+mod ethanol_aliquoting_step_model;
+mod qrcode_step_model;
+mod rinsing_step_model_95;
+mod water_aliquoting_step_model;
 
 pub(super) async fn init_ethanol_70_percent(
     user: &User,
@@ -16,61 +20,56 @@ pub(super) async fn init_ethanol_70_percent(
 ) -> Result<(), crate::error::Error> {
     let ethanol_70: ProcedureModel = ProcedureModel::new()
         .name("Ethanol 70%")?
-        .description(
-            "Ethanol used to sterilize all sorts of tools/instruments in the EMI project.",
-        )?
+        .description("Ethanol mixed with water used to sterilize all sorts of surfaces.")?
         .icon("blender")?
         .created_by(user.id)?
         .build()?
         .backend_insert(portal_conn)
         .await?;
 
-    ProcedureModelToolCategory::new()
-        .procedure_model_id(ethanol_70.id)?
-        .tool_category(ToolCategory::VolumeMeasuringTool)?
-        .created_by(user.id)?
-        .build()?
-        .backend_insert(portal_conn)
-        .await?;
-
-    ProcedureModelContainerCategory::new()
+    let ethanol_70_container_category = ProcedureModelContainerCategory::new()
         .procedure_model_id(ethanol_70.id)?
         .container_category(ContainerCategory::Bottle)?
-        .created_by(user.id)?
         .build()?
-        .backend_insert(portal_conn)
+        .insert(&user.id, portal_conn)
         .await?;
 
-    let ethanol = Reagent::from_name("Absolute Ethanol, >= 95%", portal_conn)
-        .await?
-        .expect("Absolute Ethanol reagent not found");
-    let distilled_water = Reagent::from_name("Distilled water", portal_conn)
-        .await?
-        .expect("Distilled water reagent not found");
+    let ethanol_70_nameplate_category = ProcedureModelNameplateCategory::new()
+        .procedure_model_id(ethanol_70.id)?
+        .nameplate_category(NameplateCategory::SemiPermanent)?
+        .build()?
+        .insert(&user.id, portal_conn)
+        .await?;
 
-    for reagent in vec![ethanol, distilled_water] {
-        ProcedureModelReagent::new()
-            .procedure_model_id(ethanol_70.id)?
-            .reagent_id(reagent.id)?
-            .created_by(user.id)?
-            .build()?
-            .insert(&user.id, portal_conn)
-            .await?;
-    }
-
-    let cleaning_step = StepModel::from_name("Cleaning materials", portal_conn)
-        .await?
-        .expect("Cleaning step model not found");
-
-    for step_model in &[cleaning_step] {
-        ProcedureStepModel::new()
-            .procedure_model_id(ethanol_70.id)?
-            .step_model_id(step_model.id)?
-            .created_by(user.id)?
-            .build()?
-            .insert(&user.id, portal_conn)
-            .await?;
-    }
+    rinsing_step_model_95::init_rinsing_step_model_95(
+        user,
+        &ethanol_70,
+        &ethanol_70_container_category,
+        portal_conn,
+    )
+    .await?;
+    qrcode_step_model::init_qrcode_step_model(
+        user,
+        &ethanol_70,
+        &ethanol_70_nameplate_category,
+        &ethanol_70_container_category,
+        portal_conn,
+    )
+    .await?;
+    ethanol_aliquoting_step_model::init_ethanol_aliquoting_step_model(
+        user,
+        &ethanol_70,
+        &ethanol_70_container_category,
+        portal_conn,
+    )
+    .await?;
+    water_aliquoting_step_model::init_water_aliquoting_step_model(
+        user,
+        &ethanol_70,
+        &ethanol_70_container_category,
+        portal_conn,
+    )
+    .await?;
 
     Ok(())
 }

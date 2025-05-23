@@ -1,7 +1,14 @@
 //! Submodule providing the errors enumeration.
 
 use core_structures::tables::insertables::{
-    InsertableAliquotingStepModelAttributes, InsertableBrandAttributes, InsertableCommercialProductAttributes, InsertableDocumentAttributes, InsertableLoginProviderAttributes, InsertableProcedureModelAttributes, InsertableProcedureModelContainerCategoryAttributes, InsertableProcedureModelReagentAttributes, InsertableProcedureModelToolCategoryAttributes, InsertableProcedureStepModelAttributes, InsertableReagentAttributes, InsertableStepModelAttributes, InsertableUserAttributes
+    InsertableAliquotingStepModelAttributes, InsertableBrandAttributes,
+    InsertableCommercialProductAttributes, InsertableDocumentAttributes,
+    InsertableLoginProviderAttributes, InsertableProcedureModelAttributes,
+    InsertableProcedureModelContainerCategoryAttributes,
+    InsertableProcedureModelNameplateCategoryAttributes, InsertableReagentAttributes,
+    InsertableSamplingStepModelAttributes, InsertableStepModelAttributes,
+    InsertableStepModelContainerCategoryAttributes, InsertableStepModelNameplateCategoryAttributes,
+    InsertableStepModelReagentAttributes, InsertableUserAttributes,
 };
 use web_common_traits::database::InsertError;
 
@@ -17,12 +24,6 @@ pub enum Error {
     LoginProvider(InsertError<InsertableLoginProviderAttributes>),
     /// Failed to insert a new procedure model
     ProcedureModel(InsertError<InsertableProcedureModelAttributes>),
-    /// Failed to insert a new procedure model tool category
-    ProcedureModelToolCategory(InsertError<InsertableProcedureModelToolCategoryAttributes>),
-    /// Failed to insert a new procedure model container category
-    ProcedureModelContainerCategory(
-        InsertError<InsertableProcedureModelContainerCategoryAttributes>,
-    ),
     /// Failed to insert a new commercial product
     CommercialProduct(InsertError<InsertableCommercialProductAttributes>),
     /// Failed to insert a new brand
@@ -31,16 +32,28 @@ pub enum Error {
     User(InsertError<InsertableUserAttributes>),
     /// Failed to insert a new reagent
     Reagent(InsertError<InsertableReagentAttributes>),
-    /// Failed to insert a new procedure model reagent
-    ProcedureModelReagent(InsertError<InsertableProcedureModelReagentAttributes>),
     /// Failed to insert a new step model
     StepModel(InsertError<InsertableStepModelAttributes>),
-    /// Failed to insert a new procedure model step model
-    ProcedureModelStepModel(InsertError<InsertableProcedureStepModelAttributes>),
     /// Failed to insert a new aliquoting step model
     AliquotingStepModel(InsertError<InsertableAliquotingStepModelAttributes>),
+    /// Failed to insert a new sampling step model
+    SamplingStepModel(InsertError<InsertableSamplingStepModelAttributes>),
     /// Failed to insert a new document
-    Document(InsertError<InsertableDocumentAttributes>)
+    Document(InsertError<InsertableDocumentAttributes>),
+    /// Failed to insert a new step model container category
+    StepModelContainerCategory(InsertError<InsertableStepModelContainerCategoryAttributes>),
+    /// Failed to insert a new step model nameplate category
+    StepModelNameplateCategory(InsertError<InsertableStepModelNameplateCategoryAttributes>),
+    /// Failed to insert a new step model reagent
+    StepModelReagent(InsertError<InsertableStepModelReagentAttributes>),
+    /// Failed to insert a new procedure model container category
+    ProcedureModelContainerCategory(
+        InsertError<InsertableProcedureModelContainerCategoryAttributes>,
+    ),
+    /// Failed to insert a new procedure model nameplate category
+    ProcedureModelNameplateCategory(
+        InsertError<InsertableProcedureModelNameplateCategoryAttributes>,
+    ),
 }
 
 impl From<diesel::ConnectionError> for Error {
@@ -73,18 +86,6 @@ impl From<InsertError<InsertableUserAttributes>> for Error {
     }
 }
 
-impl From<InsertError<InsertableProcedureModelToolCategoryAttributes>> for Error {
-    fn from(value: InsertError<InsertableProcedureModelToolCategoryAttributes>) -> Self {
-        Error::ProcedureModelToolCategory(value)
-    }
-}
-
-impl From<InsertError<InsertableProcedureModelContainerCategoryAttributes>> for Error {
-    fn from(value: InsertError<InsertableProcedureModelContainerCategoryAttributes>) -> Self {
-        Error::ProcedureModelContainerCategory(value)
-    }
-}
-
 impl From<InsertError<InsertableCommercialProductAttributes>> for Error {
     fn from(value: InsertError<InsertableCommercialProductAttributes>) -> Self {
         Error::CommercialProduct(value)
@@ -103,21 +104,9 @@ impl From<InsertError<InsertableReagentAttributes>> for Error {
     }
 }
 
-impl From<InsertError<InsertableProcedureModelReagentAttributes>> for Error {
-    fn from(value: InsertError<InsertableProcedureModelReagentAttributes>) -> Self {
-        Error::ProcedureModelReagent(value)
-    }
-}
-
 impl From<InsertError<InsertableStepModelAttributes>> for Error {
     fn from(value: InsertError<InsertableStepModelAttributes>) -> Self {
         Error::StepModel(value)
-    }
-}
-
-impl From<InsertError<InsertableProcedureStepModelAttributes>> for Error {
-    fn from(value: InsertError<InsertableProcedureStepModelAttributes>) -> Self {
-        Error::ProcedureModelStepModel(value)
     }
 }
 
@@ -130,5 +119,41 @@ impl From<InsertError<InsertableAliquotingStepModelAttributes>> for Error {
 impl From<InsertError<InsertableDocumentAttributes>> for Error {
     fn from(value: InsertError<InsertableDocumentAttributes>) -> Self {
         Error::Document(value)
+    }
+}
+
+impl From<InsertError<InsertableSamplingStepModelAttributes>> for Error {
+    fn from(value: InsertError<InsertableSamplingStepModelAttributes>) -> Self {
+        Error::SamplingStepModel(value)
+    }
+}
+
+impl From<InsertError<InsertableStepModelContainerCategoryAttributes>> for Error {
+    fn from(value: InsertError<InsertableStepModelContainerCategoryAttributes>) -> Self {
+        Error::StepModelContainerCategory(value)
+    }
+}
+
+impl From<InsertError<InsertableStepModelReagentAttributes>> for Error {
+    fn from(value: InsertError<InsertableStepModelReagentAttributes>) -> Self {
+        Error::StepModelReagent(value)
+    }
+}
+
+impl From<InsertError<InsertableProcedureModelContainerCategoryAttributes>> for Error {
+    fn from(value: InsertError<InsertableProcedureModelContainerCategoryAttributes>) -> Self {
+        Error::ProcedureModelContainerCategory(value)
+    }
+}
+
+impl From<InsertError<InsertableProcedureModelNameplateCategoryAttributes>> for Error {
+    fn from(value: InsertError<InsertableProcedureModelNameplateCategoryAttributes>) -> Self {
+        Error::ProcedureModelNameplateCategory(value)
+    }
+}
+
+impl From<InsertError<InsertableStepModelNameplateCategoryAttributes>> for Error {
+    fn from(value: InsertError<InsertableStepModelNameplateCategoryAttributes>) -> Self {
+        Error::StepModelNameplateCategory(value)
     }
 }

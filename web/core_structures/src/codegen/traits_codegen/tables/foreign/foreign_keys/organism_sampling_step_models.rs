@@ -1,9 +1,9 @@
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OrganismSamplingStepModelForeignKeys {
-    pub id: Option<crate::codegen::structs_codegen::tables::step_models::StepModel>,
-    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
-    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub id:
+        Option<crate::codegen::structs_codegen::tables::sampling_step_models::SamplingStepModel>,
+    pub organism: Option<crate::codegen::structs_codegen::tables::organisms::Organism>,
 }
 impl web_common_traits::prelude::HasForeignKeys
 for crate::codegen::structs_codegen::tables::organism_sampling_step_models::OrganismSamplingStepModel {
@@ -16,7 +16,7 @@ for crate::codegen::structs_codegen::tables::organism_sampling_step_models::Orga
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepModel(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::SamplingStepModel(
                         self.id,
                     ),
                 ),
@@ -24,23 +24,14 @@ for crate::codegen::structs_codegen::tables::organism_sampling_step_models::Orga
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(
-                        self.created_by,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(
-                        self.updated_by,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::Organism(
+                        self.organism_id,
                     ),
                 ),
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.id.is_some() && foreign_keys.created_by.is_some()
-            && foreign_keys.updated_by.is_some()
+        foreign_keys.id.is_some() && foreign_keys.organism.is_some()
     }
     fn update(
         &self,
@@ -51,50 +42,46 @@ for crate::codegen::structs_codegen::tables::organism_sampling_step_models::Orga
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::StepModel(step_models),
+                crate::codegen::tables::row::Row::Organism(organisms),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if step_models.id == self.id {
-                    foreign_keys.id = Some(step_models);
+                if organisms.id == self.organism_id {
+                    foreign_keys.organism = Some(organisms);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::StepModel(step_models),
+                crate::codegen::tables::row::Row::Organism(organisms),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if step_models.id == self.id {
+                if organisms.id == self.organism_id {
+                    foreign_keys.organism = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::SamplingStepModel(
+                    sampling_step_models,
+                ),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if sampling_step_models.id == self.id {
+                    foreign_keys.id = Some(sampling_step_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::SamplingStepModel(
+                    sampling_step_models,
+                ),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if sampling_step_models.id == self.id {
                     foreign_keys.id = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = Some(users.clone());
-                    updated = true;
-                }
-                if users.id == self.updated_by {
-                    foreign_keys.updated_by = Some(users.clone());
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if users.id == self.created_by {
-                    foreign_keys.created_by = None;
-                    updated = true;
-                }
-                if users.id == self.updated_by {
-                    foreign_keys.updated_by = None;
                     updated = true;
                 }
             }

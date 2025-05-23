@@ -18,7 +18,9 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .do_update()
             .set(self)
             .filter(
-                name.ne(excluded(name))
+                procedure_model_id
+                    .ne(excluded(procedure_model_id))
+                    .or(name.ne(excluded(name)))
                     .or(description.ne(excluded(description)))
                     .or(snoozable.ne(excluded(snoozable)))
                     .or(copiable.ne(excluded(copiable)))
@@ -54,7 +56,9 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .do_update()
             .set(self)
             .filter(
-                name.ne(excluded(name))
+                procedure_model_id
+                    .ne(excluded(procedure_model_id))
+                    .or(name.ne(excluded(name)))
                     .or(description.ne(excluded(description)))
                     .or(snoozable.ne(excluded(snoozable)))
                     .or(copiable.ne(excluded(copiable)))

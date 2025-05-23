@@ -123,17 +123,8 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
                 crate::codegen::tables::rows::Rows::from(procedure_model_nameplate_categories)
             }
-            super::Row::ProcedureModelReagent(procedure_model_reagents) => {
-                crate::codegen::tables::rows::Rows::from(procedure_model_reagents)
-            }
-            super::Row::ProcedureModelToolCategory(procedure_model_tool_categories) => {
-                crate::codegen::tables::rows::Rows::from(procedure_model_tool_categories)
-            }
             super::Row::ProcedureModel(procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(procedure_models)
-            }
-            super::Row::ProcedureStepModel(procedure_step_models) => {
-                crate::codegen::tables::rows::Rows::from(procedure_step_models)
             }
             super::Row::Procedure(procedures) => {
                 crate::codegen::tables::rows::Rows::from(procedures)
@@ -197,6 +188,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::StepModelNameplateCategory(step_model_nameplate_categories) => {
                 crate::codegen::tables::rows::Rows::from(step_model_nameplate_categories)
+            }
+            super::Row::StepModelReagent(step_model_reagents) => {
+                crate::codegen::tables::rows::Rows::from(step_model_reagents)
             }
             super::Row::StepModelToolCategory(step_model_tool_categories) => {
                 crate::codegen::tables::rows::Rows::from(step_model_tool_categories)

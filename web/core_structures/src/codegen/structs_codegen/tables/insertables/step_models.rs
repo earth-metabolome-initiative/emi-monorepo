@@ -1,6 +1,7 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableStepModelAttributes {
+    ProcedureModelId,
     Name,
     Description,
     Snoozable,
@@ -16,6 +17,9 @@ pub enum InsertableStepModelAttributes {
 impl core::fmt::Display for InsertableStepModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
+            InsertableStepModelAttributes::ProcedureModelId => {
+                write!(f, "procedure_model_id")
+            }
             InsertableStepModelAttributes::Name => write!(f, "name"),
             InsertableStepModelAttributes::Description => write!(f, "description"),
             InsertableStepModelAttributes::Snoozable => write!(f, "snoozable"),
@@ -39,6 +43,7 @@ impl core::fmt::Display for InsertableStepModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableStepModel {
+    procedure_model_id: i32,
     name: String,
     description: String,
     snoozable: bool,
@@ -52,6 +57,26 @@ pub struct InsertableStepModel {
     updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableStepModel {
+    #[cfg(feature = "postgres")]
+    pub async fn procedure_model(
+        &self,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
+        diesel::result::Error,
+    > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::dsl::id
+                    .eq(&self.procedure_model_id),
+            )
+            .first::<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>(
+                conn,
+            )
+            .await
+    }
     #[cfg(feature = "postgres")]
     pub async fn photograph(
         &self,
@@ -98,6 +123,7 @@ impl InsertableStepModel {
     }
 }
 pub struct InsertableStepModelBuilder {
+    procedure_model_id: Option<i32>,
     name: Option<String>,
     description: Option<String>,
     snoozable: Option<bool>,
@@ -113,6 +139,7 @@ pub struct InsertableStepModelBuilder {
 impl Default for InsertableStepModelBuilder {
     fn default() -> Self {
         Self {
+            procedure_model_id: None,
             name: None,
             description: None,
             snoozable: Some(false),
@@ -128,6 +155,21 @@ impl Default for InsertableStepModelBuilder {
     }
 }
 impl InsertableStepModelBuilder {
+    pub fn procedure_model_id<P>(
+        mut self,
+        procedure_model_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let procedure_model_id =
+            procedure_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(InsertableStepModelAttributes::ProcedureModelId)
+            })?;
+        self.procedure_model_id = Some(procedure_model_id);
+        Ok(self)
+    }
     pub fn name<P>(
         mut self,
         name: P,
@@ -308,6 +350,11 @@ impl common_traits::prelude::Builder for InsertableStepModelBuilder {
     type Attribute = InsertableStepModelAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
+            procedure_model_id: self.procedure_model_id.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableStepModelAttributes::ProcedureModelId,
+                ),
+            )?,
             name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableStepModelAttributes::Name,
             ))?,
@@ -366,6 +413,7 @@ impl TryFrom<InsertableStepModel> for InsertableStepModelBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableStepModel) -> Result<Self, Self::Error> {
         Self::default()
+            .procedure_model_id(insertable_variant.procedure_model_id)?
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
             .snoozable(insertable_variant.snoozable)?

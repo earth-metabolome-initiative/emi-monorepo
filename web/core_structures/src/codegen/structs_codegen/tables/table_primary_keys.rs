@@ -47,10 +47,7 @@ pub enum TablePrimaryKey {
     ProcedureModelContainerCategory(i32),
     ProcedureModelInstrumentCategory(i32),
     ProcedureModelNameplateCategory(i32),
-    ProcedureModelReagent(i32),
-    ProcedureModelToolCategory(i32),
     ProcedureModel(i32),
-    ProcedureStepModel(i32),
     Procedure(i32),
     Processable(::rosetta_uuid::Uuid),
     ProcessingStep(::rosetta_uuid::Uuid),
@@ -76,6 +73,7 @@ pub enum TablePrimaryKey {
     StepModelInstrumentModel(i32),
     StepModelInstrument(i32),
     StepModelNameplateCategory(i32),
+    StepModelReagent(i32),
     StepModelToolCategory(i32),
     StepModel(i32),
     StepNameplateModel(::rosetta_uuid::Uuid),
@@ -234,17 +232,8 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::ProcedureModelNameplateCategory(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModelNameplateCategory
             }
-            TablePrimaryKey::ProcedureModelReagent(_) => {
-                crate::codegen::tables::table_names::TableName::ProcedureModelReagent
-            }
-            TablePrimaryKey::ProcedureModelToolCategory(_) => {
-                crate::codegen::tables::table_names::TableName::ProcedureModelToolCategory
-            }
             TablePrimaryKey::ProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModel
-            }
-            TablePrimaryKey::ProcedureStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::ProcedureStepModel
             }
             TablePrimaryKey::Procedure(_) => {
                 crate::codegen::tables::table_names::TableName::Procedure
@@ -310,6 +299,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::StepModelNameplateCategory(_) => {
                 crate::codegen::tables::table_names::TableName::StepModelNameplateCategory
+            }
+            TablePrimaryKey::StepModelReagent(_) => {
+                crate::codegen::tables::table_names::TableName::StepModelReagent
             }
             TablePrimaryKey::StepModelToolCategory(_) => {
                 crate::codegen::tables::table_names::TableName::StepModelToolCategory

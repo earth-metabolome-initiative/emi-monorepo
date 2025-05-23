@@ -7,10 +7,10 @@ The ordering of items is not stable, it is driven by a dependency graph.
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/container_categories/src/lib.rs:23
+-- web/web_common/container_categories/src/lib.rs:14
 -- container_categories::ContainerCategory
 CREATE TYPE ContainerCategory AS ENUM (
-	'SampleContainer',
+	'Bottle',
 	'SampleContainerRack',
 	'ContainerBox'
 );

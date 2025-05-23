@@ -332,29 +332,8 @@ impl web_common_traits::prelude::AsyncBoundedReadDispatch<diesel_async::AsyncPgC
                     .await
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::ProcedureModelReagent => {
-                <crate::codegen::structs_codegen::tables::procedure_model_reagents::ProcedureModelReagent as web_common_traits::database::AsyncBoundedRead<
-                    diesel_async::AsyncPgConnection,
-                >>::bounded_read_async(offset, limit, conn)
-                    .await
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::ProcedureModelToolCategory => {
-                <crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory as web_common_traits::database::AsyncBoundedRead<
-                    diesel_async::AsyncPgConnection,
-                >>::bounded_read_async(offset, limit, conn)
-                    .await
-                    .map(super::Rows::from)
-            }
             crate::codegen::tables::table_names::TableName::ProcedureModel => {
                 <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as web_common_traits::database::AsyncBoundedRead<
-                    diesel_async::AsyncPgConnection,
-                >>::bounded_read_async(offset, limit, conn)
-                    .await
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::ProcedureStepModel => {
-                <crate::codegen::structs_codegen::tables::procedure_step_models::ProcedureStepModel as web_common_traits::database::AsyncBoundedRead<
                     diesel_async::AsyncPgConnection,
                 >>::bounded_read_async(offset, limit, conn)
                     .await
@@ -530,6 +509,13 @@ impl web_common_traits::prelude::AsyncBoundedReadDispatch<diesel_async::AsyncPgC
             }
             crate::codegen::tables::table_names::TableName::StepModelNameplateCategory => {
                 <crate::codegen::structs_codegen::tables::step_model_nameplate_categories::StepModelNameplateCategory as web_common_traits::database::AsyncBoundedRead<
+                    diesel_async::AsyncPgConnection,
+                >>::bounded_read_async(offset, limit, conn)
+                    .await
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::StepModelReagent => {
+                <crate::codegen::structs_codegen::tables::step_model_reagents::StepModelReagent as web_common_traits::database::AsyncBoundedRead<
                     diesel_async::AsyncPgConnection,
                 >>::bounded_read_async(offset, limit, conn)
                     .await

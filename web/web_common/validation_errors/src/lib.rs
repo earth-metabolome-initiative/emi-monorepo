@@ -208,10 +208,7 @@ impl<A: core::fmt::Display> core::fmt::Display for SingleFieldError<A> {
                 )
             }
             SingleFieldError::InvalidMediaType(field_name, error) => {
-                write!(
-                    f,
-                    "The {field_name} field must be a valid media type. Error: {error}"
-                )
+                write!(f, "The {field_name} field must be a valid media type. Error: {error}")
             }
         }
     }

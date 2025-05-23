@@ -122,17 +122,8 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::ProcedureModelNameplateCategory(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModelNameplateCategory
             }
-            super::Row::ProcedureModelReagent(_) => {
-                crate::codegen::tables::table_names::TableName::ProcedureModelReagent
-            }
-            super::Row::ProcedureModelToolCategory(_) => {
-                crate::codegen::tables::table_names::TableName::ProcedureModelToolCategory
-            }
             super::Row::ProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModel
-            }
-            super::Row::ProcedureStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::ProcedureStepModel
             }
             super::Row::Procedure(_) => crate::codegen::tables::table_names::TableName::Procedure,
             super::Row::Processable(_) => {
@@ -194,6 +185,9 @@ impl web_common_traits::prelude::Tabular for super::Row {
             }
             super::Row::StepModelNameplateCategory(_) => {
                 crate::codegen::tables::table_names::TableName::StepModelNameplateCategory
+            }
+            super::Row::StepModelReagent(_) => {
+                crate::codegen::tables::table_names::TableName::StepModelReagent
             }
             super::Row::StepModelToolCategory(_) => {
                 crate::codegen::tables::table_names::TableName::StepModelToolCategory

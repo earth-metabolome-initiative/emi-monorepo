@@ -1,6 +1,8 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StepModelForeignKeys {
+    pub procedure_model:
+        Option<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
     pub photograph: Option<crate::codegen::structs_codegen::tables::documents::Document>,
     pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
     pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
@@ -15,6 +17,11 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(
+                self.procedure_model_id,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Document(
                 self.photograph_id,
             ),
@@ -27,7 +34,8 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.photograph.is_some()
+        foreign_keys.procedure_model.is_some()
+            && foreign_keys.photograph.is_some()
             && foreign_keys.created_by.is_some()
             && foreign_keys.updated_by.is_some()
     }
@@ -56,6 +64,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if documents.id == self.photograph_id {
                     foreign_keys.photograph = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if procedure_models.id == self.procedure_model_id {
+                    foreign_keys.procedure_model = Some(procedure_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if procedure_models.id == self.procedure_model_id {
+                    foreign_keys.procedure_model = None;
                     updated = true;
                 }
             }

@@ -9,7 +9,6 @@ services:
     environment:
       - HOST_UID=${USER_ID}
       - HOST_GID=${GROUP_ID}
-    container_name: nameplate_categories_builder
     volumes:
       - ../../..:/workspace  # Mount the entire monorepo
       - ./extension:/home/appuser/extension # Output directory

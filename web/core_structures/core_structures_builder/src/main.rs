@@ -24,6 +24,13 @@ async fn build_core_structures(
         return Err(WebCodeGenError::MissingExtension("pgrx_validation".to_owned()));
     };
 
+    // First, we delete the old `/src/codegen` directory
+    let out_codegen_dir = out_dir.join("codegen");
+    if out_codegen_dir.exists() {
+        std::fs::remove_dir_all(out_codegen_dir)
+            .expect("Failed to remove the old codegen directory");
+    }
+
     Codegen::default()
         .users(&users)
         .projects(&projects)

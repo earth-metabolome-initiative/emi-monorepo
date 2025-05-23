@@ -745,6 +745,16 @@ impl Column {
                     #value
                 }
             }
+            ("f32", DefaultTypes::F32(value)) => {
+                quote::quote! {
+                    #value
+                }
+            }
+            ("f64", DefaultTypes::F64(value)) => {
+                quote::quote! {
+                    #value
+                }
+            }
             ("bool", DefaultTypes::Bool(value)) => {
                 quote::quote! {
                     #value

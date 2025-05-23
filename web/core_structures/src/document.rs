@@ -23,13 +23,13 @@ pub async fn create_photograph(
             Box::pin(async move {
                 let document: Document = crate::Document::new()
                     .mime_type(info.mime_type())?
-					.created_by(user.id)?
+                    .created_by(user.id)?
                     .build()?
                     .insert(&user.id, conn)
                     .await?;
 
                 // TODO: actually write the document to the file system
-				// Using `document.id` as the file name
+                // Using `document.id` as the file name
 
                 Ok(document)
             })

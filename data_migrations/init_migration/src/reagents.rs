@@ -7,12 +7,15 @@ use web_common_traits::{
     prelude::Builder,
 };
 
+pub const ETHANOL_95: &str = "Absolute Ethanol, >= 95%";
+pub const DISTILLED_WATER: &str = "Distilled water";
+
 pub(crate) async fn init_reagents(
     user: &User,
     portal_conn: &mut AsyncPgConnection,
 ) -> Result<(), crate::error::Error> {
     let _ethanol = Reagent::new()
-        .name("Absolute Ethanol, >= 95%")?
+        .name(ETHANOL_95)?
         .description("Absolute Ethanol, >= 95%, with 5% isopropanol")?
         .purity(95.0)?
         .cas_code("64-17-5")?

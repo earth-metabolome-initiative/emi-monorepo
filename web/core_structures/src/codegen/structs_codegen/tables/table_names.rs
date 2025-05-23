@@ -47,10 +47,7 @@ pub enum TableName {
     ProcedureModelContainerCategory,
     ProcedureModelInstrumentCategory,
     ProcedureModelNameplateCategory,
-    ProcedureModelReagent,
-    ProcedureModelToolCategory,
     ProcedureModel,
-    ProcedureStepModel,
     Procedure,
     Processable,
     ProcessingStep,
@@ -76,6 +73,7 @@ pub enum TableName {
     StepModelInstrumentModel,
     StepModelInstrument,
     StepModelNameplateCategory,
+    StepModelReagent,
     StepModelToolCategory,
     StepModel,
     StepNameplateModel,
@@ -171,14 +169,7 @@ impl core::fmt::Display for TableName {
             TableName::ProcedureModelNameplateCategory => {
                 write!(f, stringify!(ProcedureModelNameplateCategory))
             }
-            TableName::ProcedureModelReagent => {
-                write!(f, stringify!(ProcedureModelReagent))
-            }
-            TableName::ProcedureModelToolCategory => {
-                write!(f, stringify!(ProcedureModelToolCategory))
-            }
             TableName::ProcedureModel => write!(f, stringify!(ProcedureModel)),
-            TableName::ProcedureStepModel => write!(f, stringify!(ProcedureStepModel)),
             TableName::Procedure => write!(f, stringify!(Procedure)),
             TableName::Processable => write!(f, stringify!(Processable)),
             TableName::ProcessingStep => write!(f, stringify!(ProcessingStep)),
@@ -214,6 +205,7 @@ impl core::fmt::Display for TableName {
             TableName::StepModelNameplateCategory => {
                 write!(f, stringify!(StepModelNameplateCategory))
             }
+            TableName::StepModelReagent => write!(f, stringify!(StepModelReagent)),
             TableName::StepModelToolCategory => {
                 write!(f, stringify!(StepModelToolCategory))
             }

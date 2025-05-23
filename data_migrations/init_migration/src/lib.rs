@@ -6,14 +6,12 @@ mod error;
 mod login_providers;
 mod procedure_models;
 mod reagents;
-mod step_models;
 mod users;
 
 use brands::init_brands;
 use login_providers::init_login_providers;
 use procedure_models::init_procedure_models;
 use reagents::init_reagents;
-use step_models::init_step_models;
 use users::init_root_user;
 
 #[allow(clippy::unused_async)]
@@ -34,7 +32,6 @@ pub async fn init_migration(portal_conn: &mut AsyncPgConnection) -> Result<(), e
                 let darwin = init_root_user(portal_conn).await?;
                 init_brands(&darwin, portal_conn).await?;
                 init_reagents(&darwin, portal_conn).await?;
-                init_step_models(&darwin, portal_conn).await?;
                 init_procedure_models(&darwin, portal_conn).await?;
                 Ok(())
             })

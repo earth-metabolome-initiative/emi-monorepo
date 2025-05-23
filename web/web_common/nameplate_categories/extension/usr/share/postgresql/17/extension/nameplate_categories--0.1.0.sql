@@ -7,10 +7,11 @@ The ordering of items is not stable, it is driven by a dependency graph.
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/nameplate_categories/src/lib.rs:17
+-- web/web_common/nameplate_categories/src/lib.rs:14
 -- nameplate_categories::NameplateCategory
 CREATE TYPE NameplateCategory AS ENUM (
-	'Permanent'
+	'Permanent',
+	'SemiPermanent'
 );
 /* </end connected objects> */
 

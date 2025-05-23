@@ -23,6 +23,9 @@ pub enum NameplateCategory {
     /// It is used for labeling specimens such as trees.
     /// Placed at human height and nailed to the trunk.
     Permanent,
+    /// A plastified adhesive nameplate with a white background and black
+    /// QR code for the specimen or container.
+    SemiPermanent,
 }
 
 impl NameplateCategory {
@@ -31,6 +34,7 @@ impl NameplateCategory {
     pub fn name(&self) -> &'static str {
         match self {
             NameplateCategory::Permanent => "Permanent",
+            NameplateCategory::SemiPermanent => "Semi-Permanent",
         }
     }
 
@@ -43,6 +47,10 @@ impl NameplateCategory {
                 It is used for labeling specimens such as trees. Placed at human height \
                 and nailed to the trunk."
             }
+            NameplateCategory::SemiPermanent => {
+                "A plastified adhesive nameplate with a white background and black \
+                QR code for the specimen or container."
+            }
         }
     }
 
@@ -51,6 +59,7 @@ impl NameplateCategory {
     pub fn icon(&self) -> &'static str {
         match self {
             NameplateCategory::Permanent => "tag",
+            NameplateCategory::SemiPermanent => "qrcode",
         }
     }
 }

@@ -47,10 +47,7 @@ mod postgres_async_bounded_read_dispatch;
 mod procedure_model_container_categories;
 mod procedure_model_instrument_categories;
 mod procedure_model_nameplate_categories;
-mod procedure_model_reagents;
-mod procedure_model_tool_categories;
 mod procedure_models;
-mod procedure_step_models;
 mod procedures;
 mod processables;
 mod processing_steps;
@@ -77,6 +74,7 @@ mod step_model_instrument_categories;
 mod step_model_instrument_models;
 mod step_model_instruments;
 mod step_model_nameplate_categories;
+mod step_model_reagents;
 mod step_model_tool_categories;
 mod step_models;
 mod step_nameplate_models;
@@ -268,23 +266,8 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory,
         >,
     ),
-    ProcedureModelReagent(
-        Vec<
-            crate::codegen::structs_codegen::tables::procedure_model_reagents::ProcedureModelReagent,
-        >,
-    ),
-    ProcedureModelToolCategory(
-        Vec<
-            crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory,
-        >,
-    ),
     ProcedureModel(
         Vec<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
-    ),
-    ProcedureStepModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::procedure_step_models::ProcedureStepModel,
-        >,
     ),
     Procedure(Vec<crate::codegen::structs_codegen::tables::procedures::Procedure>),
     Processable(Vec<crate::codegen::structs_codegen::tables::processables::Processable>),
@@ -363,6 +346,11 @@ pub enum Rows {
     StepModelNameplateCategory(
         Vec<
             crate::codegen::structs_codegen::tables::step_model_nameplate_categories::StepModelNameplateCategory,
+        >,
+    ),
+    StepModelReagent(
+        Vec<
+            crate::codegen::structs_codegen::tables::step_model_reagents::StepModelReagent,
         >,
     ),
     StepModelToolCategory(
@@ -768,29 +756,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::ProcedureModelReagent(procedure_model_reagents) => {
-                procedure_model_reagents
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ProcedureModelToolCategory(procedure_model_tool_categories) => {
-                procedure_model_tool_categories
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
             Rows::ProcedureModel(procedure_models) => {
                 procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ProcedureStepModel(procedure_step_models) => {
-                procedure_step_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -966,6 +933,13 @@ impl Rows {
             }
             Rows::StepModelNameplateCategory(step_model_nameplate_categories) => {
                 step_model_nameplate_categories
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::StepModelReagent(step_model_reagents) => {
+                step_model_reagents
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -1224,14 +1198,7 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
                 procedure_model_nameplate_categories.primary_keys()
             }
-            Rows::ProcedureModelReagent(procedure_model_reagents) => {
-                procedure_model_reagents.primary_keys()
-            }
-            Rows::ProcedureModelToolCategory(procedure_model_tool_categories) => {
-                procedure_model_tool_categories.primary_keys()
-            }
             Rows::ProcedureModel(procedure_models) => procedure_models.primary_keys(),
-            Rows::ProcedureStepModel(procedure_step_models) => procedure_step_models.primary_keys(),
             Rows::Procedure(procedures) => procedures.primary_keys(),
             Rows::Processable(processables) => processables.primary_keys(),
             Rows::ProcessingStep(processing_steps) => processing_steps.primary_keys(),
@@ -1269,6 +1236,7 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::StepModelNameplateCategory(step_model_nameplate_categories) => {
                 step_model_nameplate_categories.primary_keys()
             }
+            Rows::StepModelReagent(step_model_reagents) => step_model_reagents.primary_keys(),
             Rows::StepModelToolCategory(step_model_tool_categories) => {
                 step_model_tool_categories.primary_keys()
             }

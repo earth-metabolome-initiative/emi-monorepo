@@ -33,6 +33,8 @@ pub enum InstrumentCategory {
     Dispenser,
     /// Shaker
     Shaker,
+    /// Printer
+    Printer,
 }
 
 impl InstrumentCategory {
@@ -47,6 +49,7 @@ impl InstrumentCategory {
             InstrumentCategory::Centrifuge => "Centrifuge",
             InstrumentCategory::Dispenser => "Dispenser",
             InstrumentCategory::Shaker => "Shaker",
+            InstrumentCategory::Printer => "Printer",
         }
     }
 
@@ -69,6 +72,7 @@ impl InstrumentCategory {
                 "A device used to dispense a specific amount of liquid or powder."
             }
             InstrumentCategory::Shaker => "A device used to mix or agitate a sample.",
+            InstrumentCategory::Printer => "A device used to print labels.",
         }
     }
 
@@ -82,6 +86,7 @@ impl InstrumentCategory {
             InstrumentCategory::BallMill => "mortar-pestle",
             InstrumentCategory::Dispenser => "eye-dropper",
             InstrumentCategory::Shaker => "vial",
+            InstrumentCategory::Printer => "printer",
         }
     }
 }

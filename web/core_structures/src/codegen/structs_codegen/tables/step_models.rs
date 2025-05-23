@@ -12,6 +12,7 @@
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::step_models::step_models)]
 pub struct StepModel {
     pub id: i32,
+    pub procedure_model_id: i32,
     pub name: String,
     pub description: String,
     pub snoozable: bool,
@@ -31,6 +32,26 @@ impl diesel::Identifiable for StepModel {
     }
 }
 impl StepModel {
+    #[cfg(feature = "postgres")]
+    pub async fn procedure_model(
+        &self,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
+        diesel::result::Error,
+    > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_models::procedure_models::dsl::id
+                    .eq(&self.procedure_model_id),
+            )
+            .first::<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>(
+                conn,
+            )
+            .await
+    }
     #[cfg(feature = "postgres")]
     pub async fn photograph(
         &self,
@@ -73,6 +94,21 @@ impl StepModel {
                 crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.updated_by),
             )
             .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_procedure_model_id(
+        conn: &mut diesel_async::AsyncPgConnection,
+        procedure_model_id: &crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::step_models::step_models::dsl::procedure_model_id
+                    .eq(procedure_model_id.id),
+            )
+            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -121,17 +157,43 @@ impl StepModel {
             .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_name(
+    pub async fn from_procedure_model_id_and_name(
+        procedure_model_id: &i32,
         name: &str,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl,
+            associations::HasTable,
+        };
         use diesel_async::RunQueryDsl;
         Self::table()
-            .filter(crate::codegen::diesel_codegen::tables::step_models::step_models::name.eq(name))
+            .filter(
+                crate::codegen::diesel_codegen::tables::step_models::step_models::procedure_model_id
+                    .eq(procedure_model_id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::step_models::step_models::name
+                            .eq(name),
+                    ),
+            )
             .first::<Self>(conn)
             .await
             .optional()
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_name(
+        name: &String,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::step_models::step_models;
+        Self::table()
+            .filter(step_models::name.eq(name))
+            .order_by(step_models::id.asc())
+            .load::<Self>(conn)
+            .await
     }
     #[cfg(feature = "postgres")]
     pub async fn from_description(

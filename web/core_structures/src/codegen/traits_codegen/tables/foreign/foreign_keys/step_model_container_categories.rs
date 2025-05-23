@@ -1,7 +1,12 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StepModelContainerCategoryForeignKeys {
-    pub step_model: Option<crate::codegen::structs_codegen::tables::step_models::StepModel>,
+    pub step_model: Option<
+        crate::codegen::structs_codegen::tables::step_models::StepModel,
+    >,
+    pub procedure_model_container_category: Option<
+        crate::codegen::structs_codegen::tables::procedure_model_container_categories::ProcedureModelContainerCategory,
+    >,
     pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
     pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
@@ -24,6 +29,14 @@ for crate::codegen::structs_codegen::tables::step_model_container_categories::St
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelContainerCategory(
+                        self.procedure_model_container_category_id,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(
                         self.created_by,
                     ),
@@ -39,8 +52,9 @@ for crate::codegen::structs_codegen::tables::step_model_container_categories::St
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.step_model.is_some() && foreign_keys.created_by.is_some()
-            && foreign_keys.updated_by.is_some()
+        foreign_keys.step_model.is_some()
+            && foreign_keys.procedure_model_container_category.is_some()
+            && foreign_keys.created_by.is_some() && foreign_keys.updated_by.is_some()
     }
     fn update(
         &self,
@@ -50,6 +64,36 @@ for crate::codegen::structs_codegen::tables::step_model_container_categories::St
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
+            (
+                crate::codegen::tables::row::Row::ProcedureModelContainerCategory(
+                    procedure_model_container_categories,
+                ),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if procedure_model_container_categories.id
+                    == self.procedure_model_container_category_id
+                {
+                    foreign_keys.procedure_model_container_category = Some(
+                        procedure_model_container_categories,
+                    );
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureModelContainerCategory(
+                    procedure_model_container_categories,
+                ),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if procedure_model_container_categories.id
+                    == self.procedure_model_container_category_id
+                {
+                    foreign_keys.procedure_model_container_category = None;
+                    updated = true;
+                }
+            }
             (
                 crate::codegen::tables::row::Row::StepModel(step_models),
                 web_common_traits::crud::CRUD::Read

@@ -6,18 +6,15 @@
 //! the user to the login page.
 
 use yew::prelude::*;
-use yewdux::prelude::*;
 
-use crate::stores::app_state;
+use crate::components::font_awesome_icon::SolidIcon;
 
 #[function_component(Logout)]
 /// Logout button for the sidebar.
 pub fn logout() -> Html {
-    let (_, app_dispatch) = use_store::<app_state::AppState>();
-
     html! {
         <button class="btn btn-primary logout">
-            <i class="fas fa-right-from-bracket"></i>
+            <SolidIcon icon="right-from-bracket"/>
             {'\u{00a0}'}
             {"Logout"}
         </button>

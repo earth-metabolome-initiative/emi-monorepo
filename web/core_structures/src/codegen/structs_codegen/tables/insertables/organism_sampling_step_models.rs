@@ -2,26 +2,14 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableOrganismSamplingStepModelAttributes {
     Id,
-    CreatedBy,
-    CreatedAt,
-    UpdatedBy,
-    UpdatedAt,
+    OrganismId,
 }
 impl core::fmt::Display for InsertableOrganismSamplingStepModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertableOrganismSamplingStepModelAttributes::Id => write!(f, "id"),
-            InsertableOrganismSamplingStepModelAttributes::CreatedBy => {
-                write!(f, "created_by")
-            }
-            InsertableOrganismSamplingStepModelAttributes::CreatedAt => {
-                write!(f, "created_at")
-            }
-            InsertableOrganismSamplingStepModelAttributes::UpdatedBy => {
-                write!(f, "updated_by")
-            }
-            InsertableOrganismSamplingStepModelAttributes::UpdatedAt => {
-                write!(f, "updated_at")
+            InsertableOrganismSamplingStepModelAttributes::OrganismId => {
+                write!(f, "organism_id")
             }
         }
     }
@@ -36,10 +24,7 @@ impl core::fmt::Display for InsertableOrganismSamplingStepModelAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableOrganismSamplingStepModel {
     id: i32,
-    created_by: i32,
-    created_at: ::rosetta_timestamp::TimestampUTC,
-    updated_by: i32,
-    updated_at: ::rosetta_timestamp::TimestampUTC,
+    organism_id: ::rosetta_uuid::Uuid,
 }
 impl InsertableOrganismSamplingStepModel {
     #[cfg(feature = "postgres")]
@@ -47,65 +32,42 @@ impl InsertableOrganismSamplingStepModel {
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::step_models::StepModel,
+        crate::codegen::structs_codegen::tables::sampling_step_models::SamplingStepModel,
         diesel::result::Error,
     > {
         use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::step_models::StepModel::table()
+        crate::codegen::structs_codegen::tables::sampling_step_models::SamplingStepModel::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::step_models::step_models::dsl::id
+                crate::codegen::diesel_codegen::tables::sampling_step_models::sampling_step_models::dsl::id
                     .eq(&self.id),
             )
-            .first::<crate::codegen::structs_codegen::tables::step_models::StepModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::sampling_step_models::SamplingStepModel,
+            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn created_by(
+    pub async fn organism(
         &self,
         conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::organisms::Organism, diesel::result::Error>
+    {
         use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
         use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
+        crate::codegen::structs_codegen::tables::organisms::Organism::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.created_by),
+                crate::codegen::diesel_codegen::tables::organisms::organisms::dsl::id
+                    .eq(&self.organism_id),
             )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn updated_by(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.updated_by),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
+            .first::<crate::codegen::structs_codegen::tables::organisms::Organism>(conn)
             .await
     }
 }
+#[derive(Default)]
 pub struct InsertableOrganismSamplingStepModelBuilder {
     id: Option<i32>,
-    created_by: Option<i32>,
-    created_at: Option<::rosetta_timestamp::TimestampUTC>,
-    updated_by: Option<i32>,
-    updated_at: Option<::rosetta_timestamp::TimestampUTC>,
-}
-impl Default for InsertableOrganismSamplingStepModelBuilder {
-    fn default() -> Self {
-        Self {
-            id: None,
-            created_by: None,
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: None,
-            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
-        }
-    }
+    organism_id: Option<::rosetta_uuid::Uuid>,
 }
 impl InsertableOrganismSamplingStepModelBuilder {
     pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
@@ -119,69 +81,21 @@ impl InsertableOrganismSamplingStepModelBuilder {
         self.id = Some(id);
         Ok(self)
     }
-    pub fn created_by<P>(
+    pub fn organism_id<P>(
         mut self,
-        created_by: P,
+        organism_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
     where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<::rosetta_uuid::Uuid>,
+        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableOrganismSamplingStepModelAttributes::CreatedBy)
-        })?;
-        self.created_by = Some(created_by);
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+        let organism_id = organism_id.try_into().map_err(
+            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
                 Into::into(err)
-                    .rename_field(InsertableOrganismSamplingStepModelAttributes::CreatedAt)
+                    .rename_field(InsertableOrganismSamplingStepModelAttributes::OrganismId)
             },
         )?;
-        self.created_at = Some(created_at);
-        Ok(self)
-    }
-    pub fn updated_by<P>(
-        mut self,
-        updated_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableOrganismSamplingStepModelAttributes::UpdatedBy)
-        })?;
-        self.updated_by = Some(updated_by);
-        Ok(self)
-    }
-    pub fn updated_at<P>(
-        mut self,
-        updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let updated_at = updated_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err)
-                    .rename_field(InsertableOrganismSamplingStepModelAttributes::UpdatedAt)
-            },
-        )?;
-        self.updated_at = Some(updated_at);
+        self.organism_id = Some(organism_id);
         Ok(self)
     }
 }
@@ -195,24 +109,9 @@ impl common_traits::prelude::Builder for InsertableOrganismSamplingStepModelBuil
             id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableOrganismSamplingStepModelAttributes::Id,
             ))?,
-            created_by: self.created_by.ok_or(
+            organism_id: self.organism_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganismSamplingStepModelAttributes::CreatedBy,
-                ),
-            )?,
-            created_at: self.created_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganismSamplingStepModelAttributes::CreatedAt,
-                ),
-            )?,
-            updated_by: self.updated_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganismSamplingStepModelAttributes::UpdatedBy,
-                ),
-            )?,
-            updated_at: self.updated_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganismSamplingStepModelAttributes::UpdatedAt,
+                    InsertableOrganismSamplingStepModelAttributes::OrganismId,
                 ),
             )?,
         })
@@ -223,11 +122,6 @@ impl TryFrom<InsertableOrganismSamplingStepModel> for InsertableOrganismSampling
     fn try_from(
         insertable_variant: InsertableOrganismSamplingStepModel,
     ) -> Result<Self, Self::Error> {
-        Self::default()
-            .id(insertable_variant.id)?
-            .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?
-            .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)
+        Self::default().id(insertable_variant.id)?.organism_id(insertable_variant.organism_id)
     }
 }

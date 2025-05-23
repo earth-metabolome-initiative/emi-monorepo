@@ -46,10 +46,7 @@ mod postgres_async_read_dispatch;
 mod procedure_model_container_categories;
 mod procedure_model_instrument_categories;
 mod procedure_model_nameplate_categories;
-mod procedure_model_reagents;
-mod procedure_model_tool_categories;
 mod procedure_models;
-mod procedure_step_models;
 mod procedures;
 mod processables;
 mod processing_steps;
@@ -76,6 +73,7 @@ mod step_model_instrument_categories;
 mod step_model_instrument_models;
 mod step_model_instruments;
 mod step_model_nameplate_categories;
+mod step_model_reagents;
 mod step_model_tool_categories;
 mod step_models;
 mod step_nameplate_models;
@@ -217,17 +215,8 @@ pub enum Row {
     ProcedureModelNameplateCategory(
         crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory,
     ),
-    ProcedureModelReagent(
-        crate::codegen::structs_codegen::tables::procedure_model_reagents::ProcedureModelReagent,
-    ),
-    ProcedureModelToolCategory(
-        crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory,
-    ),
     ProcedureModel(
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
-    ),
-    ProcedureStepModel(
-        crate::codegen::structs_codegen::tables::procedure_step_models::ProcedureStepModel,
     ),
     Procedure(crate::codegen::structs_codegen::tables::procedures::Procedure),
     Processable(crate::codegen::structs_codegen::tables::processables::Processable),
@@ -277,6 +266,9 @@ pub enum Row {
     ),
     StepModelNameplateCategory(
         crate::codegen::structs_codegen::tables::step_model_nameplate_categories::StepModelNameplateCategory,
+    ),
+    StepModelReagent(
+        crate::codegen::structs_codegen::tables::step_model_reagents::StepModelReagent,
     ),
     StepModelToolCategory(
         crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
@@ -433,16 +425,7 @@ impl Row {
             Row::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
                 procedure_model_nameplate_categories.upsert(conn)?.map(Row::from)
             }
-            Row::ProcedureModelReagent(procedure_model_reagents) => {
-                procedure_model_reagents.upsert(conn)?.map(Row::from)
-            }
-            Row::ProcedureModelToolCategory(procedure_model_tool_categories) => {
-                procedure_model_tool_categories.upsert(conn)?.map(Row::from)
-            }
             Row::ProcedureModel(procedure_models) => procedure_models.upsert(conn)?.map(Row::from),
-            Row::ProcedureStepModel(procedure_step_models) => {
-                procedure_step_models.upsert(conn)?.map(Row::from)
-            }
             Row::Procedure(procedures) => procedures.upsert(conn)?.map(Row::from),
             Row::Processable(processables) => processables.upsert(conn)?.map(Row::from),
             Row::ProcessingStep(processing_steps) => processing_steps.upsert(conn)?.map(Row::from),
@@ -487,6 +470,9 @@ impl Row {
             }
             Row::StepModelNameplateCategory(step_model_nameplate_categories) => {
                 step_model_nameplate_categories.upsert(conn)?.map(Row::from)
+            }
+            Row::StepModelReagent(step_model_reagents) => {
+                step_model_reagents.upsert(conn)?.map(Row::from)
             }
             Row::StepModelToolCategory(step_model_tool_categories) => {
                 step_model_tool_categories.upsert(conn)?.map(Row::from)
@@ -608,14 +594,7 @@ impl web_common_traits::prelude::Row for Row {
             Row::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
                 procedure_model_nameplate_categories.primary_key()
             }
-            Row::ProcedureModelReagent(procedure_model_reagents) => {
-                procedure_model_reagents.primary_key()
-            }
-            Row::ProcedureModelToolCategory(procedure_model_tool_categories) => {
-                procedure_model_tool_categories.primary_key()
-            }
             Row::ProcedureModel(procedure_models) => procedure_models.primary_key(),
-            Row::ProcedureStepModel(procedure_step_models) => procedure_step_models.primary_key(),
             Row::Procedure(procedures) => procedures.primary_key(),
             Row::Processable(processables) => processables.primary_key(),
             Row::ProcessingStep(processing_steps) => processing_steps.primary_key(),
@@ -653,6 +632,7 @@ impl web_common_traits::prelude::Row for Row {
             Row::StepModelNameplateCategory(step_model_nameplate_categories) => {
                 step_model_nameplate_categories.primary_key()
             }
+            Row::StepModelReagent(step_model_reagents) => step_model_reagents.primary_key(),
             Row::StepModelToolCategory(step_model_tool_categories) => {
                 step_model_tool_categories.primary_key()
             }

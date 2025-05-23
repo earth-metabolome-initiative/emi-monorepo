@@ -2,7 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableStepModelNameplateCategoryAttributes {
     StepModelId,
-    NameplateCategory,
+    ProcedureModelNameplateCategoryId,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -14,8 +14,8 @@ impl core::fmt::Display for InsertableStepModelNameplateCategoryAttributes {
             InsertableStepModelNameplateCategoryAttributes::StepModelId => {
                 write!(f, "step_model_id")
             }
-            InsertableStepModelNameplateCategoryAttributes::NameplateCategory => {
-                write!(f, "nameplate_category")
+            InsertableStepModelNameplateCategoryAttributes::ProcedureModelNameplateCategoryId => {
+                write!(f, "procedure_model_nameplate_category_id")
             }
             InsertableStepModelNameplateCategoryAttributes::CreatedBy => {
                 write!(f, "created_by")
@@ -42,7 +42,7 @@ impl core::fmt::Display for InsertableStepModelNameplateCategoryAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableStepModelNameplateCategory {
     step_model_id: i32,
-    nameplate_category: ::nameplate_categories::NameplateCategory,
+    procedure_model_nameplate_category_id: i32,
     created_by: i32,
     created_at: ::rosetta_timestamp::TimestampUTC,
     updated_by: i32,
@@ -65,6 +65,26 @@ impl InsertableStepModelNameplateCategory {
                     .eq(&self.step_model_id),
             )
             .first::<crate::codegen::structs_codegen::tables::step_models::StepModel>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn procedure_model_nameplate_category(
+        &self,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory,
+        diesel::result::Error,
+    >{
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_model_nameplate_categories::procedure_model_nameplate_categories::dsl::id
+                    .eq(&self.procedure_model_nameplate_category_id),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory,
+            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -98,7 +118,7 @@ impl InsertableStepModelNameplateCategory {
 }
 pub struct InsertableStepModelNameplateCategoryBuilder {
     step_model_id: Option<i32>,
-    nameplate_category: Option<::nameplate_categories::NameplateCategory>,
+    procedure_model_nameplate_category_id: Option<i32>,
     created_by: Option<i32>,
     created_at: Option<::rosetta_timestamp::TimestampUTC>,
     updated_by: Option<i32>,
@@ -108,7 +128,7 @@ impl Default for InsertableStepModelNameplateCategoryBuilder {
     fn default() -> Self {
         Self {
             step_model_id: None,
-            nameplate_category: None,
+            procedure_model_nameplate_category_id: None,
             created_by: None,
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             updated_by: None,
@@ -133,22 +153,23 @@ impl InsertableStepModelNameplateCategoryBuilder {
         self.step_model_id = Some(step_model_id);
         Ok(self)
     }
-    pub fn nameplate_category<P>(
+    pub fn procedure_model_nameplate_category_id<P>(
         mut self,
-        nameplate_category: P,
+        procedure_model_nameplate_category_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
     where
-        P: TryInto<::nameplate_categories::NameplateCategory>,
-        <P as TryInto<::nameplate_categories::NameplateCategory>>::Error:
-            Into<validation_errors::SingleFieldError>,
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let nameplate_category = nameplate_category.try_into().map_err(
-            |err: <P as TryInto<::nameplate_categories::NameplateCategory>>::Error| {
+        let procedure_model_nameplate_category_id = procedure_model_nameplate_category_id
+            .try_into()
+            .map_err(|err: <P as TryInto<i32>>::Error| {
                 Into::into(err)
-                    .rename_field(InsertableStepModelNameplateCategoryAttributes::NameplateCategory)
-            },
-        )?;
-        self.nameplate_category = Some(nameplate_category);
+                    .rename_field(
+                        InsertableStepModelNameplateCategoryAttributes::ProcedureModelNameplateCategoryId,
+                    )
+            })?;
+        self.procedure_model_nameplate_category_id = Some(procedure_model_nameplate_category_id);
         Ok(self)
     }
     pub fn created_by<P>(
@@ -224,36 +245,48 @@ impl common_traits::prelude::Builder for InsertableStepModelNameplateCategoryBui
     type Attribute = InsertableStepModelNameplateCategoryAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            step_model_id: self.step_model_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepModelNameplateCategoryAttributes::StepModelId,
-                ),
-            )?,
-            nameplate_category: self.nameplate_category.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepModelNameplateCategoryAttributes::NameplateCategory,
-                ),
-            )?,
-            created_by: self.created_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepModelNameplateCategoryAttributes::CreatedBy,
-                ),
-            )?,
-            created_at: self.created_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepModelNameplateCategoryAttributes::CreatedAt,
-                ),
-            )?,
-            updated_by: self.updated_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepModelNameplateCategoryAttributes::UpdatedBy,
-                ),
-            )?,
-            updated_at: self.updated_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepModelNameplateCategoryAttributes::UpdatedAt,
-                ),
-            )?,
+            step_model_id: self
+                .step_model_id
+                .ok_or(
+                    common_traits::prelude::BuilderError::IncompleteBuild(
+                        InsertableStepModelNameplateCategoryAttributes::StepModelId,
+                    ),
+                )?,
+            procedure_model_nameplate_category_id: self
+                .procedure_model_nameplate_category_id
+                .ok_or(
+                    common_traits::prelude::BuilderError::IncompleteBuild(
+                        InsertableStepModelNameplateCategoryAttributes::ProcedureModelNameplateCategoryId,
+                    ),
+                )?,
+            created_by: self
+                .created_by
+                .ok_or(
+                    common_traits::prelude::BuilderError::IncompleteBuild(
+                        InsertableStepModelNameplateCategoryAttributes::CreatedBy,
+                    ),
+                )?,
+            created_at: self
+                .created_at
+                .ok_or(
+                    common_traits::prelude::BuilderError::IncompleteBuild(
+                        InsertableStepModelNameplateCategoryAttributes::CreatedAt,
+                    ),
+                )?,
+            updated_by: self
+                .updated_by
+                .ok_or(
+                    common_traits::prelude::BuilderError::IncompleteBuild(
+                        InsertableStepModelNameplateCategoryAttributes::UpdatedBy,
+                    ),
+                )?,
+            updated_at: self
+                .updated_at
+                .ok_or(
+                    common_traits::prelude::BuilderError::IncompleteBuild(
+                        InsertableStepModelNameplateCategoryAttributes::UpdatedAt,
+                    ),
+                )?,
         })
     }
 }
@@ -264,7 +297,9 @@ impl TryFrom<InsertableStepModelNameplateCategory> for InsertableStepModelNamepl
     ) -> Result<Self, Self::Error> {
         Self::default()
             .step_model_id(insertable_variant.step_model_id)?
-            .nameplate_category(insertable_variant.nameplate_category)?
+            .procedure_model_nameplate_category_id(
+                insertable_variant.procedure_model_nameplate_category_id,
+            )?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?

@@ -7,7 +7,7 @@ The ordering of items is not stable, it is driven by a dependency graph.
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/instrument_categories/src/lib.rs:17
+-- web/web_common/instrument_categories/src/lib.rs:14
 -- instrument_categories::InstrumentCategory
 CREATE TYPE InstrumentCategory AS ENUM (
 	'MassSpectrometer',
@@ -16,7 +16,8 @@ CREATE TYPE InstrumentCategory AS ENUM (
 	'BallMill',
 	'Centrifuge',
 	'Dispenser',
-	'Shaker'
+	'Shaker',
+	'Printer'
 );
 /* </end connected objects> */
 

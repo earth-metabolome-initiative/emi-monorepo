@@ -20,7 +20,7 @@ pub fn login_provider(provider: &AssignedConnectorProps<OAuthLoginProvider>) -> 
 
     html! {
         <a class="login-provider" href={url}>
-            <BrandIcon ..provider.row.icon.clone() />
+            <BrandIcon icon={provider.row.icon.clone()} />
             {format!("Login with {}", provider.row.name)}
         </a>
     }

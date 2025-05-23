@@ -191,24 +191,9 @@ pub use procedure_model_nameplate_categories::{
     InsertableProcedureModelNameplateCategory, InsertableProcedureModelNameplateCategoryAttributes,
     InsertableProcedureModelNameplateCategoryBuilder,
 };
-mod procedure_model_reagents;
-pub use procedure_model_reagents::{
-    InsertableProcedureModelReagent, InsertableProcedureModelReagentAttributes,
-    InsertableProcedureModelReagentBuilder,
-};
-mod procedure_model_tool_categories;
-pub use procedure_model_tool_categories::{
-    InsertableProcedureModelToolCategory, InsertableProcedureModelToolCategoryAttributes,
-    InsertableProcedureModelToolCategoryBuilder,
-};
 mod procedure_models;
 pub use procedure_models::{
     InsertableProcedureModel, InsertableProcedureModelAttributes, InsertableProcedureModelBuilder,
-};
-mod procedure_step_models;
-pub use procedure_step_models::{
-    InsertableProcedureStepModel, InsertableProcedureStepModelAttributes,
-    InsertableProcedureStepModelBuilder,
 };
 mod procedures;
 pub use procedures::{
@@ -307,6 +292,11 @@ mod step_model_nameplate_categories;
 pub use step_model_nameplate_categories::{
     InsertableStepModelNameplateCategory, InsertableStepModelNameplateCategoryAttributes,
     InsertableStepModelNameplateCategoryBuilder,
+};
+mod step_model_reagents;
+pub use step_model_reagents::{
+    InsertableStepModelReagent, InsertableStepModelReagentAttributes,
+    InsertableStepModelReagentBuilder,
 };
 mod step_model_tool_categories;
 pub use step_model_tool_categories::{

@@ -19,7 +19,10 @@ for crate::codegen::structs_codegen::tables::step_model_container_categories::St
             .filter(
                 step_model_id
                     .ne(excluded(step_model_id))
-                    .or(container_category.ne(excluded(container_category)))
+                    .or(
+                        procedure_model_container_category_id
+                            .ne(excluded(procedure_model_container_category_id)),
+                    )
                     .or(expected_kelvin.ne(excluded(expected_kelvin)))
                     .or(tolerance_kelvin.ne(excluded(tolerance_kelvin)))
                     .or(created_by.ne(excluded(created_by)))
@@ -52,7 +55,10 @@ for crate::codegen::structs_codegen::tables::step_model_container_categories::St
             .filter(
                 step_model_id
                     .ne(excluded(step_model_id))
-                    .or(container_category.ne(excluded(container_category)))
+                    .or(
+                        procedure_model_container_category_id
+                            .ne(excluded(procedure_model_container_category_id)),
+                    )
                     .or(expected_kelvin.ne(excluded(expected_kelvin)))
                     .or(tolerance_kelvin.ne(excluded(tolerance_kelvin)))
                     .or(created_by.ne(excluded(created_by)))
