@@ -1,5 +1,3 @@
-
-# from your workspace root:
 cargo llvm-cov \
   --package molecular_formula \
   --tests \
