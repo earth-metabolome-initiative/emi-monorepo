@@ -3,8 +3,8 @@ name = "instrument_categories"
 version = "0.1.0"
 edition = "2024"
 
-[lib]
-crate-type = ["cdylib", "lib"]
+# [lib]
+# crate-type = ["cdylib", "lib"]
 
 [[bin]]
 name = "pgrx_embed_instrument_categories"

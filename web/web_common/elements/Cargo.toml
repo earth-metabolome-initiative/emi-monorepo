@@ -10,8 +10,8 @@ include = [
   "isotopes_data.json",
 ]
 
-[lib]
-crate-type = ["cdylib", "lib"]
+# [lib]
+# crate-type = ["cdylib", "lib"]
 
 [[bin]]
 name = "pgrx_embed_elements"
