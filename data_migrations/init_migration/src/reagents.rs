@@ -19,7 +19,7 @@ pub(crate) async fn init_reagents(
         .description("Absolute Ethanol, >= 95%, with 5% isopropanol")?
         .purity(95.0)?
         .cas_code("64-17-5")?
-        .molecular_formula("CH3CH2OH")?
+        .molecular_formulas("CH3CH2OH")?
         .created_by(user.id)?
         .build()?
         .backend_insert(portal_conn)
@@ -30,7 +30,7 @@ pub(crate) async fn init_reagents(
         .description("Methanol, >= 99.8%, HPLC grade")?
         .purity(99.8)?
         .cas_code("67-56-1")?
-        .molecular_formula("CH3OH")?
+        .molecular_formulas("CH3OH")?
         .created_by(user.id)?
         .build()?
         .backend_insert(portal_conn)
@@ -41,7 +41,7 @@ pub(crate) async fn init_reagents(
         .description("Formic acid, 98+%, pure")?
         .purity(98.0)?
         .cas_code("64-18-6")?
-        .molecular_formula("HCOOH")?
+        .molecular_formulas("HCOOH")?
         .created_by(user.id)?
         .build()?
         .backend_insert(portal_conn)
@@ -52,7 +52,7 @@ pub(crate) async fn init_reagents(
         .description("Distilled water, pure")?
         .purity(100.0)?
         .cas_code("7732-18-5")?
-        .molecular_formula("H2O")?
+        .molecular_formulas("H2O")?
         .created_by(user.id)?
         .build()?
         .backend_insert(portal_conn)

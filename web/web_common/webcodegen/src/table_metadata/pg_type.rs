@@ -238,7 +238,7 @@ pub async fn rust_type_str<S: AsRef<str>>(
         "containercategory" | "ContainerCategory" => "::container_categories::ContainerCategory",
 
         "cas" => "::cas_codes::CAS",
-        "molecularformula" => "::molecular_formula::MolecularFormula",
+        "molecularformula" => "::molecular_formulas::MolecularFormula",
 
         "mediatype" | "MediaType" => "::media_types::MediaType",
 
@@ -342,7 +342,7 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<String, WebCod
 
         "cas" => "::cas_codes::diesel_impls::CAS",
         "molecularformula" => {
-            "::molecular_formula::molecular_formula::diesel_impls::MolecularFormula"
+            "::molecular_formulas::molecular_formula::diesel_impls::MolecularFormula"
         }
 
         _ => {

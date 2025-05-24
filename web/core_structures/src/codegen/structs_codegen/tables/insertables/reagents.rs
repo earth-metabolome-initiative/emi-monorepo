@@ -19,7 +19,7 @@ impl core::fmt::Display for InsertableReagentAttributes {
             InsertableReagentAttributes::Purity => write!(f, "purity"),
             InsertableReagentAttributes::CasCode => write!(f, "cas_code"),
             InsertableReagentAttributes::MolecularFormula => {
-                write!(f, "molecular_formula")
+                write!(f, "molecular_formulas")
             }
             InsertableReagentAttributes::CreatedBy => write!(f, "created_by"),
             InsertableReagentAttributes::CreatedAt => write!(f, "created_at"),
@@ -39,7 +39,7 @@ pub struct InsertableReagent {
     description: String,
     purity: f32,
     cas_code: ::cas_codes::CAS,
-    molecular_formula: ::molecular_formula::MolecularFormula,
+    molecular_formulas: ::molecular_formulas::MolecularFormula,
     created_by: i32,
     created_at: ::rosetta_timestamp::TimestampUTC,
     updated_by: i32,
@@ -80,7 +80,7 @@ pub struct InsertableReagentBuilder {
     description: Option<String>,
     purity: Option<f32>,
     cas_code: Option<::cas_codes::CAS>,
-    molecular_formula: Option<::molecular_formula::MolecularFormula>,
+    molecular_formulas: Option<::molecular_formulas::MolecularFormula>,
     created_by: Option<i32>,
     created_at: Option<::rosetta_timestamp::TimestampUTC>,
     updated_by: Option<i32>,
@@ -93,7 +93,7 @@ impl Default for InsertableReagentBuilder {
             description: None,
             purity: None,
             cas_code: None,
-            molecular_formula: None,
+            molecular_formulas: None,
             created_by: None,
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             updated_by: None,
@@ -170,21 +170,21 @@ impl InsertableReagentBuilder {
         self.cas_code = Some(cas_code);
         Ok(self)
     }
-    pub fn molecular_formula<P>(
+    pub fn molecular_formulas<P>(
         mut self,
-        molecular_formula: P,
+        molecular_formulas: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
     where
-        P: TryInto<::molecular_formula::MolecularFormula>,
-        <P as TryInto<::molecular_formula::MolecularFormula>>::Error:
+        P: TryInto<::molecular_formulas::MolecularFormula>,
+        <P as TryInto<::molecular_formulas::MolecularFormula>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        let molecular_formula = molecular_formula.try_into().map_err(
-            |err: <P as TryInto<::molecular_formula::MolecularFormula>>::Error| {
+        let molecular_formulas = molecular_formulas.try_into().map_err(
+            |err: <P as TryInto<::molecular_formulas::MolecularFormula>>::Error| {
                 Into::into(err).rename_field(InsertableReagentAttributes::MolecularFormula)
             },
         )?;
-        self.molecular_formula = Some(molecular_formula);
+        self.molecular_formulas = Some(molecular_formulas);
         Ok(self)
     }
     pub fn created_by<P>(
@@ -273,7 +273,7 @@ impl common_traits::prelude::Builder for InsertableReagentBuilder {
                     InsertableReagentAttributes::CasCode,
                 ),
             )?,
-            molecular_formula: self.molecular_formula.ok_or(
+            molecular_formulas: self.molecular_formulas.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableReagentAttributes::MolecularFormula,
                 ),
@@ -309,7 +309,7 @@ impl TryFrom<InsertableReagent> for InsertableReagentBuilder {
             .description(insertable_variant.description)?
             .purity(insertable_variant.purity)?
             .cas_code(insertable_variant.cas_code)?
-            .molecular_formula(insertable_variant.molecular_formula)?
+            .molecular_formulas(insertable_variant.molecular_formulas)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?

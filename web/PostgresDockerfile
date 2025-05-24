@@ -50,10 +50,10 @@ COPY ./web_common/elements/extension/usr/lib/postgresql/17/lib/elements.so /usr/
 COPY ./web_common/elements/extension/usr/share/postgresql/17/extension/elements.control /usr/share/postgresql/17/extension/elements.control
 COPY ./web_common/elements/extension/usr/share/postgresql/17/extension/elements--0.1.0.sql usr/share/postgresql/17/extension/elements--0.1.0.sql
 
-# Next, we copy the the `molecular_formula` extension files to the image
-COPY ./web_common/molecular_formula/extension/usr/lib/postgresql/17/lib/molecular_formula.so /usr/lib/postgresql/17/lib/molecular_formula.so
-COPY ./web_common/molecular_formula/extension/usr/share/postgresql/17/extension/molecular_formula.control /usr/share/postgresql/17/extension/molecular_formula.control
-COPY ./web_common/molecular_formula/extension/usr/share/postgresql/17/extension/molecular_formula--0.1.0.sql usr/share/postgresql/17/extension/molecular_formula--0.1.0.sql
+# Next, we copy the the `molecular_formulas` extension files to the image
+COPY ./web_common/molecular_formulas/extension/usr/lib/postgresql/17/lib/molecular_formulas.so /usr/lib/postgresql/17/lib/molecular_formulas.so
+COPY ./web_common/molecular_formulas/extension/usr/share/postgresql/17/extension/molecular_formulas.control /usr/share/postgresql/17/extension/molecular_formulas.control
+COPY ./web_common/molecular_formulas/extension/usr/share/postgresql/17/extension/molecular_formulas--0.1.0.sql usr/share/postgresql/17/extension/molecular_formulas--0.1.0.sql
 
 # Next, we copy the the `cas_codes` extension files to the image
 COPY ./web_common/cas_codes/extension/usr/lib/postgresql/17/lib/cas_codes.so /usr/lib/postgresql/17/lib/cas_codes.so

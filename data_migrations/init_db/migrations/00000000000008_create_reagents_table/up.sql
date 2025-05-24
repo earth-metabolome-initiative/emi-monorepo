@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS reagents (
     AND must_be_smaller_than_f32(purity, 100.0)
   ),
   cas_code CAS NOT NULL UNIQUE,
-  molecular_formula MolecularFormula NOT NULL,
+  molecular_formulas MolecularFormula NOT NULL,
   created_by INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_by INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,

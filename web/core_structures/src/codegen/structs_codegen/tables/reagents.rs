@@ -16,7 +16,7 @@ pub struct Reagent {
     pub description: String,
     pub purity: f32,
     pub cas_code: ::cas_codes::CAS,
-    pub molecular_formula: ::molecular_formula::MolecularFormula,
+    pub molecular_formulas: ::molecular_formulas::MolecularFormula,
     pub created_by: i32,
     pub created_at: ::rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,

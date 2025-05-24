@@ -25,7 +25,7 @@ nameplate_categories = { workspace = true, features = ["diesel_pgrx"] }
 container_categories = { workspace = true, features = ["diesel_pgrx"] }
 validation_errors.workspace = true
 cas_codes = { workspace = true, features = ["diesel_pgrx"] }
-molecular_formula = { workspace = true, features = ["diesel_pgrx"] }
+molecular_formulas = { workspace = true, features = ["diesel_pgrx"] }
 media_types = { workspace = true, features = ["diesel_pgrx"] }
 yew = { workspace = true, optional = true }
 
@@ -43,7 +43,7 @@ serde = [
   "nameplate_categories/serde",
   "container_categories/serde",
   "cas_codes/serde",
-  "molecular_formula/serde",
+  "molecular_formulas/serde",
   "media_types/serde",
 ]
 yew = ["dep:yew"]
@@ -61,7 +61,7 @@ postgres = [
   "instrument_categories/postgres",
   "container_categories/postgres",
   "cas_codes/postgres",
-  "molecular_formula/postgres",
+  "molecular_formulas/postgres",
   "media_types/postgres",
 ]
 sqlite = [
@@ -78,7 +78,7 @@ sqlite = [
   "nameplate_categories/sqlite",
   "container_categories/sqlite",
   "cas_codes/sqlite",
-  "molecular_formula/sqlite",
+  "molecular_formulas/sqlite",
   "media_types/sqlite",
 ]
 backend = ["postgres", "web_common_traits/backend"]

@@ -51,7 +51,7 @@ pub enum SingleFieldError<FieldName = ()> {
     /// The provided text is not a valid cas code.
     InvalidCasCode(FieldName, cas_codes::errors::Error),
     /// The provided text is not a valid Molecular Formula.
-    InvalidMolecularFormula(FieldName, molecular_formula::errors::Error),
+    InvalidMolecularFormula(FieldName, molecular_formulas::errors::Error),
     /// The provided text is not a valid media type.
     InvalidMediaType(FieldName, media_types::errors::Error),
 }

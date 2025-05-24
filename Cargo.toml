@@ -54,7 +54,7 @@ members = [
   "utils/diesel_pgrx",
   "web/web_common/elements",
   "utils/diesel_pgrx/example_extension",
-  "web/web_common/molecular_formula",
+  "web/web_common/molecular_formulas",
   "utils/numeric_common_traits",
 ]
 
@@ -180,7 +180,7 @@ fmtastic = "0.2.1"
 byteorder = "1.5.0"
 image_validation = { path = "utils/image_validation" }
 media_types = { path = "web/web_common/media_types" }
-molecular_formula = { path = "web/web_common/molecular_formula" }
+molecular_formulas = { path = "web/web_common/molecular_formulas" }
 cas_codes = { path = "web/web_common/cas_codes" }
 
 [workspace.lints.rust]

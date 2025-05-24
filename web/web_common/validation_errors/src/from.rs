@@ -46,14 +46,14 @@ impl From<cas_codes::errors::Error> for Error {
     }
 }
 
-impl From<molecular_formula::errors::Error> for SingleFieldError {
-    fn from(error: molecular_formula::errors::Error) -> Self {
+impl From<molecular_formulas::errors::Error> for SingleFieldError {
+    fn from(error: molecular_formulas::errors::Error) -> Self {
         Self::InvalidMolecularFormula((), error)
     }
 }
 
-impl From<molecular_formula::errors::Error> for Error {
-    fn from(error: molecular_formula::errors::Error) -> Self {
+impl From<molecular_formulas::errors::Error> for Error {
+    fn from(error: molecular_formulas::errors::Error) -> Self {
         Self::SingleField(error.into())
     }
 }

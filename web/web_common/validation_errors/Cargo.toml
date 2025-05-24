@@ -8,5 +8,5 @@ diesel.workspace = true
 instrument_categories.workspace = true
 serde.workspace = true
 cas_codes.workspace = true
-molecular_formula.workspace = true
+molecular_formulas.workspace = true
 media_types.workspace = true
