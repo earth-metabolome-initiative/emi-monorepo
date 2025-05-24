@@ -214,7 +214,7 @@ mod tests {
         assert_eq!(
             must_be_strictly_positive_f32(-0.0_f32).unwrap_err(),
             validation_errors::SingleFieldError::UnexpectedNegativeOrZeroValue(())
-        )
+        );
     }
 
     #[test]

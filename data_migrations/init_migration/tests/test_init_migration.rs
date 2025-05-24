@@ -1,5 +1,5 @@
 //! Test to check whether the database can indeed be initialized in the
-//! reference docker and populated with the init_migration.
+//! reference docker and populated with the `init_migration`.
 
 use core_structures::LoginProvider;
 use init_db::init_database;

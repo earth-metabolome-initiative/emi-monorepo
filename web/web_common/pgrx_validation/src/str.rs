@@ -173,7 +173,7 @@ mod tests {
             must_not_be_empty(x).unwrap_err(),
             validation_errors::SingleFieldError::EmptyText(())
         );
-        assert!(must_not_be_empty("marco").is_ok())
+        assert!(must_not_be_empty("marco").is_ok());
     }
 
     #[test]

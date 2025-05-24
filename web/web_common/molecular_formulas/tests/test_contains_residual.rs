@@ -14,14 +14,14 @@ const FORMULAS_WITHOUT_RESIDUALS: &[&str] =
 /// Test to check that the `contains_residual` method works as expected
 fn test_residual_detection() {
     for formula in FORMULAS_WITH_RESIDUALS {
-        let formula =
-            MolecularFormula::from_str(formula).expect(&format!("Failed to parse `{}`", formula));
-        assert!(formula.contains_residual(), "Expected {} to contain a residual", formula);
-        assert!(formula.molar_mass().is_err(), "Expected {} to have no known molar mass", formula);
+        let formula = MolecularFormula::from_str(formula)
+            .unwrap_or_else(|_| panic!("Failed to parse `{formula}`"));
+        assert!(formula.contains_residual(), "Expected {formula} to contain a residual",);
+        assert!(formula.molar_mass().is_err(), "Expected {formula} to have no known molar mass",);
     }
 
     for formula in FORMULAS_WITHOUT_RESIDUALS {
         let formula = MolecularFormula::from_str(formula).unwrap();
-        assert!(!formula.contains_residual(), "Expected {} not to contain a residual", formula);
+        assert!(!formula.contains_residual(), "Expected {formula} not to contain a residual");
     }
 }

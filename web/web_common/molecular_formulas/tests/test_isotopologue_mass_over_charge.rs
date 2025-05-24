@@ -14,8 +14,8 @@ fn test_isotopologue_mass_over_charge() {
         let formula = MolecularFormula::from_str(formula).unwrap();
         let isotopologue_mass_over_charge = formula.isotopologue_mass_over_charge().unwrap();
 
-        assert_eq!(
-            isotopologue_mass_over_charge, expected_isotopologue_mass_over_charge,
+        assert!(
+            (isotopologue_mass_over_charge - expected_isotopologue_mass_over_charge).abs() < 1e-11,
             "Unexpected isotopologue mass over charge for `{formula}`",
         );
     }

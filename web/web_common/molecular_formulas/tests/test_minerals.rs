@@ -41,7 +41,7 @@ fn test_goethite() {
 
     assert_eq!(
         MolecularFormula::try_from(formula)
-            .expect(&format!("Failed to parse formula `{}`", formula)),
+            .unwrap_or_else(|_| panic!("Failed to parse formula `{formula}`")),
         MolecularFormula::Sequence(vec![
             GreekLetter::Alpha.into(),
             Element::Fe.into(),
@@ -50,7 +50,6 @@ fn test_goethite() {
                 MolecularFormula::Sequence(vec![Element::O.into(), Element::H.into()]).into()
             )
         ]),
-        "Expected formula `{}` to be parsed correctly",
-        formula
+        "Expected formula `{formula}` to be parsed correctly",
     );
 }

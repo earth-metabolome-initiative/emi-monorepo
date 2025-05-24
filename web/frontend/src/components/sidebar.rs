@@ -24,8 +24,8 @@ pub fn sidebar(props: &SidebarProps) -> Html {
     let (state, _) = use_store::<AppState>();
     let route: AppRoute = use_route().unwrap_or_default();
     let node = use_node_ref();
-    let onclose = props.onclose.clone();
-    let visible = props.visible;
+    // let onclose = props.onclose.clone();
+    // let visible = props.visible;
     // use_click_away(node.clone(), move |_: Event| {
     //     if visible {
     //         onclose.emit(!visible);

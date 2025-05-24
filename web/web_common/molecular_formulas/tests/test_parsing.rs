@@ -298,7 +298,7 @@ fn test_parser() {
     for formula in COMPLEX_FORMULAS {
         let parsed = MolecularFormula::from_str(formula);
         if let Err(e) = parsed {
-            panic!("Failed to parse formula {}: {:?}", formula, e);
+            panic!("Failed to parse formula {formula}: {e:?}");
         }
     }
 }

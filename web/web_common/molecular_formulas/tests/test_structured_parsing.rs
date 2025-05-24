@@ -17,7 +17,7 @@ fn test_parse<M: Into<MolecularFormula>>(formula: &str, expected: M, simmetric: 
     );
     assert_eq!(
         simmetric,
-        &format!("{}", parsed_formula),
+        &format!("{parsed_formula}"),
         "Failed to serialize formula: {formula}, got `{parsed_formula}`"
     );
 }
@@ -137,7 +137,7 @@ fn test_molecular_hydrogen() {
 fn test_hydrogen_molecular_ion() {
     test_parse(
         "H2+",
-        Ion::from_formula(MolecularFormula::Count(Element::H.into(), 2).into(), 1).unwrap(),
+        Ion::from_formula(MolecularFormula::Count(Element::H.into(), 2), 1).unwrap(),
         Some("H₂⁺"),
     );
 }
@@ -158,7 +158,7 @@ fn test_formula_including_isotopes() {
             MolecularFormula::Count(Isotope::try_from((Element::Cl, 35)).unwrap().into(), 2), /* Isotope with mass number 35 */
         ]),
         Some("¹²C₁₈¹H₁₈¹⁰⁶Pd₂³⁵Cl₂"),
-    )
+    );
 }
 
 #[test]
@@ -170,7 +170,7 @@ fn test_irregular_ion_position1() {
             MolecularFormula::Count(Element::H.into(), 4),
         ]),
         Some("C⁺⁴H₄"),
-    )
+    );
 }
 
 #[test]
@@ -182,7 +182,7 @@ fn test_irregular_ion_position2() {
             MolecularFormula::Count(Element::H.into(), 4),
         ]),
         Some("C⁺²H₄"),
-    )
+    );
 }
 
 #[test]
@@ -194,17 +194,17 @@ fn test_irregular_ion_position3() {
             MolecularFormula::Count(Element::H.into(), 4),
         ]),
         Some("C⁻²H₄"),
-    )
+    );
 }
 
 #[test]
 fn test_ion1() {
-    test_parse("C²⁻", Ion::from_element(Element::C, -2).unwrap(), Some("C⁻²"))
+    test_parse("C²⁻", Ion::from_element(Element::C, -2).unwrap(), Some("C⁻²"));
 }
 
 #[test]
 fn test_ion2() {
-    test_parse("C²⁺", Ion::from_element(Element::C, 2).unwrap(), Some("C⁺²"))
+    test_parse("C²⁺", Ion::from_element(Element::C, 2).unwrap(), Some("C⁺²"));
 }
 
 #[test]
@@ -369,8 +369,7 @@ fn test_hexaamminecobalt_iii_chloride() {
                         ),
                     ])
                     .into(),
-                )
-                .into(),
+                ),
                 3,
             )
             .unwrap()

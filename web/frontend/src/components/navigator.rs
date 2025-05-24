@@ -17,11 +17,7 @@ pub struct Navigator {
     toggle_timeout: Option<Timeout>,
 }
 
-impl Navigator {
-    fn sidebar_open(&self) -> bool {
-        true
-    }
-}
+impl Navigator {}
 
 /// Message types for the Navigator component.
 pub enum NavigatorMessage {
@@ -41,13 +37,13 @@ impl Component for Navigator {
     type Message = NavigatorMessage;
     type Properties = ConnectorProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self { toggle_timeout: None }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            NavigatorMessage::AppState(app_state) => {
+            NavigatorMessage::AppState(_app_state) => {
                 // if self.app_state == app_state {
                 //     return false;
                 // }
@@ -56,7 +52,7 @@ impl Component for Navigator {
 
                 true
             }
-            NavigatorMessage::SetSidebarVisibility(visibility) => {
+            NavigatorMessage::SetSidebarVisibility(_visibility) => {
                 // self.app_dispatch.reduce_mut(|state| {
                 //     state.set_sidebar_visibility(visibility);
                 // });
@@ -87,7 +83,7 @@ impl Component for Navigator {
         html! {
             <>
                 <nav>
-                    <Hamburger is_active = {self.sidebar_open()} onclick = {toggle.clone()}/>
+                    <Hamburger is_active = {true} onclick = {toggle.clone()}/>
                     <h1>
                         <Link<AppRoute> classes="logo" to={AppRoute::Home}>
                             {"EMI"}
@@ -112,7 +108,7 @@ impl Component for Navigator {
                     //     </Link<AppRoute>>
                     // }
                 </nav>
-                <Sidebar visible={self.sidebar_open()} onclose={toggle} />
+                <Sidebar visible={true} onclose={toggle} />
             </>
         }
     }

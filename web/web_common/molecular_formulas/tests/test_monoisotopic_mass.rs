@@ -36,10 +36,9 @@ fn test_isotopologue_mass_without_charge() {
         // precision issues
         let monoisotopic_mass = (monoisotopic_mass * 1e11).round() / 1e11;
 
-        assert_eq!(
-            monoisotopic_mass, *expected_monoisotopic_mass,
-            "Expected exact mass of {} to be {}",
-            formula, expected_monoisotopic_mass
+        assert!(
+            (monoisotopic_mass - *expected_monoisotopic_mass).abs() < 1e-11,
+            "Expected exact mass of {formula} to be {expected_monoisotopic_mass}",
         );
     }
 }
@@ -55,10 +54,9 @@ fn test_isotopologue_mass_with_charge() {
         // precision issues
         let monoisotopic_mass = (monoisotopic_mass * 1e11).round() / 1e11;
 
-        assert_eq!(
-            monoisotopic_mass, *expected_monoisotopic_mass,
-            "Expected exact mass of {} to be {}",
-            formula, expected_monoisotopic_mass
+        assert!(
+            (monoisotopic_mass - *expected_monoisotopic_mass).abs() < 1e-11,
+            "Expected exact mass of {formula} to be {expected_monoisotopic_mass}",
         );
     }
 }
