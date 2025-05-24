@@ -72,6 +72,16 @@ impl super::MostAbundantIsotope for NihoniumIsotope {
         Self::Nh287
     }
 }
+impl From<NihoniumIsotope> for crate::Isotope {
+    fn from(isotope: NihoniumIsotope) -> Self {
+        crate::Isotope::Nh(isotope)
+    }
+}
+impl From<NihoniumIsotope> for crate::Element {
+    fn from(_isotope: NihoniumIsotope) -> Self {
+        crate::Element::Nh
+    }
+}
 impl TryFrom<u16> for NihoniumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

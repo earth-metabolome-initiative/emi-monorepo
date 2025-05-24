@@ -223,6 +223,16 @@ impl super::MostAbundantIsotope for SamariumIsotope {
         Self::Sm152
     }
 }
+impl From<SamariumIsotope> for crate::Isotope {
+    fn from(isotope: SamariumIsotope) -> Self {
+        crate::Isotope::Sm(isotope)
+    }
+}
+impl From<SamariumIsotope> for crate::Element {
+    fn from(_isotope: SamariumIsotope) -> Self {
+        crate::Element::Sm
+    }
+}
 impl TryFrom<u16> for SamariumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

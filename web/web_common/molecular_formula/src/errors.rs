@@ -1,9 +1,11 @@
 //! Submodule providing the enumeration of errors which may occur while parsing
 //! a molecular formula.
 
-use crate::token::Token;
+use std::num::TryFromIntError;
 
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Hash)]
+use crate::token::{Token, greek_letters::GreekLetter};
+
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Enumeration of errors which may occur while parsing a molecular formula.
 pub enum Error {
@@ -11,6 +13,9 @@ pub enum Error {
     Element(elements::errors::Error),
     /// Error indicating that a character in the formula is invalid.
     InvalidCharacter(char),
+    /// Error indicating that a greek letter in the formula is at an
+    /// invalid position.
+    InvalidGreekLetterPosition(GreekLetter),
     /// Error indicating that a number in the formula is invalid.
     InvalidNumber,
     /// Error indicating that a number in the formula is invalid.
@@ -30,6 +35,8 @@ pub enum Error {
     UnconsumedParser,
     /// When an ion has a charge of 0.
     ZeroCharge,
+    /// When a count has a value of 0.
+    ZeroCount,
     /// When a charge is not at the end of the formula.
     InvalidChargePosition,
     /// When a superscript is at an invalid position.
@@ -42,6 +49,8 @@ pub enum Error {
     InvalidOperationForNonDiatomic,
     /// When an oxidation state is invalid.
     InvalidOxidationState(i16),
+    /// When a provided string is not a valid greek letter.
+    InvalidGreekLetter(String),
 }
 
 impl From<elements::errors::Error> for Error {
@@ -55,6 +64,9 @@ impl core::fmt::Display for Error {
         match self {
             Error::Element(e) => write!(f, "Element error: {e}"),
             Error::InvalidCharacter(c) => write!(f, "Invalid character: {c}"),
+            Error::InvalidGreekLetterPosition(c) => {
+                write!(f, "Invalid greek letter position: {c}")
+            }
             Error::InvalidNumber => write!(f, "Invalid number"),
             Error::EmptyFormula => write!(f, "Empty formula"),
             Error::InvalidFormula => write!(f, "Invalid formula"),
@@ -66,6 +78,7 @@ impl core::fmt::Display for Error {
             }
             Error::UnconsumedParser => write!(f, "Unconsumed parser"),
             Error::ZeroCharge => write!(f, "Ion has a charge of 0"),
+            Error::ZeroCount => write!(f, "Count has a value of 0"),
             Error::InvalidChargePosition => write!(f, "Charge is not at the end of the formula"),
             Error::InvalidSuperscriptPosition => {
                 write!(f, "Superscript is at an invalid position")
@@ -82,6 +95,9 @@ impl core::fmt::Display for Error {
             Error::InvalidOxidationState(state) => {
                 write!(f, "Oxidation state is invalid: {state}")
             }
+            Error::InvalidGreekLetter(greek) => {
+                write!(f, "Provided string is not a valid greek letter: {greek}")
+            }
         }
     }
 }
@@ -89,5 +105,11 @@ impl core::fmt::Display for Error {
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         None
+    }
+}
+
+impl From<TryFromIntError> for Error {
+    fn from(_: TryFromIntError) -> Self {
+        Error::InvalidNumber
     }
 }

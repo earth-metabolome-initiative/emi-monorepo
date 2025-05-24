@@ -183,6 +183,16 @@ impl super::MostAbundantIsotope for IronIsotope {
         Self::Fe56
     }
 }
+impl From<IronIsotope> for crate::Isotope {
+    fn from(isotope: IronIsotope) -> Self {
+        crate::Isotope::Fe(isotope)
+    }
+}
+impl From<IronIsotope> for crate::Element {
+    fn from(_isotope: IronIsotope) -> Self {
+        crate::Element::Fe
+    }
+}
 impl TryFrom<u16> for IronIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

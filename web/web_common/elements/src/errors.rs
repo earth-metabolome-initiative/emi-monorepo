@@ -6,8 +6,10 @@ use crate::Element;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Error codes enumeration which may be returned by the library.
 pub enum Error {
-    /// The provided container category string is unknown.
+    /// The provided element is unknown.
     Element([char; 2]),
+    /// The provided character isotope is unknown.
+    CharacterIsotope(char),
     /// The provided combination of Element and atomic mass is unknown.
     Isotope(Element, u16),
 }
@@ -17,6 +19,9 @@ impl std::fmt::Display for Error {
         match self {
             Error::Element(code) => {
                 write!(f, "Unknown element string: {code:?}")
+            }
+            Error::CharacterIsotope(c) => {
+                write!(f, "Unknown character isotope: {c}")
             }
             Error::Isotope(element, mass) => {
                 write!(f, "Unknown isotope: {element} with atomic mass {mass}")

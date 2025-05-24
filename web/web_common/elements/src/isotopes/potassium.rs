@@ -158,6 +158,16 @@ impl super::MostAbundantIsotope for PotassiumIsotope {
         Self::K39
     }
 }
+impl From<PotassiumIsotope> for crate::Isotope {
+    fn from(isotope: PotassiumIsotope) -> Self {
+        crate::Isotope::K(isotope)
+    }
+}
+impl From<PotassiumIsotope> for crate::Element {
+    fn from(_isotope: PotassiumIsotope) -> Self {
+        crate::Element::K
+    }
+}
 impl TryFrom<u16> for PotassiumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

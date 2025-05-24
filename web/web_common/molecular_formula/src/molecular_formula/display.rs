@@ -44,6 +44,9 @@ impl Display for MolecularFormula {
             Self::Residual => {
                 write!(f, "R")
             }
+            Self::Greek(greek) => {
+                write!(f, "{greek}-")
+            }
         }
     }
 }

@@ -153,6 +153,16 @@ impl super::MostAbundantIsotope for PhosphorusIsotope {
         Self::P31
     }
 }
+impl From<PhosphorusIsotope> for crate::Isotope {
+    fn from(isotope: PhosphorusIsotope) -> Self {
+        crate::Isotope::P(isotope)
+    }
+}
+impl From<PhosphorusIsotope> for crate::Element {
+    fn from(_isotope: PhosphorusIsotope) -> Self {
+        crate::Element::P
+    }
+}
 impl TryFrom<u16> for PhosphorusIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

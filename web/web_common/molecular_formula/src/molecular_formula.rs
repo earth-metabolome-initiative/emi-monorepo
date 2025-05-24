@@ -2,7 +2,7 @@
 
 use elements::{Element, Isotope};
 
-use crate::Ion;
+use crate::{Ion, token::greek_letters::GreekLetter};
 
 mod charge;
 mod contains_elements;
@@ -54,6 +54,8 @@ pub enum MolecularFormula {
     RepeatingUnit(Box<MolecularFormula>),
     /// Residual group
     Residual,
+    /// A greek letter decorator
+    Greek(GreekLetter),
 }
 
 impl MolecularFormula {
@@ -75,6 +77,7 @@ impl MolecularFormula {
     ) -> Result<Self, crate::errors::Error> {
         match self {
             Self::Sequence(mut formulas) => {
+                // TODO! UPDATE THE HANDLE WIKIPEDIA CASE!
                 let last = formulas.pop().unwrap();
                 let last = last.add_count_to_last_subformula(count)?;
                 formulas.push(last);
@@ -92,8 +95,8 @@ impl MolecularFormula {
             | Self::Residual
             | Self::Complex(_)
             | Self::RepeatingUnit(_) => Ok(Self::Count(self.into(), count)),
-            Self::Count(_, _) => {
-                unreachable!("Count {self:?} should not be counted")
+            Self::Count(_, _) | Self::Greek(_) => {
+                unreachable!("Count or greek letter `{self:?}` should not be counted")
             }
         }
     }
@@ -121,8 +124,8 @@ impl MolecularFormula {
             | Self::Complex(_)
             | Self::Residual
             | Self::RepeatingUnit(_) => Ok(Self::Count(self.into(), count)),
-            Self::Count(_, _) => {
-                unreachable!("Count {self:?} should not be counted")
+            Self::Count(_, _) | Self::Greek(_) => {
+                unreachable!("Count or greek letter `{self:?}` should not be counted")
             }
         }
     }

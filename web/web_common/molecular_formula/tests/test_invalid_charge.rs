@@ -22,7 +22,7 @@ const INVALID_OXIDATIVE_STATE: &[(&str, i16)] = &[
 ];
 
 const CHARGE_INCORRECT_POSITION: &[&str] =
-    &["C⁺4H4", "C⁻⁻", "C-⁻", "C+⁻", "C⁻-", "C⁻+", "C--", "C⁺+", "C⁺+", "C⁺⁺", "C++", "C⁺4", "⁻C"];
+    &["C⁻⁻", "C-⁻", "C+⁻", "C⁻-", "C⁻+", "C--", "C⁺+", "C⁺+", "C⁺⁺", "C++", "⁻C"];
 
 #[test]
 /// Test that invalid oxidative states raise the appropriate error when

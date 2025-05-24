@@ -213,6 +213,16 @@ impl super::MostAbundantIsotope for DysprosiumIsotope {
         Self::Dy164
     }
 }
+impl From<DysprosiumIsotope> for crate::Isotope {
+    fn from(isotope: DysprosiumIsotope) -> Self {
+        crate::Isotope::Dy(isotope)
+    }
+}
+impl From<DysprosiumIsotope> for crate::Element {
+    fn from(_isotope: DysprosiumIsotope) -> Self {
+        crate::Element::Dy
+    }
+}
 impl TryFrom<u16> for DysprosiumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

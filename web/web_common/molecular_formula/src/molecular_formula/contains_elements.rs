@@ -6,7 +6,7 @@ impl super::MolecularFormula {
     pub fn contains_elements(&self) -> bool {
         match self {
             Self::Element(_) => true,
-            Self::Isotope(_) | Self::Residual => false,
+            Self::Isotope(_) | Self::Residual | Self::Greek(_) => false,
             Self::Ion(ion) => ion.entry.contains_elements(),
             Self::Mixture(formulas) | Self::Sequence(formulas) => {
                 formulas.iter().any(Self::contains_elements)

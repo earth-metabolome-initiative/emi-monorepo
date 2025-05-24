@@ -31,6 +31,7 @@ impl super::MolecularFormula {
                     }
                 }
             }
+            Self::Greek(_) => {}
             Self::Count(formula, count) => {
                 let formula_oxidation_states = formula.oxidation_states()?;
                 for _ in 0..*count {
@@ -90,6 +91,7 @@ impl super::MolecularFormula {
                     self.oxidation_states()?.contains(&oxidation_state)
                 })
             }
+            Self::Greek(_) => Ok(true),
             Self::Ion(ion) => Ok(ion.charge == oxidation_state),
             Self::Mixture(formulas) | Self::Sequence(formulas) => {
                 Ok(

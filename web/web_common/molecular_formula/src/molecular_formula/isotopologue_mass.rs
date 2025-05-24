@@ -33,6 +33,7 @@ impl MolecularFormula {
             MolecularFormula::RepeatingUnit(formula) | MolecularFormula::Complex(formula) => {
                 formula.isotopologue_mass_with_charge()
             }
+            MolecularFormula::Greek(_) => Ok(0.0),
             MolecularFormula::Residual => Err(crate::errors::Error::InvalidOperationForResidual),
         }
     }
@@ -59,6 +60,7 @@ impl MolecularFormula {
             MolecularFormula::RepeatingUnit(formula) | MolecularFormula::Complex(formula) => {
                 formula.isotopologue_mass_without_charge()
             }
+            MolecularFormula::Greek(_) => Ok(0.0),
             MolecularFormula::Residual => Err(crate::errors::Error::InvalidOperationForResidual),
         }
     }

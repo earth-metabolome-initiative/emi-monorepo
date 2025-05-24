@@ -45,6 +45,7 @@ impl crate::MolecularFormula {
                 }
                 total_number_of_elements
             }
+            Self::Greek(_) => 0,
             Self::Residual => {
                 return Err(crate::errors::Error::InvalidOperationForResidual);
             }
@@ -96,6 +97,7 @@ impl crate::MolecularFormula {
                     unreachable!()
                 }
             }
+            Self::Greek(_) => {}
             Self::Ion(ion) => ion.entry.inner_diatomic(left, right),
             Self::Complex(formula) | Self::RepeatingUnit(formula) => {
                 formula.inner_diatomic(left, right);
@@ -198,6 +200,9 @@ impl crate::MolecularFormula {
                         unreachable!()
                     }
                 }
+            }
+            Self::Greek(_) => {
+                // Greek letters do not have valence electrons.
             }
             Self::Residual | Self::Mixture(_) => {
                 unreachable!()

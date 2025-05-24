@@ -2,8 +2,6 @@
 
 use std::iter::Peekable;
 
-use elements::Isotope;
-
 use crate::{Ion, MolecularFormula, token::Token};
 
 mod token_iter;
@@ -31,65 +29,33 @@ impl Parser<'_> {
             (Token::Radical, _) => {
                 unimplemented!("Radical not implemented yet");
             }
-            (Token::Number(_) | Token::Superscript(_), Some(MolecularFormula::Ion(_))) => {
-                return Err(crate::errors::Error::InvalidChargePosition);
-            }
-            (Token::Residual | Token::Element(_), previous) => {
+            (Token::Residual | Token::Element(_) | Token::Isotope(_), previous) => {
                 Some(match previous {
                     Some(previous) => previous.chain(token.try_into().unwrap()),
                     None => token.try_into().unwrap(),
                 })
             }
-            (Token::Superscript(number), something) => {
-                // We peak the next token and ensure it is an element.
-                let Some(next) = self.tokens_iter.next().transpose()? else {
-                    return Err(crate::errors::Error::InvalidSuperscriptPosition);
-                };
-                let formula = match next {
-                    Token::Element(element) => {
-                        let isotope = Isotope::try_from((element, number))?;
-                        if let Some(formula) = something {
-                            formula.chain(isotope.into())
-                        } else {
-                            MolecularFormula::Isotope(isotope)
-                        }
+            (Token::Greek(greek_letter), None) => {
+                let (parser, inner_formula, closing_token) = self.inner_parse()?;
+                if closing_token.is_some() {
+                    return Err(crate::errors::Error::ClosingToken {
+                        expected: None,
+                        found: closing_token,
+                    });
+                }
+                self = parser;
+                match inner_formula {
+                    MolecularFormula::Sequence(mut sequence) => {
+                        sequence.insert(0, MolecularFormula::Greek(greek_letter));
+                        Some(MolecularFormula::Sequence(sequence))
                     }
-                    Token::SuperscriptMinus | Token::SuperscriptPlus => {
-                        if let Some(
-                            Token::SuperscriptMinus
-                            | Token::SuperscriptPlus
-                            | Token::Minus
-                            | Token::Plus,
-                        ) = self.tokens_iter.peek().copied().transpose()?
-                        {
-                            return Err(crate::errors::Error::InvalidChargePosition);
-                        }
-
-                        match something {
-                            Some(formula) => {
-                                // We need to check whether the next token is a number or not. If
-                                // it is, we create a new `Ion` with the element and the number,
-                                // otherwise we create a new `Ion` with the element and charge 1.
-                                let mut charge: i16 = i16::try_from(number)
-                                    .map_err(|_| crate::errors::Error::InvalidNumber)?;
-
-                                if next == Token::SuperscriptMinus {
-                                    charge *= -1;
-                                }
-
-                                Ion::from_formula(formula, charge)?.into()
-                            }
-                            None => return Err(crate::errors::Error::InvalidSuperscriptPosition),
-                        }
-                    }
-                    _ => {
-                        return Err(crate::errors::Error::InvalidSuperscriptPosition);
-                    }
-                };
-                Some(formula)
+                    other => Some(MolecularFormula::Greek(greek_letter).chain(other)),
+                }
             }
-
-            (Token::Number(count), None) => {
+            (Token::Greek(greek_letter), Some(_)) => {
+                return Err(crate::errors::Error::InvalidGreekLetterPosition(greek_letter));
+            }
+            (Token::Count(count), None) => {
                 let (parser, inner_formula, closing_token) = self.inner_parse()?;
                 if closing_token.is_some() {
                     return Err(crate::errors::Error::ClosingToken {
@@ -111,46 +77,13 @@ impl Parser<'_> {
                     _ => inner_formula.add_count_to_first_subformula(count).ok(),
                 }
             }
-            (Token::SuperscriptPlus | Token::SuperscriptMinus, Some(formula)) => {
-                // We need to check whether the next token is a number or not. If
-                // it is, we create a new `Ion` with the element and the number,
-                // otherwise we create a new `Ion` with the element and charge 1.
-                let mut charge: i16 = match self.tokens_iter.peek().copied().transpose()? {
-                    Some(Token::Superscript(charge)) => {
-                        self.tokens_iter.next();
-                        i16::try_from(charge).map_err(|_| crate::errors::Error::InvalidNumber)?
-                    }
-                    Some(token) if token.is_charge() => {
-                        return Err(crate::errors::Error::InvalidChargePosition);
-                    }
-                    _ => 1,
-                };
-
-                if token == Token::SuperscriptMinus {
-                    charge *= -1;
-                }
-
-                Some(Ion::from_formula(formula, charge)?.into())
+            (Token::Count(count), Some(formula)) => {
+                Some(formula.add_count_to_last_subformula(count)?)
             }
-            (Token::Plus | Token::Minus, Some(formula)) => {
-                // We need to check whether the next token is a number or not. If
-                // it is, we create a new `Ion` with the element and the number,
-                // otherwise we create a new `Ion` with the element and charge 1.
-                let mut charge: i16 = match self.tokens_iter.peek().copied().transpose()? {
-                    Some(Token::Number(charge)) => {
-                        self.tokens_iter.next();
-                        i16::try_from(charge).map_err(|_| crate::errors::Error::InvalidNumber)?
-                    }
-                    Some(token) if token.is_charge() => {
-                        return Err(crate::errors::Error::InvalidChargePosition);
-                    }
-                    _ => 1,
-                };
-
-                if token == Token::Minus {
-                    charge *= -1;
-                }
-
+            (Token::Charge(_), Some(MolecularFormula::Ion(_)) | None) => {
+                return Err(crate::errors::Error::InvalidChargePosition);
+            }
+            (Token::Charge(charge), Some(formula)) => {
                 Some(Ion::from_formula(formula, charge)?.into())
             }
             (Token::Dot, Some(formula)) => {
@@ -194,27 +127,10 @@ impl Parser<'_> {
                 sequence[number_of_elements - 1] = new_formula.unwrap();
                 Some(MolecularFormula::Sequence(sequence))
             }
-            (Token::Number(count), Some(formula)) => {
-                Some(formula.add_count_to_last_subformula(count)?)
-            }
-            (Token::Subscript(count), Some(formula)) => {
-                Some(formula.add_count_to_last_subformula(count)?)
-            }
             (Token::CloseRoundBracket | Token::CloseSquareBracket, _) => {
                 unreachable!("This case should be handled in the `inner_parse` function")
             }
-            (
-                Token::Dot
-                | Token::Plus
-                | Token::Minus
-                | Token::SuperscriptMinus
-                | Token::Subscript(_)
-                | Token::SuperscriptPlus,
-                None,
-            ) => {
-                if token.is_charge() {
-                    return Err(crate::errors::Error::InvalidChargePosition);
-                }
+            (Token::Dot, None) => {
                 return Err(crate::errors::Error::InvalidLeadingToken(token));
             }
         };

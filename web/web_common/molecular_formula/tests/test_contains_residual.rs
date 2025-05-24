@@ -14,9 +14,10 @@ const FORMULAS_WITHOUT_RESIDUALS: &[&str] =
 /// Test to check that the `contains_residual` method works as expected
 fn test_residual_detection() {
     for formula in FORMULAS_WITH_RESIDUALS {
-        let formula = MolecularFormula::from_str(formula).unwrap();
+        let formula =
+            MolecularFormula::from_str(formula).expect(&format!("Failed to parse `{}`", formula));
         assert!(formula.contains_residual(), "Expected {} to contain a residual", formula);
-        assert!(formula.molar_mass().is_none(), "Expected {} to have no known molar mass", formula);
+        assert!(formula.molar_mass().is_err(), "Expected {} to have no known molar mass", formula);
     }
 
     for formula in FORMULAS_WITHOUT_RESIDUALS {

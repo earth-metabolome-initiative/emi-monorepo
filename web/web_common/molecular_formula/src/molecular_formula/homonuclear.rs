@@ -24,12 +24,18 @@ impl crate::MolecularFormula {
             Self::Complex(formula) | Self::RepeatingUnit(formula) => {
                 formula.inner_is_homonuclear(other)?
             }
-            Self::Mixture(_) => {
-                unreachable!("Mixture should not be passed to inner_is_homonuclear");
+            Self::Mixture(_) | Self::Greek(_) => {
+                unreachable!(
+                    "Mixture of greek letters should not be passed to inner_is_homonuclear"
+                );
             }
             Self::Sequence(formulas) => {
                 let mut homonuclear = true;
                 for formula in formulas {
+                    if matches!(formula, Self::Greek(_)) {
+                        continue;
+                    }
+
                     let (this_homonuclear, element) = formula.inner_is_homonuclear(other)?;
                     if other.is_none() {
                         other = Some(element);
@@ -80,6 +86,9 @@ impl crate::MolecularFormula {
                     homonuclear &= formula.is_homonuclear()?;
                 }
                 homonuclear
+            }
+            Self::Greek(_) => {
+                unreachable!("Illegal state: Formula cannot have as root a Greek letter");
             }
             Self::Residual => {
                 return Err(crate::errors::Error::InvalidOperationForResidual);

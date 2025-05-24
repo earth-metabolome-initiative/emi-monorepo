@@ -158,6 +158,16 @@ impl super::MostAbundantIsotope for CalciumIsotope {
         Self::Ca40
     }
 }
+impl From<CalciumIsotope> for crate::Isotope {
+    fn from(isotope: CalciumIsotope) -> Self {
+        crate::Isotope::Ca(isotope)
+    }
+}
+impl From<CalciumIsotope> for crate::Element {
+    fn from(_isotope: CalciumIsotope) -> Self {
+        crate::Element::Ca
+    }
+}
 impl TryFrom<u16> for CalciumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

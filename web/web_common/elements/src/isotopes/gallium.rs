@@ -193,6 +193,16 @@ impl super::MostAbundantIsotope for GalliumIsotope {
         Self::Ga69
     }
 }
+impl From<GalliumIsotope> for crate::Isotope {
+    fn from(isotope: GalliumIsotope) -> Self {
+        crate::Isotope::Ga(isotope)
+    }
+}
+impl From<GalliumIsotope> for crate::Element {
+    fn from(_isotope: GalliumIsotope) -> Self {
+        crate::Element::Ga
+    }
+}
 impl TryFrom<u16> for GalliumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

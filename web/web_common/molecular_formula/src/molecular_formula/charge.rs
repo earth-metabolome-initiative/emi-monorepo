@@ -10,7 +10,7 @@ impl MolecularFormula {
     pub fn charge(&self) -> Result<i16, crate::errors::Error> {
         Ok(match self {
             Self::Ion(ion) => ion.charge,
-            Self::Element(_) | Self::Isotope(_) => 0,
+            Self::Element(_) | Self::Isotope(_) | Self::Greek(_) => 0,
             Self::Count(formula, count) => {
                 formula.charge()?
                     * i16::try_from(*count).map_err(|_| crate::errors::Error::InvalidNumber)?

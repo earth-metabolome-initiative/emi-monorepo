@@ -213,6 +213,16 @@ impl super::MostAbundantIsotope for ThuliumIsotope {
         Self::Tm169
     }
 }
+impl From<ThuliumIsotope> for crate::Isotope {
+    fn from(isotope: ThuliumIsotope) -> Self {
+        crate::Isotope::Tm(isotope)
+    }
+}
+impl From<ThuliumIsotope> for crate::Element {
+    fn from(_isotope: ThuliumIsotope) -> Self {
+        crate::Element::Tm
+    }
+}
 impl TryFrom<u16> for ThuliumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

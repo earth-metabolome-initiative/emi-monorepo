@@ -26,22 +26,19 @@ impl TryFrom<Token> for crate::MolecularFormula {
     type Error = Infallible;
 
     fn try_from(token: Token) -> Result<Self, Self::Error> {
-        match token {
-            Token::Element(element) => Ok(crate::MolecularFormula::Element(element)),
-            Token::Residual => Ok(crate::MolecularFormula::Residual),
+        Ok(match token {
+            Token::Element(element) => element.into(),
+            Token::Isotope(isotope) => isotope.into(),
+            Token::Greek(greek_letter) => greek_letter.into(),
+            Token::Residual => crate::MolecularFormula::Residual,
             Token::CloseRoundBracket
             | Token::CloseSquareBracket
             | Token::Dot
-            | Token::Minus
-            | Token::Number(_)
             | Token::Radical
             | Token::OpenRoundBracket
-            | Token::OpenSquareBracket
-            | Token::Plus
-            | Token::Superscript(_)
-            | Token::Subscript(_)
-            | Token::SuperscriptMinus
-            | Token::SuperscriptPlus => unreachable!("Invalid token for MolecularFormula"),
-        }
+            | Token::Charge(_)
+            | Token::Count(_)
+            | Token::OpenSquareBracket => unreachable!("Invalid token for MolecularFormula"),
+        })
     }
 }

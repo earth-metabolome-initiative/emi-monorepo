@@ -52,6 +52,16 @@ impl super::MostAbundantIsotope for MoscoviumIsotope {
         Self::Mc291
     }
 }
+impl From<MoscoviumIsotope> for crate::Isotope {
+    fn from(isotope: MoscoviumIsotope) -> Self {
+        crate::Isotope::Mc(isotope)
+    }
+}
+impl From<MoscoviumIsotope> for crate::Element {
+    fn from(_isotope: MoscoviumIsotope) -> Self {
+        crate::Element::Mc
+    }
+}
 impl TryFrom<u16> for MoscoviumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

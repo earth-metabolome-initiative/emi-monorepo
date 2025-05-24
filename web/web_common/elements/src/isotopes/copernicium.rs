@@ -72,6 +72,16 @@ impl super::MostAbundantIsotope for CoperniciumIsotope {
         Self::Cn285
     }
 }
+impl From<CoperniciumIsotope> for crate::Isotope {
+    fn from(isotope: CoperniciumIsotope) -> Self {
+        crate::Isotope::Cn(isotope)
+    }
+}
+impl From<CoperniciumIsotope> for crate::Element {
+    fn from(_isotope: CoperniciumIsotope) -> Self {
+        crate::Element::Cn
+    }
+}
 impl TryFrom<u16> for CoperniciumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

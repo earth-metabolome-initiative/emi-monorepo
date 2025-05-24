@@ -36,12 +36,19 @@ impl crate::MolecularFormula {
                     (min, max * i16::try_from(*count).map_err(|_| Error::InvalidNumber)?)
                 }
             }
+            Self::Greek(_) => {
+                unreachable!("Greek formulas do not have a defined number of bonds")
+            }
             Self::Complex(formula) | Self::RepeatingUnit(formula) => formula.number_of_bonds()?,
             Self::Sequence(formulas) => {
                 let mut total_minimum_number_of_bonds = 0;
                 let mut total_maximum_number_of_bonds = 0;
 
                 for formula in formulas {
+                    if matches!(formula, Self::Greek(_)) {
+                        continue;
+                    }
+
                     let (min, max) = formula.number_of_bonds()?;
                     total_minimum_number_of_bonds += min;
                     total_maximum_number_of_bonds += max;

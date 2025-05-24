@@ -327,6 +327,18 @@ fn implement_isotope_enum(isotopes: &[IsotopeMetadata]) -> TokenStream {
             }
         }
 
+        impl From<#isotope_ident> for crate::Isotope {
+            fn from(isotope: #isotope_ident) -> Self {
+                crate::Isotope::#element_symbol_ident(isotope)
+            }
+        }
+
+        impl From<#isotope_ident> for crate::Element {
+            fn from(_isotope: #isotope_ident) -> Self {
+                crate::Element::#element_symbol_ident
+            }
+        }
+
         impl TryFrom<u16> for #isotope_ident {
             type Error = crate::errors::Error;
 

@@ -1,7 +1,9 @@
 //! Submodule providing a `Token` enumeration with the entries which may appear
 //! in a molecular formula.
 
-use elements::Element;
+use elements::{Element, Isotope};
+use greek_letters::GreekLetter;
+pub mod greek_letters;
 
 #[derive(Debug, PartialEq, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -9,12 +11,12 @@ use elements::Element;
 pub enum Token {
     /// An element
     Element(Element),
-    /// A number
-    Number(u16),
-    /// A superscript number, which may be an isotope
-    Superscript(u16),
+    /// An isotope
+    Isotope(Isotope),
+    /// A charge
+    Charge(i16),
     /// A subscript number, which may be a count
-    Subscript(u16),
+    Count(u16),
     /// A residual group
     Residual,
     /// A Radical
@@ -27,27 +29,13 @@ pub enum Token {
     OpenSquareBracket,
     /// A close square bracket
     CloseSquareBracket,
-    /// A plus sign
-    Plus,
-    /// A superscript plus sign
-    SuperscriptPlus,
-    /// A minus sign
-    Minus,
-    /// A superscript minus sign
-    SuperscriptMinus,
     /// A dot
     Dot,
+    /// A greek letter
+    Greek(GreekLetter),
 }
 
 impl Token {
-    /// Returns whether the token represents a charge.
-    pub fn is_charge(self) -> bool {
-        matches!(
-            self,
-            Token::SuperscriptPlus | Token::SuperscriptMinus | Token::Plus | Token::Minus
-        )
-    }
-
     /// Returns the associated closing token for the given opening token.
     ///
     /// # Panics
@@ -82,5 +70,17 @@ impl Token {
 impl From<Element> for Token {
     fn from(element: Element) -> Self {
         Token::Element(element)
+    }
+}
+
+impl From<Isotope> for Token {
+    fn from(isotope: Isotope) -> Self {
+        Token::Isotope(isotope)
+    }
+}
+
+impl From<GreekLetter> for Token {
+    fn from(greek_letter: GreekLetter) -> Self {
+        Token::Greek(greek_letter)
     }
 }

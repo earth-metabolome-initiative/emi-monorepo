@@ -52,6 +52,16 @@ impl super::MostAbundantIsotope for LivermoriumIsotope {
         Self::Lv293
     }
 }
+impl From<LivermoriumIsotope> for crate::Isotope {
+    fn from(isotope: LivermoriumIsotope) -> Self {
+        crate::Isotope::Lv(isotope)
+    }
+}
+impl From<LivermoriumIsotope> for crate::Element {
+    fn from(_isotope: LivermoriumIsotope) -> Self {
+        crate::Element::Lv
+    }
+}
 impl TryFrom<u16> for LivermoriumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

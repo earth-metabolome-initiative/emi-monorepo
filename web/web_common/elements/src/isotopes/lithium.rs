@@ -88,6 +88,16 @@ impl super::MostAbundantIsotope for LithiumIsotope {
         Self::Li7
     }
 }
+impl From<LithiumIsotope> for crate::Isotope {
+    fn from(isotope: LithiumIsotope) -> Self {
+        crate::Isotope::Li(isotope)
+    }
+}
+impl From<LithiumIsotope> for crate::Element {
+    fn from(_isotope: LithiumIsotope) -> Self {
+        crate::Element::Li
+    }
+}
 impl TryFrom<u16> for LithiumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

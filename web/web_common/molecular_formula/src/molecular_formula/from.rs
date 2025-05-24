@@ -4,7 +4,7 @@
 use elements::{Element, Isotope};
 
 use super::MolecularFormula;
-use crate::Ion;
+use crate::{Ion, token::greek_letters::GreekLetter};
 
 impl From<Element> for MolecularFormula {
     fn from(element: Element) -> Self {
@@ -21,6 +21,12 @@ impl From<Isotope> for MolecularFormula {
 impl From<Isotope> for Box<MolecularFormula> {
     fn from(isotope: Isotope) -> Self {
         MolecularFormula::Isotope(isotope).into()
+    }
+}
+
+impl From<GreekLetter> for MolecularFormula {
+    fn from(greek_letter: GreekLetter) -> Self {
+        MolecularFormula::Greek(greek_letter)
     }
 }
 
