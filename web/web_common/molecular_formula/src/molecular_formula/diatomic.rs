@@ -35,7 +35,7 @@ impl crate::MolecularFormula {
             Self::Element(_) | Self::Isotope(_) => 1,
             Self::Ion(ion) => ion.entry.number_of_elements()?,
             Self::Count(formula, count) => formula.number_of_elements()? * (*count as usize),
-            Self::Complex(formula) | Self::RepeatingUnit(formula) => {
+            Self::Complex(formula) | Self::RepeatingUnit(formula) | Self::Radical(formula, _) => {
                 formula.number_of_elements()?
             }
             Self::Mixture(formulas) | Self::Sequence(formulas) => {
@@ -99,7 +99,7 @@ impl crate::MolecularFormula {
             }
             Self::Greek(_) => {}
             Self::Ion(ion) => ion.entry.inner_diatomic(left, right),
-            Self::Complex(formula) | Self::RepeatingUnit(formula) => {
+            Self::Complex(formula) | Self::RepeatingUnit(formula) | Self::Radical(formula, _) => {
                 formula.inner_diatomic(left, right);
             }
             Self::Sequence(formulas) => {
@@ -189,7 +189,7 @@ impl crate::MolecularFormula {
                     unreachable!()
                 }
             }
-            Self::Complex(formula) | Self::RepeatingUnit(formula) => {
+            Self::Complex(formula) | Self::RepeatingUnit(formula) | Self::Radical(formula, _) => {
                 formula.inner_diatomic_valence_electrons(left, right);
             }
             Self::Sequence(formulas) => {

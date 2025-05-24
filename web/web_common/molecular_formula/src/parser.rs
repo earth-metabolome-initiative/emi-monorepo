@@ -2,7 +2,7 @@
 
 use std::iter::Peekable;
 
-use crate::{Ion, MolecularFormula, token::Token};
+use crate::{Ion, MolecularFormula, molecular_formula::Side, token::Token};
 
 mod token_iter;
 
@@ -21,14 +21,11 @@ impl<'a> From<&'a str> for Parser<'a> {
 impl Parser<'_> {
     #[allow(clippy::too_many_lines)]
     fn update_formula(
-        mut self,
+        &mut self,
         formula: Option<MolecularFormula>,
         token: Token,
-    ) -> Result<(Self, Option<MolecularFormula>), crate::errors::Error> {
+    ) -> Result<Option<MolecularFormula>, crate::errors::Error> {
         let new_formula = match (token, formula) {
-            (Token::Radical, _) => {
-                unimplemented!("Radical not implemented yet");
-            }
             (Token::Residual | Token::Element(_) | Token::Isotope(_), previous) => {
                 Some(match previous {
                     Some(previous) => previous.chain(token.try_into().unwrap()),
@@ -36,14 +33,13 @@ impl Parser<'_> {
                 })
             }
             (Token::Greek(greek_letter), None) => {
-                let (parser, inner_formula, closing_token) = self.inner_parse()?;
+                let (inner_formula, closing_token) = self.inner_parse()?;
                 if closing_token.is_some() {
                     return Err(crate::errors::Error::ClosingToken {
                         expected: None,
                         found: closing_token,
                     });
                 }
-                self = parser;
                 match inner_formula {
                     MolecularFormula::Sequence(mut sequence) => {
                         sequence.insert(0, MolecularFormula::Greek(greek_letter));
@@ -56,14 +52,13 @@ impl Parser<'_> {
                 return Err(crate::errors::Error::InvalidGreekLetterPosition(greek_letter));
             }
             (Token::Count(count), None) => {
-                let (parser, inner_formula, closing_token) = self.inner_parse()?;
+                let (inner_formula, closing_token) = self.inner_parse()?;
                 if closing_token.is_some() {
                     return Err(crate::errors::Error::ClosingToken {
                         expected: None,
                         found: closing_token,
                     });
                 }
-                self = parser;
                 match inner_formula {
                     MolecularFormula::Sequence(sequence) => {
                         Some(MolecularFormula::Count(
@@ -86,24 +81,35 @@ impl Parser<'_> {
             (Token::Charge(charge), Some(formula)) => {
                 Some(Ion::from_formula(formula, charge)?.into())
             }
-            (Token::Dot, Some(formula)) => {
-                let (parser, inner_formula, closing_token) = self.inner_parse()?;
+            (Token::Dot, formula) => {
+                let (inner_formula, closing_token) = match (formula.is_some(), self.inner_parse()) {
+                    (_, Ok(result)) => result,
+                    (true, Err(crate::errors::Error::EmptyFormula)) => {
+                        return Ok(Some(MolecularFormula::Radical(
+                            formula.unwrap().into(),
+                            Side::Right,
+                        )));
+                    }
+                    (_, Err(e)) => return Err(e),
+                };
                 if closing_token.is_some() {
                     return Err(crate::errors::Error::ClosingToken {
                         expected: None,
                         found: closing_token,
                     });
                 }
-                self = parser;
-                if let MolecularFormula::Mixture(mut mixture) = formula {
-                    mixture.push(inner_formula);
-                    Some(MolecularFormula::Mixture(mixture))
-                } else {
-                    Some(MolecularFormula::Mixture(vec![formula, inner_formula]))
-                }
+
+                Some(match formula {
+                    Some(MolecularFormula::Mixture(mut mixture)) => {
+                        mixture.push(inner_formula);
+                        MolecularFormula::Mixture(mixture)
+                    }
+                    Some(other) => MolecularFormula::Mixture(vec![other, inner_formula]),
+                    None => MolecularFormula::Radical(inner_formula.into(), Side::Left),
+                })
             }
             (Token::OpenRoundBracket | Token::OpenSquareBracket, outer_formula) => {
-                let (parser, inner_formula, closing_token) = self.inner_parse()?;
+                let (inner_formula, closing_token) = self.inner_parse()?;
                 let expected_closing_token = token.closing_token();
                 if closing_token != Some(expected_closing_token) {
                     return Err(crate::errors::Error::ClosingToken {
@@ -111,7 +117,6 @@ impl Parser<'_> {
                         found: closing_token,
                     });
                 }
-                self = parser;
                 let inner_formula = token.dispatch_wrapped_formula(inner_formula);
 
                 match outer_formula {
@@ -121,8 +126,7 @@ impl Parser<'_> {
             }
             (_, Some(MolecularFormula::Sequence(mut sequence))) => {
                 let last = sequence.last().unwrap().clone();
-                let (new_parser, new_formula) = self.update_formula(Some(last), token)?;
-                self = new_parser;
+                let new_formula = self.update_formula(Some(last), token)?;
                 let number_of_elements = sequence.len();
                 sequence[number_of_elements - 1] = new_formula.unwrap();
                 Some(MolecularFormula::Sequence(sequence))
@@ -130,45 +134,39 @@ impl Parser<'_> {
             (Token::CloseRoundBracket | Token::CloseSquareBracket, _) => {
                 unreachable!("This case should be handled in the `inner_parse` function")
             }
-            (Token::Dot, None) => {
-                return Err(crate::errors::Error::InvalidLeadingToken(token));
-            }
         };
 
-        Ok((self, new_formula))
+        Ok(new_formula)
     }
 
-    fn inner_parse(
-        mut self,
-    ) -> Result<(Self, MolecularFormula, Option<Token>), crate::errors::Error> {
+    fn inner_parse(&mut self) -> Result<(MolecularFormula, Option<Token>), crate::errors::Error> {
         let mut formula = None;
         while let Some(token) = self.tokens_iter.next().transpose()? {
             if matches!(token, Token::CloseRoundBracket | Token::CloseSquareBracket) {
                 return if let Some(formula) = formula {
-                    Ok((self, formula, Some(token)))
+                    Ok((formula, Some(token)))
                 } else {
                     Err(crate::errors::Error::EmptyFormula)
                 };
             }
 
-            let (new_parser, new_formula) = self.update_formula(formula, token)?;
-            self = new_parser;
+            let new_formula = self.update_formula(formula, token)?;
             formula = new_formula;
         }
 
         if let Some(formula) = formula {
-            Ok((self, formula, None))
+            Ok((formula, None))
         } else {
             Err(crate::errors::Error::EmptyFormula)
         }
     }
 
-    pub(crate) fn parse(self) -> Result<MolecularFormula, crate::errors::Error> {
-        let (mut parser, formula, token) = self.inner_parse()?;
+    pub(crate) fn parse(mut self) -> Result<MolecularFormula, crate::errors::Error> {
+        let (formula, token) = self.inner_parse()?;
         if token.is_some() {
             return Err(crate::errors::Error::ClosingToken { expected: None, found: token });
         }
-        if parser.tokens_iter.peek().is_some() {
+        if self.tokens_iter.peek().is_some() {
             return Err(crate::errors::Error::UnconsumedParser);
         }
         Ok(formula)

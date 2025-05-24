@@ -23,6 +23,7 @@ numeric_common_traits.workspace = true
 [dev-dependencies]
 strum.workspace = true
 criterion.workspace = true
+csv.workspace = true
 
 [features]
 default = ["serde"]

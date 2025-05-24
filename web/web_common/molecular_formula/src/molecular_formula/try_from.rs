@@ -22,6 +22,15 @@ impl TryFrom<String> for crate::MolecularFormula {
     }
 }
 
+impl TryFrom<&String> for crate::MolecularFormula {
+    type Error = crate::errors::Error;
+
+    #[inline]
+    fn try_from(s: &String) -> Result<Self, Self::Error> {
+        <crate::MolecularFormula as std::str::FromStr>::from_str(s)
+    }
+}
+
 impl TryFrom<Token> for crate::MolecularFormula {
     type Error = Infallible;
 
@@ -34,7 +43,6 @@ impl TryFrom<Token> for crate::MolecularFormula {
             Token::CloseRoundBracket
             | Token::CloseSquareBracket
             | Token::Dot
-            | Token::Radical
             | Token::OpenRoundBracket
             | Token::Charge(_)
             | Token::Count(_)

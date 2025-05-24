@@ -36,6 +36,7 @@ impl super::MolecularFormula {
             Self::Count(formula, _) | Self::RepeatingUnit(formula) | Self::Complex(formula) => {
                 formula.contains_isotope()
             }
+            Self::Radical(formula, _) => formula.contains_isotope(),
         }
     }
 }

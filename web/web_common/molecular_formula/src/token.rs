@@ -19,8 +19,6 @@ pub enum Token {
     Count(u16),
     /// A residual group
     Residual,
-    /// A Radical
-    Radical,
     /// An open round bracket
     OpenRoundBracket,
     /// A close round bracket

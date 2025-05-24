@@ -10,4 +10,5 @@ mod token;
 pub use ion::Ion;
 pub use molecular_formula::MolecularFormula;
 pub use token::greek_letters::GreekLetter;
+pub use token::Token;
 pub mod errors;

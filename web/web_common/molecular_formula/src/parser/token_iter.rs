@@ -135,6 +135,10 @@ fn is_any_minus(c: char) -> bool {
     is_superscript_minus(c) || is_ascii_minus(c)
 }
 
+fn is_dot(c: char) -> bool {
+    c == '.' || c == '•' || c == '⋅' || c == '·'
+}
+
 impl TokenIter<'_> {
     fn consume_digit<T: From<u8> + ConstOne + CheckedMul + CheckedAdd>(
         &mut self,
@@ -237,14 +241,35 @@ impl TokenIter<'_> {
         None
     }
 
+    /// Peaks the next character in the iterator and consumes it if it is a
+    /// dot.
+    fn consume_dot(&mut self) -> Option<Token> {
+        if let Some(&next) = self.chars.peek() {
+            if is_dot(next) {
+                self.chars.next();
+                return Some(Token::Dot);
+            }
+        }
+        None
+    }
+
     fn parse_token(&mut self, current_char: char) -> Result<Token, crate::errors::Error> {
         Ok(match current_char {
             '(' => crate::token::Token::OpenRoundBracket,
             ')' => crate::token::Token::CloseRoundBracket,
             '[' => crate::token::Token::OpenSquareBracket,
             ']' => crate::token::Token::CloseSquareBracket,
-            '.' => crate::token::Token::Dot,
-            '•' | '⋅' => crate::token::Token::Radical,
+            maybe_dot if is_dot(maybe_dot) => {
+                // We peak that the next character is not a dot, or we
+                // raise a `InvalidRepeatedToken` error.
+                if self.consume_dot().is_some() {
+                    return Err(crate::errors::Error::InvalidRepeatedToken(
+                        crate::token::Token::Dot,
+                    ));
+                }
+
+                crate::token::Token::Dot
+            }
             c if GreekLetter::is_greek_letter(c) => {
                 // We peak whether the next character is a 'Token::Minus',
                 // which is necessary to determine whether the greek letter is

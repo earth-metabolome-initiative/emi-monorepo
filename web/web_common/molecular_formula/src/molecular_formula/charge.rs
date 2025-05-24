@@ -22,6 +22,9 @@ impl MolecularFormula {
                 }
                 charge
             }
+            Self::Radical(formula, _) => {
+                formula.charge()?
+            }
             Self::RepeatingUnit(formula) | Self::Complex(formula) => formula.charge()?,
             Self::Residual => return Err(crate::errors::Error::InvalidOperationForResidual),
         })

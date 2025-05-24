@@ -14,27 +14,27 @@ impl MolecularFormula {
     /// * If the `MolecularFormula` contains Residual.
     pub fn isotopologue_mass_with_charge(&self) -> Result<f64, crate::errors::Error> {
         match self {
-            MolecularFormula::Element(element) => Ok(element.relative_atomic_mass()),
-            MolecularFormula::Isotope(isotope) => Ok(isotope.relative_atomic_mass()),
-            MolecularFormula::Ion(ion) => {
+            Self::Element(element) => Ok(element.relative_atomic_mass()),
+            Self::Isotope(isotope) => Ok(isotope.relative_atomic_mass()),
+            Self::Ion(ion) => {
                 ion.entry.isotopologue_mass_with_charge().map(|isotopologue_mass_with_charge| {
                     isotopologue_mass_with_charge
                         - f64::from(ion.charge) * crate::ion::ELECTRON_MASS
                 })
             }
-            MolecularFormula::Count(formula, count) => {
+            Self::Count(formula, count) => {
                 formula.isotopologue_mass_with_charge().map(|isotopologue_mass_with_charge| {
                     isotopologue_mass_with_charge * f64::from(*count)
                 })
             }
-            MolecularFormula::Mixture(formulas) | MolecularFormula::Sequence(formulas) => {
-                formulas.iter().map(MolecularFormula::isotopologue_mass_with_charge).sum()
+            Self::Mixture(formulas) | Self::Sequence(formulas) => {
+                formulas.iter().map(Self::isotopologue_mass_with_charge).sum()
             }
-            MolecularFormula::RepeatingUnit(formula) | MolecularFormula::Complex(formula) => {
+            Self::RepeatingUnit(formula) | Self::Complex(formula) | Self::Radical(formula, _) => {
                 formula.isotopologue_mass_with_charge()
             }
-            MolecularFormula::Greek(_) => Ok(0.0),
-            MolecularFormula::Residual => Err(crate::errors::Error::InvalidOperationForResidual),
+            Self::Greek(_) => Ok(0.0),
+            Self::Residual => Err(crate::errors::Error::InvalidOperationForResidual),
         }
     }
 
@@ -46,22 +46,22 @@ impl MolecularFormula {
     /// * If the `MolecularFormula` contains Residual.
     pub fn isotopologue_mass_without_charge(&self) -> Result<f64, crate::errors::Error> {
         match self {
-            MolecularFormula::Element(element) => Ok(element.relative_atomic_mass()),
-            MolecularFormula::Isotope(isotope) => Ok(isotope.relative_atomic_mass()),
-            MolecularFormula::Ion(ion) => ion.entry.isotopologue_mass_without_charge(),
-            MolecularFormula::Count(formula, count) => {
+            Self::Element(element) => Ok(element.relative_atomic_mass()),
+            Self::Isotope(isotope) => Ok(isotope.relative_atomic_mass()),
+            Self::Ion(ion) => ion.entry.isotopologue_mass_without_charge(),
+            Self::Count(formula, count) => {
                 formula.isotopologue_mass_without_charge().map(|isotopologue_mass_without_charge| {
                     isotopologue_mass_without_charge * f64::from(*count)
                 })
             }
-            MolecularFormula::Mixture(formulas) | MolecularFormula::Sequence(formulas) => {
-                formulas.iter().map(MolecularFormula::isotopologue_mass_without_charge).sum()
+            Self::Mixture(formulas) | Self::Sequence(formulas) => {
+                formulas.iter().map(Self::isotopologue_mass_without_charge).sum()
             }
-            MolecularFormula::RepeatingUnit(formula) | MolecularFormula::Complex(formula) => {
+            Self::RepeatingUnit(formula) | Self::Complex(formula) | Self::Radical(formula, _) => {
                 formula.isotopologue_mass_without_charge()
             }
-            MolecularFormula::Greek(_) => Ok(0.0),
-            MolecularFormula::Residual => Err(crate::errors::Error::InvalidOperationForResidual),
+            Self::Greek(_) => Ok(0.0),
+            Self::Residual => Err(crate::errors::Error::InvalidOperationForResidual),
         }
     }
 }

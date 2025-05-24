@@ -21,7 +21,7 @@ impl crate::MolecularFormula {
             }
             Self::Ion(ion) => ion.entry.inner_is_homonuclear(other)?,
             Self::Count(formula, _) => formula.inner_is_homonuclear(other)?,
-            Self::Complex(formula) | Self::RepeatingUnit(formula) => {
+            Self::Complex(formula) | Self::RepeatingUnit(formula) | Self::Radical(formula, _) => {
                 formula.inner_is_homonuclear(other)?
             }
             Self::Mixture(_) | Self::Greek(_) => {
@@ -79,6 +79,7 @@ impl crate::MolecularFormula {
             | Self::Count(_, _)
             | Self::Complex(_)
             | Self::RepeatingUnit(_)
+            | Self::Radical(_, _)
             | Self::Sequence(_) => self.inner_is_homonuclear(None)?.0,
             Self::Mixture(formulas) => {
                 let mut homonuclear = true;

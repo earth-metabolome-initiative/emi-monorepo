@@ -14,6 +14,7 @@ impl super::MolecularFormula {
                 formula.contains_residual()
             }
             Self::Residual => true,
+            Self::Radical(formula, _) => formula.contains_residual(),
         }
     }
 }

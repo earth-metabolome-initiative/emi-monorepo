@@ -13,6 +13,7 @@ mod diatomic;
 mod display;
 mod from;
 mod from_str;
+mod serde;
 mod homonuclear;
 mod isotopologue_mass;
 mod isotopologue_mass_over_charge;
@@ -22,8 +23,16 @@ mod number_of_bonds;
 mod oxidation_states;
 mod try_from;
 
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+/// Represents the side in a molecular formula.
+pub enum Side {
+    /// The left side.
+    Left,
+    /// The right side.
+    Right,
+}
+
 #[cfg_attr(feature = "diesel_pgrx", derive(diesel_pgrx::DieselPGRX))]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(
     feature = "pgrx",
     derive(pgrx::PostgresType, pgrx::PostgresEq, pgrx::PostgresOrd, pgrx::PostgresHash)
@@ -40,6 +49,8 @@ pub enum MolecularFormula {
     Element(Element),
     /// An isotope (element with mass number)
     Isotope(Isotope),
+    /// A left-hand side radical.
+    Radical(Box<MolecularFormula>, Side),
     /// An ion (element or molecule with charge)
     Ion(Ion<Box<MolecularFormula>>),
     /// A mixture of molecules
@@ -83,6 +94,12 @@ impl MolecularFormula {
                 formulas.push(last);
                 Ok(Self::Sequence(formulas))
             }
+            Self::Radical(formula, side) => {
+                Ok(Self::Radical(
+                    Box::new(formula.add_count_to_last_subformula(count)?),
+                    side
+                ))
+            }
             Self::Mixture(mut formulas) => {
                 let last = formulas.pop().unwrap();
                 let last = last.add_count_to_last_subformula(count)?;
@@ -124,7 +141,7 @@ impl MolecularFormula {
             | Self::Complex(_)
             | Self::Residual
             | Self::RepeatingUnit(_) => Ok(Self::Count(self.into(), count)),
-            Self::Count(_, _) | Self::Greek(_) => {
+            Self::Count(_, _) | Self::Greek(_) | Self::Radical(_, _) => {
                 unreachable!("Count or greek letter `{self:?}` should not be counted")
             }
         }

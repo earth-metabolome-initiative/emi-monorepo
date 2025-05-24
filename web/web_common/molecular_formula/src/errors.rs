@@ -13,6 +13,8 @@ pub enum Error {
     Element(elements::errors::Error),
     /// Error indicating that a character in the formula is invalid.
     InvalidCharacter(char),
+    /// Invalid repeated token in the formula.
+    InvalidRepeatedToken(Token),
     /// Error indicating that a greek letter in the formula is at an
     /// invalid position.
     InvalidGreekLetterPosition(GreekLetter),
@@ -64,6 +66,9 @@ impl core::fmt::Display for Error {
         match self {
             Error::Element(e) => write!(f, "Element error: {e}"),
             Error::InvalidCharacter(c) => write!(f, "Invalid character: {c}"),
+            Error::InvalidRepeatedToken(token) => {
+                write!(f, "Invalid repeated token: {token:?}")
+            }
             Error::InvalidGreekLetterPosition(c) => {
                 write!(f, "Invalid greek letter position: {c}")
             }

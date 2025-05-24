@@ -5,7 +5,7 @@ use std::fmt::Display;
 use elements::{ElementVariant, MassNumber};
 use fmtastic::{Subscript, Superscript};
 
-use super::MolecularFormula;
+use super::{MolecularFormula, Side};
 
 impl Display for MolecularFormula {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -46,6 +46,12 @@ impl Display for MolecularFormula {
             }
             Self::Greek(greek) => {
                 write!(f, "{greek}-")
+            }
+            Self::Radical(formula, side) => {
+                match side {
+                    Side::Left => write!(f, "•{formula}"),
+                    Side::Right => write!(f, "{formula}•"),
+                }
             }
         }
     }

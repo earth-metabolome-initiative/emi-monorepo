@@ -12,6 +12,10 @@ impl super::MolecularFormula {
             Self::Count(formula, _) | Self::RepeatingUnit(formula) | Self::Complex(formula) => {
                 formula.contains_mixture()
             }
+            Self::Radical(formula, _) => {
+                debug_assert!(!formula.contains_mixture(), "Radical should not contain mixtures");
+                false
+            }
         }
     }
 }

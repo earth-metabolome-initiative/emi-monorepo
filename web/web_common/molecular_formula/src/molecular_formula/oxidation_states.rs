@@ -23,7 +23,7 @@ impl super::MolecularFormula {
             Self::Isotope(isotope) => {
                 oxidation_states.extend(isotope.element().oxidation_states().iter().copied());
             }
-            Self::Complex(formula) | Self::RepeatingUnit(formula) => {
+            Self::Complex(formula) | Self::RepeatingUnit(formula) | Self::Radical(formula, _) => {
                 let formula_oxidation_states = formula.oxidation_states()?;
                 for molecular_oxidation_state in oxidation_states.clone() {
                     for oxidation_state in &formula_oxidation_states {
@@ -81,7 +81,7 @@ impl super::MolecularFormula {
             Self::Isotope(isotope) => {
                 Ok(isotope.element().oxidation_states().contains(&oxidation_state))
             }
-            Self::Complex(formula) | Self::RepeatingUnit(formula) => {
+            Self::Complex(formula) | Self::RepeatingUnit(formula) | Self::Radical(formula, _) => {
                 formula.is_valid_oxidation_state(oxidation_state)
             }
             Self::Count(formula, _) => {

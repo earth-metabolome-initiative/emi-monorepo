@@ -14,6 +14,7 @@ impl super::MolecularFormula {
             Self::Count(formula, _) | Self::RepeatingUnit(formula) | Self::Complex(formula) => {
                 formula.contains_elements()
             }
+            Self::Radical(formula, _) => formula.contains_elements(),
         }
     }
 }

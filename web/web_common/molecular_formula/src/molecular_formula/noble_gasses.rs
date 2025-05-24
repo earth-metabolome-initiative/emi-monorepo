@@ -16,7 +16,7 @@ impl crate::MolecularFormula {
             Self::Isotope(isotope) => isotope.is_noble_gas(),
             Self::Ion(ion) => ion.entry.is_noble_gas_compound()?,
             Self::Count(formula, _) => formula.is_noble_gas_compound()?,
-            Self::Complex(formula) | Self::RepeatingUnit(formula) => {
+            Self::Complex(formula) | Self::RepeatingUnit(formula) | Self::Radical(formula, _) => {
                 formula.is_noble_gas_compound()?
             }
             Self::Greek(_) => {
