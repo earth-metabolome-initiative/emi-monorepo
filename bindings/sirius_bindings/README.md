@@ -237,7 +237,7 @@ cargo doc --open
 
 Fuzzing is a technique for finding security vulnerabilities and bugs in software by providing random input to the code. It can be an effective way of uncovering issues that might not be discovered through other testing methods. In our library, we take fuzzing seriously, and we use the [cargo fuzz](https://github.com/rust-fuzz/cargo-fuzz) tool to ensure our code is robust and secure. cargo fuzz automates the process of generating and running randomized test inputs, and it can help identify obscure bugs that would be difficult to detect through traditional testing methods. We make sure that our fuzz targets are continuously updated and run against the latest versions of the library to ensure that any vulnerabilities or bugs are quickly identified and addressed.
 
-You can learn more about fuzzing [here](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/sirius_bindings/bindings/sirius/fuzz).
+You can learn more about fuzzing [here](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/bindings/sirius_bindings/fuzz).
 
 ## Citing Sirius
 

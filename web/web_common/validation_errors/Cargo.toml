@@ -7,6 +7,6 @@ edition = "2024"
 diesel.workspace = true
 instrument_categories.workspace = true
 serde.workspace = true
-cas_codes.workspace = true
-molecular_formulas.workspace = true
-media_types.workspace = true
+cas_codes = { workspace = true, features = ["serde"] }
+molecular_formulas = { workspace = true, features = ["serde"] }
+media_types = { workspace = true, features = ["serde"] }

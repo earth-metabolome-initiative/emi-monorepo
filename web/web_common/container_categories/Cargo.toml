@@ -11,7 +11,7 @@ name = "pgrx_embed_container_categories"
 path = "./src/bin/pgrx_embed.rs"
 
 [dependencies]
-serde = { workspace = true, features = ["derive"], optional = true }
+serde = { workspace = true, optional = true }
 pgrx = { workspace = true, optional = true }
 diesel = { workspace = true, optional = true }
 strum_macros.workspace = true
