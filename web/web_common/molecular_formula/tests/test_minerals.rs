@@ -5,6 +5,7 @@
 //! formula, which does not have any specific chemical meaning, but simply
 //! distinguishes the different variants of the same mineral.
 
+use elements::Element;
 use molecular_formula::{GreekLetter, MolecularFormula, errors::Error};
 
 #[test]
@@ -32,4 +33,24 @@ fn test_only_greek_letter() {
             "Expected error for formula `{formula}` with greek letter `{greek_letter}`"
         );
     }
+}
+
+#[test]
+fn test_goethite() {
+    let formula = "\u{03b1}-FeO(OH)";
+
+    assert_eq!(
+        MolecularFormula::try_from(formula)
+            .expect(&format!("Failed to parse formula `{}`", formula)),
+        MolecularFormula::Sequence(vec![
+            GreekLetter::Alpha.into(),
+            Element::Fe.into(),
+            Element::O.into(),
+            MolecularFormula::RepeatingUnit(
+                MolecularFormula::Sequence(vec![Element::O.into(), Element::H.into()]).into()
+            )
+        ]),
+        "Expected formula `{}` to be parsed correctly",
+        formula
+    );
 }
