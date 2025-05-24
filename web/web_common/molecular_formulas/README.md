@@ -6,6 +6,10 @@
 
 Crate proving a parser, structs and utilities for molecular formulas.
 
+## Future work
+
+- [ ] Add basic MOT-based (Molecular Orbital Theory) validation for simple molecular formulas.
+
 ## Compiling the PGRX extension
 
 After having cloned the repository, you can compile the PGRX extension in the `./extension` directory by running in this directory:

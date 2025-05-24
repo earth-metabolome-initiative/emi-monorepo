@@ -1,0 +1,6 @@
+comment = 'molecular_formulas:  Created by pgrx'
+default_version = '0.1.0'
+module_pathname = '$libdir/molecular_formulas'
+relocatable = false
+superuser = true
+trusted = false
