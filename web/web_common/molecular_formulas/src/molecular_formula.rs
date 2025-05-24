@@ -13,7 +13,6 @@ mod diatomic;
 mod display;
 mod from;
 mod from_str;
-mod serde;
 mod homonuclear;
 mod isotopologue_mass;
 mod isotopologue_mass_over_charge;
@@ -21,6 +20,7 @@ mod molar_mass;
 mod noble_gasses;
 mod number_of_bonds;
 mod oxidation_states;
+mod serde;
 mod try_from;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -95,10 +95,7 @@ impl MolecularFormula {
                 Ok(Self::Sequence(formulas))
             }
             Self::Radical(formula, side) => {
-                Ok(Self::Radical(
-                    Box::new(formula.add_count_to_last_subformula(count)?),
-                    side
-                ))
+                Ok(Self::Radical(Box::new(formula.add_count_to_last_subformula(count)?), side))
             }
             Self::Mixture(mut formulas) => {
                 let last = formulas.pop().unwrap();

@@ -21,7 +21,8 @@ pub fn test_element_oxidative_states() {
         for isotope in element.isotopes() {
             assert_eq!(isotope.element(), element);
             let molecular_formulas: MolecularFormula = isotope.into();
-            let molecular_formulas_oxidation_states = molecular_formulas.oxidation_states().unwrap();
+            let molecular_formulas_oxidation_states =
+                molecular_formulas.oxidation_states().unwrap();
             assert_eq!(element_oxidation_states, molecular_formulas_oxidation_states);
         }
     }

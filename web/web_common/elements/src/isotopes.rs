@@ -1,8 +1,8 @@
 //! Submodule providing the enumeration of `Isotopes` for each element.
 
 mod display;
-mod element_variant;
 mod element_isotopes;
+mod element_variant;
 mod isotopic_composition;
 mod mass_number;
 mod most_abundant_isotope;
