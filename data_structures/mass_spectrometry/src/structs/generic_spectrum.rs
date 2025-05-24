@@ -1,6 +1,6 @@
 //! A naively implemented generic spectrum struct.
 
-use algebra::prelude::Number;
+use numeric_common_traits::prelude::Number;
 use sorted_vec::prelude::SortedVec;
 
 use crate::traits::{Spectrum, SpectrumAlloc, SpectrumMut};

@@ -1,10 +1,11 @@
 //! Submodule providing an iterator over the indices of empty rows in a CSR
 //! matrix.
 
+use numeric_common_traits::prelude::{IntoUsize, One, Zero};
+
 use crate::{
     impls::ranged::SimpleRanged,
-    prelude::{One, Zero},
-    traits::{IntoUsize, Matrix2D, SizedRowsSparseMatrix2D},
+    traits::{Matrix2D, SizedRowsSparseMatrix2D},
 };
 
 /// Iterator over the indices of empty rows in a CSR matrix.

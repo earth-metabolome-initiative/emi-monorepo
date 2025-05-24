@@ -3,10 +3,12 @@
 //! values by using the `Map` generic made available in the `PaddedMatrix2D`
 //! struct.
 
+use numeric_common_traits::prelude::{IntoUsize, TryFromUsize};
+
 use super::PaddedMatrix2D;
 use crate::{
     impls::ranged::SimpleRanged,
-    traits::{IntoUsize, Matrix2D, SparseValuedMatrix2D, TryFromUsize, ValuedMatrix},
+    traits::{Matrix2D, SparseValuedMatrix2D, ValuedMatrix},
 };
 
 /// A wrapper over the `SparseRowValues` from the `SparseValuedMatrix2D` trait,

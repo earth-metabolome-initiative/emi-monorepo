@@ -4,10 +4,10 @@
 
 use std::fmt::Debug;
 
+use numeric_common_traits::prelude::{Bounded, IntoUsize};
+
 use super::MutabilityError;
-use crate::traits::{
-    Bounded, IntoUsize, Matrix2D, SparseMatrix2D, SparseValuedMatrix2D, ValuedMatrix,
-};
+use crate::traits::{Matrix2D, SparseMatrix2D, SparseValuedMatrix2D, ValuedMatrix};
 
 mod imputed_row_values;
 mod matrix;

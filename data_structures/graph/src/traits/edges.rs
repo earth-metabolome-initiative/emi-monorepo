@@ -2,9 +2,10 @@
 //! or a ragged list or a compressed sparse row matrix.
 
 use algebra::prelude::{
-    IntoUsize, MatrixMut, PositiveInteger, SizedRowsSparseMatrix2D, SizedSparseMatrix,
-    SparseMatrix, SparseMatrix2D, SparseMatrixMut, TryFromUsize, Zero,
+    MatrixMut, SizedRowsSparseMatrix2D, SizedSparseMatrix, SparseMatrix, SparseMatrix2D,
+    SparseMatrixMut,
 };
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize, Zero};
 
 use super::Edge;
 

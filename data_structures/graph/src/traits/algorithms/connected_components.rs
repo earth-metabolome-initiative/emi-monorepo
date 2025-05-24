@@ -1,6 +1,7 @@
 //! Submodule providing the `ConnectedComponents` trait and its primary methods.
 
 use algebra::prelude::*;
+use numeric_common_traits::prelude::{IntoUsize, One, PositiveInteger, Zero};
 
 use crate::traits::{MonopartiteGraph, UndirectedMonopartiteMonoplexGraph};
 

@@ -1,7 +1,7 @@
 //! Submodule defining the properties of a positive integer.
 
 /// Trait defining a positive integer.
-pub trait PositiveInteger: super::Integer {}
+pub trait PositiveInteger: super::integer::Integer {}
 
 impl PositiveInteger for u8 {}
 impl PositiveInteger for u16 {}

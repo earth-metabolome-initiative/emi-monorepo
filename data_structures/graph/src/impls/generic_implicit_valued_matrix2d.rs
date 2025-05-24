@@ -2,9 +2,9 @@
 //! [`GenericImplicitValuedMatrix2D`](algebra::prelude::GenericImplicitValuedMatrix2D).
 
 use algebra::prelude::{
-    GenericImplicitValuedMatrix2D, Matrix2D, Matrix2DRef, Number, SizedSparseMatrix,
-    SizedSparseMatrix2D, TryFromUsize, Zero,
+    GenericImplicitValuedMatrix2D, Matrix2D, Matrix2DRef, SizedSparseMatrix, SizedSparseMatrix2D,
 };
+use numeric_common_traits::prelude::{Number, TryFromUsize, Zero};
 
 use crate::traits::{BidirectionalVocabulary, BipartiteGraph, Edges, Graph, MonoplexGraph};
 

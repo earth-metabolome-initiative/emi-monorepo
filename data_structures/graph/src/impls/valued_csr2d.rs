@@ -2,6 +2,7 @@
 //! [`ValuedCSR2D`](algebra::prelude::ValuedCSR2D).
 
 use algebra::prelude::*;
+use numeric_common_traits::prelude::{IntoUsize, Number, PositiveInteger, TryFromUsize};
 
 use crate::{errors::builder::edges::EdgesBuilderError, prelude::*};
 

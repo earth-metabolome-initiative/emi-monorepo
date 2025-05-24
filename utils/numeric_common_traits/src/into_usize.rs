@@ -2,7 +2,7 @@
 //! always fit into `usize` without loss of information, with the appropriate
 //! compilation flags.
 
-use super::Integer;
+use super::prelude::Integer;
 
 /// Trait defining the conversion into `usize`.
 pub trait IntoUsize: Integer {

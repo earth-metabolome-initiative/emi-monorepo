@@ -2,9 +2,10 @@
 
 use algebra::{
     impls::{GenericImplicitValuedMatrix2D, RangedCSR2D, ranged::SimpleRanged},
-    prelude::{Number, One, Pow, SparseLAPJV, SparseMatrix, Sqrt, Ten, Two, Zero},
+    prelude::{SparseLAPJV, SparseMatrix},
 };
 use functional_properties::prelude::ScalarSimilarity;
+use numeric_common_traits::prelude::{Number, One, Pow, Sqrt, Ten, Two, Zero};
 
 use crate::traits::{ScalarSpectralSimilarity, Spectrum};
 

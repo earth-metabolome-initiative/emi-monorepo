@@ -3,12 +3,14 @@
 
 use core::fmt::Debug;
 
+use numeric_common_traits::prelude::{IntoUsize, One, PositiveInteger, TryFromUsize, Zero};
+
 use super::{CSR2D, MutabilityError};
 use crate::traits::{
-    EmptyRows, IntoUsize, Matrix, Matrix2D, Matrix2DRef, MatrixMut, One, PositiveInteger,
-    RankSelectSparseMatrix, SizedRowsSparseMatrix2D, SizedSparseMatrix, SizedSparseMatrix2D,
-    SizedSparseValuedMatrix, SparseMatrix, SparseMatrix2D, SparseMatrixMut, SparseValuedMatrix,
-    SparseValuedMatrix2D, TryFromUsize, ValuedMatrix, ValuedMatrix2D, Zero,
+    EmptyRows, Matrix, Matrix2D, Matrix2DRef, MatrixMut, RankSelectSparseMatrix,
+    SizedRowsSparseMatrix2D, SizedSparseMatrix, SizedSparseMatrix2D, SizedSparseValuedMatrix,
+    SparseMatrix, SparseMatrix2D, SparseMatrixMut, SparseValuedMatrix, SparseValuedMatrix2D,
+    ValuedMatrix, ValuedMatrix2D,
 };
 
 #[cfg(feature = "arbitrary")]

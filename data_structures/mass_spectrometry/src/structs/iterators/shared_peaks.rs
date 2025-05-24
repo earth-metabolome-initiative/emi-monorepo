@@ -2,8 +2,8 @@
 
 use core::iter::Peekable;
 
-use algebra::prelude::*;
 use common_traits::prelude::{Builder, BuilderError};
+use numeric_common_traits::prelude::Zero;
 
 use crate::prelude::Spectrum;
 

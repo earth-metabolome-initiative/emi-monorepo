@@ -1,8 +1,8 @@
 //! Trait defining a number.
 
-use common_traits::prelude::Serde;
+use common_traits::prelude::{Serde, TotalOrd};
 
-use super::{Bounded, Finite, One, Ten, TotalOrd, Two, Zero};
+use super::prelude::{Bounded, Finite, One, Ten, Two, Zero};
 
 /// Trait defining a number.
 pub trait Number:

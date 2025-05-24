@@ -3,11 +3,12 @@
 //! will add new elements where missing. If the underlying matrix is
 //! rectangular, new rows and columns will be added to make it square.
 
-use crate::traits::{
-    Bounded, EmptyRows, IntoUsize, Matrix, Matrix2D, One, SparseMatrix, SparseMatrix2D,
-    SparseValuedMatrix, SparseValuedMatrix2D, TryFromUsize, ValuedMatrix, ValuedMatrix2D, Zero,
-};
+use numeric_common_traits::prelude::{Bounded, IntoUsize, One, TryFromUsize, Zero};
 
+use crate::traits::{
+    EmptyRows, Matrix, Matrix2D, SparseMatrix, SparseMatrix2D, SparseValuedMatrix,
+    SparseValuedMatrix2D, ValuedMatrix, ValuedMatrix2D,
+};
 mod sparse_row_with_padded_diagonal;
 use sparse_row_with_padded_diagonal::SparseRowWithPaddedDiagonal;
 mod sparse_rows_with_padded_diagonal;

@@ -1,7 +1,7 @@
 //! Submodule providing a `Range`-like struct with softer and stable
 //! constrainsts.
 
-use crate::traits::{IntoUsize, PositiveInteger};
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger};
 
 /// Error enumeration associated with the `Ranged` trait.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]

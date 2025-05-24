@@ -4,8 +4,9 @@ use core::fmt::Debug;
 
 use algebra::{
     impls::{MutabilityError, SymmetricCSR2D, UpperTriangularCSR2D},
-    prelude::{Matrix2D, SizedSparseMatrix2D, TryFromUsize},
+    prelude::{Matrix2D, SizedSparseMatrix2D},
 };
+use numeric_common_traits::prelude::TryFromUsize;
 
 use crate::traits::{Edges, EdgesBuilderOptions};
 

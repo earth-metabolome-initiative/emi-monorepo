@@ -1,6 +1,8 @@
 //! Submodule providing a definition of a CSR matrix.
 use core::{fmt::Debug, iter::repeat_n};
 
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize, Zero};
+
 use crate::prelude::*;
 
 #[derive(Clone)]

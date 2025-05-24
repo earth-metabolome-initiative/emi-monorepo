@@ -1,6 +1,7 @@
 //! Submodule implementing Edges-related traits for [`SquaredSquareCSR2D`].
 
 use algebra::prelude::*;
+use numeric_common_traits::prelude::TryFromUsize;
 
 use crate::{errors::builder::edges::EdgesBuilderError, prelude::*};
 

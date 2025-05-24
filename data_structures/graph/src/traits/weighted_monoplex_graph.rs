@@ -1,6 +1,7 @@
 //! Submodule providing the traits for a generic graph that has weighted edges.
 
-use algebra::prelude::{Number, SparseValuedMatrix, SparseValuedMatrix2D};
+use algebra::prelude::{SparseValuedMatrix, SparseValuedMatrix2D};
+use numeric_common_traits::prelude::Number;
 
 use super::{AttributedEdge, Edges, MonoplexGraph};
 

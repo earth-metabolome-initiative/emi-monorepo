@@ -1,8 +1,10 @@
 //! Submodule proving a 2D matrix with implicit values.
 
+use numeric_common_traits::prelude::IntoUsize;
+
 use crate::traits::{
     EmptyRows, ImplicitValuedMatrix, ImplicitValuedSparseMatrix, ImplicitValuedSparseRowIterator,
-    IntoUsize, Matrix, Matrix2D, Matrix2DRef, RankSelectSparseMatrix, SizedRowsSparseMatrix2D,
+    Matrix, Matrix2D, Matrix2DRef, RankSelectSparseMatrix, SizedRowsSparseMatrix2D,
     SizedSparseMatrix, SizedSparseMatrix2D, SizedSparseValuedMatrix, SparseMatrix, SparseMatrix2D,
     SparseValuedMatrix, SparseValuedMatrix2D, ValuedMatrix, ValuedMatrix2D,
 };

@@ -1,0 +1,10 @@
+[package]
+name = "numeric_common_traits"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+common_traits.workspace = true
+
+[lints]
+workspace = true

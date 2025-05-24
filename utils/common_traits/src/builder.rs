@@ -1,7 +1,5 @@
 //! Submodule defining a trait for what a `Builder` should be able to do.
 
-use crate::prelude::Basic;
-
 /// Trait defining what a `Builder` should be able to do.
 pub trait Builder: Default {
     /// The type of the object being built.
@@ -9,7 +7,7 @@ pub trait Builder: Default {
     /// The type of errors that can occur during building.
     type Error: core::error::Error + From<BuilderError<Self::Attribute>>;
     /// The enumeration of the attributes that can be set.
-    type Attribute: Basic;
+    type Attribute;
 
     /// Builds the object.
     ///

@@ -2,13 +2,11 @@
 //! sparse matrices, which provides the Tarjan's algorithm for strongly
 //! connected components.
 
+use numeric_common_traits::prelude::{IntoUsize, One, Zero};
+
 use crate::{
     impls::ranged::SimpleRanged,
-    traits::{
-        SparseMatrix2D, SquareMatrix,
-        constants::{One, Zero},
-        into_usize::IntoUsize,
-    },
+    traits::{SparseMatrix2D, SquareMatrix},
 };
 
 /// Iterator over the strongly connected components of a sparse matrix.

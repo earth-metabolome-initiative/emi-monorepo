@@ -1,7 +1,9 @@
 //! Submodule implementing the `Matrix` trait for the `PaddedMatrix` struct.
 
+use numeric_common_traits::prelude::{IntoUsize, TryFromUsize};
+
 use super::PaddedMatrix2D;
-use crate::traits::{IntoUsize, Matrix, Matrix2D, TryFromUsize};
+use crate::traits::{Matrix, Matrix2D};
 
 impl<M, Map> Matrix for PaddedMatrix2D<M, Map>
 where

@@ -1,10 +1,9 @@
 //! Trait defining a bidimensional matrix.
 
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, Zero};
+
 use super::SquareMatrix;
-use crate::{
-    impls::ranged::SimpleRanged,
-    traits::{IntoUsize, Matrix, PositiveInteger, Zero},
-};
+use crate::{impls::ranged::SimpleRanged, traits::Matrix};
 
 /// Trait defining a bidimensional matrix.
 pub trait Matrix2D:

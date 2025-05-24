@@ -3,12 +3,10 @@
 
 use core::error::Error;
 
-use common_traits::basic::Basic;
-
 use crate::prelude::Operation;
 
 /// Trait for operation errors.
-pub trait OperationError: Error + Basic {
+pub trait OperationError: Error {
     /// The operation associated to this error.
     type Operation: Operation<Error = Self>;
 

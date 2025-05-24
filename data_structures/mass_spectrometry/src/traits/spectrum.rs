@@ -1,6 +1,7 @@
 //! Submodule defining a single Spectrum collection trait.
 
 use algebra::{impls::ranged::SimpleRanged, prelude::*};
+use numeric_common_traits::prelude::Number;
 
 use crate::prelude::Annotation;
 

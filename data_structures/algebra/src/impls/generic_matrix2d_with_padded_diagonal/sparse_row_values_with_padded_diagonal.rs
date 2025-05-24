@@ -4,10 +4,9 @@
 //! in the sorted position where it is expected to be in the
 //! sparse row.
 
-use crate::{
-    impls::MutabilityError,
-    traits::{IntoUsize, SparseValuedMatrix2D, TryFromUsize},
-};
+use numeric_common_traits::prelude::{IntoUsize, TryFromUsize};
+
+use crate::{impls::MutabilityError, traits::SparseValuedMatrix2D};
 
 /// A wrapper iterator over the sparse row values which includes the diagonal
 /// if it is not already present in the underlying matrix. The diagonal

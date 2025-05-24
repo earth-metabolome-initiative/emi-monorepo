@@ -1,6 +1,8 @@
 //! Submodule providing a definition of a CSR matrix.
 use core::fmt::Debug;
 
+use numeric_common_traits::prelude::{IntoUsize, One, PositiveInteger, Zero};
+
 #[cfg(feature = "arbitrary")]
 mod arbitrary_impl;
 

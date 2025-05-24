@@ -2,7 +2,7 @@
 
 use core::ops::Index;
 
-use super::{IntoUsize, PositiveInteger, Zero};
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, Zero};
 
 /// Trait defining a vector.
 pub trait Vector: Index<<Self as Vector>::Index, Output = <Self as Vector>::Value> {

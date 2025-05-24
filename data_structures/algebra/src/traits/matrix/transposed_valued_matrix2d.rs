@@ -1,10 +1,11 @@
 //! Submodule providing the [`TransposedValuedMatrix2D`] trait.
 
+use common_traits::prelude::TotalOrd;
+
 use super::{
     BiMatrix2D, SizedSparseBiMatrix2D, SparseMatrix2D, SparseValuedMatrix2D, SymmetricMatrix2D,
     ValuedMatrix, ValuedMatrix2D,
 };
-use crate::traits::TotalOrd;
 
 /// Trait defining a sparse matrix which supports efficient operations on
 /// columns.

@@ -1,4 +1,6 @@
 //! Submodule providing a definition of a CSR matrix.
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
+
 use crate::prelude::*;
 
 #[derive(Clone)]

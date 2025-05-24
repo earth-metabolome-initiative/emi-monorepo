@@ -3,11 +3,9 @@
 
 use algebra::{
     impls::RaggedVector,
-    prelude::{
-        IntoUsize, Matrix2D, Matrix2DRef, PositiveInteger, SizedSparseMatrix, SparseMatrix,
-        SparseMatrixMut, TryFromUsize,
-    },
+    prelude::{Matrix2D, Matrix2DRef, SizedSparseMatrix, SparseMatrix, SparseMatrixMut},
 };
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use crate::{
     errors::builder::edges::EdgesBuilderError,

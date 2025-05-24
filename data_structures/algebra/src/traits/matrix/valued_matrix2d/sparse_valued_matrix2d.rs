@@ -2,10 +2,10 @@
 //!
 //! A sparse valued matrix is a matrix where not all the values are defined.
 
+use common_traits::prelude::TotalOrd;
+
 use super::ValuedMatrix2D;
-use crate::traits::{
-    ImplicitValuedMatrix, SparseMatrix2D, SparseValuedMatrix, TotalOrd, ValuedMatrix,
-};
+use crate::traits::{ImplicitValuedMatrix, SparseMatrix2D, SparseValuedMatrix, ValuedMatrix};
 
 /// Trait defining a bi-dimensional matrix.
 pub trait SparseValuedMatrix2D: SparseMatrix2D + ValuedMatrix2D + SparseValuedMatrix {

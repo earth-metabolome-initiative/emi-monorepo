@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 common_traits.workspace = true
+numeric_common_traits.workspace = true
 serde = { workspace = true, optional = true }
 arbitrary = { workspace = true, optional = true }
 iter_utils.workspace = true

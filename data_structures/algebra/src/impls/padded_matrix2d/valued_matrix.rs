@@ -1,12 +1,14 @@
 //! Submodule for the `PaddedMatrix2D` struct, implementing the `ValuedMatrix`
 //! trait and its related traits.
 
+use numeric_common_traits::prelude::{IntoUsize, TryFromUsize};
+
 use super::{PaddedMatrix2D, imputed_row_values::ImputedRowValues};
 use crate::{
     impls::M2DValues,
     traits::{
-        DenseMatrix, DenseMatrix2D, DenseValuedMatrix, DenseValuedMatrix2D, IntoUsize,
-        SparseValuedMatrix, SparseValuedMatrix2D, TryFromUsize, ValuedMatrix, ValuedMatrix2D,
+        DenseMatrix, DenseMatrix2D, DenseValuedMatrix, DenseValuedMatrix2D, SparseValuedMatrix,
+        SparseValuedMatrix2D, ValuedMatrix, ValuedMatrix2D,
     },
 };
 

@@ -1,6 +1,6 @@
 //! Submodule providing the implementation of implicit numeric vocabularies.
 
-use algebra::prelude::IntoUsize;
+use numeric_common_traits::prelude::IntoUsize;
 
 use crate::traits::{BidirectionalVocabulary, Vocabulary};
 

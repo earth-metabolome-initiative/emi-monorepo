@@ -1,6 +1,6 @@
 //! Submodule providing a naively implemented generic Monoparted Graph.
 
-use algebra::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use super::generic_monoplex_monopartite_graph_builder::MonoplexMonopartiteGraphBuilderError;
 use crate::traits::{BidirectionalVocabulary, Edges, Graph, MonopartiteGraph, MonoplexGraph};

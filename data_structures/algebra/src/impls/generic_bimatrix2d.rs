@@ -1,6 +1,8 @@
 //! [`GenericBiMatrix2D`] data structure, which provides a wrapper to a matrix
 //! and its transposed version.
 
+use numeric_common_traits::prelude::IntoUsize;
+
 use crate::prelude::*;
 
 /// [`GenericBiMatrix2D`] data structure, which provides a wrapper to a matrix

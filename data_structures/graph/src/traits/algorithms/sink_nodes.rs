@@ -2,7 +2,7 @@
 //! implementation, which provides a method to retrieve the sink nodes of the
 //! graph, which are the set of nodes with no successors.
 
-use algebra::prelude::IntoUsize;
+use numeric_common_traits::prelude::IntoUsize;
 
 use crate::traits::MonoplexMonopartiteGraph;
 /// Trait providing the `sink_nodes` method, which returns the sink nodes of the

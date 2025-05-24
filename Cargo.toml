@@ -55,6 +55,7 @@ members = [
   "web/web_common/elements",
   "utils/diesel_pgrx/example_extension",
   "web/web_common/molecular_formula",
+  "utils/numeric_common_traits",
 ]
 
 [workspace.dependencies]
@@ -150,9 +151,11 @@ rustfft = "6.2.0"
 lender = "0.3.2"
 sql_minifier = "0.1.5"
 blake3 = "1.8.2"
+num-traits = "0.2.19"
 phf = { version = "0.11.3", features = ["macros"] }
 api_path = { path = "web/web_common/api_path" }
 time_requirements = { path = "utils/time_requirements" }
+numeric_common_traits = { path = "utils/numeric_common_traits" }
 algebra = { path = "data_structures/algebra" }
 graph = { path = "data_structures/graph" }
 sorted_vec = { path = "data_structures/sorted_vec" }

@@ -2,7 +2,7 @@
 //! implementation, which provides a method to retrieve the root nodes of the
 //! graph, which are the set of nodes with no predecessors.
 
-use algebra::prelude::IntoUsize;
+use numeric_common_traits::prelude::IntoUsize;
 
 use crate::traits::MonoplexMonopartiteGraph;
 

@@ -8,6 +8,7 @@ algebra.workspace = true
 functional_properties.workspace = true
 common_traits.workspace = true
 sorted_vec.workspace = true
+numeric_common_traits.workspace = true
 
 [dev-dependencies]
 criterion.workspace = true

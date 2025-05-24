@@ -1,10 +1,10 @@
 //! Submodule providing the concrete implementation of the LAPJV algorithm.
 
+use common_traits::prelude::TotalOrd;
+use numeric_common_traits::prelude::{Bounded, Finite, IntoUsize, Number, TryFromUsize, Zero};
+
 use super::LAPJVError;
-use crate::traits::{
-    AssignmentState, Bounded, DenseValuedMatrix2D, Finite, IntoUsize, Number, TotalOrd,
-    TryFromUsize, Zero,
-};
+use crate::traits::{AssignmentState, DenseValuedMatrix2D};
 
 /// Support struct for computing the weighted assignment using the LAPJV
 /// algorithm.

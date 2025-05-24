@@ -1,6 +1,6 @@
 //! Submodule providing a naively implemented `GenericBiGraph`.
 
-use algebra::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use super::generic_monoplex_bipartite_graph_builder::MonoplexBipartiteGraphBuilderError;
 use crate::traits::{

@@ -5,10 +5,11 @@ mod inner;
 
 pub use errors::LAPJVError;
 use inner::Inner;
+use numeric_common_traits::prelude::{Finite, Number, TryFromUsize, Zero};
 
 use crate::{
     impls::PaddedMatrix2D,
-    traits::{DenseValuedMatrix2D, Finite, Number, SparseValuedMatrix2D, TryFromUsize, Zero},
+    traits::{DenseValuedMatrix2D, SparseValuedMatrix2D},
 };
 
 /// Trait defining the LAPJV algorithm for solving the Weighted Assignment

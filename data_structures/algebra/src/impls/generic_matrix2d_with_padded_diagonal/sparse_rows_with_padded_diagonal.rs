@@ -2,10 +2,9 @@
 //! for the [`GenericMatrix2DWithPaddedDiagonal`] struct, which automatically
 //! adds diagonal values when missing.
 
-use crate::{
-    impls::ranged::SimpleRanged,
-    traits::{IntoUsize, SparseMatrix2D, TryFromUsize},
-};
+use numeric_common_traits::prelude::{IntoUsize, TryFromUsize};
+
+use crate::{impls::ranged::SimpleRanged, traits::SparseMatrix2D};
 
 /// Iterator over the indices of the rows with values for the
 /// [`GenericMatrix2DWithPaddedDiagonal`] struct, which automatically adds

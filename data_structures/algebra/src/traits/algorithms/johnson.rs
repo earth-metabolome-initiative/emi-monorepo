@@ -3,10 +3,11 @@
 //! cycles in a sparse matrix.
 
 use lender::prelude::{Lender, Lending};
+use numeric_common_traits::prelude::{IntoUsize, One, Zero};
 
 use crate::{
     impls::{LowerBoundedSquareMatrix, SubsetSquareMatrix},
-    traits::{IntoUsize, One, SparseMatrix2D, SquareMatrix, Tarjan, Zero},
+    traits::{SparseMatrix2D, SquareMatrix, Tarjan},
 };
 
 #[allow(clippy::type_complexity)]

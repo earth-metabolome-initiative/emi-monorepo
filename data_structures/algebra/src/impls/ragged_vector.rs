@@ -2,14 +2,12 @@
 
 use std::{fmt::Debug, iter::repeat_n};
 
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize, Zero};
+
 use super::MutabilityError;
-use crate::{
-    prelude::Zero,
-    traits::{
-        EmptyRows, IntoUsize, Matrix, Matrix2D, Matrix2DRef, MatrixMut, PositiveInteger,
-        SizedRowsSparseMatrix2D, SizedSparseMatrix, SparseMatrix, SparseMatrix2D, SparseMatrixMut,
-        TransposableMatrix2D, TryFromUsize,
-    },
+use crate::traits::{
+    EmptyRows, Matrix, Matrix2D, Matrix2DRef, MatrixMut, SizedRowsSparseMatrix2D,
+    SizedSparseMatrix, SparseMatrix, SparseMatrix2D, SparseMatrixMut, TransposableMatrix2D,
 };
 
 #[derive(Clone)]

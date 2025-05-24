@@ -1,7 +1,7 @@
 //! Submodule defining illegal graph states that, if reached, indicate a bug in
 //! some implementation of the graph traits.
 
-use algebra::prelude::Bounded;
+use numeric_common_traits::prelude::Bounded;
 
 use crate::traits::MonopartiteGraph;
 

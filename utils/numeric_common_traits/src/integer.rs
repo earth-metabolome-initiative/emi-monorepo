@@ -1,10 +1,10 @@
 //! Submodule defining the Integer number trait.
 
-use super::SaturatingSub;
+use super::ops::SaturatingSub;
 
 /// Trait defining an integer number.
 pub trait Integer:
-    super::Number + Ord + Eq + core::hash::Hash + From<bool> + SaturatingSub<Output = Self>
+    super::number::Number + Ord + Eq + core::hash::Hash + From<bool> + SaturatingSub<Output = Self>
 {
 }
 
