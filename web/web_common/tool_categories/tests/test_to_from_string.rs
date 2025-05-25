@@ -1,8 +1,8 @@
 //! Test submodule to verify that the `to_string` and `from_str` methods
 //! work as expected for the enumeration.
 
-use tool_categories::ToolCategory;
 use strum::IntoEnumIterator;
+use tool_categories::ToolCategory;
 
 #[test]
 fn test_to_from_string() {
