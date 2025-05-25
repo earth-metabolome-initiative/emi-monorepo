@@ -276,7 +276,7 @@ pub const EAT_UCS_CBOR: &str = "eat-ucs+cbor";
 /// The `eat-ucs+json` subtype of the `application` media type.
 pub const EAT_UCS_JSON: &str = "eat-ucs+json";
 /// The `ecmascript` subtype of the `application` media type.
-#[deprecated(since = "0.1.0", note = "Use `media_types::text::JAVASCRIPT` instead")]
+#[deprecated(since = "0.1.0", note = "Use `media_types_builder::text::JAVASCRIPT` instead")]
 pub const ECMASCRIPT: &str = "ecmascript";
 /// The `edhoc+cbor-seq` subtype of the `application` media type.
 pub const EDHOC_CBOR_SEQ: &str = "edhoc+cbor-seq";
@@ -356,12 +356,12 @@ pub const FITS: &str = "fits";
 /// The `flexfec` subtype of the `application` media type.
 pub const FLEXFEC: &str = "flexfec";
 /// The `font-sfnt` subtype of the `application` media type.
-#[deprecated(since = "0.1.0", note = "Use `media_types::font::SFNT` instead")]
+#[deprecated(since = "0.1.0", note = "Use `media_types_builder::font::SFNT` instead")]
 pub const FONT_SFNT: &str = "font-sfnt";
 /// The `font-tdpfr` subtype of the `application` media type.
 pub const FONT_TDPFR: &str = "font-tdpfr";
 /// The `font-woff` subtype of the `application` media type.
-#[deprecated(since = "0.1.0", note = "Use `media_types::font::WOFF` instead")]
+#[deprecated(since = "0.1.0", note = "Use `media_types_builder::font::WOFF` instead")]
 pub const FONT_WOFF: &str = "font-woff";
 /// The `framework-attributes+xml` subtype of the `application` media type.
 pub const FRAMEWORK_ATTRIBUTES_XML: &str = "framework-attributes+xml";
@@ -438,7 +438,7 @@ pub const ITS_XML: &str = "its+xml";
 /// The `java-archive` subtype of the `application` media type.
 pub const JAVA_ARCHIVE: &str = "java-archive";
 /// The `javascript` subtype of the `application` media type.
-#[deprecated(since = "0.1.0", note = "Use `media_types::text::JAVASCRIPT` instead")]
+#[deprecated(since = "0.1.0", note = "Use `media_types_builder::text::JAVASCRIPT` instead")]
 pub const JAVASCRIPT: &str = "javascript";
 /// The `jf2feed+json` subtype of the `application` media type.
 pub const JF2FEED_JSON: &str = "jf2feed+json";
@@ -900,7 +900,7 @@ pub const SIPC: &str = "sipc";
 /// The `slate` subtype of the `application` media type.
 pub const SLATE: &str = "slate";
 /// The `smil` subtype of the `application` media type.
-#[deprecated(since = "0.1.0", note = "Use `media_types::application::SMIL_XML` instead")]
+#[deprecated(since = "0.1.0", note = "Use `media_types_builder::application::SMIL_XML` instead")]
 pub const SMIL: &str = "smil";
 /// The `smil+xml` subtype of the `application` media type.
 pub const SMIL_XML: &str = "smil+xml";
@@ -1137,7 +1137,7 @@ pub const VND_3GPP_MCVIDEO_AFFILIATION_COMMAND_XML: &str =
 /// media type.
 #[deprecated(
     since = "0.1.0",
-    note = "Use `media_types::application::VND_3GPP_MCVIDEO_INFO_XML` instead"
+    note = "Use `media_types_builder::application::VND_3GPP_MCVIDEO_INFO_XML` instead"
 )]
 pub const VND_3GPP_MCVIDEO_AFFILIATION_INFO_XML: &str = "vnd.3gpp.mcvideo-affiliation-info+xml";
 /// The `vnd.3gpp.mcvideo-info+xml` subtype of the `application` media type.
@@ -1374,7 +1374,7 @@ pub const VND_APPLE_PAGES: &str = "vnd.apple.pages";
 /// The `vnd.arastra.swi` subtype of the `application` media type.
 #[deprecated(
     since = "0.1.0",
-    note = "Use `media_types::application::VND_ARISTANETWORKS_SWI` instead"
+    note = "Use `media_types_builder::application::VND_ARISTANETWORKS_SWI` instead"
 )]
 pub const VND_ARASTRA_SWI: &str = "vnd.arastra.swi";
 /// The `vnd.aristanetworks.swi` subtype of the `application` media type.
@@ -1911,7 +1911,7 @@ pub const VND_GENTOO_XPAK: &str = "vnd.gentoo.xpak";
 /// The `vnd.gentoo.pkgmetadata+xml` subtype of the `application` media type.
 pub const VND_GENTOO_PKGMETADATA_XML: &str = "vnd.gentoo.pkgmetadata+xml";
 /// The `vnd.geo+json` subtype of the `application` media type.
-#[deprecated(since = "0.1.0", note = "Use `media_types::application::GEO_JSON` instead")]
+#[deprecated(since = "0.1.0", note = "Use `media_types_builder::application::GEO_JSON` instead")]
 pub const VND_GEO_JSON: &str = "vnd.geo+json";
 /// The `vnd.geocube+xml` subtype of the `application` media type.
 #[deprecated(since = "0.1.0", note = "This subtype is deprecated and should not be used.")]
@@ -2028,7 +2028,7 @@ pub const VND_HZN_3D_CROSSWORD: &str = "vnd.hzn-3d-crossword";
 /// The `vnd.ibm.afplinedata` subtype of the `application` media type.
 #[deprecated(
     since = "0.1.0",
-    note = "Use `media_types::application::VND_AFPC_AFPLINEDATA` instead"
+    note = "Use `media_types_builder::application::VND_AFPC_AFPLINEDATA` instead"
 )]
 pub const VND_IBM_AFPLINEDATA: &str = "vnd.ibm.afplinedata";
 /// The `vnd.ibm.electronic-media` subtype of the `application` media type.
@@ -2036,7 +2036,10 @@ pub const VND_IBM_ELECTRONIC_MEDIA: &str = "vnd.ibm.electronic-media";
 /// The `vnd.ibm.MiniPay` subtype of the `application` media type.
 pub const VND_IBM_MINIPAY: &str = "vnd.ibm.MiniPay";
 /// The `vnd.ibm.modcap` subtype of the `application` media type.
-#[deprecated(since = "0.1.0", note = "Use `media_types::application::VND_AFPC_MODCA` instead")]
+#[deprecated(
+    since = "0.1.0",
+    note = "Use `media_types_builder::application::VND_AFPC_MODCA` instead"
+)]
 pub const VND_IBM_MODCAP: &str = "vnd.ibm.modcap";
 /// The `vnd.ibm.rights-management` subtype of the `application` media type.
 pub const VND_IBM_RIGHTS_MANAGEMENT: &str = "vnd.ibm.rights-management";
@@ -2085,7 +2088,10 @@ pub const VND_INFOTECH_PROJECT: &str = "vnd.infotech.project";
 /// The `vnd.infotech.project+xml` subtype of the `application` media type.
 pub const VND_INFOTECH_PROJECT_XML: &str = "vnd.infotech.project+xml";
 /// The `vnd.informix-visionary` subtype of the `application` media type.
-#[deprecated(since = "0.1.0", note = "Use `media_types::application::VND_VISIONARY` instead")]
+#[deprecated(
+    since = "0.1.0",
+    note = "Use `media_types_builder::application::VND_VISIONARY` instead"
+)]
 pub const VND_INFORMIX_VISIONARY: &str = "vnd.informix-visionary";
 /// The `vnd.innopath.wamp.notification` subtype of the `application` media
 /// type.
@@ -2566,7 +2572,7 @@ pub const VND_OASIS_OPENDOCUMENT_CHART_TEMPLATE: &str = "vnd.oasis.opendocument.
 /// type.
 #[deprecated(
     since = "0.1.0",
-    note = "Use `media_types::application::VND_OASIS_OPENDOCUMENT_BASE` instead"
+    note = "Use `media_types_builder::application::VND_OASIS_OPENDOCUMENT_BASE` instead"
 )]
 pub const VND_OASIS_OPENDOCUMENT_DATABASE: &str = "vnd.oasis.opendocument.database";
 /// The `vnd.oasis.opendocument.formula` subtype of the `application` media
@@ -3573,7 +3579,7 @@ pub const VND_YAOWEME: &str = "vnd.yaoweme";
 /// The `vnd.yellowriver-custom-menu` subtype of the `application` media type.
 pub const VND_YELLOWRIVER_CUSTOM_MENU: &str = "vnd.yellowriver-custom-menu";
 /// The `vnd.youtube.yt` subtype of the `application` media type.
-#[deprecated(since = "0.1.0", note = "Use `media_types::video::VND_YOUTUBE_YT` instead")]
+#[deprecated(since = "0.1.0", note = "Use `media_types_builder::video::VND_YOUTUBE_YT` instead")]
 pub const VND_YOUTUBE_YT: &str = "vnd.youtube.yt";
 /// The `vnd.zul` subtype of the `application` media type.
 pub const VND_ZUL: &str = "vnd.zul";

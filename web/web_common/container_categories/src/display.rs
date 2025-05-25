@@ -3,7 +3,10 @@
 
 impl core::fmt::Display for crate::ContainerCategory {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        let name = self.name();
-        <str as core::fmt::Display>::fmt(name, f)
+        match self {
+            crate::ContainerCategory::Bottle => write!(f, "Bottle"),
+            crate::ContainerCategory::SampleContainerRack => write!(f, "SampleContainerRack"),
+            crate::ContainerCategory::ContainerBox => write!(f, "ContainerBox"),
+        }
     }
 }

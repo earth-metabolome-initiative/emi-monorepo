@@ -87,7 +87,7 @@ async fn test_user_table() {
 
     assert!(columns.is_ok());
     let columns = columns.unwrap();
-    assert_eq!(columns.len(), 8);
+    assert_eq!(columns.len(), 5);
 
     assert!(primary_key_columns.is_ok());
     let primary_key_columns = primary_key_columns.unwrap();

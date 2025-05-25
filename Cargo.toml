@@ -34,6 +34,7 @@ members = [
   "utils/functional_properties",
   "utils/image_validation",
   "web/web_common/media_types",
+  "web/web_common/media_types/media_types_builder",
   "web/web_common/ws_messages",
   "utils/rosetta_timestamp",
   "utils/iter_utils",
@@ -190,6 +191,7 @@ unconditional_recursion = "forbid"
 unreachable_patterns = "forbid"
 unused_import_braces = "forbid"
 unused_must_use = "forbid"
+deprecated = "deny"
 
 [workspace.lints.clippy]
 unreadable_literal = "allow"

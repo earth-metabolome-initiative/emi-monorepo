@@ -14,13 +14,13 @@ use web_common_traits::{
 use crate::reagents::ETHANOL_95;
 
 pub(super) async fn init_rinsing_step_model_95(
-    darwin: &User,
+    user: &User,
     procedure: &ProcedureModel,
     procedure_container_category: &ProcedureModelContainerCategory,
     portal_conn: &mut AsyncPgConnection,
 ) -> Result<(), crate::error::Error> {
     let rinsing_materials_photograph =
-        create_photograph(include_bytes!("../../../images/cleaning.jpg"), darwin, portal_conn)
+        create_photograph(include_bytes!("../../../images/cleaning.jpg"), user, portal_conn)
             .await?;
 
     let rinsing_materials_step_model = StepModel::new()
@@ -29,7 +29,7 @@ pub(super) async fn init_rinsing_step_model_95(
         .icon("spray-can-sparkles")?
         .procedure_model_id(procedure.id)?
         .photograph_id(rinsing_materials_photograph.id)?
-        .created_by(darwin.id)?
+        .created_by(user.id)?
         .snoozable(true)?
         .copiable(true)?
         .step_model_category(StepModelCategory::Cleaning)?
@@ -40,6 +40,7 @@ pub(super) async fn init_rinsing_step_model_95(
     let _step_model_container_category = StepModelContainerCategory::new()
         .step_model_id(rinsing_materials_step_model.id)?
         .procedure_model_container_category_id(procedure_container_category.id)?
+        .created_by(user.id)?
         .build()?
         .backend_insert(portal_conn)
         .await?;
@@ -50,6 +51,7 @@ pub(super) async fn init_rinsing_step_model_95(
     let _step_model_reagent = StepModelReagent::new()
         .id(rinsing_materials_step_model.id)?
         .reagent_id(ethanol_95.id)?
+        .created_by(user.id)?
         .build()?
         .backend_insert(portal_conn)
         .await?;

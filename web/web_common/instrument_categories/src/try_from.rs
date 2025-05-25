@@ -1,10 +1,12 @@
 //!  Submodule provding implementations of the `TryFrom` trait for the
 //! [`InstrumentCategory`] enum.
 
-impl TryFrom<&str> for crate::InstrumentCategory {
-    type Error = crate::errors::UnknownInstrumentCategory;
+use std::str::FromStr;
 
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
+impl FromStr for crate::InstrumentCategory {
+    type Err = crate::errors::UnknownInstrumentCategory;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
         Ok(match value {
             "MassSpectrometer" => Self::MassSpectrometer,
             "WeightScale" => Self::WeightScale,
@@ -13,12 +15,21 @@ impl TryFrom<&str> for crate::InstrumentCategory {
             "Centrifuge" => Self::Centrifuge,
             "Dispenser" => Self::Dispenser,
             "Shaker" => Self::Shaker,
+            "Printer" => Self::Printer,
             _ => {
                 return Err(crate::errors::UnknownInstrumentCategory::UnknownString(
                     value.to_string(),
                 ));
             }
         })
+    }
+}
+
+impl TryFrom<&str> for crate::InstrumentCategory {
+    type Error = crate::errors::UnknownInstrumentCategory;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Self::from_str(value)
     }
 }
 

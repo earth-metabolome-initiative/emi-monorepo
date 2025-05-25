@@ -28,3 +28,11 @@ impl TryFrom<String> for crate::ToolCategory {
         Self::try_from(value.as_str())
     }
 }
+
+impl TryFrom<&String> for crate::ToolCategory {
+    type Error = crate::errors::UnknownToolCategory;
+
+    fn try_from(value: &String) -> Result<Self, Self::Error> {
+        Self::try_from(value.as_str())
+    }
+}

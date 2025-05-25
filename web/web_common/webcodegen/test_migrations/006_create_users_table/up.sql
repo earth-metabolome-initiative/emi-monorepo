@@ -16,27 +16,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql IMMUTABLE STRICT PARALLEL SAFE;
 
--- DROP DOMAIN IF EXISTS jpeg_in CASCADE;
--- CREATE DOMAIN jpeg_in AS BYTEA
---     CONSTRAINT jpeg_in_check CHECK (js_jpeg(VALUE));
-
-DROP TYPE IF EXISTS jpeg CASCADE;
-CREATE TYPE jpeg AS (
-    value BYTEA
-);
-
-CREATE TYPE norse_gods AS ENUM ('THOR', 'ODIN', 'LOKI');
-
-CREATE TYPE Point2d AS (x DOUBLE PRECISION,y DOUBLE PRECISION);
-
 CREATE TABLE composite_users (
     primary_id INT,
     secondary_id INT,
     username VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
-    user_image jpeg NOT NULL,
-    position Point2d NOT NULL,
-    god norse_gods NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (primary_id, secondary_id),
     FOREIGN KEY (primary_id) REFERENCES users(id),

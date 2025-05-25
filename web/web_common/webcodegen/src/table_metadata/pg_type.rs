@@ -93,7 +93,18 @@ pub(crate) const HASH_TYPES: [&str; 14] = [
 /// This struct contains metadata about a `PostgreSQL` type, including its name,
 /// OID (Object Identifier), namespace, and other properties.
 #[derive(
-    Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone,
+    Queryable,
+    QueryableByName,
+    Selectable,
+    Debug,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Clone,
+    serde::Serialize,
+    serde::Deserialize,
 )]
 #[diesel(table_name = crate::schema::pg_type)]
 #[allow(clippy::struct_excessive_bools)]
@@ -1320,5 +1331,20 @@ impl PgType {
             .select(PgEnum::as_select())
             .load::<PgEnum>(conn)
             .await?)
+    }
+
+    /// Returns all the postgres types in the database.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
+    pub async fn load_all(conn: &mut AsyncPgConnection) -> Result<Vec<PgType>, WebCodeGenError> {
+        use crate::schema::pg_type;
+
+        Ok(pg_type::table.select(PgType::as_select()).load::<PgType>(conn).await?)
     }
 }

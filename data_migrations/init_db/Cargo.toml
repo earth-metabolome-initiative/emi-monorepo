@@ -14,7 +14,6 @@ webcodegen.workspace = true
 [dev-dependencies]
 tokio.workspace = true
 reference_docker.workspace = true
-webcodegen.workspace = true
 
 [lints]
 workspace = true

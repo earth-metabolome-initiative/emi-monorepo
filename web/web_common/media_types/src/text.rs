@@ -23,7 +23,7 @@ pub const DIRECTORY: &str = "directory";
 /// The `dns` subtype of the `text` media type.
 pub const DNS: &str = "dns";
 /// The `ecmascript` subtype of the `text` media type.
-#[deprecated(since = "0.1.0", note = "Use `media_types::text::JAVASCRIPT` instead")]
+#[deprecated(since = "0.1.0", note = "Use `media_types_builder::text::JAVASCRIPT` instead")]
 pub const ECMASCRIPT: &str = "ecmascript";
 /// The `encaprtp` subtype of the `text` media type.
 pub const ENCAPRTP: &str = "encaprtp";

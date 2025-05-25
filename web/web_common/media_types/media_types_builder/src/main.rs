@@ -264,7 +264,7 @@ pub async fn main() -> Result<(), Error> {
 
         // We write out the module to `src/<root>.rs`
         let file_name = format!("{root}.rs");
-        let file_path = PathBuf::from("src").join(&file_name);
+        let file_path = PathBuf::from("../src").join(&file_name);
         let mut file = std::fs::File::create(&file_path).expect("Failed to create file");
         writeln!(file, "{module}").expect("Failed to write to file");
 

@@ -44,6 +44,7 @@ pub(super) async fn init_ethanol_aliquoting_step_model(
     let _step_model_container_category = StepModelContainerCategory::new()
         .step_model_id(aliquoting_materials_step_model.id)?
         .procedure_model_container_category_id(procedure_container_category.id)?
+        .created_by(darwin.id)?
         .build()?
         .backend_insert(portal_conn)
         .await?;
@@ -54,6 +55,7 @@ pub(super) async fn init_ethanol_aliquoting_step_model(
     let _step_model_reagent = StepModelReagent::new()
         .id(aliquoting_materials_step_model.id)?
         .reagent_id(ethanol_95.id)?
+        .created_by(darwin.id)?
         .build()?
         .backend_insert(portal_conn)
         .await?;

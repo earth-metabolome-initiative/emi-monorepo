@@ -310,7 +310,7 @@ pub const VND_OCTEL_SBC: &str = "vnd.octel.sbc";
 /// The `vnd.presonus.multitrack` subtype of the `audio` media type.
 pub const VND_PRESONUS_MULTITRACK: &str = "vnd.presonus.multitrack";
 /// The `vnd.qcelp` subtype of the `audio` media type.
-#[deprecated(since = "0.1.0", note = "Use `media_types::audio::QCELP` instead")]
+#[deprecated(since = "0.1.0", note = "Use `media_types_builder::audio::QCELP` instead")]
 pub const VND_QCELP: &str = "vnd.qcelp";
 /// The `vnd.rhetorex.32kadpcm` subtype of the `audio` media type.
 pub const VND_RHETOREX_32KADPCM: &str = "vnd.rhetorex.32kadpcm";

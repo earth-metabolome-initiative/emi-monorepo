@@ -35,3 +35,11 @@ impl TryFrom<String> for crate::StepModelCategory {
         Self::try_from(value.as_str())
     }
 }
+
+impl TryFrom<&String> for crate::StepModelCategory {
+    type Error = crate::errors::UnknownStepModelCategory;
+
+    fn try_from(value: &String) -> Result<Self, Self::Error> {
+        Self::try_from(value.as_str())
+    }
+}

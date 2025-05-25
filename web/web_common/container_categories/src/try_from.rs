@@ -1,10 +1,12 @@
 //!  Submodule provding implementations of the `TryFrom` trait for the
 //! [`ContainerCategory`] enum.
 
-impl TryFrom<&str> for crate::ContainerCategory {
-    type Error = crate::errors::UnknownContainerCategory;
+use std::str::FromStr;
 
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
+impl FromStr for crate::ContainerCategory {
+    type Err = crate::errors::UnknownContainerCategory;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
         Ok(match value {
             "Bottle" => Self::Bottle,
             "SampleContainerRack" => Self::SampleContainerRack,
@@ -15,6 +17,14 @@ impl TryFrom<&str> for crate::ContainerCategory {
                 ));
             }
         })
+    }
+}
+
+impl TryFrom<&str> for crate::ContainerCategory {
+    type Error = crate::errors::UnknownContainerCategory;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Self::from_str(value)
     }
 }
 

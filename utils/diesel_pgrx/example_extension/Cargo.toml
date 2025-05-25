@@ -3,8 +3,8 @@ name = "example_extension"
 version = "0.1.0"
 edition = "2024"
 
-[lib]
-crate-type = ["cdylib", "lib"]
+# [lib]
+# crate-type = ["cdylib", "lib"]
 
 [[bin]]
 name = "pgrx_embed_example_extension"

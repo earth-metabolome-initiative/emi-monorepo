@@ -30,6 +30,7 @@ pub(super) async fn init_ethanol_70_percent(
     let ethanol_70_container_category = ProcedureModelContainerCategory::new()
         .procedure_model_id(ethanol_70.id)?
         .container_category(ContainerCategory::Bottle)?
+        .created_by(user.id)?
         .build()?
         .insert(&user.id, portal_conn)
         .await?;
@@ -37,6 +38,7 @@ pub(super) async fn init_ethanol_70_percent(
     let ethanol_70_nameplate_category = ProcedureModelNameplateCategory::new()
         .procedure_model_id(ethanol_70.id)?
         .nameplate_category(NameplateCategory::SemiPermanent)?
+        .created_by(user.id)?
         .build()?
         .insert(&user.id, portal_conn)
         .await?;

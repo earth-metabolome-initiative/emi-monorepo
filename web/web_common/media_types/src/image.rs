@@ -169,10 +169,10 @@ pub const WEBP: &str = "webp";
 /// The `wmf` subtype of the `image` media type.
 pub const WMF: &str = "wmf";
 /// The `x-emf` subtype of the `image` media type.
-#[deprecated(since = "0.1.0", note = "Use `media_types::image::EMF` instead")]
+#[deprecated(since = "0.1.0", note = "Use `media_types_builder::image::EMF` instead")]
 pub const X_EMF: &str = "x-emf";
 /// The `x-wmf` subtype of the `image` media type.
-#[deprecated(since = "0.1.0", note = "Use `media_types::image::WMF` instead")]
+#[deprecated(since = "0.1.0", note = "Use `media_types_builder::image::WMF` instead")]
 pub const X_WMF: &str = "x-wmf";
 /// Set of all subtypes of the `image` media type. This set is generated from the IANA registry at `https://www.iana.org/assignments/media-types/image.csv`.
 pub static SUBTYPES: ::phf::Set<&'static str> = ::phf::phf_set! { "aces" , "apng" , "avci" , "avcs" , "avif" , "bmp" , "cgm" , "dicom-rle" , "dpx" , "emf" , "example" , "fits" , "g3fax" , "gif" , "heic" , "heic-sequence" , "heif" , "heif-sequence" , "hej2k" , "hsj2" , "ief" , "j2c" , "jaii" , "jais" , "jls" , "jp2" , "jpeg" , "jph" , "jphc" , "jpm" , "jpx" , "jxl" , "jxr" , "jxrA" , "jxrS" , "jxs" , "jxsc" , "jxsi" , "jxss" , "ktx" , "ktx2" , "naplps" , "png" , "prs.btif" , "prs.pti" , "pwg-raster" , "svg+xml" , "t38" , "tiff" , "tiff-fx" , "vnd.adobe.photoshop" , "vnd.airzip.accelerator.azv" , "vnd.blockfact.facti" , "vnd.clip" , "vnd.cns.inf2" , "vnd.dece.graphic" , "vnd.djvu" , "vnd.dwg" , "vnd.dxf" , "vnd.dvb.subtitle" , "vnd.fastbidsheet" , "vnd.fpx" , "vnd.fst" , "vnd.fujixerox.edmics-mmr" , "vnd.fujixerox.edmics-rlc" , "vnd.globalgraphics.pgb" , "vnd.microsoft.icon" , "vnd.mix" , "vnd.ms-modi" , "vnd.mozilla.apng" , "vnd.net-fpx" , "vnd.pco.b16" , "vnd.radiance" , "vnd.sealed.png" , "vnd.sealedmedia.softseal.gif" , "vnd.sealedmedia.softseal.jpg" , "vnd.svf" , "vnd.tencent.tap" , "vnd.valve.source.texture" , "vnd.wap.wbmp" , "vnd.xiff" , "vnd.zbrush.pcx" , "webp" , "wmf" , "x-emf" , "x-wmf" };

@@ -18,3 +18,11 @@ impl TryFrom<String> for CountryCode {
         code.as_str().try_into()
     }
 }
+
+impl TryFrom<&String> for CountryCode {
+    type Error = crate::errors::UnknownCountryCode;
+
+    fn try_from(code: &String) -> Result<Self, Self::Error> {
+        code.as_str().try_into()
+    }
+}
