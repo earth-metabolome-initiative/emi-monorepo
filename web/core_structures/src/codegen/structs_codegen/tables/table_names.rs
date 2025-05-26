@@ -15,7 +15,6 @@ pub enum TableName {
     Color,
     CommercialProductLot,
     CommercialProduct,
-    CommercialReagentModel,
     CommercialReagent,
     ContainerModel,
     Country,
@@ -47,6 +46,7 @@ pub enum TableName {
     ProcedureModelContainerCategory,
     ProcedureModelInstrumentCategory,
     ProcedureModelNameplateCategory,
+    ProcedureModelToolCategory,
     ProcedureModel,
     Procedure,
     Processable,
@@ -73,8 +73,8 @@ pub enum TableName {
     StepModelInstrumentModel,
     StepModelInstrument,
     StepModelNameplateCategory,
-    StepModelReagent,
     StepModelToolCategory,
+    StepModelTrackableCategory,
     StepModel,
     StepNameplateModel,
     StepStorageContainer,
@@ -88,6 +88,7 @@ pub enum TableName {
     Team,
     TemporaryUser,
     ToolModel,
+    TrackableCategory,
     TrackableLocation,
     TrackableState,
     Trackable,
@@ -121,9 +122,6 @@ impl core::fmt::Display for TableName {
                 write!(f, stringify!(CommercialProductLot))
             }
             TableName::CommercialProduct => write!(f, stringify!(CommercialProduct)),
-            TableName::CommercialReagentModel => {
-                write!(f, stringify!(CommercialReagentModel))
-            }
             TableName::CommercialReagent => write!(f, stringify!(CommercialReagent)),
             TableName::ContainerModel => write!(f, stringify!(ContainerModel)),
             TableName::Country => write!(f, stringify!(Country)),
@@ -169,6 +167,9 @@ impl core::fmt::Display for TableName {
             TableName::ProcedureModelNameplateCategory => {
                 write!(f, stringify!(ProcedureModelNameplateCategory))
             }
+            TableName::ProcedureModelToolCategory => {
+                write!(f, stringify!(ProcedureModelToolCategory))
+            }
             TableName::ProcedureModel => write!(f, stringify!(ProcedureModel)),
             TableName::Procedure => write!(f, stringify!(Procedure)),
             TableName::Processable => write!(f, stringify!(Processable)),
@@ -205,9 +206,11 @@ impl core::fmt::Display for TableName {
             TableName::StepModelNameplateCategory => {
                 write!(f, stringify!(StepModelNameplateCategory))
             }
-            TableName::StepModelReagent => write!(f, stringify!(StepModelReagent)),
             TableName::StepModelToolCategory => {
                 write!(f, stringify!(StepModelToolCategory))
+            }
+            TableName::StepModelTrackableCategory => {
+                write!(f, stringify!(StepModelTrackableCategory))
             }
             TableName::StepModel => write!(f, stringify!(StepModel)),
             TableName::StepNameplateModel => write!(f, stringify!(StepNameplateModel)),
@@ -224,6 +227,7 @@ impl core::fmt::Display for TableName {
             TableName::Team => write!(f, stringify!(Team)),
             TableName::TemporaryUser => write!(f, stringify!(TemporaryUser)),
             TableName::ToolModel => write!(f, stringify!(ToolModel)),
+            TableName::TrackableCategory => write!(f, stringify!(TrackableCategory)),
             TableName::TrackableLocation => write!(f, stringify!(TrackableLocation)),
             TableName::TrackableState => write!(f, stringify!(TrackableState)),
             TableName::Trackable => write!(f, stringify!(Trackable)),

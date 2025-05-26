@@ -35,7 +35,7 @@ pub(crate) const COPY_TYPES: [&str; 13] = [
 ];
 
 /// Constant listing types supporting `Eq`.
-pub(crate) const EQ_TYPES: [&str; 14] = [
+pub(crate) const EQ_TYPES: [&str; 13] = [
     "i16",
     "i32",
     "i64",
@@ -48,12 +48,11 @@ pub(crate) const EQ_TYPES: [&str; 14] = [
     "::instrument_categories::InstrumentCategory",
     "::tool_categories::ToolCategory",
     "::nameplate_categories::NameplateCategory",
-    "::container_categories::ContainerCategory",
     "::media_types::MediaType",
 ];
 
 /// Constant listing types supporting `Ord`.
-pub(crate) const ORD_TYPES: [&str; 14] = [
+pub(crate) const ORD_TYPES: [&str; 13] = [
     "i16",
     "i32",
     "i64",
@@ -66,12 +65,11 @@ pub(crate) const ORD_TYPES: [&str; 14] = [
     "::instrument_categories::InstrumentCategory",
     "::tool_categories::ToolCategory",
     "::nameplate_categories::NameplateCategory",
-    "::container_categories::ContainerCategory",
     "::media_types::MediaType",
 ];
 
 /// Constant listing types supporting `Hash`.
-pub(crate) const HASH_TYPES: [&str; 14] = [
+pub(crate) const HASH_TYPES: [&str; 13] = [
     "i16",
     "i32",
     "i64",
@@ -84,7 +82,6 @@ pub(crate) const HASH_TYPES: [&str; 14] = [
     "::instrument_categories::InstrumentCategory",
     "::tool_categories::ToolCategory",
     "::nameplate_categories::NameplateCategory",
-    "::container_categories::ContainerCategory",
     "::media_types::MediaType",
 ];
 

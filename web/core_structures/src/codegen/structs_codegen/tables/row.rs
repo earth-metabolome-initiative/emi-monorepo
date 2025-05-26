@@ -12,7 +12,6 @@ mod cities;
 mod colors;
 mod commercial_product_lots;
 mod commercial_products;
-mod commercial_reagent_models;
 mod commercial_reagents;
 mod container_models;
 mod countries;
@@ -46,6 +45,7 @@ mod postgres_async_read_dispatch;
 mod procedure_model_container_categories;
 mod procedure_model_instrument_categories;
 mod procedure_model_nameplate_categories;
+mod procedure_model_tool_categories;
 mod procedure_models;
 mod procedures;
 mod processables;
@@ -73,8 +73,8 @@ mod step_model_instrument_categories;
 mod step_model_instrument_models;
 mod step_model_instruments;
 mod step_model_nameplate_categories;
-mod step_model_reagents;
 mod step_model_tool_categories;
+mod step_model_trackable_categories;
 mod step_models;
 mod step_nameplate_models;
 mod step_storage_containers;
@@ -89,6 +89,7 @@ mod team_states;
 mod teams;
 mod temporary_user;
 mod tool_models;
+mod trackable_categories;
 mod trackable_locations;
 mod trackable_states;
 mod trackables;
@@ -134,9 +135,6 @@ pub enum Row {
     ),
     CommercialProduct(
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-    ),
-    CommercialReagentModel(
-        crate::codegen::structs_codegen::tables::commercial_reagent_models::CommercialReagentModel,
     ),
     CommercialReagent(
         crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent,
@@ -215,6 +213,9 @@ pub enum Row {
     ProcedureModelNameplateCategory(
         crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory,
     ),
+    ProcedureModelToolCategory(
+        crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory,
+    ),
     ProcedureModel(
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     ),
@@ -267,11 +268,11 @@ pub enum Row {
     StepModelNameplateCategory(
         crate::codegen::structs_codegen::tables::step_model_nameplate_categories::StepModelNameplateCategory,
     ),
-    StepModelReagent(
-        crate::codegen::structs_codegen::tables::step_model_reagents::StepModelReagent,
-    ),
     StepModelToolCategory(
         crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
+    ),
+    StepModelTrackableCategory(
+        crate::codegen::structs_codegen::tables::step_model_trackable_categories::StepModelTrackableCategory,
     ),
     StepModel(crate::codegen::structs_codegen::tables::step_models::StepModel),
     StepNameplateModel(
@@ -296,6 +297,9 @@ pub enum Row {
         crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser,
     ),
     ToolModel(crate::codegen::structs_codegen::tables::tool_models::ToolModel),
+    TrackableCategory(
+        crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory,
+    ),
     TrackableLocation(
         crate::codegen::structs_codegen::tables::trackable_locations::TrackableLocation,
     ),
@@ -356,9 +360,6 @@ impl Row {
             }
             Row::CommercialProduct(commercial_products) => {
                 commercial_products.upsert(conn)?.map(Row::from)
-            }
-            Row::CommercialReagentModel(commercial_reagent_models) => {
-                commercial_reagent_models.upsert(conn)?.map(Row::from)
             }
             Row::CommercialReagent(commercial_reagents) => {
                 commercial_reagents.upsert(conn)?.map(Row::from)
@@ -425,6 +426,9 @@ impl Row {
             Row::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
                 procedure_model_nameplate_categories.upsert(conn)?.map(Row::from)
             }
+            Row::ProcedureModelToolCategory(procedure_model_tool_categories) => {
+                procedure_model_tool_categories.upsert(conn)?.map(Row::from)
+            }
             Row::ProcedureModel(procedure_models) => procedure_models.upsert(conn)?.map(Row::from),
             Row::Procedure(procedures) => procedures.upsert(conn)?.map(Row::from),
             Row::Processable(processables) => processables.upsert(conn)?.map(Row::from),
@@ -471,11 +475,11 @@ impl Row {
             Row::StepModelNameplateCategory(step_model_nameplate_categories) => {
                 step_model_nameplate_categories.upsert(conn)?.map(Row::from)
             }
-            Row::StepModelReagent(step_model_reagents) => {
-                step_model_reagents.upsert(conn)?.map(Row::from)
-            }
             Row::StepModelToolCategory(step_model_tool_categories) => {
                 step_model_tool_categories.upsert(conn)?.map(Row::from)
+            }
+            Row::StepModelTrackableCategory(step_model_trackable_categories) => {
+                step_model_trackable_categories.upsert(conn)?.map(Row::from)
             }
             Row::StepModel(step_models) => step_models.upsert(conn)?.map(Row::from),
             Row::StepNameplateModel(step_nameplate_models) => {
@@ -496,6 +500,9 @@ impl Row {
             Row::Team(teams) => teams.upsert(conn)?.map(Row::from),
             Row::TemporaryUser(temporary_user) => temporary_user.upsert(conn)?.map(Row::from),
             Row::ToolModel(tool_models) => tool_models.upsert(conn)?.map(Row::from),
+            Row::TrackableCategory(trackable_categories) => {
+                trackable_categories.upsert(conn)?.map(Row::from)
+            }
             Row::TrackableLocation(trackable_locations) => {
                 trackable_locations.upsert(conn)?.map(Row::from)
             }
@@ -546,9 +553,6 @@ impl web_common_traits::prelude::Row for Row {
                 commercial_product_lots.primary_key()
             }
             Row::CommercialProduct(commercial_products) => commercial_products.primary_key(),
-            Row::CommercialReagentModel(commercial_reagent_models) => {
-                commercial_reagent_models.primary_key()
-            }
             Row::CommercialReagent(commercial_reagents) => commercial_reagents.primary_key(),
             Row::ContainerModel(container_models) => container_models.primary_key(),
             Row::Country(countries) => countries.primary_key(),
@@ -594,6 +598,9 @@ impl web_common_traits::prelude::Row for Row {
             Row::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
                 procedure_model_nameplate_categories.primary_key()
             }
+            Row::ProcedureModelToolCategory(procedure_model_tool_categories) => {
+                procedure_model_tool_categories.primary_key()
+            }
             Row::ProcedureModel(procedure_models) => procedure_models.primary_key(),
             Row::Procedure(procedures) => procedures.primary_key(),
             Row::Processable(processables) => processables.primary_key(),
@@ -632,9 +639,11 @@ impl web_common_traits::prelude::Row for Row {
             Row::StepModelNameplateCategory(step_model_nameplate_categories) => {
                 step_model_nameplate_categories.primary_key()
             }
-            Row::StepModelReagent(step_model_reagents) => step_model_reagents.primary_key(),
             Row::StepModelToolCategory(step_model_tool_categories) => {
                 step_model_tool_categories.primary_key()
+            }
+            Row::StepModelTrackableCategory(step_model_trackable_categories) => {
+                step_model_trackable_categories.primary_key()
             }
             Row::StepModel(step_models) => step_models.primary_key(),
             Row::StepNameplateModel(step_nameplate_models) => step_nameplate_models.primary_key(),
@@ -651,6 +660,7 @@ impl web_common_traits::prelude::Row for Row {
             Row::Team(teams) => teams.primary_key(),
             Row::TemporaryUser(temporary_user) => temporary_user.primary_key(),
             Row::ToolModel(tool_models) => tool_models.primary_key(),
+            Row::TrackableCategory(trackable_categories) => trackable_categories.primary_key(),
             Row::TrackableLocation(trackable_locations) => trackable_locations.primary_key(),
             Row::TrackableState(trackable_states) => trackable_states.primary_key(),
             Row::Trackable(trackables) => trackables.primary_key(),

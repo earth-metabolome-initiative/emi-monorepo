@@ -12,8 +12,6 @@
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::reagents::reagents)]
 pub struct Reagent {
     pub id: i32,
-    pub name: String,
-    pub description: String,
     pub purity: f32,
     pub cas_code: ::cas_codes::CAS,
     pub molecular_formulas: ::molecular_formulas::MolecularFormula,
@@ -29,6 +27,26 @@ impl diesel::Identifiable for Reagent {
     }
 }
 impl Reagent {
+    #[cfg(feature = "postgres")]
+    pub async fn id(
+        &self,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory,
+        diesel::result::Error,
+    > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::trackable_categories::trackable_categories::dsl::id
+                    .eq(&self.id),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory,
+            >(conn)
+            .await
+    }
     #[cfg(feature = "postgres")]
     pub async fn created_by(
         &self,
@@ -55,6 +73,18 @@ impl Reagent {
                 crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.updated_by),
             )
             .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_id(
+        conn: &mut diesel_async::AsyncPgConnection,
+        id: &crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        Self::table()
+            .filter(crate::codegen::diesel_codegen::tables::reagents::reagents::dsl::id.eq(id.id))
+            .first::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -88,19 +118,6 @@ impl Reagent {
             .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_name(
-        name: &str,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(crate::codegen::diesel_codegen::tables::reagents::reagents::name.eq(name))
-            .first::<Self>(conn)
-            .await
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
     pub async fn from_cas_code(
         cas_code: &::cas_codes::CAS,
         conn: &mut diesel_async::AsyncPgConnection,
@@ -114,21 +131,6 @@ impl Reagent {
             .first::<Self>(conn)
             .await
             .optional()
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_description(
-        description: &String,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-
-        use crate::codegen::diesel_codegen::tables::reagents::reagents;
-        Self::table()
-            .filter(reagents::description.eq(description))
-            .order_by(reagents::id.asc())
-            .load::<Self>(conn)
-            .await
     }
     #[cfg(feature = "postgres")]
     pub async fn from_created_at(

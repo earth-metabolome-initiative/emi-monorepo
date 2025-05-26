@@ -66,9 +66,9 @@ CREATE TABLE IF NOT EXISTS step_model_nameplate_categories (
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS step_model_reagents (
-	id INTEGER PRIMARY KEY REFERENCES step_models(id),
-	reagent_id INTEGER NOT NULL REFERENCES reagents(id),
+CREATE TABLE IF NOT EXISTS step_model_trackable_categories (
+	id INTEGER PRIMARY KEY REFERENCES step_models(id) ON DELETE CASCADE,
+	trackable_category_id INTEGER NOT NULL REFERENCES trackable_categories(id) ON DELETE CASCADE,
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INTEGER NOT NULL REFERENCES users(id),
@@ -90,8 +90,8 @@ CREATE TABLE IF NOT EXISTS step_model_container_categories (
 
 CREATE TABLE IF NOT EXISTS step_model_tool_categories (
 	id SERIAL PRIMARY KEY,
-	step_model_id INTEGER NOT NULL REFERENCES step_models(id),
-	tool_category ToolCategory NOT NULL,
+	step_model_id INTEGER NOT NULL REFERENCES step_models(id) ON DELETE CASCADE,
+	procedure_model_tool_category_id INTEGER NOT NULL REFERENCES procedure_model_tool_categories(id) ON DELETE CASCADE,
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INTEGER NOT NULL REFERENCES users(id),

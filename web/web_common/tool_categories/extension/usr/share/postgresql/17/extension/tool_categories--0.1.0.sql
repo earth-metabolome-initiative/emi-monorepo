@@ -7,7 +7,7 @@ The ordering of items is not stable, it is driven by a dependency graph.
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/tool_categories/src/lib.rs:17
+-- web/web_common/tool_categories/src/lib.rs:14
 -- tool_categories::ToolCategory
 CREATE TYPE ToolCategory AS ENUM (
 	'Camera',
@@ -19,7 +19,10 @@ CREATE TYPE ToolCategory AS ENUM (
 	'Gloves',
 	'HandCleaningAgent',
 	'PaperTowels',
-	'VolumeMeasuringTool'
+	'GraduatedCylinder',
+	'Pipette',
+	'PipetteTip',
+	'PipettingContainer'
 );
 /* </end connected objects> */
 

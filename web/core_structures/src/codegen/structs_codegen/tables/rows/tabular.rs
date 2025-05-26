@@ -36,9 +36,6 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::CommercialProduct(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialProduct
             }
-            super::Rows::CommercialReagentModel(_) => {
-                crate::codegen::tables::table_names::TableName::CommercialReagentModel
-            }
             super::Rows::CommercialReagent(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialReagent
             }
@@ -124,6 +121,9 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::ProcedureModelNameplateCategory(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModelNameplateCategory
             }
+            super::Rows::ProcedureModelToolCategory(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureModelToolCategory
+            }
             super::Rows::ProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModel
             }
@@ -188,11 +188,11 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::StepModelNameplateCategory(_) => {
                 crate::codegen::tables::table_names::TableName::StepModelNameplateCategory
             }
-            super::Rows::StepModelReagent(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelReagent
-            }
             super::Rows::StepModelToolCategory(_) => {
                 crate::codegen::tables::table_names::TableName::StepModelToolCategory
+            }
+            super::Rows::StepModelTrackableCategory(_) => {
+                crate::codegen::tables::table_names::TableName::StepModelTrackableCategory
             }
             super::Rows::StepModel(_) => crate::codegen::tables::table_names::TableName::StepModel,
             super::Rows::StepNameplateModel(_) => {
@@ -221,6 +221,9 @@ impl web_common_traits::prelude::Tabular for super::Rows {
                 crate::codegen::tables::table_names::TableName::TemporaryUser
             }
             super::Rows::ToolModel(_) => crate::codegen::tables::table_names::TableName::ToolModel,
+            super::Rows::TrackableCategory(_) => {
+                crate::codegen::tables::table_names::TableName::TrackableCategory
+            }
             super::Rows::TrackableLocation(_) => {
                 crate::codegen::tables::table_names::TableName::TrackableLocation
             }

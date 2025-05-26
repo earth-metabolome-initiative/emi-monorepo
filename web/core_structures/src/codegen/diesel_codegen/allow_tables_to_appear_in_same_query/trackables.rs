@@ -4,6 +4,8 @@ use crate::codegen::diesel_codegen::tables::{
 diesel::allow_tables_to_appear_in_same_query!(trackables, container_models);
 use crate::codegen::diesel_codegen::tables::projects::projects;
 diesel::allow_tables_to_appear_in_same_query!(trackables, projects);
+use crate::codegen::diesel_codegen::tables::trackable_categories::trackable_categories;
+diesel::allow_tables_to_appear_in_same_query!(trackables, trackable_categories);
 use crate::codegen::diesel_codegen::tables::trackable_states::trackable_states;
 diesel::allow_tables_to_appear_in_same_query!(trackables, trackable_states);
 use crate::codegen::diesel_codegen::tables::users::users;

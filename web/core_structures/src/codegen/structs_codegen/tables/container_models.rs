@@ -122,21 +122,6 @@ impl ContainerModel {
             .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_container_category(
-        container_category: &::container_categories::ContainerCategory,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-
-        use crate::codegen::diesel_codegen::tables::container_models::container_models;
-        Self::table()
-            .filter(container_models::container_category.eq(container_category))
-            .order_by(container_models::id.asc())
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
     pub async fn from_created_at(
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel_async::AsyncPgConnection,

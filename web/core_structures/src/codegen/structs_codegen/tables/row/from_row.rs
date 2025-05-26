@@ -35,9 +35,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::CommercialProduct(commercial_products) => {
                 crate::codegen::tables::rows::Rows::from(commercial_products)
             }
-            super::Row::CommercialReagentModel(commercial_reagent_models) => {
-                crate::codegen::tables::rows::Rows::from(commercial_reagent_models)
-            }
             super::Row::CommercialReagent(commercial_reagents) => {
                 crate::codegen::tables::rows::Rows::from(commercial_reagents)
             }
@@ -123,6 +120,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
                 crate::codegen::tables::rows::Rows::from(procedure_model_nameplate_categories)
             }
+            super::Row::ProcedureModelToolCategory(procedure_model_tool_categories) => {
+                crate::codegen::tables::rows::Rows::from(procedure_model_tool_categories)
+            }
             super::Row::ProcedureModel(procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(procedure_models)
             }
@@ -189,11 +189,11 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::StepModelNameplateCategory(step_model_nameplate_categories) => {
                 crate::codegen::tables::rows::Rows::from(step_model_nameplate_categories)
             }
-            super::Row::StepModelReagent(step_model_reagents) => {
-                crate::codegen::tables::rows::Rows::from(step_model_reagents)
-            }
             super::Row::StepModelToolCategory(step_model_tool_categories) => {
                 crate::codegen::tables::rows::Rows::from(step_model_tool_categories)
+            }
+            super::Row::StepModelTrackableCategory(step_model_trackable_categories) => {
+                crate::codegen::tables::rows::Rows::from(step_model_trackable_categories)
             }
             super::Row::StepModel(step_models) => {
                 crate::codegen::tables::rows::Rows::from(step_models)
@@ -227,6 +227,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::ToolModel(tool_models) => {
                 crate::codegen::tables::rows::Rows::from(tool_models)
+            }
+            super::Row::TrackableCategory(trackable_categories) => {
+                crate::codegen::tables::rows::Rows::from(trackable_categories)
             }
             super::Row::TrackableLocation(trackable_locations) => {
                 crate::codegen::tables::rows::Rows::from(trackable_locations)

@@ -20,7 +20,8 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 step_model_id
                     .ne(excluded(step_model_id))
-                    .or(tool_category.ne(excluded(tool_category)))
+                    .or(procedure_model_tool_category_id
+                        .ne(excluded(procedure_model_tool_category_id)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))
@@ -52,7 +53,8 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 step_model_id
                     .ne(excluded(step_model_id))
-                    .or(tool_category.ne(excluded(tool_category)))
+                    .or(procedure_model_tool_category_id
+                        .ne(excluded(procedure_model_tool_category_id)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))

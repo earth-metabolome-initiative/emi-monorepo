@@ -15,7 +15,7 @@
 pub struct StepModelToolCategory {
     pub id: i32,
     pub step_model_id: i32,
-    pub tool_category: ::tool_categories::ToolCategory,
+    pub procedure_model_tool_category_id: i32,
     pub created_by: i32,
     pub created_at: ::rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,
@@ -44,6 +44,26 @@ impl StepModelToolCategory {
                     .eq(&self.step_model_id),
             )
             .first::<crate::codegen::structs_codegen::tables::step_models::StepModel>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn procedure_model_tool_category(
+        &self,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory,
+        diesel::result::Error,
+    >{
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_model_tool_categories::procedure_model_tool_categories::dsl::id
+                    .eq(&self.procedure_model_tool_category_id),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory,
+            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -90,6 +110,21 @@ impl StepModelToolCategory {
             .await
     }
     #[cfg(feature = "postgres")]
+    pub async fn from_procedure_model_tool_category_id(
+        conn: &mut diesel_async::AsyncPgConnection,
+        procedure_model_tool_category_id: &crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::step_model_tool_categories::step_model_tool_categories::dsl::procedure_model_tool_category_id
+                    .eq(procedure_model_tool_category_id.id),
+            )
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
     pub async fn from_created_by(
         conn: &mut diesel_async::AsyncPgConnection,
         created_by: &crate::codegen::structs_codegen::tables::users::User,
@@ -116,21 +151,6 @@ impl StepModelToolCategory {
                 crate::codegen::diesel_codegen::tables::step_model_tool_categories::step_model_tool_categories::dsl::updated_by
                     .eq(updated_by.id),
             )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_tool_category(
-        tool_category: &::tool_categories::ToolCategory,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-
-        use crate::codegen::diesel_codegen::tables::step_model_tool_categories::step_model_tool_categories;
-        Self::table()
-            .filter(step_model_tool_categories::tool_category.eq(tool_category))
-            .order_by(step_model_tool_categories::id.asc())
             .load::<Self>(conn)
             .await
     }

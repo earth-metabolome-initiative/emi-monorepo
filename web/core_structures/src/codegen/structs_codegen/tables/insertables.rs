@@ -52,11 +52,6 @@ pub use commercial_products::{
     InsertableCommercialProduct, InsertableCommercialProductAttributes,
     InsertableCommercialProductBuilder,
 };
-mod commercial_reagent_models;
-pub use commercial_reagent_models::{
-    InsertableCommercialReagentModel, InsertableCommercialReagentModelAttributes,
-    InsertableCommercialReagentModelBuilder,
-};
 mod commercial_reagents;
 pub use commercial_reagents::{
     InsertableCommercialReagent, InsertableCommercialReagentAttributes,
@@ -191,6 +186,11 @@ pub use procedure_model_nameplate_categories::{
     InsertableProcedureModelNameplateCategory, InsertableProcedureModelNameplateCategoryAttributes,
     InsertableProcedureModelNameplateCategoryBuilder,
 };
+mod procedure_model_tool_categories;
+pub use procedure_model_tool_categories::{
+    InsertableProcedureModelToolCategory, InsertableProcedureModelToolCategoryAttributes,
+    InsertableProcedureModelToolCategoryBuilder,
+};
 mod procedure_models;
 pub use procedure_models::{
     InsertableProcedureModel, InsertableProcedureModelAttributes, InsertableProcedureModelBuilder,
@@ -293,15 +293,15 @@ pub use step_model_nameplate_categories::{
     InsertableStepModelNameplateCategory, InsertableStepModelNameplateCategoryAttributes,
     InsertableStepModelNameplateCategoryBuilder,
 };
-mod step_model_reagents;
-pub use step_model_reagents::{
-    InsertableStepModelReagent, InsertableStepModelReagentAttributes,
-    InsertableStepModelReagentBuilder,
-};
 mod step_model_tool_categories;
 pub use step_model_tool_categories::{
     InsertableStepModelToolCategory, InsertableStepModelToolCategoryAttributes,
     InsertableStepModelToolCategoryBuilder,
+};
+mod step_model_trackable_categories;
+pub use step_model_trackable_categories::{
+    InsertableStepModelTrackableCategory, InsertableStepModelTrackableCategoryAttributes,
+    InsertableStepModelTrackableCategoryBuilder,
 };
 mod step_models;
 pub use step_models::{
@@ -351,6 +351,11 @@ pub use temporary_user::{
 mod tool_models;
 pub use tool_models::{
     InsertableToolModel, InsertableToolModelAttributes, InsertableToolModelBuilder,
+};
+mod trackable_categories;
+pub use trackable_categories::{
+    InsertableTrackableCategory, InsertableTrackableCategoryAttributes,
+    InsertableTrackableCategoryBuilder,
 };
 mod trackable_locations;
 pub use trackable_locations::{

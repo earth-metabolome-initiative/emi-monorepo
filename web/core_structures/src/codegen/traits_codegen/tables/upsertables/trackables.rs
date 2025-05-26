@@ -18,8 +18,9 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .do_update()
             .set(self)
             .filter(
-                container_model_id
-                    .ne(excluded(container_model_id))
+                trackable_category_id
+                    .ne(excluded(trackable_category_id))
+                    .or(container_model_id.ne(excluded(container_model_id)))
                     .or(project_id.ne(excluded(project_id)))
                     .or(trackable_state_id.ne(excluded(trackable_state_id)))
                     .or(created_by.ne(excluded(created_by)))
@@ -51,8 +52,9 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .do_update()
             .set(self)
             .filter(
-                container_model_id
-                    .ne(excluded(container_model_id))
+                trackable_category_id
+                    .ne(excluded(trackable_category_id))
+                    .or(container_model_id.ne(excluded(container_model_id)))
                     .or(project_id.ne(excluded(project_id)))
                     .or(trackable_state_id.ne(excluded(trackable_state_id)))
                     .or(created_by.ne(excluded(created_by)))

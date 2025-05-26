@@ -15,7 +15,6 @@ pub enum TablePrimaryKey {
     Color(i16),
     CommercialProductLot(i32),
     CommercialProduct(i32),
-    CommercialReagentModel(i32),
     CommercialReagent(::rosetta_uuid::Uuid),
     ContainerModel(i32),
     Country(::iso_codes::CountryCode),
@@ -47,6 +46,7 @@ pub enum TablePrimaryKey {
     ProcedureModelContainerCategory(i32),
     ProcedureModelInstrumentCategory(i32),
     ProcedureModelNameplateCategory(i32),
+    ProcedureModelToolCategory(i32),
     ProcedureModel(i32),
     Procedure(i32),
     Processable(::rosetta_uuid::Uuid),
@@ -73,8 +73,8 @@ pub enum TablePrimaryKey {
     StepModelInstrumentModel(i32),
     StepModelInstrument(i32),
     StepModelNameplateCategory(i32),
-    StepModelReagent(i32),
     StepModelToolCategory(i32),
+    StepModelTrackableCategory(i32),
     StepModel(i32),
     StepNameplateModel(::rosetta_uuid::Uuid),
     StepStorageContainer(::rosetta_uuid::Uuid),
@@ -88,6 +88,7 @@ pub enum TablePrimaryKey {
     Team(i32),
     TemporaryUser(i32),
     ToolModel(i32),
+    TrackableCategory(i32),
     TrackableLocation(::rosetta_uuid::Uuid),
     TrackableState(i16),
     Trackable(::rosetta_uuid::Uuid),
@@ -137,9 +138,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::CommercialProduct(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialProduct
-            }
-            TablePrimaryKey::CommercialReagentModel(_) => {
-                crate::codegen::tables::table_names::TableName::CommercialReagentModel
             }
             TablePrimaryKey::CommercialReagent(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialReagent
@@ -232,6 +230,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::ProcedureModelNameplateCategory(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModelNameplateCategory
             }
+            TablePrimaryKey::ProcedureModelToolCategory(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureModelToolCategory
+            }
             TablePrimaryKey::ProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModel
             }
@@ -300,11 +301,11 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::StepModelNameplateCategory(_) => {
                 crate::codegen::tables::table_names::TableName::StepModelNameplateCategory
             }
-            TablePrimaryKey::StepModelReagent(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelReagent
-            }
             TablePrimaryKey::StepModelToolCategory(_) => {
                 crate::codegen::tables::table_names::TableName::StepModelToolCategory
+            }
+            TablePrimaryKey::StepModelTrackableCategory(_) => {
+                crate::codegen::tables::table_names::TableName::StepModelTrackableCategory
             }
             TablePrimaryKey::StepModel(_) => {
                 crate::codegen::tables::table_names::TableName::StepModel
@@ -338,6 +339,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::ToolModel(_) => {
                 crate::codegen::tables::table_names::TableName::ToolModel
+            }
+            TablePrimaryKey::TrackableCategory(_) => {
+                crate::codegen::tables::table_names::TableName::TrackableCategory
             }
             TablePrimaryKey::TrackableLocation(_) => {
                 crate::codegen::tables::table_names::TableName::TrackableLocation

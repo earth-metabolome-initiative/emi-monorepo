@@ -1,6 +1,8 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TrackableForeignKeys {
+    pub trackable_category:
+        Option<crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory>,
     pub container_model:
         Option<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
     pub project: Option<crate::codegen::structs_codegen::tables::projects::Project>,
@@ -18,6 +20,11 @@ impl web_common_traits::prelude::HasForeignKeys
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::TrackableCategory(
+                self.trackable_category_id,
+            ),
+        ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerModel(
                 self.container_model_id,
@@ -39,7 +46,8 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.container_model.is_some()
+        foreign_keys.trackable_category.is_some()
+            && foreign_keys.container_model.is_some()
             && foreign_keys.project.is_some()
             && foreign_keys.trackable_state.is_some()
             && foreign_keys.created_by.is_some()
@@ -90,6 +98,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if projects.id == self.project_id {
                     foreign_keys.project = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::TrackableCategory(trackable_categories),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if trackable_categories.id == self.trackable_category_id {
+                    foreign_keys.trackable_category = Some(trackable_categories);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::TrackableCategory(trackable_categories),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if trackable_categories.id == self.trackable_category_id {
+                    foreign_keys.trackable_category = None;
                     updated = true;
                 }
             }

@@ -40,9 +40,14 @@ pub enum ToolCategory {
     HandCleaningAgent,
     /// Absorbent paper used for drying hands or cleaning surfaces.
     PaperTowels,
-    /// A device used to measure the volume of liquids, such as graduated
-    /// cylinders or pipettes.
-    VolumeMeasuringTool,
+    /// A device used to measure the volume of liquids.
+    GraduatedCylinder,
+    /// A pipette or similar device used to measure and transfer liquids.
+    Pipette,
+    /// A pipette tip used to avoid contamination when transferring liquids.
+    PipetteTip,
+    /// A temporary container used for pipetting without risking contamination.
+    PipettingContainer,
 }
 
 impl ToolCategory {
@@ -59,7 +64,10 @@ impl ToolCategory {
             ToolCategory::Gloves => "Gloves",
             ToolCategory::HandCleaningAgent => "Hand Cleaning Agent",
             ToolCategory::PaperTowels => "Paper Towels",
-            ToolCategory::VolumeMeasuringTool => "Volume Measuring Tool",
+            ToolCategory::GraduatedCylinder => "Graduated Cylinder",
+            ToolCategory::Pipette => "Pipette",
+            ToolCategory::PipetteTip => "Pipette Tip",
+            ToolCategory::PipettingContainer => "Pipetting Container",
         }
     }
 
@@ -90,8 +98,15 @@ impl ToolCategory {
             ToolCategory::PaperTowels => {
                 "Absorbent paper used for drying hands or cleaning surfaces."
             }
-            ToolCategory::VolumeMeasuringTool => {
-                "A device used to measure the volume of liquids, such as graduated cylinders or pipettes."
+            ToolCategory::GraduatedCylinder => "A device used to measure the volume of liquids.",
+            ToolCategory::Pipette => {
+                "A pipette or similar device used to measure and transfer liquids."
+            }
+            ToolCategory::PipetteTip => {
+                "A pipette tip used to avoid contamination when transferring liquids."
+            }
+            ToolCategory::PipettingContainer => {
+                "A temporary container used for pipetting without risking contamination."
             }
         }
     }
@@ -109,7 +124,9 @@ impl ToolCategory {
             ToolCategory::Gloves => "hand",
             ToolCategory::HandCleaningAgent => "pump-soap",
             ToolCategory::PaperTowels => "box-tissue",
-            ToolCategory::VolumeMeasuringTool => "flask",
+            ToolCategory::GraduatedCylinder => "flask",
+            ToolCategory::PipetteTip | ToolCategory::Pipette => "syringe",
+            ToolCategory::PipettingContainer => "fill-drip",
         }
     }
 }

@@ -63,11 +63,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::CommercialProduct)
                     .collect::<Vec<_>>()
             }
-            super::Rows::CommercialReagentModel(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::CommercialReagentModel)
-                    .collect::<Vec<_>>()
-            }
             super::Rows::CommercialReagent(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::CommercialReagent)
@@ -215,6 +210,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::ProcedureModelNameplateCategory)
                     .collect::<Vec<_>>()
             }
+            super::Rows::ProcedureModelToolCategory(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::ProcedureModelToolCategory)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::ProcedureModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::ProcedureModel)
@@ -333,14 +333,14 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::StepModelNameplateCategory)
                     .collect::<Vec<_>>()
             }
-            super::Rows::StepModelReagent(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::StepModelReagent)
-                    .collect::<Vec<_>>()
-            }
             super::Rows::StepModelToolCategory(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::StepModelToolCategory)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::StepModelTrackableCategory(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::StepModelTrackableCategory)
                     .collect::<Vec<_>>()
             }
             super::Rows::StepModel(rows) => {
@@ -400,6 +400,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::ToolModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::ToolModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::TrackableCategory(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::TrackableCategory)
                     .collect::<Vec<_>>()
             }
             super::Rows::TrackableLocation(rows) => {

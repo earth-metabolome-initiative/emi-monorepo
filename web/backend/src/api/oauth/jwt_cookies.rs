@@ -392,8 +392,7 @@ pub(crate) async fn build_login_response(
         encode_jwt_refresh_cookie(user.id, redis_client, false).await?
     } else {
         let temporary_user = handle_unknown_user(primary_email, provider, conn).await?;
-        encode_jwt_refresh_cookie(temporary_user.id, redis_client, true)
-            .await?
+        encode_jwt_refresh_cookie(temporary_user.id, redis_client, true).await?
     };
 
     let login_cookie = encode_user_online_cookie()?;

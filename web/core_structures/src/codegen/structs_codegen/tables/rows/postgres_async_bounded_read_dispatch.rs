@@ -108,13 +108,6 @@ impl web_common_traits::prelude::AsyncBoundedReadDispatch<diesel_async::AsyncPgC
                     .await
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::CommercialReagentModel => {
-                <crate::codegen::structs_codegen::tables::commercial_reagent_models::CommercialReagentModel as web_common_traits::database::AsyncBoundedRead<
-                    diesel_async::AsyncPgConnection,
-                >>::bounded_read_async(offset, limit, conn)
-                    .await
-                    .map(super::Rows::from)
-            }
             crate::codegen::tables::table_names::TableName::CommercialReagent => {
                 <crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent as web_common_traits::database::AsyncBoundedRead<
                     diesel_async::AsyncPgConnection,
@@ -332,6 +325,13 @@ impl web_common_traits::prelude::AsyncBoundedReadDispatch<diesel_async::AsyncPgC
                     .await
                     .map(super::Rows::from)
             }
+            crate::codegen::tables::table_names::TableName::ProcedureModelToolCategory => {
+                <crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory as web_common_traits::database::AsyncBoundedRead<
+                    diesel_async::AsyncPgConnection,
+                >>::bounded_read_async(offset, limit, conn)
+                    .await
+                    .map(super::Rows::from)
+            }
             crate::codegen::tables::table_names::TableName::ProcedureModel => {
                 <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as web_common_traits::database::AsyncBoundedRead<
                     diesel_async::AsyncPgConnection,
@@ -514,15 +514,15 @@ impl web_common_traits::prelude::AsyncBoundedReadDispatch<diesel_async::AsyncPgC
                     .await
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::StepModelReagent => {
-                <crate::codegen::structs_codegen::tables::step_model_reagents::StepModelReagent as web_common_traits::database::AsyncBoundedRead<
+            crate::codegen::tables::table_names::TableName::StepModelToolCategory => {
+                <crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory as web_common_traits::database::AsyncBoundedRead<
                     diesel_async::AsyncPgConnection,
                 >>::bounded_read_async(offset, limit, conn)
                     .await
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::StepModelToolCategory => {
-                <crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory as web_common_traits::database::AsyncBoundedRead<
+            crate::codegen::tables::table_names::TableName::StepModelTrackableCategory => {
+                <crate::codegen::structs_codegen::tables::step_model_trackable_categories::StepModelTrackableCategory as web_common_traits::database::AsyncBoundedRead<
                     diesel_async::AsyncPgConnection,
                 >>::bounded_read_async(offset, limit, conn)
                     .await
@@ -614,6 +614,13 @@ impl web_common_traits::prelude::AsyncBoundedReadDispatch<diesel_async::AsyncPgC
             }
             crate::codegen::tables::table_names::TableName::ToolModel => {
                 <crate::codegen::structs_codegen::tables::tool_models::ToolModel as web_common_traits::database::AsyncBoundedRead<
+                    diesel_async::AsyncPgConnection,
+                >>::bounded_read_async(offset, limit, conn)
+                    .await
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::TrackableCategory => {
+                <crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory as web_common_traits::database::AsyncBoundedRead<
                     diesel_async::AsyncPgConnection,
                 >>::bounded_read_async(offset, limit, conn)
                     .await

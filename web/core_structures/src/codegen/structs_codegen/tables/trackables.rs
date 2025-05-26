@@ -12,6 +12,7 @@
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::trackables::trackables)]
 pub struct Trackable {
     pub id: ::rosetta_uuid::Uuid,
+    pub trackable_category_id: i32,
     pub container_model_id: i32,
     pub project_id: i32,
     pub trackable_state_id: i16,
@@ -27,6 +28,26 @@ impl diesel::Identifiable for Trackable {
     }
 }
 impl Trackable {
+    #[cfg(feature = "postgres")]
+    pub async fn trackable_category(
+        &self,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory,
+        diesel::result::Error,
+    > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::trackable_categories::trackable_categories::dsl::id
+                    .eq(&self.trackable_category_id),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory,
+            >(conn)
+            .await
+    }
     #[cfg(feature = "postgres")]
     pub async fn container_model(
         &self,
@@ -109,6 +130,21 @@ impl Trackable {
                 crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.updated_by),
             )
             .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_trackable_category_id(
+        conn: &mut diesel_async::AsyncPgConnection,
+        trackable_category_id: &crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        Self::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::trackables::trackables::dsl::trackable_category_id
+                    .eq(trackable_category_id.id),
+            )
+            .load::<Self>(conn)
             .await
     }
     #[cfg(feature = "postgres")]

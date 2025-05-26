@@ -5,6 +5,7 @@ use diesel_async::AsyncPgConnection;
 
 mod emi_solvent_procedure;
 mod ethanol_70_percent;
+mod shared_step_models;
 
 pub(crate) async fn init_procedure_models(
     user: &User,

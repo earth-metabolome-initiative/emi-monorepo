@@ -18,9 +18,8 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .do_update()
             .set(self)
             .filter(
-                name.ne(excluded(name))
-                    .or(description.ne(excluded(description)))
-                    .or(purity.ne(excluded(purity)))
+                purity
+                    .ne(excluded(purity))
                     .or(cas_code.ne(excluded(cas_code)))
                     .or(molecular_formulas.ne(excluded(molecular_formulas)))
                     .or(created_by.ne(excluded(created_by)))
@@ -52,9 +51,8 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .do_update()
             .set(self)
             .filter(
-                name.ne(excluded(name))
-                    .or(description.ne(excluded(description)))
-                    .or(purity.ne(excluded(purity)))
+                purity
+                    .ne(excluded(purity))
                     .or(cas_code.ne(excluded(cas_code)))
                     .or(molecular_formulas.ne(excluded(molecular_formulas)))
                     .or(created_by.ne(excluded(created_by)))

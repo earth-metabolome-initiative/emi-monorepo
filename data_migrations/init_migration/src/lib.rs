@@ -6,15 +6,16 @@ mod error;
 mod login_providers;
 mod procedure_models;
 mod reagents;
+mod trackable_categories;
 mod users;
 
 use brands::init_brands;
 use login_providers::init_login_providers;
 use procedure_models::init_procedure_models;
 use reagents::init_reagents;
+use trackable_categories::init_trackable_categories;
 use users::init_root_user;
 
-#[allow(clippy::unused_async)]
 /// Executes the init migration.
 ///
 /// # Arguments
@@ -31,6 +32,7 @@ pub async fn init_migration(portal_conn: &mut AsyncPgConnection) -> Result<(), e
                 init_login_providers(portal_conn).await?;
                 let darwin = init_root_user(portal_conn).await?;
                 init_brands(&darwin, portal_conn).await?;
+                init_trackable_categories(&darwin, portal_conn).await?;
                 init_reagents(&darwin, portal_conn).await?;
                 init_procedure_models(&darwin, portal_conn).await?;
                 Ok(())

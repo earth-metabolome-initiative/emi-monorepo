@@ -12,7 +12,6 @@ mod cities;
 mod colors;
 mod commercial_product_lots;
 mod commercial_products;
-mod commercial_reagent_models;
 mod commercial_reagents;
 mod container_models;
 mod countries;
@@ -47,6 +46,7 @@ mod postgres_async_bounded_read_dispatch;
 mod procedure_model_container_categories;
 mod procedure_model_instrument_categories;
 mod procedure_model_nameplate_categories;
+mod procedure_model_tool_categories;
 mod procedure_models;
 mod procedures;
 mod processables;
@@ -74,8 +74,8 @@ mod step_model_instrument_categories;
 mod step_model_instrument_models;
 mod step_model_instruments;
 mod step_model_nameplate_categories;
-mod step_model_reagents;
 mod step_model_tool_categories;
+mod step_model_trackable_categories;
 mod step_models;
 mod step_nameplate_models;
 mod step_storage_containers;
@@ -90,6 +90,7 @@ mod team_states;
 mod teams;
 mod temporary_user;
 mod tool_models;
+mod trackable_categories;
 mod trackable_locations;
 mod trackable_states;
 mod trackables;
@@ -148,11 +149,6 @@ pub enum Rows {
     CommercialProduct(
         Vec<
             crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-        >,
-    ),
-    CommercialReagentModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::commercial_reagent_models::CommercialReagentModel,
         >,
     ),
     CommercialReagent(
@@ -266,6 +262,11 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory,
         >,
     ),
+    ProcedureModelToolCategory(
+        Vec<
+            crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory,
+        >,
+    ),
     ProcedureModel(
         Vec<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
     ),
@@ -348,14 +349,14 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::step_model_nameplate_categories::StepModelNameplateCategory,
         >,
     ),
-    StepModelReagent(
-        Vec<
-            crate::codegen::structs_codegen::tables::step_model_reagents::StepModelReagent,
-        >,
-    ),
     StepModelToolCategory(
         Vec<
             crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
+        >,
+    ),
+    StepModelTrackableCategory(
+        Vec<
+            crate::codegen::structs_codegen::tables::step_model_trackable_categories::StepModelTrackableCategory,
         >,
     ),
     StepModel(Vec<crate::codegen::structs_codegen::tables::step_models::StepModel>),
@@ -389,6 +390,11 @@ pub enum Rows {
         Vec<crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser>,
     ),
     ToolModel(Vec<crate::codegen::structs_codegen::tables::tool_models::ToolModel>),
+    TrackableCategory(
+        Vec<
+            crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory,
+        >,
+    ),
     TrackableLocation(
         Vec<
             crate::codegen::structs_codegen::tables::trackable_locations::TrackableLocation,
@@ -527,13 +533,6 @@ impl Rows {
             }
             Rows::CommercialProduct(commercial_products) => {
                 commercial_products
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::CommercialReagentModel(commercial_reagent_models) => {
-                commercial_reagent_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -756,6 +755,13 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::ProcedureModelToolCategory(procedure_model_tool_categories) => {
+                procedure_model_tool_categories
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::ProcedureModel(procedure_models) => {
                 procedure_models
                     .iter()
@@ -938,15 +944,15 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::StepModelReagent(step_model_reagents) => {
-                step_model_reagents
+            Rows::StepModelToolCategory(step_model_tool_categories) => {
+                step_model_tool_categories
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::StepModelToolCategory(step_model_tool_categories) => {
-                step_model_tool_categories
+            Rows::StepModelTrackableCategory(step_model_trackable_categories) => {
+                step_model_trackable_categories
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -1037,6 +1043,13 @@ impl Rows {
             }
             Rows::ToolModel(tool_models) => {
                 tool_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::TrackableCategory(trackable_categories) => {
+                trackable_categories
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -1148,9 +1161,6 @@ impl web_common_traits::prelude::Rows for Rows {
                 commercial_product_lots.primary_keys()
             }
             Rows::CommercialProduct(commercial_products) => commercial_products.primary_keys(),
-            Rows::CommercialReagentModel(commercial_reagent_models) => {
-                commercial_reagent_models.primary_keys()
-            }
             Rows::CommercialReagent(commercial_reagents) => commercial_reagents.primary_keys(),
             Rows::ContainerModel(container_models) => container_models.primary_keys(),
             Rows::Country(countries) => countries.primary_keys(),
@@ -1198,6 +1208,9 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
                 procedure_model_nameplate_categories.primary_keys()
             }
+            Rows::ProcedureModelToolCategory(procedure_model_tool_categories) => {
+                procedure_model_tool_categories.primary_keys()
+            }
             Rows::ProcedureModel(procedure_models) => procedure_models.primary_keys(),
             Rows::Procedure(procedures) => procedures.primary_keys(),
             Rows::Processable(processables) => processables.primary_keys(),
@@ -1236,9 +1249,11 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::StepModelNameplateCategory(step_model_nameplate_categories) => {
                 step_model_nameplate_categories.primary_keys()
             }
-            Rows::StepModelReagent(step_model_reagents) => step_model_reagents.primary_keys(),
             Rows::StepModelToolCategory(step_model_tool_categories) => {
                 step_model_tool_categories.primary_keys()
+            }
+            Rows::StepModelTrackableCategory(step_model_trackable_categories) => {
+                step_model_trackable_categories.primary_keys()
             }
             Rows::StepModel(step_models) => step_models.primary_keys(),
             Rows::StepNameplateModel(step_nameplate_models) => step_nameplate_models.primary_keys(),
@@ -1255,6 +1270,7 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::Team(teams) => teams.primary_keys(),
             Rows::TemporaryUser(temporary_user) => temporary_user.primary_keys(),
             Rows::ToolModel(tool_models) => tool_models.primary_keys(),
+            Rows::TrackableCategory(trackable_categories) => trackable_categories.primary_keys(),
             Rows::TrackableLocation(trackable_locations) => trackable_locations.primary_keys(),
             Rows::TrackableState(trackable_states) => trackable_states.primary_keys(),
             Rows::Trackable(trackables) => trackables.primary_keys(),

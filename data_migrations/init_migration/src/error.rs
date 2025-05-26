@@ -5,10 +5,12 @@ use core_structures::tables::insertables::{
     InsertableCommercialProductAttributes, InsertableDocumentAttributes,
     InsertableLoginProviderAttributes, InsertableProcedureModelAttributes,
     InsertableProcedureModelContainerCategoryAttributes,
-    InsertableProcedureModelNameplateCategoryAttributes, InsertableReagentAttributes,
+    InsertableProcedureModelNameplateCategoryAttributes,
+    InsertableProcedureModelToolCategoryAttributes, InsertableReagentAttributes,
     InsertableSamplingStepModelAttributes, InsertableStepModelAttributes,
     InsertableStepModelContainerCategoryAttributes, InsertableStepModelNameplateCategoryAttributes,
-    InsertableStepModelReagentAttributes, InsertableUserAttributes,
+    InsertableStepModelToolCategoryAttributes, InsertableStepModelTrackableCategoryAttributes,
+    InsertableTrackableCategoryAttributes, InsertableUserAttributes,
 };
 use web_common_traits::database::InsertError;
 
@@ -30,6 +32,8 @@ pub enum Error {
     Brand(InsertError<InsertableBrandAttributes>),
     /// Failed to insert a  new user
     User(InsertError<InsertableUserAttributes>),
+    /// Failed to insert a new trackable category
+    TrackableCategory(InsertError<InsertableTrackableCategoryAttributes>),
     /// Failed to insert a new reagent
     Reagent(InsertError<InsertableReagentAttributes>),
     /// Failed to insert a new step model
@@ -45,7 +49,9 @@ pub enum Error {
     /// Failed to insert a new step model nameplate category
     StepModelNameplateCategory(InsertError<InsertableStepModelNameplateCategoryAttributes>),
     /// Failed to insert a new step model reagent
-    StepModelReagent(InsertError<InsertableStepModelReagentAttributes>),
+    StepModelTrackableCategory(InsertError<InsertableStepModelTrackableCategoryAttributes>),
+    /// Failed to insert a new step model tool category
+    StepModelToolCategory(InsertError<InsertableStepModelToolCategoryAttributes>),
     /// Failed to insert a new procedure model container category
     ProcedureModelContainerCategory(
         InsertError<InsertableProcedureModelContainerCategoryAttributes>,
@@ -54,6 +60,8 @@ pub enum Error {
     ProcedureModelNameplateCategory(
         InsertError<InsertableProcedureModelNameplateCategoryAttributes>,
     ),
+    /// Failed to insert a new procedure model tool category
+    ProcedureModelToolCategory(InsertError<InsertableProcedureModelToolCategoryAttributes>),
 }
 
 impl From<diesel::ConnectionError> for Error {
@@ -134,9 +142,9 @@ impl From<InsertError<InsertableStepModelContainerCategoryAttributes>> for Error
     }
 }
 
-impl From<InsertError<InsertableStepModelReagentAttributes>> for Error {
-    fn from(value: InsertError<InsertableStepModelReagentAttributes>) -> Self {
-        Error::StepModelReagent(value)
+impl From<InsertError<InsertableStepModelTrackableCategoryAttributes>> for Error {
+    fn from(value: InsertError<InsertableStepModelTrackableCategoryAttributes>) -> Self {
+        Error::StepModelTrackableCategory(value)
     }
 }
 
@@ -155,5 +163,23 @@ impl From<InsertError<InsertableProcedureModelNameplateCategoryAttributes>> for 
 impl From<InsertError<InsertableStepModelNameplateCategoryAttributes>> for Error {
     fn from(value: InsertError<InsertableStepModelNameplateCategoryAttributes>) -> Self {
         Error::StepModelNameplateCategory(value)
+    }
+}
+
+impl From<InsertError<InsertableTrackableCategoryAttributes>> for Error {
+    fn from(value: InsertError<InsertableTrackableCategoryAttributes>) -> Self {
+        Error::TrackableCategory(value)
+    }
+}
+
+impl From<InsertError<InsertableStepModelToolCategoryAttributes>> for Error {
+    fn from(value: InsertError<InsertableStepModelToolCategoryAttributes>) -> Self {
+        Error::StepModelToolCategory(value)
+    }
+}
+
+impl From<InsertError<InsertableProcedureModelToolCategoryAttributes>> for Error {
+    fn from(value: InsertError<InsertableProcedureModelToolCategoryAttributes>) -> Self {
+        Error::ProcedureModelToolCategory(value)
     }
 }

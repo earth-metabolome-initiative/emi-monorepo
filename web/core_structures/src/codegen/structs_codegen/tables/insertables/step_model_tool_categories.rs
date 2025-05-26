@@ -2,7 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableStepModelToolCategoryAttributes {
     StepModelId,
-    ToolCategory,
+    ProcedureModelToolCategoryId,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -14,8 +14,8 @@ impl core::fmt::Display for InsertableStepModelToolCategoryAttributes {
             InsertableStepModelToolCategoryAttributes::StepModelId => {
                 write!(f, "step_model_id")
             }
-            InsertableStepModelToolCategoryAttributes::ToolCategory => {
-                write!(f, "tool_category")
+            InsertableStepModelToolCategoryAttributes::ProcedureModelToolCategoryId => {
+                write!(f, "procedure_model_tool_category_id")
             }
             InsertableStepModelToolCategoryAttributes::CreatedBy => {
                 write!(f, "created_by")
@@ -42,7 +42,7 @@ impl core::fmt::Display for InsertableStepModelToolCategoryAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableStepModelToolCategory {
     step_model_id: i32,
-    tool_category: ::tool_categories::ToolCategory,
+    procedure_model_tool_category_id: i32,
     created_by: i32,
     created_at: ::rosetta_timestamp::TimestampUTC,
     updated_by: i32,
@@ -65,6 +65,26 @@ impl InsertableStepModelToolCategory {
                     .eq(&self.step_model_id),
             )
             .first::<crate::codegen::structs_codegen::tables::step_models::StepModel>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn procedure_model_tool_category(
+        &self,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory,
+        diesel::result::Error,
+    >{
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_model_tool_categories::procedure_model_tool_categories::dsl::id
+                    .eq(&self.procedure_model_tool_category_id),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory,
+            >(conn)
             .await
     }
     #[cfg(feature = "postgres")]
@@ -98,7 +118,7 @@ impl InsertableStepModelToolCategory {
 }
 pub struct InsertableStepModelToolCategoryBuilder {
     step_model_id: Option<i32>,
-    tool_category: Option<::tool_categories::ToolCategory>,
+    procedure_model_tool_category_id: Option<i32>,
     created_by: Option<i32>,
     created_at: Option<::rosetta_timestamp::TimestampUTC>,
     updated_by: Option<i32>,
@@ -108,7 +128,7 @@ impl Default for InsertableStepModelToolCategoryBuilder {
     fn default() -> Self {
         Self {
             step_model_id: None,
-            tool_category: None,
+            procedure_model_tool_category_id: None,
             created_by: None,
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             updated_by: None,
@@ -132,22 +152,22 @@ impl InsertableStepModelToolCategoryBuilder {
         self.step_model_id = Some(step_model_id);
         Ok(self)
     }
-    pub fn tool_category<P>(
+    pub fn procedure_model_tool_category_id<P>(
         mut self,
-        tool_category: P,
+        procedure_model_tool_category_id: P,
     ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
     where
-        P: TryInto<::tool_categories::ToolCategory>,
-        <P as TryInto<::tool_categories::ToolCategory>>::Error:
-            Into<validation_errors::SingleFieldError>,
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let tool_category = tool_category.try_into().map_err(
-            |err: <P as TryInto<::tool_categories::ToolCategory>>::Error| {
-                Into::into(err)
-                    .rename_field(InsertableStepModelToolCategoryAttributes::ToolCategory)
-            },
-        )?;
-        self.tool_category = Some(tool_category);
+        let procedure_model_tool_category_id = procedure_model_tool_category_id
+            .try_into()
+            .map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(
+                    InsertableStepModelToolCategoryAttributes::ProcedureModelToolCategoryId,
+                )
+            })?;
+        self.procedure_model_tool_category_id = Some(procedure_model_tool_category_id);
         Ok(self)
     }
     pub fn created_by<P>(
@@ -226,9 +246,9 @@ impl common_traits::prelude::Builder for InsertableStepModelToolCategoryBuilder 
                     InsertableStepModelToolCategoryAttributes::StepModelId,
                 ),
             )?,
-            tool_category: self.tool_category.ok_or(
+            procedure_model_tool_category_id: self.procedure_model_tool_category_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableStepModelToolCategoryAttributes::ToolCategory,
+                    InsertableStepModelToolCategoryAttributes::ProcedureModelToolCategoryId,
                 ),
             )?,
             created_by: self.created_by.ok_or(
@@ -259,7 +279,7 @@ impl TryFrom<InsertableStepModelToolCategory> for InsertableStepModelToolCategor
     fn try_from(insertable_variant: InsertableStepModelToolCategory) -> Result<Self, Self::Error> {
         Self::default()
             .step_model_id(insertable_variant.step_model_id)?
-            .tool_category(insertable_variant.tool_category)?
+            .procedure_model_tool_category_id(insertable_variant.procedure_model_tool_category_id)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?

@@ -160,17 +160,6 @@ impl web_common_traits::prelude::AsyncReadDispatch<diesel_async::AsyncPgConnecti
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialReagentModel(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::commercial_reagent_models::CommercialReagentModel as web_common_traits::database::AsyncRead<
-                        diesel_async::AsyncPgConnection,
-                    >>::read_async(primary_key, conn)
-                        .await?
-                        .map(super::Row::from),
-                )
-            }
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialReagent(
                 primary_key,
             ) => {
@@ -512,6 +501,17 @@ impl web_common_traits::prelude::AsyncReadDispatch<diesel_async::AsyncPgConnecti
                         .map(super::Row::from),
                 )
             }
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelToolCategory(
+                primary_key,
+            ) => {
+                Ok(
+                    <crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory as web_common_traits::database::AsyncRead<
+                        diesel_async::AsyncPgConnection,
+                    >>::read_async(primary_key, conn)
+                        .await?
+                        .map(super::Row::from),
+                )
+            }
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(
                 primary_key,
             ) => {
@@ -798,22 +798,22 @@ impl web_common_traits::prelude::AsyncReadDispatch<diesel_async::AsyncPgConnecti
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepModelReagent(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepModelToolCategory(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::step_model_reagents::StepModelReagent as web_common_traits::database::AsyncRead<
+                    <crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory as web_common_traits::database::AsyncRead<
                         diesel_async::AsyncPgConnection,
                     >>::read_async(primary_key, conn)
                         .await?
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepModelToolCategory(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepModelTrackableCategory(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory as web_common_traits::database::AsyncRead<
+                    <crate::codegen::structs_codegen::tables::step_model_trackable_categories::StepModelTrackableCategory as web_common_traits::database::AsyncRead<
                         diesel_async::AsyncPgConnection,
                     >>::read_async(primary_key, conn)
                         .await?
@@ -957,6 +957,17 @@ impl web_common_traits::prelude::AsyncReadDispatch<diesel_async::AsyncPgConnecti
             ) => {
                 Ok(
                     <crate::codegen::structs_codegen::tables::tool_models::ToolModel as web_common_traits::database::AsyncRead<
+                        diesel_async::AsyncPgConnection,
+                    >>::read_async(primary_key, conn)
+                        .await?
+                        .map(super::Row::from),
+                )
+            }
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::TrackableCategory(
+                primary_key,
+            ) => {
+                Ok(
+                    <crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory as web_common_traits::database::AsyncRead<
                         diesel_async::AsyncPgConnection,
                     >>::read_async(primary_key, conn)
                         .await?

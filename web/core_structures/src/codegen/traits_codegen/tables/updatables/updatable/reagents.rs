@@ -7,13 +7,16 @@ impl web_common_traits::database::Updatable
     async fn can_update(
         &self,
         user_id: &Self::UserId,
-        _conn: &mut Self::Conn,
+        conn: &mut Self::Conn,
     ) -> Result<bool, diesel::result::Error> {
         if *user_id == self.created_by {
             return Ok(true);
         }
         if *user_id == self.updated_by {
             return Ok(true);
+        }
+        if !self.id(conn).await?.can_update(user_id, conn).await? {
+            return Ok(false);
         }
         Ok(true)
     }

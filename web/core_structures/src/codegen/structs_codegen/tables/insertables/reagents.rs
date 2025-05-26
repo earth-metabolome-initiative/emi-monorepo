@@ -1,11 +1,10 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableReagentAttributes {
-    Name,
-    Description,
+    Id,
     Purity,
     CasCode,
-    MolecularFormula,
+    MolecularFormulas,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -14,11 +13,10 @@ pub enum InsertableReagentAttributes {
 impl core::fmt::Display for InsertableReagentAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableReagentAttributes::Name => write!(f, "name"),
-            InsertableReagentAttributes::Description => write!(f, "description"),
+            InsertableReagentAttributes::Id => write!(f, "id"),
             InsertableReagentAttributes::Purity => write!(f, "purity"),
             InsertableReagentAttributes::CasCode => write!(f, "cas_code"),
-            InsertableReagentAttributes::MolecularFormula => {
+            InsertableReagentAttributes::MolecularFormulas => {
                 write!(f, "molecular_formulas")
             }
             InsertableReagentAttributes::CreatedBy => write!(f, "created_by"),
@@ -35,8 +33,7 @@ impl core::fmt::Display for InsertableReagentAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableReagent {
-    name: String,
-    description: String,
+    id: i32,
     purity: f32,
     cas_code: ::cas_codes::CAS,
     molecular_formulas: ::molecular_formulas::MolecularFormula,
@@ -46,6 +43,26 @@ pub struct InsertableReagent {
     updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableReagent {
+    #[cfg(feature = "postgres")]
+    pub async fn id(
+        &self,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory,
+        diesel::result::Error,
+    > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::trackable_categories::trackable_categories::dsl::id
+                    .eq(&self.id),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory,
+            >(conn)
+            .await
+    }
     #[cfg(feature = "postgres")]
     pub async fn created_by(
         &self,
@@ -76,8 +93,7 @@ impl InsertableReagent {
     }
 }
 pub struct InsertableReagentBuilder {
-    name: Option<String>,
-    description: Option<String>,
+    id: Option<i32>,
     purity: Option<f32>,
     cas_code: Option<::cas_codes::CAS>,
     molecular_formulas: Option<::molecular_formulas::MolecularFormula>,
@@ -89,8 +105,7 @@ pub struct InsertableReagentBuilder {
 impl Default for InsertableReagentBuilder {
     fn default() -> Self {
         Self {
-            name: None,
-            description: None,
+            id: None,
             purity: None,
             cas_code: None,
             molecular_formulas: None,
@@ -102,37 +117,15 @@ impl Default for InsertableReagentBuilder {
     }
 }
 impl InsertableReagentBuilder {
-    pub fn name<P>(
-        mut self,
-        name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableReagentAttributes::Name)
+        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableReagentAttributes::Id)
         })?;
-        pgrx_validation::must_be_paragraph(name.as_ref())
-            .map_err(|e| e.rename_field(InsertableReagentAttributes::Name))?;
-        self.name = Some(name);
-        Ok(self)
-    }
-    pub fn description<P>(
-        mut self,
-        description: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let description =
-            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-                Into::into(err).rename_field(InsertableReagentAttributes::Description)
-            })?;
-        pgrx_validation::must_be_paragraph(description.as_ref())
-            .map_err(|e| e.rename_field(InsertableReagentAttributes::Description))?;
-        self.description = Some(description);
+        self.id = Some(id);
         Ok(self)
     }
     pub fn purity<P>(
@@ -181,7 +174,7 @@ impl InsertableReagentBuilder {
     {
         let molecular_formulas = molecular_formulas.try_into().map_err(
             |err: <P as TryInto<::molecular_formulas::MolecularFormula>>::Error| {
-                Into::into(err).rename_field(InsertableReagentAttributes::MolecularFormula)
+                Into::into(err).rename_field(InsertableReagentAttributes::MolecularFormulas)
             },
         )?;
         self.molecular_formulas = Some(molecular_formulas);
@@ -257,14 +250,9 @@ impl common_traits::prelude::Builder for InsertableReagentBuilder {
     type Attribute = InsertableReagentAttributes;
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
-            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableReagentAttributes::Name,
+            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableReagentAttributes::Id,
             ))?,
-            description: self.description.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableReagentAttributes::Description,
-                ),
-            )?,
             purity: self.purity.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableReagentAttributes::Purity,
             ))?,
@@ -275,7 +263,7 @@ impl common_traits::prelude::Builder for InsertableReagentBuilder {
             )?,
             molecular_formulas: self.molecular_formulas.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableReagentAttributes::MolecularFormula,
+                    InsertableReagentAttributes::MolecularFormulas,
                 ),
             )?,
             created_by: self.created_by.ok_or(
@@ -305,8 +293,7 @@ impl TryFrom<InsertableReagent> for InsertableReagentBuilder {
     type Error = <Self as common_traits::prelude::Builder>::Error;
     fn try_from(insertable_variant: InsertableReagent) -> Result<Self, Self::Error> {
         Self::default()
-            .name(insertable_variant.name)?
-            .description(insertable_variant.description)?
+            .id(insertable_variant.id)?
             .purity(insertable_variant.purity)?
             .cas_code(insertable_variant.cas_code)?
             .molecular_formulas(insertable_variant.molecular_formulas)?

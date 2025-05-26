@@ -3,24 +3,23 @@
 #[cfg(feature = "pgrx")]
 ::pgrx::pg_module_magic!();
 
-mod as_ref;
-pub mod diesel_impls;
 mod display;
-pub mod errors;
-mod try_from;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, strum_macros::EnumIter)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, strum_macros::EnumIter)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresEnum))]
+#[cfg_attr(feature = "diesel_pgrx", derive(diesel_pgrx::DieselPGRX))]
+#[cfg_attr(feature = "pgrx", derive(pgrx::PostgresType))]
 #[cfg_attr(feature = "diesel", derive(diesel::FromSqlRow, diesel::AsExpression))]
-#[cfg_attr(
-	feature = "diesel",
-	diesel(sql_type = crate::diesel_impls::ContainerCategory)
-)]
+#[
+    cfg_attr(feature = "diesel", diesel(sql_type = crate::diesel_impls::ContainerCategory))]
+#[cfg_attr(feature = "pgrx", pg_binary_protocol)]
 /// Enum representing different instrument categories
 pub enum ContainerCategory {
     /// A container which may be used for samples or mixtures.
-    Bottle,
+    Bottle {
+        /// The volume of the bottle in liters
+        liters: f64,
+    },
     /// A rack for sample containers, such as leaves or roots
     SampleContainerRack,
     /// A box for sample containers, or sample container racks
@@ -32,7 +31,7 @@ impl ContainerCategory {
     /// Returns the name of the instrument category
     pub fn name(&self) -> &'static str {
         match self {
-            ContainerCategory::Bottle => "Bottle",
+            ContainerCategory::Bottle { .. } => "Bottle",
             ContainerCategory::SampleContainerRack => "Sample Container Rack",
             ContainerCategory::ContainerBox => "Container Box",
         }
@@ -42,7 +41,7 @@ impl ContainerCategory {
     /// Returns the description of the instrument category
     pub fn description(&self) -> &'static str {
         match self {
-            ContainerCategory::Bottle => {
+            ContainerCategory::Bottle { .. } => {
                 "A container appropriate for samples, such as leafs or roots."
             }
             ContainerCategory::SampleContainerRack => {
@@ -58,7 +57,7 @@ impl ContainerCategory {
     /// Returns the icon of the instrument category
     pub fn icon(&self) -> &'static str {
         match self {
-            ContainerCategory::Bottle => "FlaskVial",
+            ContainerCategory::Bottle { .. } => "FlaskVial",
             ContainerCategory::SampleContainerRack => "Vials",
             ContainerCategory::ContainerBox => "Box",
         }

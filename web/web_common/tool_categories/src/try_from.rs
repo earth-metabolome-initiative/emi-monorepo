@@ -15,7 +15,10 @@ impl TryFrom<&str> for crate::ToolCategory {
             "Gloves" => Self::Gloves,
             "HandCleaningAgent" => Self::HandCleaningAgent,
             "PaperTowels" => Self::PaperTowels,
-            "VolumeMeasuringTool" => Self::VolumeMeasuringTool,
+            "GraduatedCylinder" => Self::GraduatedCylinder,
+            "Pipette" => Self::Pipette,
+            "PipetteTip" => Self::PipetteTip,
+            "PipettingContainer" => Self::PipettingContainer,
             _ => return Err(crate::errors::UnknownToolCategory::UnknownString(value.to_string())),
         })
     }

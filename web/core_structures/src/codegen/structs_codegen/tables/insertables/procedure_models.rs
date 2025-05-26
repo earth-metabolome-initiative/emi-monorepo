@@ -157,7 +157,6 @@ impl InsertableProcedureModelBuilder {
         self.icon = Some(icon);
         Ok(self)
     }
-
     pub fn created_by<P>(
         mut self,
         created_by: P,

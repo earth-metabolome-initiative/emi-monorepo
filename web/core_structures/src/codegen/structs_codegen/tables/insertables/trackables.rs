@@ -2,6 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableTrackableAttributes {
     Id,
+    TrackableCategoryId,
     ContainerModelId,
     ProjectId,
     TrackableStateId,
@@ -14,6 +15,9 @@ impl core::fmt::Display for InsertableTrackableAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertableTrackableAttributes::Id => write!(f, "id"),
+            InsertableTrackableAttributes::TrackableCategoryId => {
+                write!(f, "trackable_category_id")
+            }
             InsertableTrackableAttributes::ContainerModelId => {
                 write!(f, "container_model_id")
             }
@@ -36,6 +40,7 @@ impl core::fmt::Display for InsertableTrackableAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTrackable {
     id: ::rosetta_uuid::Uuid,
+    trackable_category_id: i32,
     container_model_id: i32,
     project_id: i32,
     trackable_state_id: i16,
@@ -45,6 +50,26 @@ pub struct InsertableTrackable {
     updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableTrackable {
+    #[cfg(feature = "postgres")]
+    pub async fn trackable_category(
+        &self,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory,
+        diesel::result::Error,
+    > {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+        crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::trackable_categories::trackable_categories::dsl::id
+                    .eq(&self.trackable_category_id),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory,
+            >(conn)
+            .await
+    }
     #[cfg(feature = "postgres")]
     pub async fn container_model(
         &self,
@@ -132,6 +157,7 @@ impl InsertableTrackable {
 }
 pub struct InsertableTrackableBuilder {
     id: Option<::rosetta_uuid::Uuid>,
+    trackable_category_id: Option<i32>,
     container_model_id: Option<i32>,
     project_id: Option<i32>,
     trackable_state_id: Option<i16>,
@@ -144,6 +170,7 @@ impl Default for InsertableTrackableBuilder {
     fn default() -> Self {
         Self {
             id: None,
+            trackable_category_id: None,
             container_model_id: None,
             project_id: None,
             trackable_state_id: None,
@@ -164,6 +191,21 @@ impl InsertableTrackableBuilder {
             Into::into(err).rename_field(InsertableTrackableAttributes::Id)
         })?;
         self.id = Some(id);
+        Ok(self)
+    }
+    pub fn trackable_category_id<P>(
+        mut self,
+        trackable_category_id: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let trackable_category_id =
+            trackable_category_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err).rename_field(InsertableTrackableAttributes::TrackableCategoryId)
+            })?;
+        self.trackable_category_id = Some(trackable_category_id);
         Ok(self)
     }
     pub fn container_model_id<P>(
@@ -283,6 +325,11 @@ impl common_traits::prelude::Builder for InsertableTrackableBuilder {
             id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableTrackableAttributes::Id,
             ))?,
+            trackable_category_id: self.trackable_category_id.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableTrackableAttributes::TrackableCategoryId,
+                ),
+            )?,
             container_model_id: self.container_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableAttributes::ContainerModelId,
@@ -326,6 +373,7 @@ impl TryFrom<InsertableTrackable> for InsertableTrackableBuilder {
     fn try_from(insertable_variant: InsertableTrackable) -> Result<Self, Self::Error> {
         Self::default()
             .id(insertable_variant.id)?
+            .trackable_category_id(insertable_variant.trackable_category_id)?
             .container_model_id(insertable_variant.container_model_id)?
             .project_id(insertable_variant.project_id)?
             .trackable_state_id(insertable_variant.trackable_state_id)?

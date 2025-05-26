@@ -9,7 +9,7 @@ diesel = { workspace = true, optional = true, features = ["uuid"] }
 pgrx = { workspace = true, optional = true, features = ["pg17"] }
 pgrx-sql-entity-graph = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
-redis = {workspace = true, optional = true}
+redis = { workspace = true, optional = true }
 
 [features]
 default = []

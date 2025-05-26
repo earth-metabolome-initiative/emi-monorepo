@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(
     diesel::Selectable,
@@ -118,21 +118,6 @@ impl ProcedureModelContainerCategory {
                 crate::codegen::diesel_codegen::tables::procedure_model_container_categories::procedure_model_container_categories::dsl::updated_by
                     .eq(updated_by.id),
             )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_container_category(
-        container_category: &::container_categories::ContainerCategory,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-
-        use crate::codegen::diesel_codegen::tables::procedure_model_container_categories::procedure_model_container_categories;
-        Self::table()
-            .filter(procedure_model_container_categories::container_category.eq(container_category))
-            .order_by(procedure_model_container_categories::id.asc())
             .load::<Self>(conn)
             .await
     }
