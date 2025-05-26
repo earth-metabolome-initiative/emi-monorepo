@@ -33,8 +33,6 @@ pub(crate) async fn init_qrcode_step_model(
         // https://fontawesome.com/icons/qrcode?f=classic&s=solid
         .icon("qrcode")?
         .photograph_id(qrcode_materials_photograph.id)?
-        .snoozable(true)?
-        .copiable(true)?
         .step_model_category(StepModelCategory::Labelling)?
         .created_by(user.id)?
         .build()?

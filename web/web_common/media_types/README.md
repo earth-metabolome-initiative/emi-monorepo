@@ -118,21 +118,24 @@ The `media_types` crate provides a custom `Diesel` type that allows you to use t
 Next, to use the `MediaType` type in your `Diesel` schema, you need to add the following line to your `schema.rs` file:
 
 ```rust
-# #![cfg(feature = "diesel_pgrx")]
-
-table! {
-    my_table (id) {
-        id -> Integer,
-        mime_type -> media_types::diesel_impl::MediaType,
+# #[cfg(all(feature = "diesel_pgrx", any(feature = "postgres", feature = "sqlite")))]
+# pub fn main() {
+    diesel::table! {
+        my_table (id) {
+            id -> Integer,
+            mime_type -> ::media_types::diesel_impls::MediaType,
+        }
     }
-}
 
-#[derive(Queryable, Insertable, Debug)]
-#[diesel(table_name = "my_table")]
-struct MyTable {
-    id: i32,
-    mime_type: media_types::MediaType,
-}
+    #[derive(diesel::Queryable, diesel::Insertable, Debug)]
+    #[diesel(table_name = my_table)]
+    struct MyTable {
+        id: i32,
+        mime_type: ::media_types::MediaType,
+    }
+# }
+# #[cfg(not(all(feature = "diesel_pgrx", any(feature = "postgres", feature = "sqlite"))))]
+# pub fn main() {}
 ```
 
 ## Related work
