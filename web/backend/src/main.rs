@@ -46,12 +46,17 @@ async fn main() -> std::io::Result<()> {
     {
         let mut connection = pool.get().await.unwrap();
         let database_name = std::env::var("POSTGRES_DB").expect("POSTGRES_DB must be set");
-        init_db::init_database(&database_name, &mut connection)
+        if !init_db::database_exists(&database_name, &mut connection)
             .await
-            .expect("Error creating database");
-        init_migration::init_migration(&mut connection)
-            .await
-            .expect("Error running init migration");
+            .expect("Error checking if database exists")
+        {
+            init_db::init_database(&database_name, &mut connection)
+                .await
+                .expect("Error creating database");
+            init_migration::init_migration(&mut connection)
+                .await
+                .expect("Error running init migration");
+        }
     }
 
     let redis_client =

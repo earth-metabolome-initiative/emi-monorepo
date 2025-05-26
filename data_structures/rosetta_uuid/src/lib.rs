@@ -2,10 +2,9 @@
 
 use std::str::FromStr;
 
-#[cfg(feature = "diesel")]
 pub mod diesel_impls;
-#[cfg(feature = "pgrx")]
 mod pgrx;
+mod redis;
 
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

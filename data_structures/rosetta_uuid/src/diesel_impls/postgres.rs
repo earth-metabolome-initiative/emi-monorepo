@@ -1,3 +1,4 @@
+#![cfg(feature = "postgres")]
 //! Implementation for the [Postgres Backend](diesel::pg::Pg).
 
 impl diesel::deserialize::FromSql<crate::diesel_impls::Uuid, diesel::pg::Pg> for crate::Uuid {

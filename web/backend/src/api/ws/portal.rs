@@ -35,9 +35,10 @@ pub(super) async fn portal_ws(
     diesel_pool: web::Data<crate::DBPool>,
     listen_notify_handle: crate::ListenNotifyHandle,
     msg_stream: actix_ws::MessageStream,
-    _user: MaybeUser,
+    user: MaybeUser,
 ) {
-    // let mut name = None;
+    log::debug!("portal_ws: user={user:?}");
+
     let mut last_heartbeat = Instant::now();
     let mut interval = interval(HEARTBEAT_INTERVAL);
     let mut conn = diesel_pool.get().await.unwrap();

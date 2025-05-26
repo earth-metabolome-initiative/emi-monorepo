@@ -13,6 +13,15 @@ pub(super) async fn handle_unknown_user(
     provider: &LoginProvider,
     conn: &mut crate::Conn,
 ) -> Result<TemporaryUser, BackendError> {
+    // We check whether there is already a temporary user with the same email and
+    // login provider.
+    if let Some(existing_user) =
+        TemporaryUser::from_email_and_login_provider_id(email, &provider.id, conn).await?
+    {
+        // If such a user exists, we return it.
+        return Ok(existing_user);
+    }
+
     // If the user is not registered, we create a new temporary user.
     let temporary_user = TemporaryUser::new()
         .email(email)?

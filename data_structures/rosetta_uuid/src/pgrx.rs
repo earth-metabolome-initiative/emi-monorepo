@@ -1,3 +1,4 @@
+#![cfg(feature = "pgrx")]
 //! Implementation of the traits to allow for [`PGRX`](https://docs.rs/pgrx/latest/pgrx/)
 
 use pgrx::{FromDatum, IntoDatum, pg_sys};

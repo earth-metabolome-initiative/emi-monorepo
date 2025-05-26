@@ -9,6 +9,7 @@ diesel = { workspace = true, optional = true, features = ["uuid"] }
 pgrx = { workspace = true, optional = true, features = ["pg17"] }
 pgrx-sql-entity-graph = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
+redis = {workspace = true, optional = true}
 
 [features]
 default = []
@@ -17,6 +18,7 @@ diesel = ["dep:diesel"]
 postgres = ["diesel", "diesel/postgres"]
 sqlite = ["diesel", "diesel/sqlite"]
 pgrx = ["dep:pgrx", "dep:pgrx-sql-entity-graph"]
+redis = ["dep:redis"]
 
 [lints]
 workspace = true

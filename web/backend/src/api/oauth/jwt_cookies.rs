@@ -34,10 +34,8 @@ use unknown_user::handle_unknown_user;
 
 /// Set a const with the expected cookie name.
 pub(crate) const REFRESH_COOKIE_NAME: &str = "refresh_token";
-pub(crate) const TEMPORARY_COOKIE_NAME: &str = "temporary_refresh_token";
 
 pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpResponse {
-    log::info!("Eliminating cookies");
     let refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, "")
         .same_site(actix_web::cookie::SameSite::Strict)
         .secure(true)
@@ -60,60 +58,26 @@ pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpRespons
 
 #[derive(Debug)]
 struct JWTConfig {
-    access_token_base_64_public_key: String,
-    access_token_base_64_private_key: String,
+    access_token_public_key: String,
+    access_token_private_key: String,
     access_token_minutes: i64,
-    refresh_token_base_64_public_key: String,
-    refresh_token_base_64_private_key: String,
     refresh_token_minutes: i64,
 }
 
 impl JWTConfig {
     fn from_env() -> Result<JWTConfig, BackendError> {
         Ok(JWTConfig {
-            access_token_base_64_public_key: std::env::var("ACCESS_TOKEN_PUBLIC_KEY")?,
-            access_token_base_64_private_key: std::env::var("ACCESS_TOKEN_PRIVATE_KEY")?,
+            access_token_public_key: String::from_utf8(
+                base64::engine::general_purpose::STANDARD
+                    .decode(&std::env::var("ACCESS_TOKEN_PUBLIC_KEY")?)?,
+            )?,
+            access_token_private_key: String::from_utf8(
+                base64::engine::general_purpose::STANDARD
+                    .decode(&std::env::var("ACCESS_TOKEN_PRIVATE_KEY")?)?,
+            )?,
             access_token_minutes: std::env::var("ACCESS_TOKEN_MINUTES")?.parse()?,
-            refresh_token_base_64_public_key: std::env::var("REFRESH_TOKEN_PUBLIC_KEY")?,
-            refresh_token_base_64_private_key: std::env::var("REFRESH_TOKEN_PRIVATE_KEY")?,
             refresh_token_minutes: std::env::var("REFRESH_TOKEN_MINUTES")?.parse()?,
         })
-    }
-
-    fn access_token_public_key(&self) -> Result<String, BackendError> {
-        Ok(String::from_utf8(
-            base64::engine::general_purpose::STANDARD
-                .decode(&self.access_token_base_64_public_key)?,
-        )?)
-    }
-
-    fn access_token_private_key(&self) -> Result<String, BackendError> {
-        Ok(String::from_utf8(
-            base64::engine::general_purpose::STANDARD
-                .decode(&self.access_token_base_64_private_key)?,
-        )?)
-    }
-
-    fn access_token_minutes(&self) -> i64 {
-        self.access_token_minutes
-    }
-
-    fn refresh_token_public_key(&self) -> Result<String, BackendError> {
-        Ok(String::from_utf8(
-            base64::engine::general_purpose::STANDARD
-                .decode(&self.refresh_token_base_64_public_key)?,
-        )?)
-    }
-
-    fn refresh_token_private_key(&self) -> Result<String, BackendError> {
-        Ok(String::from_utf8(
-            base64::engine::general_purpose::STANDARD
-                .decode(&self.refresh_token_base_64_private_key)?,
-        )?)
-    }
-
-    fn refresh_token_minutes(&self) -> i64 {
-        self.refresh_token_minutes
     }
 }
 
@@ -150,7 +114,7 @@ impl JsonWebToken {
 
         let mut con = redis_client.get_multiplexed_async_connection().await?;
 
-        Ok(con.set_ex(self.token_id.to_string(), self.user_id().to_string(), minutes * 60).await?)
+        Ok(con.set_ex(self.token_id, (self.user_id, self.temporary), minutes * 60).await?)
     }
 
     /// Checks whether the token is still present in the redis database and has
@@ -168,9 +132,9 @@ impl JsonWebToken {
         // the redis database with a different `user_id`. This may happen due to a
         // collision, or more likely, if some potentially malicious action is
         // taking place.
-        let user_id: String = con.get(self.token_id.to_string()).await?;
+        let (user_id, temporary): (i32, bool) = con.get(self.token_id).await?;
 
-        Ok(user_id == self.user_id().to_string())
+        Ok(user_id == self.user_id && temporary == self.temporary)
     }
 
     /// Delete the token from the redis database.
@@ -180,7 +144,7 @@ impl JsonWebToken {
     async fn delete_from_redis(&self, redis_client: &redis::Client) -> Result<(), BackendError> {
         let mut con = redis_client.get_multiplexed_async_connection().await?;
 
-        Ok(con.del(self.token_id.to_string()).await?)
+        Ok(con.del(self.token_id).await?)
     }
 
     fn user_id(&self) -> i32 {
@@ -222,7 +186,7 @@ impl JsonRefreshToken {
             web_token: JsonWebToken::new(
                 user_id,
                 temporary,
-                JWTConfig::from_env()?.refresh_token_minutes(),
+                JWTConfig::from_env()?.refresh_token_minutes,
             ),
         })
     }
@@ -234,7 +198,7 @@ impl JsonRefreshToken {
     async fn insert_into_redis(&self, redis_client: &redis::Client) -> Result<(), BackendError> {
         let config = JWTConfig::from_env()?;
         self.web_token
-            .insert_into_redis(redis_client, u64::try_from(config.refresh_token_minutes()).unwrap())
+            .insert_into_redis(redis_client, u64::try_from(config.refresh_token_minutes).unwrap())
             .await
     }
 
@@ -270,14 +234,14 @@ impl JsonRefreshToken {
     }
 
     pub(crate) fn encode(&self) -> Result<String, BackendError> {
-        Ok(self.web_token.encode(&JWTConfig::from_env()?.refresh_token_private_key()?)?)
+        Ok(self.web_token.encode(&JWTConfig::from_env()?.access_token_private_key)?)
     }
 
     pub(crate) fn decode(token: &str) -> Result<JsonRefreshToken, BackendError> {
         Ok(JsonRefreshToken {
             web_token: JsonWebToken::decode(
                 token,
-                &JWTConfig::from_env()?.refresh_token_public_key()?,
+                &JWTConfig::from_env()?.access_token_public_key,
             )?
             .claims,
         })
@@ -295,7 +259,7 @@ impl JsonAccessToken {
             web_token: JsonWebToken::new(
                 user_id,
                 temporary,
-                JWTConfig::from_env()?.access_token_minutes(),
+                JWTConfig::from_env()?.access_token_minutes,
             ),
         })
     }
@@ -310,7 +274,7 @@ impl JsonAccessToken {
     ) -> Result<(), BackendError> {
         let config = JWTConfig::from_env()?;
         self.web_token
-            .insert_into_redis(redis_client, u64::try_from(config.access_token_minutes()).unwrap())
+            .insert_into_redis(redis_client, u64::try_from(config.access_token_minutes).unwrap())
             .await
     }
 
@@ -351,13 +315,13 @@ impl JsonAccessToken {
 
     pub fn encode(&self) -> Result<String, BackendError> {
         let config = JWTConfig::from_env()?;
-        Ok(self.web_token.encode(&config.access_token_private_key()?)?)
+        Ok(self.web_token.encode(&config.access_token_private_key)?)
     }
 
     pub fn decode(token: &str) -> Result<JsonAccessToken, BackendError> {
         let config = JWTConfig::from_env()?;
         Ok(JsonAccessToken {
-            web_token: JsonWebToken::decode(token, &config.access_token_public_key()?)?.claims,
+            web_token: JsonWebToken::decode(token, &config.access_token_public_key)?.claims,
         })
     }
 }
@@ -367,12 +331,10 @@ impl JsonAccessToken {
 /// # Arguments
 /// * `user_id` - The ID of the user to create the JWT for.
 /// * `redis_client` - The redis client to use for the login.
-/// * `cookie_name` - The name of the cookie to create.
 /// * `temporary` - Whether the cookie is temporary or not.
 async fn encode_jwt_refresh_cookie<'a>(
     user_id: i32,
     redis_client: &redis::Client,
-    cookie_name: &'a str,
     temporary: bool,
 ) -> Result<Cookie<'a>, BackendError> {
     log::info!("Creating refresh token");
@@ -382,11 +344,11 @@ async fn encode_jwt_refresh_cookie<'a>(
 
     token.insert_into_redis(redis_client).await?;
 
-    let cookie = Cookie::build(cookie_name, token.encode()?)
+    let cookie = Cookie::build(REFRESH_COOKIE_NAME, token.encode()?)
         .same_site(actix_web::cookie::SameSite::Strict)
         .secure(true)
         .path("/")
-        .max_age(ActixWebDuration::minutes(config.refresh_token_minutes()))
+        .max_age(ActixWebDuration::minutes(config.refresh_token_minutes))
         // The HTTP_ONLY flag is set to true to prevent the cookie from being accessed by
         // JavaScript. This is a security measure to prevent XSS attacks.
         .http_only(true)
@@ -402,7 +364,7 @@ fn encode_user_online_cookie<'a>() -> Result<Cookie<'a>, BackendError> {
         .same_site(actix_web::cookie::SameSite::Strict)
         .secure(true)
         .path("/")
-        .max_age(ActixWebDuration::minutes(config.refresh_token_minutes()))
+        .max_age(ActixWebDuration::minutes(config.refresh_token_minutes))
         // We want to be able to check the existence of this cookie from the frontend
         // by using javascript (or in our case Yew) so we set http_only to false.
         .http_only(false)
@@ -422,27 +384,25 @@ pub(crate) async fn build_login_response(
     emails: &[&str],
     primary_email: &str,
     provider: &LoginProvider,
-    state: &str,
+    _state: &str,
     redis_client: &redis::Client,
     conn: &mut AsyncPgConnection,
 ) -> Result<HttpResponse, BackendError> {
     let refresh_cookie = if let Some(user) = handle_known_user(emails, provider, conn).await? {
-        encode_jwt_refresh_cookie(user.id, redis_client, REFRESH_COOKIE_NAME, false).await?
+        encode_jwt_refresh_cookie(user.id, redis_client, false).await?
     } else {
         let temporary_user = handle_unknown_user(primary_email, provider, conn).await?;
-        encode_jwt_refresh_cookie(temporary_user.id, redis_client, TEMPORARY_COOKIE_NAME, true)
+        encode_jwt_refresh_cookie(temporary_user.id, redis_client, true)
             .await?
     };
 
     let login_cookie = encode_user_online_cookie()?;
 
     let response = HttpResponse::Found()
-        .append_header((LOCATION, state.to_string()))
+        .append_header((LOCATION, "/"))
         .cookie(refresh_cookie)
         .cookie(login_cookie)
         .finish();
-
-    log::info!("Returning login response");
 
     Ok(response)
 }
@@ -462,6 +422,7 @@ pub(crate) async fn access_token_validator(
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
 pub enum MaybeUser {
     TemporaryUser(TemporaryUser),
     User(User),
@@ -512,6 +473,9 @@ impl FromRequest for MaybeUser {
         // of the form:
         // Authorization: Bearer <token here>
         //
+
+        // TODO! INCLUDE THE HANDLING OF COOKIES HERE AS WELL.
+
         let Ok(bearer) = BearerAuth::from_request(req, payload).into_inner() else {
             return Box::pin(ready(Ok(MaybeUser::Anonymous)));
         };

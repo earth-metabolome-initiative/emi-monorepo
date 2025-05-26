@@ -16,7 +16,7 @@ diesel.workspace = true
 diesel-async = { workspace = true, features = ["bb8", "pool", "postgres"] }
 serde.workspace = true
 serde_json.workspace = true
-rosetta_uuid.workspace = true
+rosetta_uuid = {workspace = true, features = ["redis"]}
 bincode.workspace = true
 futures.workspace = true
 api_path.workspace = true
