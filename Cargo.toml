@@ -4,7 +4,7 @@ resolver = "2"
 members = [
   "bindings/sirius_bindings",
   "web/backend",
-  # "web/frontend",
+  "web/frontend",
   "web/web_common/web_common_traits",
   "web/web_common/webcodegen",
   "web/web_common/csqlv",
