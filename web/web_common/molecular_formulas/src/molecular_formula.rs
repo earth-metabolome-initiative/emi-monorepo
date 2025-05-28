@@ -9,6 +9,7 @@ mod contains_elements;
 mod contains_isotopes;
 mod contains_mixtures;
 mod contains_residual;
+mod countable;
 mod diatomic;
 mod display;
 mod from;
@@ -109,9 +110,7 @@ impl MolecularFormula {
             | Self::Residual
             | Self::Complex(_)
             | Self::RepeatingUnit(_) => Ok(Self::Count(self.into(), count)),
-            Self::Count(_, _) | Self::Greek(_) => {
-                unreachable!("Count or greek letter `{self:?}` should not be counted")
-            }
+            Self::Count(_, _) | Self::Greek(_) => Err(crate::errors::Error::CountingUncountable),
         }
     }
 
@@ -136,11 +135,10 @@ impl MolecularFormula {
             | Self::Element(_)
             | Self::Ion(_)
             | Self::Complex(_)
+            | Self::Radical(_, _)
             | Self::Residual
             | Self::RepeatingUnit(_) => Ok(Self::Count(self.into(), count)),
-            Self::Count(_, _) | Self::Greek(_) | Self::Radical(_, _) => {
-                unreachable!("Count or greek letter `{self:?}` should not be counted")
-            }
+            Self::Count(_, _) | Self::Greek(_) => Err(crate::errors::Error::CountingUncountable),
         }
     }
 }

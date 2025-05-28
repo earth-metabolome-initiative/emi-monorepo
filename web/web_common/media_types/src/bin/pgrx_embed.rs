@@ -5,6 +5,4 @@
 
 #[cfg(not(feature = "pgrx"))]
 /// Stub function to allow compilation without pgrx
-fn main() {
-    println!("Hello, media_types!");
-}
+fn main() {}

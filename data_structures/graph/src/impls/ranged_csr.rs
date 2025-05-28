@@ -2,10 +2,12 @@
 //! [`RangedCSR`](algebra::prelude::RangedCSR) data structure.
 
 use algebra::{
-    impls::{Ranged, RangedCSR2D},
+    impls::RangedCSR2D,
     prelude::{Matrix2D, Matrix2DRef, SizedSparseMatrix, SparseMatrix, SparseMatrixMut},
 };
-use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize, Zero};
+use multi_ranged::{MultiRanged, Step};
+use num_traits::ConstZero;
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use crate::{
     errors::builder::edges::EdgesBuilderError,
@@ -14,10 +16,10 @@ use crate::{
 
 impl<SparseIndex, RowIndex, R> Edges for RangedCSR2D<SparseIndex, RowIndex, R>
 where
-    R: Ranged,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    R: MultiRanged,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: TryFromUsize + IntoUsize + PositiveInteger,
-    R::Step: TryFromUsize,
+    R::Step: PositiveInteger + TryFromUsize + IntoUsize,
 {
     type Edge = (<Self as Matrix2D>::RowIndex, <Self as Matrix2D>::ColumnIndex);
     type SourceNodeId = <Self as Matrix2D>::RowIndex;
@@ -32,10 +34,10 @@ where
 
 impl<SparseIndex, RowIndex, R> GrowableEdges for RangedCSR2D<SparseIndex, RowIndex, R>
 where
-    R: Ranged,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    R: MultiRanged,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: TryFromUsize + IntoUsize + PositiveInteger,
-    R::Step: TryFromUsize,
+    R::Step: PositiveInteger + TryFromUsize + IntoUsize,
 {
     type GrowableMatrix = Self;
     type Error = EdgesBuilderError<Self>;
@@ -58,10 +60,10 @@ where
 
 impl<SparseIndex, RowIndex, R> Graph for RangedCSR2D<SparseIndex, RowIndex, R>
 where
-    R: Ranged,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    R: MultiRanged,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: TryFromUsize + IntoUsize + PositiveInteger,
-    R::Step: TryFromUsize,
+    R::Step: PositiveInteger + TryFromUsize + IntoUsize,
 {
     fn has_nodes(&self) -> bool {
         self.number_of_rows() > <Self as Matrix2D>::RowIndex::ZERO
@@ -75,10 +77,10 @@ where
 
 impl<SparseIndex, RowIndex, R> MonoplexGraph for RangedCSR2D<SparseIndex, RowIndex, R>
 where
-    R: Ranged,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    R: MultiRanged,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: TryFromUsize + IntoUsize + PositiveInteger,
-    R::Step: TryFromUsize,
+    R::Step: PositiveInteger + TryFromUsize + IntoUsize,
 {
     type Edge = (<Self as Matrix2D>::RowIndex, <Self as Matrix2D>::ColumnIndex);
     type Edges = Self;
@@ -90,8 +92,9 @@ where
 
 impl<SparseIndex, RowIndex, R> BipartiteGraph for RangedCSR2D<SparseIndex, RowIndex, R>
 where
-    R: Ranged,
-    RowIndex: PositiveInteger
+    R: MultiRanged,
+    RowIndex: Step
+        + PositiveInteger
         + IntoUsize
         + TryFromUsize
         + BidirectionalVocabulary<
@@ -103,7 +106,8 @@ where
         + BidirectionalVocabulary<
             SourceSymbol = <Self as Matrix2D>::ColumnIndex,
             DestinationSymbol = <Self as Matrix2D>::ColumnIndex,
-        >,
+        > + IntoUsize
+        + PositiveInteger,
 {
     type LeftNodeId = <Self as Matrix2D>::RowIndex;
     type RightNodeId = <Self as Matrix2D>::ColumnIndex;

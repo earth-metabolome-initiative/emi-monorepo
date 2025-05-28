@@ -108,6 +108,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::PackagingStepModel(packaging_step_models) => {
                 crate::codegen::tables::rows::Rows::from(packaging_step_models)
             }
+            super::Row::ParentProcedureModel(parent_procedure_models) => {
+                crate::codegen::tables::rows::Rows::from(parent_procedure_models)
+            }
             super::Row::PermanenceCategory(permanence_categories) => {
                 crate::codegen::tables::rows::Rows::from(permanence_categories)
             }

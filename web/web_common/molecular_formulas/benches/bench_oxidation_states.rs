@@ -7,8 +7,8 @@ use criterion::Criterion;
 use molecular_formulas::MolecularFormula;
 
 /// Benchmark for the `oxidation_states` method.
-fn bench_oxidation_states(c: &mut Criterion) {
-    let mut epimeloscine_group = c.benchmark_group("large_molecular_formulas");
+fn bench_epimeloscine(c: &mut Criterion) {
+    let mut epimeloscine_group = c.benchmark_group("epimeloscine");
     epimeloscine_group.sample_size(10);
 
     let formula = MolecularFormula::from_str("2(C17H23NO3).H2O.H2SO4").unwrap();
@@ -49,11 +49,24 @@ fn bench_oxidation_states(c: &mut Criterion) {
     epimeloscine_group.finish();
 }
 
+/// Benchmark for the `oxidation_states` method with fuzzing timeouts.
+fn bench_oxidation_states_fuzzing_timeouts(c: &mut Criterion) {
+    let mut fuzzing_timeouts = c.benchmark_group("fuzzing_timeouts");
+    fuzzing_timeouts.sample_size(10);
+
+    fuzzing_timeouts.bench_function("6Re427-851", |b| {
+        b.iter(|| MolecularFormula::from_str(black_box("6Re427-851")));
+    });
+
+    fuzzing_timeouts.finish();
+}
+
 /// Function to run all benchmarks.
 pub fn benches() {
     let mut criterion: ::criterion::Criterion<_> =
         ::criterion::Criterion::default().configure_from_args();
-    bench_oxidation_states(&mut criterion);
+    bench_epimeloscine(&mut criterion);
+    bench_oxidation_states_fuzzing_timeouts(&mut criterion);
 }
 
 /// Main function to run the benchmarks.

@@ -20,9 +20,12 @@ pub enum ContainerCategory {
         /// The volume of the bottle in liters
         liters: f64,
     },
-    /// A rack for sample containers, such as leaves or roots
+    /// A sample container, such as falcon tube that contains solid sample
+    SampleContainer,
+    /// A rack for sample containers, that can contain multiple sample
+    /// containers. Open.
     SampleContainerRack,
-    /// A box for sample containers, or sample container racks
+    /// A box for sample containers, or sample container racks. Closed.
     ContainerBox,
 }
 
@@ -32,6 +35,7 @@ impl ContainerCategory {
     pub fn name(&self) -> &'static str {
         match self {
             ContainerCategory::Bottle { .. } => "Bottle",
+            ContainerCategory::SampleContainer => "Sample Container",
             ContainerCategory::SampleContainerRack => "Sample Container Rack",
             ContainerCategory::ContainerBox => "Container Box",
         }
@@ -41,6 +45,9 @@ impl ContainerCategory {
     /// Returns the description of the instrument category
     pub fn description(&self) -> &'static str {
         match self {
+            ContainerCategory::SampleContainer => {
+                "A sample container, such as falcon tube that contains solid sample."
+            }
             ContainerCategory::Bottle { .. } => {
                 "A container appropriate for samples, such as leafs or roots."
             }
@@ -57,9 +64,10 @@ impl ContainerCategory {
     /// Returns the icon of the instrument category
     pub fn icon(&self) -> &'static str {
         match self {
-            ContainerCategory::Bottle { .. } => "FlaskVial",
-            ContainerCategory::SampleContainerRack => "Vials",
-            ContainerCategory::ContainerBox => "Box",
+            ContainerCategory::SampleContainer => "vial",
+            ContainerCategory::Bottle { .. } => "flask-vial",
+            ContainerCategory::SampleContainerRack => "vials",
+            ContainerCategory::ContainerBox => "box",
         }
     }
 }

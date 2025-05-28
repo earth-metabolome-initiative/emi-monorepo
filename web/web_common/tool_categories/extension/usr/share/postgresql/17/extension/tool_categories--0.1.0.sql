@@ -14,6 +14,7 @@ CREATE TYPE ToolCategory AS ENUM (
 	'InsectTrap',
 	'CuttingTool',
 	'Wrapper',
+	'EmpiricalMeasurementTool',
 	'PreciseManipulationTool',
 	'BreakingBeads',
 	'Gloves',

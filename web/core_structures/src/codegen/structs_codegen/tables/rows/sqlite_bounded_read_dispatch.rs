@@ -254,6 +254,12 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
+            crate::codegen::tables::table_names::TableName::ParentProcedureModel => {
+                <crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel as web_common_traits::database::BoundedRead<
+                    diesel::SqliteConnection,
+                >>::bounded_read(offset, limit, conn)
+                    .map(super::Rows::from)
+            }
             crate::codegen::tables::table_names::TableName::PermanenceCategory => {
                 <crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,

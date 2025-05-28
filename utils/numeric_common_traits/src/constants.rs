@@ -1,15 +1,5 @@
 //! Submodule providing traits for several common numerical constants.
 
-/// Trait for the number zero.
-pub trait Zero {
-    /// The zero value.
-    const ZERO: Self;
-}
-/// Trait for the number one.
-pub trait One {
-    /// The one value.
-    const ONE: Self;
-}
 /// Trait for the number two.
 pub trait Two {
     /// The two value.
@@ -35,12 +25,6 @@ pub trait Bounded {
 macro_rules! impl_numeric_traits {
     ($($t:ty),+) => {
         $(
-            impl Zero for $t {
-                const ZERO: Self = 0;
-            }
-            impl One for $t {
-                const ONE: Self = 1;
-            }
             impl Two for $t {
                 const TWO: Self = 0;
             }
@@ -60,12 +44,6 @@ macro_rules! impl_numeric_traits {
 macro_rules! impl_float_traits {
     ($($t:ty),+) => {
         $(
-            impl Zero for $t {
-                const ZERO: Self = 0.0;
-            }
-            impl One for $t {
-                const ONE: Self = 1.0;
-            }
             impl Two for $t {
                 const TWO: Self = 2.0;
             }

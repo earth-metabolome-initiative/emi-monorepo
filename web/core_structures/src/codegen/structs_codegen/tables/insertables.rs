@@ -165,6 +165,11 @@ pub use packaging_step_models::{
     InsertablePackagingStepModel, InsertablePackagingStepModelAttributes,
     InsertablePackagingStepModelBuilder,
 };
+mod parent_procedure_models;
+pub use parent_procedure_models::{
+    InsertableParentProcedureModel, InsertableParentProcedureModelAttributes,
+    InsertableParentProcedureModelBuilder,
+};
 mod permanence_categories;
 pub use permanence_categories::{
     InsertablePermanenceCategory, InsertablePermanenceCategoryAttributes,

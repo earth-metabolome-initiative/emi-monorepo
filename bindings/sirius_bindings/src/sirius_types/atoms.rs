@@ -634,7 +634,6 @@ mod tests {
     }
     #[test]
     fn test_display() {
-        println!("{}", AtomVector::from(vec![Atoms::N]));
         assert_eq!(AtomVector::from(vec![Atoms::N, Atoms::O, Atoms::P]).to_string(), "N,O,P");
     }
 }

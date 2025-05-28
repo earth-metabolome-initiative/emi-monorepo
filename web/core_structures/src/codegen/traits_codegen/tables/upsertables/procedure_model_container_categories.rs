@@ -20,6 +20,8 @@ for crate::codegen::structs_codegen::tables::procedure_model_container_categorie
                 procedure_model_id
                     .ne(excluded(procedure_model_id))
                     .or(container_category.ne(excluded(container_category)))
+                    .or(expected_kelvin.ne(excluded(expected_kelvin)))
+                    .or(tolerance_kelvin.ne(excluded(tolerance_kelvin)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))
@@ -51,6 +53,8 @@ for crate::codegen::structs_codegen::tables::procedure_model_container_categorie
                 procedure_model_id
                     .ne(excluded(procedure_model_id))
                     .or(container_category.ne(excluded(container_category)))
+                    .or(expected_kelvin.ne(excluded(expected_kelvin)))
+                    .or(tolerance_kelvin.ne(excluded(tolerance_kelvin)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))

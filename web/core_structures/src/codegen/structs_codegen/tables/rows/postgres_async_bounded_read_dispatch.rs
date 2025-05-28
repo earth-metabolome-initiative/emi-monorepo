@@ -297,6 +297,13 @@ impl web_common_traits::prelude::AsyncBoundedReadDispatch<diesel_async::AsyncPgC
                     .await
                     .map(super::Rows::from)
             }
+            crate::codegen::tables::table_names::TableName::ParentProcedureModel => {
+                <crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel as web_common_traits::database::AsyncBoundedRead<
+                    diesel_async::AsyncPgConnection,
+                >>::bounded_read_async(offset, limit, conn)
+                    .await
+                    .map(super::Rows::from)
+            }
             crate::codegen::tables::table_names::TableName::PermanenceCategory => {
                 <crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory as web_common_traits::database::AsyncBoundedRead<
                     diesel_async::AsyncPgConnection,

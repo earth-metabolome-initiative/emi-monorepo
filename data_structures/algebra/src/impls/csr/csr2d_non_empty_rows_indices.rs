@@ -1,16 +1,18 @@
 //! Submodule providing an iterator over the indices of non-empty rows in a CSR
 //! matrix.
 
-use numeric_common_traits::prelude::{IntoUsize, One, Zero};
+use multi_ranged::SimpleRange;
+use num_traits::{ConstOne, ConstZero};
+use numeric_common_traits::prelude::IntoUsize;
 
-use crate::{impls::ranged::SimpleRanged, traits::SizedRowsSparseMatrix2D};
+use crate::traits::SizedRowsSparseMatrix2D;
 
 /// Iterator over the indices of non-empty rows in a CSR matrix.
 pub struct CSR2DNonEmptyRowIndices<'a, CSR: SizedRowsSparseMatrix2D> {
     /// The CSR matrix.
     csr2d: &'a CSR,
     /// The iterator of the row indices and their sizes.
-    row_sizes: (SimpleRanged<CSR::RowIndex>, CSR::SparseRowSizes<'a>),
+    row_sizes: (SimpleRange<CSR::RowIndex>, CSR::SparseRowSizes<'a>),
     /// The number of non-empty rows returned so far.
     returned_non_empty_rows: CSR::RowIndex,
 }

@@ -1,11 +1,13 @@
 //! Submodule providing the implementation of the `SparseMatrix2D` trait
 //! and related traits for the `PaddedMatrix2D` struct.
 
-use numeric_common_traits::prelude::{IntoUsize, One, TryFromUsize, Zero};
+use multi_ranged::{SimpleRange, Step};
+use num_traits::{ConstOne, ConstZero};
+use numeric_common_traits::prelude::{IntoUsize, TryFromUsize};
 
 use super::{PaddedMatrix2D, padded_coordinates::PaddedCoordinates};
 use crate::{
-    impls::{CSR2DColumns, ranged::SimpleRanged},
+    impls::CSR2DColumns,
     traits::{
         EmptyRows, Matrix2D, SizedRowsSparseMatrix2D, SizedSparseMatrix, SparseMatrix,
         SparseMatrix2D,
@@ -60,7 +62,7 @@ where
 impl<M: SparseMatrix2D, Map> SizedRowsSparseMatrix2D for PaddedMatrix2D<M, Map>
 where
     M::RowIndex: IntoUsize + TryFromUsize,
-    M::ColumnIndex: IntoUsize + TryFromUsize,
+    M::ColumnIndex: IntoUsize + TryFromUsize + Step,
 {
     type SparseRowSizes<'a>
         = crate::impls::CSR2DSizedRowsizes<'a, Self>
@@ -81,10 +83,10 @@ where
 impl<M: SparseMatrix2D, Map> SparseMatrix2D for PaddedMatrix2D<M, Map>
 where
     M::RowIndex: IntoUsize + TryFromUsize,
-    M::ColumnIndex: IntoUsize + TryFromUsize,
+    M::ColumnIndex: IntoUsize + TryFromUsize + Step,
 {
     type SparseRow<'a>
-        = SimpleRanged<M::ColumnIndex>
+        = SimpleRange<M::ColumnIndex>
     where
         Self: 'a;
     type SparseColumns<'a>
@@ -114,15 +116,15 @@ where
 
 impl<M: EmptyRows, Map> EmptyRows for PaddedMatrix2D<M, Map>
 where
-    M::RowIndex: IntoUsize + TryFromUsize,
-    M::ColumnIndex: IntoUsize + TryFromUsize,
+    M::RowIndex: IntoUsize + TryFromUsize + Step,
+    M::ColumnIndex: IntoUsize + TryFromUsize + Step,
 {
     type EmptyRowIndices<'a>
         = core::iter::Empty<M::RowIndex>
     where
         Self: 'a;
     type NonEmptyRowIndices<'a>
-        = SimpleRanged<M::RowIndex>
+        = SimpleRange<M::RowIndex>
     where
         Self: 'a;
 

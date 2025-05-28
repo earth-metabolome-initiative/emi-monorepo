@@ -2,7 +2,8 @@
 
 use core::iter::{RepeatN, repeat_n};
 
-use numeric_common_traits::prelude::{IntoUsize, One, Zero};
+use num_traits::{ConstOne, ConstZero};
+use numeric_common_traits::prelude::IntoUsize;
 
 use crate::prelude::*;
 

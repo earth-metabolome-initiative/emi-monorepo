@@ -4,7 +4,8 @@
 use algebra::prelude::{
     GenericImplicitValuedMatrix2D, Matrix2D, Matrix2DRef, SizedSparseMatrix, SizedSparseMatrix2D,
 };
-use numeric_common_traits::prelude::{Number, TryFromUsize, Zero};
+use num_traits::ConstZero;
+use numeric_common_traits::prelude::{Number, TryFromUsize};
 
 use crate::traits::{BidirectionalVocabulary, BipartiteGraph, Edges, Graph, MonoplexGraph};
 

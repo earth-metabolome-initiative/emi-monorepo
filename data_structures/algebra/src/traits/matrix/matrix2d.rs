@@ -1,18 +1,20 @@
 //! Trait defining a bidimensional matrix.
 
-use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, Zero};
+use multi_ranged::{SimpleRange, Step};
+use num_traits::ConstZero;
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger};
 
 use super::SquareMatrix;
-use crate::{impls::ranged::SimpleRanged, traits::Matrix};
+use crate::traits::Matrix;
 
 /// Trait defining a bidimensional matrix.
 pub trait Matrix2D:
     Matrix<Coordinates = (<Self as Matrix2D>::RowIndex, <Self as Matrix2D>::ColumnIndex)>
 {
     /// Type of the row index.
-    type RowIndex: PositiveInteger + IntoUsize;
+    type RowIndex: Step + PositiveInteger + IntoUsize;
     /// Type of the column index.
-    type ColumnIndex: PositiveInteger + IntoUsize;
+    type ColumnIndex: Step + PositiveInteger + IntoUsize;
 
     /// Returns the number of rows of the matrix.
     fn number_of_rows(&self) -> Self::RowIndex;
@@ -22,14 +24,14 @@ pub trait Matrix2D:
 
     #[inline]
     /// Returns an iterator over the rows of the matrix.
-    fn row_indices(&self) -> SimpleRanged<Self::RowIndex> {
-        SimpleRanged::new(Self::RowIndex::ZERO, self.number_of_rows())
+    fn row_indices(&self) -> SimpleRange<Self::RowIndex> {
+        SimpleRange::try_from((Self::RowIndex::ZERO, self.number_of_rows())).unwrap()
     }
 
     #[inline]
     /// Returns an iterator over the columns of the matrix.
-    fn column_indices(&self) -> SimpleRanged<Self::ColumnIndex> {
-        SimpleRanged::new(Self::ColumnIndex::ZERO, self.number_of_columns())
+    fn column_indices(&self) -> SimpleRange<Self::ColumnIndex> {
+        SimpleRange::try_from((Self::ColumnIndex::ZERO, self.number_of_columns())).unwrap()
     }
 }
 

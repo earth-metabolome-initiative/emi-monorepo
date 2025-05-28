@@ -79,13 +79,10 @@ CREATE TABLE IF NOT EXISTS step_model_container_categories (
 	id SERIAL PRIMARY KEY,
 	step_model_id INTEGER NOT NULL REFERENCES step_models(id),
 	procedure_model_container_category_id INTEGER NOT NULL REFERENCES procedure_model_container_categories(id),
-	expected_kelvin REAL NOT NULL CHECK (must_be_strictly_positive_f32(expected_kelvin)) DEFAULT 293.15,
-	tolerance_kelvin REAL NOT NULL CHECK (must_be_strictly_positive_f32(tolerance_kelvin)) DEFAULT 20.0,
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INTEGER NOT NULL REFERENCES users(id),
-	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	CHECK (must_be_strictly_smaller_than_f32(tolerance_kelvin, expected_kelvin))
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS step_model_tool_categories (

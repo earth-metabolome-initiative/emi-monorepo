@@ -375,7 +375,7 @@ pub fn main() {
             acc
         });
 
-    let isotopes_module_dir = Path::new("src/isotopes/");
+    let isotopes_module_dir = Path::new("../src/isotopes/");
     for (_atomic_number, isotopes) in isotopes_by_atomic_number {
         let element_name = element_name_from_symbol(&isotopes[0].atomic_symbol).to_lowercase();
         let tokens = implement_isotope_enum(&isotopes);
@@ -391,6 +391,4 @@ pub fn main() {
             .expect("Failed to run rustfmt");
         assert!(status.success(), "rustfmt failed with status: {status}");
     }
-
-    println!("cargo:rerun-if-changed=isotopes_data.json");
 }

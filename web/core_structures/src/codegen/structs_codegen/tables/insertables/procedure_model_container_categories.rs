@@ -3,6 +3,8 @@
 pub enum InsertableProcedureModelContainerCategoryAttributes {
     ProcedureModelId,
     ContainerCategory,
+    ExpectedKelvin,
+    ToleranceKelvin,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -16,6 +18,12 @@ impl core::fmt::Display for InsertableProcedureModelContainerCategoryAttributes 
             }
             InsertableProcedureModelContainerCategoryAttributes::ContainerCategory => {
                 write!(f, "container_category")
+            }
+            InsertableProcedureModelContainerCategoryAttributes::ExpectedKelvin => {
+                write!(f, "expected_kelvin")
+            }
+            InsertableProcedureModelContainerCategoryAttributes::ToleranceKelvin => {
+                write!(f, "tolerance_kelvin")
             }
             InsertableProcedureModelContainerCategoryAttributes::CreatedBy => {
                 write!(f, "created_by")
@@ -43,6 +51,8 @@ impl core::fmt::Display for InsertableProcedureModelContainerCategoryAttributes 
 pub struct InsertableProcedureModelContainerCategory {
     procedure_model_id: i32,
     container_category: ::container_categories::ContainerCategory,
+    expected_kelvin: f32,
+    tolerance_kelvin: f32,
     created_by: i32,
     created_at: ::rosetta_timestamp::TimestampUTC,
     updated_by: i32,
@@ -101,6 +111,8 @@ impl InsertableProcedureModelContainerCategory {
 pub struct InsertableProcedureModelContainerCategoryBuilder {
     procedure_model_id: Option<i32>,
     container_category: Option<::container_categories::ContainerCategory>,
+    expected_kelvin: Option<f32>,
+    tolerance_kelvin: Option<f32>,
     created_by: Option<i32>,
     created_at: Option<::rosetta_timestamp::TimestampUTC>,
     updated_by: Option<i32>,
@@ -111,6 +123,8 @@ impl Default for InsertableProcedureModelContainerCategoryBuilder {
         Self {
             procedure_model_id: None,
             container_category: None,
+            expected_kelvin: Some(293.15f32),
+            tolerance_kelvin: Some(20f32),
             created_by: None,
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             updated_by: None,
@@ -153,6 +167,64 @@ impl InsertableProcedureModelContainerCategoryBuilder {
             },
         )?;
         self.container_category = Some(container_category);
+        Ok(self)
+    }
+    pub fn expected_kelvin<P>(
+        mut self,
+        expected_kelvin: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let expected_kelvin =
+            expected_kelvin.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+                Into::into(err).rename_field(
+                    InsertableProcedureModelContainerCategoryAttributes::ExpectedKelvin,
+                )
+            })?;
+        if let Some(tolerance_kelvin) = self.tolerance_kelvin {
+            pgrx_validation::must_be_strictly_smaller_than_f32(tolerance_kelvin, expected_kelvin)
+                .map_err(|e| {
+                e.rename_fields(
+                    InsertableProcedureModelContainerCategoryAttributes::ToleranceKelvin,
+                    InsertableProcedureModelContainerCategoryAttributes::ExpectedKelvin,
+                )
+            })?;
+        }
+        pgrx_validation::must_be_strictly_positive_f32(expected_kelvin).map_err(|e| {
+            e.rename_field(InsertableProcedureModelContainerCategoryAttributes::ExpectedKelvin)
+        })?;
+        self.expected_kelvin = Some(expected_kelvin);
+        Ok(self)
+    }
+    pub fn tolerance_kelvin<P>(
+        mut self,
+        tolerance_kelvin: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let tolerance_kelvin =
+            tolerance_kelvin.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+                Into::into(err).rename_field(
+                    InsertableProcedureModelContainerCategoryAttributes::ToleranceKelvin,
+                )
+            })?;
+        if let Some(expected_kelvin) = self.expected_kelvin {
+            pgrx_validation::must_be_strictly_smaller_than_f32(tolerance_kelvin, expected_kelvin)
+                .map_err(|e| {
+                e.rename_fields(
+                    InsertableProcedureModelContainerCategoryAttributes::ToleranceKelvin,
+                    InsertableProcedureModelContainerCategoryAttributes::ExpectedKelvin,
+                )
+            })?;
+        }
+        pgrx_validation::must_be_strictly_positive_f32(tolerance_kelvin).map_err(|e| {
+            e.rename_field(InsertableProcedureModelContainerCategoryAttributes::ToleranceKelvin)
+        })?;
+        self.tolerance_kelvin = Some(tolerance_kelvin);
         Ok(self)
     }
     pub fn created_by<P>(
@@ -241,6 +313,16 @@ impl common_traits::prelude::Builder for InsertableProcedureModelContainerCatego
                     InsertableProcedureModelContainerCategoryAttributes::ContainerCategory,
                 ),
             )?,
+            expected_kelvin: self.expected_kelvin.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableProcedureModelContainerCategoryAttributes::ExpectedKelvin,
+                ),
+            )?,
+            tolerance_kelvin: self.tolerance_kelvin.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableProcedureModelContainerCategoryAttributes::ToleranceKelvin,
+                ),
+            )?,
             created_by: self.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelContainerCategoryAttributes::CreatedBy,
@@ -274,6 +356,8 @@ impl TryFrom<InsertableProcedureModelContainerCategory>
         Self::default()
             .procedure_model_id(insertable_variant.procedure_model_id)?
             .container_category(insertable_variant.container_category)?
+            .expected_kelvin(insertable_variant.expected_kelvin)?
+            .tolerance_kelvin(insertable_variant.tolerance_kelvin)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?
             .updated_by(insertable_variant.updated_by)?

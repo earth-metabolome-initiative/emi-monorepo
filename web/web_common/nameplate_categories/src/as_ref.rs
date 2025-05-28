@@ -4,6 +4,7 @@
 impl AsRef<str> for crate::NameplateCategory {
     fn as_ref(&self) -> &str {
         match self {
+            Self::Digital => "Digital",
             Self::Permanent => "Permanent",
             Self::SemiPermanent => "SemiPermanent",
         }

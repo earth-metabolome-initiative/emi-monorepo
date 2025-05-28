@@ -3,13 +3,11 @@
 //! values by using the `Map` generic made available in the `PaddedMatrix2D`
 //! struct.
 
+use multi_ranged::SimpleRange;
 use numeric_common_traits::prelude::{IntoUsize, TryFromUsize};
 
 use super::PaddedMatrix2D;
-use crate::{
-    impls::ranged::SimpleRanged,
-    traits::{Matrix2D, SparseValuedMatrix2D, ValuedMatrix},
-};
+use crate::traits::{Matrix2D, SparseValuedMatrix2D, ValuedMatrix};
 
 /// A wrapper over the `SparseRowValues` from the `SparseValuedMatrix2D` trait,
 /// adding the imputation of all the missing values by using the `Map` generic
@@ -20,7 +18,7 @@ pub struct ImputedRowValues<'a, M: SparseValuedMatrix2D, Map> {
     /// The row index.
     row_index: M::RowIndex,
     /// The iterator over all column indices.
-    column_indices: SimpleRanged<M::ColumnIndex>,
+    column_indices: SimpleRange<M::ColumnIndex>,
     /// The iterator over the underlying sparse matrix values.
     sparse_values: Option<M::SparseRowValues<'a>>,
     /// The iterator over the underlying sparse matrix column indices.

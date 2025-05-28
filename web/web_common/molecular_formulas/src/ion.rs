@@ -4,6 +4,7 @@ use std::fmt::Display;
 
 use elements::Element;
 use fmtastic::Superscript;
+use multi_ranged::MultiRanged;
 
 use crate::MolecularFormula;
 
@@ -35,7 +36,7 @@ impl Ion<Element> {
         if charge == 0 {
             return Err(crate::errors::Error::ZeroCharge);
         }
-        if !element.oxidation_states().contains(&charge) {
+        if !element.oxidation_states().contains(charge) {
             return Err(crate::errors::Error::InvalidOxidationState(charge));
         }
         Ok(Ion { entry: element, charge })

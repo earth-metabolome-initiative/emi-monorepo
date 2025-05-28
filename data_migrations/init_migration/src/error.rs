@@ -3,8 +3,8 @@
 use core_structures::tables::insertables::{
     InsertableAliquotingStepModelAttributes, InsertableBrandAttributes,
     InsertableCommercialProductAttributes, InsertableDocumentAttributes,
-    InsertableLoginProviderAttributes, InsertableProcedureModelAttributes,
-    InsertableProcedureModelContainerCategoryAttributes,
+    InsertableLoginProviderAttributes, InsertableParentProcedureModelAttributes,
+    InsertableProcedureModelAttributes, InsertableProcedureModelContainerCategoryAttributes,
     InsertableProcedureModelNameplateCategoryAttributes,
     InsertableProcedureModelToolCategoryAttributes, InsertableReagentAttributes,
     InsertableSamplingStepModelAttributes, InsertableStepModelAttributes,
@@ -62,6 +62,8 @@ pub enum Error {
     ),
     /// Failed to insert a new procedure model tool category
     ProcedureModelToolCategory(InsertError<InsertableProcedureModelToolCategoryAttributes>),
+    /// Failed to insert a parent-child relationship
+    ParentProcedureModel(InsertError<InsertableParentProcedureModelAttributes>),
 }
 
 impl From<diesel::ConnectionError> for Error {
@@ -181,5 +183,11 @@ impl From<InsertError<InsertableStepModelToolCategoryAttributes>> for Error {
 impl From<InsertError<InsertableProcedureModelToolCategoryAttributes>> for Error {
     fn from(value: InsertError<InsertableProcedureModelToolCategoryAttributes>) -> Self {
         Error::ProcedureModelToolCategory(value)
+    }
+}
+
+impl From<InsertError<InsertableParentProcedureModelAttributes>> for Error {
+    fn from(value: InsertError<InsertableParentProcedureModelAttributes>) -> Self {
+        Error::ParentProcedureModel(value)
     }
 }

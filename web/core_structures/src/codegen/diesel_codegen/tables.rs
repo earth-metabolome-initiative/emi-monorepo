@@ -39,6 +39,7 @@ pub mod organisms;
 pub mod organizations;
 pub mod packaging_models;
 pub mod packaging_step_models;
+pub mod parent_procedure_models;
 pub mod permanence_categories;
 pub mod procedure_model_container_categories;
 pub mod procedure_model_instrument_categories;

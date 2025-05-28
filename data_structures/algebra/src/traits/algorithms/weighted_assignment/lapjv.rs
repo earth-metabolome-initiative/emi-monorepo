@@ -5,7 +5,8 @@ mod inner;
 
 pub use errors::LAPJVError;
 use inner::Inner;
-use numeric_common_traits::prelude::{Finite, Number, TryFromUsize, Zero};
+use num_traits::ConstZero;
+use numeric_common_traits::prelude::{Finite, Number, TryFromUsize};
 
 use crate::{
     impls::PaddedMatrix2D,

@@ -42,6 +42,7 @@ impl super::Rows {
             super::Rows::Organization(rows) => rows.len(),
             super::Rows::PackagingModel(rows) => rows.len(),
             super::Rows::PackagingStepModel(rows) => rows.len(),
+            super::Rows::ParentProcedureModel(rows) => rows.len(),
             super::Rows::PermanenceCategory(rows) => rows.len(),
             super::Rows::ProcedureModelContainerCategory(rows) => rows.len(),
             super::Rows::ProcedureModelInstrumentCategory(rows) => rows.len(),

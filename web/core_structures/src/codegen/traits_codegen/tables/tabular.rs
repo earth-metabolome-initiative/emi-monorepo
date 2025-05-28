@@ -39,6 +39,7 @@ mod organisms;
 mod organizations;
 mod packaging_models;
 mod packaging_step_models;
+mod parent_procedure_models;
 mod permanence_categories;
 mod procedure_model_container_categories;
 mod procedure_model_instrument_categories;

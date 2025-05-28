@@ -2,9 +2,10 @@
 //! for the [`GenericMatrix2DWithPaddedDiagonal`] struct, which automatically
 //! adds diagonal values when missing.
 
+use multi_ranged::SimpleRange;
 use numeric_common_traits::prelude::{IntoUsize, TryFromUsize};
 
-use crate::{impls::ranged::SimpleRanged, traits::SparseMatrix2D};
+use crate::traits::SparseMatrix2D;
 
 /// Iterator over the indices of the rows with values for the
 /// [`GenericMatrix2DWithPaddedDiagonal`] struct, which automatically adds
@@ -13,7 +14,7 @@ pub struct SparseRowsWithPaddedDiagonal<'matrix, M: SparseMatrix2D> {
     /// The underlying matrix.
     matrix: &'matrix M,
     /// The iterator over the row indices.
-    row_indices: SimpleRanged<M::RowIndex>,
+    row_indices: SimpleRange<M::RowIndex>,
     /// The row index and iterator from the beginning of the iterator.
     start_row: Option<(M::RowIndex, M::SparseRow<'matrix>)>,
     /// The row index and iterator from the end of the iterator.

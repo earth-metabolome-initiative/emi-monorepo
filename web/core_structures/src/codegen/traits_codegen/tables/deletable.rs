@@ -18,6 +18,7 @@ mod nameplate_models;
 mod organism_observations;
 mod packaging_models;
 mod packaging_step_models;
+mod parent_procedure_models;
 mod procedure_model_container_categories;
 mod procedure_model_instrument_categories;
 mod procedure_model_nameplate_categories;

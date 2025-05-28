@@ -1,7 +1,9 @@
 //! Submodule providing a definition of a CSR matrix.
 use core::{fmt::Debug, iter::repeat_n};
 
-use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize, Zero};
+use multi_ranged::Step;
+use num_traits::ConstZero;
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use crate::prelude::*;
 
@@ -34,7 +36,7 @@ impl<SparseIndex: Debug, RowIndex: Debug, ColumnIndex: Debug> Debug
     }
 }
 
-impl<SparseIndex: Zero, RowIndex: Zero, ColumnIndex: Zero> Default
+impl<SparseIndex: ConstZero, RowIndex: ConstZero, ColumnIndex: ConstZero> Default
     for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     fn default() -> Self {
@@ -50,8 +52,8 @@ impl<SparseIndex: Zero, RowIndex: Zero, ColumnIndex: Zero> Default
 
 impl<
     SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
 > SparseMatrixMut for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: SparseMatrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex, SparseIndex = SparseIndex>,
@@ -93,8 +95,8 @@ impl<
 
 impl<
     SparseIndex,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize,
 > Matrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     type RowIndex = RowIndex;
@@ -121,8 +123,8 @@ impl<
 
 impl<
     SparseIndex,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize,
 > Matrix2DRef for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     fn number_of_rows_ref(&self) -> &Self::RowIndex {
@@ -136,8 +138,8 @@ impl<
 
 impl<
     SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
 > SparseMatrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
@@ -181,8 +183,8 @@ where
 
 impl<
     SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
 > SizedSparseMatrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
@@ -194,8 +196,8 @@ where
 
 impl<
     SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
 > RankSelectSparseMatrix for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
@@ -224,8 +226,8 @@ where
 
 impl<
     SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
 > SparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     type SparseRow<'a>
@@ -258,8 +260,8 @@ impl<
 
 impl<
     SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
 > EmptyRows for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 {
     type EmptyRowIndices<'a>
@@ -289,8 +291,8 @@ impl<
 
 impl<
     SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
 > SizedSparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
@@ -326,8 +328,8 @@ where
 
 impl<
     SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
 > SizedRowsSparseMatrix2D for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
@@ -355,8 +357,8 @@ where
 
 impl<
     SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
 > MatrixMut for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where
     Self: Matrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex>,
@@ -453,8 +455,8 @@ where
 
 impl<
     SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFrom<SparseIndex>,
 > TransposableMatrix2D<CSR2D<SparseIndex, ColumnIndex, RowIndex>>
     for CSR2D<SparseIndex, RowIndex, ColumnIndex>
 where

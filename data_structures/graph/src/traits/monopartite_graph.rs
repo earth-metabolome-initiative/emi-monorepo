@@ -4,7 +4,8 @@
 //! they are not divided into different partitions.
 
 use algebra::prelude::*;
-use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize, Zero};
+use num_traits::ConstZero;
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use super::{BidirectionalVocabulary, Edges, Vocabulary};
 

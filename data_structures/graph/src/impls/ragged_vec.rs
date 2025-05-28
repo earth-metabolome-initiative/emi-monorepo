@@ -5,6 +5,7 @@ use algebra::{
     impls::RaggedVector,
     prelude::{Matrix2D, Matrix2DRef, SizedSparseMatrix, SparseMatrix, SparseMatrixMut},
 };
+use multi_ranged::Step;
 use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use crate::{
@@ -14,8 +15,8 @@ use crate::{
 
 impl<SparseIndex, RowIndex, ColumnIndex> Edges for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: TryFromUsize + IntoUsize + PositiveInteger,
 {
     type Edge = (<Self as Matrix2D>::RowIndex, <Self as Matrix2D>::ColumnIndex);
@@ -32,8 +33,8 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> GrowableEdges
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: TryFromUsize + IntoUsize + PositiveInteger,
 {
     type GrowableMatrix = Self;
@@ -57,8 +58,8 @@ where
 
 impl<SparseIndex, RowIndex, ColumnIndex> Graph for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: TryFromUsize + IntoUsize + PositiveInteger,
 {
     fn has_nodes(&self) -> bool {
@@ -74,8 +75,8 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> MonoplexGraph
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: TryFromUsize + IntoUsize + PositiveInteger,
 {
     type Edge = (<Self as Matrix2D>::RowIndex, <Self as Matrix2D>::ColumnIndex);
@@ -89,7 +90,8 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> BipartiteGraph
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger
+    RowIndex: Step
+        + PositiveInteger
         + IntoUsize
         + TryFromUsize
         + BidirectionalVocabulary<
@@ -97,7 +99,8 @@ where
             DestinationSymbol = <Self as Matrix2D>::RowIndex,
         >,
     SparseIndex: TryFromUsize + IntoUsize + PositiveInteger,
-    ColumnIndex: PositiveInteger
+    ColumnIndex: Step
+        + PositiveInteger
         + IntoUsize
         + TryFromUsize
         + BidirectionalVocabulary<

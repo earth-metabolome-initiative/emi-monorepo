@@ -1,18 +1,20 @@
 //! Submodule providing an iterator over all of the (row, column) coordinates
 //! of a dense rectangular matrix.
 
-use numeric_common_traits::prelude::{IntoUsize, Zero};
+use multi_ranged::SimpleRange;
+use num_traits::ConstZero;
+use numeric_common_traits::prelude::IntoUsize;
 
-use crate::{impls::ranged::SimpleRanged, traits::Matrix2D};
+use crate::traits::Matrix2D;
 
 /// Iterator over all of the (row, column) coordinates of a dense rectangular
 pub struct PaddedCoordinates<M: Matrix2D> {
     /// The underlying matrix.
     matrix: M,
     /// The row iterator.
-    row_iter: SimpleRanged<M::RowIndex>,
+    row_iter: SimpleRange<M::RowIndex>,
     /// The column iterator.
-    column_iter: SimpleRanged<M::ColumnIndex>,
+    column_iter: SimpleRange<M::ColumnIndex>,
     /// The current row index.
     current_row: M::RowIndex,
 }

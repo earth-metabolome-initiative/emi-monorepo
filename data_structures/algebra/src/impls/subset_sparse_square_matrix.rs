@@ -1,7 +1,7 @@
 //! A subset sparse square matrix, where only the existing coordinates that have
 //! both row and column ids are within a provided subset.
 
-use numeric_common_traits::prelude::Zero;
+use num_traits::ConstZero;
 
 use super::MutabilityError;
 use crate::traits::SquareMatrix;

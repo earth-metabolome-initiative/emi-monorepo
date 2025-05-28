@@ -1,4 +1,5 @@
 //! Submodule providing a definition of a CSR matrix.
+use multi_ranged::Step;
 use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use crate::prelude::*;
@@ -271,7 +272,7 @@ where
 impl<SparseIndex, Idx> Symmetrize<SymmetricCSR2D<CSR2D<SparseIndex, Idx, Idx>>>
     for UpperTriangularCSR2D<CSR2D<SparseIndex, Idx, Idx>>
 where
-    Idx: PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
+    Idx: Step + PositiveInteger + IntoUsize + TryFromUsize + TryFrom<SparseIndex>,
     SparseIndex: PositiveInteger + IntoUsize + TryFromUsize,
 {
     fn symmetrize(&self) -> SymmetricCSR2D<CSR2D<SparseIndex, Idx, Idx>> {

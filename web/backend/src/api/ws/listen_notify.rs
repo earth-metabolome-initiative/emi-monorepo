@@ -52,10 +52,10 @@ impl ListenNotifyServer {
     /// Register new session and assign unique ID to this session
     fn connect(&mut self, db_sender: tokio::sync::mpsc::UnboundedSender<DBMessage>) -> u64 {
         // register session with random connection ID
-        let mut thread_rng = rand::thread_rng();
-        let mut new_session_id = thread_rng.r#gen();
+        let mut thread_rng = rand::rng();
+        let mut new_session_id = thread_rng.random();
         while self.sessions.contains_key(&new_session_id) {
-            new_session_id = thread_rng.r#gen();
+            new_session_id = thread_rng.random();
         }
 
         log::info!("{new_session_id} joined");

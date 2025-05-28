@@ -1,11 +1,13 @@
 //! Implementation of the cosine distance for mass spectra.
 
 use algebra::{
-    impls::{GenericImplicitValuedMatrix2D, RangedCSR2D, ranged::SimpleRanged},
+    impls::{GenericImplicitValuedMatrix2D, RangedCSR2D},
     prelude::{SparseLAPJV, SparseMatrix},
 };
 use functional_properties::prelude::ScalarSimilarity;
-use numeric_common_traits::prelude::{Number, One, Pow, Sqrt, Ten, Two, Zero};
+use multi_ranged::SimpleRange;
+use num_traits::{ConstOne, ConstZero};
+use numeric_common_traits::prelude::{Number, Pow, Sqrt, Ten, Two};
 
 use crate::traits::{ScalarSpectralSimilarity, Spectrum};
 
@@ -81,18 +83,15 @@ where
         let left_peak_norm: S1::Mz = left_peak_squared_sums.sqrt();
         let right_peak_norm: S1::Mz = right_peak_squared_sums.sqrt();
 
-        let map: GenericImplicitValuedMatrix2D<
-            RangedCSR2D<u16, u16, SimpleRanged<u16>>,
-            _,
-            S1::Mz,
-        > = GenericImplicitValuedMatrix2D::new(
-            left.matching_peaks(right, self.mz_tolerance),
-            |(i, j)| {
-                S1::Mz::ONE
-                    / (S1::Mz::ONE
-                        + left_peak_products[i as usize] * right_peak_products[j as usize])
-            },
-        );
+        let map: GenericImplicitValuedMatrix2D<RangedCSR2D<u16, u16, SimpleRange<u16>>, _, S1::Mz> =
+            GenericImplicitValuedMatrix2D::new(
+                left.matching_peaks(right, self.mz_tolerance),
+                |(i, j)| {
+                    S1::Mz::ONE
+                        / (S1::Mz::ONE
+                            + left_peak_products[i as usize] * right_peak_products[j as usize])
+                },
+            );
 
         if map.is_empty() {
             return (S1::Mz::ZERO, 0);

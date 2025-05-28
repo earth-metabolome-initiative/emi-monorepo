@@ -3,7 +3,8 @@
 //! will add new elements where missing. If the underlying matrix is
 //! rectangular, new rows and columns will be added to make it square.
 
-use numeric_common_traits::prelude::{Bounded, IntoUsize, One, TryFromUsize, Zero};
+use num_traits::{ConstOne, ConstZero};
+use numeric_common_traits::prelude::{Bounded, IntoUsize, TryFromUsize};
 
 use crate::traits::{
     EmptyRows, Matrix, Matrix2D, SparseMatrix, SparseMatrix2D, SparseValuedMatrix,
@@ -14,9 +15,10 @@ use sparse_row_with_padded_diagonal::SparseRowWithPaddedDiagonal;
 mod sparse_rows_with_padded_diagonal;
 use sparse_rows_with_padded_diagonal::SparseRowsWithPaddedDiagonal;
 mod sparse_row_values_with_padded_diagonal;
+use multi_ranged::{SimpleRange, Step};
 use sparse_row_values_with_padded_diagonal::SparseRowValuesWithPaddedDiagonal;
 
-use super::{CSR2DColumns, CSR2DView, M2DValues, MutabilityError, ranged::SimpleRanged};
+use super::{CSR2DColumns, CSR2DView, M2DValues, MutabilityError};
 
 #[cfg(feature = "arbitrary")]
 mod arbitrary_impl;
@@ -201,7 +203,7 @@ where
 impl<M, Map> EmptyRows for GenericMatrix2DWithPaddedDiagonal<M, Map>
 where
     M: EmptyRows,
-    M::RowIndex: IntoUsize + TryFromUsize,
+    M::RowIndex: IntoUsize + TryFromUsize + Step,
     M::ColumnIndex: IntoUsize + TryFromUsize,
 {
     type EmptyRowIndices<'a>
@@ -209,7 +211,7 @@ where
     where
         Self: 'a;
     type NonEmptyRowIndices<'a>
-        = SimpleRanged<Self::RowIndex>
+        = SimpleRange<Self::RowIndex>
     where
         Self: 'a;
     fn empty_row_indices(&self) -> Self::EmptyRowIndices<'_> {
@@ -221,7 +223,7 @@ where
     fn non_empty_row_indices(&self) -> Self::NonEmptyRowIndices<'_> {
         // Since we are artificially always adding rows and columns, we
         // will always have non-empty rows.
-        SimpleRanged::new(Self::RowIndex::ZERO, self.number_of_rows())
+        SimpleRange::try_from((Self::RowIndex::ZERO, self.number_of_rows())).unwrap()
     }
 
     fn number_of_empty_rows(&self) -> Self::RowIndex {

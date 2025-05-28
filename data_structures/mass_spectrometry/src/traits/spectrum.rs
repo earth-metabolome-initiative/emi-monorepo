@@ -1,6 +1,7 @@
 //! Submodule defining a single Spectrum collection trait.
 
-use algebra::{impls::ranged::SimpleRanged, prelude::*};
+use algebra::prelude::*;
+use multi_ranged::SimpleRange;
 use numeric_common_traits::prelude::Number;
 
 use crate::prelude::Annotation;
@@ -95,7 +96,7 @@ pub trait Spectrum {
         &self,
         other: &S,
         mz_tolerance: Self::Mz,
-    ) -> RangedCSR2D<u16, u16, SimpleRanged<u16>> {
+    ) -> RangedCSR2D<u16, u16, SimpleRange<u16>> {
         let mut matching_peaks = RangedCSR2D::default();
         let mut lowest_other_index = 0;
         for (i, mz) in self.mz().enumerate() {

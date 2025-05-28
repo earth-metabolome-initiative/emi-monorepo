@@ -12,7 +12,7 @@ For further reading we recommend you to refer to the official [Sirius website](h
 
 ## Sirius Installation
 
-Since version 5.7.0 SIRIUS is officially available via conda ([conda-forge](https://conda-forge.org/)) under the package name [sirius-ms](https://anaconda.org/conda-forge/sirius-ms). Native MacOS arm64 (Apple Silicon) builds are solely available via conda.
+Since version 5.7.0 SIRIUS is officially available via conda ([conda-forge](https://conda-forge.org/)) under the package name [sirius-ms](https://anaconda.org/conda-forge/sirius-ms). Native `MacOS` arm64 (Apple Silicon) builds are solely available via conda.
 
 Additionally, you can install Sirius via their [GitHub repository](https://github.com/boecker-lab/sirius).
 
@@ -216,12 +216,12 @@ For now some *config* parameters are not fully implemented and only the default 
 
 If you are interested in looking at the default values you can either run `sirius config --help`. Here we present is a non-exhaustive list of the parameters where only the default values can be used:
 
-* **PossibleAdductsSwitches** default is `[M+Na]+:[M+H]+,[M+K]+:[M+H]+,[M+Cl]-:[M-H]-`
-* **AdductSettingsEnforced** default is `,`
-* **FormulaResultRankingScore** default is `AUTO`
-* **IsotopeMS2Settings** default is `IGNORE`
-* **NoiseThresholdSettingsBasePeak** default is `NOT_PRECURSOR`
-* **Adducts** don't have default, but some adducts are probably not included in the enumeration.
+* `PossibleAdductsSwitches` default is `[M+Na]+:[M+H]+,[M+K]+:[M+H]+,[M+Cl]-:[M-H]-`
+* `AdductSettingsEnforced` default is `,`
+* `FormulaResultRankingScore` default is `AUTO`
+* `IsotopeMS2Settings` default is `IGNORE`
+* `NoiseThresholdSettingsBasePeak` default is `NOT_PRECURSOR`
+* `Adducts` don't have default, but some adducts are probably not included in the enumeration.
 
 In the future, we will add the possibility to add custom values for these parameters. In case you need to add custom values for these parameters, do not hesitate to open an issue or a pull request.
 
@@ -237,7 +237,7 @@ cargo doc --open
 
 Fuzzing is a technique for finding security vulnerabilities and bugs in software by providing random input to the code. It can be an effective way of uncovering issues that might not be discovered through other testing methods. In our library, we take fuzzing seriously, and we use the [cargo fuzz](https://github.com/rust-fuzz/cargo-fuzz) tool to ensure our code is robust and secure. cargo fuzz automates the process of generating and running randomized test inputs, and it can help identify obscure bugs that would be difficult to detect through traditional testing methods. We make sure that our fuzz targets are continuously updated and run against the latest versions of the library to ensure that any vulnerabilities or bugs are quickly identified and addressed.
 
-You can learn more about fuzzing [here](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/bindings/sirius_bindings/fuzz).
+You can [learn more about fuzzing here](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/bindings/sirius_bindings/fuzz).
 
 ## Citing Sirius
 

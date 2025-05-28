@@ -190,6 +190,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::PackagingStepModel)
                     .collect::<Vec<_>>()
             }
+            super::Rows::ParentProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::ParentProcedureModel)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::PermanenceCategory(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::PermanenceCategory)

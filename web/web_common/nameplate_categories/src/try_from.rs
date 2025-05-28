@@ -6,6 +6,7 @@ impl TryFrom<&str> for crate::NameplateCategory {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         Ok(match value {
+            "Digital" => Self::Digital,
             "Permanent" => Self::Permanent,
             "SemiPermanent" => Self::SemiPermanent,
             _ => {

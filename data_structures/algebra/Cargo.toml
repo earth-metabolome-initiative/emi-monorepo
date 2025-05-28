@@ -10,6 +10,8 @@ serde = { workspace = true, optional = true }
 arbitrary = { workspace = true, optional = true }
 iter_utils.workspace = true
 lender.workspace = true
+multi_ranged.workspace = true
+num-traits.workspace = true
 
 [lints]
 workspace = true

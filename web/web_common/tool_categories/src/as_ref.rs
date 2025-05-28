@@ -8,6 +8,7 @@ impl AsRef<str> for crate::ToolCategory {
             Self::InsectTrap => "InsectTrap",
             Self::CuttingTool => "CuttingTool",
             Self::Wrapper => "Wrapper",
+            Self::EmpiricalMeasurementTool => "EmpiricalMeasurementTool",
             Self::PreciseManipulationTool => "PreciseManipulationTool",
             Self::BreakingBeads => "BreakingBeads",
             Self::Gloves => "Gloves",

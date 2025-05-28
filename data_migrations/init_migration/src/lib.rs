@@ -4,6 +4,7 @@ use diesel_async::{AsyncConnection, AsyncPgConnection};
 mod brands;
 mod error;
 mod login_providers;
+mod plans;
 mod procedure_models;
 mod reagents;
 mod trackable_categories;
@@ -11,6 +12,7 @@ mod users;
 
 use brands::init_brands;
 use login_providers::init_login_providers;
+use plans::init_plans;
 use procedure_models::init_procedure_models;
 use reagents::init_reagents;
 use trackable_categories::init_trackable_categories;
@@ -35,6 +37,7 @@ pub async fn init_migration(portal_conn: &mut AsyncPgConnection) -> Result<(), e
                 init_trackable_categories(&darwin, portal_conn).await?;
                 init_reagents(&darwin, portal_conn).await?;
                 init_procedure_models(&darwin, portal_conn).await?;
+                init_plans(&darwin, portal_conn).await?;
                 Ok(())
             })
         })

@@ -1,5 +1,6 @@
 //! Submodule for the [`SquareMatrix`] trait.
 
+use multi_ranged::Step;
 use numeric_common_traits::prelude::{IntoUsize, PositiveInteger};
 
 use super::{Matrix2D, SparseMatrix2D, SymmetricMatrix2D};
@@ -7,7 +8,7 @@ use super::{Matrix2D, SparseMatrix2D, SymmetricMatrix2D};
 /// Trait defining a square matrix.
 pub trait SquareMatrix: Matrix2D<RowIndex = Self::Index, ColumnIndex = Self::Index> {
     /// Type of the index for this matrix.
-    type Index: PositiveInteger + IntoUsize;
+    type Index: Step + PositiveInteger + IntoUsize;
 
     /// Returns the order of the matrix.
     fn order(&self) -> Self::Index;

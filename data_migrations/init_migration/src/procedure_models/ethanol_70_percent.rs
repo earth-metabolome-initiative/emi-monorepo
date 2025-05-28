@@ -12,7 +12,7 @@ use web_common_traits::{
 };
 
 use super::shared_step_models::{
-    init_qrcode_step_model, init_rinsing_step_model_95, init_water_aliquoting_step_model,
+    init_bottle_qrcode_step_model, init_rinsing_step_model_95, init_water_aliquoting_step_model,
 };
 
 mod ethanol_aliquoting_step_model;
@@ -56,7 +56,7 @@ pub(super) async fn init_ethanol_70_percent(
 
     init_rinsing_step_model_95(user, &ethanol_70, &ethanol_70_container_category, portal_conn)
         .await?;
-    init_qrcode_step_model(
+    init_bottle_qrcode_step_model(
         user,
         &ethanol_70,
         &ethanol_70_nameplate_category,

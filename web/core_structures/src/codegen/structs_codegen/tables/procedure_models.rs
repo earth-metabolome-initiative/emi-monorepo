@@ -16,6 +16,8 @@ pub struct ProcedureModel {
     pub id: i32,
     pub name: String,
     pub description: String,
+    pub repeatable: bool,
+    pub deprecated: bool,
     pub icon: String,
     pub created_by: i32,
     pub created_at: ::rosetta_timestamp::TimestampUTC,
@@ -114,6 +116,36 @@ impl ProcedureModel {
         use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
         Self::table()
             .filter(procedure_models::description.eq(description))
+            .order_by(procedure_models::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_repeatable(
+        repeatable: &bool,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        Self::table()
+            .filter(procedure_models::repeatable.eq(repeatable))
+            .order_by(procedure_models::id.asc())
+            .load::<Self>(conn)
+            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub async fn from_deprecated(
+        deprecated: &bool,
+        conn: &mut diesel_async::AsyncPgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
+        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        Self::table()
+            .filter(procedure_models::deprecated.eq(deprecated))
             .order_by(procedure_models::id.asc())
             .load::<Self>(conn)
             .await

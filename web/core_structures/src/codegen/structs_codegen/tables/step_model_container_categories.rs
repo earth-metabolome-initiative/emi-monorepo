@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Copy)]
+#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(
     diesel::Selectable,
@@ -16,8 +16,6 @@ pub struct StepModelContainerCategory {
     pub id: i32,
     pub step_model_id: i32,
     pub procedure_model_container_category_id: i32,
-    pub expected_kelvin: f32,
-    pub tolerance_kelvin: f32,
     pub created_by: i32,
     pub created_at: ::rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,

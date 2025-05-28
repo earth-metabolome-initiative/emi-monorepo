@@ -10,6 +10,7 @@ impl TryFrom<&str> for crate::ToolCategory {
             "InsectTrap" => Self::InsectTrap,
             "CuttingTool" => Self::CuttingTool,
             "Wrapper" => Self::Wrapper,
+            "EmpiricalMeasurementTool" => Self::EmpiricalMeasurementTool,
             "PreciseManipulationTool" => Self::PreciseManipulationTool,
             "BreakingBeads" => Self::BreakingBeads,
             "Gloves" => Self::Gloves,

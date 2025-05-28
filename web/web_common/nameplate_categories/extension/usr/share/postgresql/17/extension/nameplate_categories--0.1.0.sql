@@ -10,6 +10,7 @@ The ordering of items is not stable, it is driven by a dependency graph.
 -- web/web_common/nameplate_categories/src/lib.rs:14
 -- nameplate_categories::NameplateCategory
 CREATE TYPE NameplateCategory AS ENUM (
+	'Digital',
 	'Permanent',
 	'SemiPermanent'
 );

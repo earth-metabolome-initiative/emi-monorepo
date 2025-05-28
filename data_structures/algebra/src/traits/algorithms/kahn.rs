@@ -2,7 +2,8 @@
 //! sparse matrices, which provides the Kahn's algorithm for topological
 //! sorting.
 
-use numeric_common_traits::prelude::{IntoUsize, One, Zero};
+use num_traits::{ConstOne, ConstZero};
+use numeric_common_traits::prelude::IntoUsize;
 
 use crate::traits::{SparseMatrix2D, SquareMatrix};
 

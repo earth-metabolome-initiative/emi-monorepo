@@ -1,0 +1,25 @@
+[package]
+name = "molecular_formulas_fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+honggfuzz = "0.5"
+molecular_formulas = { path = "../../molecular_formulas" }
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[profile.release]
+debug = 1
+
+[[bin]]
+name = "from_str"
+path = "fuzz_targets/from_str.rs"
+test = false
+doc = false

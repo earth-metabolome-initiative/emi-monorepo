@@ -14,7 +14,7 @@ pub mod try_from_usize;
 /// A prelude module that re-exports commonly used traits and types
 pub mod prelude {
     pub use crate::{
-        constants::{Bounded, One, Ten, Two, Zero},
+        constants::{Bounded, Ten, Two},
         finite::Finite,
         integer::Integer,
         into_usize::IntoUsize,

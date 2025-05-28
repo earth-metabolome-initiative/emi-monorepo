@@ -4,7 +4,7 @@ resolver = "2"
 members = [
   "bindings/sirius_bindings",
   "web/backend",
-  "web/frontend",
+  # "web/frontend",
   "web/web_common/web_common_traits",
   "web/web_common/webcodegen",
   "web/web_common/csqlv",
@@ -54,13 +54,15 @@ members = [
   "utils/diesel_pgrx_derive",
   "utils/diesel_pgrx",
   "web/web_common/elements",
+  "web/web_common/elements/elements_builder",
   "utils/diesel_pgrx/example_extension",
   "web/web_common/molecular_formulas",
   "utils/numeric_common_traits",
+  "data_structures/multi_ranged",
 ]
 
 [workspace.dependencies]
-actix-web = { version = "4.10", features = ["cookies", "openssl"] }
+actix-web = { version = "4.11", features = ["cookies", "openssl"] }
 actix-http = { version = "3.11.0" }
 actix-files = { version = "0.6.6" }
 actix-web-codegen = { version = "4.3.0", git = "https://github.com/LucaCappelletti94/actix-web.git", branch = "macro-doc" }
@@ -113,7 +115,7 @@ pgrx-tests = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/p
 pgrx-sql-entity-graph = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }
 image = "0.25.6"
 rsa = { version = "0.9.8" }
-rand = { version = "0.8" }
+rand = { version = "0.9.1" }
 gloo = "0.11.0"
 gloo-timers = "0.3.0"
 criterion = { version = "0.6", features = ["html_reports"] }
@@ -183,6 +185,7 @@ image_validation = { path = "utils/image_validation" }
 media_types = { path = "web/web_common/media_types" }
 molecular_formulas = { path = "web/web_common/molecular_formulas" }
 cas_codes = { path = "web/web_common/cas_codes" }
+multi_ranged = { path = "data_structures/multi_ranged" }
 
 [workspace.lints.rust]
 missing_docs = "forbid"

@@ -40,6 +40,7 @@ mod organisms;
 mod organizations;
 mod packaging_models;
 mod packaging_step_models;
+mod parent_procedure_models;
 mod permanence_categories;
 mod postgres_async_read_dispatch;
 mod procedure_model_container_categories;
@@ -200,6 +201,9 @@ pub enum Row {
     ),
     PackagingStepModel(
         crate::codegen::structs_codegen::tables::packaging_step_models::PackagingStepModel,
+    ),
+    ParentProcedureModel(
+        crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel,
     ),
     PermanenceCategory(
         crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
@@ -414,6 +418,9 @@ impl Row {
             Row::PackagingStepModel(packaging_step_models) => {
                 packaging_step_models.upsert(conn)?.map(Row::from)
             }
+            Row::ParentProcedureModel(parent_procedure_models) => {
+                parent_procedure_models.upsert(conn)?.map(Row::from)
+            }
             Row::PermanenceCategory(permanence_categories) => {
                 permanence_categories.upsert(conn)?.map(Row::from)
             }
@@ -588,6 +595,9 @@ impl web_common_traits::prelude::Row for Row {
             Row::Organization(organizations) => organizations.primary_key(),
             Row::PackagingModel(packaging_models) => packaging_models.primary_key(),
             Row::PackagingStepModel(packaging_step_models) => packaging_step_models.primary_key(),
+            Row::ParentProcedureModel(parent_procedure_models) => {
+                parent_procedure_models.primary_key()
+            }
             Row::PermanenceCategory(permanence_categories) => permanence_categories.primary_key(),
             Row::ProcedureModelContainerCategory(procedure_model_container_categories) => {
                 procedure_model_container_categories.primary_key()

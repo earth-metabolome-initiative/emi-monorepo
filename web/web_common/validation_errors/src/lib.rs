@@ -39,7 +39,7 @@ pub enum SingleFieldError<FieldName = ()> {
     /// The provided mail address is invalid.
     InvalidMail(FieldName),
     /// The provided text is not a valid font awesome class.
-    InvalidFontAwesomeClass(FieldName),
+    InvalidFontAwesomeClass(FieldName, String),
     /// The float is not strictly positive (0.0, ...]
     UnexpectedNegativeOrZeroValue(FieldName),
     /// The float is not strictly greater than the expected amount.
@@ -69,8 +69,8 @@ impl SingleFieldError {
                 SingleFieldError::ControlCharacters(field_name)
             }
             SingleFieldError::InvalidMail(_) => SingleFieldError::InvalidMail(field_name),
-            SingleFieldError::InvalidFontAwesomeClass(_) => {
-                SingleFieldError::InvalidFontAwesomeClass(field_name)
+            SingleFieldError::InvalidFontAwesomeClass(_, icon) => {
+                SingleFieldError::InvalidFontAwesomeClass(field_name, icon)
             }
             SingleFieldError::UnexpectedNegativeOrZeroValue(_) => {
                 SingleFieldError::UnexpectedNegativeOrZeroValue(field_name)
@@ -118,7 +118,7 @@ impl SingleFieldError {
             | SingleFieldError::PaddedText(_)
             | SingleFieldError::ConsecutiveWhitespace(_)
             | SingleFieldError::ControlCharacters(_)
-            | SingleFieldError::InvalidFontAwesomeClass(_)
+            | SingleFieldError::InvalidFontAwesomeClass(_, _)
             | SingleFieldError::InvalidMail(_)
             | SingleFieldError::UnknownInstrumentCategory(_)
             | SingleFieldError::InvalidCasCode(_, _)
@@ -180,10 +180,10 @@ impl<A: core::fmt::Display> core::fmt::Display for SingleFieldError<A> {
                     "The {field_name} field contains an invalid email address. Please check and try again."
                 )
             }
-            SingleFieldError::InvalidFontAwesomeClass(field_name) => {
+            SingleFieldError::InvalidFontAwesomeClass(field_name, icon) => {
                 write!(
                     f,
-                    "The {field_name} field contains an invalid Font Awesome class. Please check and try again."
+                    "The {field_name} field contains an invalid Font Awesome class `{icon}`. Please check and try again."
                 )
             }
             SingleFieldError::UnexpectedNegativeOrZeroValue(field_name) => {

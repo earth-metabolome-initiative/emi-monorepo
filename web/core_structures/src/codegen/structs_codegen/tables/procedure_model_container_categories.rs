@@ -16,6 +16,8 @@ pub struct ProcedureModelContainerCategory {
     pub id: i32,
     pub procedure_model_id: i32,
     pub container_category: ::container_categories::ContainerCategory,
+    pub expected_kelvin: f32,
+    pub tolerance_kelvin: f32,
     pub created_by: i32,
     pub created_at: ::rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,

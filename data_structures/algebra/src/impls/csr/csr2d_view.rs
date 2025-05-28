@@ -2,7 +2,8 @@
 
 use std::cmp::Ordering;
 
-use numeric_common_traits::prelude::{IntoUsize, One, SaturatingSub, Zero};
+use num_traits::{ConstOne, ConstZero};
+use numeric_common_traits::prelude::{IntoUsize, SaturatingSub};
 
 use crate::prelude::*;
 

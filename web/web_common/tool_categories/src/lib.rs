@@ -28,6 +28,9 @@ pub enum ToolCategory {
     /// Something used to wrap or package items, such as plastic wrap, foil or
     /// paper.
     Wrapper,
+    /// Any tool allowing for empirically measure the length of a material,
+    /// the volume of a liquid, or the mass of an object.
+    EmpiricalMeasurementTool,
     /// A tool designed for precise manipulation of small objects, such as
     /// tweezers or forceps.
     PreciseManipulationTool,
@@ -59,6 +62,7 @@ impl ToolCategory {
             ToolCategory::InsectTrap => "Insect Trap",
             ToolCategory::CuttingTool => "Cutting Tool",
             ToolCategory::Wrapper => "Wrapper",
+            ToolCategory::EmpiricalMeasurementTool => "Empirical Measurement Tool",
             ToolCategory::PreciseManipulationTool => "Precise Manipulation Tool",
             ToolCategory::BreakingBeads => "Breaking Beads",
             ToolCategory::Gloves => "Gloves",
@@ -82,6 +86,11 @@ impl ToolCategory {
             }
             ToolCategory::Wrapper => {
                 "Something used to wrap or package items, such as plastic wrap, foil or paper."
+            }
+            ToolCategory::EmpiricalMeasurementTool => {
+                "Any tool allowing for empirically measure the length of a material, \
+                 the volume of a liquid, or the mass of an object, which can include rulers, \
+                    measuring cups, scales, or even eye-sight."
             }
             ToolCategory::PreciseManipulationTool => {
                 "A tool designed for precise manipulation of small objects, such as tweezers or forceps."
@@ -119,6 +128,7 @@ impl ToolCategory {
             ToolCategory::InsectTrap => "mosquito-net",
             ToolCategory::CuttingTool => "scissors",
             ToolCategory::Wrapper => "sheet-plastic",
+            ToolCategory::EmpiricalMeasurementTool => "ruler",
             ToolCategory::PreciseManipulationTool => "spoon",
             ToolCategory::BreakingBeads => "bowling-ball",
             ToolCategory::Gloves => "hand",

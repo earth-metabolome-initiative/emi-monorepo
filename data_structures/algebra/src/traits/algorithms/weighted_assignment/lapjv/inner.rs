@@ -1,7 +1,8 @@
 //! Submodule providing the concrete implementation of the LAPJV algorithm.
 
 use common_traits::prelude::TotalOrd;
-use numeric_common_traits::prelude::{Bounded, Finite, IntoUsize, Number, TryFromUsize, Zero};
+use num_traits::ConstZero;
+use numeric_common_traits::prelude::{Bounded, Finite, IntoUsize, Number, TryFromUsize};
 
 use super::LAPJVError;
 use crate::traits::{AssignmentState, DenseValuedMatrix2D};

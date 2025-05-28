@@ -109,6 +109,9 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::PackagingStepModel(_) => {
                 crate::codegen::tables::table_names::TableName::PackagingStepModel
             }
+            super::Rows::ParentProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::ParentProcedureModel
+            }
             super::Rows::PermanenceCategory(_) => {
                 crate::codegen::tables::table_names::TableName::PermanenceCategory
             }

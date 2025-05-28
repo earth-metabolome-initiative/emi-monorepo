@@ -416,6 +416,16 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
                         .map(super::Row::from),
                 )
             }
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ParentProcedureModel(
+                primary_key,
+            ) => {
+                Ok(
+                    <crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel as web_common_traits::database::Read<
+                        diesel::SqliteConnection,
+                    >>::read(primary_key, conn)?
+                        .map(super::Row::from),
+                )
+            }
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::PermanenceCategory(
                 primary_key,
             ) => {

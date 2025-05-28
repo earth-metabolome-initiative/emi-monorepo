@@ -3,7 +3,7 @@
 use core::iter::Peekable;
 
 use common_traits::prelude::{Builder, BuilderError};
-use numeric_common_traits::prelude::Zero;
+use num_traits::ConstZero;
 
 use crate::prelude::Spectrum;
 

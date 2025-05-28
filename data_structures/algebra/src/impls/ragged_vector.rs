@@ -2,7 +2,9 @@
 
 use std::{fmt::Debug, iter::repeat_n};
 
-use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize, Zero};
+use multi_ranged::Step;
+use num_traits::ConstZero;
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use super::MutabilityError;
 use crate::traits::{
@@ -45,9 +47,9 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> Default
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    SparseIndex: Zero,
-    RowIndex: Zero,
-    ColumnIndex: Zero,
+    SparseIndex: ConstZero,
+    RowIndex: ConstZero,
+    ColumnIndex: ConstZero,
 {
     fn default() -> Self {
         Self {
@@ -62,8 +64,8 @@ where
 
 impl<SparseIndex, RowIndex, ColumnIndex> Matrix for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize,
-    ColumnIndex: PositiveInteger + IntoUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize,
 {
     type Coordinates = (RowIndex, ColumnIndex);
 
@@ -75,8 +77,8 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> Matrix2D
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize,
-    ColumnIndex: PositiveInteger + IntoUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize,
 {
     type RowIndex = RowIndex;
     type ColumnIndex = ColumnIndex;
@@ -93,8 +95,8 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> Matrix2DRef
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize,
-    ColumnIndex: PositiveInteger + IntoUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize,
 {
     fn number_of_columns_ref(&self) -> &Self::ColumnIndex {
         &self.number_of_columns
@@ -108,8 +110,8 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> SparseMatrix
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: PositiveInteger + IntoUsize,
 {
     type SparseIndex = SparseIndex;
@@ -143,8 +145,8 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> SizedSparseMatrix
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: PositiveInteger + IntoUsize,
 {
     fn number_of_defined_values(&self) -> Self::SparseIndex {
@@ -155,8 +157,8 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> SparseMatrix2D
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: PositiveInteger + IntoUsize,
 {
     type SparseRow<'a>
@@ -193,8 +195,8 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> EmptyRows
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: PositiveInteger + IntoUsize,
 {
     type EmptyRowIndices<'a>
@@ -225,8 +227,8 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> SizedRowsSparseMatrix2D
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: PositiveInteger + IntoUsize,
 {
     type SparseRowSizes<'a>
@@ -248,8 +250,8 @@ where
 impl<SparseIndex, RowIndex, ColumnIndex> MatrixMut
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: PositiveInteger + IntoUsize,
 {
     type Entry = Self::Coordinates;
@@ -304,8 +306,8 @@ impl<SparseIndex, RowIndex, ColumnIndex>
     TransposableMatrix2D<RaggedVector<SparseIndex, ColumnIndex, RowIndex>>
     for RaggedVector<SparseIndex, RowIndex, ColumnIndex>
 where
-    RowIndex: PositiveInteger + IntoUsize + TryFromUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
     SparseIndex: PositiveInteger + IntoUsize,
 {
     fn transpose(&self) -> RaggedVector<SparseIndex, ColumnIndex, RowIndex> {
@@ -329,8 +331,8 @@ impl<SparseIndex, RowIndex, ColumnIndex> SparseMatrixMut
 where
     Self: SparseMatrix2D<RowIndex = RowIndex, ColumnIndex = ColumnIndex, SparseIndex = SparseIndex>,
     SparseIndex: PositiveInteger + IntoUsize,
-    RowIndex: PositiveInteger + IntoUsize,
-    ColumnIndex: PositiveInteger + IntoUsize + TryFromUsize,
+    RowIndex: Step + PositiveInteger + IntoUsize,
+    ColumnIndex: Step + PositiveInteger + IntoUsize + TryFromUsize,
 {
     type MinimalShape = Self::Coordinates;
 

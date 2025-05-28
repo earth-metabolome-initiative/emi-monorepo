@@ -15,7 +15,7 @@ mod formic_acid_aliquoting_step_model;
 mod methanol_aliquoting_step_model;
 
 use super::shared_step_models::{
-    init_qrcode_step_model, init_rinsing_step_model_95, init_water_aliquoting_step_model,
+    init_bottle_qrcode_step_model, init_rinsing_step_model_95, init_water_aliquoting_step_model,
 };
 
 pub(super) async fn init_emi_solvent_procedure_models(
@@ -86,7 +86,7 @@ pub(super) async fn init_emi_solvent_procedure_models(
         portal_conn,
     )
     .await?;
-    init_qrcode_step_model(
+    init_bottle_qrcode_step_model(
         user,
         &emi_solvent_procedure,
         &emi_solvent_procedure_nameplate_category,

@@ -1,6 +1,7 @@
 //! Submodule for the `PaddedMatrix2D` struct, implementing the `ValuedMatrix`
 //! trait and its related traits.
 
+use multi_ranged::Step;
 use numeric_common_traits::prelude::{IntoUsize, TryFromUsize};
 
 use super::{PaddedMatrix2D, imputed_row_values::ImputedRowValues};
@@ -44,7 +45,7 @@ where
 impl<M: SparseValuedMatrix2D, Map> DenseValuedMatrix for PaddedMatrix2D<M, Map>
 where
     M::RowIndex: IntoUsize + TryFromUsize,
-    M::ColumnIndex: IntoUsize + TryFromUsize,
+    M::ColumnIndex: IntoUsize + TryFromUsize + Step,
     Map: Fn((M::RowIndex, M::ColumnIndex)) -> M::Value,
 {
     type Values<'a>
@@ -76,7 +77,7 @@ where
 impl<M: SparseValuedMatrix2D, Map> SparseValuedMatrix for PaddedMatrix2D<M, Map>
 where
     M::RowIndex: IntoUsize + TryFromUsize,
-    M::ColumnIndex: IntoUsize + TryFromUsize,
+    M::ColumnIndex: IntoUsize + TryFromUsize + Step,
     Map: Fn((M::RowIndex, M::ColumnIndex)) -> M::Value,
 {
     type SparseValues<'a>
@@ -93,7 +94,7 @@ where
 impl<M: SparseValuedMatrix2D, Map> SparseValuedMatrix2D for PaddedMatrix2D<M, Map>
 where
     M::RowIndex: IntoUsize + TryFromUsize,
-    M::ColumnIndex: IntoUsize + TryFromUsize,
+    M::ColumnIndex: IntoUsize + TryFromUsize + Step,
     Map: Fn((M::RowIndex, M::ColumnIndex)) -> M::Value,
 {
     type SparseRowValues<'a>
@@ -110,7 +111,7 @@ where
 impl<M: SparseValuedMatrix2D, Map> DenseValuedMatrix2D for PaddedMatrix2D<M, Map>
 where
     M::RowIndex: IntoUsize + TryFromUsize,
-    M::ColumnIndex: IntoUsize + TryFromUsize,
+    M::ColumnIndex: IntoUsize + TryFromUsize + Step,
     Map: Fn((M::RowIndex, M::ColumnIndex)) -> M::Value,
 {
     type RowValues<'a>

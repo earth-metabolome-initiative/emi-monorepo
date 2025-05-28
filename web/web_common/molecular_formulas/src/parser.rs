@@ -69,7 +69,7 @@ impl Parser<'_> {
                             count,
                         ))
                     }
-                    _ => inner_formula.add_count_to_first_subformula(count).ok(),
+                    _ => Some(inner_formula.add_count_to_first_subformula(count)?),
                 }
             }
             (Token::Count(count), Some(formula)) => {

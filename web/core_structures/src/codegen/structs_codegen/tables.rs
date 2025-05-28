@@ -80,6 +80,8 @@ pub mod packaging_models;
 pub use packaging_models::PackagingModel;
 pub mod packaging_step_models;
 pub use packaging_step_models::PackagingStepModel;
+pub mod parent_procedure_models;
+pub use parent_procedure_models::ParentProcedureModel;
 pub mod permanence_categories;
 pub use permanence_categories::PermanenceCategory;
 pub mod procedure_model_container_categories;

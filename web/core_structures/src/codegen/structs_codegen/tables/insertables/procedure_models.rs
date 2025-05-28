@@ -3,6 +3,8 @@
 pub enum InsertableProcedureModelAttributes {
     Name,
     Description,
+    Repeatable,
+    Deprecated,
     Icon,
     CreatedBy,
     CreatedAt,
@@ -14,6 +16,8 @@ impl core::fmt::Display for InsertableProcedureModelAttributes {
         match self {
             InsertableProcedureModelAttributes::Name => write!(f, "name"),
             InsertableProcedureModelAttributes::Description => write!(f, "description"),
+            InsertableProcedureModelAttributes::Repeatable => write!(f, "repeatable"),
+            InsertableProcedureModelAttributes::Deprecated => write!(f, "deprecated"),
             InsertableProcedureModelAttributes::Icon => write!(f, "icon"),
             InsertableProcedureModelAttributes::CreatedBy => write!(f, "created_by"),
             InsertableProcedureModelAttributes::CreatedAt => write!(f, "created_at"),
@@ -33,6 +37,8 @@ impl core::fmt::Display for InsertableProcedureModelAttributes {
 pub struct InsertableProcedureModel {
     name: String,
     description: String,
+    repeatable: bool,
+    deprecated: bool,
     icon: String,
     created_by: i32,
     created_at: ::rosetta_timestamp::TimestampUTC,
@@ -72,6 +78,8 @@ impl InsertableProcedureModel {
 pub struct InsertableProcedureModelBuilder {
     name: Option<String>,
     description: Option<String>,
+    repeatable: Option<bool>,
+    deprecated: Option<bool>,
     icon: Option<String>,
     created_by: Option<i32>,
     created_at: Option<::rosetta_timestamp::TimestampUTC>,
@@ -83,6 +91,8 @@ impl Default for InsertableProcedureModelBuilder {
         Self {
             name: None,
             description: None,
+            repeatable: Some(false),
+            deprecated: Some(false),
             icon: Some("book".to_owned()),
             created_by: None,
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
@@ -139,6 +149,34 @@ impl InsertableProcedureModelBuilder {
         pgrx_validation::must_be_paragraph(description.as_ref())
             .map_err(|e| e.rename_field(InsertableProcedureModelAttributes::Description))?;
         self.description = Some(description);
+        Ok(self)
+    }
+    pub fn repeatable<P>(
+        mut self,
+        repeatable: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let repeatable = repeatable.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
+            Into::into(err).rename_field(InsertableProcedureModelAttributes::Repeatable)
+        })?;
+        self.repeatable = Some(repeatable);
+        Ok(self)
+    }
+    pub fn deprecated<P>(
+        mut self,
+        deprecated: P,
+    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let deprecated = deprecated.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
+            Into::into(err).rename_field(InsertableProcedureModelAttributes::Deprecated)
+        })?;
+        self.deprecated = Some(deprecated);
         Ok(self)
     }
     pub fn icon<P>(
@@ -235,6 +273,16 @@ impl common_traits::prelude::Builder for InsertableProcedureModelBuilder {
                     InsertableProcedureModelAttributes::Description,
                 ),
             )?,
+            repeatable: self.repeatable.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableProcedureModelAttributes::Repeatable,
+                ),
+            )?,
+            deprecated: self.deprecated.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableProcedureModelAttributes::Deprecated,
+                ),
+            )?,
             icon: self.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableProcedureModelAttributes::Icon,
             ))?,
@@ -267,6 +315,8 @@ impl TryFrom<InsertableProcedureModel> for InsertableProcedureModelBuilder {
         Self::default()
             .name(insertable_variant.name)?
             .description(insertable_variant.description)?
+            .repeatable(insertable_variant.repeatable)?
+            .deprecated(insertable_variant.deprecated)?
             .icon(insertable_variant.icon)?
             .created_by(insertable_variant.created_by)?
             .created_at(insertable_variant.created_at)?

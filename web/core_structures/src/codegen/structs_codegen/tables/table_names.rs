@@ -42,6 +42,7 @@ pub enum TableName {
     Organization,
     PackagingModel,
     PackagingStepModel,
+    ParentProcedureModel,
     PermanenceCategory,
     ProcedureModelContainerCategory,
     ProcedureModelInstrumentCategory,
@@ -157,6 +158,9 @@ impl core::fmt::Display for TableName {
             TableName::Organization => write!(f, stringify!(Organization)),
             TableName::PackagingModel => write!(f, stringify!(PackagingModel)),
             TableName::PackagingStepModel => write!(f, stringify!(PackagingStepModel)),
+            TableName::ParentProcedureModel => {
+                write!(f, stringify!(ParentProcedureModel))
+            }
             TableName::PermanenceCategory => write!(f, stringify!(PermanenceCategory)),
             TableName::ProcedureModelContainerCategory => {
                 write!(f, stringify!(ProcedureModelContainerCategory))

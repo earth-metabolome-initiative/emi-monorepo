@@ -11,18 +11,17 @@ use strum::IntoEnumIterator;
 /// correct.
 pub fn test_element_oxidative_states() {
     for element in Element::iter() {
-        let mut element_oxidation_states = element.oxidation_states().to_vec();
-        element_oxidation_states.push(0);
-        element_oxidation_states.sort_unstable();
+        let element_oxidation_states: Vec<i16> = element.oxidation_states().into();
         let molecular_formulas: MolecularFormula = element.into();
-        let molecular_formulas_oxidation_states = molecular_formulas.oxidation_states().unwrap();
+        let molecular_formulas_oxidation_states: Vec<i16> =
+            molecular_formulas.oxidation_states().unwrap().into();
         assert_eq!(element_oxidation_states, molecular_formulas_oxidation_states);
 
         for isotope in element.isotopes() {
             assert_eq!(isotope.element(), element);
             let molecular_formulas: MolecularFormula = isotope.into();
-            let molecular_formulas_oxidation_states =
-                molecular_formulas.oxidation_states().unwrap();
+            let molecular_formulas_oxidation_states: Vec<i16> =
+                molecular_formulas.oxidation_states().unwrap().into();
             assert_eq!(element_oxidation_states, molecular_formulas_oxidation_states);
         }
     }
@@ -32,7 +31,7 @@ pub fn test_element_oxidative_states() {
 /// Test validating the oxidation state of `HRn`
 pub fn test_rn_h() {
     let molecular_formulas = MolecularFormula::from_str("HRn").unwrap();
-    let oxidation_states = molecular_formulas.oxidation_states().unwrap();
+    let oxidation_states: Vec<i16> = molecular_formulas.oxidation_states().unwrap().into();
     assert_eq!(oxidation_states, vec![-1, 0, 1, 2, 3, 5, 6, 7]);
 }
 
@@ -40,7 +39,7 @@ pub fn test_rn_h() {
 /// Test validating the oxidation state of `H2`
 pub fn test_h2() {
     let molecular_formulas = MolecularFormula::from_str("H2").unwrap();
-    let oxidation_states = molecular_formulas.oxidation_states().unwrap();
+    let oxidation_states: Vec<i16> = molecular_formulas.oxidation_states().unwrap().into();
     assert_eq!(oxidation_states, vec![-2, -1, 0, 1, 2]);
 }
 
@@ -48,7 +47,7 @@ pub fn test_h2() {
 /// Test validating the oxidation state of `H2O`
 pub fn test_h2o() {
     let molecular_formulas = MolecularFormula::from_str("H2O").unwrap();
-    let oxidation_states = molecular_formulas.oxidation_states().unwrap();
+    let oxidation_states: Vec<i16> = molecular_formulas.oxidation_states().unwrap().into();
     assert_eq!(oxidation_states, vec![-4, -3, -2, -1, 0, 1, 2, 3, 4]);
 }
 
@@ -56,7 +55,7 @@ pub fn test_h2o() {
 /// Test validating the oxidation state of `LvNh`
 pub fn test_lvnh() {
     let molecular_formulas = MolecularFormula::from_str("LvNh").unwrap();
-    let oxidation_states = molecular_formulas.oxidation_states().unwrap();
+    let oxidation_states: Vec<i16> = molecular_formulas.oxidation_states().unwrap().into();
     assert_eq!(oxidation_states, vec![-2, 0, 4]);
 }
 
@@ -64,7 +63,7 @@ pub fn test_lvnh() {
 /// Test validating the oxidation state of a large formula
 pub fn test_large_formula() {
     let molecular_formulas = MolecularFormula::from_str("2(C17H23NO3).H2O.H2SO4").unwrap();
-    let oxidation_states = molecular_formulas.oxidation_states().unwrap();
+    let oxidation_states: Vec<i16> = molecular_formulas.oxidation_states().unwrap().into();
     assert_eq!(
         oxidation_states,
         vec![

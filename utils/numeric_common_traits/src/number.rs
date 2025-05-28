@@ -1,8 +1,9 @@
 //! Trait defining a number.
 
 use common_traits::prelude::{Serde, TotalOrd};
+use num_traits::{ConstOne, ConstZero};
 
-use super::prelude::{Bounded, Finite, One, Ten, Two, Zero};
+use super::prelude::{Bounded, Finite, Ten, Two};
 
 /// Trait defining a number.
 pub trait Number:
@@ -15,8 +16,8 @@ pub trait Number:
     + TotalOrd
     + Ten
     + Two
-    + One
-    + Zero
+    + ConstOne
+    + ConstZero
     + Finite
     + Bounded
     + Serde
@@ -37,17 +38,31 @@ pub trait Number:
 /// Trait defining a positive number.
 pub trait PositiveNumber: Number {}
 
-impl Number for i8 {}
-impl Number for i16 {}
-impl Number for i32 {}
-impl Number for i64 {}
-impl Number for i128 {}
-impl Number for isize {}
-impl Number for u8 {}
-impl Number for u16 {}
-impl Number for u32 {}
-impl Number for u64 {}
-impl Number for u128 {}
-impl Number for usize {}
-impl Number for f32 {}
-impl Number for f64 {}
+impl<T> Number for T where
+    T: Copy
+        + Clone
+        + core::fmt::Display
+        + core::fmt::Debug
+        + PartialEq
+        + PartialOrd
+        + TotalOrd
+        + Ten
+        + Two
+        + ConstOne
+        + ConstZero
+        + Finite
+        + Bounded
+        + Serde
+        + core::iter::Sum
+        + core::ops::Add<Output = T>
+        + core::ops::Sub<Output = T>
+        + core::ops::Mul<Output = T>
+        + core::ops::Div<Output = T>
+        + core::ops::Rem<Output = T>
+        + core::ops::AddAssign
+        + core::ops::SubAssign
+        + core::ops::MulAssign
+        + core::ops::DivAssign
+        + core::ops::RemAssign
+{
+}

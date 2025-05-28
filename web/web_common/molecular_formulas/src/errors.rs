@@ -31,6 +31,8 @@ pub enum Error {
         /// The found closing token.
         found: Option<Token>,
     },
+    /// Error raised when an uncountable term is being counted.
+    CountingUncountable,
     /// When the leading token is not a number or an element.
     InvalidLeadingToken(Token),
     /// When the parser is not completely consumed.
@@ -78,6 +80,7 @@ impl core::fmt::Display for Error {
             Error::ClosingToken { expected, found } => {
                 write!(f, "Expected closing token: {expected:?}, found: {found:?}")
             }
+            Error::CountingUncountable => write!(f, "Counting uncountable term"),
             Error::InvalidLeadingToken(token) => {
                 write!(f, "Invalid leading token: {token:?}")
             }

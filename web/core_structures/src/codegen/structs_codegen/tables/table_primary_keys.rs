@@ -42,6 +42,7 @@ pub enum TablePrimaryKey {
     Organization(i16),
     PackagingModel(i32),
     PackagingStepModel(i32),
+    ParentProcedureModel((i32, i32)),
     PermanenceCategory(i16),
     ProcedureModelContainerCategory(i32),
     ProcedureModelInstrumentCategory(i32),
@@ -217,6 +218,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::PackagingStepModel(_) => {
                 crate::codegen::tables::table_names::TableName::PackagingStepModel
+            }
+            TablePrimaryKey::ParentProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::ParentProcedureModel
             }
             TablePrimaryKey::PermanenceCategory(_) => {
                 crate::codegen::tables::table_names::TableName::PermanenceCategory
