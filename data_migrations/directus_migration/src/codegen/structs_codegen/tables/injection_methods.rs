@@ -5,7 +5,7 @@
     diesel::Insertable,
     diesel::AsChangeset,
     diesel::Queryable,
-    diesel::Identifiable
+    diesel::Identifiable,
 )]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -54,19 +54,18 @@ impl InjectionMethod {
             crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{RunQueryDsl, QueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(user_created) = self.user_created else {
             return Ok(None);
         };
         RunQueryDsl::first(
-                QueryDsl::find(
-                    crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table(),
-                    user_created,
-                ),
-                conn,
-            )
-            .map(Some)
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table(),
+                user_created,
+            ),
+            conn,
+        )
+        .map(Some)
     }
     pub fn user_updated<C: diesel::connection::LoadConnection>(
         &self,
@@ -91,30 +90,29 @@ impl InjectionMethod {
             crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{RunQueryDsl, QueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(user_updated) = self.user_updated else {
             return Ok(None);
         };
         RunQueryDsl::first(
-                QueryDsl::find(
-                    crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table(),
-                    user_updated,
-                ),
-                conn,
-            )
-            .map(Some)
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table(),
+                user_updated,
+            ),
+            conn,
+        )
+        .map(Some)
     }
     #[cfg(feature = "postgres")]
     pub fn from_method_name(
         method_name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
         use crate::codegen::diesel_codegen::tables::injection_methods::injection_methods;
-        use diesel::OptionalExtension;
         Self::table()
             .filter(injection_methods::method_name.eq(method_name))
             .order_by(injection_methods::id.asc())
@@ -126,9 +124,8 @@ impl InjectionMethod {
         status: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::injection_methods::injection_methods;
         Self::table()
             .filter(injection_methods::status.eq(status))
@@ -140,9 +137,8 @@ impl InjectionMethod {
         user_created: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::injection_methods::injection_methods;
         Self::table()
             .filter(injection_methods::user_created.eq(user_created))
@@ -154,9 +150,8 @@ impl InjectionMethod {
         date_created: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::injection_methods::injection_methods;
         Self::table()
             .filter(injection_methods::date_created.eq(date_created))
@@ -168,9 +163,8 @@ impl InjectionMethod {
         user_updated: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::injection_methods::injection_methods;
         Self::table()
             .filter(injection_methods::user_updated.eq(user_updated))
@@ -182,9 +176,8 @@ impl InjectionMethod {
         date_updated: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::injection_methods::injection_methods;
         Self::table()
             .filter(injection_methods::date_updated.eq(date_updated))
@@ -196,9 +189,8 @@ impl InjectionMethod {
         method_description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::injection_methods::injection_methods;
         Self::table()
             .filter(injection_methods::method_description.eq(method_description))

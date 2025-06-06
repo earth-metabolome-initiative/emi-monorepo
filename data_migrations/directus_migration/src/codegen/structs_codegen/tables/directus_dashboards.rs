@@ -5,7 +5,7 @@
     diesel::Insertable,
     diesel::AsChangeset,
     diesel::Queryable,
-    diesel::Identifiable
+    diesel::Identifiable,
 )]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -53,28 +53,26 @@ impl DirectusDashboard {
             crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{RunQueryDsl, QueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(user_created) = self.user_created else {
             return Ok(None);
         };
         RunQueryDsl::first(
-                QueryDsl::find(
-                    crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table(),
-                    user_created,
-                ),
-                conn,
-            )
-            .map(Some)
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table(),
+                user_created,
+            ),
+            conn,
+        )
+        .map(Some)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_dashboards::directus_dashboards;
         Self::table()
             .filter(directus_dashboards::name.eq(name))
@@ -86,9 +84,8 @@ impl DirectusDashboard {
         icon: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_dashboards::directus_dashboards;
         Self::table()
             .filter(directus_dashboards::icon.eq(icon))
@@ -100,9 +97,8 @@ impl DirectusDashboard {
         note: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_dashboards::directus_dashboards;
         Self::table()
             .filter(directus_dashboards::note.eq(note))
@@ -114,9 +110,8 @@ impl DirectusDashboard {
         date_created: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_dashboards::directus_dashboards;
         Self::table()
             .filter(directus_dashboards::date_created.eq(date_created))
@@ -128,9 +123,8 @@ impl DirectusDashboard {
         user_created: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_dashboards::directus_dashboards;
         Self::table()
             .filter(directus_dashboards::user_created.eq(user_created))
@@ -142,9 +136,8 @@ impl DirectusDashboard {
         color: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_dashboards::directus_dashboards;
         Self::table()
             .filter(directus_dashboards::color.eq(color))

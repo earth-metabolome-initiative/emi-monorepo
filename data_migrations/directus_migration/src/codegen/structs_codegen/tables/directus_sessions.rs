@@ -5,7 +5,7 @@
     diesel::Insertable,
     diesel::AsChangeset,
     diesel::Queryable,
-    diesel::Identifiable
+    diesel::Identifiable,
 )]
 #[diesel(primary_key(token))]
 #[diesel(
@@ -54,19 +54,18 @@ impl DirectusSession {
             crate::codegen::structs_codegen::tables::directus_shares::DirectusShare,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{RunQueryDsl, QueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(share) = self.share else {
             return Ok(None);
         };
         RunQueryDsl::first(
-                QueryDsl::find(
-                    crate::codegen::structs_codegen::tables::directus_shares::DirectusShare::table(),
-                    share,
-                ),
-                conn,
-            )
-            .map(Some)
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::directus_shares::DirectusShare::table(),
+                share,
+            ),
+            conn,
+        )
+        .map(Some)
     }
     pub fn user<C: diesel::connection::LoadConnection>(
         &self,
@@ -91,28 +90,26 @@ impl DirectusSession {
             crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{RunQueryDsl, QueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(user) = self.user else {
             return Ok(None);
         };
         RunQueryDsl::first(
-                QueryDsl::find(
-                    crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table(),
-                    user,
-                ),
-                conn,
-            )
-            .map(Some)
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table(),
+                user,
+            ),
+            conn,
+        )
+        .map(Some)
     }
     #[cfg(feature = "postgres")]
     pub fn from_user(
         user: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions;
         Self::table()
             .filter(directus_sessions::user.eq(user))
@@ -124,9 +121,8 @@ impl DirectusSession {
         expires: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions;
         Self::table()
             .filter(directus_sessions::expires.eq(expires))
@@ -138,9 +134,8 @@ impl DirectusSession {
         ip: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions;
         Self::table()
             .filter(directus_sessions::ip.eq(ip))
@@ -152,9 +147,8 @@ impl DirectusSession {
         user_agent: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions;
         Self::table()
             .filter(directus_sessions::user_agent.eq(user_agent))
@@ -166,9 +160,8 @@ impl DirectusSession {
         share: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions;
         Self::table()
             .filter(directus_sessions::share.eq(share))
@@ -180,9 +173,8 @@ impl DirectusSession {
         origin: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions;
         Self::table()
             .filter(directus_sessions::origin.eq(origin))
@@ -194,9 +186,8 @@ impl DirectusSession {
         next_token: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions;
         Self::table()
             .filter(directus_sessions::next_token.eq(next_token))

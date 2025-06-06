@@ -5,7 +5,7 @@
     diesel::Insertable,
     diesel::AsChangeset,
     diesel::Queryable,
-    diesel::Identifiable
+    diesel::Identifiable,
 )]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::addresses::addresses)]
@@ -16,9 +16,7 @@ pub struct Address {
     pub street: String,
     pub street_number: String,
     pub postal_code: String,
-    pub geolocation: postgis_diesel::types::GeometryContainer<
-        postgis_diesel::types::Point,
-    >,
+    pub geolocation: postgis_diesel::types::GeometryContainer<postgis_diesel::types::Point>,
     pub city_code: String,
 }
 impl web_common_traits::prelude::TableName for Address {
@@ -36,9 +34,8 @@ impl Address {
         country: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::addresses::addresses;
         Self::table()
             .filter(addresses::country.eq(country))
@@ -50,9 +47,8 @@ impl Address {
         city: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::addresses::addresses;
         Self::table()
             .filter(addresses::city.eq(city))
@@ -64,9 +60,8 @@ impl Address {
         street: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::addresses::addresses;
         Self::table()
             .filter(addresses::street.eq(street))
@@ -78,9 +73,8 @@ impl Address {
         street_number: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::addresses::addresses;
         Self::table()
             .filter(addresses::street_number.eq(street_number))
@@ -92,9 +86,8 @@ impl Address {
         postal_code: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::addresses::addresses;
         Self::table()
             .filter(addresses::postal_code.eq(postal_code))
@@ -106,9 +99,8 @@ impl Address {
         city_code: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::addresses::addresses;
         Self::table()
             .filter(addresses::city_code.eq(city_code))
