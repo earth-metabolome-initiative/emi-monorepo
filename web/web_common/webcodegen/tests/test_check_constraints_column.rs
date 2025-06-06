@@ -21,14 +21,12 @@ async fn test_check_constraints_column() {
     {
         let column =
             Column::load(column_name, "constrained_users", "public", &database_name, &mut conn)
-                .await
                 .unwrap_or_else(|_| panic!("Failed to query database `{database_name}`"))
                 .unwrap_or_else(|| panic!("Failed to retrieve column `{column_name}`"));
 
-        let column_check_constraints =
-            column.check_constraints(&mut conn).await.unwrap_or_else(|_| {
-                panic!("Failed to query check constraints for column `{column_name}`")
-            });
+        let column_check_constraints = column.check_constraints(&mut conn).unwrap_or_else(|_| {
+            panic!("Failed to query check constraints for column `{column_name}`")
+        });
 
         assert_eq!(
             column_check_constraints.len(),
@@ -37,7 +35,7 @@ async fn test_check_constraints_column() {
         );
 
         for check_constraint in column_check_constraints {
-            let functions = check_constraint.functions(&mut conn).await.unwrap_or_else(|_| {
+            let functions = check_constraint.functions(&mut conn).unwrap_or_else(|_| {
                 panic!(
                     "Failed to query functions for check constraint `{check_constraint_name}`",
                     check_constraint_name = check_constraint.constraint_name
@@ -53,7 +51,7 @@ async fn test_check_constraints_column() {
             // None of these functions are expected to be associated with an extension.
             for function in functions {
                 assert!(
-                    function.extension(&mut conn).await.unwrap().is_none(),
+                    function.extension(&mut conn).unwrap().is_none(),
                     "Function `{function_name}` is associated with an extension",
                     function_name = function.proname
                 );

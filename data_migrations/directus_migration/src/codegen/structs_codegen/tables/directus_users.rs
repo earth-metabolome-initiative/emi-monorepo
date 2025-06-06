@@ -49,13 +49,12 @@ impl DirectusUser {
     #[cfg(feature = "postgres")]
     pub async fn role(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::directus_roles::DirectusRole>,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(role) = self.role.as_ref() else {
             return Ok(None);
         };
@@ -70,11 +69,10 @@ impl DirectusUser {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_role(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         role: &crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::role
@@ -86,10 +84,9 @@ impl DirectusUser {
     #[cfg(feature = "postgres")]
     pub async fn from_email(
         email: Option<&str>,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(diesel::ExpressionMethods::eq(
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::email,
@@ -102,10 +99,9 @@ impl DirectusUser {
     #[cfg(feature = "postgres")]
     pub async fn from_external_identifier(
         external_identifier: Option<&str>,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 diesel::ExpressionMethods::eq(
@@ -120,10 +116,9 @@ impl DirectusUser {
     #[cfg(feature = "postgres")]
     pub async fn from_token(
         token: Option<&str>,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(diesel::ExpressionMethods::eq(
                 crate::codegen::diesel_codegen::tables::directus_users::directus_users::token,

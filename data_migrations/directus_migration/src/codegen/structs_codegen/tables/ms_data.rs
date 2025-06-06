@@ -38,13 +38,12 @@ impl MsDatum {
     #[cfg(feature = "postgres")]
     pub async fn user_created(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
@@ -60,13 +59,12 @@ impl MsDatum {
     #[cfg(feature = "postgres")]
     pub async fn user_updated(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
@@ -82,11 +80,10 @@ impl MsDatum {
     #[cfg(feature = "postgres")]
     pub async fn injection_volume_unit(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<crate::codegen::structs_codegen::tables::si_units::SiUnit, diesel::result::Error>
     {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         crate::codegen::structs_codegen::tables::si_units::SiUnit::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::si_units::si_units::dsl::id
@@ -98,13 +95,12 @@ impl MsDatum {
     #[cfg(feature = "postgres")]
     pub async fn injection_method(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         crate::codegen::structs_codegen::tables::injection_methods::InjectionMethod,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         crate::codegen::structs_codegen::tables::injection_methods::InjectionMethod::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::injection_methods::injection_methods::dsl::id
@@ -118,13 +114,12 @@ impl MsDatum {
     #[cfg(feature = "postgres")]
     pub async fn instrument_used(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         crate::codegen::structs_codegen::tables::instruments::Instrument,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         crate::codegen::structs_codegen::tables::instruments::Instrument::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::instruments::instruments::dsl::id
@@ -136,13 +131,12 @@ impl MsDatum {
     #[cfg(feature = "postgres")]
     pub async fn batch(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::batches::Batch>,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(batch) = self.batch.as_ref() else {
             return Ok(None);
         };
@@ -155,11 +149,10 @@ impl MsDatum {
     #[cfg(feature = "postgres")]
     pub async fn parent_sample_container(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<crate::codegen::structs_codegen::tables::containers::Container, diesel::result::Error>
     {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         crate::codegen::structs_codegen::tables::containers::Container::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::containers::containers::dsl::id
@@ -170,11 +163,10 @@ impl MsDatum {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_user_created(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::ms_data::ms_data::dsl::user_created
@@ -185,11 +177,10 @@ impl MsDatum {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_user_updated(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::ms_data::ms_data::dsl::user_updated
@@ -200,11 +191,10 @@ impl MsDatum {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_injection_volume_unit(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         injection_volume_unit: &crate::codegen::structs_codegen::tables::si_units::SiUnit,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::ms_data::ms_data::dsl::injection_volume_unit
@@ -215,11 +205,10 @@ impl MsDatum {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_injection_method(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         injection_method: &crate::codegen::structs_codegen::tables::injection_methods::InjectionMethod,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::ms_data::ms_data::dsl::injection_method
@@ -230,11 +219,10 @@ impl MsDatum {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_instrument_used(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         instrument_used: &crate::codegen::structs_codegen::tables::instruments::Instrument,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::ms_data::ms_data::dsl::instrument_used
@@ -245,11 +233,10 @@ impl MsDatum {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_batch(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         batch: &crate::codegen::structs_codegen::tables::batches::Batch,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::ms_data::ms_data::dsl::batch.eq(batch.id),
@@ -259,11 +246,10 @@ impl MsDatum {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_parent_sample_container(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         parent_sample_container: &crate::codegen::structs_codegen::tables::containers::Container,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::ms_data::ms_data::dsl::parent_sample_container
@@ -275,10 +261,9 @@ impl MsDatum {
     #[cfg(feature = "postgres")]
     pub async fn from_filename(
         filename: &str,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(diesel::ExpressionMethods::eq(
                 crate::codegen::diesel_codegen::tables::ms_data::ms_data::filename,

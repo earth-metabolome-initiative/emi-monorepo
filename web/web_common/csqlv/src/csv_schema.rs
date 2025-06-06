@@ -144,14 +144,14 @@ impl CSVSchema {
     /// # Errors
     ///
     /// * If the connection to the database fails.
-    pub async fn connect_and_create<C: diesel_async::AsyncConnection>(
+    pub fn connect_and_create<C: diesel::Connection>(
         &self,
         url: &str,
         sql_generation_options: &SQLGenerationOptions,
     ) -> Result<(), CSVSchemaError> {
         let mut attempts = 0;
         loop {
-            match C::establish(url).await {
+            match C::establish(url) {
                 Err(err) => {
                     if attempts >= 10 {
                         return Err(err.into());
@@ -159,7 +159,7 @@ impl CSVSchema {
                     std::thread::sleep(std::time::Duration::from_secs(1));
                     attempts += 1;
                 }
-                Ok(mut conn) => return self.create(&mut conn, sql_generation_options).await,
+                Ok(mut conn) => return self.create(&mut conn, sql_generation_options),
             }
         }
     }
@@ -176,13 +176,13 @@ impl CSVSchema {
     ///
     /// * If the connection to the database fails.
     /// * If the SQL execution fails.
-    pub async fn create<C: diesel_async::AsyncConnection>(
+    pub fn create<C: diesel::Connection>(
         &self,
         conn: &mut C,
         sql_generation_options: &SQLGenerationOptions,
     ) -> Result<(), CSVSchemaError> {
         let sql = self.to_sql(sql_generation_options)?;
-        Ok(conn.batch_execute(&sql).await?)
+        Ok(conn.batch_execute(&sql)?)
     }
 
     #[must_use]
@@ -210,13 +210,13 @@ impl CSVSchema {
     /// # Errors
     ///
     /// * If the connection to the database fails.
-    pub async fn connect_and_delete<C: diesel_async::AsyncConnection>(
+    pub fn connect_and_delete<C: diesel::Connection>(
         &self,
         url: &str,
     ) -> Result<(), CSVSchemaError> {
         let mut attempts = 0;
         loop {
-            match C::establish(url).await {
+            match C::establish(url) {
                 Err(err) => {
                     if attempts >= 10 {
                         return Err(err.into());
@@ -224,7 +224,7 @@ impl CSVSchema {
                     std::thread::sleep(std::time::Duration::from_secs(1));
                     attempts += 1;
                 }
-                Ok(mut conn) => return self.delete(&mut conn).await,
+                Ok(mut conn) => return self.delete(&mut conn),
             }
         }
     }
@@ -240,12 +240,9 @@ impl CSVSchema {
     ///
     /// * If the connection to the database fails.
     /// * If the SQL execution fails.
-    pub async fn delete<C: diesel_async::AsyncConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<(), CSVSchemaError> {
+    pub fn delete<C: diesel::Connection>(&self, conn: &mut C) -> Result<(), CSVSchemaError> {
         let sql = self.to_sql_delete();
-        Ok(conn.batch_execute(&sql).await?)
+        Ok(conn.batch_execute(&sql)?)
     }
 }
 

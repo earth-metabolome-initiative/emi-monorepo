@@ -5,7 +5,6 @@ edition = "2024"
 
 [dependencies]
 diesel = { workspace = true, features = ["postgres", "chrono", "uuid"] }
-diesel-async = { workspace = true, features = ["postgres"] }
 itertools = "0.13.0"
 serde.workspace = true
 syn.workspace = true
@@ -23,7 +22,6 @@ strum.workspace = true
 strum_macros.workspace = true
 iso_codes.workspace = true
 cached.workspace = true
-async-trait.workspace = true
 
 [dev-dependencies]
 reference_docker.workspace = true
@@ -43,7 +41,7 @@ web_common_traits = { workspace = true, features = ["backend"] }
 macaddr = "1.0.1"
 postgis_diesel.workspace = true
 diesel_full_text_search.workspace = true
-diesel-async = { workspace = true, features = ["postgres", "bb8"] }
+diesel = { workspace = true, features = ["postgres", "r2d2"] }
 validation_errors.workspace = true
 pgrx_validation.workspace = true
 yew.workspace = true

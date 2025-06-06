@@ -26,41 +26,31 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AliquotingStepModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AliquotingProcedureModel(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::aliquoting_step_models::AliquotingStepModel as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AliquotingStep(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AliquotingProcedure(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::aliquoting_steps::AliquotingStep as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillStepModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillProcedureModel(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::ball_mill_step_models::BallMillStepModel as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillStep(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::ball_mill_steps::BallMillStep as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::ball_mill_procedure_models::BallMillProcedureModel as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
@@ -76,31 +66,11 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeStepModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeProcedureModel(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::centrifuge_step_models::CentrifugeStepModel as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeStep(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::centrifuge_steps::CentrifugeStep as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ChemicalEntity(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::chemical_entities::ChemicalEntity as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::centrifuge_procedure_models::CentrifugeProcedureModel as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
@@ -166,6 +136,16 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
                         .map(super::Row::from),
                 )
             }
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Container(
+                primary_key,
+            ) => {
+                Ok(
+                    <crate::codegen::structs_codegen::tables::containers::Container as web_common_traits::database::Read<
+                        diesel::SqliteConnection,
+                    >>::read(primary_key, conn)?
+                        .map(super::Row::from),
+                )
+            }
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Country(
                 primary_key,
             ) => {
@@ -176,31 +156,11 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::DisposalStepModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::DisposalProcedureModel(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::disposal_step_models::DisposalStepModel as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::DisposalStep(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::disposal_steps::DisposalStep as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::DocumentFormat(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::document_formats::DocumentFormat as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::disposal_procedure_models::DisposalProcedureModel as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
@@ -226,51 +186,31 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::FractioningStepModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::FractioningProcedureModel(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::FractioningStep(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::FractioningProcedure(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::fractioning_steps::FractioningStep as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryingStepModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryingProcedureModel(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::freeze_drying_step_models::FreezeDryingStepModel as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::InstrumentLocation(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::instrument_locations::InstrumentLocation as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::InstrumentModelCategory(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::instrument_model_categories::InstrumentModelCategory as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
@@ -326,11 +266,31 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::NameplateModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::MixCountableProcedureModel(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::nameplate_models::NameplateModel as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::mix_countable_procedure_models::MixCountableProcedureModel as web_common_traits::database::Read<
+                        diesel::SqliteConnection,
+                    >>::read(primary_key, conn)?
+                        .map(super::Row::from),
+                )
+            }
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::MixSolidProcedureModel(
+                primary_key,
+            ) => {
+                Ok(
+                    <crate::codegen::structs_codegen::tables::mix_solid_procedure_models::MixSolidProcedureModel as web_common_traits::database::Read<
+                        diesel::SqliteConnection,
+                    >>::read(primary_key, conn)?
+                        .map(super::Row::from),
+                )
+            }
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::NextProcedureModel(
+                primary_key,
+            ) => {
+                Ok(
+                    <crate::codegen::structs_codegen::tables::next_procedure_models::NextProcedureModel as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
@@ -351,16 +311,6 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
             ) => {
                 Ok(
                     <crate::codegen::structs_codegen::tables::organism_observations::OrganismObservation as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::OrganismSamplingStepModel(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::organism_sampling_step_models::OrganismSamplingStepModel as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
@@ -406,11 +356,11 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingStepModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingProcedureModel(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::packaging_step_models::PackagingStepModel as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::packaging_procedure_models::PackagingProcedureModel as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
@@ -436,41 +386,21 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelContainerCategory(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PouringProcedureModel(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::procedure_model_container_categories::ProcedureModelContainerCategory as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::pouring_procedure_models::PouringProcedureModel as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelInstrumentCategory(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::procedure_model_instrument_categories::ProcedureModelInstrumentCategory as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelNameplateCategory(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelToolCategory(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
@@ -481,6 +411,16 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
             ) => {
                 Ok(
                     <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as web_common_traits::database::Read<
+                        diesel::SqliteConnection,
+                    >>::read(primary_key, conn)?
+                        .map(super::Row::from),
+                )
+            }
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTrackable(
+                primary_key,
+            ) => {
+                Ok(
+                    <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
@@ -506,11 +446,11 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcessingStep(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcessingProcedure(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::processing_steps::ProcessingStep as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::processing_procedures::ProcessingProcedure as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
@@ -521,16 +461,6 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
             ) => {
                 Ok(
                     <crate::codegen::structs_codegen::tables::project_states::ProjectState as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProjectWorkflowModel(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::project_workflow_models::ProjectWorkflowModel as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
@@ -596,41 +526,41 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::SamplingStepModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::SamplingProcedureModel(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::sampling_step_models::SamplingStepModel as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::sampling_procedure_models::SamplingProcedureModel as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::SamplingStep(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::SamplingProcedure(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::sampling_steps::SamplingStep as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::sampling_procedures::SamplingProcedure as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ShakingStepModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ShakingProcedureModel(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::shaking_step_models::ShakingStepModel as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::shaking_procedure_models::ShakingProcedureModel as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ShakingStep(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::SharedProcedureModelTrackable(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::shaking_steps::ShakingStep as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::shared_procedure_model_trackables::SharedProcedureModelTrackable as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
@@ -661,156 +591,6 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
             ) => {
                 Ok(
                     <crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepContainerModel(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::step_container_models::StepContainerModel as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepInstrument(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::step_instruments::StepInstrument as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepModelContainerCategory(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::step_model_container_categories::StepModelContainerCategory as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepModelInstrumentCategory(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepModelInstrumentModel(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::step_model_instrument_models::StepModelInstrumentModel as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepModelInstrument(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::step_model_instruments::StepModelInstrument as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepModelNameplateCategory(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::step_model_nameplate_categories::StepModelNameplateCategory as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepModelToolCategory(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepModelTrackableCategory(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::step_model_trackable_categories::StepModelTrackableCategory as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepModel(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::step_models::StepModel as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepNameplateModel(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::step_nameplate_models::StepNameplateModel as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepStorageContainer(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::step_storage_containers::StepStorageContainer as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StepToolModel(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::step_tool_models::StepToolModel as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Step(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::steps::Step as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StorageContainer(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::storage_containers::StorageContainer as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
@@ -876,41 +656,11 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ToolModel(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::tool_models::ToolModel as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::TrackableCategory(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::TrackableLocation(
                 primary_key,
             ) => {
                 Ok(
                     <crate::codegen::structs_codegen::tables::trackable_locations::TrackableLocation as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::TrackableState(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::trackable_states::TrackableState as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),
@@ -986,21 +736,11 @@ impl web_common_traits::prelude::ReadDispatch<diesel::SqliteConnection> for supe
                         .map(super::Row::from),
                 )
             }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingStepModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingProcedureModel(
                 primary_key,
             ) => {
                 Ok(
-                    <crate::codegen::structs_codegen::tables::weighing_step_models::WeighingStepModel as web_common_traits::database::Read<
-                        diesel::SqliteConnection,
-                    >>::read(primary_key, conn)?
-                        .map(super::Row::from),
-                )
-            }
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingStep(
-                primary_key,
-            ) => {
-                Ok(
-                    <crate::codegen::structs_codegen::tables::weighing_steps::WeighingStep as web_common_traits::database::Read<
+                    <crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel as web_common_traits::database::Read<
                         diesel::SqliteConnection,
                     >>::read(primary_key, conn)?
                         .map(super::Row::from),

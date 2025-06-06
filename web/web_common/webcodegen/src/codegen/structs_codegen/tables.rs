@@ -2,11 +2,11 @@
 
 use std::path::Path;
 
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use proc_macro2::TokenStream;
 
 use super::Codegen;
-use crate::{Table, codegen::Syntax};
+use crate::Table;
 
 mod crud;
 mod insertables;
@@ -20,34 +20,27 @@ impl Codegen<'_> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(crate) async fn generate_table_structs(
+    pub(crate) fn generate_table_structs(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
         // We generate each table in a separate document under the provided root, and we
         // collect all of the imported modules in a public one.
         let mut table_main_module = TokenStream::new();
-        let syntax = Syntax::PostgreSQL;
         for table in tables {
             let table_identifier = table.snake_case_ident()?;
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let table_struct = table.struct_ident()?;
-            let table_content = table.to_syn(self.enable_yew, conn).await?;
+            let table_content = table.to_syn(self.enable_yew, conn)?;
             let foreign_key_methods = if self.enable_foreign_trait {
-                table.foreign_key_methods(conn, &syntax).await?
+                table.foreign_key_methods(conn)?
             } else {
                 TokenStream::new()
             };
-            let from_foreign_key_methods = if self.enable_foreign_trait {
-                table.from_foreign_key_methods(conn, &syntax).await?
-            } else {
-                TokenStream::new()
-            };
-            let from_unique_indices = table.from_unique_indices(conn, &syntax).await?;
-            let from_attributes = table.from_attributes(conn, &syntax).await?;
+            let from_attributes = table.from_attributes(conn)?;
 
             std::fs::write(
                 &table_file,
@@ -55,9 +48,13 @@ impl Codegen<'_> {
                     #table_content
                     impl #table_struct {
                         #foreign_key_methods
-                        #from_foreign_key_methods
-                        #from_unique_indices
                         #from_attributes
+                    }
+
+                    impl AsRef<#table_struct> for #table_struct {
+                        fn as_ref(&self) -> &#table_struct {
+                            self
+                        }
                     }
                 })?,
             )?;
@@ -69,8 +66,7 @@ impl Codegen<'_> {
         }
 
         if self.enable_insertable_trait {
-            self.generate_insertable_structs(root.join("insertables").as_path(), tables, conn)
-                .await?;
+            self.generate_insertable_structs(root.join("insertables").as_path(), tables, conn)?;
             table_main_module.extend(quote::quote! {
                 pub mod insertables;
             });
@@ -83,7 +79,7 @@ impl Codegen<'_> {
                 pub mod table_names;
             });
 
-            self.generate_table_primary_keys_enumeration(root, tables, conn).await?;
+            self.generate_table_primary_keys_enumeration(root, tables, conn)?;
             table_main_module.extend(quote::quote! {
                 pub mod table_primary_keys;
             });

@@ -33,7 +33,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if colors.id == self.color_id {
+                if self.color_id == colors.id {
                     foreign_keys.color = Some(colors);
                     updated = true;
                 }
@@ -42,7 +42,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::Color(colors),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if colors.id == self.color_id {
+                if self.color_id == colors.id {
                     foreign_keys.color = None;
                     updated = true;
                 }

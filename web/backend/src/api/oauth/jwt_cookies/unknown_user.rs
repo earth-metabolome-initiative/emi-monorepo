@@ -1,14 +1,11 @@
 //! Submodule handling the case where the user is not registered in the system.
 
 use core_structures::{LoginProvider, TemporaryUser};
-use web_common_traits::{
-    database::{BackendInsertableVariant, Insertable},
-    prelude::Builder,
-};
+use web_common_traits::database::{Insertable, UncheckedInsertableVariant};
 
 use crate::BackendError;
 
-pub(super) async fn handle_unknown_user(
+pub(super) fn handle_unknown_user(
     email: &str,
     provider: &LoginProvider,
     conn: &mut crate::Conn,
@@ -16,7 +13,7 @@ pub(super) async fn handle_unknown_user(
     // We check whether there is already a temporary user with the same email and
     // login provider.
     if let Some(existing_user) =
-        TemporaryUser::from_email_and_login_provider_id(email, &provider.id, conn).await?
+        TemporaryUser::from_email_and_login_provider_id(email, &provider.id, conn)?
     {
         // If such a user exists, we return it.
         return Ok(existing_user);
@@ -26,9 +23,7 @@ pub(super) async fn handle_unknown_user(
     let temporary_user = TemporaryUser::new()
         .email(email)?
         .login_provider_id(provider.id)?
-        .build()?
-        .backend_insert(conn)
-        .await?;
+        .unchecked_insert(conn)?;
 
     Ok(temporary_user)
 }

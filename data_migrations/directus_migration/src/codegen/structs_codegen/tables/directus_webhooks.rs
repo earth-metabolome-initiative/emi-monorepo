@@ -34,13 +34,12 @@ impl DirectusWebhook {
     #[cfg(feature = "postgres")]
     pub async fn migrated_flow(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow>,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(migrated_flow) = self.migrated_flow.as_ref() else {
             return Ok(None);
         };
@@ -55,11 +54,10 @@ impl DirectusWebhook {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_migrated_flow(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         migrated_flow: &crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks::dsl::migrated_flow

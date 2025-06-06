@@ -1,7 +1,7 @@
 //! Login providers migration
 
 use core_structures::LoginProvider;
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use web_common_traits::prelude::*;
 
 /// Initialize the GitHub login provider if it does not exist
@@ -11,17 +11,14 @@ use web_common_traits::prelude::*;
 ///
 /// # Arguments
 ///
-/// * `portal_conn` - A mutable reference to an asynchronous `PostgreSQL`
-///   connection.
+/// * `portal_conn` - A mutable reference to an hronous `PostgreSQL` connection.
 ///
 /// # Errors
 ///
 /// * If the login provider cannot be created or inserted into the database, an
 ///   error is returned.
-async fn init_github_login_provider(
-    portal_conn: &mut AsyncPgConnection,
-) -> Result<(), crate::error::Error> {
-    if LoginProvider::from_name("GitHub", portal_conn).await?.is_none() {
+fn init_github_login_provider(portal_conn: &mut PgConnection) -> Result<(), crate::error::Error> {
+    if LoginProvider::from_name("GitHub", portal_conn)?.is_none() {
         let _provider = LoginProvider::new()
             .icon("github")?
             .name("GitHub")?
@@ -29,9 +26,7 @@ async fn init_github_login_provider(
             .client_id(std::env::var("GITHUB_CLIENT_ID").expect("GITHUB_CLIENT_ID"))?
             .redirect_uri(std::env::var("GITHUB_REDIRECT_URI").expect("GITHUB_REDIRECT_URI"))?
             .scope("read:user,user:email")?
-            .build()?
-            .backend_insert(portal_conn)
-            .await?;
+            .unchecked_insert(portal_conn)?;
     }
     Ok(())
 }
@@ -40,15 +35,14 @@ async fn init_github_login_provider(
 ///
 /// # Arguments
 ///
-/// * `portal_conn` - A mutable reference to an asynchronous `PostgreSQL`
-///   connection.
+/// * `portal_conn` - A mutable reference to an hronous `PostgreSQL` connection.
 ///
 /// # Errors
 ///
 /// * If the login provider cannot be created or inserted into the database, an
 ///   error is returned.
-pub(crate) async fn init_login_providers(
-    portal_conn: &mut AsyncPgConnection,
+pub(crate) fn init_login_providers(
+    portal_conn: &mut PgConnection,
 ) -> Result<(), crate::error::Error> {
-    init_github_login_provider(portal_conn).await
+    init_github_login_provider(portal_conn)
 }

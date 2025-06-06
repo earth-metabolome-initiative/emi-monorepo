@@ -26,6 +26,21 @@ pub enum BuilderError<A> {
     IncompleteBuild(A),
 }
 
+impl<FieldName> BuilderError<FieldName> {
+    /// Converts the `BuilderError` into a new `BuilderError` with a different
+    /// field name.
+    pub fn into_field_name<NewFieldName>(self) -> BuilderError<NewFieldName>
+    where
+        NewFieldName: From<FieldName>,
+    {
+        match self {
+            BuilderError::IncompleteBuild(missing_attribute) => {
+                BuilderError::IncompleteBuild(missing_attribute.into())
+            }
+        }
+    }
+}
+
 impl<A: core::fmt::Display> core::fmt::Display for BuilderError<A> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

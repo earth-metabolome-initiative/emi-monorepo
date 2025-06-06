@@ -25,25 +25,37 @@ pub struct InsertableSpectrum {
     spectra_collection_id: i32,
 }
 impl InsertableSpectrum {
-    #[cfg(feature = "postgres")]
-    pub async fn spectra_collection(
+    pub fn spectra_collection<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::spectra_collections::spectra_collections::dsl::id
-                    .eq(&self.spectra_collection_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
-            >(conn)
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection::table(),
+                self.spectra_collection_id,
+            ),
+            conn,
+        )
     }
 }
 #[derive(Default)]
@@ -52,7 +64,10 @@ pub struct InsertableSpectrumBuilder {
     spectra_collection_id: Option<i32>,
 }
 impl InsertableSpectrumBuilder {
-    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    pub fn id<P>(
+        mut self,
+        id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectrumAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -66,7 +81,7 @@ impl InsertableSpectrumBuilder {
     pub fn spectra_collection_id<P>(
         mut self,
         spectra_collection_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectrumAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -79,28 +94,18 @@ impl InsertableSpectrumBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableSpectrumBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableSpectrumAttributes>;
-    type Object = InsertableSpectrum;
-    type Attribute = InsertableSpectrumAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+impl TryFrom<InsertableSpectrumBuilder> for InsertableSpectrum {
+    type Error = common_traits::prelude::BuilderError<InsertableSpectrumAttributes>;
+    fn try_from(builder: InsertableSpectrumBuilder) -> Result<InsertableSpectrum, Self::Error> {
+        Ok(Self {
+            id: builder.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableSpectrumAttributes::Id,
             ))?,
-            spectra_collection_id: self.spectra_collection_id.ok_or(
+            spectra_collection_id: builder.spectra_collection_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableSpectrumAttributes::SpectraCollectionId,
                 ),
             )?,
         })
-    }
-}
-impl TryFrom<InsertableSpectrum> for InsertableSpectrumBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableSpectrum) -> Result<Self, Self::Error> {
-        Self::default()
-            .id(insertable_variant.id)?
-            .spectra_collection_id(insertable_variant.spectra_collection_id)
     }
 }

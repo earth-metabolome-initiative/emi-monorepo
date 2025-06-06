@@ -8,8 +8,7 @@ postgis_diesel = { workspace = true, features = ["diesel"] }
 rosetta_uuid = { workspace = true, features = ["diesel"] }
 rosetta_timestamp = { workspace = true, features = ["diesel"] }
 chrono.workspace = true
-diesel = { workspace = true, features = ["extras"] }
-diesel-async.workspace = true
+diesel.workspace = true
 web_common_traits.workspace = true
 serde = { workspace = true, optional = true }
 common_traits.workspace = true
@@ -49,7 +48,6 @@ serde = [
 yew = ["dep:yew"]
 postgres = [
   "web_common_traits/postgres",
-  "diesel-async/postgres",
   "diesel/postgres",
   "postgis_diesel/postgres",
   "rosetta_uuid/postgres",

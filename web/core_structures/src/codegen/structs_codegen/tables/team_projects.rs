@@ -10,6 +10,9 @@ pub struct TeamProject {
     pub team_id: i32,
     pub project_id: i32,
 }
+impl web_common_traits::prelude::TableName for TeamProject {
+    const TABLE_NAME: &'static str = "team_projects";
+}
 impl diesel::Identifiable for TeamProject {
     type Id = (i32, i32);
     fn id(self) -> Self::Id {
@@ -17,86 +20,99 @@ impl diesel::Identifiable for TeamProject {
     }
 }
 impl TeamProject {
-    #[cfg(feature = "postgres")]
-    pub async fn team(
+    pub fn project<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::teams::Team, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::teams::Team::table()
-            .filter(crate::codegen::diesel_codegen::tables::teams::teams::dsl::id.eq(&self.team_id))
-            .first::<crate::codegen::structs_codegen::tables::teams::Team>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn project(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::projects::Project, diesel::result::Error>
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::projects::Project,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::projects::Project: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::projects::Project,
+        >,
     {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::projects::Project::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::projects::projects::dsl::id
-                    .eq(&self.project_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::projects::Project>(conn)
-            .await
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::projects::Project::table(),
+                self.project_id,
+            ),
+            conn,
+        )
+    }
+    pub fn team<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::teams::Team,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::teams::Team: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::teams::Team,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::teams::Team::table(),
+                self.team_id,
+            ),
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_team_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        team_id: &crate::codegen::structs_codegen::tables::teams::Team,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::team_projects::team_projects::dsl::team_id
-                    .eq(team_id.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_project_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        project_id: &crate::codegen::structs_codegen::tables::projects::Project,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::team_projects::team_projects::dsl::project_id
-                    .eq(project_id.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_team_id_and_project_id(
+    pub fn from_team_id(
         team_id: &i32,
-        project_id: &i32,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl,
-            associations::HasTable,
-        };
-        use diesel_async::RunQueryDsl;
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::team_projects::team_projects;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::team_projects::team_projects::team_id
-                    .eq(team_id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::team_projects::team_projects::project_id
-                            .eq(project_id),
-                    ),
-            )
-            .first::<Self>(conn)
-            .await
-            .optional()
+            .filter(team_projects::team_id.eq(team_id))
+            .order_by((team_projects::team_id.asc(), team_projects::project_id.asc()))
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_project_id(
+        project_id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::team_projects::team_projects;
+        Self::table()
+            .filter(team_projects::project_id.eq(project_id))
+            .order_by((team_projects::team_id.asc(), team_projects::project_id.asc()))
+            .load::<Self>(conn)
+    }
+}
+impl AsRef<TeamProject> for TeamProject {
+    fn as_ref(&self) -> &TeamProject {
+        self
     }
 }

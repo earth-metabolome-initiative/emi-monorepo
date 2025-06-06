@@ -2,10 +2,7 @@
 //! provider is already registered in the system.
 
 use core_structures::{EmailProvider, LoginProvider, User, UserEmail};
-use web_common_traits::{
-    database::{BackendInsertableVariant, Insertable},
-    prelude::Builder,
-};
+use web_common_traits::database::{Insertable, Read, UncheckedInsertableVariant};
 
 use crate::BackendError;
 
@@ -23,7 +20,7 @@ use crate::BackendError;
 /// * If there is a collision between two users, an error is returned.
 /// * If there is an error while inserting a new email or email provider, an
 ///   error is returned.
-pub(super) async fn handle_known_user(
+pub(super) fn handle_known_user(
     emails: &[&str],
     provider: &LoginProvider,
     conn: &mut crate::Conn,
@@ -34,20 +31,13 @@ pub(super) async fn handle_known_user(
     let mut unregistered_emails = Vec::new();
 
     for email in emails {
-        if let Some(user_email) = UserEmail::from_email(email, conn).await? {
-            let user = user_email.created_by(conn).await?;
+        if let Some(user_email) = UserEmail::from_email(email, conn)? {
+            let user = user_email.created_by(conn)?;
             if !users.contains(&user) {
                 users.push(user);
             }
 
-            if EmailProvider::from_email_id_and_login_provider_id(
-                &user_email.id,
-                &provider.id,
-                conn,
-            )
-            .await?
-            .is_none()
-            {
+            if EmailProvider::read((user_email.id, provider.id), conn)?.is_none() {
                 email_not_registered_with_provider.push(user_email);
             }
         } else {
@@ -70,9 +60,7 @@ pub(super) async fn handle_known_user(
         let _ = EmailProvider::new()
             .email_id(user_email.id)?
             .login_provider_id(provider.id)?
-            .build()?
-            .backend_insert(conn)
-            .await?;
+            .unchecked_insert(conn)?;
     }
 
     // If there is only one user, and there is one or more emails which are not
@@ -83,15 +71,11 @@ pub(super) async fn handle_known_user(
             .created_by(user.id)?
             .email(*unregistered_email)?
             .primary_email(false)?
-            .build()?
-            .backend_insert(conn)
-            .await?;
+            .unchecked_insert(conn)?;
         let _ = EmailProvider::new()
             .email_id(newly_inserted_email.id)?
             .login_provider_id(provider.id)?
-            .build()?
-            .backend_insert(conn)
-            .await?;
+            .unchecked_insert(conn)?;
     }
 
     Ok(Some(user))

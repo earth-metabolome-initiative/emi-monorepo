@@ -6,7 +6,6 @@ edition = "2024"
 [dependencies]
 sqlparser.workspace = true
 diesel.workspace = true
-diesel-async.workspace = true
 graph.workspace = true
 algebra.workspace = true
 

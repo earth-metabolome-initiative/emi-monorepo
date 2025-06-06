@@ -32,19 +32,37 @@ pub struct InsertableAddress {
     geolocation: postgis_diesel::types::Point,
 }
 impl InsertableAddress {
-    #[cfg(feature = "postgres")]
-    pub async fn city(
+    pub fn city<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::cities::City, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::cities::City::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::cities::cities::dsl::id.eq(&self.city_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::cities::City>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::cities::City,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::cities::City: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::cities::City as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::cities::City as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::cities::City as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::cities::City as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::cities::City as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::cities::City as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::cities::City,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::cities::City::table(),
+                self.city_id,
+            ),
+            conn,
+        )
     }
 }
 #[derive(Default)]
@@ -59,7 +77,7 @@ impl InsertableAddressBuilder {
     pub fn city_id<P>(
         mut self,
         city_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -73,7 +91,7 @@ impl InsertableAddressBuilder {
     pub fn street_name<P>(
         mut self,
         street_name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -88,7 +106,7 @@ impl InsertableAddressBuilder {
     pub fn street_number<P>(
         mut self,
         street_number: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -103,7 +121,7 @@ impl InsertableAddressBuilder {
     pub fn postal_code<P>(
         mut self,
         postal_code: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -118,7 +136,7 @@ impl InsertableAddressBuilder {
     pub fn geolocation<P>(
         mut self,
         geolocation: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
     where
         P: TryInto<postgis_diesel::types::Point>,
         <P as TryInto<postgis_diesel::types::Point>>::Error:
@@ -133,46 +151,35 @@ impl InsertableAddressBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableAddressBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableAddressAttributes>;
-    type Object = InsertableAddress;
-    type Attribute = InsertableAddressAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            city_id: self.city_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableAddressAttributes::CityId,
-            ))?,
-            street_name: self.street_name.ok_or(
+impl TryFrom<InsertableAddressBuilder> for InsertableAddress {
+    type Error = common_traits::prelude::BuilderError<InsertableAddressAttributes>;
+    fn try_from(builder: InsertableAddressBuilder) -> Result<InsertableAddress, Self::Error> {
+        Ok(Self {
+            city_id: builder.city_id.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableAddressAttributes::CityId,
+                ),
+            )?,
+            street_name: builder.street_name.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAddressAttributes::StreetName,
                 ),
             )?,
-            street_number: self.street_number.ok_or(
+            street_number: builder.street_number.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAddressAttributes::StreetNumber,
                 ),
             )?,
-            postal_code: self.postal_code.ok_or(
+            postal_code: builder.postal_code.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAddressAttributes::PostalCode,
                 ),
             )?,
-            geolocation: self.geolocation.ok_or(
+            geolocation: builder.geolocation.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableAddressAttributes::Geolocation,
                 ),
             )?,
         })
-    }
-}
-impl TryFrom<InsertableAddress> for InsertableAddressBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableAddress) -> Result<Self, Self::Error> {
-        Self::default()
-            .city_id(insertable_variant.city_id)?
-            .street_name(insertable_variant.street_name)?
-            .street_number(insertable_variant.street_number)?
-            .postal_code(insertable_variant.postal_code)?
-            .geolocation(insertable_variant.geolocation)
     }
 }

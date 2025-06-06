@@ -27,35 +27,69 @@ pub struct InsertableUserOrganization {
     organization_id: i16,
 }
 impl InsertableUserOrganization {
-    #[cfg(feature = "postgres")]
-    pub async fn user(
+    pub fn organization<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.user_id))
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn organization(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::organizations::Organization,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::organizations::Organization::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::organizations::organizations::dsl::id
-                    .eq(&self.organization_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::organizations::Organization>(conn)
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::organizations::Organization: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::organizations::Organization as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::organizations::Organization as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::organizations::Organization,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::organizations::Organization::table(),
+                self.organization_id,
+            ),
+            conn,
+        )
+    }
+    pub fn user<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.user_id,
+            ),
+            conn,
+        )
     }
 }
 #[derive(Default)]
@@ -67,7 +101,7 @@ impl InsertableUserOrganizationBuilder {
     pub fn user_id<P>(
         mut self,
         user_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserOrganizationAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -81,7 +115,7 @@ impl InsertableUserOrganizationBuilder {
     pub fn organization_id<P>(
         mut self,
         organization_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserOrganizationAttributes>>
     where
         P: TryInto<i16>,
         <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
@@ -94,28 +128,22 @@ impl InsertableUserOrganizationBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableUserOrganizationBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableUserOrganizationAttributes>;
-    type Object = InsertableUserOrganization;
-    type Attribute = InsertableUserOrganizationAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            user_id: self.user_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableUserOrganizationAttributes::UserId,
-            ))?,
-            organization_id: self.organization_id.ok_or(
+impl TryFrom<InsertableUserOrganizationBuilder> for InsertableUserOrganization {
+    type Error = common_traits::prelude::BuilderError<InsertableUserOrganizationAttributes>;
+    fn try_from(
+        builder: InsertableUserOrganizationBuilder,
+    ) -> Result<InsertableUserOrganization, Self::Error> {
+        Ok(Self {
+            user_id: builder.user_id.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableUserOrganizationAttributes::UserId,
+                ),
+            )?,
+            organization_id: builder.organization_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableUserOrganizationAttributes::OrganizationId,
                 ),
             )?,
         })
-    }
-}
-impl TryFrom<InsertableUserOrganization> for InsertableUserOrganizationBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableUserOrganization) -> Result<Self, Self::Error> {
-        Self::default()
-            .user_id(insertable_variant.user_id)?
-            .organization_id(insertable_variant.organization_id)
     }
 }

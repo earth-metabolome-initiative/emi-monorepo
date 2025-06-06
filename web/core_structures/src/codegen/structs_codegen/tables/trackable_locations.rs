@@ -15,11 +15,14 @@
 pub struct TrackableLocation {
     pub id: ::rosetta_uuid::Uuid,
     pub trackable_id: ::rosetta_uuid::Uuid,
-    pub storage_container_id: Option<::rosetta_uuid::Uuid>,
+    pub container_id: Option<::rosetta_uuid::Uuid>,
     pub geolocation: postgis_diesel::types::Point,
     pub inferred: bool,
     pub created_at: ::rosetta_timestamp::TimestampUTC,
     pub created_by: i32,
+}
+impl web_common_traits::prelude::TableName for TrackableLocation {
+    const TABLE_NAME: &'static str = "trackable_locations";
 }
 impl diesel::Identifiable for TrackableLocation {
     type Id = ::rosetta_uuid::Uuid;
@@ -28,133 +31,174 @@ impl diesel::Identifiable for TrackableLocation {
     }
 }
 impl TrackableLocation {
-    #[cfg(feature = "postgres")]
-    pub async fn trackable(
+    pub fn container<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::trackables::Trackable, diesel::result::Error>
-    {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::trackables::Trackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::trackables::trackables::dsl::id
-                    .eq(&self.trackable_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::trackables::Trackable>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn storage_container(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::storage_containers::StorageContainer>,
+        Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        let Some(storage_container_id) = self.storage_container_id.as_ref() else {
+    >
+    where
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(container_id) = self.container_id else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::storage_containers::StorageContainer::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::storage_containers::storage_containers::dsl::id
-                    .eq(storage_container_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::storage_containers::StorageContainer,
-            >(conn)
-            .await
-            .map(Some)
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                container_id,
+            ),
+            conn,
+        )
+        .map(Some)
     }
-    #[cfg(feature = "postgres")]
-    pub async fn created_by(
+    pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.created_by),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.created_by,
+            ),
+            conn,
+        )
+    }
+    pub fn trackable<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                self.trackable_id,
+            ),
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_trackable_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        trackable_id: &crate::codegen::structs_codegen::tables::trackables::Trackable,
+    pub fn from_trackable_id(
+        trackable_id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::trackable_locations::trackable_locations;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::trackable_locations::trackable_locations::dsl::trackable_id
-                    .eq(trackable_id.id),
-            )
+            .filter(trackable_locations::trackable_id.eq(trackable_id))
+            .order_by(trackable_locations::id.asc())
             .load::<Self>(conn)
-            .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_storage_container_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        storage_container_id: &crate::codegen::structs_codegen::tables::storage_containers::StorageContainer,
+    pub fn from_container_id(
+        container_id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::trackable_locations::trackable_locations;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::trackable_locations::trackable_locations::dsl::storage_container_id
-                    .eq(storage_container_id.id),
-            )
+            .filter(trackable_locations::container_id.eq(container_id))
+            .order_by(trackable_locations::id.asc())
             .load::<Self>(conn)
-            .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_created_by(
-        conn: &mut diesel_async::AsyncPgConnection,
-        created_by: &crate::codegen::structs_codegen::tables::users::User,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::trackable_locations::trackable_locations::dsl::created_by
-                    .eq(created_by.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_inferred(
+    pub fn from_inferred(
         inferred: &bool,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::trackable_locations::trackable_locations;
         Self::table()
             .filter(trackable_locations::inferred.eq(inferred))
             .order_by(trackable_locations::id.asc())
             .load::<Self>(conn)
-            .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_created_at(
+    pub fn from_created_at(
         created_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::trackable_locations::trackable_locations;
         Self::table()
             .filter(trackable_locations::created_at.eq(created_at))
             .order_by(trackable_locations::id.asc())
             .load::<Self>(conn)
-            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_created_by(
+        created_by: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::trackable_locations::trackable_locations;
+        Self::table()
+            .filter(trackable_locations::created_by.eq(created_by))
+            .order_by(trackable_locations::id.asc())
+            .load::<Self>(conn)
+    }
+}
+impl AsRef<TrackableLocation> for TrackableLocation {
+    fn as_ref(&self) -> &TrackableLocation {
+        self
     }
 }

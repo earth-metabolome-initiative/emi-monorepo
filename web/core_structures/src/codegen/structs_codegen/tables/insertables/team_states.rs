@@ -29,19 +29,37 @@ pub struct InsertableTeamState {
     color_id: i16,
 }
 impl InsertableTeamState {
-    #[cfg(feature = "postgres")]
-    pub async fn color(
+    pub fn color<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::colors::Color::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::colors::colors::dsl::id.eq(&self.color_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::colors::Color>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::colors::Color,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::colors::Color: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::colors::Color,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::colors::Color::table(),
+                self.color_id,
+            ),
+            conn,
+        )
     }
 }
 #[derive(Default)]
@@ -55,7 +73,7 @@ impl InsertableTeamStateBuilder {
     pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamStateAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -69,7 +87,7 @@ impl InsertableTeamStateBuilder {
     pub fn description<P>(
         mut self,
         description: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamStateAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -84,7 +102,7 @@ impl InsertableTeamStateBuilder {
     pub fn icon<P>(
         mut self,
         icon: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamStateAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -98,7 +116,7 @@ impl InsertableTeamStateBuilder {
     pub fn color_id<P>(
         mut self,
         color_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamStateAttributes>>
     where
         P: TryInto<i16>,
         <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
@@ -110,38 +128,26 @@ impl InsertableTeamStateBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableTeamStateBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableTeamStateAttributes>;
-    type Object = InsertableTeamState;
-    type Attribute = InsertableTeamStateAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+impl TryFrom<InsertableTeamStateBuilder> for InsertableTeamState {
+    type Error = common_traits::prelude::BuilderError<InsertableTeamStateAttributes>;
+    fn try_from(builder: InsertableTeamStateBuilder) -> Result<InsertableTeamState, Self::Error> {
+        Ok(Self {
+            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableTeamStateAttributes::Name,
             ))?,
-            description: self.description.ok_or(
+            description: builder.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTeamStateAttributes::Description,
                 ),
             )?,
-            icon: self.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            icon: builder.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableTeamStateAttributes::Icon,
             ))?,
-            color_id: self.color_id.ok_or(
+            color_id: builder.color_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTeamStateAttributes::ColorId,
                 ),
             )?,
         })
-    }
-}
-impl TryFrom<InsertableTeamState> for InsertableTeamStateBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableTeamState) -> Result<Self, Self::Error> {
-        Self::default()
-            .name(insertable_variant.name)?
-            .description(insertable_variant.description)?
-            .icon(insertable_variant.icon)?
-            .color_id(insertable_variant.color_id)
     }
 }

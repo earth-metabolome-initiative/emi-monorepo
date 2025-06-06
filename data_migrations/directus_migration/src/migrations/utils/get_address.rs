@@ -1,9 +1,9 @@
 //! Submodule providing an utility to retrieve or insert an address.
 
 use core_structures::{Address as PortalAddress, City as PortalCity, Country as PortalCountry};
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use web_common_traits::{
-    database::{BackendInsertableVariant, Insertable},
+    database::{Insertable, InsertableVariant},
     prelude::Builder,
 };
 
@@ -12,7 +12,7 @@ use crate::codegen::Address as DirectusAddress;
 /// Returns (potentially newly created) address for a Directus address.
 pub(crate) async fn get_address(
     directus_address: &DirectusAddress,
-    portal_conn: &mut AsyncPgConnection,
+    portal_conn: &mut PgConnection,
 ) -> Result<PortalAddress, crate::error::Error> {
     let country = PortalCountry::from_name(&directus_address.country, portal_conn)
         .await?

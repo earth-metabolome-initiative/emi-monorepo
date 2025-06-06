@@ -1,42 +1,39 @@
-#[cfg(feature = "backend")]
-impl web_common_traits::database::BackendInsertableVariant
-    for crate::codegen::structs_codegen::tables::insertables::InsertableCity
-{
-    async fn backend_insert(
-        self,
-        conn: &mut Self::Conn,
-    ) -> Result<
-        Self::Row,
-        web_common_traits::database::InsertError<
-            <Self::InsertableBuilder as common_traits::prelude::Builder>::Attribute,
-        >,
-    > {
-        use diesel::associations::HasTable;
-        use diesel_async::RunQueryDsl;
-        Ok(diesel::insert_into(Self::Row::table()).values(self).get_result(conn).await?)
-    }
-}
-#[cfg(feature = "postgres")]
-impl web_common_traits::database::InsertableVariant
-    for crate::codegen::structs_codegen::tables::insertables::InsertableCity
+impl<
+    C: diesel::connection::LoadConnection,
+> web_common_traits::database::InsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertableCityBuilder
+where
+    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
+    diesel::query_builder::InsertStatement<
+        <crate::codegen::structs_codegen::tables::cities::City as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::insertables::InsertableCity as diesel::Insertable<
+            <crate::codegen::structs_codegen::tables::cities::City as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::cities::City,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::cities::City;
-    type InsertableBuilder =
-        crate::codegen::structs_codegen::tables::insertables::InsertableCityBuilder;
-    type Conn = diesel_async::AsyncPgConnection;
+    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCity;
+    type Error = web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::InsertableCityAttributes,
+    >;
     type UserId = i32;
-    async fn insert(
+    fn insert(
         self,
-        _user_id: &Self::UserId,
-        conn: &mut Self::Conn,
-    ) -> Result<
-        Self::Row,
-        web_common_traits::database::InsertError<
-            <Self::InsertableBuilder as common_traits::prelude::Builder>::Attribute,
-        >,
-    > {
+        _user_id: Self::UserId,
+        conn: &mut C,
+    ) -> Result<Self::Row, Self::Error> {
+        use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel_async::RunQueryDsl;
-        Ok(diesel::insert_into(Self::Row::table()).values(self).get_result(conn).await?)
+        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCity = self
+            .try_into()?;
+        Ok(
+            diesel::insert_into(Self::Row::table())
+                .values(insertable_struct)
+                .get_result(conn)?,
+        )
     }
 }

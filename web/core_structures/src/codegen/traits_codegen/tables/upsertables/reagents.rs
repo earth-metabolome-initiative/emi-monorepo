@@ -21,11 +21,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                 purity
                     .ne(excluded(purity))
                     .or(cas_code.ne(excluded(cas_code)))
-                    .or(molecular_formulas.ne(excluded(molecular_formulas)))
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
+                    .or(molecular_formula.ne(excluded(molecular_formula))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -54,11 +50,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                 purity
                     .ne(excluded(purity))
                     .or(cas_code.ne(excluded(cas_code)))
-                    .or(molecular_formulas.ne(excluded(molecular_formulas)))
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
+                    .or(molecular_formula.ne(excluded(molecular_formula))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

@@ -10,6 +10,9 @@ pub struct TeamMember {
     pub team_id: i32,
     pub member_id: i32,
 }
+impl web_common_traits::prelude::TableName for TeamMember {
+    const TABLE_NAME: &'static str = "team_members";
+}
 impl diesel::Identifiable for TeamMember {
     type Id = (i32, i32);
     fn id(self) -> Self::Id {
@@ -17,84 +20,99 @@ impl diesel::Identifiable for TeamMember {
     }
 }
 impl TeamMember {
-    #[cfg(feature = "postgres")]
-    pub async fn team(
+    pub fn member<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::teams::Team, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::teams::Team::table()
-            .filter(crate::codegen::diesel_codegen::tables::teams::teams::dsl::id.eq(&self.team_id))
-            .first::<crate::codegen::structs_codegen::tables::teams::Team>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.member_id,
+            ),
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub async fn member(
+    pub fn team<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.member_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::teams::Team,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::teams::Team: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::teams::Team,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::teams::Team::table(),
+                self.team_id,
+            ),
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_team_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        team_id: &crate::codegen::structs_codegen::tables::teams::Team,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::team_members::team_members::dsl::team_id
-                    .eq(team_id.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_member_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        member_id: &crate::codegen::structs_codegen::tables::users::User,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::team_members::team_members::dsl::member_id
-                    .eq(member_id.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_team_id_and_member_id(
+    pub fn from_team_id(
         team_id: &i32,
-        member_id: &i32,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl,
-            associations::HasTable,
-        };
-        use diesel_async::RunQueryDsl;
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::team_members::team_members;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::team_members::team_members::team_id
-                    .eq(team_id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::team_members::team_members::member_id
-                            .eq(member_id),
-                    ),
-            )
-            .first::<Self>(conn)
-            .await
-            .optional()
+            .filter(team_members::team_id.eq(team_id))
+            .order_by((team_members::team_id.asc(), team_members::member_id.asc()))
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_member_id(
+        member_id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::team_members::team_members;
+        Self::table()
+            .filter(team_members::member_id.eq(member_id))
+            .order_by((team_members::team_id.asc(), team_members::member_id.asc()))
+            .load::<Self>(conn)
+    }
+}
+impl AsRef<TeamMember> for TeamMember {
+    fn as_ref(&self) -> &TeamMember {
+        self
     }
 }

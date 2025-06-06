@@ -1,42 +1,47 @@
-#[cfg(feature = "backend")]
-impl web_common_traits::database::BackendInsertableVariant
-    for crate::codegen::structs_codegen::tables::insertables::InsertableContainerModel
-{
-    async fn backend_insert(
-        self,
-        conn: &mut Self::Conn,
-    ) -> Result<
-        Self::Row,
-        web_common_traits::database::InsertError<
-            <Self::InsertableBuilder as common_traits::prelude::Builder>::Attribute,
+impl<
+    C: diesel::connection::LoadConnection,
+> web_common_traits::database::InsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder
+where
+    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
+    diesel::query_builder::InsertStatement<
+        <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::insertables::InsertableContainerModel as diesel::Insertable<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder: web_common_traits::database::InsertableVariant<
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
         >,
-    > {
-        use diesel::associations::HasTable;
-        use diesel_async::RunQueryDsl;
-        Ok(diesel::insert_into(Self::Row::table()).values(self).get_result(conn).await?)
-    }
-}
-#[cfg(feature = "postgres")]
-impl web_common_traits::database::InsertableVariant
-    for crate::codegen::structs_codegen::tables::insertables::InsertableContainerModel
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::container_models::ContainerModel;
-    type InsertableBuilder =
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder;
-    type Conn = diesel_async::AsyncPgConnection;
+    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableContainerModel;
+    type Error = web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes,
+    >;
     type UserId = i32;
-    async fn insert(
+    fn insert(
         self,
-        _user_id: &Self::UserId,
-        conn: &mut Self::Conn,
-    ) -> Result<
-        Self::Row,
-        web_common_traits::database::InsertError<
-            <Self::InsertableBuilder as common_traits::prelude::Builder>::Attribute,
-        >,
-    > {
+        user_id: Self::UserId,
+        conn: &mut C,
+    ) -> Result<Self::Row, Self::Error> {
+        use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel_async::RunQueryDsl;
-        Ok(diesel::insert_into(Self::Row::table()).values(self).get_result(conn).await?)
+        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableContainerModel = self
+            .try_insert(user_id, conn)?;
+        Ok(
+            diesel::insert_into(Self::Row::table())
+                .values(insertable_struct)
+                .get_result(conn)?,
+        )
     }
 }

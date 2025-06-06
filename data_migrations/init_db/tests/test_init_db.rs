@@ -22,7 +22,7 @@ async fn test_init_db() {
     }
 
     for extension in ["pgrx_validation", "iso_codes", "tool_categories", "instrument_categories"] {
-        if PgExtension::load(extension, "public", &mut conn).await.unwrap().is_none() {
+        if PgExtension::load(extension, "public", &mut conn).unwrap().is_none() {
             docker.stop().await.expect("Failed to stop the docker container");
             panic!(
                 "Failed to load extension {extension} in the database. \

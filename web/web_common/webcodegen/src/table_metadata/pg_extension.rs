@@ -2,10 +2,9 @@
 //! table.
 
 use diesel::{
-    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, Queryable,
-    QueryableByName, Selectable, SelectableHelper,
+    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, OptionalExtension, PgConnection, QueryDsl,
+    Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
-use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
 use super::PgProc;
 use crate::errors::WebCodeGenError;
@@ -49,9 +48,9 @@ impl PgExtension {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub async fn load_all(conn: &mut AsyncPgConnection) -> Result<Vec<Self>, WebCodeGenError> {
+    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::pg_extension;
-        pg_extension::table.load(conn).await.map_err(WebCodeGenError::from)
+        pg_extension::table.load(conn).map_err(WebCodeGenError::from)
     }
 
     /// Loads the [`PgExtension`] with the given name amd namespace from the
@@ -66,10 +65,10 @@ impl PgExtension {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub async fn load(
+    pub fn load(
         name: &str,
         namespace: &str,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<Option<Self>, WebCodeGenError> {
         use crate::schema::{pg_extension, pg_namespace};
         pg_extension::table
@@ -77,7 +76,6 @@ impl PgExtension {
             .filter(pg_extension::extname.eq(name).and(pg_namespace::nspname.eq(namespace)))
             .select(PgExtension::as_select())
             .first(conn)
-            .await
             .optional()
             .map_err(WebCodeGenError::from)
     }
@@ -91,17 +89,13 @@ impl PgExtension {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub async fn functions(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<Vec<PgProc>, diesel::result::Error> {
+    pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, diesel::result::Error> {
         use crate::schema::{pg_depend, pg_proc};
         pg_depend::table
             .inner_join(pg_proc::table.on(pg_depend::objid.eq(pg_proc::oid)))
             .filter(pg_depend::refobjid.eq(self.oid))
             .select(PgProc::as_select())
             .load(conn)
-            .await
     }
 
     /// Returns all [`PgType`](crate::PgType) types associated with this
@@ -114,9 +108,9 @@ impl PgExtension {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub async fn types(
+    pub fn types(
         &self,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<Vec<crate::PgType>, diesel::result::Error> {
         use crate::schema::{pg_depend, pg_type};
         pg_depend::table
@@ -124,7 +118,6 @@ impl PgExtension {
             .filter(pg_depend::refobjid.eq(self.oid))
             .select(crate::PgType::as_select())
             .load(conn)
-            .await
     }
 
     /// Returns all [`PgEnum`](crate::PgEnum) enums associated with this
@@ -137,9 +130,9 @@ impl PgExtension {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub async fn enums(
+    pub fn enums(
         &self,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<Vec<crate::PgEnum>, diesel::result::Error> {
         use crate::schema::{pg_depend, pg_enum, pg_type};
 
@@ -149,7 +142,6 @@ impl PgExtension {
             .filter(pg_depend::refobjid.eq(self.oid))
             .select(crate::PgEnum::as_select())
             .load(conn)
-            .await
     }
 
     #[must_use]

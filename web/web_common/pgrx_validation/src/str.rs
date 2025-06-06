@@ -14,7 +14,7 @@ use validator::ValidateEmail;
 ///
 /// * `validation_errors::SingleFieldError::InvalidMail` if the string is not a
 ///   valid mail address.
-pub fn must_be_mail(value: &str) -> Result<(), validation_errors::SingleFieldError> {
+pub fn must_be_email(value: &str) -> Result<(), validation_errors::SingleFieldError> {
     must_not_be_empty(value)?;
     if value.validate_email() {
         Ok(())
@@ -177,14 +177,14 @@ mod tests {
     }
 
     #[test]
-    fn test_must_be_mail() {
-        assert!(must_be_mail("marco.visani@unifr.ch").is_ok());
+    fn test_must_be_email() {
+        assert!(must_be_email("marco.visani@unifr.ch").is_ok());
         assert_eq!(
-            must_be_mail("marco").unwrap_err(),
+            must_be_email("marco").unwrap_err(),
             validation_errors::SingleFieldError::InvalidMail(())
         );
         assert_eq!(
-            must_be_mail("").unwrap_err(),
+            must_be_email("").unwrap_err(),
             validation_errors::SingleFieldError::EmptyText(())
         );
     }

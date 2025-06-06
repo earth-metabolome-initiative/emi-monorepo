@@ -1,48 +1,35 @@
-#[cfg(feature = "postgres")]
-impl web_common_traits::database::Updatable
-    for crate::codegen::structs_codegen::tables::projects::Project
+impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
+for crate::codegen::structs_codegen::tables::projects::Project
+where
+    crate::codegen::structs_codegen::tables::projects::Project: diesel::Identifiable,
+    <crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
+    >,
+    <<crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
+    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+    <<<crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
+    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+        'a,
+        C,
+        crate::codegen::structs_codegen::tables::projects::Project,
+    >,
 {
     type UserId = i32;
-    type Conn = diesel_async::AsyncPgConnection;
-    async fn can_update(
+    fn can_update(
         &self,
-        user_id: &Self::UserId,
-        conn: &mut Self::Conn,
+        user_id: Self::UserId,
+        conn: &mut C,
     ) -> Result<bool, diesel::result::Error> {
-        use diesel::{BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl};
-        use diesel_async::RunQueryDsl;
-        if *user_id == self.created_by {
+        if user_id == self.created_by {
             return Ok(true);
         }
-        if *user_id == self.updated_by {
+        if user_id == self.updated_by {
             return Ok(true);
         }
-        if crate::codegen::diesel_codegen::tables::team_members::team_members::table
-            .inner_join(
-                crate::codegen::diesel_codegen::tables::team_projects::team_projects::table
-                    .on(
-                        crate::codegen::diesel_codegen::tables::team_members::team_members::team_id
-                            .eq(
-                                crate::codegen::diesel_codegen::tables::team_projects::team_projects::team_id,
-                            ),
-                    ),
-            )
-            .filter(
-                crate::codegen::diesel_codegen::tables::team_members::team_members::member_id
-                    .eq(user_id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::team_projects::team_projects::project_id
-                            .eq(self.id),
-                    ),
-            )
-            .count()
-            .get_result::<i64>(conn)
-            .await? > 0
-        {
-            return Ok(true);
-        }
-        if let Some(projects) = self.parent_project(conn).await? {
-            if !std::boxed::Box::pin(projects.can_update(user_id, conn)).await? {
+        if let Some(projects) = self.parent_project(conn)? {
+            if !projects.can_update(user_id, conn)? {
                 return Ok(false);
             }
         }

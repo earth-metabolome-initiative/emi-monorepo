@@ -22,11 +22,7 @@ pub trait Deletable {
     ///
     /// * Returns an error if the row cannot be deleted.
     /// * Returns an error if the user is not authorized to delete the row.
-    fn delete(
-        &self,
-        user_id: &Self::UserId,
-        conn: &mut Self::Conn,
-    ) -> impl core::future::Future<Output = Result<bool, DeleteError>>;
+    fn delete(&self, user_id: Self::UserId, conn: &mut Self::Conn) -> Result<bool, DeleteError>;
 }
 
 /// The error type for deletions.

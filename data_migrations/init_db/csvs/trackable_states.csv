@@ -1,4 +1,0 @@
-name,description,icon,colors.name
-Active,The tracking is currently active.,Check,green
-Paused,The tracking is currently paused.,BoxArchive,yellow
-Deprecated,The tracking has been deprecated.,Ban,red

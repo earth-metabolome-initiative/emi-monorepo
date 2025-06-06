@@ -14,7 +14,7 @@ impl TryFrom<&str> for crate::ToolCategory {
             "PreciseManipulationTool" => Self::PreciseManipulationTool,
             "BreakingBeads" => Self::BreakingBeads,
             "Gloves" => Self::Gloves,
-            "HandCleaningAgent" => Self::HandCleaningAgent,
+            "LiquidDispenser" => Self::LiquidDispenser,
             "PaperTowels" => Self::PaperTowels,
             "GraduatedCylinder" => Self::GraduatedCylinder,
             "Pipette" => Self::Pipette,

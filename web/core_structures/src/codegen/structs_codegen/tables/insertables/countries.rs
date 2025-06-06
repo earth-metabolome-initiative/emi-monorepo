@@ -32,7 +32,7 @@ impl InsertableCountryBuilder {
     pub fn iso<P>(
         mut self,
         iso: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCountryAttributes>>
     where
         P: TryInto<::iso_codes::CountryCode>,
         <P as TryInto<::iso_codes::CountryCode>>::Error: Into<validation_errors::SingleFieldError>,
@@ -47,7 +47,7 @@ impl InsertableCountryBuilder {
     pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCountryAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -59,24 +59,16 @@ impl InsertableCountryBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableCountryBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableCountryAttributes>;
-    type Object = InsertableCountry;
-    type Attribute = InsertableCountryAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            iso: self.iso.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+impl TryFrom<InsertableCountryBuilder> for InsertableCountry {
+    type Error = common_traits::prelude::BuilderError<InsertableCountryAttributes>;
+    fn try_from(builder: InsertableCountryBuilder) -> Result<InsertableCountry, Self::Error> {
+        Ok(Self {
+            iso: builder.iso.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableCountryAttributes::Iso,
             ))?,
-            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableCountryAttributes::Name,
             ))?,
         })
-    }
-}
-impl TryFrom<InsertableCountry> for InsertableCountryBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableCountry) -> Result<Self, Self::Error> {
-        Self::default().iso(insertable_variant.iso)?.name(insertable_variant.name)
     }
 }

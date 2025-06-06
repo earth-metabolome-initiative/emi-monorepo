@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS containers (
+	id UUID PRIMARY KEY REFERENCES trackables(id) ON DELETE CASCADE,
+	container_model_id UUID NOT NULL REFERENCES container_models(id) ON DELETE CASCADE
+);

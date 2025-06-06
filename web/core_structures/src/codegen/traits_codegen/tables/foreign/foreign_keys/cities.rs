@@ -33,7 +33,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if countries.iso == self.iso {
+                if self.iso == countries.iso {
                     foreign_keys.iso = Some(countries);
                     updated = true;
                 }
@@ -42,7 +42,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::Country(countries),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if countries.iso == self.iso {
+                if self.iso == countries.iso {
                     foreign_keys.iso = None;
                     updated = true;
                 }

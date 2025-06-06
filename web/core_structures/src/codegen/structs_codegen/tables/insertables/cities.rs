@@ -23,21 +23,37 @@ pub struct InsertableCity {
     iso: ::iso_codes::CountryCode,
 }
 impl InsertableCity {
-    #[cfg(feature = "postgres")]
-    pub async fn iso(
+    pub fn iso<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::countries::Country, diesel::result::Error>
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::countries::Country,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::countries::Country: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::countries::Country as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::countries::Country as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::countries::Country as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::countries::Country as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::countries::Country as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::countries::Country as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::countries::Country,
+        >,
     {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::countries::Country::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::countries::countries::dsl::iso
-                    .eq(&self.iso),
-            )
-            .first::<crate::codegen::structs_codegen::tables::countries::Country>(conn)
-            .await
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::countries::Country::table(),
+                self.iso,
+            ),
+            conn,
+        )
     }
 }
 #[derive(Default)]
@@ -49,7 +65,7 @@ impl InsertableCityBuilder {
     pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCityAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -63,7 +79,7 @@ impl InsertableCityBuilder {
     pub fn iso<P>(
         mut self,
         iso: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCityAttributes>>
     where
         P: TryInto<::iso_codes::CountryCode>,
         <P as TryInto<::iso_codes::CountryCode>>::Error: Into<validation_errors::SingleFieldError>,
@@ -76,24 +92,16 @@ impl InsertableCityBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableCityBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableCityAttributes>;
-    type Object = InsertableCity;
-    type Attribute = InsertableCityAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+impl TryFrom<InsertableCityBuilder> for InsertableCity {
+    type Error = common_traits::prelude::BuilderError<InsertableCityAttributes>;
+    fn try_from(builder: InsertableCityBuilder) -> Result<InsertableCity, Self::Error> {
+        Ok(Self {
+            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableCityAttributes::Name,
             ))?,
-            iso: self.iso.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            iso: builder.iso.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableCityAttributes::Iso,
             ))?,
         })
-    }
-}
-impl TryFrom<InsertableCity> for InsertableCityBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableCity) -> Result<Self, Self::Error> {
-        Self::default().name(insertable_variant.name)?.iso(insertable_variant.iso)
     }
 }

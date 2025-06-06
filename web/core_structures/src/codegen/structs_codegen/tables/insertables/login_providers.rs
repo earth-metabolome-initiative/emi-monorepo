@@ -50,7 +50,7 @@ impl InsertableLoginProviderBuilder {
     pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -66,7 +66,7 @@ impl InsertableLoginProviderBuilder {
     pub fn icon<P>(
         mut self,
         icon: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -82,7 +82,7 @@ impl InsertableLoginProviderBuilder {
     pub fn client_id<P>(
         mut self,
         client_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -98,7 +98,7 @@ impl InsertableLoginProviderBuilder {
     pub fn redirect_uri<P>(
         mut self,
         redirect_uri: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -113,7 +113,7 @@ impl InsertableLoginProviderBuilder {
     pub fn oauth_url<P>(
         mut self,
         oauth_url: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -127,7 +127,7 @@ impl InsertableLoginProviderBuilder {
     pub fn scope<P>(
         mut self,
         scope: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -141,48 +141,36 @@ impl InsertableLoginProviderBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableLoginProviderBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableLoginProviderAttributes>;
-    type Object = InsertableLoginProvider;
-    type Attribute = InsertableLoginProviderAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+impl TryFrom<InsertableLoginProviderBuilder> for InsertableLoginProvider {
+    type Error = common_traits::prelude::BuilderError<InsertableLoginProviderAttributes>;
+    fn try_from(
+        builder: InsertableLoginProviderBuilder,
+    ) -> Result<InsertableLoginProvider, Self::Error> {
+        Ok(Self {
+            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableLoginProviderAttributes::Name,
             ))?,
-            icon: self.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            icon: builder.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableLoginProviderAttributes::Icon,
             ))?,
-            client_id: self.client_id.ok_or(
+            client_id: builder.client_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableLoginProviderAttributes::ClientId,
                 ),
             )?,
-            redirect_uri: self.redirect_uri.ok_or(
+            redirect_uri: builder.redirect_uri.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableLoginProviderAttributes::RedirectUri,
                 ),
             )?,
-            oauth_url: self.oauth_url.ok_or(
+            oauth_url: builder.oauth_url.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableLoginProviderAttributes::OauthUrl,
                 ),
             )?,
-            scope: self.scope.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            scope: builder.scope.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableLoginProviderAttributes::Scope,
             ))?,
         })
-    }
-}
-impl TryFrom<InsertableLoginProvider> for InsertableLoginProviderBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableLoginProvider) -> Result<Self, Self::Error> {
-        Self::default()
-            .name(insertable_variant.name)?
-            .icon(insertable_variant.icon)?
-            .client_id(insertable_variant.client_id)?
-            .redirect_uri(insertable_variant.redirect_uri)?
-            .oauth_url(insertable_variant.oauth_url)?
-            .scope(insertable_variant.scope)
     }
 }

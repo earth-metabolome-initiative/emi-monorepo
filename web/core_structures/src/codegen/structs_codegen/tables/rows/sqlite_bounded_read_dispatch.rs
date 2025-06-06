@@ -20,26 +20,20 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::AliquotingStepModel => {
-                <crate::codegen::structs_codegen::tables::aliquoting_step_models::AliquotingStepModel as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::AliquotingProcedureModel => {
+                <crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::AliquotingStep => {
-                <crate::codegen::structs_codegen::tables::aliquoting_steps::AliquotingStep as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::AliquotingProcedure => {
+                <crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::BallMillStepModel => {
-                <crate::codegen::structs_codegen::tables::ball_mill_step_models::BallMillStepModel as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::BallMillStep => {
-                <crate::codegen::structs_codegen::tables::ball_mill_steps::BallMillStep as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::BallMillProcedureModel => {
+                <crate::codegen::structs_codegen::tables::ball_mill_procedure_models::BallMillProcedureModel as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
@@ -50,20 +44,8 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::CentrifugeStepModel => {
-                <crate::codegen::structs_codegen::tables::centrifuge_step_models::CentrifugeStepModel as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::CentrifugeStep => {
-                <crate::codegen::structs_codegen::tables::centrifuge_steps::CentrifugeStep as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::ChemicalEntity => {
-                <crate::codegen::structs_codegen::tables::chemical_entities::ChemicalEntity as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::CentrifugeProcedureModel => {
+                <crate::codegen::structs_codegen::tables::centrifuge_procedure_models::CentrifugeProcedureModel as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
@@ -104,26 +86,20 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
+            crate::codegen::tables::table_names::TableName::Container => {
+                <crate::codegen::structs_codegen::tables::containers::Container as web_common_traits::database::BoundedRead<
+                    diesel::SqliteConnection,
+                >>::bounded_read(offset, limit, conn)
+                    .map(super::Rows::from)
+            }
             crate::codegen::tables::table_names::TableName::Country => {
                 <crate::codegen::structs_codegen::tables::countries::Country as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::DisposalStepModel => {
-                <crate::codegen::structs_codegen::tables::disposal_step_models::DisposalStepModel as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::DisposalStep => {
-                <crate::codegen::structs_codegen::tables::disposal_steps::DisposalStep as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::DocumentFormat => {
-                <crate::codegen::structs_codegen::tables::document_formats::DocumentFormat as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::DisposalProcedureModel => {
+                <crate::codegen::structs_codegen::tables::disposal_procedure_models::DisposalProcedureModel as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
@@ -140,32 +116,20 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::FractioningStepModel => {
-                <crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::FractioningProcedureModel => {
+                <crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::FractioningStep => {
-                <crate::codegen::structs_codegen::tables::fractioning_steps::FractioningStep as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::FractioningProcedure => {
+                <crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::FreezeDryingStepModel => {
-                <crate::codegen::structs_codegen::tables::freeze_drying_step_models::FreezeDryingStepModel as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::InstrumentLocation => {
-                <crate::codegen::structs_codegen::tables::instrument_locations::InstrumentLocation as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::InstrumentModelCategory => {
-                <crate::codegen::structs_codegen::tables::instrument_model_categories::InstrumentModelCategory as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::FreezeDryingProcedureModel => {
+                <crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
@@ -200,8 +164,20 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::NameplateModel => {
-                <crate::codegen::structs_codegen::tables::nameplate_models::NameplateModel as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::MixCountableProcedureModel => {
+                <crate::codegen::structs_codegen::tables::mix_countable_procedure_models::MixCountableProcedureModel as web_common_traits::database::BoundedRead<
+                    diesel::SqliteConnection,
+                >>::bounded_read(offset, limit, conn)
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::MixSolidProcedureModel => {
+                <crate::codegen::structs_codegen::tables::mix_solid_procedure_models::MixSolidProcedureModel as web_common_traits::database::BoundedRead<
+                    diesel::SqliteConnection,
+                >>::bounded_read(offset, limit, conn)
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::NextProcedureModel => {
+                <crate::codegen::structs_codegen::tables::next_procedure_models::NextProcedureModel as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
@@ -214,12 +190,6 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
             }
             crate::codegen::tables::table_names::TableName::OrganismObservation => {
                 <crate::codegen::structs_codegen::tables::organism_observations::OrganismObservation as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::OrganismSamplingStepModel => {
-                <crate::codegen::structs_codegen::tables::organism_sampling_step_models::OrganismSamplingStepModel as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
@@ -248,8 +218,8 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::PackagingStepModel => {
-                <crate::codegen::structs_codegen::tables::packaging_step_models::PackagingStepModel as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::PackagingProcedureModel => {
+                <crate::codegen::structs_codegen::tables::packaging_procedure_models::PackagingProcedureModel as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
@@ -266,32 +236,26 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::ProcedureModelContainerCategory => {
-                <crate::codegen::structs_codegen::tables::procedure_model_container_categories::ProcedureModelContainerCategory as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::PouringProcedureModel => {
+                <crate::codegen::structs_codegen::tables::pouring_procedure_models::PouringProcedureModel as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::ProcedureModelInstrumentCategory => {
-                <crate::codegen::structs_codegen::tables::procedure_model_instrument_categories::ProcedureModelInstrumentCategory as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::ProcedureModelNameplateCategory => {
-                <crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::ProcedureModelToolCategory => {
-                <crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::ProcedureModelTrackable => {
+                <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
             crate::codegen::tables::table_names::TableName::ProcedureModel => {
                 <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as web_common_traits::database::BoundedRead<
+                    diesel::SqliteConnection,
+                >>::bounded_read(offset, limit, conn)
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::ProcedureTrackable => {
+                <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
@@ -308,20 +272,14 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::ProcessingStep => {
-                <crate::codegen::structs_codegen::tables::processing_steps::ProcessingStep as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::ProcessingProcedure => {
+                <crate::codegen::structs_codegen::tables::processing_procedures::ProcessingProcedure as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
             crate::codegen::tables::table_names::TableName::ProjectState => {
                 <crate::codegen::structs_codegen::tables::project_states::ProjectState as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::ProjectWorkflowModel => {
-                <crate::codegen::structs_codegen::tables::project_workflow_models::ProjectWorkflowModel as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
@@ -362,26 +320,26 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::SamplingStepModel => {
-                <crate::codegen::structs_codegen::tables::sampling_step_models::SamplingStepModel as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::SamplingProcedureModel => {
+                <crate::codegen::structs_codegen::tables::sampling_procedure_models::SamplingProcedureModel as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::SamplingStep => {
-                <crate::codegen::structs_codegen::tables::sampling_steps::SamplingStep as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::SamplingProcedure => {
+                <crate::codegen::structs_codegen::tables::sampling_procedures::SamplingProcedure as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::ShakingStepModel => {
-                <crate::codegen::structs_codegen::tables::shaking_step_models::ShakingStepModel as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::ShakingProcedureModel => {
+                <crate::codegen::structs_codegen::tables::shaking_procedure_models::ShakingProcedureModel as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::ShakingStep => {
-                <crate::codegen::structs_codegen::tables::shaking_steps::ShakingStep as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::SharedProcedureModelTrackable => {
+                <crate::codegen::structs_codegen::tables::shared_procedure_model_trackables::SharedProcedureModelTrackable as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
@@ -400,96 +358,6 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
             }
             crate::codegen::tables::table_names::TableName::SpectraCollection => {
                 <crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::StepContainerModel => {
-                <crate::codegen::structs_codegen::tables::step_container_models::StepContainerModel as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::StepInstrument => {
-                <crate::codegen::structs_codegen::tables::step_instruments::StepInstrument as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::StepModelContainerCategory => {
-                <crate::codegen::structs_codegen::tables::step_model_container_categories::StepModelContainerCategory as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::StepModelInstrumentCategory => {
-                <crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::StepModelInstrumentModel => {
-                <crate::codegen::structs_codegen::tables::step_model_instrument_models::StepModelInstrumentModel as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::StepModelInstrument => {
-                <crate::codegen::structs_codegen::tables::step_model_instruments::StepModelInstrument as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::StepModelNameplateCategory => {
-                <crate::codegen::structs_codegen::tables::step_model_nameplate_categories::StepModelNameplateCategory as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::StepModelToolCategory => {
-                <crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::StepModelTrackableCategory => {
-                <crate::codegen::structs_codegen::tables::step_model_trackable_categories::StepModelTrackableCategory as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::StepModel => {
-                <crate::codegen::structs_codegen::tables::step_models::StepModel as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::StepNameplateModel => {
-                <crate::codegen::structs_codegen::tables::step_nameplate_models::StepNameplateModel as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::StepStorageContainer => {
-                <crate::codegen::structs_codegen::tables::step_storage_containers::StepStorageContainer as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::StepToolModel => {
-                <crate::codegen::structs_codegen::tables::step_tool_models::StepToolModel as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::Step => {
-                <crate::codegen::structs_codegen::tables::steps::Step as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::StorageContainer => {
-                <crate::codegen::structs_codegen::tables::storage_containers::StorageContainer as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
@@ -530,26 +398,8 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::ToolModel => {
-                <crate::codegen::structs_codegen::tables::tool_models::ToolModel as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::TrackableCategory => {
-                <crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
             crate::codegen::tables::table_names::TableName::TrackableLocation => {
                 <crate::codegen::structs_codegen::tables::trackable_locations::TrackableLocation as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::TrackableState => {
-                <crate::codegen::structs_codegen::tables::trackable_states::TrackableState as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
@@ -596,14 +446,8 @@ impl web_common_traits::prelude::BoundedReadDispatch<diesel::SqliteConnection> f
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::WeighingStepModel => {
-                <crate::codegen::structs_codegen::tables::weighing_step_models::WeighingStepModel as web_common_traits::database::BoundedRead<
-                    diesel::SqliteConnection,
-                >>::bounded_read(offset, limit, conn)
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::WeighingStep => {
-                <crate::codegen::structs_codegen::tables::weighing_steps::WeighingStep as web_common_traits::database::BoundedRead<
+            crate::codegen::tables::table_names::TableName::WeighingProcedureModel => {
+                <crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel as web_common_traits::database::BoundedRead<
                     diesel::SqliteConnection,
                 >>::bounded_read(offset, limit, conn)
                     .map(super::Rows::from)

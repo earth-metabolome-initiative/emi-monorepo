@@ -10,7 +10,7 @@ quote.workspace = true
 webcodegen.workspace = true
 reference_docker.workspace = true
 init_db.workspace = true
-diesel-async = { workspace = true, features = ["postgres"] }
+diesel = { workspace = true, features = ["postgres"] }
 
 [lints]
 workspace = true

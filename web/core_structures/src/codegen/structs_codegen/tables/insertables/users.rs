@@ -49,7 +49,7 @@ impl InsertableUserBuilder {
     pub fn first_name<P>(
         mut self,
         first_name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -65,7 +65,7 @@ impl InsertableUserBuilder {
     pub fn last_name<P>(
         mut self,
         last_name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -81,7 +81,7 @@ impl InsertableUserBuilder {
     pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -98,7 +98,7 @@ impl InsertableUserBuilder {
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -113,42 +113,30 @@ impl InsertableUserBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableUserBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableUserAttributes>;
-    type Object = InsertableUser;
-    type Attribute = InsertableUserAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            first_name: self.first_name.ok_or(
+impl TryFrom<InsertableUserBuilder> for InsertableUser {
+    type Error = common_traits::prelude::BuilderError<InsertableUserAttributes>;
+    fn try_from(builder: InsertableUserBuilder) -> Result<InsertableUser, Self::Error> {
+        Ok(Self {
+            first_name: builder.first_name.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableUserAttributes::FirstName,
                 ),
             )?,
-            last_name: self.last_name.ok_or(
+            last_name: builder.last_name.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableUserAttributes::LastName,
                 ),
             )?,
-            created_at: self.created_at.ok_or(
+            created_at: builder.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableUserAttributes::CreatedAt,
                 ),
             )?,
-            updated_at: self.updated_at.ok_or(
+            updated_at: builder.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableUserAttributes::UpdatedAt,
                 ),
             )?,
         })
-    }
-}
-impl TryFrom<InsertableUser> for InsertableUserBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableUser) -> Result<Self, Self::Error> {
-        Self::default()
-            .first_name(insertable_variant.first_name)?
-            .last_name(insertable_variant.last_name)?
-            .created_at(insertable_variant.created_at)?
-            .updated_at(insertable_variant.updated_at)
     }
 }

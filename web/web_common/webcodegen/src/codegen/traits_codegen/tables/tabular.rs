@@ -4,7 +4,7 @@
 
 use std::path::Path;
 
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 
@@ -19,11 +19,11 @@ impl Codegen<'_> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(super) async fn generate_tabular_impls(
+    pub(super) fn generate_tabular_impls(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
         // We generate each table in a separate document under the provided root, and we
@@ -39,8 +39,7 @@ impl Codegen<'_> {
             let snake_case_ident = table.snake_case_ident()?;
 
             let primary_key: Vec<TokenStream> = table
-                .primary_key_columns(conn)
-                .await?
+                .primary_key_columns(conn)?
                 .into_iter()
                 .map(|column| {
                     let column_snake_ident = column.snake_case_ident()?;

@@ -1,13 +1,22 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableVolumetricProcessableAttributes {
-    Id,
+    Id(crate::codegen::structs_codegen::tables::insertables::InsertableProcessableAttributes),
     Liters,
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcessableAttributes>
+    for InsertableVolumetricProcessableAttributes
+{
+    fn from(
+        extension: crate::codegen::structs_codegen::tables::insertables::InsertableProcessableAttributes,
+    ) -> Self {
+        Self::Id(extension)
+    }
 }
 impl core::fmt::Display for InsertableVolumetricProcessableAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableVolumetricProcessableAttributes::Id => write!(f, "id"),
+            InsertableVolumetricProcessableAttributes::Id(id) => write!(f, "{}", id),
             InsertableVolumetricProcessableAttributes::Liters => write!(f, "liters"),
         }
     }
@@ -25,46 +34,52 @@ pub struct InsertableVolumetricProcessable {
     liters: f32,
 }
 impl InsertableVolumetricProcessable {
-    #[cfg(feature = "postgres")]
-    pub async fn id(
+    pub fn id<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::processables::Processable,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::processables::Processable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::processables::processables::dsl::id
-                    .eq(&self.id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::processables::Processable>(conn)
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::processables::Processable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::processables::Processable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::processables::Processable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::processables::Processable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::processables::Processable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::processables::Processable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::processables::Processable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::processables::Processable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::processables::Processable::table(),
+                self.id,
+            ),
+            conn,
+        )
     }
 }
 #[derive(Default)]
 pub struct InsertableVolumetricProcessableBuilder {
-    id: Option<::rosetta_uuid::Uuid>,
+    id: crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder,
     liters: Option<f32>,
 }
 impl InsertableVolumetricProcessableBuilder {
-    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
-    where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let id = id.try_into().map_err(|err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-            Into::into(err).rename_field(InsertableVolumetricProcessableAttributes::Id)
-        })?;
-        self.id = Some(id);
-        Ok(self)
-    }
     pub fn liters<P>(
         mut self,
         liters: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    >
     where
         P: TryInto<f32>,
         <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -77,26 +92,179 @@ impl InsertableVolumetricProcessableBuilder {
         self.liters = Some(liters);
         Ok(self)
     }
+    pub fn kilograms<P>(
+        mut self,
+        kilograms: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    >
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.kilograms(kilograms).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn id<P>(
+        mut self,
+        id: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_uuid::Uuid>,
+        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.id(id).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    >
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.name(name).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn description<P>(
+        mut self,
+        description: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    >
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.description(description).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn photograph_id<P>(
+        mut self,
+        photograph_id: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    >
+    where
+        P: TryInto<Option<::rosetta_uuid::Uuid>>,
+        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.photograph_id(photograph_id).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn parent_id<P>(
+        mut self,
+        parent_id: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    >
+    where
+        P: TryInto<Option<::rosetta_uuid::Uuid>>,
+        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.parent_id(parent_id).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn created_by<P>(
+        mut self,
+        created_by: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    >
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.created_by(created_by).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.created_at(created_at).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn updated_by<P>(
+        mut self,
+        updated_by: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    >
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.updated_by(updated_by).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn updated_at<P>(
+        mut self,
+        updated_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.updated_at(updated_at).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
 }
-impl common_traits::prelude::Builder for InsertableVolumetricProcessableBuilder {
-    type Error =
-        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>;
-    type Object = InsertableVolumetricProcessable;
-    type Attribute = InsertableVolumetricProcessableAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableVolumetricProcessableAttributes::Id,
-            ))?,
+impl InsertableVolumetricProcessableBuilder {
+    pub(crate) fn try_insert<C>(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<
+        InsertableVolumetricProcessable,
+        web_common_traits::database::InsertError<
+            InsertableVolumetricProcessableAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::processables::Processable,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcessableAttributes,
+            >,
+        >,
+    {
+        use diesel::associations::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        Ok(InsertableVolumetricProcessable {
             liters: self.liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableVolumetricProcessableAttributes::Liters,
             ))?,
+            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
         })
-    }
-}
-impl TryFrom<InsertableVolumetricProcessable> for InsertableVolumetricProcessableBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableVolumetricProcessable) -> Result<Self, Self::Error> {
-        Self::default().id(insertable_variant.id)?.liters(insertable_variant.liters)
     }
 }

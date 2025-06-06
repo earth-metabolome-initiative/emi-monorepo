@@ -39,7 +39,7 @@ impl Codegen<'_> {
         &self,
         root: &Path,
         tables: &[Table],
-        _conn: &mut diesel_async::AsyncPgConnection,
+        _conn: &mut diesel::PgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
         let table_name_enum_path = Self::table_names_enum_path();
@@ -159,10 +159,10 @@ impl Codegen<'_> {
             )?;
         }
 
-        let mut trait_modules: Vec<(&str, TokenStream)> = Vec::new();
+        let mut trait_modules: Vec<(String, TokenStream)> = Vec::new();
 
         trait_modules.push((
-            "tabular",
+            "tabular".to_owned(),
             quote::quote! {
                 impl web_common_traits::prelude::Tabular for super::Rows {
                     type TableName = #table_name_enum_path;
@@ -189,7 +189,7 @@ impl Codegen<'_> {
             .collect::<Result<Vec<_>, crate::errors::WebCodeGenError>>()?;
 
         trait_modules.push((
-            "len",
+            "len".to_owned(),
             quote::quote! {
                 impl super::Rows {
                     pub fn len(&self) -> usize {
@@ -222,7 +222,7 @@ impl Codegen<'_> {
             .collect::<Result<Vec<_>, crate::errors::WebCodeGenError>>()?;
 
         trait_modules.push((
-            "into_iter",
+            "into_iter".to_owned(),
             quote::quote! {
                 impl From<super::Rows> for Vec<#row_enum_path> {
                     fn from(rows: super::Rows) -> Self {
@@ -244,92 +244,50 @@ impl Codegen<'_> {
             },
         ));
 
-        Syntax::iter()
-            .try_for_each(|syntax| {
-                let feature_flag = syntax.as_feature_flag();
-                let table_name_enum_path = table_name_enum_path.clone();
-                let sync_connection = syntax.as_connection_type(false);
-                let async_connection = syntax.as_connection_type(true);
-                if syntax.is_sqlite() {
-                    let bounded_read_impls: Vec<TokenStream> = tables
-            .iter()
-            .map(|table| {
-                let struct_ident = table.struct_ident()?;
-                let struct_path = table.import_struct_path()?;
-                Ok(quote::quote! {
-                    #table_name_enum_path::#struct_ident => {
-                        <#struct_path as web_common_traits::database::BoundedRead<#sync_connection>>::bounded_read(offset, limit, conn)
-                            .map(super::Rows::from)
-                    }
+        let table_name_enum_path = table_name_enum_path.clone();
+
+        for syntax in Syntax::iter() {
+            let connection_type = syntax.as_connection_type();
+            let feature_flag = syntax.as_feature_flag();
+            let bounded_read_impls: Vec<TokenStream> = tables
+                .iter()
+                .map(|table| {
+                    let struct_ident = table.struct_ident()?;
+                    let struct_path = table.import_struct_path()?;
+                    Ok(quote::quote! {
+                        #table_name_enum_path::#struct_ident => {
+                            <#struct_path as web_common_traits::database::BoundedRead<#connection_type>>::bounded_read(offset, limit, conn)
+                                .map(super::Rows::from)
+                        }
+                    })
                 })
-            })
-            .collect::<Result<Vec<_>, crate::errors::WebCodeGenError>>()?;
+                .collect::<Result<Vec<_>, crate::errors::WebCodeGenError>>()?;
+            trait_modules.push((
+                format!("{}_bounded_read_dispatch", syntax.as_str()),
+                quote::quote! {
+                    #feature_flag
+                    impl web_common_traits::prelude::BoundedReadDispatch<#connection_type> for super::Rows {
+                        type TableName = #table_name_enum_path;
 
-                    trait_modules.push((
-                        "sqlite_bounded_read_dispatch",
-                        quote::quote! {
-                        #feature_flag
-                        impl web_common_traits::prelude::BoundedReadDispatch<#sync_connection> for super::Rows {
-                            type TableName = #table_name_enum_path;
-
-                            fn bounded_read(
-                                table_name: Self::TableName,
-                                offset: u16,
-                                limit: u16,
-                                conn: &mut #sync_connection,
-                            ) -> Result<Self, diesel::result::Error> {
-                                match table_name {
-                                    #(
-                                        #bounded_read_impls
-                                    )*
-                                }
+                        fn bounded_read(
+                            table_name: Self::TableName,
+                            offset: u16,
+                            limit: u16,
+                            conn: &mut #connection_type,
+                        ) -> Result<Self, diesel::result::Error> {
+                            match table_name {
+                                #(
+                                    #bounded_read_impls
+                                )*
                             }
                         }
-                    }));
-                } else {
-                    let async_bounded_read_impls: Vec<TokenStream> = tables
-            .iter()
-            .map(|table| {
-                let struct_ident = table.struct_ident()?;
-                let struct_path = table.import_struct_path()?;
-                Ok(quote::quote! {
-                    #table_name_enum_path::#struct_ident => {
-                        <#struct_path as web_common_traits::database::AsyncBoundedRead<#async_connection>>::bounded_read_async(offset, limit, conn).await
-                            .map(super::Rows::from)
                     }
-                })
-            })
-            .collect::<Result<Vec<_>, crate::errors::WebCodeGenError>>()?;
-
-                    trait_modules.push((
-                        "postgres_async_bounded_read_dispatch",
-                    quote::quote! {
-                        #feature_flag
-                        impl web_common_traits::prelude::AsyncBoundedReadDispatch<#async_connection> for super::Rows {
-                            type TableName = #table_name_enum_path;
-
-                            async fn bounded_read(
-                                table_name: Self::TableName,
-                                offset: u16,
-                                limit: u16,
-                                conn: &mut #async_connection,
-                            ) -> Result<Self, diesel::result::Error> {
-                                match table_name {
-                                    #(
-                                        #async_bounded_read_impls
-                                    )*
-                                }
-                            }
-                        }
-                    }));
-                }
-
-                Ok::<(), crate::errors::WebCodeGenError>(())
-            })?;
+                }));
+        }
 
         for (trait_module_name, trait_impl) in trait_modules {
             let trait_file = root.join(format!("{trait_module_name}.rs"));
-            let trait_module_ident = Ident::new(trait_module_name, proc_macro2::Span::call_site());
+            let trait_module_ident = Ident::new(&trait_module_name, proc_macro2::Span::call_site());
             std::fs::write(
                 &trait_file,
                 self.beautify_code(&quote! {

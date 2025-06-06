@@ -10,7 +10,7 @@ use api_path::api::oauth::jwt_cookies::USER_ONLINE_COOKIE_NAME;
 use base64::prelude::*;
 use chrono::{Duration, Utc};
 use core_structures::LoginProvider;
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use jsonwebtoken::{
     Algorithm, DecodingKey, EncodingKey, Header, TokenData, Validation, decode, encode,
 };
@@ -381,12 +381,12 @@ pub(crate) async fn build_login_response(
     provider: &LoginProvider,
     _state: &str,
     redis_client: &redis::Client,
-    conn: &mut AsyncPgConnection,
+    conn: &mut PgConnection,
 ) -> Result<HttpResponse, BackendError> {
-    let refresh_cookie = if let Some(user) = handle_known_user(emails, provider, conn).await? {
+    let refresh_cookie = if let Some(user) = handle_known_user(emails, provider, conn)? {
         encode_jwt_refresh_cookie(user.id, redis_client, false).await?
     } else {
-        let temporary_user = handle_unknown_user(primary_email, provider, conn).await?;
+        let temporary_user = handle_unknown_user(primary_email, provider, conn)?;
         encode_jwt_refresh_cookie(temporary_user.id, redis_client, true).await?
     };
 

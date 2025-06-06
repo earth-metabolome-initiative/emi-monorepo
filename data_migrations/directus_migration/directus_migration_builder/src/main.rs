@@ -1,7 +1,7 @@
 //! Build the core structures.
 use std::path::Path;
 
-use diesel_async::{AsyncConnection, AsyncPgConnection};
+use diesel::{Connection, PgConnection};
 use webcodegen::{Codegen, Table};
 
 const DATABASE_NAME: &str = "directus";
@@ -19,10 +19,10 @@ pub async fn main() {
     // Get the output directory
     let out_dir = Path::new("../src");
 
-    let mut conn = AsyncPgConnection::establish(DATABASE_URL).await.unwrap();
+    let mut conn = PgConnection::establish(DATABASE_URL).unwrap();
 
     // We write to the target directory the generated structs
-    let curation_data = Table::load(&mut conn, "Curation_Data", None, DATABASE_NAME).await.unwrap();
+    let curation_data = Table::load(&mut conn, "Curation_Data", None, DATABASE_NAME).unwrap();
 
     // Generate the code associated with the database
     Codegen::default()
@@ -31,6 +31,5 @@ pub async fn main() {
         .enable_foreign_trait()
         .beautify()
         .generate(&mut conn, DATABASE_NAME, None)
-        .await
         .unwrap();
 }

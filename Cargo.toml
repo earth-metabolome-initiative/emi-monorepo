@@ -86,10 +86,13 @@ bytes = "1.10.0"
 bincode = { version = "2", features = ["serde"] }
 sqlparser = { git = "https://github.com/apache/datafusion-sqlparser-rs.git", branch = "main" }
 arbitrary = { version = "1", features = ["derive"] }
-diesel = { git = "https://github.com/LucaCappelletti94/diesel.git", branch = "supports_on_conflict_clause_where", features = [
+diesel = { git = "https://github.com/diesel-rs/diesel", rev = "2cf1642d69a699ddefaa15fabc2d58e37670a735", features = [
   "extras",
+  "sqlite",
+  "returning_clauses_for_sqlite_3_35",
+  "postgres",
+  "i-implement-a-third-party-backend-and-opt-into-breaking-changes",
 ] }
-diesel-async = { git = "https://github.com/LucaCappelletti94/diesel_async", branch = "custom-diesel" }
 diesel_full_text_search = "2.2"
 diesel_pgrx = { path = "utils/diesel_pgrx" }
 diesel_pgrx_derive = { path = "utils/diesel_pgrx_derive" }
@@ -109,7 +112,6 @@ yew-agent = { git = "https://github.com/yewstack/yew.git", branch = "master" }
 strum_macros = "0.27"
 zip = "4.0"
 reference_docker = { path = "web/web_common/reference_docker" }
-async-trait = "0.1.88"
 pgrx = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }
 pgrx-tests = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }
 pgrx-sql-entity-graph = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }

@@ -24,11 +24,7 @@ for crate::codegen::structs_codegen::tables::aliquoting_instrument_models::Aliqu
                     )
                     .or(
                         maximum_measurable_liters.ne(excluded(maximum_measurable_liters)),
-                    )
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
+                    ),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })
@@ -60,11 +56,7 @@ for crate::codegen::structs_codegen::tables::aliquoting_instrument_models::Aliqu
                     )
                     .or(
                         maximum_measurable_liters.ne(excluded(maximum_measurable_liters)),
-                    )
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
+                    ),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })

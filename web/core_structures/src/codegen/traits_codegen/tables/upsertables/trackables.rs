@@ -18,11 +18,10 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .do_update()
             .set(self)
             .filter(
-                trackable_category_id
-                    .ne(excluded(trackable_category_id))
-                    .or(container_model_id.ne(excluded(container_model_id)))
-                    .or(project_id.ne(excluded(project_id)))
-                    .or(trackable_state_id.ne(excluded(trackable_state_id)))
+                name.ne(excluded(name))
+                    .or(description.ne(excluded(description)))
+                    .or(photograph_id.ne(excluded(photograph_id)))
+                    .or(parent_id.ne(excluded(parent_id)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))
@@ -52,11 +51,10 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .do_update()
             .set(self)
             .filter(
-                trackable_category_id
-                    .ne(excluded(trackable_category_id))
-                    .or(container_model_id.ne(excluded(container_model_id)))
-                    .or(project_id.ne(excluded(project_id)))
-                    .or(trackable_state_id.ne(excluded(trackable_state_id)))
+                name.ne(excluded(name))
+                    .or(description.ne(excluded(description)))
+                    .or(photograph_id.ne(excluded(photograph_id)))
+                    .or(parent_id.ne(excluded(parent_id)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))

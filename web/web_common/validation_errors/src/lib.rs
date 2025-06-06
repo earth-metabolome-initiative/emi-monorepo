@@ -11,6 +11,19 @@ pub enum Error<FieldName = ()> {
     DoubleField(DoubleFieldError<FieldName>),
 }
 
+impl<FieldName> Error<FieldName> {
+    /// Converts the error into the provided new attribute type.
+    pub fn into_field_name<NewFieldName>(self) -> Error<NewFieldName>
+    where
+        NewFieldName: From<FieldName>,
+    {
+        match self {
+            Error::SingleField(error) => Error::SingleField(error.into_field_name()),
+            Error::DoubleField(error) => Error::DoubleField(error.into_field_name()),
+        }
+    }
+}
+
 impl<FieldName: core::fmt::Display + core::fmt::Debug> core::error::Error for Error<FieldName> {}
 
 impl<FieldName: core::fmt::Display> core::fmt::Display for Error<FieldName> {
@@ -27,6 +40,7 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for Error<FieldName> {
 }
 
 #[derive(Debug, Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]
+/// Enumeration of errors that can occur during validation of a single field.
 pub enum SingleFieldError<FieldName = ()> {
     /// The provided text is empty.
     EmptyText(FieldName),
@@ -131,13 +145,64 @@ impl SingleFieldError {
     }
 }
 
+impl<FieldName> SingleFieldError<FieldName> {
+    /// Converts the error into the provided new attribute type.
+    pub fn into_field_name<NewFieldName>(self) -> SingleFieldError<NewFieldName>
+    where
+        NewFieldName: From<FieldName>,
+    {
+        match self {
+            SingleFieldError::EmptyText(field_name) => {
+                SingleFieldError::EmptyText(field_name.into())
+            }
+            SingleFieldError::PaddedText(field_name) => {
+                SingleFieldError::PaddedText(field_name.into())
+            }
+            SingleFieldError::ConsecutiveWhitespace(field_name) => {
+                SingleFieldError::ConsecutiveWhitespace(field_name.into())
+            }
+            SingleFieldError::ControlCharacters(field_name) => {
+                SingleFieldError::ControlCharacters(field_name.into())
+            }
+            SingleFieldError::InvalidMail(field_name) => {
+                SingleFieldError::InvalidMail(field_name.into())
+            }
+            SingleFieldError::InvalidFontAwesomeClass(field_name, icon) => {
+                SingleFieldError::InvalidFontAwesomeClass(field_name.into(), icon)
+            }
+            SingleFieldError::UnexpectedNegativeOrZeroValue(field_name) => {
+                SingleFieldError::UnexpectedNegativeOrZeroValue(field_name.into())
+            }
+            SingleFieldError::MustBeSmallerThan(field_name, expected_value) => {
+                SingleFieldError::MustBeSmallerThan(field_name.into(), expected_value)
+            }
+            SingleFieldError::MustBeGreaterThan(field_name, expected_value) => {
+                SingleFieldError::MustBeGreaterThan(field_name.into(), expected_value)
+            }
+            SingleFieldError::UnknownInstrumentCategory(field_name) => {
+                SingleFieldError::UnknownInstrumentCategory(field_name.into())
+            }
+            SingleFieldError::InvalidCasCode(field_name, error) => {
+                SingleFieldError::InvalidCasCode(field_name.into(), error)
+            }
+            SingleFieldError::InvalidMolecularFormula(field_name, error) => {
+                SingleFieldError::InvalidMolecularFormula(field_name.into(), error)
+            }
+            SingleFieldError::InvalidMediaType(field_name, error) => {
+                SingleFieldError::InvalidMediaType(field_name.into(), error)
+            }
+        }
+    }
+}
+
 impl<A> From<SingleFieldError<A>> for Error<A> {
     fn from(error: SingleFieldError<A>) -> Self {
         Error::SingleField(error)
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]
+/// Enumeration of errors that can occur during validation of two fields.
 pub enum DoubleFieldError<FieldName = ()> {
     /// The provided entries should be distinct.
     NotDistinct(FieldName, FieldName),
@@ -244,6 +309,26 @@ impl DoubleFieldError {
             }
             DoubleFieldError::MustBeGreaterThan(_, _) => {
                 DoubleFieldError::MustBeGreaterThan(left, right)
+            }
+        }
+    }
+}
+
+impl<FieldName> DoubleFieldError<FieldName> {
+    /// Converts the error into the provided new attribute type.
+    pub fn into_field_name<NewFieldName>(self) -> DoubleFieldError<NewFieldName>
+    where
+        NewFieldName: From<FieldName>,
+    {
+        match self {
+            DoubleFieldError::NotDistinct(left, right) => {
+                DoubleFieldError::NotDistinct(left.into(), right.into())
+            }
+            DoubleFieldError::MustBeSmallerThan(left, right) => {
+                DoubleFieldError::MustBeSmallerThan(left.into(), right.into())
+            }
+            DoubleFieldError::MustBeGreaterThan(left, right) => {
+                DoubleFieldError::MustBeGreaterThan(left.into(), right.into())
             }
         }
     }

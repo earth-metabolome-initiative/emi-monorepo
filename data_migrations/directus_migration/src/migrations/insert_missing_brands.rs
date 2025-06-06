@@ -2,7 +2,7 @@
 //! database to the new database.
 
 use core_structures::Brand as PortalBrand;
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use web_common_traits::{
     database::{AsyncBoundedRead, Insertable, InsertableVariant},
     prelude::Builder,
@@ -22,8 +22,8 @@ use crate::codegen::Brand as DirectusBrand;
 ///
 /// * If the insertion fails, an error of type `error::Error` is returned.
 pub async fn insert_missing_brands(
-    directus_conn: &mut AsyncPgConnection,
-    portal_conn: &mut AsyncPgConnection,
+    directus_conn: &mut PgConnection,
+    portal_conn: &mut PgConnection,
 ) -> Result<(), crate::error::Error> {
     let directus_brands = DirectusBrand::read_all_async(directus_conn).await?;
 

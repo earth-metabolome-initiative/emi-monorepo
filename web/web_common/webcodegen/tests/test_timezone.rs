@@ -11,7 +11,7 @@ async fn test_timezone() {
     let (docker, mut conn, _database_name) =
         setup_database_with_default_migrations("test_timezone").await.unwrap();
 
-    let time_zone = PgSetting::time_zone(&mut conn).await;
+    let time_zone = PgSetting::time_zone(&mut conn);
 
     docker.stop().await.unwrap();
 

@@ -10,6 +10,9 @@ pub struct UserOrganization {
     pub user_id: i32,
     pub organization_id: i16,
 }
+impl web_common_traits::prelude::TableName for UserOrganization {
+    const TABLE_NAME: &'static str = "user_organizations";
+}
 impl diesel::Identifiable for UserOrganization {
     type Id = (i32, i16);
     fn id(self) -> Self::Id {
@@ -17,88 +20,105 @@ impl diesel::Identifiable for UserOrganization {
     }
 }
 impl UserOrganization {
-    #[cfg(feature = "postgres")]
-    pub async fn user(
+    pub fn organization<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.user_id))
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn organization(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::organizations::Organization,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::organizations::Organization::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::organizations::organizations::dsl::id
-                    .eq(&self.organization_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::organizations::Organization>(conn)
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::organizations::Organization: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::organizations::Organization as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::organizations::Organization as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::organizations::Organization,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::organizations::Organization::table(),
+                self.organization_id,
+            ),
+            conn,
+        )
+    }
+    pub fn user<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.user_id,
+            ),
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_user_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        user_id: &crate::codegen::structs_codegen::tables::users::User,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::dsl::user_id
-                    .eq(user_id.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_organization_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        organization_id: &crate::codegen::structs_codegen::tables::organizations::Organization,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::dsl::organization_id
-                    .eq(organization_id.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_user_id_and_organization_id(
+    pub fn from_user_id(
         user_id: &i32,
-        organization_id: &i16,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl,
-            associations::HasTable,
-        };
-        use diesel_async::RunQueryDsl;
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::user_organizations::user_organizations;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::user_id
-                    .eq(user_id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::organization_id
-                            .eq(organization_id),
-                    ),
-            )
-            .first::<Self>(conn)
-            .await
-            .optional()
+            .filter(user_organizations::user_id.eq(user_id))
+            .order_by((
+                user_organizations::user_id.asc(),
+                user_organizations::organization_id.asc(),
+            ))
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_organization_id(
+        organization_id: &i16,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::user_organizations::user_organizations;
+        Self::table()
+            .filter(user_organizations::organization_id.eq(organization_id))
+            .order_by((
+                user_organizations::user_id.asc(),
+                user_organizations::organization_id.asc(),
+            ))
+            .load::<Self>(conn)
+    }
+}
+impl AsRef<UserOrganization> for UserOrganization {
+    fn as_ref(&self) -> &UserOrganization {
+        self
     }
 }

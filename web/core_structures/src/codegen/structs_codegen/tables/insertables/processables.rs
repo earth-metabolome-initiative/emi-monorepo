@@ -1,13 +1,22 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableProcessableAttributes {
-    Id,
+    Id(crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes),
     Kilograms,
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes>
+    for InsertableProcessableAttributes
+{
+    fn from(
+        extension: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
+    ) -> Self {
+        Self::Id(extension)
+    }
 }
 impl core::fmt::Display for InsertableProcessableAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableProcessableAttributes::Id => write!(f, "id"),
+            InsertableProcessableAttributes::Id(id) => write!(f, "{}", id),
             InsertableProcessableAttributes::Kilograms => write!(f, "kilograms"),
         }
     }
@@ -25,44 +34,49 @@ pub struct InsertableProcessable {
     kilograms: f32,
 }
 impl InsertableProcessable {
-    #[cfg(feature = "postgres")]
-    pub async fn id(
+    pub fn id<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::trackables::Trackable, diesel::result::Error>
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
+        >,
     {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::trackables::Trackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::trackables::trackables::dsl::id
-                    .eq(&self.id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::trackables::Trackable>(conn)
-            .await
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                self.id,
+            ),
+            conn,
+        )
     }
 }
 #[derive(Default)]
 pub struct InsertableProcessableBuilder {
-    id: Option<::rosetta_uuid::Uuid>,
+    id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     kilograms: Option<f32>,
 }
 impl InsertableProcessableBuilder {
-    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
-    where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let id = id.try_into().map_err(|err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-            Into::into(err).rename_field(InsertableProcessableAttributes::Id)
-        })?;
-        self.id = Some(id);
-        Ok(self)
-    }
     pub fn kilograms<P>(
         mut self,
         kilograms: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
     where
         P: TryInto<f32>,
         <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -75,27 +89,138 @@ impl InsertableProcessableBuilder {
         self.kilograms = Some(kilograms);
         Ok(self)
     }
+    pub fn id<P>(
+        mut self,
+        id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    where
+        P: TryInto<::rosetta_uuid::Uuid>,
+        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.id(id).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.name(name).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn description<P>(
+        mut self,
+        description: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.description(description).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn photograph_id<P>(
+        mut self,
+        photograph_id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    where
+        P: TryInto<Option<::rosetta_uuid::Uuid>>,
+        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.photograph_id(photograph_id).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn parent_id<P>(
+        mut self,
+        parent_id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    where
+        P: TryInto<Option<::rosetta_uuid::Uuid>>,
+        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.parent_id(parent_id).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn created_by<P>(
+        mut self,
+        created_by: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.created_by(created_by).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.created_at(created_at).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn updated_by<P>(
+        mut self,
+        updated_by: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.updated_by(updated_by).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn updated_at<P>(
+        mut self,
+        updated_at: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.updated_at(updated_at).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
 }
-impl common_traits::prelude::Builder for InsertableProcessableBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableProcessableAttributes>;
-    type Object = InsertableProcessable;
-    type Attribute = InsertableProcessableAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableProcessableAttributes::Id,
-            ))?,
+impl InsertableProcessableBuilder {
+    pub(crate) fn try_insert<C>(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<
+        InsertableProcessable,
+        web_common_traits::database::InsertError<InsertableProcessableAttributes>,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::trackables::Trackable,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
+            >,
+        >,
+    {
+        use diesel::associations::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        Ok(InsertableProcessable {
             kilograms: self.kilograms.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcessableAttributes::Kilograms,
                 ),
             )?,
+            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
         })
-    }
-}
-impl TryFrom<InsertableProcessable> for InsertableProcessableBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableProcessable) -> Result<Self, Self::Error> {
-        Self::default().id(insertable_variant.id)?.kilograms(insertable_variant.kilograms)
     }
 }

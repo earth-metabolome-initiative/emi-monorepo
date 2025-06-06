@@ -32,9 +32,8 @@ impl GitHubConfig {
     ///
     /// * If the environment variables are not set, an error is returned.
     /// * If the `LoginProvider` cannot be retrieved, an error is returned.
-    async fn from_env(connection: &mut crate::Conn) -> Result<GitHubConfig, BackendError> {
-        let provider = LoginProvider::from_name("GitHub", connection)
-            .await?
+    fn from_env(connection: &mut crate::Conn) -> Result<GitHubConfig, BackendError> {
+        let provider = LoginProvider::from_name("GitHub", connection)?
             .ok_or_else(|| BackendError::UnknownLoginProvider("GitHub".to_string()))?;
         Ok(GitHubConfig { client_secret: env::var("GITHUB_CLIENT_SECRET")?, provider })
     }
@@ -67,14 +66,14 @@ async fn github_oauth_handler(
         return BackendError::Unauthorized.into();
     }
 
-    let mut connection = match pool.get().await.map_err(BackendError::from) {
+    let mut connection = match pool.get().map_err(BackendError::from) {
         Ok(connection) => connection,
         Err(error) => {
             return error.into();
         }
     };
 
-    let github_config = match GitHubConfig::from_env(&mut connection).await {
+    let github_config = match GitHubConfig::from_env(&mut connection) {
         Ok(config) => config,
         Err(error) => {
             return error.into();

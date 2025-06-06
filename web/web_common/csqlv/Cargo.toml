@@ -6,7 +6,6 @@ edition = "2024"
 [dependencies]
 csv = "1.3.1"
 diesel = { workspace = true, optional = true }
-diesel-async = { workspace = true, optional = true }
 flate2 = "1.0.35"
 indicatif = "0.17.11"
 rosetta_uuid.workspace = true
@@ -22,13 +21,12 @@ testcontainers.workspace = true
 tokio.workspace = true
 chrono.workspace = true
 ipnetwork = "0.20.0"
-diesel-async = { workspace = true, features = ["postgres"] }
+diesel = { workspace = true, features = ["postgres"] }
 
 [lints]
 workspace = true
 
 [features]
-default = ["diesel", "diesel-async"]
+default = ["diesel"]
 diesel = ["dep:diesel"]
-diesel-async = ["dep:diesel-async", "diesel"]
 iso_codes = ["dep:iso_codes"]

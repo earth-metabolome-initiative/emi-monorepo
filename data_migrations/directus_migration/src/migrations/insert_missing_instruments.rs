@@ -6,7 +6,7 @@ use core_structures::{
     InstrumentLocation as PortalInstrumentLocation, InstrumentModel as PortalInstrumentModel,
     InstrumentState as PortalInstrumentState,
 };
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use web_common_traits::{
     database::{AsyncBoundedRead, Insertable, InsertableVariant},
     prelude::Builder,
@@ -27,8 +27,8 @@ use crate::codegen::Instrument as DirectusInstrument;
 ///
 /// * If the database operations fail, an error is returned.
 pub(crate) async fn insert_missing_instruments(
-    directus_conn: &mut AsyncPgConnection,
-    portal_conn: &mut AsyncPgConnection,
+    directus_conn: &mut PgConnection,
+    portal_conn: &mut PgConnection,
 ) -> Result<(), crate::error::Error> {
     let directus_instruments = DirectusInstrument::read_all_async(directus_conn).await?;
     for directus_instrument in directus_instruments {

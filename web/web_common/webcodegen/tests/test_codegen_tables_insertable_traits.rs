@@ -14,19 +14,14 @@ async fn test_codegen_tables_insertable_traits() {
             .unwrap();
 
     let users = Table::load(&mut conn, "users", None, &database_name)
-        .await
         .expect("Failed to load `users` table");
     let projects = Table::load(&mut conn, "projects", None, &database_name)
-        .await
         .expect("Failed to load `projects` table");
     let team_members = Table::load(&mut conn, "team_members", None, &database_name)
-        .await
         .expect("Failed to load `team_members` table");
     let team_projects = Table::load(&mut conn, "team_projects", None, &database_name)
-        .await
         .expect("Failed to load `team_projects` table");
     let pgrx_validation = PgExtension::load("pgrx_validation", "public", &mut conn)
-        .await
         .expect("Failed to query the database")
         .expect("Failed to load `pgrx_validation` extension, maybe it is not installed");
     let outcome = Codegen::default()
@@ -38,8 +33,7 @@ async fn test_codegen_tables_insertable_traits() {
         .set_output_directory("tests/codegen_tables_insertable_traits".as_ref())
         .enable_insertable_trait()
         .beautify()
-        .generate(&mut conn, &database_name, None)
-        .await;
+        .generate(&mut conn, &database_name, None);
     docker.stop().await.unwrap();
     outcome.unwrap();
 

@@ -1,5 +1,4 @@
-use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName};
-use diesel_async::{AsyncPgConnection, RunQueryDsl};
+use diesel::{ExpressionMethods, PgConnection, QueryDsl, Queryable, QueryableByName, RunQueryDsl};
 
 use crate::errors::WebCodeGenError;
 
@@ -43,13 +42,12 @@ impl ConstraintColumnUsage {
     /// # Errors
     ///
     /// If an error occurs while loading the column usages from the database
-    pub async fn load_all_constraint_column_usages(
-        conn: &mut AsyncPgConnection,
+    pub fn load_all_constraint_column_usages(
+        conn: &mut PgConnection,
     ) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::constraint_column_usage;
         constraint_column_usage::table
             .load::<ConstraintColumnUsage>(conn)
-            .await
             .map_err(WebCodeGenError::from)
     }
 
@@ -73,8 +71,8 @@ impl ConstraintColumnUsage {
     /// # Errors
     ///
     /// If an error occurs while loading the column usages from the database
-    pub async fn load_constraint_column_usages(
-        conn: &mut AsyncPgConnection,
+    pub fn load_constraint_column_usages(
+        conn: &mut PgConnection,
         constraint_name: &str,
         constraint_schema: Option<&str>,
         constraint_catalog: &str,
@@ -86,7 +84,6 @@ impl ConstraintColumnUsage {
             .filter(constraint_column_usage::constraint_schema.eq(constraint_schema))
             .filter(constraint_column_usage::constraint_catalog.eq(constraint_catalog))
             .load::<ConstraintColumnUsage>(conn)
-            .await
             .map_err(WebCodeGenError::from)
     }
 }

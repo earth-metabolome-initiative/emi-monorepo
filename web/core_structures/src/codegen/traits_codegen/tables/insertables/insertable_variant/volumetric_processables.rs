@@ -1,42 +1,47 @@
-#[cfg(feature = "backend")]
-impl web_common_traits::database::BackendInsertableVariant
-    for crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessable
-{
-    async fn backend_insert(
-        self,
-        conn: &mut Self::Conn,
-    ) -> Result<
-        Self::Row,
-        web_common_traits::database::InsertError<
-            <Self::InsertableBuilder as common_traits::prelude::Builder>::Attribute,
+impl<
+    C: diesel::connection::LoadConnection,
+> web_common_traits::database::InsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableBuilder
+where
+    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
+    diesel::query_builder::InsertStatement<
+        <crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessable as diesel::Insertable<
+            <crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder: web_common_traits::database::InsertableVariant<
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::processables::Processable,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::InsertableProcessableAttributes,
         >,
-    > {
-        use diesel::associations::HasTable;
-        use diesel_async::RunQueryDsl;
-        Ok(diesel::insert_into(Self::Row::table()).values(self).get_result(conn).await?)
-    }
-}
-#[cfg(feature = "postgres")]
-impl web_common_traits::database::InsertableVariant
-    for crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessable
+    >,
 {
-    type Row =
-        crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable;
-    type InsertableBuilder = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableBuilder;
-    type Conn = diesel_async::AsyncPgConnection;
+    type Row = crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable;
+    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessable;
+    type Error = web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableAttributes,
+    >;
     type UserId = i32;
-    async fn insert(
+    fn insert(
         self,
-        _user_id: &Self::UserId,
-        conn: &mut Self::Conn,
-    ) -> Result<
-        Self::Row,
-        web_common_traits::database::InsertError<
-            <Self::InsertableBuilder as common_traits::prelude::Builder>::Attribute,
-        >,
-    > {
+        user_id: Self::UserId,
+        conn: &mut C,
+    ) -> Result<Self::Row, Self::Error> {
+        use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        use diesel_async::RunQueryDsl;
-        Ok(diesel::insert_into(Self::Row::table()).values(self).get_result(conn).await?)
+        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessable = self
+            .try_insert(user_id, conn)?;
+        Ok(
+            diesel::insert_into(Self::Row::table())
+                .values(insertable_struct)
+                .get_result(conn)?,
+        )
     }
 }

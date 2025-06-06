@@ -2,7 +2,7 @@
 
 use std::path::Path;
 
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use proc_macro2::TokenStream;
 
 use super::Codegen;
@@ -22,11 +22,11 @@ impl Codegen<'_> {
     /// * `tables` - The list of tables for which to generate the web common
     ///   traits code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(crate) async fn generate_web_common_traits_implementations(
+    pub(crate) fn generate_web_common_traits_implementations(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<TimeTracker, crate::errors::WebCodeGenError> {
         let submodule_file = root.with_extension("rs");
         let mut time_tracker = TimeTracker::new("Generate Web Common Traits");
@@ -41,8 +41,7 @@ impl Codegen<'_> {
                 root.join(crate::codegen::CODEGEN_TYPES_PATH).as_path(),
                 tables,
                 conn,
-            )
-            .await?;
+            )?;
             let types_ident =
                 Ident::new(crate::codegen::CODEGEN_TYPES_PATH, proc_macro2::Span::call_site());
 
@@ -53,14 +52,11 @@ impl Codegen<'_> {
         }
 
         if self.should_generate_table_traits() {
-            time_tracker.extend(
-                self.generate_table_traits(
-                    root.join(crate::codegen::CODEGEN_TABLES_PATH).as_path(),
-                    tables,
-                    conn,
-                )
-                .await?,
-            );
+            time_tracker.extend(self.generate_table_traits(
+                root.join(crate::codegen::CODEGEN_TABLES_PATH).as_path(),
+                tables,
+                conn,
+            )?);
 
             let tables_ident =
                 Ident::new(crate::codegen::CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());

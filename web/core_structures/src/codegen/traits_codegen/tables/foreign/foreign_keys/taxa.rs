@@ -33,7 +33,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if ranks.id == self.rank_id {
+                if self.rank_id == ranks.id {
                     foreign_keys.rank = Some(ranks);
                     updated = true;
                 }
@@ -42,7 +42,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::Rank(ranks),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if ranks.id == self.rank_id {
+                if self.rank_id == ranks.id {
                     foreign_keys.rank = None;
                     updated = true;
                 }

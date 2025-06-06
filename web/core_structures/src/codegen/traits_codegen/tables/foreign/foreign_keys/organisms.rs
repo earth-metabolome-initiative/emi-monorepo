@@ -33,7 +33,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if trackables.id == self.id {
+                if self.id == trackables.id {
                     foreign_keys.id = Some(trackables);
                     updated = true;
                 }
@@ -42,7 +42,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::Trackable(trackables),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if trackables.id == self.id {
+                if self.id == trackables.id {
                     foreign_keys.id = None;
                     updated = true;
                 }

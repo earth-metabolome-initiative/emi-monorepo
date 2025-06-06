@@ -20,7 +20,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 trackable_id
                     .ne(excluded(trackable_id))
-                    .or(storage_container_id.ne(excluded(storage_container_id)))
+                    .or(container_id.ne(excluded(container_id)))
                     .or(geolocation.ne(excluded(geolocation)))
                     .or(inferred.ne(excluded(inferred)))
                     .or(created_at.ne(excluded(created_at)))
@@ -52,7 +52,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 trackable_id
                     .ne(excluded(trackable_id))
-                    .or(storage_container_id.ne(excluded(storage_container_id)))
+                    .or(container_id.ne(excluded(container_id)))
                     .or(geolocation.ne(excluded(geolocation)))
                     .or(inferred.ne(excluded(inferred)))
                     .or(created_at.ne(excluded(created_at)))

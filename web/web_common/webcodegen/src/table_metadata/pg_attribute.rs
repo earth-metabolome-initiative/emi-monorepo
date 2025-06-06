@@ -1,6 +1,7 @@
 //! Submodule providing the struct `PgAttribute` and associated methods.
-use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, Selectable};
-use diesel_async::{AsyncPgConnection, RunQueryDsl};
+use diesel::{
+    ExpressionMethods, PgConnection, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
+};
 
 use crate::{PgType, errors::WebCodeGenError};
 
@@ -72,12 +73,11 @@ impl PgAttribute {
     /// # Errors
     ///
     /// Returns an error if the provided database connection fails.
-    pub async fn pg_type(&self, conn: &mut AsyncPgConnection) -> Result<PgType, WebCodeGenError> {
+    pub fn pg_type(&self, conn: &mut PgConnection) -> Result<PgType, WebCodeGenError> {
         use crate::schema::pg_type;
         pg_type::table
             .filter(pg_type::oid.eq(self.atttypid))
             .first(conn)
-            .await
             .map_err(WebCodeGenError::from)
     }
 
@@ -86,11 +86,8 @@ impl PgAttribute {
     /// # Errors
     ///
     /// Returns an error if the provided database connection fails.
-    pub async fn supports_copy(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<bool, WebCodeGenError> {
-        Box::pin(self.pg_type(conn).await?.supports_copy(conn)).await
+    pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        self.pg_type(conn)?.supports_copy(conn)
     }
 
     /// Returns whether the associated rust type supports `Hash`.
@@ -98,11 +95,8 @@ impl PgAttribute {
     /// # Errors
     ///
     /// Returns an error if the provided database connection fails.
-    pub async fn supports_hash(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<bool, WebCodeGenError> {
-        Box::pin(self.pg_type(conn).await?.supports_hash(conn)).await
+    pub fn supports_hash(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        self.pg_type(conn)?.supports_hash(conn)
     }
 
     /// Returns whether the associated rust type supports `Eq`.
@@ -110,8 +104,8 @@ impl PgAttribute {
     /// # Errors
     ///
     /// Returns an error if the provided database connection fails.
-    pub async fn supports_eq(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
-        Box::pin(self.pg_type(conn).await?.supports_eq(conn)).await
+    pub fn supports_eq(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        self.pg_type(conn)?.supports_eq(conn)
     }
 
     /// Returns whether the associated rust type supports `Ord`.
@@ -119,10 +113,7 @@ impl PgAttribute {
     /// # Errors
     ///
     /// Returns an error if the provided database connection fails.
-    pub async fn supports_ord(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<bool, WebCodeGenError> {
-        Box::pin(self.pg_type(conn).await?.supports_ord(conn)).await
+    pub fn supports_ord(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        self.pg_type(conn)?.supports_ord(conn)
     }
 }

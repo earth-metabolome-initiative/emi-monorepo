@@ -7,8 +7,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
-            upsert::excluded,
+            ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl, upsert::excluded,
         };
 
         use crate::codegen::diesel_codegen::tables::instruments::instruments::*;
@@ -17,16 +16,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(
-                instrument_model_id
-                    .ne(excluded(instrument_model_id))
-                    .or(instrument_state_id.ne(excluded(instrument_state_id)))
-                    .or(qrcode.ne(excluded(qrcode)))
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
-            )
+            .filter(instrument_model_id.ne(excluded(instrument_model_id)))
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -40,8 +30,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
-            upsert::excluded,
+            ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl, upsert::excluded,
         };
 
         use crate::codegen::diesel_codegen::tables::instruments::instruments::*;
@@ -50,16 +39,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(
-                instrument_model_id
-                    .ne(excluded(instrument_model_id))
-                    .or(instrument_state_id.ne(excluded(instrument_state_id)))
-                    .or(qrcode.ne(excluded(qrcode)))
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
-            )
+            .filter(instrument_model_id.ne(excluded(instrument_model_id)))
             .get_results(conn)
             .map(|mut result| result.pop())
     }

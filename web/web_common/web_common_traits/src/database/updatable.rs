@@ -1,11 +1,9 @@
 //! Submodule defining a trait for types that can be updated in the database.
 
 /// A trait for types that can be updated in the database.
-pub trait Updatable {
+pub trait Updatable<C> {
     /// The expected user ID type.
     type UserId;
-    /// The connection type of the table.
-    type Conn;
 
     /// Returns whether the user can update the row.
     ///
@@ -23,7 +21,7 @@ pub trait Updatable {
     /// * If the database connection fails.
     fn can_update(
         &self,
-        user_id: &Self::UserId,
-        conn: &mut Self::Conn,
-    ) -> impl core::future::Future<Output = Result<bool, diesel::result::Error>>;
+        user_id: Self::UserId,
+        conn: &mut C,
+    ) -> Result<bool, diesel::result::Error>;
 }

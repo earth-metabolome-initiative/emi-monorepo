@@ -25,31 +25,69 @@ pub struct InsertableTeamMember {
     member_id: i32,
 }
 impl InsertableTeamMember {
-    #[cfg(feature = "postgres")]
-    pub async fn team(
+    pub fn member<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::teams::Team, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::teams::Team::table()
-            .filter(crate::codegen::diesel_codegen::tables::teams::teams::dsl::id.eq(&self.team_id))
-            .first::<crate::codegen::structs_codegen::tables::teams::Team>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.member_id,
+            ),
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub async fn member(
+    pub fn team<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.member_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::teams::Team,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::teams::Team: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::teams::Team,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::teams::Team::table(),
+                self.team_id,
+            ),
+            conn,
+        )
     }
 }
 #[derive(Default)]
@@ -61,7 +99,7 @@ impl InsertableTeamMemberBuilder {
     pub fn team_id<P>(
         mut self,
         team_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamMemberAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -75,7 +113,7 @@ impl InsertableTeamMemberBuilder {
     pub fn member_id<P>(
         mut self,
         member_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamMemberAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -87,26 +125,20 @@ impl InsertableTeamMemberBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableTeamMemberBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableTeamMemberAttributes>;
-    type Object = InsertableTeamMember;
-    type Attribute = InsertableTeamMemberAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            team_id: self.team_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableTeamMemberAttributes::TeamId,
-            ))?,
-            member_id: self.member_id.ok_or(
+impl TryFrom<InsertableTeamMemberBuilder> for InsertableTeamMember {
+    type Error = common_traits::prelude::BuilderError<InsertableTeamMemberAttributes>;
+    fn try_from(builder: InsertableTeamMemberBuilder) -> Result<InsertableTeamMember, Self::Error> {
+        Ok(Self {
+            team_id: builder.team_id.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableTeamMemberAttributes::TeamId,
+                ),
+            )?,
+            member_id: builder.member_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTeamMemberAttributes::MemberId,
                 ),
             )?,
         })
-    }
-}
-impl TryFrom<InsertableTeamMember> for InsertableTeamMemberBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableTeamMember) -> Result<Self, Self::Error> {
-        Self::default().team_id(insertable_variant.team_id)?.member_id(insertable_variant.member_id)
     }
 }

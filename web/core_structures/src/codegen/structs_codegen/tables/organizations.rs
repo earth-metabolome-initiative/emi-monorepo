@@ -21,6 +21,9 @@ pub struct Organization {
     pub domain: String,
     pub id: i16,
 }
+impl web_common_traits::prelude::TableName for Organization {
+    const TABLE_NAME: &'static str = "organizations";
+}
 impl diesel::Identifiable for Organization {
     type Id = i16;
     fn id(self) -> Self::Id {
@@ -29,94 +32,92 @@ impl diesel::Identifiable for Organization {
 }
 impl Organization {
     #[cfg(feature = "postgres")]
-    pub async fn from_url(
+    pub fn from_url(
         url: &str,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::organizations::organizations;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::organizations::organizations::url.eq(url),
-            )
+            .filter(organizations::url.eq(url))
+            .order_by(organizations::id.asc())
             .first::<Self>(conn)
-            .await
             .optional()
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_domain(
+    pub fn from_domain(
         domain: &str,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::organizations::organizations;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::organizations::organizations::domain
-                    .eq(domain),
-            )
+            .filter(organizations::domain.eq(domain))
+            .order_by(organizations::id.asc())
             .first::<Self>(conn)
-            .await
             .optional()
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_name(
-        name: &String,
-        conn: &mut diesel_async::AsyncPgConnection,
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::organizations::organizations;
         Self::table()
             .filter(organizations::name.eq(name))
             .order_by(organizations::id.asc())
             .load::<Self>(conn)
-            .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_country(
-        country: &String,
-        conn: &mut diesel_async::AsyncPgConnection,
+    pub fn from_country(
+        country: &str,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::organizations::organizations;
         Self::table()
             .filter(organizations::country.eq(country))
             .order_by(organizations::id.asc())
             .load::<Self>(conn)
-            .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_alpha_two_code(
+    pub fn from_alpha_two_code(
         alpha_two_code: &::iso_codes::CountryCode,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::organizations::organizations;
         Self::table()
             .filter(organizations::alpha_two_code.eq(alpha_two_code))
             .order_by(organizations::id.asc())
             .load::<Self>(conn)
-            .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_state_province(
-        state_province: &Option<String>,
-        conn: &mut diesel_async::AsyncPgConnection,
+    pub fn from_state_province(
+        state_province: &str,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::organizations::organizations;
         Self::table()
             .filter(organizations::state_province.eq(state_province))
             .order_by(organizations::id.asc())
             .load::<Self>(conn)
-            .await
+    }
+}
+impl AsRef<Organization> for Organization {
+    fn as_ref(&self) -> &Organization {
+        self
     }
 }

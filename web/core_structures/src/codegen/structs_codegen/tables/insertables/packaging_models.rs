@@ -1,22 +1,25 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertablePackagingModelAttributes {
-    Id,
+    Id(crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes),
     Kilograms,
-    CreatedBy,
-    CreatedAt,
-    UpdatedBy,
-    UpdatedAt,
+}
+impl
+    From<
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
+    > for InsertablePackagingModelAttributes
+{
+    fn from(
+        extension: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
+    ) -> Self {
+        Self::Id(extension)
+    }
 }
 impl core::fmt::Display for InsertablePackagingModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertablePackagingModelAttributes::Id => write!(f, "id"),
+            InsertablePackagingModelAttributes::Id(id) => write!(f, "{}", id),
             InsertablePackagingModelAttributes::Kilograms => write!(f, "kilograms"),
-            InsertablePackagingModelAttributes::CreatedBy => write!(f, "created_by"),
-            InsertablePackagingModelAttributes::CreatedAt => write!(f, "created_at"),
-            InsertablePackagingModelAttributes::UpdatedBy => write!(f, "updated_by"),
-            InsertablePackagingModelAttributes::UpdatedAt => write!(f, "updated_at"),
         }
     }
 }
@@ -29,99 +32,53 @@ impl core::fmt::Display for InsertablePackagingModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertablePackagingModel {
-    id: i32,
+    id: ::rosetta_uuid::Uuid,
     kilograms: f32,
-    created_by: i32,
-    created_at: ::rosetta_timestamp::TimestampUTC,
-    updated_by: i32,
-    updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertablePackagingModel {
-    #[cfg(feature = "postgres")]
-    pub async fn id(
+    pub fn id<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::dsl::id
-                    .eq(&self.id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-            >(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn created_by(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.created_by),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn updated_by(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.updated_by),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::table(),
+                self.id,
+            ),
+            conn,
+        )
     }
 }
+#[derive(Default)]
 pub struct InsertablePackagingModelBuilder {
-    id: Option<i32>,
+    id: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder,
     kilograms: Option<f32>,
-    created_by: Option<i32>,
-    created_at: Option<::rosetta_timestamp::TimestampUTC>,
-    updated_by: Option<i32>,
-    updated_at: Option<::rosetta_timestamp::TimestampUTC>,
-}
-impl Default for InsertablePackagingModelBuilder {
-    fn default() -> Self {
-        Self {
-            id: None,
-            kilograms: None,
-            created_by: None,
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: None,
-            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
-        }
-    }
 }
 impl InsertablePackagingModelBuilder {
-    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertablePackagingModelAttributes::Id)
-        })?;
-        self.id = Some(id);
-        Ok(self)
-    }
     pub fn kilograms<P>(
         mut self,
         kilograms: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePackagingModelAttributes>>
     where
         P: TryInto<f32>,
         <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -134,116 +91,162 @@ impl InsertablePackagingModelBuilder {
         self.kilograms = Some(kilograms);
         Ok(self)
     }
-    pub fn created_by<P>(
+    pub fn deprecation_date<P>(
         mut self,
-        created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+        deprecation_date: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePackagingModelAttributes>>
+    where
+        P: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
+        <P as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id =
+            self.id.deprecation_date(deprecation_date).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn brand_id<P>(
+        mut self,
+        brand_id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePackagingModelAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertablePackagingModelAttributes::CreatedBy)
-        })?;
-        self.created_by = Some(created_by);
-        self = self.updated_by(created_by)?;
+        self.id = self.id.brand_id(brand_id).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn id<P>(
+        mut self,
+        id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePackagingModelAttributes>>
+    where
+        P: TryInto<::rosetta_uuid::Uuid>,
+        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.id(id).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePackagingModelAttributes>>
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.name(name).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn description<P>(
+        mut self,
+        description: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePackagingModelAttributes>>
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.description(description).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn photograph_id<P>(
+        mut self,
+        photograph_id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePackagingModelAttributes>>
+    where
+        P: TryInto<Option<::rosetta_uuid::Uuid>>,
+        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.photograph_id(photograph_id).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn parent_id<P>(
+        mut self,
+        parent_id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePackagingModelAttributes>>
+    where
+        P: TryInto<Option<::rosetta_uuid::Uuid>>,
+        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.parent_id(parent_id).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn created_by<P>(
+        mut self,
+        created_by: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePackagingModelAttributes>>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.created_by(created_by).map_err(|err| err.into_field_name())?;
         Ok(self)
     }
     pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePackagingModelAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertablePackagingModelAttributes::CreatedAt)
-            },
-        )?;
-        self.created_at = Some(created_at);
+        self.id = self.id.created_at(created_at).map_err(|err| err.into_field_name())?;
         Ok(self)
     }
     pub fn updated_by<P>(
         mut self,
         updated_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePackagingModelAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertablePackagingModelAttributes::UpdatedBy)
-        })?;
-        self.updated_by = Some(updated_by);
+        self.id = self.id.updated_by(updated_by).map_err(|err| err.into_field_name())?;
         Ok(self)
     }
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePackagingModelAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        let updated_at = updated_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertablePackagingModelAttributes::UpdatedAt)
-            },
-        )?;
-        self.updated_at = Some(updated_at);
+        self.id = self.id.updated_at(updated_at).map_err(|err| err.into_field_name())?;
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertablePackagingModelBuilder {
-    type Error = web_common_traits::database::InsertError<InsertablePackagingModelAttributes>;
-    type Object = InsertablePackagingModel;
-    type Attribute = InsertablePackagingModelAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertablePackagingModelAttributes::Id,
-            ))?,
+impl InsertablePackagingModelBuilder {
+    pub(crate) fn try_insert<C>(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<
+        InsertablePackagingModel,
+        web_common_traits::database::InsertError<InsertablePackagingModelAttributes>,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
+            >,
+        >,
+    {
+        use diesel::associations::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        Ok(InsertablePackagingModel {
             kilograms: self.kilograms.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertablePackagingModelAttributes::Kilograms,
                 ),
             )?,
-            created_by: self.created_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertablePackagingModelAttributes::CreatedBy,
-                ),
-            )?,
-            created_at: self.created_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertablePackagingModelAttributes::CreatedAt,
-                ),
-            )?,
-            updated_by: self.updated_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertablePackagingModelAttributes::UpdatedBy,
-                ),
-            )?,
-            updated_at: self.updated_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertablePackagingModelAttributes::UpdatedAt,
-                ),
-            )?,
+            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
         })
-    }
-}
-impl TryFrom<InsertablePackagingModel> for InsertablePackagingModelBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertablePackagingModel) -> Result<Self, Self::Error> {
-        Self::default()
-            .id(insertable_variant.id)?
-            .kilograms(insertable_variant.kilograms)?
-            .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?
-            .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)
     }
 }

@@ -2,7 +2,7 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username TEXT NOT NULL CHECK (must_not_be_empty(username)),
-    email CITEXT NOT NULL CHECK (must_be_mail(email)),
+    email CITEXT NOT NULL CHECK (must_be_email(email)),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (username),
     UNIQUE (email),
@@ -25,4 +25,12 @@ CREATE TABLE composite_users (
     PRIMARY KEY (primary_id, secondary_id),
     FOREIGN KEY (primary_id) REFERENCES users(id),
     FOREIGN KEY (secondary_id) REFERENCES users(id)
+);
+
+CREATE TABLE composite_user_profiles (
+    id SERIAL PRIMARY KEY,
+    primary_id INT,
+    secondary_id INT,
+    description TEXT,
+    CONSTRAINT fk_composite_user_profiles FOREIGN KEY (primary_id, secondary_id) REFERENCES composite_users(primary_id, secondary_id)
 );

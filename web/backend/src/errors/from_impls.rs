@@ -6,7 +6,6 @@ use core_structures::tables::insertables::{
     InsertableEmailProviderAttributes, InsertableTemporaryUserAttributes,
     InsertableUserEmailAttributes,
 };
-use diesel_async::pooled_connection::{PoolError, bb8::RunError};
 use generic_backend_request_errors::GenericBackendRequestError;
 use tokio::sync::{mpsc::error::SendError, oneshot::error::RecvError};
 use web_common_traits::database::InsertError;
@@ -23,20 +22,6 @@ impl From<diesel::result::Error> for BackendError {
 impl From<diesel::ConnectionError> for BackendError {
     fn from(connection_error: diesel::ConnectionError) -> Self {
         BackendError::PostgresConnectionError(connection_error)
-    }
-}
-
-impl From<RunError> for BackendError {
-    fn from(bb8_error: RunError) -> Self {
-        match bb8_error {
-            RunError::TimedOut => BackendError::PostgresPoolTimeoutError,
-            RunError::User(PoolError::ConnectionError(connection_error)) => {
-                BackendError::PostgresConnectionError(connection_error)
-            }
-            RunError::User(PoolError::QueryError(query_error)) => {
-                BackendError::PostgresQueryError(query_error)
-            }
-        }
     }
 }
 

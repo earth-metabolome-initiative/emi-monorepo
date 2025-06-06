@@ -19,12 +19,11 @@ pub use init::init_database;
 /// # Errors
 ///
 /// * If the query fails, an error of type `errors::Error` is returned.
-pub async fn database_exists(
+pub fn database_exists(
     database_name: &str,
-    connection: &mut diesel_async::AsyncPgConnection,
+    connection: &mut diesel::PgConnection,
 ) -> Result<bool, errors::Error> {
-    use diesel::{QueryableByName, sql_query, sql_types::Integer};
-    use diesel_async::RunQueryDsl;
+    use diesel::{QueryableByName, RunQueryDsl, sql_query, sql_types::Integer};
 
     #[derive(QueryableByName)]
     struct Exists {
@@ -33,8 +32,7 @@ pub async fn database_exists(
     }
 
     Ok(sql_query(format!("SELECT 1 as exists FROM pg_database WHERE datname = '{database_name}'",))
-        .get_result::<Exists>(connection)
-        .await?
+        .get_result::<Exists>(connection)?
         .exists
         == 1)
 }

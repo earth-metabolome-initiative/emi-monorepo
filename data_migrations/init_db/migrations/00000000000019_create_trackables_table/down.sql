@@ -1,2 +1,0 @@
--- DOWN MIGRATION
-DROP TABLE IF EXISTS trackables;

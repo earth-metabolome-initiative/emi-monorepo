@@ -38,9 +38,9 @@ pub enum ToolCategory {
     BreakingBeads,
     /// Protective coverings for hands, often made of latex or nitrile.
     Gloves,
-    /// A chemical agent, often ethanol, used to avoid contamination among
+    /// A dispensing agent, often ethanol, used to avoid contamination among
     /// samples.
-    HandCleaningAgent,
+    LiquidDispenser,
     /// Absorbent paper used for drying hands or cleaning surfaces.
     PaperTowels,
     /// A device used to measure the volume of liquids.
@@ -66,7 +66,7 @@ impl ToolCategory {
             ToolCategory::PreciseManipulationTool => "Precise Manipulation Tool",
             ToolCategory::BreakingBeads => "Breaking Beads",
             ToolCategory::Gloves => "Gloves",
-            ToolCategory::HandCleaningAgent => "Hand Cleaning Agent",
+            ToolCategory::LiquidDispenser => "Liquid Dispenser",
             ToolCategory::PaperTowels => "Paper Towels",
             ToolCategory::GraduatedCylinder => "Graduated Cylinder",
             ToolCategory::Pipette => "Pipette",
@@ -101,8 +101,8 @@ impl ToolCategory {
             ToolCategory::Gloves => {
                 "Protective coverings for hands, often made of latex or nitrile."
             }
-            ToolCategory::HandCleaningAgent => {
-                "A chemical agent, often ethanol, used to avoid contamination among samples."
+            ToolCategory::LiquidDispenser => {
+                "A liquid dispenser, often ethanol, used to avoid contamination among samples."
             }
             ToolCategory::PaperTowels => {
                 "Absorbent paper used for drying hands or cleaning surfaces."
@@ -132,7 +132,7 @@ impl ToolCategory {
             ToolCategory::PreciseManipulationTool => "spoon",
             ToolCategory::BreakingBeads => "bowling-ball",
             ToolCategory::Gloves => "hand",
-            ToolCategory::HandCleaningAgent => "pump-soap",
+            ToolCategory::LiquidDispenser => "pump-soap",
             ToolCategory::PaperTowels => "box-tissue",
             ToolCategory::GraduatedCylinder => "flask",
             ToolCategory::PipetteTip | ToolCategory::Pipette => "syringe",

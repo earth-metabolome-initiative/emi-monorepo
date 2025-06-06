@@ -19,6 +19,9 @@ pub struct SampleState {
     pub color_id: i16,
     pub id: i16,
 }
+impl web_common_traits::prelude::TableName for SampleState {
+    const TABLE_NAME: &'static str = "sample_states";
+}
 impl diesel::Identifiable for SampleState {
     type Id = i16;
     fn id(self) -> Self::Id {
@@ -26,79 +29,105 @@ impl diesel::Identifiable for SampleState {
     }
 }
 impl SampleState {
-    #[cfg(feature = "postgres")]
-    pub async fn color(
+    pub fn color<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::colors::Color::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::colors::colors::dsl::id.eq(&self.color_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::colors::Color>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::colors::Color,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::colors::Color: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::colors::Color,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::colors::Color::table(),
+                self.color_id,
+            ),
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_color_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        color_id: &crate::codegen::structs_codegen::tables::colors::Color,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::sample_states::sample_states::dsl::color_id
-                    .eq(color_id.id),
-            )
-            .first::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_name(
+    pub fn from_name(
         name: &str,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::sample_states::sample_states;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::sample_states::sample_states::name.eq(name),
-            )
+            .filter(sample_states::name.eq(name))
+            .order_by(sample_states::id.asc())
             .first::<Self>(conn)
-            .await
             .optional()
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_description(
+    pub fn from_description(
         description: &str,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::sample_states::sample_states;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::sample_states::sample_states::description
-                    .eq(description),
-            )
+            .filter(sample_states::description.eq(description))
+            .order_by(sample_states::id.asc())
             .first::<Self>(conn)
-            .await
             .optional()
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_icon(
+    pub fn from_icon(
         icon: &str,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::sample_states::sample_states;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::sample_states::sample_states::icon.eq(icon),
-            )
+            .filter(sample_states::icon.eq(icon))
+            .order_by(sample_states::id.asc())
             .first::<Self>(conn)
-            .await
             .optional()
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_color_id(
+        color_id: &i16,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::sample_states::sample_states;
+        Self::table()
+            .filter(sample_states::color_id.eq(color_id))
+            .order_by(sample_states::id.asc())
+            .first::<Self>(conn)
+            .optional()
+    }
+}
+impl AsRef<SampleState> for SampleState {
+    fn as_ref(&self) -> &SampleState {
+        self
     }
 }

@@ -52,7 +52,7 @@ impl InsertableOrganizationBuilder {
     pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganizationAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -66,7 +66,7 @@ impl InsertableOrganizationBuilder {
     pub fn url<P>(
         mut self,
         url: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganizationAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -80,7 +80,7 @@ impl InsertableOrganizationBuilder {
     pub fn country<P>(
         mut self,
         country: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganizationAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -94,7 +94,7 @@ impl InsertableOrganizationBuilder {
     pub fn alpha_two_code<P>(
         mut self,
         alpha_two_code: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganizationAttributes>>
     where
         P: TryInto<::iso_codes::CountryCode>,
         <P as TryInto<::iso_codes::CountryCode>>::Error: Into<validation_errors::SingleFieldError>,
@@ -110,7 +110,7 @@ impl InsertableOrganizationBuilder {
     pub fn state_province<P>(
         mut self,
         state_province: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganizationAttributes>>
     where
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
@@ -125,7 +125,7 @@ impl InsertableOrganizationBuilder {
     pub fn domain<P>(
         mut self,
         domain: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganizationAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -137,42 +137,32 @@ impl InsertableOrganizationBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableOrganizationBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableOrganizationAttributes>;
-    type Object = InsertableOrganization;
-    type Attribute = InsertableOrganizationAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+impl TryFrom<InsertableOrganizationBuilder> for InsertableOrganization {
+    type Error = common_traits::prelude::BuilderError<InsertableOrganizationAttributes>;
+    fn try_from(
+        builder: InsertableOrganizationBuilder,
+    ) -> Result<InsertableOrganization, Self::Error> {
+        Ok(Self {
+            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableOrganizationAttributes::Name,
             ))?,
-            url: self.url.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            url: builder.url.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableOrganizationAttributes::Url,
             ))?,
-            country: self.country.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableOrganizationAttributes::Country,
-            ))?,
-            alpha_two_code: self.alpha_two_code.ok_or(
+            country: builder.country.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableOrganizationAttributes::Country,
+                ),
+            )?,
+            alpha_two_code: builder.alpha_two_code.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableOrganizationAttributes::AlphaTwoCode,
                 ),
             )?,
-            state_province: self.state_province,
-            domain: self.domain.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            state_province: builder.state_province,
+            domain: builder.domain.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableOrganizationAttributes::Domain,
             ))?,
         })
-    }
-}
-impl TryFrom<InsertableOrganization> for InsertableOrganizationBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableOrganization) -> Result<Self, Self::Error> {
-        Self::default()
-            .name(insertable_variant.name)?
-            .url(insertable_variant.url)?
-            .country(insertable_variant.country)?
-            .alpha_two_code(insertable_variant.alpha_two_code)?
-            .state_province(insertable_variant.state_province)?
-            .domain(insertable_variant.domain)
     }
 }

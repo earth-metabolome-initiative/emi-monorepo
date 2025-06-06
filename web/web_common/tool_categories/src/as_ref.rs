@@ -12,7 +12,7 @@ impl AsRef<str> for crate::ToolCategory {
             Self::PreciseManipulationTool => "PreciseManipulationTool",
             Self::BreakingBeads => "BreakingBeads",
             Self::Gloves => "Gloves",
-            Self::HandCleaningAgent => "HandCleaningAgent",
+            Self::LiquidDispenser => "LiquidDispenser",
             Self::PaperTowels => "PaperTowels",
             Self::GraduatedCylinder => "GraduatedCylinder",
             Self::Pipette => "Pipette",

@@ -42,49 +42,101 @@ pub struct InsertableSpectraCollection {
     updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableSpectraCollection {
-    #[cfg(feature = "postgres")]
-    pub async fn trackable(
+    pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::trackables::Trackable, diesel::result::Error>
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
     {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::trackables::Trackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::trackables::trackables::dsl::id
-                    .eq(&self.trackable_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::trackables::Trackable>(conn)
-            .await
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.created_by,
+            ),
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub async fn created_by(
+    pub fn trackable<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.created_by),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                self.trackable_id,
+            ),
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub async fn updated_by(
+    pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.updated_by),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.updated_by,
+            ),
+            conn,
+        )
     }
 }
 pub struct InsertableSpectraCollectionBuilder {
@@ -110,7 +162,10 @@ impl Default for InsertableSpectraCollectionBuilder {
     }
 }
 impl InsertableSpectraCollectionBuilder {
-    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    pub fn id<P>(
+        mut self,
+        id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -124,7 +179,7 @@ impl InsertableSpectraCollectionBuilder {
     pub fn notes<P>(
         mut self,
         notes: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
     where
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
@@ -138,7 +193,7 @@ impl InsertableSpectraCollectionBuilder {
     pub fn trackable_id<P>(
         mut self,
         trackable_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
     where
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
@@ -154,7 +209,7 @@ impl InsertableSpectraCollectionBuilder {
     pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -169,7 +224,7 @@ impl InsertableSpectraCollectionBuilder {
     pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -186,7 +241,7 @@ impl InsertableSpectraCollectionBuilder {
     pub fn updated_by<P>(
         mut self,
         updated_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -200,7 +255,7 @@ impl InsertableSpectraCollectionBuilder {
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -215,54 +270,41 @@ impl InsertableSpectraCollectionBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableSpectraCollectionBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>;
-    type Object = InsertableSpectraCollection;
-    type Attribute = InsertableSpectraCollectionAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+impl TryFrom<InsertableSpectraCollectionBuilder> for InsertableSpectraCollection {
+    type Error = common_traits::prelude::BuilderError<InsertableSpectraCollectionAttributes>;
+    fn try_from(
+        builder: InsertableSpectraCollectionBuilder,
+    ) -> Result<InsertableSpectraCollection, Self::Error> {
+        Ok(Self {
+            id: builder.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableSpectraCollectionAttributes::Id,
             ))?,
-            notes: self.notes,
-            trackable_id: self.trackable_id.ok_or(
+            notes: builder.notes,
+            trackable_id: builder.trackable_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableSpectraCollectionAttributes::TrackableId,
                 ),
             )?,
-            created_by: self.created_by.ok_or(
+            created_by: builder.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableSpectraCollectionAttributes::CreatedBy,
                 ),
             )?,
-            created_at: self.created_at.ok_or(
+            created_at: builder.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableSpectraCollectionAttributes::CreatedAt,
                 ),
             )?,
-            updated_by: self.updated_by.ok_or(
+            updated_by: builder.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableSpectraCollectionAttributes::UpdatedBy,
                 ),
             )?,
-            updated_at: self.updated_at.ok_or(
+            updated_at: builder.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableSpectraCollectionAttributes::UpdatedAt,
                 ),
             )?,
         })
-    }
-}
-impl TryFrom<InsertableSpectraCollection> for InsertableSpectraCollectionBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableSpectraCollection) -> Result<Self, Self::Error> {
-        Self::default()
-            .id(insertable_variant.id)?
-            .notes(insertable_variant.notes)?
-            .trackable_id(insertable_variant.trackable_id)?
-            .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?
-            .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)
     }
 }

@@ -1,17 +1,24 @@
 //! Submodule providing utilities to create and manage documents.
-use common_traits::prelude::Builder;
-use diesel_async::AsyncConnection;
+use diesel::connection::LoadConnection;
 use web_common_traits::database::{InsertError, Insertable, InsertableVariant};
 
 use crate::{Document, tables::insertables::InsertableDocumentAttributes};
 
-#[cfg(feature = "postgres")]
 /// Returns the newly created photograph.
-pub async fn create_photograph(
+pub fn create_photograph<C: LoadConnection>(
     photograph: &[u8],
     user: &crate::User,
-    conn: &mut diesel_async::AsyncPgConnection,
-) -> Result<Document, InsertError<InsertableDocumentAttributes>> {
+    conn: &mut C,
+) -> Result<Document, InsertError<InsertableDocumentAttributes>>
+where
+    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
+    diesel::query_builder::InsertStatement<
+        <Document as diesel::associations::HasTable>::Table,
+        <<Document as Insertable>::InsertableVariant as diesel::Insertable<
+            <Document as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, Document>,
+{
     let info = infer::get(photograph).expect("Failed to infer document type");
 
     // TODO: add validation for the photograph.
@@ -20,21 +27,16 @@ pub async fn create_photograph(
     // database
     let document: Document = conn
         .transaction::<Document, InsertError<InsertableDocumentAttributes>, _>(|conn| {
-            Box::pin(async move {
-                let document: Document = crate::Document::new()
-                    .mime_type(info.mime_type())?
-                    .created_by(user.id)?
-                    .build()?
-                    .insert(&user.id, conn)
-                    .await?;
+            let document: Document = crate::Document::new()
+                .mime_type(info.mime_type())?
+                .created_by(user.id)?
+                .insert(user.id, conn)?;
 
-                // TODO: actually write the document to the file system
-                // Using `document.id` as the file name
+            // TODO: actually write the document to the file system
+            // Using `document.id` as the file name
 
-                Ok(document)
-            })
-        })
-        .await?;
+            Ok(document)
+        })?;
 
     Ok(document)
 }

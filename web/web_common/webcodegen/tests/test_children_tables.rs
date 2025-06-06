@@ -1,19 +1,19 @@
 //! Test suite for testing the `children_tables` method
 mod utils;
 
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use utils::*;
 use webcodegen::{errors::WebCodeGenError, *};
 
 async fn inner_test_children_tables(
-    conn: &mut AsyncPgConnection,
+    conn: &mut PgConnection,
     database_name: &str,
 ) -> Result<(), WebCodeGenError> {
-    let teams = Table::load(conn, "teams", None, database_name).await?;
-    let team_members = Table::load(conn, "team_members", None, database_name).await?;
-    let team_projects = Table::load(conn, "team_projects", None, database_name).await?;
+    let teams = Table::load(conn, "teams", None, database_name)?;
+    let team_members = Table::load(conn, "team_members", None, database_name)?;
+    let team_projects = Table::load(conn, "team_projects", None, database_name)?;
 
-    let children = teams.children_tables(conn).await?;
+    let children = teams.children_tables(conn)?;
     assert_eq!(children.len(), 2);
     assert_eq!(children, vec![team_members, team_projects]);
 

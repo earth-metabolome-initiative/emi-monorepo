@@ -32,7 +32,7 @@ impl InsertableRankBuilder {
     pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRankAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -46,7 +46,7 @@ impl InsertableRankBuilder {
     pub fn description<P>(
         mut self,
         description: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRankAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -59,26 +59,18 @@ impl InsertableRankBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableRankBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableRankAttributes>;
-    type Object = InsertableRank;
-    type Attribute = InsertableRankAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+impl TryFrom<InsertableRankBuilder> for InsertableRank {
+    type Error = common_traits::prelude::BuilderError<InsertableRankAttributes>;
+    fn try_from(builder: InsertableRankBuilder) -> Result<InsertableRank, Self::Error> {
+        Ok(Self {
+            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableRankAttributes::Name,
             ))?,
-            description: self.description.ok_or(
+            description: builder.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRankAttributes::Description,
                 ),
             )?,
         })
-    }
-}
-impl TryFrom<InsertableRank> for InsertableRankBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableRank) -> Result<Self, Self::Error> {
-        Self::default().name(insertable_variant.name)?.description(insertable_variant.description)
     }
 }

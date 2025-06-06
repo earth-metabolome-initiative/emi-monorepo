@@ -16,6 +16,9 @@ pub struct Color {
     pub description: String,
     pub id: i16,
 }
+impl web_common_traits::prelude::TableName for Color {
+    const TABLE_NAME: &'static str = "colors";
+}
 impl diesel::Identifiable for Color {
     type Id = i16;
     fn id(self) -> Self::Id {
@@ -24,47 +27,56 @@ impl diesel::Identifiable for Color {
 }
 impl Color {
     #[cfg(feature = "postgres")]
-    pub async fn from_name(
+    pub fn from_name(
         name: &str,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::colors::colors;
         Self::table()
-            .filter(crate::codegen::diesel_codegen::tables::colors::colors::name.eq(name))
+            .filter(colors::name.eq(name))
+            .order_by(colors::id.asc())
             .first::<Self>(conn)
-            .await
             .optional()
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_hexadecimal_value(
+    pub fn from_hexadecimal_value(
         hexadecimal_value: &str,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::colors::colors;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::colors::colors::hexadecimal_value
-                    .eq(hexadecimal_value),
-            )
+            .filter(colors::hexadecimal_value.eq(hexadecimal_value))
+            .order_by(colors::id.asc())
             .first::<Self>(conn)
-            .await
             .optional()
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_description(
+    pub fn from_description(
         description: &str,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::colors::colors;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::colors::colors::description.eq(description),
-            )
+            .filter(colors::description.eq(description))
+            .order_by(colors::id.asc())
             .first::<Self>(conn)
-            .await
             .optional()
+    }
+}
+impl AsRef<Color> for Color {
+    fn as_ref(&self) -> &Color {
+        self
     }
 }

@@ -1,13 +1,22 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableCommercialReagentAttributes {
-    Id,
+    Id(crate::codegen::structs_codegen::tables::insertables::InsertableProcessableAttributes),
     CommercialProductLotId,
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcessableAttributes>
+    for InsertableCommercialReagentAttributes
+{
+    fn from(
+        extension: crate::codegen::structs_codegen::tables::insertables::InsertableProcessableAttributes,
+    ) -> Self {
+        Self::Id(extension)
+    }
 }
 impl core::fmt::Display for InsertableCommercialReagentAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableCommercialReagentAttributes::Id => write!(f, "id"),
+            InsertableCommercialReagentAttributes::Id(id) => write!(f, "{}", id),
             InsertableCommercialReagentAttributes::CommercialProductLotId => {
                 write!(f, "commercial_product_lot_id")
             }
@@ -24,104 +33,240 @@ impl core::fmt::Display for InsertableCommercialReagentAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialReagent {
     id: ::rosetta_uuid::Uuid,
-    commercial_product_lot_id: i32,
+    commercial_product_lot_id: ::rosetta_uuid::Uuid,
 }
 impl InsertableCommercialReagent {
-    #[cfg(feature = "postgres")]
-    pub async fn id(
+    pub fn commercial_product_lot<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::processables::Processable,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::processables::Processable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::processables::processables::dsl::id
-                    .eq(&self.id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::processables::Processable>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn commercial_product_lot(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots::dsl::id
-                    .eq(&self.commercial_product_lot_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-            >(conn)
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::table(),
+                self.commercial_product_lot_id,
+            ),
+            conn,
+        )
+    }
+    pub fn id<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::processables::Processable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::processables::Processable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::processables::Processable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::processables::Processable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::processables::Processable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::processables::Processable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::processables::Processable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::processables::Processable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::processables::Processable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::processables::Processable::table(),
+                self.id,
+            ),
+            conn,
+        )
     }
 }
 #[derive(Default)]
 pub struct InsertableCommercialReagentBuilder {
-    id: Option<::rosetta_uuid::Uuid>,
-    commercial_product_lot_id: Option<i32>,
+    id: crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder,
+    commercial_product_lot_id: Option<::rosetta_uuid::Uuid>,
 }
 impl InsertableCommercialReagentBuilder {
-    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    pub fn commercial_product_lot_id<P>(
+        mut self,
+        commercial_product_lot_id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialReagentAttributes>>
     where
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let id = id.try_into().map_err(|err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-            Into::into(err).rename_field(InsertableCommercialReagentAttributes::Id)
-        })?;
-        self.id = Some(id);
+        let commercial_product_lot_id = commercial_product_lot_id.try_into().map_err(
+            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableCommercialReagentAttributes::CommercialProductLotId)
+            },
+        )?;
+        self.commercial_product_lot_id = Some(commercial_product_lot_id);
         Ok(self)
     }
-    pub fn commercial_product_lot_id<P>(
+    pub fn kilograms<P>(
         mut self,
-        commercial_product_lot_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+        kilograms: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialReagentAttributes>>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.kilograms(kilograms).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn id<P>(
+        mut self,
+        id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialReagentAttributes>>
+    where
+        P: TryInto<::rosetta_uuid::Uuid>,
+        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.id(id).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialReagentAttributes>>
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.name(name).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn description<P>(
+        mut self,
+        description: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialReagentAttributes>>
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.description(description).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn photograph_id<P>(
+        mut self,
+        photograph_id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialReagentAttributes>>
+    where
+        P: TryInto<Option<::rosetta_uuid::Uuid>>,
+        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.photograph_id(photograph_id).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn parent_id<P>(
+        mut self,
+        parent_id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialReagentAttributes>>
+    where
+        P: TryInto<Option<::rosetta_uuid::Uuid>>,
+        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.parent_id(parent_id).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn created_by<P>(
+        mut self,
+        created_by: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialReagentAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let commercial_product_lot_id =
-            commercial_product_lot_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-                Into::into(err)
-                    .rename_field(InsertableCommercialReagentAttributes::CommercialProductLotId)
-            })?;
-        self.commercial_product_lot_id = Some(commercial_product_lot_id);
+        self.id = self.id.created_by(created_by).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialReagentAttributes>>
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.created_at(created_at).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn updated_by<P>(
+        mut self,
+        updated_by: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialReagentAttributes>>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.updated_by(updated_by).map_err(|err| err.into_field_name())?;
+        Ok(self)
+    }
+    pub fn updated_at<P>(
+        mut self,
+        updated_at: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialReagentAttributes>>
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.updated_at(updated_at).map_err(|err| err.into_field_name())?;
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableCommercialReagentBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableCommercialReagentAttributes>;
-    type Object = InsertableCommercialReagent;
-    type Attribute = InsertableCommercialReagentAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableCommercialReagentAttributes::Id,
-            ))?,
+impl InsertableCommercialReagentBuilder {
+    pub(crate) fn try_insert<C>(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<
+        InsertableCommercialReagent,
+        web_common_traits::database::InsertError<InsertableCommercialReagentAttributes>,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::processables::Processable,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcessableAttributes,
+            >,
+        >,
+    {
+        use diesel::associations::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        Ok(InsertableCommercialReagent {
             commercial_product_lot_id: self.commercial_product_lot_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableCommercialReagentAttributes::CommercialProductLotId,
                 ),
             )?,
+            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
         })
-    }
-}
-impl TryFrom<InsertableCommercialReagent> for InsertableCommercialReagentBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableCommercialReagent) -> Result<Self, Self::Error> {
-        Self::default()
-            .id(insertable_variant.id)?
-            .commercial_product_lot_id(insertable_variant.commercial_product_lot_id)
     }
 }

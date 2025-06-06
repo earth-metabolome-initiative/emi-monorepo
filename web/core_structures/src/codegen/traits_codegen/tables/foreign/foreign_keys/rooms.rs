@@ -43,7 +43,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if addresses.id == self.addresses_id {
+                if self.addresses_id == addresses.id {
                     foreign_keys.addresses = Some(addresses);
                     updated = true;
                 }
@@ -52,7 +52,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::Address(addresses),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if addresses.id == self.addresses_id {
+                if self.addresses_id == addresses.id {
                     foreign_keys.addresses = None;
                     updated = true;
                 }
@@ -63,11 +63,11 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if users.id == self.created_by {
+                if self.created_by == users.id {
                     foreign_keys.created_by = Some(users.clone());
                     updated = true;
                 }
-                if users.id == self.updated_by {
+                if self.updated_by == users.id {
                     foreign_keys.updated_by = Some(users.clone());
                     updated = true;
                 }
@@ -76,11 +76,11 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if users.id == self.created_by {
+                if self.created_by == users.id {
                     foreign_keys.created_by = None;
                     updated = true;
                 }
-                if users.id == self.updated_by {
+                if self.updated_by == users.id {
                     foreign_keys.updated_by = None;
                     updated = true;
                 }

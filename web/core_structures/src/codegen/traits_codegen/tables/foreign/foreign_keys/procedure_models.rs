@@ -2,6 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProcedureModelForeignKeys {
     pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub photograph: Option<crate::codegen::structs_codegen::tables::documents::Document>,
     pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -16,12 +17,21 @@ impl web_common_traits::prelude::HasForeignKeys
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
         ));
+        if let Some(photograph_id) = self.photograph_id {
+            connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::Document(
+                    photograph_id,
+                ),
+            ));
+        }
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.updated_by),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.created_by.is_some() && foreign_keys.updated_by.is_some()
+        foreign_keys.created_by.is_some()
+            && (foreign_keys.photograph.is_some() || self.photograph_id.is_some())
+            && foreign_keys.updated_by.is_some()
     }
     fn update(
         &self,
@@ -32,16 +42,36 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
+                crate::codegen::tables::row::Row::Document(documents),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.photograph_id.is_some_and(|photograph_id| photograph_id == documents.id) {
+                    foreign_keys.photograph = Some(documents);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Document(documents),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.photograph_id.is_some_and(|photograph_id| photograph_id == documents.id) {
+                    foreign_keys.photograph = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if users.id == self.created_by {
+                if self.created_by == users.id {
                     foreign_keys.created_by = Some(users.clone());
                     updated = true;
                 }
-                if users.id == self.updated_by {
+                if self.updated_by == users.id {
                     foreign_keys.updated_by = Some(users.clone());
                     updated = true;
                 }
@@ -50,11 +80,11 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if users.id == self.created_by {
+                if self.created_by == users.id {
                     foreign_keys.created_by = None;
                     updated = true;
                 }
-                if users.id == self.updated_by {
+                if self.updated_by == users.id {
                     foreign_keys.updated_by = None;
                     updated = true;
                 }

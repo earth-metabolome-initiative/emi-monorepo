@@ -44,49 +44,101 @@ pub struct InsertableRoom {
     updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableRoom {
-    #[cfg(feature = "postgres")]
-    pub async fn addresses(
+    pub fn addresses<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::addresses::Address, diesel::result::Error>
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::addresses::Address,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::addresses::Address: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::addresses::Address as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::addresses::Address as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::addresses::Address as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::addresses::Address as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::addresses::Address as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::addresses::Address as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::addresses::Address,
+        >,
     {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::addresses::Address::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::addresses::addresses::dsl::id
-                    .eq(&self.addresses_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::addresses::Address>(conn)
-            .await
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::addresses::Address::table(),
+                self.addresses_id,
+            ),
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub async fn created_by(
+    pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.created_by),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.created_by,
+            ),
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub async fn updated_by(
+    pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.updated_by),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.updated_by,
+            ),
+            conn,
+        )
     }
 }
 pub struct InsertableRoomBuilder {
@@ -119,7 +171,7 @@ impl InsertableRoomBuilder {
     pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -135,7 +187,7 @@ impl InsertableRoomBuilder {
     pub fn description<P>(
         mut self,
         description: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -152,7 +204,7 @@ impl InsertableRoomBuilder {
     pub fn qrcode<P>(
         mut self,
         qrcode: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
     where
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
@@ -167,7 +219,7 @@ impl InsertableRoomBuilder {
     pub fn addresses_id<P>(
         mut self,
         addresses_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -181,7 +233,7 @@ impl InsertableRoomBuilder {
     pub fn geolocation<P>(
         mut self,
         geolocation: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
     where
         P: TryInto<postgis_diesel::types::Point>,
         <P as TryInto<postgis_diesel::types::Point>>::Error:
@@ -198,7 +250,7 @@ impl InsertableRoomBuilder {
     pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -213,7 +265,7 @@ impl InsertableRoomBuilder {
     pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -230,7 +282,7 @@ impl InsertableRoomBuilder {
     pub fn updated_by<P>(
         mut self,
         updated_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -244,7 +296,7 @@ impl InsertableRoomBuilder {
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -259,68 +311,51 @@ impl InsertableRoomBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableRoomBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableRoomAttributes>;
-    type Object = InsertableRoom;
-    type Attribute = InsertableRoomAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+impl TryFrom<InsertableRoomBuilder> for InsertableRoom {
+    type Error = common_traits::prelude::BuilderError<InsertableRoomAttributes>;
+    fn try_from(builder: InsertableRoomBuilder) -> Result<InsertableRoom, Self::Error> {
+        Ok(Self {
+            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableRoomAttributes::Name,
             ))?,
-            description: self.description.ok_or(
+            description: builder.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRoomAttributes::Description,
                 ),
             )?,
-            qrcode: self.qrcode.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            qrcode: builder.qrcode.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableRoomAttributes::Qrcode,
             ))?,
-            addresses_id: self.addresses_id.ok_or(
+            addresses_id: builder.addresses_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRoomAttributes::AddressesId,
                 ),
             )?,
-            geolocation: self.geolocation.ok_or(
+            geolocation: builder.geolocation.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRoomAttributes::Geolocation,
                 ),
             )?,
-            created_by: self.created_by.ok_or(
+            created_by: builder.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRoomAttributes::CreatedBy,
                 ),
             )?,
-            created_at: self.created_at.ok_or(
+            created_at: builder.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRoomAttributes::CreatedAt,
                 ),
             )?,
-            updated_by: self.updated_by.ok_or(
+            updated_by: builder.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRoomAttributes::UpdatedBy,
                 ),
             )?,
-            updated_at: self.updated_at.ok_or(
+            updated_at: builder.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableRoomAttributes::UpdatedAt,
                 ),
             )?,
         })
-    }
-}
-impl TryFrom<InsertableRoom> for InsertableRoomBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableRoom) -> Result<Self, Self::Error> {
-        Self::default()
-            .name(insertable_variant.name)?
-            .description(insertable_variant.description)?
-            .qrcode(insertable_variant.qrcode)?
-            .addresses_id(insertable_variant.addresses_id)?
-            .geolocation(insertable_variant.geolocation)?
-            .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?
-            .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)
     }
 }

@@ -3,8 +3,8 @@ name = "pgrx_validation"
 version = "0.0.0"
 edition = "2024"
 
-# [lib]
-# crate-type = ["cdylib", "lib"]
+[lib]
+crate-type = ["cdylib", "lib"]
 
 [[bin]]
 name = "pgrx_embed_pgrx_validation"
@@ -12,6 +12,7 @@ path = "./src/bin/pgrx_embed.rs"
 
 [dependencies]
 pgrx = { workspace = true, optional = true }
+chrono.workspace = true
 pgrx-tests = { workspace = true, optional = true }
 pgrx_validation_derive.workspace = true
 validation_errors.workspace = true

@@ -1,7 +1,7 @@
 //! Build the core structures.
 use std::path::Path;
 
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use init_db::init_database;
 use reference_docker::reference_docker_with_connection;
 use time_requirements::prelude::*;
@@ -10,17 +10,15 @@ use webcodegen::{Codegen, PgExtension, Table, errors::WebCodeGenError};
 pub(crate) const DATABASE_NAME: &str = "development.db";
 pub(crate) const DATABASE_PORT: u16 = 17032;
 
-async fn build_core_structures(
-    conn: &mut AsyncPgConnection,
-) -> Result<TimeTracker, WebCodeGenError> {
+async fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, WebCodeGenError> {
     // Generate the code associated with the database
     let out_dir = Path::new("../src");
-    let users = Table::load(conn, "users", None, DATABASE_NAME).await?;
-    let projects = Table::load(conn, "projects", None, DATABASE_NAME).await?;
-    let teams = Table::load(conn, "teams", None, DATABASE_NAME).await?;
-    let team_members = Table::load(conn, "team_members", None, DATABASE_NAME).await?;
-    let team_projects = Table::load(conn, "team_projects", None, DATABASE_NAME).await?;
-    let Some(pgrx_validation) = PgExtension::load("pgrx_validation", "public", conn).await? else {
+    let users = Table::load(conn, "users", None, DATABASE_NAME)?;
+    let projects = Table::load(conn, "projects", None, DATABASE_NAME)?;
+    let teams = Table::load(conn, "teams", None, DATABASE_NAME)?;
+    let team_members = Table::load(conn, "team_members", None, DATABASE_NAME)?;
+    let team_projects = Table::load(conn, "team_projects", None, DATABASE_NAME)?;
+    let Some(pgrx_validation) = PgExtension::load("pgrx_validation", "public", conn)? else {
         return Err(WebCodeGenError::MissingExtension("pgrx_validation".to_owned()));
     };
 
@@ -48,7 +46,6 @@ async fn build_core_structures(
         .enable_yew()
         .beautify()
         .generate(conn, DATABASE_NAME, None)
-        .await
 }
 
 #[tokio::main]

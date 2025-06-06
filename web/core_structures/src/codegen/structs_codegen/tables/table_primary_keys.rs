@@ -2,105 +2,79 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum TablePrimaryKey {
     Address(i32),
-    AliquotingInstrumentModel(i32),
-    AliquotingStepModel(i32),
-    AliquotingStep(::rosetta_uuid::Uuid),
-    BallMillStepModel(i32),
-    BallMillStep(::rosetta_uuid::Uuid),
+    AliquotingInstrumentModel(::rosetta_uuid::Uuid),
+    AliquotingProcedureModel(i32),
+    AliquotingProcedure(::rosetta_uuid::Uuid),
+    BallMillProcedureModel(i32),
     Brand(i32),
-    CentrifugeStepModel(i32),
-    CentrifugeStep(::rosetta_uuid::Uuid),
-    ChemicalEntity(i32),
+    CentrifugeProcedureModel(i32),
     City(i32),
     Color(i16),
-    CommercialProductLot(i32),
-    CommercialProduct(i32),
+    CommercialProductLot(::rosetta_uuid::Uuid),
+    CommercialProduct(::rosetta_uuid::Uuid),
     CommercialReagent(::rosetta_uuid::Uuid),
-    ContainerModel(i32),
+    ContainerModel(::rosetta_uuid::Uuid),
+    Container(::rosetta_uuid::Uuid),
     Country(::iso_codes::CountryCode),
-    DisposalStepModel(i32),
-    DisposalStep(::rosetta_uuid::Uuid),
-    DocumentFormat(i16),
+    DisposalProcedureModel(i32),
     Document(::rosetta_uuid::Uuid),
     EmailProvider((i32, i16)),
-    FractioningStepModel(i32),
-    FractioningStep(::rosetta_uuid::Uuid),
-    FreezeDryingStepModel(i32),
-    InstrumentLocation(i32),
-    InstrumentModelCategory(i32),
-    InstrumentModel(i32),
+    FractioningProcedureModel(i32),
+    FractioningProcedure(::rosetta_uuid::Uuid),
+    FreezeDryingProcedureModel(i32),
+    InstrumentModel(::rosetta_uuid::Uuid),
     InstrumentState(i16),
-    Instrument(i32),
+    Instrument(::rosetta_uuid::Uuid),
     LoginProvider(i16),
     Material(i16),
-    NameplateModel(i32),
+    MixCountableProcedureModel(i32),
+    MixSolidProcedureModel(i32),
+    NextProcedureModel((i32, i32, i32)),
     ObservationSubject(i16),
     OrganismObservation(::rosetta_uuid::Uuid),
-    OrganismSamplingStepModel(i32),
     OrganismTaxon((::rosetta_uuid::Uuid, i32)),
     Organism(::rosetta_uuid::Uuid),
     Organization(i16),
-    PackagingModel(i32),
-    PackagingStepModel(i32),
+    PackagingModel(::rosetta_uuid::Uuid),
+    PackagingProcedureModel(i32),
     ParentProcedureModel((i32, i32)),
     PermanenceCategory(i16),
-    ProcedureModelContainerCategory(i32),
-    ProcedureModelInstrumentCategory(i32),
-    ProcedureModelNameplateCategory(i32),
-    ProcedureModelToolCategory(i32),
+    PouringProcedureModel(i32),
+    ProcedureModelTrackable(i32),
     ProcedureModel(i32),
-    Procedure(i32),
+    ProcedureTrackable((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
+    Procedure(::rosetta_uuid::Uuid),
     Processable(::rosetta_uuid::Uuid),
-    ProcessingStep(::rosetta_uuid::Uuid),
+    ProcessingProcedure(::rosetta_uuid::Uuid),
     ProjectState(i16),
-    ProjectWorkflowModel(i32),
     Project(i32),
     Rank(i16),
-    Reagent(i32),
+    Reagent(::rosetta_uuid::Uuid),
     Role(i16),
     Room(i32),
     SampleState(i16),
-    SamplingStepModel(i32),
-    SamplingStep(::rosetta_uuid::Uuid),
-    ShakingStepModel(i32),
-    ShakingStep(::rosetta_uuid::Uuid),
+    SamplingProcedureModel(i32),
+    SamplingProcedure(::rosetta_uuid::Uuid),
+    ShakingProcedureModel(i32),
+    SharedProcedureModelTrackable((i32, i32)),
     SpatialRefSy(i32),
     Spectrum(i32),
     SpectraCollection(i32),
-    StepContainerModel(::rosetta_uuid::Uuid),
-    StepInstrument(::rosetta_uuid::Uuid),
-    StepModelContainerCategory(i32),
-    StepModelInstrumentCategory(i32),
-    StepModelInstrumentModel(i32),
-    StepModelInstrument(i32),
-    StepModelNameplateCategory(i32),
-    StepModelToolCategory(i32),
-    StepModelTrackableCategory(i32),
-    StepModel(i32),
-    StepNameplateModel(::rosetta_uuid::Uuid),
-    StepStorageContainer(::rosetta_uuid::Uuid),
-    StepToolModel(::rosetta_uuid::Uuid),
-    Step(::rosetta_uuid::Uuid),
-    StorageContainer(::rosetta_uuid::Uuid),
     Taxon(i32),
     TeamMember((i32, i32)),
     TeamProject((i32, i32)),
     TeamState(i16),
     Team(i32),
     TemporaryUser(i32),
-    ToolModel(i32),
-    TrackableCategory(i32),
     TrackableLocation(::rosetta_uuid::Uuid),
-    TrackableState(i16),
     Trackable(::rosetta_uuid::Uuid),
     Unit(i16),
     UserEmail(i32),
     UserOrganization((i32, i16)),
     User(i32),
     VolumetricProcessable(::rosetta_uuid::Uuid),
-    WeighingInstrumentModel(i32),
-    WeighingStepModel(i32),
-    WeighingStep(::rosetta_uuid::Uuid),
+    WeighingInstrumentModel(::rosetta_uuid::Uuid),
+    WeighingProcedureModel(i32),
 }
 impl web_common_traits::prelude::Tabular for TablePrimaryKey {
     type TableName = crate::codegen::tables::table_names::TableName;
@@ -110,27 +84,18 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::AliquotingInstrumentModel(_) => {
                 crate::codegen::tables::table_names::TableName::AliquotingInstrumentModel
             }
-            TablePrimaryKey::AliquotingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::AliquotingStepModel
+            TablePrimaryKey::AliquotingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::AliquotingProcedureModel
             }
-            TablePrimaryKey::AliquotingStep(_) => {
-                crate::codegen::tables::table_names::TableName::AliquotingStep
+            TablePrimaryKey::AliquotingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::AliquotingProcedure
             }
-            TablePrimaryKey::BallMillStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::BallMillStepModel
-            }
-            TablePrimaryKey::BallMillStep(_) => {
-                crate::codegen::tables::table_names::TableName::BallMillStep
+            TablePrimaryKey::BallMillProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::BallMillProcedureModel
             }
             TablePrimaryKey::Brand(_) => crate::codegen::tables::table_names::TableName::Brand,
-            TablePrimaryKey::CentrifugeStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::CentrifugeStepModel
-            }
-            TablePrimaryKey::CentrifugeStep(_) => {
-                crate::codegen::tables::table_names::TableName::CentrifugeStep
-            }
-            TablePrimaryKey::ChemicalEntity(_) => {
-                crate::codegen::tables::table_names::TableName::ChemicalEntity
+            TablePrimaryKey::CentrifugeProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::CentrifugeProcedureModel
             }
             TablePrimaryKey::City(_) => crate::codegen::tables::table_names::TableName::City,
             TablePrimaryKey::Color(_) => crate::codegen::tables::table_names::TableName::Color,
@@ -146,15 +111,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::ContainerModel(_) => {
                 crate::codegen::tables::table_names::TableName::ContainerModel
             }
+            TablePrimaryKey::Container(_) => {
+                crate::codegen::tables::table_names::TableName::Container
+            }
             TablePrimaryKey::Country(_) => crate::codegen::tables::table_names::TableName::Country,
-            TablePrimaryKey::DisposalStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::DisposalStepModel
-            }
-            TablePrimaryKey::DisposalStep(_) => {
-                crate::codegen::tables::table_names::TableName::DisposalStep
-            }
-            TablePrimaryKey::DocumentFormat(_) => {
-                crate::codegen::tables::table_names::TableName::DocumentFormat
+            TablePrimaryKey::DisposalProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::DisposalProcedureModel
             }
             TablePrimaryKey::Document(_) => {
                 crate::codegen::tables::table_names::TableName::Document
@@ -162,20 +124,14 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::EmailProvider(_) => {
                 crate::codegen::tables::table_names::TableName::EmailProvider
             }
-            TablePrimaryKey::FractioningStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::FractioningStepModel
+            TablePrimaryKey::FractioningProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::FractioningProcedureModel
             }
-            TablePrimaryKey::FractioningStep(_) => {
-                crate::codegen::tables::table_names::TableName::FractioningStep
+            TablePrimaryKey::FractioningProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::FractioningProcedure
             }
-            TablePrimaryKey::FreezeDryingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::FreezeDryingStepModel
-            }
-            TablePrimaryKey::InstrumentLocation(_) => {
-                crate::codegen::tables::table_names::TableName::InstrumentLocation
-            }
-            TablePrimaryKey::InstrumentModelCategory(_) => {
-                crate::codegen::tables::table_names::TableName::InstrumentModelCategory
+            TablePrimaryKey::FreezeDryingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::FreezeDryingProcedureModel
             }
             TablePrimaryKey::InstrumentModel(_) => {
                 crate::codegen::tables::table_names::TableName::InstrumentModel
@@ -192,17 +148,20 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::Material(_) => {
                 crate::codegen::tables::table_names::TableName::Material
             }
-            TablePrimaryKey::NameplateModel(_) => {
-                crate::codegen::tables::table_names::TableName::NameplateModel
+            TablePrimaryKey::MixCountableProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::MixCountableProcedureModel
+            }
+            TablePrimaryKey::MixSolidProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::MixSolidProcedureModel
+            }
+            TablePrimaryKey::NextProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::NextProcedureModel
             }
             TablePrimaryKey::ObservationSubject(_) => {
                 crate::codegen::tables::table_names::TableName::ObservationSubject
             }
             TablePrimaryKey::OrganismObservation(_) => {
                 crate::codegen::tables::table_names::TableName::OrganismObservation
-            }
-            TablePrimaryKey::OrganismSamplingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::OrganismSamplingStepModel
             }
             TablePrimaryKey::OrganismTaxon(_) => {
                 crate::codegen::tables::table_names::TableName::OrganismTaxon
@@ -216,8 +175,8 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::PackagingModel(_) => {
                 crate::codegen::tables::table_names::TableName::PackagingModel
             }
-            TablePrimaryKey::PackagingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::PackagingStepModel
+            TablePrimaryKey::PackagingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::PackagingProcedureModel
             }
             TablePrimaryKey::ParentProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::ParentProcedureModel
@@ -225,20 +184,17 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::PermanenceCategory(_) => {
                 crate::codegen::tables::table_names::TableName::PermanenceCategory
             }
-            TablePrimaryKey::ProcedureModelContainerCategory(_) => {
-                crate::codegen::tables::table_names::TableName::ProcedureModelContainerCategory
+            TablePrimaryKey::PouringProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::PouringProcedureModel
             }
-            TablePrimaryKey::ProcedureModelInstrumentCategory(_) => {
-                crate::codegen::tables::table_names::TableName::ProcedureModelInstrumentCategory
-            }
-            TablePrimaryKey::ProcedureModelNameplateCategory(_) => {
-                crate::codegen::tables::table_names::TableName::ProcedureModelNameplateCategory
-            }
-            TablePrimaryKey::ProcedureModelToolCategory(_) => {
-                crate::codegen::tables::table_names::TableName::ProcedureModelToolCategory
+            TablePrimaryKey::ProcedureModelTrackable(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureModelTrackable
             }
             TablePrimaryKey::ProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModel
+            }
+            TablePrimaryKey::ProcedureTrackable(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureTrackable
             }
             TablePrimaryKey::Procedure(_) => {
                 crate::codegen::tables::table_names::TableName::Procedure
@@ -246,14 +202,11 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::Processable(_) => {
                 crate::codegen::tables::table_names::TableName::Processable
             }
-            TablePrimaryKey::ProcessingStep(_) => {
-                crate::codegen::tables::table_names::TableName::ProcessingStep
+            TablePrimaryKey::ProcessingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::ProcessingProcedure
             }
             TablePrimaryKey::ProjectState(_) => {
                 crate::codegen::tables::table_names::TableName::ProjectState
-            }
-            TablePrimaryKey::ProjectWorkflowModel(_) => {
-                crate::codegen::tables::table_names::TableName::ProjectWorkflowModel
             }
             TablePrimaryKey::Project(_) => crate::codegen::tables::table_names::TableName::Project,
             TablePrimaryKey::Rank(_) => crate::codegen::tables::table_names::TableName::Rank,
@@ -263,17 +216,17 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::SampleState(_) => {
                 crate::codegen::tables::table_names::TableName::SampleState
             }
-            TablePrimaryKey::SamplingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::SamplingStepModel
+            TablePrimaryKey::SamplingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::SamplingProcedureModel
             }
-            TablePrimaryKey::SamplingStep(_) => {
-                crate::codegen::tables::table_names::TableName::SamplingStep
+            TablePrimaryKey::SamplingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::SamplingProcedure
             }
-            TablePrimaryKey::ShakingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::ShakingStepModel
+            TablePrimaryKey::ShakingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::ShakingProcedureModel
             }
-            TablePrimaryKey::ShakingStep(_) => {
-                crate::codegen::tables::table_names::TableName::ShakingStep
+            TablePrimaryKey::SharedProcedureModelTrackable(_) => {
+                crate::codegen::tables::table_names::TableName::SharedProcedureModelTrackable
             }
             TablePrimaryKey::SpatialRefSy(_) => {
                 crate::codegen::tables::table_names::TableName::SpatialRefSy
@@ -283,49 +236,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::SpectraCollection(_) => {
                 crate::codegen::tables::table_names::TableName::SpectraCollection
-            }
-            TablePrimaryKey::StepContainerModel(_) => {
-                crate::codegen::tables::table_names::TableName::StepContainerModel
-            }
-            TablePrimaryKey::StepInstrument(_) => {
-                crate::codegen::tables::table_names::TableName::StepInstrument
-            }
-            TablePrimaryKey::StepModelContainerCategory(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelContainerCategory
-            }
-            TablePrimaryKey::StepModelInstrumentCategory(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelInstrumentCategory
-            }
-            TablePrimaryKey::StepModelInstrumentModel(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelInstrumentModel
-            }
-            TablePrimaryKey::StepModelInstrument(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelInstrument
-            }
-            TablePrimaryKey::StepModelNameplateCategory(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelNameplateCategory
-            }
-            TablePrimaryKey::StepModelToolCategory(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelToolCategory
-            }
-            TablePrimaryKey::StepModelTrackableCategory(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelTrackableCategory
-            }
-            TablePrimaryKey::StepModel(_) => {
-                crate::codegen::tables::table_names::TableName::StepModel
-            }
-            TablePrimaryKey::StepNameplateModel(_) => {
-                crate::codegen::tables::table_names::TableName::StepNameplateModel
-            }
-            TablePrimaryKey::StepStorageContainer(_) => {
-                crate::codegen::tables::table_names::TableName::StepStorageContainer
-            }
-            TablePrimaryKey::StepToolModel(_) => {
-                crate::codegen::tables::table_names::TableName::StepToolModel
-            }
-            TablePrimaryKey::Step(_) => crate::codegen::tables::table_names::TableName::Step,
-            TablePrimaryKey::StorageContainer(_) => {
-                crate::codegen::tables::table_names::TableName::StorageContainer
             }
             TablePrimaryKey::Taxon(_) => crate::codegen::tables::table_names::TableName::Taxon,
             TablePrimaryKey::TeamMember(_) => {
@@ -341,17 +251,8 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::TemporaryUser(_) => {
                 crate::codegen::tables::table_names::TableName::TemporaryUser
             }
-            TablePrimaryKey::ToolModel(_) => {
-                crate::codegen::tables::table_names::TableName::ToolModel
-            }
-            TablePrimaryKey::TrackableCategory(_) => {
-                crate::codegen::tables::table_names::TableName::TrackableCategory
-            }
             TablePrimaryKey::TrackableLocation(_) => {
                 crate::codegen::tables::table_names::TableName::TrackableLocation
-            }
-            TablePrimaryKey::TrackableState(_) => {
-                crate::codegen::tables::table_names::TableName::TrackableState
             }
             TablePrimaryKey::Trackable(_) => {
                 crate::codegen::tables::table_names::TableName::Trackable
@@ -370,11 +271,8 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::WeighingInstrumentModel(_) => {
                 crate::codegen::tables::table_names::TableName::WeighingInstrumentModel
             }
-            TablePrimaryKey::WeighingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::WeighingStepModel
-            }
-            TablePrimaryKey::WeighingStep(_) => {
-                crate::codegen::tables::table_names::TableName::WeighingStep
+            TablePrimaryKey::WeighingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::WeighingProcedureModel
             }
         }
     }

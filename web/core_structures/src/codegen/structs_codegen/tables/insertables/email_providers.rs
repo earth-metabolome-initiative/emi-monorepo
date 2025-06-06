@@ -27,41 +27,69 @@ pub struct InsertableEmailProvider {
     login_provider_id: i16,
 }
 impl InsertableEmailProvider {
-    #[cfg(feature = "postgres")]
-    pub async fn email(
+    pub fn email<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::user_emails::UserEmail,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::user_emails::UserEmail::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::user_emails::user_emails::dsl::id
-                    .eq(&self.email_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::user_emails::UserEmail>(conn)
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::user_emails::UserEmail: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::user_emails::UserEmail as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::user_emails::UserEmail as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::user_emails::UserEmail as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::user_emails::UserEmail as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::user_emails::UserEmail as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::user_emails::UserEmail as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::user_emails::UserEmail,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::user_emails::UserEmail::table(),
+                self.email_id,
+            ),
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub async fn login_provider(
+    pub fn login_provider<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::login_providers::LoginProvider::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::login_providers::login_providers::dsl::id
-                    .eq(&self.login_provider_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::login_providers::LoginProvider>(conn)
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::login_providers::LoginProvider::table(),
+                self.login_provider_id,
+            ),
+            conn,
+        )
     }
 }
 #[derive(Default)]
@@ -73,7 +101,7 @@ impl InsertableEmailProviderBuilder {
     pub fn email_id<P>(
         mut self,
         email_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableEmailProviderAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -87,7 +115,7 @@ impl InsertableEmailProviderBuilder {
     pub fn login_provider_id<P>(
         mut self,
         login_provider_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableEmailProviderAttributes>>
     where
         P: TryInto<i16>,
         <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
@@ -100,30 +128,22 @@ impl InsertableEmailProviderBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableEmailProviderBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableEmailProviderAttributes>;
-    type Object = InsertableEmailProvider;
-    type Attribute = InsertableEmailProviderAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            email_id: self.email_id.ok_or(
+impl TryFrom<InsertableEmailProviderBuilder> for InsertableEmailProvider {
+    type Error = common_traits::prelude::BuilderError<InsertableEmailProviderAttributes>;
+    fn try_from(
+        builder: InsertableEmailProviderBuilder,
+    ) -> Result<InsertableEmailProvider, Self::Error> {
+        Ok(Self {
+            email_id: builder.email_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableEmailProviderAttributes::EmailId,
                 ),
             )?,
-            login_provider_id: self.login_provider_id.ok_or(
+            login_provider_id: builder.login_provider_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableEmailProviderAttributes::LoginProviderId,
                 ),
             )?,
         })
-    }
-}
-impl TryFrom<InsertableEmailProvider> for InsertableEmailProviderBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableEmailProvider) -> Result<Self, Self::Error> {
-        Self::default()
-            .email_id(insertable_variant.email_id)?
-            .login_provider_id(insertable_variant.login_provider_id)
     }
 }

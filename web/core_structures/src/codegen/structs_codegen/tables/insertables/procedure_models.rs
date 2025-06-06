@@ -3,8 +3,8 @@
 pub enum InsertableProcedureModelAttributes {
     Name,
     Description,
-    Repeatable,
     Deprecated,
+    PhotographId,
     Icon,
     CreatedBy,
     CreatedAt,
@@ -16,8 +16,10 @@ impl core::fmt::Display for InsertableProcedureModelAttributes {
         match self {
             InsertableProcedureModelAttributes::Name => write!(f, "name"),
             InsertableProcedureModelAttributes::Description => write!(f, "description"),
-            InsertableProcedureModelAttributes::Repeatable => write!(f, "repeatable"),
             InsertableProcedureModelAttributes::Deprecated => write!(f, "deprecated"),
+            InsertableProcedureModelAttributes::PhotographId => {
+                write!(f, "photograph_id")
+            }
             InsertableProcedureModelAttributes::Icon => write!(f, "icon"),
             InsertableProcedureModelAttributes::CreatedBy => write!(f, "created_by"),
             InsertableProcedureModelAttributes::CreatedAt => write!(f, "created_at"),
@@ -37,8 +39,8 @@ impl core::fmt::Display for InsertableProcedureModelAttributes {
 pub struct InsertableProcedureModel {
     name: String,
     description: String,
-    repeatable: bool,
     deprecated: bool,
+    photograph_id: Option<::rosetta_uuid::Uuid>,
     icon: String,
     created_by: i32,
     created_at: ::rosetta_timestamp::TimestampUTC,
@@ -46,40 +48,112 @@ pub struct InsertableProcedureModel {
     updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProcedureModel {
-    #[cfg(feature = "postgres")]
-    pub async fn created_by(
+    pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.created_by),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.created_by,
+            ),
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub async fn updated_by(
+    pub fn photograph<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.updated_by),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::documents::Document>,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::documents::Document: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::documents::Document as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::documents::Document as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::documents::Document as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::documents::Document as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::documents::Document as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::documents::Document as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::documents::Document,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(photograph_id) = self.photograph_id else {
+            return Ok(None);
+        };
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::documents::Document::table(),
+                photograph_id,
+            ),
+            conn,
+        )
+        .map(Some)
+    }
+    pub fn updated_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.updated_by,
+            ),
+            conn,
+        )
     }
 }
 pub struct InsertableProcedureModelBuilder {
     name: Option<String>,
     description: Option<String>,
-    repeatable: Option<bool>,
     deprecated: Option<bool>,
+    photograph_id: Option<::rosetta_uuid::Uuid>,
     icon: Option<String>,
     created_by: Option<i32>,
     created_at: Option<::rosetta_timestamp::TimestampUTC>,
@@ -91,8 +165,8 @@ impl Default for InsertableProcedureModelBuilder {
         Self {
             name: None,
             description: None,
-            repeatable: Some(false),
             deprecated: Some(false),
+            photograph_id: None,
             icon: Some("book".to_owned()),
             created_by: None,
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
@@ -105,7 +179,7 @@ impl InsertableProcedureModelBuilder {
     pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -129,7 +203,7 @@ impl InsertableProcedureModelBuilder {
     pub fn description<P>(
         mut self,
         description: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -151,24 +225,10 @@ impl InsertableProcedureModelBuilder {
         self.description = Some(description);
         Ok(self)
     }
-    pub fn repeatable<P>(
-        mut self,
-        repeatable: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
-    where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let repeatable = repeatable.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
-            Into::into(err).rename_field(InsertableProcedureModelAttributes::Repeatable)
-        })?;
-        self.repeatable = Some(repeatable);
-        Ok(self)
-    }
     pub fn deprecated<P>(
         mut self,
         deprecated: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
     where
         P: TryInto<bool>,
         <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
@@ -179,10 +239,27 @@ impl InsertableProcedureModelBuilder {
         self.deprecated = Some(deprecated);
         Ok(self)
     }
+    pub fn photograph_id<P>(
+        mut self,
+        photograph_id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
+    where
+        P: TryInto<Option<::rosetta_uuid::Uuid>>,
+        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let photograph_id = photograph_id.try_into().map_err(
+            |err: <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error| {
+                Into::into(err).rename_field(InsertableProcedureModelAttributes::PhotographId)
+            },
+        )?;
+        self.photograph_id = photograph_id;
+        Ok(self)
+    }
     pub fn icon<P>(
         mut self,
         icon: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -198,7 +275,7 @@ impl InsertableProcedureModelBuilder {
     pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -213,7 +290,7 @@ impl InsertableProcedureModelBuilder {
     pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -230,7 +307,7 @@ impl InsertableProcedureModelBuilder {
     pub fn updated_by<P>(
         mut self,
         updated_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -244,7 +321,7 @@ impl InsertableProcedureModelBuilder {
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -259,68 +336,49 @@ impl InsertableProcedureModelBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableProcedureModelBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableProcedureModelAttributes>;
-    type Object = InsertableProcedureModel;
-    type Attribute = InsertableProcedureModelAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+impl TryFrom<InsertableProcedureModelBuilder> for InsertableProcedureModel {
+    type Error = common_traits::prelude::BuilderError<InsertableProcedureModelAttributes>;
+    fn try_from(
+        builder: InsertableProcedureModelBuilder,
+    ) -> Result<InsertableProcedureModel, Self::Error> {
+        Ok(Self {
+            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableProcedureModelAttributes::Name,
             ))?,
-            description: self.description.ok_or(
+            description: builder.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelAttributes::Description,
                 ),
             )?,
-            repeatable: self.repeatable.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureModelAttributes::Repeatable,
-                ),
-            )?,
-            deprecated: self.deprecated.ok_or(
+            deprecated: builder.deprecated.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelAttributes::Deprecated,
                 ),
             )?,
-            icon: self.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            photograph_id: builder.photograph_id,
+            icon: builder.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableProcedureModelAttributes::Icon,
             ))?,
-            created_by: self.created_by.ok_or(
+            created_by: builder.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelAttributes::CreatedBy,
                 ),
             )?,
-            created_at: self.created_at.ok_or(
+            created_at: builder.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelAttributes::CreatedAt,
                 ),
             )?,
-            updated_by: self.updated_by.ok_or(
+            updated_by: builder.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelAttributes::UpdatedBy,
                 ),
             )?,
-            updated_at: self.updated_at.ok_or(
+            updated_at: builder.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelAttributes::UpdatedAt,
                 ),
             )?,
         })
-    }
-}
-impl TryFrom<InsertableProcedureModel> for InsertableProcedureModelBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableProcedureModel) -> Result<Self, Self::Error> {
-        Self::default()
-            .name(insertable_variant.name)?
-            .description(insertable_variant.description)?
-            .repeatable(insertable_variant.repeatable)?
-            .deprecated(insertable_variant.deprecated)?
-            .icon(insertable_variant.icon)?
-            .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?
-            .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)
     }
 }

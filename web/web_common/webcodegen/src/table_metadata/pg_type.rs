@@ -1,10 +1,9 @@
 //! Submodule providing the [`PgType`] struct and associated methods.
 
 use diesel::{
-    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
-    Selectable, SelectableHelper,
+    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, Queryable,
+    QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
-use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{Ident, Type, parse_str};
@@ -181,9 +180,9 @@ pub struct PgType {
 /// # Panics
 ///
 /// Panics if the type is not supported.
-pub async fn rust_type_str<S: AsRef<str>>(
+pub fn rust_type_str<S: AsRef<str>>(
     type_name: S,
-    conn: &mut AsyncPgConnection,
+    conn: &mut PgConnection,
 ) -> Result<&'static str, WebCodeGenError> {
     Ok(match type_name.as_ref() {
         // Numeric types
@@ -204,8 +203,8 @@ pub async fn rust_type_str<S: AsRef<str>>(
 
         // Temporal types
         "timestamp without time zone" => "::chrono::NaiveDateTime",
-        "timestamp with time zone" => {
-            let time_zone = PgSetting::time_zone(conn).await?;
+        "timestamp with time zone" | "timestamptz" => {
+            let time_zone = PgSetting::time_zone(conn)?;
             match time_zone.setting.as_str() {
                 "UTC" => "::rosetta_timestamp::TimestampUTC",
                 unknown_time_zone => {
@@ -405,12 +404,12 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn rust_type(
+    pub fn rust_type(
         &self,
         optional: bool,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<Type, WebCodeGenError> {
-        match rust_type_str(&self.typname, conn).await {
+        match rust_type_str(&self.typname, conn) {
             Ok(rust_type) => Ok(parse_str::<Type>(rust_type)?),
             Err(error) => {
                 if self.is_composite() || self.is_enum() {
@@ -424,11 +423,11 @@ impl PgType {
                     }
 
                     Ok(parse_str::<Type>(&struct_name)?)
-                } else if self.is_user_defined(conn).await? {
-                    let Some(base_type) = self.base_type(conn).await? else {
+                } else if self.is_user_defined(conn)? {
+                    let Some(base_type) = self.base_type(conn)? else {
                         return Err(WebCodeGenError::MissingBaseType(Box::new(self.clone())));
                     };
-                    Box::pin(base_type.rust_type(optional, conn)).await
+                    base_type.rust_type(optional, conn)
                 } else {
                     Err(error)
                 }
@@ -451,10 +450,10 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn diesel_type(
+    pub fn diesel_type(
         &self,
         nullable: bool,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<Type, WebCodeGenError> {
         let diesel_type = postgres_type_to_diesel(&self.typname, nullable);
         match diesel_type {
@@ -470,10 +469,10 @@ impl PgType {
                         full_name = format!("diesel::sql_types::Nullable<{full_name}>");
                     }
                     Ok(parse_str::<Type>(&full_name)?)
-                } else if self.is_user_defined(conn).await? {
-                    let base_type = self.base_type(conn).await?;
+                } else if self.is_user_defined(conn)? {
+                    let base_type = self.base_type(conn)?;
                     if let Some(base_type) = base_type {
-                        Box::pin(base_type.diesel_type(nullable, conn)).await
+                        base_type.diesel_type(nullable, conn)
                     } else {
                         Err(WebCodeGenError::MissingBaseType(Box::new(self.clone())))
                     }
@@ -498,9 +497,9 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn extension(
+    pub fn extension(
         &self,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<Option<PgExtension>, WebCodeGenError> {
         use diesel::OptionalExtension;
 
@@ -511,7 +510,6 @@ impl PgType {
             .inner_join(pg_extension::table.on(pg_extension::oid.eq(pg_depend::refobjid)))
             .select(PgExtension::as_select())
             .first::<PgExtension>(conn)
-            .await
             .optional()?)
     }
 
@@ -529,15 +527,15 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn internal_custom_types(
+    pub fn internal_custom_types(
         &self,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<Vec<PgType>, WebCodeGenError> {
         let mut internal_custom_types = Vec::new();
-        for attribute in self.attributes(conn).await? {
-            let pg_type = attribute.pg_type(conn).await?;
+        for attribute in self.attributes(conn)? {
+            let pg_type = attribute.pg_type(conn)?;
             if pg_type.is_composite() || pg_type.is_enum() {
-                internal_custom_types.extend(Box::pin(pg_type.internal_custom_types(conn)).await?);
+                internal_custom_types.extend(pg_type.internal_custom_types(conn)?);
                 internal_custom_types.push(pg_type);
             }
         }
@@ -559,19 +557,12 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn base_type(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<Option<PgType>, WebCodeGenError> {
+    pub fn base_type(&self, conn: &mut PgConnection) -> Result<Option<PgType>, WebCodeGenError> {
         if self.typbasetype == 0 {
             Ok(None)
         } else {
             use crate::schema::pg_type;
-            Ok(pg_type::table
-                .filter(pg_type::oid.eq(self.typbasetype))
-                .first::<PgType>(conn)
-                .await
-                .ok())
+            Ok(pg_type::table.filter(pg_type::oid.eq(self.typbasetype)).first::<PgType>(conn).ok())
         }
     }
 
@@ -616,11 +607,8 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn is_user_defined(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<bool, WebCodeGenError> {
-        Ok(&self.typcategory == "U" && self.base_type(conn).await?.is_some())
+    pub fn is_user_defined(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(&self.typcategory == "U" && self.base_type(conn)?.is_some())
     }
 
     #[must_use]
@@ -649,26 +637,19 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn supports_copy(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<bool, WebCodeGenError> {
+    pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         if self.is_composite() {
             let mut supports_copy = true;
-            for attribute in self.attributes(conn).await? {
-                supports_copy &= attribute.supports_copy(conn).await?;
+            for attribute in self.attributes(conn)? {
+                supports_copy &= attribute.supports_copy(conn)?;
             }
             Ok(supports_copy)
-        } else if self.is_user_defined(conn).await? {
-            Box::pin(
-                self.base_type(conn)
-                    .await?
-                    .ok_or(WebCodeGenError::MissingBaseType(Box::new(self.clone())))?
-                    .supports_copy(conn),
-            )
-            .await
+        } else if self.is_user_defined(conn)? {
+            self.base_type(conn)?
+                .ok_or(WebCodeGenError::MissingBaseType(Box::new(self.clone())))?
+                .supports_copy(conn)
         } else {
-            Ok(COPY_TYPES.contains(&rust_type_str(&self.typname, conn).await?))
+            Ok(COPY_TYPES.contains(&rust_type_str(&self.typname, conn)?))
         }
     }
 
@@ -686,18 +667,15 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn supports_hash(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<bool, WebCodeGenError> {
-        if self.is_user_defined(conn).await? || self.is_composite() {
+    pub fn supports_hash(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        if self.is_user_defined(conn)? || self.is_composite() {
             let mut supports_hash = true;
-            for attribute in self.attributes(conn).await? {
-                supports_hash &= attribute.supports_hash(conn).await?;
+            for attribute in self.attributes(conn)? {
+                supports_hash &= attribute.supports_hash(conn)?;
             }
             Ok(supports_hash)
         } else {
-            Ok(HASH_TYPES.contains(&rust_type_str(&self.typname, conn).await?))
+            Ok(HASH_TYPES.contains(&rust_type_str(&self.typname, conn)?))
         }
     }
 
@@ -715,15 +693,15 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn supports_eq(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
-        if self.is_user_defined(conn).await? || self.is_composite() {
+    pub fn supports_eq(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        if self.is_user_defined(conn)? || self.is_composite() {
             let mut supports_eq = true;
-            for attribute in self.attributes(conn).await? {
-                supports_eq &= attribute.supports_eq(conn).await?;
+            for attribute in self.attributes(conn)? {
+                supports_eq &= attribute.supports_eq(conn)?;
             }
             Ok(supports_eq)
         } else {
-            Ok(EQ_TYPES.contains(&rust_type_str(&self.typname, conn).await?))
+            Ok(EQ_TYPES.contains(&rust_type_str(&self.typname, conn)?))
         }
     }
 
@@ -741,18 +719,15 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn supports_ord(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<bool, WebCodeGenError> {
-        if self.is_user_defined(conn).await? || self.is_composite() {
+    pub fn supports_ord(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        if self.is_user_defined(conn)? || self.is_composite() {
             let mut supports_ord = true;
-            for attribute in self.attributes(conn).await? {
-                supports_ord &= attribute.supports_ord(conn).await?;
+            for attribute in self.attributes(conn)? {
+                supports_ord &= attribute.supports_ord(conn)?;
             }
             Ok(supports_ord)
         } else {
-            Ok(ORD_TYPES.contains(&rust_type_str(&self.typname, conn).await?))
+            Ok(ORD_TYPES.contains(&rust_type_str(&self.typname, conn)?))
         }
     }
 
@@ -802,19 +777,19 @@ impl PgType {
     /// # Panics
     ///
     /// * If it is unknown how to implement the associated struct or enum.
-    pub async fn to_struct_or_enum(
+    pub fn to_struct_or_enum(
         &self,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
         let struct_name = Ident::new(&self.camelcased_name(), proc_macro2::Span::call_site());
-        let postgres_struct_name = self.diesel_type(false, conn).await?;
+        let postgres_struct_name = self.diesel_type(false, conn)?;
         if self.is_composite() {
             let mut fields = Vec::new();
-            let attributes = self.attributes(conn).await?;
+            let attributes = self.attributes(conn)?;
             for attribute in &attributes {
                 let field_name = Ident::new(&attribute.attname, proc_macro2::Span::call_site());
-                let field_pg_type = attribute.pg_type(conn).await?;
-                let field_type = field_pg_type.rust_type(false, conn).await?;
+                let field_pg_type = attribute.pg_type(conn)?;
+                let field_type = field_pg_type.rust_type(false, conn)?;
 
                 fields.push(quote! {
                     pub #field_name: #field_type
@@ -827,15 +802,15 @@ impl PgType {
                 Ident::new("PartialEq", proc_macro2::Span::call_site()),
             ];
 
-            if self.supports_eq(conn).await? {
+            if self.supports_eq(conn)? {
                 derives.push(Ident::new("Eq", proc_macro2::Span::call_site()));
             }
 
-            if self.supports_hash(conn).await? {
+            if self.supports_hash(conn)? {
                 derives.push(Ident::new("Hash", proc_macro2::Span::call_site()));
             }
 
-            if self.supports_copy(conn).await? {
+            if self.supports_copy(conn)? {
                 derives.push(Ident::new("Copy", proc_macro2::Span::call_site()));
             }
 
@@ -849,7 +824,7 @@ impl PgType {
                 }
             })
         } else if self.is_enum() {
-            let variants = self.variants(conn).await?;
+            let variants = self.variants(conn)?;
             let mut variant_names = Vec::new();
             for variant in &variants {
                 let variant_name = Ident::new(&variant.enumlabel, proc_macro2::Span::call_site());
@@ -921,30 +896,27 @@ impl PgType {
     /// # Panics
     ///
     /// * If it is unknown what type implementations are needed.
-    pub async fn to_diesel_impls(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<TokenStream, WebCodeGenError> {
-        let diesel_struct_path = self.diesel_type(false, conn).await?;
-        let rust_struct_path = self.rust_type(false, conn).await?;
+    pub fn to_diesel_impls(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
+        let diesel_struct_path = self.diesel_type(false, conn)?;
+        let rust_struct_path = self.rust_type(false, conn)?;
         if self.is_composite() {
             let mut diesel_types = Vec::new();
             let mut rust_types = Vec::new();
             let mut struct_attributes = Vec::new();
             let mut field_names = Vec::new();
-            let attributes = self.attributes(conn).await?;
+            let attributes = self.attributes(conn)?;
             for attribute in &attributes {
                 let field_name = Ident::new(&attribute.attname, proc_macro2::Span::call_site());
-                let field_pg_type = attribute.pg_type(conn).await?;
-                let field_type = field_pg_type.rust_type(false, conn).await?;
+                let field_pg_type = attribute.pg_type(conn)?;
+                let field_type = field_pg_type.rust_type(false, conn)?;
                 field_names.push(quote! {
                     #field_name
                 });
                 rust_types.push(quote! {
                     #field_type
                 });
-                let diesel_type = field_pg_type.diesel_type(attribute.attnotnull, conn).await?;
-                if field_pg_type.supports_copy(conn).await? || attributes.len() == 1 {
+                let diesel_type = field_pg_type.diesel_type(attribute.attnotnull, conn)?;
+                if field_pg_type.supports_copy(conn)? || attributes.len() == 1 {
                     struct_attributes.push(quote! {
                         self.#field_name
                     });
@@ -1009,7 +981,7 @@ impl PgType {
                 }
             })
         } else if self.is_enum() {
-            let variants = self.variants(conn).await?;
+            let variants = self.variants(conn)?;
             let mut in_variants = Vec::new();
             let mut out_variants = Vec::new();
             for variant in &variants {
@@ -1067,12 +1039,9 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn from_name(
-        type_name: &str,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<Self, WebCodeGenError> {
+    pub fn from_name(type_name: &str, conn: &mut PgConnection) -> Result<Self, WebCodeGenError> {
         use crate::schema::pg_type;
-        Ok(pg_type::table.filter(pg_type::typname.eq(type_name)).first::<PgType>(conn).await?)
+        Ok(pg_type::table.filter(pg_type::typname.eq(type_name)).first::<PgType>(conn)?)
     }
 
     /// Returns whether the [`PgType`] is a boolean.
@@ -1088,8 +1057,8 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn is_boolean(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(rust_type_str(&self.typname, conn).await? == "bool")
+    pub fn is_boolean(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "bool")
     }
 
     /// Returns whether the [`PgType`] is a text type.
@@ -1106,8 +1075,8 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn is_text(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(rust_type_str(&self.typname, conn).await? == "String")
+    pub fn is_text(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "String")
     }
 
     /// Returns whether the [`PgType`] is an i16 type.
@@ -1124,8 +1093,8 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn is_i16(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(rust_type_str(&self.typname, conn).await? == "i16")
+    pub fn is_i16(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "i16")
     }
 
     /// Returns whether the [`PgType`] is an i32 type.
@@ -1142,8 +1111,8 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn is_i32(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(rust_type_str(&self.typname, conn).await? == "i32")
+    pub fn is_i32(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "i32")
     }
 
     /// Returns whether the [`PgType`] is an i64 type.
@@ -1160,8 +1129,8 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn is_i64(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(rust_type_str(&self.typname, conn).await? == "i64")
+    pub fn is_i64(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "i64")
     }
 
     /// Returns whether the [`PgType`] is a u16 type.
@@ -1177,8 +1146,8 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn is_u16(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(rust_type_str(&self.typname, conn).await? == "u16")
+    pub fn is_u16(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "u16")
     }
 
     /// Returns whether the [`PgType`] is a u32 type.
@@ -1194,8 +1163,8 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn is_u32(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(rust_type_str(&self.typname, conn).await? == "u32")
+    pub fn is_u32(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "u32")
     }
 
     /// Returns whether the [`PgType`] is a u64 type.
@@ -1211,8 +1180,8 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn is_u64(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(rust_type_str(&self.typname, conn).await? == "u64")
+    pub fn is_u64(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "u64")
     }
 
     /// Returns whether the [`PgType`] is an f32 type.
@@ -1229,8 +1198,8 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn is_f32(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(rust_type_str(&self.typname, conn).await? == "f32")
+    pub fn is_f32(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "f32")
     }
 
     /// Returns whether the [`PgType`] is an f64 type.
@@ -1247,8 +1216,8 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn is_f64(&self, conn: &mut AsyncPgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(rust_type_str(&self.typname, conn).await? == "f64")
+    pub fn is_f64(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(rust_type_str(&self.typname, conn)? == "f64")
     }
 
     /// Returns the [`PgType`] struct from the given OID.
@@ -1266,12 +1235,9 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn from_oid(
-        oid: u32,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<Self, diesel::result::Error> {
+    pub fn from_oid(oid: u32, conn: &mut PgConnection) -> Result<Self, diesel::result::Error> {
         use crate::schema::pg_type;
-        pg_type::table.filter(pg_type::oid.eq(oid)).first::<PgType>(conn).await
+        pg_type::table.filter(pg_type::oid.eq(oid)).first::<PgType>(conn)
     }
 
     /// Returns the attributes of the type, if it is a composite type.
@@ -1288,18 +1254,14 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn attributes(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<Vec<PgAttribute>, WebCodeGenError> {
+    pub fn attributes(&self, conn: &mut PgConnection) -> Result<Vec<PgAttribute>, WebCodeGenError> {
         use crate::schema::{pg_attribute, pg_type};
 
         Ok(pg_attribute::table
             .inner_join(pg_type::table.on(pg_attribute::attrelid.eq(pg_type::typrelid)))
             .filter(pg_type::typname.eq(&self.typname).and(pg_attribute::attisdropped.eq(false)))
             .select(PgAttribute::as_select())
-            .load::<PgAttribute>(conn)
-            .await?)
+            .load::<PgAttribute>(conn)?)
     }
 
     /// Returns the variants of the type, if it is an enum type.
@@ -1316,18 +1278,14 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn variants(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<Vec<PgEnum>, WebCodeGenError> {
+    pub fn variants(&self, conn: &mut PgConnection) -> Result<Vec<PgEnum>, WebCodeGenError> {
         use crate::schema::pg_enum;
 
         Ok(pg_enum::table
             .filter(pg_enum::enumtypid.eq(self.oid))
             .order_by(pg_enum::enumsortorder)
             .select(PgEnum::as_select())
-            .load::<PgEnum>(conn)
-            .await?)
+            .load::<PgEnum>(conn)?)
     }
 
     /// Returns all the postgres types in the database.
@@ -1339,9 +1297,9 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub async fn load_all(conn: &mut AsyncPgConnection) -> Result<Vec<PgType>, WebCodeGenError> {
+    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<PgType>, WebCodeGenError> {
         use crate::schema::pg_type;
 
-        Ok(pg_type::table.select(PgType::as_select()).load::<PgType>(conn).await?)
+        Ok(pg_type::table.select(PgType::as_select()).load::<PgType>(conn)?)
     }
 }

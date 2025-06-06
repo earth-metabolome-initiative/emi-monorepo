@@ -1,7 +1,7 @@
 //! Submodule providing an utility to retrieve or insert a room.
 
 use core_structures::Room as PortalRoom;
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use web_common_traits::{
     database::{Insertable, InsertableVariant},
     prelude::Builder,
@@ -12,8 +12,8 @@ use crate::codegen::Room as DirectusRoom;
 
 pub(crate) async fn get_room(
     directus_room: &DirectusRoom,
-    directus_conn: &mut AsyncPgConnection,
-    portal_conn: &mut AsyncPgConnection,
+    directus_conn: &mut PgConnection,
+    portal_conn: &mut PgConnection,
 ) -> Result<PortalRoom, crate::error::Error> {
     if let Some(room) = PortalRoom::from_qrcode(&directus_room.qr_code, portal_conn).await? {
         Ok(room)

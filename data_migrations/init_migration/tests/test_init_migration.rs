@@ -1,11 +1,11 @@
 //! Test to check whether the database can indeed be initialized in the
 //! reference docker and populated with the `init_migration`.
 
-use core_structures::LoginProvider;
+use core_structures::{LoginProvider, ProcedureModel, traits::ProcedureModelDot};
 use init_db::init_database;
-use init_migration::init_migration;
+use init_migration::{DBGI_PLAN, init_migration};
 use reference_docker::reference_docker_with_connection;
-use web_common_traits::database::AsyncBoundedRead;
+use web_common_traits::database::BoundedRead;
 
 const DATABASE_NAME: &str = "test_init_migration.db";
 const DATABASE_PORT: u16 = 12132;
@@ -26,12 +26,12 @@ async fn test_init_migration() {
     }
 
     // We try to populate the DB with the init initialization
-    if let Err(err) = init_migration(&mut conn).await {
+    if let Err(err) = init_migration(&mut conn) {
         docker.stop().await.expect("Failed to stop the docker container");
         panic!("Failed to initialize the database: {err:?}");
     }
 
-    match LoginProvider::read_all_async(&mut conn).await {
+    match LoginProvider::bounded_read(0, 16, &mut conn) {
         Ok(login_providers) => {
             if login_providers.len() != 1 {
                 docker.stop().await.expect("Failed to stop the docker container");
@@ -43,6 +43,17 @@ async fn test_init_migration() {
             panic!("Failed to read login providers: {err:?}");
         }
     }
+
+    let procedure_model = ProcedureModel::from_name(DBGI_PLAN, &mut conn)
+        .expect("Failed to find the procedure model")
+        .unwrap();
+
+    let dot = procedure_model
+        .to_dot(&mut conn)
+        .expect("Failed to convert the procedure model to DOT format");
+
+    // We write out the DOT file to a file.
+    std::fs::write("test_init_migration.dot", dot).expect("Failed to write the DOT file");
 
     docker.stop().await.expect("Failed to stop the docker container");
 }

@@ -29,17 +29,37 @@ pub struct InsertableTaxon {
     rank_id: i16,
 }
 impl InsertableTaxon {
-    #[cfg(feature = "postgres")]
-    pub async fn rank(
+    pub fn rank<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::ranks::Rank, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::ranks::Rank::table()
-            .filter(crate::codegen::diesel_codegen::tables::ranks::ranks::dsl::id.eq(&self.rank_id))
-            .first::<crate::codegen::structs_codegen::tables::ranks::Rank>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::ranks::Rank,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::ranks::Rank: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::ranks::Rank as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::ranks::Rank as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::ranks::Rank as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::ranks::Rank as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::ranks::Rank as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::ranks::Rank as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::ranks::Rank,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::ranks::Rank::table(),
+                self.rank_id,
+            ),
+            conn,
+        )
     }
 }
 #[derive(Default)]
@@ -50,7 +70,10 @@ pub struct InsertableTaxonBuilder {
     rank_id: Option<i16>,
 }
 impl InsertableTaxonBuilder {
-    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    pub fn id<P>(
+        mut self,
+        id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTaxonAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -64,7 +87,7 @@ impl InsertableTaxonBuilder {
     pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTaxonAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -78,7 +101,7 @@ impl InsertableTaxonBuilder {
     pub fn parent_id<P>(
         mut self,
         parent_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTaxonAttributes>>
     where
         P: TryInto<Option<i32>>,
         <P as TryInto<Option<i32>>>::Error: Into<validation_errors::SingleFieldError>,
@@ -93,7 +116,7 @@ impl InsertableTaxonBuilder {
     pub fn rank_id<P>(
         mut self,
         rank_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTaxonAttributes>>
     where
         P: TryInto<i16>,
         <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
@@ -105,32 +128,22 @@ impl InsertableTaxonBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableTaxonBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableTaxonAttributes>;
-    type Object = InsertableTaxon;
-    type Attribute = InsertableTaxonAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+impl TryFrom<InsertableTaxonBuilder> for InsertableTaxon {
+    type Error = common_traits::prelude::BuilderError<InsertableTaxonAttributes>;
+    fn try_from(builder: InsertableTaxonBuilder) -> Result<InsertableTaxon, Self::Error> {
+        Ok(Self {
+            id: builder.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableTaxonAttributes::Id,
             ))?,
-            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableTaxonAttributes::Name,
             ))?,
-            parent_id: self.parent_id,
-            rank_id: self.rank_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableTaxonAttributes::RankId,
-            ))?,
+            parent_id: builder.parent_id,
+            rank_id: builder.rank_id.ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    InsertableTaxonAttributes::RankId,
+                ),
+            )?,
         })
-    }
-}
-impl TryFrom<InsertableTaxon> for InsertableTaxonBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableTaxon) -> Result<Self, Self::Error> {
-        Self::default()
-            .id(insertable_variant.id)?
-            .name(insertable_variant.name)?
-            .parent_id(insertable_variant.parent_id)?
-            .rank_id(insertable_variant.rank_id)
     }
 }

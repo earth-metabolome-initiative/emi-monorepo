@@ -38,13 +38,12 @@ impl ContainerModel {
     #[cfg(feature = "postgres")]
     pub async fn user_created(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
@@ -60,13 +59,12 @@ impl ContainerModel {
     #[cfg(feature = "postgres")]
     pub async fn user_updated(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
@@ -82,13 +80,12 @@ impl ContainerModel {
     #[cfg(feature = "postgres")]
     pub async fn container_type(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         crate::codegen::structs_codegen::tables::container_types::ContainerType,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         crate::codegen::structs_codegen::tables::container_types::ContainerType::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::container_types::container_types::dsl::id
@@ -100,11 +97,10 @@ impl ContainerModel {
     #[cfg(feature = "postgres")]
     pub async fn volume_unit(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<crate::codegen::structs_codegen::tables::si_units::SiUnit, diesel::result::Error>
     {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         crate::codegen::structs_codegen::tables::si_units::SiUnit::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::si_units::si_units::dsl::id
@@ -116,10 +112,9 @@ impl ContainerModel {
     #[cfg(feature = "postgres")]
     pub async fn brand(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<crate::codegen::structs_codegen::tables::brands::Brand, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         crate::codegen::structs_codegen::tables::brands::Brand::table()
             .filter(crate::codegen::diesel_codegen::tables::brands::brands::dsl::id.eq(&self.brand))
             .first::<crate::codegen::structs_codegen::tables::brands::Brand>(conn)
@@ -127,11 +122,10 @@ impl ContainerModel {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_user_created(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::user_created
@@ -142,11 +136,10 @@ impl ContainerModel {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_user_updated(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::user_updated
@@ -157,11 +150,10 @@ impl ContainerModel {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_container_type(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         container_type: &crate::codegen::structs_codegen::tables::container_types::ContainerType,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::container_type
@@ -172,11 +164,10 @@ impl ContainerModel {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_volume_unit(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         volume_unit: &crate::codegen::structs_codegen::tables::si_units::SiUnit,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::volume_unit
@@ -187,11 +178,10 @@ impl ContainerModel {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_brand(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         brand: &crate::codegen::structs_codegen::tables::brands::Brand,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::brand

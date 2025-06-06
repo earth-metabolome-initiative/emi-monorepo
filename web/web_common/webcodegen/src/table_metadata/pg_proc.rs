@@ -1,10 +1,9 @@
 //! Submodule providing a struct [`PgProc`] representing the `pg_proc` table.
 
 use diesel::{
-    ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, Queryable, QueryableByName,
-    Selectable, SelectableHelper,
+    ExpressionMethods, JoinOnDsl, OptionalExtension, PgConnection, QueryDsl, Queryable,
+    QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
-use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use syn::punctuated::Punctuated;
 
 use super::PgType;
@@ -86,16 +85,13 @@ impl PgProc {
     /// # Errors
     ///
     /// * If the return type does not exist.
-    pub async fn returns_result(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<bool, WebCodeGenError> {
+    pub fn returns_result(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         if self.proname.starts_with("must_be_")
             || self.proname.starts_with("must_not_be_")
             || self.proname.starts_with("must_contain_")
             || self.proname.starts_with("must_not_contain_")
         {
-            Ok(self.return_type(conn).await?.is_boolean(conn).await?)
+            Ok(self.return_type(conn)?.is_boolean(conn)?)
         } else {
             Ok(false)
         }
@@ -111,13 +107,13 @@ impl PgProc {
     /// # Errors
     ///
     /// * If the provided connection is invalid.
-    pub async fn argument_types(
+    pub fn argument_types(
         &self,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<Vec<PgType>, diesel::result::Error> {
         let mut arg_types = Vec::new();
         for oid in &self.proargtypes {
-            let arg_type = PgType::from_oid(*oid, conn).await?;
+            let arg_type = PgType::from_oid(*oid, conn)?;
             arg_types.push(arg_type);
         }
         Ok(arg_types)
@@ -132,11 +128,8 @@ impl PgProc {
     /// # Errors
     ///
     /// * If the return type does not exist.
-    pub async fn return_type(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<PgType, diesel::result::Error> {
-        PgType::from_oid(self.prorettype, conn).await
+    pub fn return_type(&self, conn: &mut PgConnection) -> Result<PgType, diesel::result::Error> {
+        PgType::from_oid(self.prorettype, conn)
     }
 
     /// Returns the [`PgProc`] associated to the given `name` and `namespace`.
@@ -150,10 +143,10 @@ impl PgProc {
     /// # Errors
     ///
     /// * If the function does not exist.
-    pub async fn load(
+    pub fn load(
         name: &str,
         namespace: &str,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<Option<PgProc>, diesel::result::Error> {
         use crate::schema::pg_proc;
         pg_proc::table
@@ -165,7 +158,6 @@ impl PgProc {
             .filter(crate::schema::pg_namespace::nspname.eq(namespace))
             .select(PgProc::as_select())
             .first::<PgProc>(conn)
-            .await
             .optional()
     }
 
@@ -179,9 +171,9 @@ impl PgProc {
     /// # Errors
     ///
     /// * If the function is not contained in an extension
-    pub async fn extension(
+    pub fn extension(
         &self,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<Option<PgExtension>, diesel::result::Error> {
         use crate::schema::{pg_depend, pg_extension};
         pg_extension::table
@@ -189,7 +181,6 @@ impl PgProc {
             .filter(pg_depend::objid.eq(self.oid))
             .select(PgExtension::as_select())
             .first::<PgExtension>(conn)
-            .await
             .optional()
     }
 
@@ -204,11 +195,8 @@ impl PgProc {
     ///
     /// * If the database connection is invalid.
     /// * If the function is not contained in an extension.
-    pub async fn path(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<syn::Path, diesel::result::Error> {
-        let extension = self.extension(conn).await?;
+    pub fn path(&self, conn: &mut PgConnection) -> Result<syn::Path, diesel::result::Error> {
+        let extension = self.extension(conn)?;
         let extension = extension.map(|ext| ext.ident());
         let ident = syn::Ident::new(&self.proname, proc_macro2::Span::call_site());
         let segments: Vec<syn::PathSegment> = match extension {

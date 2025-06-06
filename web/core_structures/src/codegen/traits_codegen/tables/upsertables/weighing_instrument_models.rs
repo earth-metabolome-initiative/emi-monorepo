@@ -21,11 +21,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                 error_kilograms
                     .ne(excluded(error_kilograms))
                     .or(minimum_measurable_kilograms.ne(excluded(minimum_measurable_kilograms)))
-                    .or(maximum_measurable_kilograms.ne(excluded(maximum_measurable_kilograms)))
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
+                    .or(maximum_measurable_kilograms.ne(excluded(maximum_measurable_kilograms))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -54,11 +50,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                 error_kilograms
                     .ne(excluded(error_kilograms))
                     .or(minimum_measurable_kilograms.ne(excluded(minimum_measurable_kilograms)))
-                    .or(maximum_measurable_kilograms.ne(excluded(maximum_measurable_kilograms)))
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
+                    .or(maximum_measurable_kilograms.ne(excluded(maximum_measurable_kilograms))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

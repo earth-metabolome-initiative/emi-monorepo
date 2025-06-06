@@ -3,7 +3,7 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web_codegen::get;
 use api_path::api::oauth::jwt_cookies::AccessToken;
 use core_structures::User;
-use web_common_traits::database::AsyncRead;
+use web_common_traits::database::Read;
 
 use crate::{
     api::oauth::jwt_cookies::{JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME},
@@ -53,12 +53,11 @@ pub(crate) async fn refresh_access_token(
     // to be authenticated and it still exists in the redis database, we still need
     // to check whether the user exists in the database, as it may have been deleted
     // in the meantime.
-    let mut connection = pool.get().await?;
+    let mut connection = pool.get()?;
 
     // If the user doesn't exist, we return an error, otherwise we return the user.
-    let user = User::read_async(refresh_token.user_id(), &mut connection)
-        .await?
-        .ok_or(BackendError::Unauthorized)?;
+    let user =
+        User::read(refresh_token.user_id(), &mut connection)?.ok_or(BackendError::Unauthorized)?;
 
     // If the user exists, we create a new access token and return it.
     let access_token = JsonAccessToken::new(refresh_token.user_id(), false)?;

@@ -20,8 +20,8 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 name.ne(excluded(name))
                     .or(description.ne(excluded(description)))
-                    .or(repeatable.ne(excluded(repeatable)))
                     .or(deprecated.ne(excluded(deprecated)))
+                    .or(photograph_id.ne(excluded(photograph_id)))
                     .or(icon.ne(excluded(icon)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
@@ -54,8 +54,8 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 name.ne(excluded(name))
                     .or(description.ne(excluded(description)))
-                    .or(repeatable.ne(excluded(repeatable)))
                     .or(deprecated.ne(excluded(deprecated)))
+                    .or(photograph_id.ne(excluded(photograph_id)))
                     .or(icon.ne(excluded(icon)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))

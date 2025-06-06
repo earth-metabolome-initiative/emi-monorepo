@@ -3,7 +3,7 @@
 pub enum InsertableTrackableLocationAttributes {
     Id,
     TrackableId,
-    StorageContainerId,
+    ContainerId,
     Geolocation,
     Inferred,
     CreatedAt,
@@ -16,8 +16,8 @@ impl core::fmt::Display for InsertableTrackableLocationAttributes {
             InsertableTrackableLocationAttributes::TrackableId => {
                 write!(f, "trackable_id")
             }
-            InsertableTrackableLocationAttributes::StorageContainerId => {
-                write!(f, "storage_container_id")
+            InsertableTrackableLocationAttributes::ContainerId => {
+                write!(f, "container_id")
             }
             InsertableTrackableLocationAttributes::Geolocation => {
                 write!(f, "geolocation")
@@ -39,72 +39,118 @@ impl core::fmt::Display for InsertableTrackableLocationAttributes {
 pub struct InsertableTrackableLocation {
     id: ::rosetta_uuid::Uuid,
     trackable_id: ::rosetta_uuid::Uuid,
-    storage_container_id: Option<::rosetta_uuid::Uuid>,
+    container_id: Option<::rosetta_uuid::Uuid>,
     geolocation: postgis_diesel::types::Point,
     inferred: bool,
     created_at: ::rosetta_timestamp::TimestampUTC,
     created_by: i32,
 }
 impl InsertableTrackableLocation {
-    #[cfg(feature = "postgres")]
-    pub async fn trackable(
+    pub fn container<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::trackables::Trackable, diesel::result::Error>
-    {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::trackables::Trackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::trackables::trackables::dsl::id
-                    .eq(&self.trackable_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::trackables::Trackable>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn storage_container(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::storage_containers::StorageContainer>,
+        Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        let Some(storage_container_id) = self.storage_container_id.as_ref() else {
+    >
+    where
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(container_id) = self.container_id else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::storage_containers::StorageContainer::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::storage_containers::storage_containers::dsl::id
-                    .eq(storage_container_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::storage_containers::StorageContainer,
-            >(conn)
-            .await
-            .map(Some)
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                container_id,
+            ),
+            conn,
+        )
+        .map(Some)
     }
-    #[cfg(feature = "postgres")]
-    pub async fn created_by(
+    pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.created_by),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.created_by,
+            ),
+            conn,
+        )
+    }
+    pub fn trackable<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                self.trackable_id,
+            ),
+            conn,
+        )
     }
 }
 pub struct InsertableTrackableLocationBuilder {
     id: Option<::rosetta_uuid::Uuid>,
     trackable_id: Option<::rosetta_uuid::Uuid>,
-    storage_container_id: Option<::rosetta_uuid::Uuid>,
+    container_id: Option<::rosetta_uuid::Uuid>,
     geolocation: Option<postgis_diesel::types::Point>,
     inferred: Option<bool>,
     created_at: Option<::rosetta_timestamp::TimestampUTC>,
@@ -115,7 +161,7 @@ impl Default for InsertableTrackableLocationBuilder {
         Self {
             id: None,
             trackable_id: None,
-            storage_container_id: None,
+            container_id: None,
             geolocation: None,
             inferred: Some(false),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
@@ -124,7 +170,10 @@ impl Default for InsertableTrackableLocationBuilder {
     }
 }
 impl InsertableTrackableLocationBuilder {
-    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    pub fn id<P>(
+        mut self,
+        id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
     where
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
@@ -138,7 +187,7 @@ impl InsertableTrackableLocationBuilder {
     pub fn trackable_id<P>(
         mut self,
         trackable_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
     where
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
@@ -151,28 +200,27 @@ impl InsertableTrackableLocationBuilder {
         self.trackable_id = Some(trackable_id);
         Ok(self)
     }
-    pub fn storage_container_id<P>(
+    pub fn container_id<P>(
         mut self,
-        storage_container_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+        container_id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
     where
         P: TryInto<Option<::rosetta_uuid::Uuid>>,
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        let storage_container_id = storage_container_id.try_into().map_err(
+        let container_id = container_id.try_into().map_err(
             |err: <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error| {
-                Into::into(err)
-                    .rename_field(InsertableTrackableLocationAttributes::StorageContainerId)
+                Into::into(err).rename_field(InsertableTrackableLocationAttributes::ContainerId)
             },
         )?;
-        self.storage_container_id = storage_container_id;
+        self.container_id = container_id;
         Ok(self)
     }
     pub fn geolocation<P>(
         mut self,
         geolocation: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
     where
         P: TryInto<postgis_diesel::types::Point>,
         <P as TryInto<postgis_diesel::types::Point>>::Error:
@@ -189,7 +237,7 @@ impl InsertableTrackableLocationBuilder {
     pub fn inferred<P>(
         mut self,
         inferred: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
     where
         P: TryInto<bool>,
         <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
@@ -203,7 +251,7 @@ impl InsertableTrackableLocationBuilder {
     pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -220,7 +268,7 @@ impl InsertableTrackableLocationBuilder {
     pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -232,54 +280,41 @@ impl InsertableTrackableLocationBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableTrackableLocationBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>;
-    type Object = InsertableTrackableLocation;
-    type Attribute = InsertableTrackableLocationAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+impl TryFrom<InsertableTrackableLocationBuilder> for InsertableTrackableLocation {
+    type Error = common_traits::prelude::BuilderError<InsertableTrackableLocationAttributes>;
+    fn try_from(
+        builder: InsertableTrackableLocationBuilder,
+    ) -> Result<InsertableTrackableLocation, Self::Error> {
+        Ok(Self {
+            id: builder.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableTrackableLocationAttributes::Id,
             ))?,
-            trackable_id: self.trackable_id.ok_or(
+            trackable_id: builder.trackable_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableLocationAttributes::TrackableId,
                 ),
             )?,
-            storage_container_id: self.storage_container_id,
-            geolocation: self.geolocation.ok_or(
+            container_id: builder.container_id,
+            geolocation: builder.geolocation.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableLocationAttributes::Geolocation,
                 ),
             )?,
-            inferred: self.inferred.ok_or(
+            inferred: builder.inferred.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableLocationAttributes::Inferred,
                 ),
             )?,
-            created_at: self.created_at.ok_or(
+            created_at: builder.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableLocationAttributes::CreatedAt,
                 ),
             )?,
-            created_by: self.created_by.ok_or(
+            created_by: builder.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableLocationAttributes::CreatedBy,
                 ),
             )?,
         })
-    }
-}
-impl TryFrom<InsertableTrackableLocation> for InsertableTrackableLocationBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableTrackableLocation) -> Result<Self, Self::Error> {
-        Self::default()
-            .id(insertable_variant.id)?
-            .trackable_id(insertable_variant.trackable_id)?
-            .storage_container_id(insertable_variant.storage_container_id)?
-            .geolocation(insertable_variant.geolocation)?
-            .inferred(insertable_variant.inferred)?
-            .created_at(insertable_variant.created_at)?
-            .created_by(insertable_variant.created_by)
     }
 }

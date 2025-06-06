@@ -66,87 +66,169 @@ pub struct InsertableProject {
     end_date: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProject {
-    #[cfg(feature = "postgres")]
-    pub async fn state(
+    pub fn color<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::project_states::ProjectState,
+        crate::codegen::structs_codegen::tables::colors::Color,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::project_states::ProjectState::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::project_states::project_states::dsl::id
-                    .eq(&self.state_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::project_states::ProjectState>(conn)
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::colors::Color: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::colors::Color,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::colors::Color::table(),
+                self.color_id,
+            ),
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub async fn color(
+    pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::colors::Color::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::colors::colors::dsl::id.eq(&self.color_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::colors::Color>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.created_by,
+            ),
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub async fn parent_project(
+    pub fn parent_project<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::projects::Project>,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        let Some(parent_project_id) = self.parent_project_id.as_ref() else {
+    >
+    where
+        crate::codegen::structs_codegen::tables::projects::Project: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::projects::Project,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(parent_project_id) = self.parent_project_id else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::projects::Project::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::projects::projects::dsl::id
-                    .eq(parent_project_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::projects::Project>(conn)
-            .await
-            .map(Some)
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::projects::Project::table(),
+                parent_project_id,
+            ),
+            conn,
+        )
+        .map(Some)
     }
-    #[cfg(feature = "postgres")]
-    pub async fn created_by(
+    pub fn state<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.created_by),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::project_states::ProjectState,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::project_states::ProjectState: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::project_states::ProjectState,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::project_states::ProjectState::table(),
+                self.state_id,
+            ),
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub async fn updated_by(
+    pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.updated_by),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.updated_by,
+            ),
+            conn,
+        )
     }
 }
 pub struct InsertableProjectBuilder {
@@ -188,7 +270,10 @@ impl Default for InsertableProjectBuilder {
     }
 }
 impl InsertableProjectBuilder {
-    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    pub fn id<P>(
+        mut self,
+        id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -210,7 +295,7 @@ impl InsertableProjectBuilder {
     pub fn name<P>(
         mut self,
         name: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -234,7 +319,7 @@ impl InsertableProjectBuilder {
     pub fn description<P>(
         mut self,
         description: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -259,7 +344,7 @@ impl InsertableProjectBuilder {
     pub fn state_id<P>(
         mut self,
         state_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
     where
         P: TryInto<i16>,
         <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
@@ -273,7 +358,7 @@ impl InsertableProjectBuilder {
     pub fn icon<P>(
         mut self,
         icon: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -289,7 +374,7 @@ impl InsertableProjectBuilder {
     pub fn color_id<P>(
         mut self,
         color_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
     where
         P: TryInto<i16>,
         <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
@@ -303,7 +388,7 @@ impl InsertableProjectBuilder {
     pub fn parent_project_id<P>(
         mut self,
         parent_project_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
     where
         P: TryInto<Option<i32>>,
         <P as TryInto<Option<i32>>>::Error: Into<validation_errors::SingleFieldError>,
@@ -326,7 +411,7 @@ impl InsertableProjectBuilder {
     pub fn budget<P>(
         mut self,
         budget: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
     where
         P: TryInto<Option<f64>>,
         <P as TryInto<Option<f64>>>::Error: Into<validation_errors::SingleFieldError>,
@@ -340,7 +425,7 @@ impl InsertableProjectBuilder {
     pub fn expenses<P>(
         mut self,
         expenses: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
     where
         P: TryInto<Option<f64>>,
         <P as TryInto<Option<f64>>>::Error: Into<validation_errors::SingleFieldError>,
@@ -354,7 +439,7 @@ impl InsertableProjectBuilder {
     pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -369,7 +454,7 @@ impl InsertableProjectBuilder {
     pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -386,7 +471,7 @@ impl InsertableProjectBuilder {
     pub fn updated_by<P>(
         mut self,
         updated_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -400,7 +485,7 @@ impl InsertableProjectBuilder {
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -417,7 +502,7 @@ impl InsertableProjectBuilder {
     pub fn expected_end_date<P>(
         mut self,
         expected_end_date: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -434,7 +519,7 @@ impl InsertableProjectBuilder {
     pub fn end_date<P>(
         mut self,
         end_date: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -449,90 +534,67 @@ impl InsertableProjectBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableProjectBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableProjectAttributes>;
-    type Object = InsertableProject;
-    type Attribute = InsertableProjectAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+impl TryFrom<InsertableProjectBuilder> for InsertableProject {
+    type Error = common_traits::prelude::BuilderError<InsertableProjectAttributes>;
+    fn try_from(builder: InsertableProjectBuilder) -> Result<InsertableProject, Self::Error> {
+        Ok(Self {
+            id: builder.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableProjectAttributes::Id,
             ))?,
-            name: self.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableProjectAttributes::Name,
             ))?,
-            description: self.description.ok_or(
+            description: builder.description.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::Description,
                 ),
             )?,
-            state_id: self.state_id.ok_or(
+            state_id: builder.state_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::StateId,
                 ),
             )?,
-            icon: self.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            icon: builder.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableProjectAttributes::Icon,
             ))?,
-            color_id: self.color_id.ok_or(
+            color_id: builder.color_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::ColorId,
                 ),
             )?,
-            parent_project_id: self.parent_project_id,
-            budget: self.budget,
-            expenses: self.expenses,
-            created_by: self.created_by.ok_or(
+            parent_project_id: builder.parent_project_id,
+            budget: builder.budget,
+            expenses: builder.expenses,
+            created_by: builder.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::CreatedBy,
                 ),
             )?,
-            created_at: self.created_at.ok_or(
+            created_at: builder.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::CreatedAt,
                 ),
             )?,
-            updated_by: self.updated_by.ok_or(
+            updated_by: builder.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::UpdatedBy,
                 ),
             )?,
-            updated_at: self.updated_at.ok_or(
+            updated_at: builder.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::UpdatedAt,
                 ),
             )?,
-            expected_end_date: self.expected_end_date.ok_or(
+            expected_end_date: builder.expected_end_date.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::ExpectedEndDate,
                 ),
             )?,
-            end_date: self.end_date.ok_or(
+            end_date: builder.end_date.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProjectAttributes::EndDate,
                 ),
             )?,
         })
-    }
-}
-impl TryFrom<InsertableProject> for InsertableProjectBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableProject) -> Result<Self, Self::Error> {
-        Self::default()
-            .id(insertable_variant.id)?
-            .name(insertable_variant.name)?
-            .description(insertable_variant.description)?
-            .state_id(insertable_variant.state_id)?
-            .icon(insertable_variant.icon)?
-            .color_id(insertable_variant.color_id)?
-            .parent_project_id(insertable_variant.parent_project_id)?
-            .budget(insertable_variant.budget)?
-            .expenses(insertable_variant.expenses)?
-            .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?
-            .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)?
-            .expected_end_date(insertable_variant.expected_end_date)?
-            .end_date(insertable_variant.end_date)
     }
 }

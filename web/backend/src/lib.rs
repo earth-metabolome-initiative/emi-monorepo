@@ -5,7 +5,7 @@ pub(crate) use api::LNCommand;
 pub use api::{ListenNotifyHandle, ListenNotifyServer};
 pub use errors::BackendError;
 
-pub(crate) type Conn = diesel_async::AsyncPgConnection;
+pub(crate) type Conn = diesel::PgConnection;
 
 /// Diesel connection pool type
-pub type DBPool = diesel_async::pooled_connection::bb8::Pool<Conn>;
+pub type DBPool = diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<Conn>>;

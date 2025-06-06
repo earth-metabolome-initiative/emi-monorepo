@@ -18,15 +18,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .do_update()
             .set(self)
             .filter(
-                name.ne(excluded(name))
-                    .or(description.ne(excluded(description)))
-                    .or(photograph_id.ne(excluded(photograph_id)))
-                    .or(deprecation_date.ne(excluded(deprecation_date)))
-                    .or(brand_id.ne(excluded(brand_id)))
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
+                deprecation_date.ne(excluded(deprecation_date)).or(brand_id.ne(excluded(brand_id))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -52,15 +44,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .do_update()
             .set(self)
             .filter(
-                name.ne(excluded(name))
-                    .or(description.ne(excluded(description)))
-                    .or(photograph_id.ne(excluded(photograph_id)))
-                    .or(deprecation_date.ne(excluded(deprecation_date)))
-                    .or(brand_id.ne(excluded(brand_id)))
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
+                deprecation_date.ne(excluded(deprecation_date)).or(brand_id.ne(excluded(brand_id))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

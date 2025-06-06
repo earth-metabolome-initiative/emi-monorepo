@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS temporary_user (
     id SERIAL PRIMARY KEY,
-    email text NOT NULL,
+    email text NOT NULL CHECK (must_be_email(email)),
     login_provider_id SMALLINT NOT NULL REFERENCES login_providers (id) ON DELETE CASCADE,
     UNIQUE (email, login_provider_id)
 );

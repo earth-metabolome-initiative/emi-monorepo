@@ -5,12 +5,11 @@ edition = "2024"
 
 [dependencies]
 testcontainers.workspace = true
-diesel-async.workspace = true
 diesel.workspace = true
 
 [dev-dependencies]
 tokio.workspace = true
-diesel-async = { workspace = true, features = ["postgres"] }
+diesel = { workspace = true, features = ["postgres"] }
 
 [lints]
 workspace = true

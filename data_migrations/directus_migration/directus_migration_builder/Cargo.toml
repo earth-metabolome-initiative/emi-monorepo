@@ -9,7 +9,7 @@ webcodegen.workspace = true
 diesel_migrations_utils.workspace = true
 quote.workspace = true
 const_format.workspace = true
-diesel-async = { workspace = true, features = ["postgres"] }
+diesel = { workspace = true, features = ["postgres"] }
 
 [lints]
 workspace = true

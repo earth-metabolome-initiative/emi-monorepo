@@ -13,89 +13,304 @@
     table_name = crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots
 )]
 pub struct CommercialProductLot {
-    pub id: i32,
+    pub id: ::rosetta_uuid::Uuid,
     pub lot: String,
-    pub product_model_id: i32,
+    pub product_model_id: ::rosetta_uuid::Uuid,
+}
+impl web_common_traits::prelude::TableName for CommercialProductLot {
+    const TABLE_NAME: &'static str = "commercial_product_lots";
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
+    > for CommercialProductLot
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
 }
 impl diesel::Identifiable for CommercialProductLot {
-    type Id = i32;
+    type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {
         self.id
     }
 }
 impl CommercialProductLot {
-    #[cfg(feature = "postgres")]
-    pub async fn product_model(
+    pub fn id<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                self.id,
+            ),
+            conn,
+        )
+    }
+    pub fn product_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::dsl::id
-                    .eq(&self.product_model_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-            >(conn)
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::table(),
+                self.product_model_id,
+            ),
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_product_model_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        product_model_id: &crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots::dsl::product_model_id
-                    .eq(product_model_id.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_lot_and_product_model_id(
+    pub fn from_lot_and_product_model_id(
         lot: &str,
-        product_model_id: &i32,
-        conn: &mut diesel_async::AsyncPgConnection,
+        product_model_id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
             associations::HasTable,
         };
-        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
         Self::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots::lot
+                commercial_product_lots::lot
                     .eq(lot)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots::product_model_id
-                            .eq(product_model_id),
-                    ),
+                    .and(commercial_product_lots::product_model_id.eq(product_model_id)),
             )
+            .order_by(commercial_product_lots::id.asc())
             .first::<Self>(conn)
-            .await
             .optional()
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_lot(
-        lot: &String,
-        conn: &mut diesel_async::AsyncPgConnection,
+    pub fn from_lot(
+        lot: &str,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
         Self::table()
             .filter(commercial_product_lots::lot.eq(lot))
             .order_by(commercial_product_lots::id.asc())
             .load::<Self>(conn)
-            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_product_model_id(
+        product_model_id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
+        Self::table()
+            .filter(commercial_product_lots::product_model_id.eq(product_model_id))
+            .order_by(commercial_product_lots::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
+            SelectableHelper, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
+        Self::table()
+            .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
+            .filter(trackables::name.eq(name))
+            .order_by(commercial_product_lots::id.asc())
+            .select(Self::as_select())
+            .first::<Self>(conn)
+            .optional()
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_description(
+        description: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
+        Self::table()
+            .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
+            .filter(trackables::description.eq(description))
+            .order_by(commercial_product_lots::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_photograph_id(
+        photograph_id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
+        Self::table()
+            .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
+            .filter(trackables::photograph_id.eq(photograph_id))
+            .order_by(commercial_product_lots::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_id(
+        parent_id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
+        Self::table()
+            .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
+            .filter(trackables::parent_id.eq(parent_id))
+            .order_by(commercial_product_lots::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_created_by(
+        created_by: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
+        Self::table()
+            .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
+            .filter(trackables::created_by.eq(created_by))
+            .order_by(commercial_product_lots::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_created_at(
+        created_at: &::rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
+        Self::table()
+            .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
+            .filter(trackables::created_at.eq(created_at))
+            .order_by(commercial_product_lots::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_updated_by(
+        updated_by: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
+        Self::table()
+            .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
+            .filter(trackables::updated_by.eq(updated_by))
+            .order_by(commercial_product_lots::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_updated_at(
+        updated_at: &::rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
+        Self::table()
+            .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
+            .filter(trackables::updated_at.eq(updated_at))
+            .order_by(commercial_product_lots::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+}
+impl AsRef<CommercialProductLot> for CommercialProductLot {
+    fn as_ref(&self) -> &CommercialProductLot {
+        self
     }
 }

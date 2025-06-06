@@ -13,7 +13,7 @@ use futures_util::{
 };
 use tokio::{sync::mpsc, time::interval};
 use web_common_traits::{
-    crud::{AsyncExecuteCrudOperation, CrudOperation},
+    crud::{CrudOperation, ExecuteCrudOperation},
     database::Tabular,
 };
 use ws_messages::{B2FMessage, F2BMessage};
@@ -41,7 +41,7 @@ pub(super) async fn portal_ws(
 
     let mut last_heartbeat = Instant::now();
     let mut interval = interval(HEARTBEAT_INTERVAL);
-    let mut conn = diesel_pool.get().await.unwrap();
+    let mut conn = diesel_pool.get().unwrap();
 
     let (listen_notify_sender, mut listen_notify_receiver) = mpsc::unbounded_channel();
 
@@ -94,7 +94,7 @@ pub(super) async fn portal_ws(
                                 }
                                 let crud = *ops.as_ref();
 
-                                match ops.execute(&mut conn).await {
+                                match ops.execute(&mut conn) {
                                     Ok(None) => {}
                                     Ok(Some(row)) => {
                                         session
@@ -119,7 +119,7 @@ pub(super) async fn portal_ws(
                                         .unwrap();
                                 }
                                 let crud = *ops.as_ref();
-                                match ops.execute(&mut conn).await {
+                                match ops.execute(&mut conn) {
                                     Ok(rows) => {
                                         if !rows.is_empty() {
                                             session

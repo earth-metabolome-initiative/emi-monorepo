@@ -17,6 +17,9 @@ pub struct TemporaryUser {
     pub email: String,
     pub login_provider_id: i16,
 }
+impl web_common_traits::prelude::TableName for TemporaryUser {
+    const TABLE_NAME: &'static str = "temporary_user";
+}
 impl diesel::Identifiable for TemporaryUser {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -24,76 +27,89 @@ impl diesel::Identifiable for TemporaryUser {
     }
 }
 impl TemporaryUser {
-    #[cfg(feature = "postgres")]
-    pub async fn login_provider(
+    pub fn login_provider<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::login_providers::LoginProvider::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::login_providers::login_providers::dsl::id
-                    .eq(&self.login_provider_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::login_providers::LoginProvider>(conn)
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::login_providers::LoginProvider::table(),
+                self.login_provider_id,
+            ),
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_login_provider_id(
-        conn: &mut diesel_async::AsyncPgConnection,
-        login_provider_id: &crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::temporary_user::temporary_user::dsl::login_provider_id
-                    .eq(login_provider_id.id),
-            )
-            .load::<Self>(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn from_email_and_login_provider_id(
+    pub fn from_email_and_login_provider_id(
         email: &str,
         login_provider_id: &i16,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
             associations::HasTable,
         };
-        use diesel_async::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::temporary_user::temporary_user;
         Self::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::temporary_user::temporary_user::email
+                temporary_user::email
                     .eq(email)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::temporary_user::temporary_user::login_provider_id
-                            .eq(login_provider_id),
-                    ),
+                    .and(temporary_user::login_provider_id.eq(login_provider_id)),
             )
+            .order_by(temporary_user::id.asc())
             .first::<Self>(conn)
-            .await
             .optional()
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_email(
-        email: &String,
-        conn: &mut diesel_async::AsyncPgConnection,
+    pub fn from_email(
+        email: &str,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::temporary_user::temporary_user;
         Self::table()
             .filter(temporary_user::email.eq(email))
             .order_by(temporary_user::id.asc())
             .load::<Self>(conn)
-            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_login_provider_id(
+        login_provider_id: &i16,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::temporary_user::temporary_user;
+        Self::table()
+            .filter(temporary_user::login_provider_id.eq(login_provider_id))
+            .order_by(temporary_user::id.asc())
+            .load::<Self>(conn)
+    }
+}
+impl AsRef<TemporaryUser> for TemporaryUser {
+    fn as_ref(&self) -> &TemporaryUser {
+        self
     }
 }

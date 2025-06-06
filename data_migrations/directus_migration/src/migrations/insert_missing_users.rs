@@ -1,15 +1,15 @@
 //! Submodule providing a method to migrate the users from the Directus database
 //! to the new database.
 
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use web_common_traits::database::AsyncBoundedRead;
 
 use super::get_user;
 use crate::codegen::DirectusUser;
 
 pub async fn insert_missing_users(
-    directus_conn: &mut AsyncPgConnection,
-    portal_conn: &mut AsyncPgConnection,
+    directus_conn: &mut PgConnection,
+    portal_conn: &mut PgConnection,
 ) -> Result<(), crate::error::Error> {
     let directus_users = DirectusUser::read_all_async(directus_conn).await?;
     for directus_user in directus_users {

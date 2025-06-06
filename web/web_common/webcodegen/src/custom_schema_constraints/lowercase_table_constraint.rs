@@ -1,5 +1,4 @@
-use async_trait::async_trait;
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 
 use crate::{
     Table,
@@ -11,11 +10,10 @@ use crate::{
 /// Constraint to enforce that all column names are lower case.
 pub struct LowercaseTableConstraint;
 
-#[async_trait]
 impl CustomTableConstraint for LowercaseTableConstraint {
-    async fn check_constraint(
+    fn check_constraint(
         &self,
-        _conn: &mut AsyncPgConnection,
+        _conn: &mut PgConnection,
         table: &Table,
     ) -> Result<(), WebCodeGenError> {
         if table.table_name.chars().any(char::is_uppercase) {

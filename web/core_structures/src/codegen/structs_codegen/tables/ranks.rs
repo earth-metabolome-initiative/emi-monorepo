@@ -15,6 +15,9 @@ pub struct Rank {
     pub description: String,
     pub id: i16,
 }
+impl web_common_traits::prelude::TableName for Rank {
+    const TABLE_NAME: &'static str = "ranks";
+}
 impl diesel::Identifiable for Rank {
     type Id = i16;
     fn id(self) -> Self::Id {
@@ -23,31 +26,40 @@ impl diesel::Identifiable for Rank {
 }
 impl Rank {
     #[cfg(feature = "postgres")]
-    pub async fn from_name(
+    pub fn from_name(
         name: &str,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::ranks::ranks;
         Self::table()
-            .filter(crate::codegen::diesel_codegen::tables::ranks::ranks::name.eq(name))
+            .filter(ranks::name.eq(name))
+            .order_by(ranks::id.asc())
             .first::<Self>(conn)
-            .await
             .optional()
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_description(
+    pub fn from_description(
         description: &str,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::ranks::ranks;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::ranks::ranks::description.eq(description),
-            )
+            .filter(ranks::description.eq(description))
+            .order_by(ranks::id.asc())
             .first::<Self>(conn)
-            .await
             .optional()
+    }
+}
+impl AsRef<Rank> for Rank {
+    fn as_ref(&self) -> &Rank {
+        self
     }
 }

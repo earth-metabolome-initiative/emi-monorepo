@@ -2,10 +2,10 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableTrackableAttributes {
     Id,
-    TrackableCategoryId,
-    ContainerModelId,
-    ProjectId,
-    TrackableStateId,
+    Name,
+    Description,
+    PhotographId,
+    ParentId,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -15,16 +15,10 @@ impl core::fmt::Display for InsertableTrackableAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertableTrackableAttributes::Id => write!(f, "id"),
-            InsertableTrackableAttributes::TrackableCategoryId => {
-                write!(f, "trackable_category_id")
-            }
-            InsertableTrackableAttributes::ContainerModelId => {
-                write!(f, "container_model_id")
-            }
-            InsertableTrackableAttributes::ProjectId => write!(f, "project_id"),
-            InsertableTrackableAttributes::TrackableStateId => {
-                write!(f, "trackable_state_id")
-            }
+            InsertableTrackableAttributes::Name => write!(f, "name"),
+            InsertableTrackableAttributes::Description => write!(f, "description"),
+            InsertableTrackableAttributes::PhotographId => write!(f, "photograph_id"),
+            InsertableTrackableAttributes::ParentId => write!(f, "parent_id"),
             InsertableTrackableAttributes::CreatedBy => write!(f, "created_by"),
             InsertableTrackableAttributes::CreatedAt => write!(f, "created_at"),
             InsertableTrackableAttributes::UpdatedBy => write!(f, "updated_by"),
@@ -40,127 +34,159 @@ impl core::fmt::Display for InsertableTrackableAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTrackable {
     id: ::rosetta_uuid::Uuid,
-    trackable_category_id: i32,
-    container_model_id: i32,
-    project_id: i32,
-    trackable_state_id: i16,
+    name: Option<String>,
+    description: Option<String>,
+    photograph_id: Option<::rosetta_uuid::Uuid>,
+    parent_id: Option<::rosetta_uuid::Uuid>,
     created_by: i32,
     created_at: ::rosetta_timestamp::TimestampUTC,
     updated_by: i32,
     updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableTrackable {
-    #[cfg(feature = "postgres")]
-    pub async fn trackable_category(
+    pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory,
+        crate::codegen::structs_codegen::tables::users::User,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::trackable_categories::trackable_categories::dsl::id
-                    .eq(&self.trackable_category_id),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory,
-            >(conn)
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn container_model(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::id
-                    .eq(&self.container_model_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::container_models::ContainerModel>(
-                conn,
-            )
-            .await
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn project(
-        &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::projects::Project, diesel::result::Error>
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
     {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::projects::Project::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::projects::projects::dsl::id
-                    .eq(&self.project_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::projects::Project>(conn)
-            .await
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.created_by,
+            ),
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub async fn trackable_state(
+    pub fn parent<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::trackable_states::TrackableState,
+        Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::trackable_states::TrackableState::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::trackable_states::trackable_states::dsl::id
-                    .eq(&self.trackable_state_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::trackable_states::TrackableState>(
-                conn,
-            )
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(parent_id) = self.parent_id else {
+            return Ok(None);
+        };
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                parent_id,
+            ),
+            conn,
+        )
+        .map(Some)
     }
-    #[cfg(feature = "postgres")]
-    pub async fn created_by(
+    pub fn photograph<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.created_by),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::documents::Document>,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::documents::Document: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::documents::Document as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::documents::Document as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::documents::Document as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::documents::Document as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::documents::Document as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::documents::Document as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::documents::Document,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(photograph_id) = self.photograph_id else {
+            return Ok(None);
+        };
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::documents::Document::table(),
+                photograph_id,
+            ),
+            conn,
+        )
+        .map(Some)
     }
-    #[cfg(feature = "postgres")]
-    pub async fn updated_by(
+    pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::users::User::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::users::users::dsl::id.eq(&self.updated_by),
-            )
-            .first::<crate::codegen::structs_codegen::tables::users::User>(conn)
-            .await
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.updated_by,
+            ),
+            conn,
+        )
     }
 }
 pub struct InsertableTrackableBuilder {
     id: Option<::rosetta_uuid::Uuid>,
-    trackable_category_id: Option<i32>,
-    container_model_id: Option<i32>,
-    project_id: Option<i32>,
-    trackable_state_id: Option<i16>,
+    name: Option<String>,
+    description: Option<String>,
+    photograph_id: Option<::rosetta_uuid::Uuid>,
+    parent_id: Option<::rosetta_uuid::Uuid>,
     created_by: Option<i32>,
     created_at: Option<::rosetta_timestamp::TimestampUTC>,
     updated_by: Option<i32>,
@@ -169,11 +195,11 @@ pub struct InsertableTrackableBuilder {
 impl Default for InsertableTrackableBuilder {
     fn default() -> Self {
         Self {
-            id: None,
-            trackable_category_id: None,
-            container_model_id: None,
-            project_id: None,
-            trackable_state_id: None,
+            id: Some(rosetta_uuid::Uuid::new_v4()),
+            name: None,
+            description: None,
+            photograph_id: None,
+            parent_id: None,
             created_by: None,
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             updated_by: None,
@@ -182,7 +208,10 @@ impl Default for InsertableTrackableBuilder {
     }
 }
 impl InsertableTrackableBuilder {
-    pub fn id<P>(mut self, id: P) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    pub fn id<P>(
+        mut self,
+        id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
     where
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
@@ -190,72 +219,116 @@ impl InsertableTrackableBuilder {
         let id = id.try_into().map_err(|err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
             Into::into(err).rename_field(InsertableTrackableAttributes::Id)
         })?;
+        if let Some(parent_id) = self.parent_id {
+            pgrx_validation::must_be_distinct_uuid(id, parent_id).map_err(|e| {
+                e.rename_fields(
+                    InsertableTrackableAttributes::Id,
+                    InsertableTrackableAttributes::ParentId,
+                )
+            })?;
+        }
         self.id = Some(id);
         Ok(self)
     }
-    pub fn trackable_category_id<P>(
+    pub fn name<P>(
         mut self,
-        trackable_category_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+        name: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
     where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let trackable_category_id =
-            trackable_category_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-                Into::into(err).rename_field(InsertableTrackableAttributes::TrackableCategoryId)
-            })?;
-        self.trackable_category_id = Some(trackable_category_id);
-        Ok(self)
-    }
-    pub fn container_model_id<P>(
-        mut self,
-        container_model_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let container_model_id =
-            container_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-                Into::into(err).rename_field(InsertableTrackableAttributes::ContainerModelId)
-            })?;
-        self.container_model_id = Some(container_model_id);
-        Ok(self)
-    }
-    pub fn project_id<P>(
-        mut self,
-        project_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let project_id = project_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableTrackableAttributes::ProjectId)
+        let name = name.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
+            Into::into(err).rename_field(InsertableTrackableAttributes::Name)
         })?;
-        self.project_id = Some(project_id);
+        if let (Some(name), Some(description)) = (name.as_ref(), self.description.as_ref()) {
+            pgrx_validation::must_be_distinct(name, description).map_err(|e| {
+                e.rename_fields(
+                    InsertableTrackableAttributes::Name,
+                    InsertableTrackableAttributes::Description,
+                )
+            })?;
+        }
+        self.name = name;
         Ok(self)
     }
-    pub fn trackable_state_id<P>(
+    pub fn description<P>(
         mut self,
-        trackable_state_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+        description: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
     where
-        P: TryInto<i16>,
-        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let trackable_state_id =
-            trackable_state_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
-                Into::into(err).rename_field(InsertableTrackableAttributes::TrackableStateId)
+        let description =
+            description.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
+                Into::into(err).rename_field(InsertableTrackableAttributes::Description)
             })?;
-        self.trackable_state_id = Some(trackable_state_id);
+        if let (Some(name), Some(description)) = (self.name.as_ref(), description.as_ref()) {
+            pgrx_validation::must_be_distinct(name, description).map_err(|e| {
+                e.rename_fields(
+                    InsertableTrackableAttributes::Name,
+                    InsertableTrackableAttributes::Description,
+                )
+            })?;
+        }
+        if let Some(description) = description.as_ref() {
+            pgrx_validation::must_be_paragraph(description)
+                .map_err(|e| e.rename_field(InsertableTrackableAttributes::Description))?;
+        }
+        if let Some(description) = description.as_ref() {
+            pgrx_validation::must_be_paragraph(description)
+                .map_err(|e| e.rename_field(InsertableTrackableAttributes::Description))?;
+        }
+        self.description = description;
+        Ok(self)
+    }
+    pub fn photograph_id<P>(
+        mut self,
+        photograph_id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
+    where
+        P: TryInto<Option<::rosetta_uuid::Uuid>>,
+        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let photograph_id = photograph_id.try_into().map_err(
+            |err: <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error| {
+                Into::into(err).rename_field(InsertableTrackableAttributes::PhotographId)
+            },
+        )?;
+        self.photograph_id = photograph_id;
+        Ok(self)
+    }
+    pub fn parent_id<P>(
+        mut self,
+        parent_id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
+    where
+        P: TryInto<Option<::rosetta_uuid::Uuid>>,
+        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let parent_id = parent_id.try_into().map_err(
+            |err: <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error| {
+                Into::into(err).rename_field(InsertableTrackableAttributes::ParentId)
+            },
+        )?;
+        if let (Some(parent_id), Some(id)) = (parent_id, self.id) {
+            pgrx_validation::must_be_distinct_uuid(id, parent_id).map_err(|e| {
+                e.rename_fields(
+                    InsertableTrackableAttributes::Id,
+                    InsertableTrackableAttributes::ParentId,
+                )
+            })?;
+        }
+        self.parent_id = parent_id;
         Ok(self)
     }
     pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -270,7 +343,7 @@ impl InsertableTrackableBuilder {
     pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -287,7 +360,7 @@ impl InsertableTrackableBuilder {
     pub fn updated_by<P>(
         mut self,
         updated_by: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -301,7 +374,7 @@ impl InsertableTrackableBuilder {
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -316,70 +389,37 @@ impl InsertableTrackableBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableTrackableBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableTrackableAttributes>;
-    type Object = InsertableTrackable;
-    type Attribute = InsertableTrackableAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            id: self.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+impl TryFrom<InsertableTrackableBuilder> for InsertableTrackable {
+    type Error = common_traits::prelude::BuilderError<InsertableTrackableAttributes>;
+    fn try_from(builder: InsertableTrackableBuilder) -> Result<InsertableTrackable, Self::Error> {
+        Ok(Self {
+            id: builder.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableTrackableAttributes::Id,
             ))?,
-            trackable_category_id: self.trackable_category_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTrackableAttributes::TrackableCategoryId,
-                ),
-            )?,
-            container_model_id: self.container_model_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTrackableAttributes::ContainerModelId,
-                ),
-            )?,
-            project_id: self.project_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTrackableAttributes::ProjectId,
-                ),
-            )?,
-            trackable_state_id: self.trackable_state_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTrackableAttributes::TrackableStateId,
-                ),
-            )?,
-            created_by: self.created_by.ok_or(
+            name: builder.name,
+            description: builder.description,
+            photograph_id: builder.photograph_id,
+            parent_id: builder.parent_id,
+            created_by: builder.created_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableAttributes::CreatedBy,
                 ),
             )?,
-            created_at: self.created_at.ok_or(
+            created_at: builder.created_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableAttributes::CreatedAt,
                 ),
             )?,
-            updated_by: self.updated_by.ok_or(
+            updated_by: builder.updated_by.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableAttributes::UpdatedBy,
                 ),
             )?,
-            updated_at: self.updated_at.ok_or(
+            updated_at: builder.updated_at.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTrackableAttributes::UpdatedAt,
                 ),
             )?,
         })
-    }
-}
-impl TryFrom<InsertableTrackable> for InsertableTrackableBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableTrackable) -> Result<Self, Self::Error> {
-        Self::default()
-            .id(insertable_variant.id)?
-            .trackable_category_id(insertable_variant.trackable_category_id)?
-            .container_model_id(insertable_variant.container_model_id)?
-            .project_id(insertable_variant.project_id)?
-            .trackable_state_id(insertable_variant.trackable_state_id)?
-            .created_by(insertable_variant.created_by)?
-            .created_at(insertable_variant.created_at)?
-            .updated_by(insertable_variant.updated_by)?
-            .updated_at(insertable_variant.updated_at)
     }
 }

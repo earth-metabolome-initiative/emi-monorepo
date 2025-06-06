@@ -43,13 +43,12 @@ impl DirectusCollection {
     #[cfg(feature = "postgres")]
     pub async fn group(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection>,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(group) = self.group.as_ref() else {
             return Ok(None);
         };
@@ -66,11 +65,10 @@ impl DirectusCollection {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_group(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         group: &crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::dsl::group

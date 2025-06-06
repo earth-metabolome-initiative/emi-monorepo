@@ -6,7 +6,7 @@ use taxonomy_fetcher::{
     impls::ncbi::{NCBIRank, NCBITaxonomy, NCBITaxonomyBuilder},
 };
 
-async fn retrieve_csvs(csv_directory: &Path) -> Result<(), crate::errors::Error> {
+pub async fn retrieve_csvs(csv_directory: &Path) -> Result<(), crate::errors::Error> {
     NCBIRank::to_csv(csv_directory.join("ranks.csv"))?;
 
     // We retrieve and build the latest version of the NCBI taxonomy
@@ -18,13 +18,11 @@ async fn retrieve_csvs(csv_directory: &Path) -> Result<(), crate::errors::Error>
     Ok(())
 }
 
-pub(crate) async fn init_csvs(
+pub(crate) fn init_csvs(
     csv_directory: &Path,
     container_directory: &Path,
-    conn: &mut diesel_async::AsyncPgConnection,
+    conn: &mut diesel::PgConnection,
 ) -> Result<(), crate::errors::Error> {
-    retrieve_csvs(csv_directory).await?;
-
     // Load the CSV directory using `csqlv`.
     let schema = CSVSchemaBuilder::default()
         .include_gz()
@@ -36,7 +34,7 @@ pub(crate) async fn init_csvs(
     let sql_generation_options: SQLGenerationOptions =
         SQLGenerationOptions::default().include_extensions();
 
-    schema.create(conn, &sql_generation_options).await?;
+    schema.create(conn, &sql_generation_options)?;
 
     Ok(())
 }

@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, path::PathBuf};
 
-use diesel_async::AsyncConnection;
+use diesel::Connection;
 use testcontainers::{
     ContainerAsync, GenericImage, ImageExt, TestcontainersError,
     core::{IntoContainerPort, WaitFor},
@@ -169,7 +169,7 @@ async fn reference_docker(
 /// # Errors
 ///
 /// * If the connection cannot be established.
-async fn establish_connection_to_postgres<C: AsyncConnection>(
+fn establish_connection_to_postgres<C: Connection>(
     database_port: u16,
     database_name: &str,
 ) -> Result<C, diesel::ConnectionError> {
@@ -179,7 +179,7 @@ async fn establish_connection_to_postgres<C: AsyncConnection>(
 
     let mut number_of_attempts = 0;
 
-    while let Err(e) = C::establish(&database_url).await {
+    while let Err(e) = C::establish(&database_url) {
         eprintln!("Failed to establish connection: {e:?}");
         std::thread::sleep(std::time::Duration::from_secs(1));
         if number_of_attempts > 10 {
@@ -189,7 +189,7 @@ async fn establish_connection_to_postgres<C: AsyncConnection>(
         number_of_attempts += 1;
     }
 
-    C::establish(&database_url).await
+    C::establish(&database_url)
 }
 
 /// Setup a database with a custom migration dir.
@@ -216,11 +216,11 @@ async fn establish_connection_to_postgres<C: AsyncConnection>(
 ///         reference_docker_with_connection::<AsyncPgConnection>("test_db", 6437).await.unwrap();
 /// }
 /// ```
-pub async fn reference_docker_with_connection<C: AsyncConnection>(
+pub async fn reference_docker_with_connection<C: Connection>(
     database_name: &str,
     port: u16,
 ) -> Result<(ContainerAsync<GenericImage>, C), diesel::ConnectionError> {
     let docker = reference_docker(port, database_name).await.expect("Failed to start container");
-    let conn = establish_connection_to_postgres(port, database_name).await?;
+    let conn = establish_connection_to_postgres(port, database_name)?;
     Ok((docker, conn))
 }

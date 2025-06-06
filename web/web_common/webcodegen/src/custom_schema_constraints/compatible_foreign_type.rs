@@ -1,8 +1,7 @@
 //! Column constraint that checks whether the type of a column is compatible
 //! with its foreign column type, if the column is indeed a foreign key.
 
-use async_trait::async_trait;
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 
 use super::CustomColumnConstraint;
 
@@ -11,25 +10,27 @@ use super::CustomColumnConstraint;
 #[derive(Debug, Clone, Copy, Default)]
 pub struct CompatibleForeignTypeConstraint;
 
-#[async_trait]
 impl CustomColumnConstraint for CompatibleForeignTypeConstraint {
-    async fn check_constraint(
+    fn check_constraint(
         &self,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
         column: &crate::Column,
     ) -> Result<(), crate::errors::WebCodeGenError> {
-        if let Some((_foreign_table, foreign_column)) = column.foreign_table(conn).await? {
-            if column.has_compatible_data_type(&foreign_column, conn).await? {
-                Ok(())
-            } else {
-                Err(super::ConstraintError::IncompatibleForeignType {
-                    column: Box::new(column.clone()),
-                    foreign_column: Box::new(foreign_column.clone()),
+        for foreign_key in column.foreign_keys(conn)? {
+            for (local_column, foreign_column) in foreign_key
+                .columns(conn)?
+                .into_iter()
+                .zip(foreign_key.foreign_columns(conn)?.into_iter())
+            {
+                if !local_column.has_compatible_data_type(&foreign_column, conn)? {
+                    return Err(super::ConstraintError::IncompatibleForeignType {
+                        column: Box::new(local_column),
+                        foreign_column: Box::new(foreign_column),
+                    }
+                    .into());
                 }
-                .into())
             }
-        } else {
-            Ok(())
         }
+        Ok(())
     }
 }

@@ -33,7 +33,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if cities.id == self.city_id {
+                if self.city_id == cities.id {
                     foreign_keys.city = Some(cities);
                     updated = true;
                 }
@@ -42,7 +42,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::City(cities),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if cities.id == self.city_id {
+                if self.city_id == cities.id {
                     foreign_keys.city = None;
                     updated = true;
                 }

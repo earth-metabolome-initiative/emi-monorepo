@@ -1,21 +1,18 @@
 #![doc = include_str!("../README.md")]
-use diesel_async::{AsyncConnection, AsyncPgConnection};
+use diesel::{Connection, PgConnection};
 
 mod brands;
 mod error;
 mod login_providers;
-mod plans;
 mod procedure_models;
-mod reagents;
-mod trackable_categories;
+mod trackables;
 mod users;
 
 use brands::init_brands;
 use login_providers::init_login_providers;
-use plans::init_plans;
+pub use procedure_models::DBGI_PLAN;
 use procedure_models::init_procedure_models;
-use reagents::init_reagents;
-use trackable_categories::init_trackable_categories;
+use trackables::init_trackables;
 use users::init_root_user;
 
 /// Executes the init migration.
@@ -27,19 +24,13 @@ use users::init_root_user;
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub async fn init_migration(portal_conn: &mut AsyncPgConnection) -> Result<(), error::Error> {
-    portal_conn
-        .transaction(|portal_conn| {
-            Box::pin(async move {
-                init_login_providers(portal_conn).await?;
-                let darwin = init_root_user(portal_conn).await?;
-                init_brands(&darwin, portal_conn).await?;
-                init_trackable_categories(&darwin, portal_conn).await?;
-                init_reagents(&darwin, portal_conn).await?;
-                init_procedure_models(&darwin, portal_conn).await?;
-                init_plans(&darwin, portal_conn).await?;
-                Ok(())
-            })
-        })
-        .await
+pub fn init_migration(portal_conn: &mut PgConnection) -> Result<(), error::Error> {
+    portal_conn.transaction(|portal_conn| {
+        init_login_providers(portal_conn)?;
+        let darwin = init_root_user(portal_conn)?;
+        init_trackables(&darwin, portal_conn)?;
+        init_brands(&darwin, portal_conn)?;
+        init_procedure_models(&darwin, portal_conn)?;
+        Ok(())
+    })
 }

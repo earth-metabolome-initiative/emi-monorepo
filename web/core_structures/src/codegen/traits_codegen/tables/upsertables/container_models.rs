@@ -18,13 +18,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .do_update()
             .set(self)
             .filter(
-                liters
-                    .ne(excluded(liters))
-                    .or(container_category.ne(excluded(container_category)))
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
+                liters.ne(excluded(liters)).or(container_category.ne(excluded(container_category))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -50,13 +44,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .do_update()
             .set(self)
             .filter(
-                liters
-                    .ne(excluded(liters))
-                    .or(container_category.ne(excluded(container_category)))
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
+                liters.ne(excluded(liters)).or(container_category.ne(excluded(container_category))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

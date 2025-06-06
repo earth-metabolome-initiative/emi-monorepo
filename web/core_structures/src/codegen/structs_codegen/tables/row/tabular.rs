@@ -6,27 +6,18 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::AliquotingInstrumentModel(_) => {
                 crate::codegen::tables::table_names::TableName::AliquotingInstrumentModel
             }
-            super::Row::AliquotingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::AliquotingStepModel
+            super::Row::AliquotingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::AliquotingProcedureModel
             }
-            super::Row::AliquotingStep(_) => {
-                crate::codegen::tables::table_names::TableName::AliquotingStep
+            super::Row::AliquotingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::AliquotingProcedure
             }
-            super::Row::BallMillStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::BallMillStepModel
-            }
-            super::Row::BallMillStep(_) => {
-                crate::codegen::tables::table_names::TableName::BallMillStep
+            super::Row::BallMillProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::BallMillProcedureModel
             }
             super::Row::Brand(_) => crate::codegen::tables::table_names::TableName::Brand,
-            super::Row::CentrifugeStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::CentrifugeStepModel
-            }
-            super::Row::CentrifugeStep(_) => {
-                crate::codegen::tables::table_names::TableName::CentrifugeStep
-            }
-            super::Row::ChemicalEntity(_) => {
-                crate::codegen::tables::table_names::TableName::ChemicalEntity
+            super::Row::CentrifugeProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::CentrifugeProcedureModel
             }
             super::Row::City(_) => crate::codegen::tables::table_names::TableName::City,
             super::Row::Color(_) => crate::codegen::tables::table_names::TableName::Color,
@@ -42,34 +33,23 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::ContainerModel(_) => {
                 crate::codegen::tables::table_names::TableName::ContainerModel
             }
+            super::Row::Container(_) => crate::codegen::tables::table_names::TableName::Container,
             super::Row::Country(_) => crate::codegen::tables::table_names::TableName::Country,
-            super::Row::DisposalStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::DisposalStepModel
-            }
-            super::Row::DisposalStep(_) => {
-                crate::codegen::tables::table_names::TableName::DisposalStep
-            }
-            super::Row::DocumentFormat(_) => {
-                crate::codegen::tables::table_names::TableName::DocumentFormat
+            super::Row::DisposalProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::DisposalProcedureModel
             }
             super::Row::Document(_) => crate::codegen::tables::table_names::TableName::Document,
             super::Row::EmailProvider(_) => {
                 crate::codegen::tables::table_names::TableName::EmailProvider
             }
-            super::Row::FractioningStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::FractioningStepModel
+            super::Row::FractioningProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::FractioningProcedureModel
             }
-            super::Row::FractioningStep(_) => {
-                crate::codegen::tables::table_names::TableName::FractioningStep
+            super::Row::FractioningProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::FractioningProcedure
             }
-            super::Row::FreezeDryingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::FreezeDryingStepModel
-            }
-            super::Row::InstrumentLocation(_) => {
-                crate::codegen::tables::table_names::TableName::InstrumentLocation
-            }
-            super::Row::InstrumentModelCategory(_) => {
-                crate::codegen::tables::table_names::TableName::InstrumentModelCategory
+            super::Row::FreezeDryingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::FreezeDryingProcedureModel
             }
             super::Row::InstrumentModel(_) => {
                 crate::codegen::tables::table_names::TableName::InstrumentModel
@@ -82,17 +62,20 @@ impl web_common_traits::prelude::Tabular for super::Row {
                 crate::codegen::tables::table_names::TableName::LoginProvider
             }
             super::Row::Material(_) => crate::codegen::tables::table_names::TableName::Material,
-            super::Row::NameplateModel(_) => {
-                crate::codegen::tables::table_names::TableName::NameplateModel
+            super::Row::MixCountableProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::MixCountableProcedureModel
+            }
+            super::Row::MixSolidProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::MixSolidProcedureModel
+            }
+            super::Row::NextProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::NextProcedureModel
             }
             super::Row::ObservationSubject(_) => {
                 crate::codegen::tables::table_names::TableName::ObservationSubject
             }
             super::Row::OrganismObservation(_) => {
                 crate::codegen::tables::table_names::TableName::OrganismObservation
-            }
-            super::Row::OrganismSamplingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::OrganismSamplingStepModel
             }
             super::Row::OrganismTaxon(_) => {
                 crate::codegen::tables::table_names::TableName::OrganismTaxon
@@ -104,8 +87,8 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::PackagingModel(_) => {
                 crate::codegen::tables::table_names::TableName::PackagingModel
             }
-            super::Row::PackagingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::PackagingStepModel
+            super::Row::PackagingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::PackagingProcedureModel
             }
             super::Row::ParentProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::ParentProcedureModel
@@ -113,33 +96,27 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::PermanenceCategory(_) => {
                 crate::codegen::tables::table_names::TableName::PermanenceCategory
             }
-            super::Row::ProcedureModelContainerCategory(_) => {
-                crate::codegen::tables::table_names::TableName::ProcedureModelContainerCategory
+            super::Row::PouringProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::PouringProcedureModel
             }
-            super::Row::ProcedureModelInstrumentCategory(_) => {
-                crate::codegen::tables::table_names::TableName::ProcedureModelInstrumentCategory
-            }
-            super::Row::ProcedureModelNameplateCategory(_) => {
-                crate::codegen::tables::table_names::TableName::ProcedureModelNameplateCategory
-            }
-            super::Row::ProcedureModelToolCategory(_) => {
-                crate::codegen::tables::table_names::TableName::ProcedureModelToolCategory
+            super::Row::ProcedureModelTrackable(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureModelTrackable
             }
             super::Row::ProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureModel
+            }
+            super::Row::ProcedureTrackable(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureTrackable
             }
             super::Row::Procedure(_) => crate::codegen::tables::table_names::TableName::Procedure,
             super::Row::Processable(_) => {
                 crate::codegen::tables::table_names::TableName::Processable
             }
-            super::Row::ProcessingStep(_) => {
-                crate::codegen::tables::table_names::TableName::ProcessingStep
+            super::Row::ProcessingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::ProcessingProcedure
             }
             super::Row::ProjectState(_) => {
                 crate::codegen::tables::table_names::TableName::ProjectState
-            }
-            super::Row::ProjectWorkflowModel(_) => {
-                crate::codegen::tables::table_names::TableName::ProjectWorkflowModel
             }
             super::Row::Project(_) => crate::codegen::tables::table_names::TableName::Project,
             super::Row::Rank(_) => crate::codegen::tables::table_names::TableName::Rank,
@@ -149,17 +126,17 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::SampleState(_) => {
                 crate::codegen::tables::table_names::TableName::SampleState
             }
-            super::Row::SamplingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::SamplingStepModel
+            super::Row::SamplingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::SamplingProcedureModel
             }
-            super::Row::SamplingStep(_) => {
-                crate::codegen::tables::table_names::TableName::SamplingStep
+            super::Row::SamplingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::SamplingProcedure
             }
-            super::Row::ShakingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::ShakingStepModel
+            super::Row::ShakingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::ShakingProcedureModel
             }
-            super::Row::ShakingStep(_) => {
-                crate::codegen::tables::table_names::TableName::ShakingStep
+            super::Row::SharedProcedureModelTrackable(_) => {
+                crate::codegen::tables::table_names::TableName::SharedProcedureModelTrackable
             }
             super::Row::SpatialRefSy(_) => {
                 crate::codegen::tables::table_names::TableName::SpatialRefSy
@@ -167,47 +144,6 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::Spectrum(_) => crate::codegen::tables::table_names::TableName::Spectrum,
             super::Row::SpectraCollection(_) => {
                 crate::codegen::tables::table_names::TableName::SpectraCollection
-            }
-            super::Row::StepContainerModel(_) => {
-                crate::codegen::tables::table_names::TableName::StepContainerModel
-            }
-            super::Row::StepInstrument(_) => {
-                crate::codegen::tables::table_names::TableName::StepInstrument
-            }
-            super::Row::StepModelContainerCategory(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelContainerCategory
-            }
-            super::Row::StepModelInstrumentCategory(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelInstrumentCategory
-            }
-            super::Row::StepModelInstrumentModel(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelInstrumentModel
-            }
-            super::Row::StepModelInstrument(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelInstrument
-            }
-            super::Row::StepModelNameplateCategory(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelNameplateCategory
-            }
-            super::Row::StepModelToolCategory(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelToolCategory
-            }
-            super::Row::StepModelTrackableCategory(_) => {
-                crate::codegen::tables::table_names::TableName::StepModelTrackableCategory
-            }
-            super::Row::StepModel(_) => crate::codegen::tables::table_names::TableName::StepModel,
-            super::Row::StepNameplateModel(_) => {
-                crate::codegen::tables::table_names::TableName::StepNameplateModel
-            }
-            super::Row::StepStorageContainer(_) => {
-                crate::codegen::tables::table_names::TableName::StepStorageContainer
-            }
-            super::Row::StepToolModel(_) => {
-                crate::codegen::tables::table_names::TableName::StepToolModel
-            }
-            super::Row::Step(_) => crate::codegen::tables::table_names::TableName::Step,
-            super::Row::StorageContainer(_) => {
-                crate::codegen::tables::table_names::TableName::StorageContainer
             }
             super::Row::Taxon(_) => crate::codegen::tables::table_names::TableName::Taxon,
             super::Row::TeamMember(_) => crate::codegen::tables::table_names::TableName::TeamMember,
@@ -219,15 +155,8 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::TemporaryUser(_) => {
                 crate::codegen::tables::table_names::TableName::TemporaryUser
             }
-            super::Row::ToolModel(_) => crate::codegen::tables::table_names::TableName::ToolModel,
-            super::Row::TrackableCategory(_) => {
-                crate::codegen::tables::table_names::TableName::TrackableCategory
-            }
             super::Row::TrackableLocation(_) => {
                 crate::codegen::tables::table_names::TableName::TrackableLocation
-            }
-            super::Row::TrackableState(_) => {
-                crate::codegen::tables::table_names::TableName::TrackableState
             }
             super::Row::Trackable(_) => crate::codegen::tables::table_names::TableName::Trackable,
             super::Row::Unit(_) => crate::codegen::tables::table_names::TableName::Unit,
@@ -242,11 +171,8 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::WeighingInstrumentModel(_) => {
                 crate::codegen::tables::table_names::TableName::WeighingInstrumentModel
             }
-            super::Row::WeighingStepModel(_) => {
-                crate::codegen::tables::table_names::TableName::WeighingStepModel
-            }
-            super::Row::WeighingStep(_) => {
-                crate::codegen::tables::table_names::TableName::WeighingStep
+            super::Row::WeighingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::WeighingProcedureModel
             }
         }
     }

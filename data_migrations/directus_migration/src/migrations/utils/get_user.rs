@@ -1,9 +1,9 @@
 //! Submodule providing a method to retrieve or insert a user in the database.
 
 use core_structures::{User, UserEmail};
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use web_common_traits::{
-    database::{BackendInsertableVariant, Insertable, InsertableVariant},
+    database::{Insertable, InsertableVariant},
     prelude::Builder,
 };
 
@@ -12,8 +12,8 @@ use crate::codegen::{DirectusUser, FieldDatum as DirectusFieldDatum};
 /// This module provides a method to retrieve or insert a user in the database.
 pub async fn get_user(
     directus_user: &DirectusUser,
-    directus_conn: &mut AsyncPgConnection,
-    portal_conn: &mut AsyncPgConnection,
+    directus_conn: &mut PgConnection,
+    portal_conn: &mut PgConnection,
 ) -> Result<User, crate::error::Error> {
     let email: &str = directus_user
         .email

@@ -18,11 +18,13 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .do_update()
             .set(self)
             .filter(
-                created_by
-                    .ne(excluded(created_by))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
+                snoozable
+                    .ne(excluded(snoozable))
+                    .or(copiable.ne(excluded(copiable)))
+                    .or(repeatable.ne(excluded(repeatable)))
+                    .or(skippable.ne(excluded(skippable)))
+                    .or(created_by.ne(excluded(created_by)))
+                    .or(created_at.ne(excluded(created_at))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -48,11 +50,13 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .do_update()
             .set(self)
             .filter(
-                created_by
-                    .ne(excluded(created_by))
-                    .or(created_at.ne(excluded(created_at)))
-                    .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
+                snoozable
+                    .ne(excluded(snoozable))
+                    .or(copiable.ne(excluded(copiable)))
+                    .or(repeatable.ne(excluded(repeatable)))
+                    .or(skippable.ne(excluded(skippable)))
+                    .or(created_by.ne(excluded(created_by)))
+                    .or(created_at.ne(excluded(created_at))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

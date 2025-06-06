@@ -2,7 +2,7 @@
 pub mod codegen;
 pub use codegen::*;
 pub mod document;
-mod procedure_models;
+pub mod traits;
 
 #[cfg(feature = "postgres")]
 pub use document::create_photograph;

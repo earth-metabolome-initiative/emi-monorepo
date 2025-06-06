@@ -3,5 +3,5 @@
 /// Trait for a type that has a description.
 pub trait Described {
     /// Returns the description of the implementing type.
-    fn description(&self) -> &str;
+    fn description(&self) -> Option<&str>;
 }

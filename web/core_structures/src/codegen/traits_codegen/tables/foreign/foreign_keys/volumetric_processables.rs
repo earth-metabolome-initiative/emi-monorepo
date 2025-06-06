@@ -33,7 +33,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if processables.id == self.id {
+                if self.id == processables.id {
                     foreign_keys.id = Some(processables);
                     updated = true;
                 }
@@ -42,7 +42,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::Processable(processables),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if processables.id == self.id {
+                if self.id == processables.id {
                     foreign_keys.id = None;
                     updated = true;
                 }

@@ -1,5 +1,4 @@
-use async_trait::async_trait;
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 
 use super::ConstraintError;
 use crate::{Column, custom_schema_constraints::CustomColumnConstraint, errors::WebCodeGenError};
@@ -20,11 +19,10 @@ impl<'column> HasSpecificTypeConstraint<'column> {
     }
 }
 
-#[async_trait]
 impl CustomColumnConstraint for HasSpecificTypeConstraint<'_> {
-    async fn check_constraint(
+    fn check_constraint(
         &self,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
         column: &Column,
     ) -> Result<(), WebCodeGenError> {
         if self.column_name == column.column_name

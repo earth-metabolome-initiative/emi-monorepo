@@ -2,10 +2,10 @@ use std::path::Path;
 
 use diesel_migrations_utils::prelude::*;
 
-pub(crate) async fn init_migrations(
+pub(crate) fn init_migrations(
     migrations_directory: &Path,
     extension_migrations_directory: &Path,
-    conn: &mut diesel_async::AsyncPgConnection,
+    conn: &mut diesel::PgConnection,
 ) -> Result<(), crate::errors::Error> {
     // We delete empty directories in the `migrations` directory which may occur
     // when some git collision occurs.
@@ -38,8 +38,8 @@ pub(crate) async fn init_migrations(
     }
 
     // We execute the migrations
-    extension_migrations.execute_ups(conn).await?;
-    migrations.execute_ups(conn).await?;
+    extension_migrations.execute_ups(conn)?;
+    migrations.execute_ups(conn)?;
 
     Ok(())
 }

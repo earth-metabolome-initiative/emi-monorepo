@@ -31,13 +31,12 @@ impl DirectusRevision {
     #[cfg(feature = "postgres")]
     pub async fn activity(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_activity::directus_activity::dsl::id
@@ -51,13 +50,12 @@ impl DirectusRevision {
     #[cfg(feature = "postgres")]
     pub async fn parent(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision>,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(parent) = self.parent.as_ref() else {
             return Ok(None);
         };
@@ -75,13 +73,12 @@ impl DirectusRevision {
     #[cfg(feature = "postgres")]
     pub async fn version(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion>,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(version) = self.version.as_ref() else {
             return Ok(None);
         };
@@ -98,11 +95,10 @@ impl DirectusRevision {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_activity(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         activity: &crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions::dsl::activity
@@ -113,11 +109,10 @@ impl DirectusRevision {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_parent(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         parent: &crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions::dsl::parent
@@ -128,11 +123,10 @@ impl DirectusRevision {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_version(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         version: &crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions::dsl::version

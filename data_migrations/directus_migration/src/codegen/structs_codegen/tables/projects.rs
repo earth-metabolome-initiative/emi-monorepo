@@ -32,13 +32,12 @@ impl Project {
     #[cfg(feature = "postgres")]
     pub async fn user_created(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(user_created) = self.user_created.as_ref() else {
             return Ok(None);
         };
@@ -54,13 +53,12 @@ impl Project {
     #[cfg(feature = "postgres")]
     pub async fn user_updated(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(user_updated) = self.user_updated.as_ref() else {
             return Ok(None);
         };
@@ -76,13 +74,12 @@ impl Project {
     #[cfg(feature = "postgres")]
     pub async fn parent_project(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::projects::Project>,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(parent_project) = self.parent_project.as_ref() else {
             return Ok(None);
         };
@@ -98,11 +95,10 @@ impl Project {
     #[cfg(feature = "postgres")]
     pub async fn batch(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<crate::codegen::structs_codegen::tables::batches::Batch, diesel::result::Error>
     {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         crate::codegen::structs_codegen::tables::batches::Batch::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::batches::batches::dsl::id.eq(&self.batch),
@@ -112,11 +108,10 @@ impl Project {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_user_created(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::projects::projects::dsl::user_created
@@ -127,11 +122,10 @@ impl Project {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_user_updated(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::projects::projects::dsl::user_updated
@@ -142,11 +136,10 @@ impl Project {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_parent_project(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         parent_project: &crate::codegen::structs_codegen::tables::projects::Project,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::projects::projects::dsl::parent_project
@@ -157,11 +150,10 @@ impl Project {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_batch(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         batch: &crate::codegen::structs_codegen::tables::batches::Batch,
     ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::projects::projects::dsl::batch.eq(batch.id),
@@ -172,10 +164,9 @@ impl Project {
     #[cfg(feature = "postgres")]
     pub async fn from_project_id(
         project_id: &str,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{OptionalExtension, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(diesel::ExpressionMethods::eq(
                 crate::codegen::diesel_codegen::tables::projects::projects::project_id,

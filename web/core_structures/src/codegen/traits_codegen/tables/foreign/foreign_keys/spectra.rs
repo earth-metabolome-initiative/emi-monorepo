@@ -36,7 +36,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if spectra_collections.id == self.spectra_collection_id {
+                if self.spectra_collection_id == spectra_collections.id {
                     foreign_keys.spectra_collection = Some(spectra_collections);
                     updated = true;
                 }
@@ -45,7 +45,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::SpectraCollection(spectra_collections),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if spectra_collections.id == self.spectra_collection_id {
+                if self.spectra_collection_id == spectra_collections.id {
                     foreign_keys.spectra_collection = None;
                     updated = true;
                 }

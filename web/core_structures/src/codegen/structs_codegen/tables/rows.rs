@@ -1,30 +1,24 @@
 mod addresses;
 mod aliquoting_instrument_models;
-mod aliquoting_step_models;
-mod aliquoting_steps;
-mod ball_mill_step_models;
-mod ball_mill_steps;
+mod aliquoting_procedure_models;
+mod aliquoting_procedures;
+mod ball_mill_procedure_models;
 mod brands;
-mod centrifuge_step_models;
-mod centrifuge_steps;
-mod chemical_entities;
+mod centrifuge_procedure_models;
 mod cities;
 mod colors;
 mod commercial_product_lots;
 mod commercial_products;
 mod commercial_reagents;
 mod container_models;
+mod containers;
 mod countries;
-mod disposal_step_models;
-mod disposal_steps;
-mod document_formats;
+mod disposal_procedure_models;
 mod documents;
 mod email_providers;
-mod fractioning_step_models;
-mod fractioning_steps;
-mod freeze_drying_step_models;
-mod instrument_locations;
-mod instrument_model_categories;
+mod fractioning_procedure_models;
+mod fractioning_procedures;
+mod freeze_drying_procedure_models;
 mod instrument_models;
 mod instrument_states;
 mod instruments;
@@ -32,57 +26,41 @@ mod into_iter;
 mod len;
 mod login_providers;
 mod materials;
-mod nameplate_models;
+mod mix_countable_procedure_models;
+mod mix_solid_procedure_models;
+mod next_procedure_models;
 mod observation_subjects;
 mod organism_observations;
-mod organism_sampling_step_models;
 mod organism_taxa;
 mod organisms;
 mod organizations;
 mod packaging_models;
-mod packaging_step_models;
+mod packaging_procedure_models;
 mod parent_procedure_models;
 mod permanence_categories;
-mod postgres_async_bounded_read_dispatch;
-mod procedure_model_container_categories;
-mod procedure_model_instrument_categories;
-mod procedure_model_nameplate_categories;
-mod procedure_model_tool_categories;
+mod postgres_bounded_read_dispatch;
+mod pouring_procedure_models;
+mod procedure_model_trackables;
 mod procedure_models;
+mod procedure_trackables;
 mod procedures;
 mod processables;
-mod processing_steps;
+mod processing_procedures;
 mod project_states;
-mod project_workflow_models;
 mod projects;
 mod ranks;
 mod reagents;
 mod roles;
 mod rooms;
 mod sample_states;
-mod sampling_step_models;
-mod sampling_steps;
-mod shaking_step_models;
-mod shaking_steps;
+mod sampling_procedure_models;
+mod sampling_procedures;
+mod shaking_procedure_models;
+mod shared_procedure_model_trackables;
 mod spatial_ref_sys;
 mod spectra;
 mod spectra_collections;
 mod sqlite_bounded_read_dispatch;
-mod step_container_models;
-mod step_instruments;
-mod step_model_container_categories;
-mod step_model_instrument_categories;
-mod step_model_instrument_models;
-mod step_model_instruments;
-mod step_model_nameplate_categories;
-mod step_model_tool_categories;
-mod step_model_trackable_categories;
-mod step_models;
-mod step_nameplate_models;
-mod step_storage_containers;
-mod step_tool_models;
-mod steps;
-mod storage_containers;
 mod tabular;
 mod taxa;
 mod team_members;
@@ -90,10 +68,7 @@ mod team_projects;
 mod team_states;
 mod teams;
 mod temporary_user;
-mod tool_models;
-mod trackable_categories;
 mod trackable_locations;
-mod trackable_states;
 mod trackables;
 mod units;
 mod user_emails;
@@ -101,8 +76,7 @@ mod user_organizations;
 mod users;
 mod volumetric_processables;
 mod weighing_instrument_models;
-mod weighing_step_models;
-mod weighing_steps;
+mod weighing_procedure_models;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Rows {
@@ -112,33 +86,26 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::aliquoting_instrument_models::AliquotingInstrumentModel,
         >,
     ),
-    AliquotingStepModel(
+    AliquotingProcedureModel(
         Vec<
-            crate::codegen::structs_codegen::tables::aliquoting_step_models::AliquotingStepModel,
+            crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
         >,
     ),
-    AliquotingStep(
-        Vec<crate::codegen::structs_codegen::tables::aliquoting_steps::AliquotingStep>,
-    ),
-    BallMillStepModel(
+    AliquotingProcedure(
         Vec<
-            crate::codegen::structs_codegen::tables::ball_mill_step_models::BallMillStepModel,
+            crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure,
         >,
     ),
-    BallMillStep(
-        Vec<crate::codegen::structs_codegen::tables::ball_mill_steps::BallMillStep>,
+    BallMillProcedureModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::ball_mill_procedure_models::BallMillProcedureModel,
+        >,
     ),
     Brand(Vec<crate::codegen::structs_codegen::tables::brands::Brand>),
-    CentrifugeStepModel(
+    CentrifugeProcedureModel(
         Vec<
-            crate::codegen::structs_codegen::tables::centrifuge_step_models::CentrifugeStepModel,
+            crate::codegen::structs_codegen::tables::centrifuge_procedure_models::CentrifugeProcedureModel,
         >,
-    ),
-    CentrifugeStep(
-        Vec<crate::codegen::structs_codegen::tables::centrifuge_steps::CentrifugeStep>,
-    ),
-    ChemicalEntity(
-        Vec<crate::codegen::structs_codegen::tables::chemical_entities::ChemicalEntity>,
     ),
     City(Vec<crate::codegen::structs_codegen::tables::cities::City>),
     Color(Vec<crate::codegen::structs_codegen::tables::colors::Color>),
@@ -160,43 +127,30 @@ pub enum Rows {
     ContainerModel(
         Vec<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
     ),
+    Container(Vec<crate::codegen::structs_codegen::tables::containers::Container>),
     Country(Vec<crate::codegen::structs_codegen::tables::countries::Country>),
-    DisposalStepModel(
+    DisposalProcedureModel(
         Vec<
-            crate::codegen::structs_codegen::tables::disposal_step_models::DisposalStepModel,
+            crate::codegen::structs_codegen::tables::disposal_procedure_models::DisposalProcedureModel,
         >,
-    ),
-    DisposalStep(
-        Vec<crate::codegen::structs_codegen::tables::disposal_steps::DisposalStep>,
-    ),
-    DocumentFormat(
-        Vec<crate::codegen::structs_codegen::tables::document_formats::DocumentFormat>,
     ),
     Document(Vec<crate::codegen::structs_codegen::tables::documents::Document>),
     EmailProvider(
         Vec<crate::codegen::structs_codegen::tables::email_providers::EmailProvider>,
     ),
-    FractioningStepModel(
+    FractioningProcedureModel(
         Vec<
-            crate::codegen::structs_codegen::tables::fractioning_step_models::FractioningStepModel,
+            crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel,
         >,
     ),
-    FractioningStep(
-        Vec<crate::codegen::structs_codegen::tables::fractioning_steps::FractioningStep>,
-    ),
-    FreezeDryingStepModel(
+    FractioningProcedure(
         Vec<
-            crate::codegen::structs_codegen::tables::freeze_drying_step_models::FreezeDryingStepModel,
+            crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure,
         >,
     ),
-    InstrumentLocation(
+    FreezeDryingProcedureModel(
         Vec<
-            crate::codegen::structs_codegen::tables::instrument_locations::InstrumentLocation,
-        >,
-    ),
-    InstrumentModelCategory(
-        Vec<
-            crate::codegen::structs_codegen::tables::instrument_model_categories::InstrumentModelCategory,
+            crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel,
         >,
     ),
     InstrumentModel(
@@ -210,8 +164,20 @@ pub enum Rows {
         Vec<crate::codegen::structs_codegen::tables::login_providers::LoginProvider>,
     ),
     Material(Vec<crate::codegen::structs_codegen::tables::materials::Material>),
-    NameplateModel(
-        Vec<crate::codegen::structs_codegen::tables::nameplate_models::NameplateModel>,
+    MixCountableProcedureModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::mix_countable_procedure_models::MixCountableProcedureModel,
+        >,
+    ),
+    MixSolidProcedureModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::mix_solid_procedure_models::MixSolidProcedureModel,
+        >,
+    ),
+    NextProcedureModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::next_procedure_models::NextProcedureModel,
+        >,
     ),
     ObservationSubject(
         Vec<
@@ -221,11 +187,6 @@ pub enum Rows {
     OrganismObservation(
         Vec<
             crate::codegen::structs_codegen::tables::organism_observations::OrganismObservation,
-        >,
-    ),
-    OrganismSamplingStepModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::organism_sampling_step_models::OrganismSamplingStepModel,
         >,
     ),
     OrganismTaxon(
@@ -238,9 +199,9 @@ pub enum Rows {
     PackagingModel(
         Vec<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel>,
     ),
-    PackagingStepModel(
+    PackagingProcedureModel(
         Vec<
-            crate::codegen::structs_codegen::tables::packaging_step_models::PackagingStepModel,
+            crate::codegen::structs_codegen::tables::packaging_procedure_models::PackagingProcedureModel,
         >,
     ),
     ParentProcedureModel(
@@ -253,41 +214,33 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
         >,
     ),
-    ProcedureModelContainerCategory(
+    PouringProcedureModel(
         Vec<
-            crate::codegen::structs_codegen::tables::procedure_model_container_categories::ProcedureModelContainerCategory,
+            crate::codegen::structs_codegen::tables::pouring_procedure_models::PouringProcedureModel,
         >,
     ),
-    ProcedureModelInstrumentCategory(
+    ProcedureModelTrackable(
         Vec<
-            crate::codegen::structs_codegen::tables::procedure_model_instrument_categories::ProcedureModelInstrumentCategory,
-        >,
-    ),
-    ProcedureModelNameplateCategory(
-        Vec<
-            crate::codegen::structs_codegen::tables::procedure_model_nameplate_categories::ProcedureModelNameplateCategory,
-        >,
-    ),
-    ProcedureModelToolCategory(
-        Vec<
-            crate::codegen::structs_codegen::tables::procedure_model_tool_categories::ProcedureModelToolCategory,
+            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         >,
     ),
     ProcedureModel(
         Vec<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
     ),
+    ProcedureTrackable(
+        Vec<
+            crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
+        >,
+    ),
     Procedure(Vec<crate::codegen::structs_codegen::tables::procedures::Procedure>),
     Processable(Vec<crate::codegen::structs_codegen::tables::processables::Processable>),
-    ProcessingStep(
-        Vec<crate::codegen::structs_codegen::tables::processing_steps::ProcessingStep>,
+    ProcessingProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::processing_procedures::ProcessingProcedure,
+        >,
     ),
     ProjectState(
         Vec<crate::codegen::structs_codegen::tables::project_states::ProjectState>,
-    ),
-    ProjectWorkflowModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::project_workflow_models::ProjectWorkflowModel,
-        >,
     ),
     Project(Vec<crate::codegen::structs_codegen::tables::projects::Project>),
     Rank(Vec<crate::codegen::structs_codegen::tables::ranks::Rank>),
@@ -297,21 +250,25 @@ pub enum Rows {
     SampleState(
         Vec<crate::codegen::structs_codegen::tables::sample_states::SampleState>,
     ),
-    SamplingStepModel(
+    SamplingProcedureModel(
         Vec<
-            crate::codegen::structs_codegen::tables::sampling_step_models::SamplingStepModel,
+            crate::codegen::structs_codegen::tables::sampling_procedure_models::SamplingProcedureModel,
         >,
     ),
-    SamplingStep(
-        Vec<crate::codegen::structs_codegen::tables::sampling_steps::SamplingStep>,
-    ),
-    ShakingStepModel(
+    SamplingProcedure(
         Vec<
-            crate::codegen::structs_codegen::tables::shaking_step_models::ShakingStepModel,
+            crate::codegen::structs_codegen::tables::sampling_procedures::SamplingProcedure,
         >,
     ),
-    ShakingStep(
-        Vec<crate::codegen::structs_codegen::tables::shaking_steps::ShakingStep>,
+    ShakingProcedureModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::shaking_procedure_models::ShakingProcedureModel,
+        >,
+    ),
+    SharedProcedureModelTrackable(
+        Vec<
+            crate::codegen::structs_codegen::tables::shared_procedure_model_trackables::SharedProcedureModelTrackable,
+        >,
     ),
     SpatialRefSy(
         Vec<crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy>,
@@ -320,69 +277,6 @@ pub enum Rows {
     SpectraCollection(
         Vec<
             crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
-        >,
-    ),
-    StepContainerModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::step_container_models::StepContainerModel,
-        >,
-    ),
-    StepInstrument(
-        Vec<crate::codegen::structs_codegen::tables::step_instruments::StepInstrument>,
-    ),
-    StepModelContainerCategory(
-        Vec<
-            crate::codegen::structs_codegen::tables::step_model_container_categories::StepModelContainerCategory,
-        >,
-    ),
-    StepModelInstrumentCategory(
-        Vec<
-            crate::codegen::structs_codegen::tables::step_model_instrument_categories::StepModelInstrumentCategory,
-        >,
-    ),
-    StepModelInstrumentModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::step_model_instrument_models::StepModelInstrumentModel,
-        >,
-    ),
-    StepModelInstrument(
-        Vec<
-            crate::codegen::structs_codegen::tables::step_model_instruments::StepModelInstrument,
-        >,
-    ),
-    StepModelNameplateCategory(
-        Vec<
-            crate::codegen::structs_codegen::tables::step_model_nameplate_categories::StepModelNameplateCategory,
-        >,
-    ),
-    StepModelToolCategory(
-        Vec<
-            crate::codegen::structs_codegen::tables::step_model_tool_categories::StepModelToolCategory,
-        >,
-    ),
-    StepModelTrackableCategory(
-        Vec<
-            crate::codegen::structs_codegen::tables::step_model_trackable_categories::StepModelTrackableCategory,
-        >,
-    ),
-    StepModel(Vec<crate::codegen::structs_codegen::tables::step_models::StepModel>),
-    StepNameplateModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::step_nameplate_models::StepNameplateModel,
-        >,
-    ),
-    StepStorageContainer(
-        Vec<
-            crate::codegen::structs_codegen::tables::step_storage_containers::StepStorageContainer,
-        >,
-    ),
-    StepToolModel(
-        Vec<crate::codegen::structs_codegen::tables::step_tool_models::StepToolModel>,
-    ),
-    Step(Vec<crate::codegen::structs_codegen::tables::steps::Step>),
-    StorageContainer(
-        Vec<
-            crate::codegen::structs_codegen::tables::storage_containers::StorageContainer,
         >,
     ),
     Taxon(Vec<crate::codegen::structs_codegen::tables::taxa::Taxon>),
@@ -395,19 +289,10 @@ pub enum Rows {
     TemporaryUser(
         Vec<crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser>,
     ),
-    ToolModel(Vec<crate::codegen::structs_codegen::tables::tool_models::ToolModel>),
-    TrackableCategory(
-        Vec<
-            crate::codegen::structs_codegen::tables::trackable_categories::TrackableCategory,
-        >,
-    ),
     TrackableLocation(
         Vec<
             crate::codegen::structs_codegen::tables::trackable_locations::TrackableLocation,
         >,
-    ),
-    TrackableState(
-        Vec<crate::codegen::structs_codegen::tables::trackable_states::TrackableState>,
     ),
     Trackable(Vec<crate::codegen::structs_codegen::tables::trackables::Trackable>),
     Unit(Vec<crate::codegen::structs_codegen::tables::units::Unit>),
@@ -428,13 +313,10 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
         >,
     ),
-    WeighingStepModel(
+    WeighingProcedureModel(
         Vec<
-            crate::codegen::structs_codegen::tables::weighing_step_models::WeighingStepModel,
+            crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel,
         >,
-    ),
-    WeighingStep(
-        Vec<crate::codegen::structs_codegen::tables::weighing_steps::WeighingStep>,
     ),
 }
 impl Rows {
@@ -460,29 +342,22 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::AliquotingStepModel(aliquoting_step_models) => {
-                aliquoting_step_models
+            Rows::AliquotingProcedureModel(aliquoting_procedure_models) => {
+                aliquoting_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::AliquotingStep(aliquoting_steps) => {
-                aliquoting_steps
+            Rows::AliquotingProcedure(aliquoting_procedures) => {
+                aliquoting_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::BallMillStepModel(ball_mill_step_models) => {
-                ball_mill_step_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::BallMillStep(ball_mill_steps) => {
-                ball_mill_steps
+            Rows::BallMillProcedureModel(ball_mill_procedure_models) => {
+                ball_mill_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -495,22 +370,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::CentrifugeStepModel(centrifuge_step_models) => {
-                centrifuge_step_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::CentrifugeStep(centrifuge_steps) => {
-                centrifuge_steps
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ChemicalEntity(chemical_entities) => {
-                chemical_entities
+            Rows::CentrifugeProcedureModel(centrifuge_procedure_models) => {
+                centrifuge_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -558,6 +419,13 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::Container(containers) => {
+                containers
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::Country(countries) => {
                 countries
                     .iter()
@@ -565,22 +433,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::DisposalStepModel(disposal_step_models) => {
-                disposal_step_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::DisposalStep(disposal_steps) => {
-                disposal_steps
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::DocumentFormat(document_formats) => {
-                document_formats
+            Rows::DisposalProcedureModel(disposal_procedure_models) => {
+                disposal_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -600,36 +454,22 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::FractioningStepModel(fractioning_step_models) => {
-                fractioning_step_models
+            Rows::FractioningProcedureModel(fractioning_procedure_models) => {
+                fractioning_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::FractioningStep(fractioning_steps) => {
-                fractioning_steps
+            Rows::FractioningProcedure(fractioning_procedures) => {
+                fractioning_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::FreezeDryingStepModel(freeze_drying_step_models) => {
-                freeze_drying_step_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::InstrumentLocation(instrument_locations) => {
-                instrument_locations
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::InstrumentModelCategory(instrument_model_categories) => {
-                instrument_model_categories
+            Rows::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
+                freeze_drying_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -670,8 +510,22 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::NameplateModel(nameplate_models) => {
-                nameplate_models
+            Rows::MixCountableProcedureModel(mix_countable_procedure_models) => {
+                mix_countable_procedure_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::MixSolidProcedureModel(mix_solid_procedure_models) => {
+                mix_solid_procedure_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::NextProcedureModel(next_procedure_models) => {
+                next_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -686,13 +540,6 @@ impl Rows {
             }
             Rows::OrganismObservation(organism_observations) => {
                 organism_observations
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::OrganismSamplingStepModel(organism_sampling_step_models) => {
-                organism_sampling_step_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -726,8 +573,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::PackagingStepModel(packaging_step_models) => {
-                packaging_step_models
+            Rows::PackagingProcedureModel(packaging_procedure_models) => {
+                packaging_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -747,29 +594,15 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::ProcedureModelContainerCategory(procedure_model_container_categories) => {
-                procedure_model_container_categories
+            Rows::PouringProcedureModel(pouring_procedure_models) => {
+                pouring_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::ProcedureModelInstrumentCategory(procedure_model_instrument_categories) => {
-                procedure_model_instrument_categories
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
-                procedure_model_nameplate_categories
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ProcedureModelToolCategory(procedure_model_tool_categories) => {
-                procedure_model_tool_categories
+            Rows::ProcedureModelTrackable(procedure_model_trackables) => {
+                procedure_model_trackables
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -777,6 +610,13 @@ impl Rows {
             }
             Rows::ProcedureModel(procedure_models) => {
                 procedure_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::ProcedureTrackable(procedure_trackables) => {
+                procedure_trackables
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -796,8 +636,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::ProcessingStep(processing_steps) => {
-                processing_steps
+            Rows::ProcessingProcedure(processing_procedures) => {
+                processing_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -805,13 +645,6 @@ impl Rows {
             }
             Rows::ProjectState(project_states) => {
                 project_states
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ProjectWorkflowModel(project_workflow_models) => {
-                project_workflow_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -859,29 +692,29 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::SamplingStepModel(sampling_step_models) => {
-                sampling_step_models
+            Rows::SamplingProcedureModel(sampling_procedure_models) => {
+                sampling_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::SamplingStep(sampling_steps) => {
-                sampling_steps
+            Rows::SamplingProcedure(sampling_procedures) => {
+                sampling_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::ShakingStepModel(shaking_step_models) => {
-                shaking_step_models
+            Rows::ShakingProcedureModel(shaking_procedure_models) => {
+                shaking_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::ShakingStep(shaking_steps) => {
-                shaking_steps
+            Rows::SharedProcedureModelTrackable(shared_procedure_model_trackables) => {
+                shared_procedure_model_trackables
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -903,111 +736,6 @@ impl Rows {
             }
             Rows::SpectraCollection(spectra_collections) => {
                 spectra_collections
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::StepContainerModel(step_container_models) => {
-                step_container_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::StepInstrument(step_instruments) => {
-                step_instruments
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::StepModelContainerCategory(step_model_container_categories) => {
-                step_model_container_categories
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::StepModelInstrumentCategory(step_model_instrument_categories) => {
-                step_model_instrument_categories
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::StepModelInstrumentModel(step_model_instrument_models) => {
-                step_model_instrument_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::StepModelInstrument(step_model_instruments) => {
-                step_model_instruments
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::StepModelNameplateCategory(step_model_nameplate_categories) => {
-                step_model_nameplate_categories
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::StepModelToolCategory(step_model_tool_categories) => {
-                step_model_tool_categories
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::StepModelTrackableCategory(step_model_trackable_categories) => {
-                step_model_trackable_categories
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::StepModel(step_models) => {
-                step_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::StepNameplateModel(step_nameplate_models) => {
-                step_nameplate_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::StepStorageContainer(step_storage_containers) => {
-                step_storage_containers
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::StepToolModel(step_tool_models) => {
-                step_tool_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Step(steps) => {
-                steps
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::StorageContainer(storage_containers) => {
-                storage_containers
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -1054,29 +782,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::ToolModel(tool_models) => {
-                tool_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::TrackableCategory(trackable_categories) => {
-                trackable_categories
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
             Rows::TrackableLocation(trackable_locations) => {
                 trackable_locations
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::TrackableState(trackable_states) => {
-                trackable_states
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -1131,15 +838,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::WeighingStepModel(weighing_step_models) => {
-                weighing_step_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::WeighingStep(weighing_steps) => {
-                weighing_steps
+            Rows::WeighingProcedureModel(weighing_procedure_models) => {
+                weighing_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -1156,18 +856,19 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::AliquotingInstrumentModel(aliquoting_instrument_models) => {
                 aliquoting_instrument_models.primary_keys()
             }
-            Rows::AliquotingStepModel(aliquoting_step_models) => {
-                aliquoting_step_models.primary_keys()
+            Rows::AliquotingProcedureModel(aliquoting_procedure_models) => {
+                aliquoting_procedure_models.primary_keys()
             }
-            Rows::AliquotingStep(aliquoting_steps) => aliquoting_steps.primary_keys(),
-            Rows::BallMillStepModel(ball_mill_step_models) => ball_mill_step_models.primary_keys(),
-            Rows::BallMillStep(ball_mill_steps) => ball_mill_steps.primary_keys(),
+            Rows::AliquotingProcedure(aliquoting_procedures) => {
+                aliquoting_procedures.primary_keys()
+            }
+            Rows::BallMillProcedureModel(ball_mill_procedure_models) => {
+                ball_mill_procedure_models.primary_keys()
+            }
             Rows::Brand(brands) => brands.primary_keys(),
-            Rows::CentrifugeStepModel(centrifuge_step_models) => {
-                centrifuge_step_models.primary_keys()
+            Rows::CentrifugeProcedureModel(centrifuge_procedure_models) => {
+                centrifuge_procedure_models.primary_keys()
             }
-            Rows::CentrifugeStep(centrifuge_steps) => centrifuge_steps.primary_keys(),
-            Rows::ChemicalEntity(chemical_entities) => chemical_entities.primary_keys(),
             Rows::City(cities) => cities.primary_keys(),
             Rows::Color(colors) => colors.primary_keys(),
             Rows::CommercialProductLot(commercial_product_lots) => {
@@ -1176,119 +877,89 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::CommercialProduct(commercial_products) => commercial_products.primary_keys(),
             Rows::CommercialReagent(commercial_reagents) => commercial_reagents.primary_keys(),
             Rows::ContainerModel(container_models) => container_models.primary_keys(),
+            Rows::Container(containers) => containers.primary_keys(),
             Rows::Country(countries) => countries.primary_keys(),
-            Rows::DisposalStepModel(disposal_step_models) => disposal_step_models.primary_keys(),
-            Rows::DisposalStep(disposal_steps) => disposal_steps.primary_keys(),
-            Rows::DocumentFormat(document_formats) => document_formats.primary_keys(),
+            Rows::DisposalProcedureModel(disposal_procedure_models) => {
+                disposal_procedure_models.primary_keys()
+            }
             Rows::Document(documents) => documents.primary_keys(),
             Rows::EmailProvider(email_providers) => email_providers.primary_keys(),
-            Rows::FractioningStepModel(fractioning_step_models) => {
-                fractioning_step_models.primary_keys()
+            Rows::FractioningProcedureModel(fractioning_procedure_models) => {
+                fractioning_procedure_models.primary_keys()
             }
-            Rows::FractioningStep(fractioning_steps) => fractioning_steps.primary_keys(),
-            Rows::FreezeDryingStepModel(freeze_drying_step_models) => {
-                freeze_drying_step_models.primary_keys()
+            Rows::FractioningProcedure(fractioning_procedures) => {
+                fractioning_procedures.primary_keys()
             }
-            Rows::InstrumentLocation(instrument_locations) => instrument_locations.primary_keys(),
-            Rows::InstrumentModelCategory(instrument_model_categories) => {
-                instrument_model_categories.primary_keys()
+            Rows::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
+                freeze_drying_procedure_models.primary_keys()
             }
             Rows::InstrumentModel(instrument_models) => instrument_models.primary_keys(),
             Rows::InstrumentState(instrument_states) => instrument_states.primary_keys(),
             Rows::Instrument(instruments) => instruments.primary_keys(),
             Rows::LoginProvider(login_providers) => login_providers.primary_keys(),
             Rows::Material(materials) => materials.primary_keys(),
-            Rows::NameplateModel(nameplate_models) => nameplate_models.primary_keys(),
+            Rows::MixCountableProcedureModel(mix_countable_procedure_models) => {
+                mix_countable_procedure_models.primary_keys()
+            }
+            Rows::MixSolidProcedureModel(mix_solid_procedure_models) => {
+                mix_solid_procedure_models.primary_keys()
+            }
+            Rows::NextProcedureModel(next_procedure_models) => next_procedure_models.primary_keys(),
             Rows::ObservationSubject(observation_subjects) => observation_subjects.primary_keys(),
             Rows::OrganismObservation(organism_observations) => {
                 organism_observations.primary_keys()
-            }
-            Rows::OrganismSamplingStepModel(organism_sampling_step_models) => {
-                organism_sampling_step_models.primary_keys()
             }
             Rows::OrganismTaxon(organism_taxa) => organism_taxa.primary_keys(),
             Rows::Organism(organisms) => organisms.primary_keys(),
             Rows::Organization(organizations) => organizations.primary_keys(),
             Rows::PackagingModel(packaging_models) => packaging_models.primary_keys(),
-            Rows::PackagingStepModel(packaging_step_models) => packaging_step_models.primary_keys(),
+            Rows::PackagingProcedureModel(packaging_procedure_models) => {
+                packaging_procedure_models.primary_keys()
+            }
             Rows::ParentProcedureModel(parent_procedure_models) => {
                 parent_procedure_models.primary_keys()
             }
             Rows::PermanenceCategory(permanence_categories) => permanence_categories.primary_keys(),
-            Rows::ProcedureModelContainerCategory(procedure_model_container_categories) => {
-                procedure_model_container_categories.primary_keys()
+            Rows::PouringProcedureModel(pouring_procedure_models) => {
+                pouring_procedure_models.primary_keys()
             }
-            Rows::ProcedureModelInstrumentCategory(procedure_model_instrument_categories) => {
-                procedure_model_instrument_categories.primary_keys()
-            }
-            Rows::ProcedureModelNameplateCategory(procedure_model_nameplate_categories) => {
-                procedure_model_nameplate_categories.primary_keys()
-            }
-            Rows::ProcedureModelToolCategory(procedure_model_tool_categories) => {
-                procedure_model_tool_categories.primary_keys()
+            Rows::ProcedureModelTrackable(procedure_model_trackables) => {
+                procedure_model_trackables.primary_keys()
             }
             Rows::ProcedureModel(procedure_models) => procedure_models.primary_keys(),
+            Rows::ProcedureTrackable(procedure_trackables) => procedure_trackables.primary_keys(),
             Rows::Procedure(procedures) => procedures.primary_keys(),
             Rows::Processable(processables) => processables.primary_keys(),
-            Rows::ProcessingStep(processing_steps) => processing_steps.primary_keys(),
-            Rows::ProjectState(project_states) => project_states.primary_keys(),
-            Rows::ProjectWorkflowModel(project_workflow_models) => {
-                project_workflow_models.primary_keys()
+            Rows::ProcessingProcedure(processing_procedures) => {
+                processing_procedures.primary_keys()
             }
+            Rows::ProjectState(project_states) => project_states.primary_keys(),
             Rows::Project(projects) => projects.primary_keys(),
             Rows::Rank(ranks) => ranks.primary_keys(),
             Rows::Reagent(reagents) => reagents.primary_keys(),
             Rows::Role(roles) => roles.primary_keys(),
             Rows::Room(rooms) => rooms.primary_keys(),
             Rows::SampleState(sample_states) => sample_states.primary_keys(),
-            Rows::SamplingStepModel(sampling_step_models) => sampling_step_models.primary_keys(),
-            Rows::SamplingStep(sampling_steps) => sampling_steps.primary_keys(),
-            Rows::ShakingStepModel(shaking_step_models) => shaking_step_models.primary_keys(),
-            Rows::ShakingStep(shaking_steps) => shaking_steps.primary_keys(),
+            Rows::SamplingProcedureModel(sampling_procedure_models) => {
+                sampling_procedure_models.primary_keys()
+            }
+            Rows::SamplingProcedure(sampling_procedures) => sampling_procedures.primary_keys(),
+            Rows::ShakingProcedureModel(shaking_procedure_models) => {
+                shaking_procedure_models.primary_keys()
+            }
+            Rows::SharedProcedureModelTrackable(shared_procedure_model_trackables) => {
+                shared_procedure_model_trackables.primary_keys()
+            }
             Rows::SpatialRefSy(spatial_ref_sys) => spatial_ref_sys.primary_keys(),
             Rows::Spectrum(spectra) => spectra.primary_keys(),
             Rows::SpectraCollection(spectra_collections) => spectra_collections.primary_keys(),
-            Rows::StepContainerModel(step_container_models) => step_container_models.primary_keys(),
-            Rows::StepInstrument(step_instruments) => step_instruments.primary_keys(),
-            Rows::StepModelContainerCategory(step_model_container_categories) => {
-                step_model_container_categories.primary_keys()
-            }
-            Rows::StepModelInstrumentCategory(step_model_instrument_categories) => {
-                step_model_instrument_categories.primary_keys()
-            }
-            Rows::StepModelInstrumentModel(step_model_instrument_models) => {
-                step_model_instrument_models.primary_keys()
-            }
-            Rows::StepModelInstrument(step_model_instruments) => {
-                step_model_instruments.primary_keys()
-            }
-            Rows::StepModelNameplateCategory(step_model_nameplate_categories) => {
-                step_model_nameplate_categories.primary_keys()
-            }
-            Rows::StepModelToolCategory(step_model_tool_categories) => {
-                step_model_tool_categories.primary_keys()
-            }
-            Rows::StepModelTrackableCategory(step_model_trackable_categories) => {
-                step_model_trackable_categories.primary_keys()
-            }
-            Rows::StepModel(step_models) => step_models.primary_keys(),
-            Rows::StepNameplateModel(step_nameplate_models) => step_nameplate_models.primary_keys(),
-            Rows::StepStorageContainer(step_storage_containers) => {
-                step_storage_containers.primary_keys()
-            }
-            Rows::StepToolModel(step_tool_models) => step_tool_models.primary_keys(),
-            Rows::Step(steps) => steps.primary_keys(),
-            Rows::StorageContainer(storage_containers) => storage_containers.primary_keys(),
             Rows::Taxon(taxa) => taxa.primary_keys(),
             Rows::TeamMember(team_members) => team_members.primary_keys(),
             Rows::TeamProject(team_projects) => team_projects.primary_keys(),
             Rows::TeamState(team_states) => team_states.primary_keys(),
             Rows::Team(teams) => teams.primary_keys(),
             Rows::TemporaryUser(temporary_user) => temporary_user.primary_keys(),
-            Rows::ToolModel(tool_models) => tool_models.primary_keys(),
-            Rows::TrackableCategory(trackable_categories) => trackable_categories.primary_keys(),
             Rows::TrackableLocation(trackable_locations) => trackable_locations.primary_keys(),
-            Rows::TrackableState(trackable_states) => trackable_states.primary_keys(),
             Rows::Trackable(trackables) => trackables.primary_keys(),
             Rows::Unit(units) => units.primary_keys(),
             Rows::UserEmail(user_emails) => user_emails.primary_keys(),
@@ -1300,8 +971,9 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::WeighingInstrumentModel(weighing_instrument_models) => {
                 weighing_instrument_models.primary_keys()
             }
-            Rows::WeighingStepModel(weighing_step_models) => weighing_step_models.primary_keys(),
-            Rows::WeighingStep(weighing_steps) => weighing_steps.primary_keys(),
+            Rows::WeighingProcedureModel(weighing_procedure_models) => {
+                weighing_procedure_models.primary_keys()
+            }
         }
     }
 }

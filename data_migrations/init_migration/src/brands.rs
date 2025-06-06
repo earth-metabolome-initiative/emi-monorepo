@@ -1,11 +1,8 @@
 //! Submodule defining the init migrations for the brands.
 
 use core_structures::{Brand, User};
-use diesel_async::AsyncPgConnection;
-use web_common_traits::{
-    database::{BackendInsertableVariant, Insertable},
-    prelude::Builder,
-};
+use diesel::PgConnection;
+use web_common_traits::database::{Insertable, InsertableVariant};
 
 /// Initializes the Fisher Scientific brand in the database.
 ///
@@ -18,19 +15,17 @@ use web_common_traits::{
 ///
 /// * If the connection to the database fails.
 /// * If the brand cannot be created.
-pub(crate) async fn fisher_scientific(
+pub(crate) fn fisher_scientific(
     user: &User,
-    portal_conn: &mut AsyncPgConnection,
+    portal_conn: &mut PgConnection,
 ) -> Result<Brand, crate::error::Error> {
-    match Brand::from_name("Fisher Scientific", portal_conn).await? {
+    match Brand::from_name("Fisher Scientific", portal_conn)? {
         Some(brand) => Ok(brand),
         None => {
             Ok(Brand::new()
                 .name("Fisher Scientific")?
                 .created_by(user.id)?
-                .build()?
-                .backend_insert(portal_conn)
-                .await?)
+                .insert(user.id, portal_conn)?)
         }
     }
 }
@@ -46,30 +41,28 @@ pub(crate) async fn fisher_scientific(
 ///
 /// * If the connection to the database fails.
 /// * If the brand cannot be created.
-pub(crate) async fn acros_organics(
+pub(crate) fn acros_organics(
     user: &User,
-    portal_conn: &mut AsyncPgConnection,
+    portal_conn: &mut PgConnection,
 ) -> Result<Brand, crate::error::Error> {
-    match Brand::from_name("Acros Organics", portal_conn).await? {
+    match Brand::from_name("Acros Organics", portal_conn)? {
         Some(brand) => Ok(brand),
         None => {
             Ok(Brand::new()
                 .name("Acros Organics")?
                 .created_by(user.id)?
-                .build()?
-                .backend_insert(portal_conn)
-                .await?)
+                .insert(user.id, portal_conn)?)
         }
     }
 }
 
 /// Initializes the brands in the database.
-pub(crate) async fn init_brands(
+pub(crate) fn init_brands(
     user: &User,
-    portal_conn: &mut AsyncPgConnection,
+    portal_conn: &mut PgConnection,
 ) -> Result<(), crate::error::Error> {
-    let _fisher_scientific = fisher_scientific(user, portal_conn).await?;
-    let _acros_organics = acros_organics(user, portal_conn).await?;
+    let _fisher_scientific = fisher_scientific(user, portal_conn)?;
+    let _acros_organics = acros_organics(user, portal_conn)?;
 
     Ok(())
 }

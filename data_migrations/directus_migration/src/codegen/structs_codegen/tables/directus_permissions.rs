@@ -31,13 +31,12 @@ impl DirectusPermission {
     #[cfg(feature = "postgres")]
     pub async fn policy(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy,
         diesel::result::Error,
     > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_policies::directus_policies::dsl::id
@@ -50,11 +49,10 @@ impl DirectusPermission {
     }
     #[cfg(feature = "postgres")]
     pub async fn from_policy(
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut diesel::PgConnection,
         policy: &crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
         Self::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::directus_permissions::directus_permissions::dsl::policy

@@ -1,7 +1,7 @@
 mod codegen;
 mod error;
 mod migrations;
-use diesel_async::{AsyncConnection, AsyncPgConnection};
+use diesel::{Connection, PgConnection};
 use migrations::{
     insert_missing_brands, insert_missing_instrument_models, insert_missing_instruments,
     insert_missing_users,
@@ -27,8 +27,8 @@ const PORTAL_DATABASE_URL: &str = const_format::formatcp!(
 /// Executes the data migration from the Directus database to the portal
 /// database.
 async fn transact_migration(
-    directus_conn: &mut AsyncPgConnection,
-    portal_conn: &mut AsyncPgConnection,
+    directus_conn: &mut PgConnection,
+    portal_conn: &mut PgConnection,
 ) -> Result<(), error::Error> {
     insert_missing_users(directus_conn, portal_conn).await?;
     insert_missing_brands(directus_conn, portal_conn).await?;
@@ -40,8 +40,8 @@ async fn transact_migration(
 
 #[tokio::main]
 async fn main() -> Result<(), error::Error> {
-    let mut directus_conn = AsyncPgConnection::establish(DIRECTUS_DATABASE_URL).await?;
-    let mut portal_conn = AsyncPgConnection::establish(PORTAL_DATABASE_URL).await?;
+    let mut directus_conn = PgConnection::establish(DIRECTUS_DATABASE_URL).await?;
+    let mut portal_conn = PgConnection::establish(PORTAL_DATABASE_URL).await?;
 
     portal_conn
         .transaction(|portal_conn| {

@@ -1,8 +1,7 @@
 use diesel::{
-    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
-    Selectable, SelectableHelper,
+    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, Queryable,
+    QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
-use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
 use super::Column;
 use crate::errors::WebCodeGenError;
@@ -78,10 +77,7 @@ impl PgIndex {
     /// # Errors
     ///
     /// If an error occurs while loading the columns from the database
-    pub async fn columns(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<Vec<Column>, WebCodeGenError> {
+    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
         use crate::schema::{columns, pg_attribute, pg_class, pg_index};
 
         Ok(pg_index::table
@@ -98,13 +94,17 @@ impl PgIndex {
                     .and(pg_attribute::attnum.eq_any(&self.indkey)),
             )
             .select(Column::as_select())
-            .load::<Column>(conn)
-            .await?)
+            .load::<Column>(conn)?)
     }
 
     #[must_use]
     /// Returns whether the index is unique
     pub fn is_unique(&self) -> bool {
         self.indisunique
+    }
+
+    /// Returns whether the index is a primary key
+    pub fn is_primary_key(&self) -> bool {
+        self.indisprimary
     }
 }

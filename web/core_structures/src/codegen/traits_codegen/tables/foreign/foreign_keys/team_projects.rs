@@ -1,8 +1,8 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TeamProjectForeignKeys {
-    pub team: Option<crate::codegen::structs_codegen::tables::teams::Team>,
     pub project: Option<crate::codegen::structs_codegen::tables::projects::Project>,
+    pub team: Option<crate::codegen::structs_codegen::tables::teams::Team>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::team_projects::TeamProject
@@ -14,14 +14,14 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Team(self.team_id),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Project(self.project_id),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Project(self.project_id),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Team(self.team_id),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.team.is_some() && foreign_keys.project.is_some()
+        foreign_keys.project.is_some() && foreign_keys.team.is_some()
     }
     fn update(
         &self,
@@ -37,7 +37,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if projects.id == self.project_id {
+                if self.project_id == projects.id {
                     foreign_keys.project = Some(projects);
                     updated = true;
                 }
@@ -46,7 +46,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::Project(projects),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if projects.id == self.project_id {
+                if self.project_id == projects.id {
                     foreign_keys.project = None;
                     updated = true;
                 }
@@ -57,7 +57,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if teams.id == self.team_id {
+                if self.team_id == teams.id {
                     foreign_keys.team = Some(teams);
                     updated = true;
                 }
@@ -66,7 +66,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::Team(teams),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if teams.id == self.team_id {
+                if self.team_id == teams.id {
                     foreign_keys.team = None;
                     updated = true;
                 }

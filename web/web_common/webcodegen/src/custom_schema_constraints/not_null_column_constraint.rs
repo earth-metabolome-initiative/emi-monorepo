@@ -1,5 +1,4 @@
-use async_trait::async_trait;
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 
 use crate::{
     Column,
@@ -21,11 +20,10 @@ impl NotNullColumnConstraint {
     }
 }
 
-#[async_trait]
 impl CustomColumnConstraint for NotNullColumnConstraint {
-    async fn check_constraint(
+    fn check_constraint(
         &self,
-        _conn: &mut AsyncPgConnection,
+        _conn: &mut PgConnection,
         column: &Column,
     ) -> Result<(), WebCodeGenError> {
         if self.column_name == column.column_name && column.is_nullable() {

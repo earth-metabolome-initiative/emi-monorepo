@@ -27,23 +27,37 @@ pub struct InsertableTemporaryUser {
     login_provider_id: i16,
 }
 impl InsertableTemporaryUser {
-    #[cfg(feature = "postgres")]
-    pub async fn login_provider(
+    pub fn login_provider<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel_async::AsyncPgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-        use diesel_async::RunQueryDsl;
-        crate::codegen::structs_codegen::tables::login_providers::LoginProvider::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::login_providers::login_providers::dsl::id
-                    .eq(&self.login_provider_id),
-            )
-            .first::<crate::codegen::structs_codegen::tables::login_providers::LoginProvider>(conn)
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::login_providers::LoginProvider::table(),
+                self.login_provider_id,
+            ),
+            conn,
+        )
     }
 }
 #[derive(Default)]
@@ -55,7 +69,7 @@ impl InsertableTemporaryUserBuilder {
     pub fn email<P>(
         mut self,
         email: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTemporaryUserAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
@@ -63,13 +77,15 @@ impl InsertableTemporaryUserBuilder {
         let email = email.try_into().map_err(|err: <P as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableTemporaryUserAttributes::Email)
         })?;
+        pgrx_validation::must_be_email(email.as_ref())
+            .map_err(|e| e.rename_field(InsertableTemporaryUserAttributes::Email))?;
         self.email = Some(email);
         Ok(self)
     }
     pub fn login_provider_id<P>(
         mut self,
         login_provider_id: P,
-    ) -> Result<Self, <Self as common_traits::prelude::Builder>::Error>
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTemporaryUserAttributes>>
     where
         P: TryInto<i16>,
         <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
@@ -82,28 +98,20 @@ impl InsertableTemporaryUserBuilder {
         Ok(self)
     }
 }
-impl common_traits::prelude::Builder for InsertableTemporaryUserBuilder {
-    type Error = web_common_traits::database::InsertError<InsertableTemporaryUserAttributes>;
-    type Object = InsertableTemporaryUser;
-    type Attribute = InsertableTemporaryUserAttributes;
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Self::Object {
-            email: self.email.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+impl TryFrom<InsertableTemporaryUserBuilder> for InsertableTemporaryUser {
+    type Error = common_traits::prelude::BuilderError<InsertableTemporaryUserAttributes>;
+    fn try_from(
+        builder: InsertableTemporaryUserBuilder,
+    ) -> Result<InsertableTemporaryUser, Self::Error> {
+        Ok(Self {
+            email: builder.email.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableTemporaryUserAttributes::Email,
             ))?,
-            login_provider_id: self.login_provider_id.ok_or(
+            login_provider_id: builder.login_provider_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableTemporaryUserAttributes::LoginProviderId,
                 ),
             )?,
         })
-    }
-}
-impl TryFrom<InsertableTemporaryUser> for InsertableTemporaryUserBuilder {
-    type Error = <Self as common_traits::prelude::Builder>::Error;
-    fn try_from(insertable_variant: InsertableTemporaryUser) -> Result<Self, Self::Error> {
-        Self::default()
-            .email(insertable_variant.email)?
-            .login_provider_id(insertable_variant.login_provider_id)
     }
 }

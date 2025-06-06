@@ -13,7 +13,7 @@ use actix_web::{
 };
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use core_structures::{TemporaryUser, User};
-use web_common_traits::database::AsyncRead;
+use web_common_traits::database::Read;
 
 use super::JsonAccessToken;
 use crate::BackendError;
@@ -103,7 +103,7 @@ impl FromRequest for MaybeUser {
             let token = bearer.token();
             let access_token = JsonAccessToken::decode(token)?;
 
-            let mut conn = diesel_pool.get().await.map_err(BackendError::from)?;
+            let mut conn = diesel_pool.get().map_err(BackendError::from)?;
 
             // If the token is expired, we return an error.
             if access_token.is_expired() {
@@ -125,8 +125,7 @@ impl FromRequest for MaybeUser {
             }
 
             let user_wrapper: MaybeUser = if access_token.is_temporary() {
-                match TemporaryUser::read_async(access_token.user_id(), &mut conn)
-                    .await
+                match TemporaryUser::read(access_token.user_id(), &mut conn)
                     .map_err(BackendError::from)?
                 {
                     None => {
@@ -135,10 +134,7 @@ impl FromRequest for MaybeUser {
                     Some(user) => user.into(),
                 }
             } else {
-                match User::read_async(access_token.user_id(), &mut conn)
-                    .await
-                    .map_err(BackendError::from)?
-                {
+                match User::read(access_token.user_id(), &mut conn).map_err(BackendError::from)? {
                     None => {
                         return Err(BackendError::Unauthorized.into());
                     }

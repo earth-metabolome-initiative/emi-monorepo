@@ -43,7 +43,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if organisms.id == self.organism_id {
+                if self.organism_id == organisms.id {
                     foreign_keys.organism = Some(organisms);
                     updated = true;
                 }
@@ -52,7 +52,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::Organism(organisms),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if organisms.id == self.organism_id {
+                if self.organism_id == organisms.id {
                     foreign_keys.organism = None;
                     updated = true;
                 }
@@ -63,7 +63,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if taxa.id == self.taxon_id {
+                if self.taxon_id == taxa.id {
                     foreign_keys.taxon = Some(taxa);
                     updated = true;
                 }
@@ -72,7 +72,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::Taxon(taxa),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if taxa.id == self.taxon_id {
+                if self.taxon_id == taxa.id {
                     foreign_keys.taxon = None;
                     updated = true;
                 }
@@ -83,7 +83,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if users.id == self.created_by {
+                if self.created_by == users.id {
                     foreign_keys.created_by = Some(users);
                     updated = true;
                 }
@@ -92,7 +92,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::User(users),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if users.id == self.created_by {
+                if self.created_by == users.id {
                     foreign_keys.created_by = None;
                     updated = true;
                 }
