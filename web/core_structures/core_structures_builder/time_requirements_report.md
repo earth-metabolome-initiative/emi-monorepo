@@ -10,14 +10,14 @@ The slowest task was `Code generation` which took 3 minutes (100.00% of all time
 ## Time Report for Code generation
 
 The total time spent on all tasks was 3 minutes.
-The slowest task was `Generate Structs` which took 2 minutes (89.01% of all time).
+The slowest task was `Generate Structs` which took 3 minutes (83.70% of all time).
 
 | name                       | time       | percentage | comment |
 |----------------------------|------------|------------|---------|
 | Retrieving tables          | now        | 0.00%      |         |
-| Generating Diesel code     | now        | 1.65%      |         |
-| Generate Structs           | 2 minutes  | 89.01%     |         |
-| Generate Web Common Traits | 16 seconds | 8.79%      |         |
+| Generating Diesel code     | now        | 3.52%      |         |
+| Generate Structs           | 3 minutes  | 83.70%     |         |
+| Generate Web Common Traits | 28 seconds | 12.33%     |         |
 
 ### Time Report for Generating Diesel code
 
@@ -32,36 +32,36 @@ The slowest task was `Generating allow tables to appear in same query schema` wh
 
 ### Time Report for Generate Structs
 
-The total time spent on all tasks was 2 minutes.
-The slowest task was `Generate Table Structs` which took 2 minutes (100.00% of all time).
+The total time spent on all tasks was 3 minutes.
+The slowest task was `Generate Table Structs` which took 3 minutes (100.00% of all time).
 
 | name                   | time      | percentage | comment |
 |------------------------|-----------|------------|---------|
 | Generate Types Structs | now       | 0.00%      |         |
-| Generate Table Structs | 2 minutes | 100.00%    |         |
+| Generate Table Structs | 3 minutes | 100.00%    |         |
 
 ### Time Report for Generate Web Common Traits
 
-The total time spent on all tasks was 16 seconds.
-The slowest task was `Generate Table Traits` which took 16 seconds (100.00% of all time).
+The total time spent on all tasks was 28 seconds.
+The slowest task was `Generate Table Traits` which took 28 seconds (100.00% of all time).
 
 | name                  | time       | percentage | comment |
 |-----------------------|------------|------------|---------|
 | Generate Types Traits | now        | 0.00%      |         |
-| Generate Table Traits | 16 seconds | 100.00%    |         |
+| Generate Table Traits | 28 seconds | 100.00%    |         |
 
 #### Time Report for Generate Table Traits
 
-The total time spent on all tasks was 16 seconds.
-The slowest task was `Generate Foreign Traits` which took now (43.75% of all time).
+The total time spent on all tasks was 28 seconds.
+The slowest task was `Generate Foreign Traits` which took 14 seconds (50.00% of all time).
 
-| name                       | time | percentage | comment |
-|----------------------------|------|------------|---------|
-| Generate CRUD Traits       | now  | 0.00%      |         |
-| Generate Deletable Traits  | now  | 12.50%     |         |
-| Generate Upsertable Traits | now  | 0.00%      |         |
-| Generate Foreign Traits    | now  | 43.75%     |         |
-| Generate Insertable Traits | now  | 18.75%     |         |
-| Generate Updatable Traits  | now  | 18.75%     |         |
+| name                       | time       | percentage | comment |
+|----------------------------|------------|------------|---------|
+| Generate CRUD Traits       | now        | 0.00%      |         |
+| Generate Deletable Traits  | now        | 3.57%      |         |
+| Generate Upsertable Traits | now        | 0.00%      |         |
+| Generate Foreign Traits    | 14 seconds | 50.00%     |         |
+| Generate Insertable Traits | now        | 28.57%     |         |
+| Generate Updatable Traits  | now        | 10.71%     |         |
 
 ![Plot](time_requirements_report.png)

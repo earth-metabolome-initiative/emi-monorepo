@@ -30,10 +30,10 @@ pub struct InsertableUser {
 }
 impl InsertableUser {}
 pub struct InsertableUserBuilder {
-    first_name: Option<String>,
-    last_name: Option<String>,
-    created_at: Option<::rosetta_timestamp::TimestampUTC>,
-    updated_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) first_name: Option<String>,
+    pub(crate) last_name: Option<String>,
+    pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
 impl Default for InsertableUserBuilder {
     fn default() -> Self {

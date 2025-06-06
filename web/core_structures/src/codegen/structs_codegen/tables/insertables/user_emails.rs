@@ -63,10 +63,10 @@ impl InsertableUserEmail {
     }
 }
 pub struct InsertableUserEmailBuilder {
-    email: Option<String>,
-    created_by: Option<i32>,
-    created_at: Option<::rosetta_timestamp::TimestampUTC>,
-    primary_email: Option<bool>,
+    pub(crate) email: Option<String>,
+    pub(crate) created_by: Option<i32>,
+    pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) primary_email: Option<bool>,
 }
 impl Default for InsertableUserEmailBuilder {
     fn default() -> Self {

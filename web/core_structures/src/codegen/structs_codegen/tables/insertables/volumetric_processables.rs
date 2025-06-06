@@ -69,8 +69,9 @@ impl InsertableVolumetricProcessable {
 }
 #[derive(Default)]
 pub struct InsertableVolumetricProcessableBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder,
-    liters: Option<f32>,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder,
+    pub(crate) liters: Option<f32>,
 }
 impl InsertableVolumetricProcessableBuilder {
     pub fn liters<P>(
@@ -260,11 +261,10 @@ impl InsertableVolumetricProcessableBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableVolumetricProcessable {
-            liters: self.liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableVolumetricProcessableAttributes::Liters,
-            ))?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let liters = self.liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            InsertableVolumetricProcessableAttributes::Liters,
+        ))?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableVolumetricProcessable { id, liters })
     }
 }

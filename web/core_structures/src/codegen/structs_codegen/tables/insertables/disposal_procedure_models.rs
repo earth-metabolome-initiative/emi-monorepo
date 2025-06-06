@@ -66,7 +66,8 @@ impl InsertableDisposalProcedureModel {
 }
 #[derive(Default)]
 pub struct InsertableDisposalProcedureModelBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
 }
 impl InsertableDisposalProcedureModelBuilder {
     pub fn name<P>(
@@ -222,8 +223,7 @@ impl InsertableDisposalProcedureModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableDisposalProcedureModel {
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableDisposalProcedureModel { id })
     }
 }

@@ -76,9 +76,10 @@ impl InsertableContainerModel {
 }
 #[derive(Default)]
 pub struct InsertableContainerModelBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder,
-    liters: Option<f32>,
-    container_category: Option<::container_categories::ContainerCategory>,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder,
+    pub(crate) liters: Option<f32>,
+    pub(crate) container_category: Option<::container_categories::ContainerCategory>,
 }
 impl InsertableContainerModelBuilder {
     pub fn liters<P>(
@@ -263,16 +264,15 @@ impl InsertableContainerModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableContainerModel {
-            liters: self.liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableContainerModelAttributes::Liters,
-            ))?,
-            container_category: self.container_category.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableContainerModelAttributes::ContainerCategory,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let liters = self.liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            InsertableContainerModelAttributes::Liters,
+        ))?;
+        let container_category = self.container_category.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableContainerModelAttributes::ContainerCategory,
+            ),
+        )?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableContainerModel { id, liters, container_category })
     }
 }

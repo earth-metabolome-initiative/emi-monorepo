@@ -8,6 +8,7 @@ for crate::codegen::structs_codegen::tables::mix_countable_procedure_models::Mix
         use diesel::ExpressionMethods;
         use diesel::query_dsl::methods::FilterDsl;
         use diesel::upsert::excluded;
+        use diesel::BoolExpressionMethods;
         use diesel::RunQueryDsl;
         use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models::*;
         diesel::insert_into(table)
@@ -15,7 +16,12 @@ for crate::codegen::structs_codegen::tables::mix_countable_procedure_models::Mix
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(quantity.ne(excluded(quantity)))
+            .filter(
+                source
+                    .ne(excluded(source))
+                    .or(destination.ne(excluded(destination)))
+                    .or(quantity.ne(excluded(quantity))),
+            )
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }
@@ -30,6 +36,7 @@ for crate::codegen::structs_codegen::tables::mix_countable_procedure_models::Mix
         use diesel::ExpressionMethods;
         use diesel::query_dsl::methods::FilterDsl;
         use diesel::upsert::excluded;
+        use diesel::BoolExpressionMethods;
         use diesel::RunQueryDsl;
         use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models::*;
         diesel::insert_into(table)
@@ -37,7 +44,12 @@ for crate::codegen::structs_codegen::tables::mix_countable_procedure_models::Mix
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(quantity.ne(excluded(quantity)))
+            .filter(
+                source
+                    .ne(excluded(source))
+                    .or(destination.ne(excluded(destination)))
+                    .or(quantity.ne(excluded(quantity))),
+            )
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }

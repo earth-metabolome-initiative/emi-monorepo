@@ -68,7 +68,8 @@ impl InsertableInstrumentModel {
 }
 #[derive(Default)]
 pub struct InsertableInstrumentModelBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder,
 }
 impl InsertableInstrumentModelBuilder {
     pub fn deprecation_date<P>(
@@ -220,8 +221,7 @@ impl InsertableInstrumentModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableInstrumentModel {
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableInstrumentModel { id })
     }
 }

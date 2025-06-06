@@ -232,21 +232,21 @@ impl InsertableProject {
     }
 }
 pub struct InsertableProjectBuilder {
-    id: Option<i32>,
-    name: Option<String>,
-    description: Option<String>,
-    state_id: Option<i16>,
-    icon: Option<String>,
-    color_id: Option<i16>,
-    parent_project_id: Option<i32>,
-    budget: Option<f64>,
-    expenses: Option<f64>,
-    created_by: Option<i32>,
-    created_at: Option<::rosetta_timestamp::TimestampUTC>,
-    updated_by: Option<i32>,
-    updated_at: Option<::rosetta_timestamp::TimestampUTC>,
-    expected_end_date: Option<::rosetta_timestamp::TimestampUTC>,
-    end_date: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) id: Option<i32>,
+    pub(crate) name: Option<String>,
+    pub(crate) description: Option<String>,
+    pub(crate) state_id: Option<i16>,
+    pub(crate) icon: Option<String>,
+    pub(crate) color_id: Option<i16>,
+    pub(crate) parent_project_id: Option<i32>,
+    pub(crate) budget: Option<f64>,
+    pub(crate) expenses: Option<f64>,
+    pub(crate) created_by: Option<i32>,
+    pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) updated_by: Option<i32>,
+    pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) expected_end_date: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) end_date: Option<::rosetta_timestamp::TimestampUTC>,
 }
 impl Default for InsertableProjectBuilder {
     fn default() -> Self {

@@ -24,6 +24,8 @@ pub trait Builder: Default {
 pub enum BuilderError<A> {
     /// An attribute was not set.
     IncompleteBuild(A),
+    /// An automatically generated attribute was unexpectedly set.
+    UnexpectedAttribute(A),
 }
 
 impl<FieldName> BuilderError<FieldName> {
@@ -37,6 +39,9 @@ impl<FieldName> BuilderError<FieldName> {
             BuilderError::IncompleteBuild(missing_attribute) => {
                 BuilderError::IncompleteBuild(missing_attribute.into())
             }
+            BuilderError::UnexpectedAttribute(unexpected_attribute) => {
+                BuilderError::UnexpectedAttribute(unexpected_attribute.into())
+            }
         }
     }
 }
@@ -47,6 +52,12 @@ impl<A: core::fmt::Display> core::fmt::Display for BuilderError<A> {
             Self::IncompleteBuild(missing_attribute) => {
                 write!(f, "Incomplete build: missing attribute: {missing_attribute}")
             }
+            Self::UnexpectedAttribute(unexpected_attribute) => {
+                write!(
+                    f,
+                    "Unexpected attribute: the attribute {unexpected_attribute} was set, but it should not have been, as it will be overwritten."
+                )
+            }
         }
     }
 }
@@ -56,6 +67,12 @@ impl<A: core::fmt::Debug> core::fmt::Debug for BuilderError<A> {
         match self {
             Self::IncompleteBuild(missing_attribute) => {
                 write!(f, "Incomplete build: missing attribute: {missing_attribute:?}")
+            }
+            Self::UnexpectedAttribute(unexpected_attribute) => {
+                write!(
+                    f,
+                    "Unexpected attribute: the attribute {unexpected_attribute:?} was set, but it should not have been, as it will be overwritten."
+                )
             }
         }
     }

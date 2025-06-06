@@ -2,7 +2,6 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableProcedureModelTrackableAttributes {
     Name,
-    Optional,
     ProcedureModelId,
     TrackableId,
     CreatedBy,
@@ -14,9 +13,6 @@ impl core::fmt::Display for InsertableProcedureModelTrackableAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertableProcedureModelTrackableAttributes::Name => write!(f, "name"),
-            InsertableProcedureModelTrackableAttributes::Optional => {
-                write!(f, "optional")
-            }
             InsertableProcedureModelTrackableAttributes::ProcedureModelId => {
                 write!(f, "procedure_model_id")
             }
@@ -48,7 +44,6 @@ impl core::fmt::Display for InsertableProcedureModelTrackableAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureModelTrackable {
     name: String,
-    optional: bool,
     procedure_model_id: i32,
     trackable_id: ::rosetta_uuid::Uuid,
     created_by: i32,
@@ -187,20 +182,18 @@ impl InsertableProcedureModelTrackable {
     }
 }
 pub struct InsertableProcedureModelTrackableBuilder {
-    name: Option<String>,
-    optional: Option<bool>,
-    procedure_model_id: Option<i32>,
-    trackable_id: Option<::rosetta_uuid::Uuid>,
-    created_by: Option<i32>,
-    created_at: Option<::rosetta_timestamp::TimestampUTC>,
-    updated_by: Option<i32>,
-    updated_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) name: Option<String>,
+    pub(crate) procedure_model_id: Option<i32>,
+    pub(crate) trackable_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) created_by: Option<i32>,
+    pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) updated_by: Option<i32>,
+    pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
 impl Default for InsertableProcedureModelTrackableBuilder {
     fn default() -> Self {
         Self {
             name: None,
-            optional: Some(false),
             procedure_model_id: None,
             trackable_id: None,
             created_by: None,
@@ -228,23 +221,6 @@ impl InsertableProcedureModelTrackableBuilder {
         pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| e.rename_field(InsertableProcedureModelTrackableAttributes::Name))?;
         self.name = Some(name);
-        Ok(self)
-    }
-    pub fn optional<P>(
-        mut self,
-        optional: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcedureModelTrackableAttributes>,
-    >
-    where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let optional = optional.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
-            Into::into(err).rename_field(InsertableProcedureModelTrackableAttributes::Optional)
-        })?;
-        self.optional = Some(optional);
         Ok(self)
     }
     pub fn procedure_model_id<P>(
@@ -371,11 +347,6 @@ impl TryFrom<InsertableProcedureModelTrackableBuilder> for InsertableProcedureMo
             name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableProcedureModelTrackableAttributes::Name,
             ))?,
-            optional: builder.optional.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureModelTrackableAttributes::Optional,
-                ),
-            )?,
             procedure_model_id: builder.procedure_model_id.ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     InsertableProcedureModelTrackableAttributes::ProcedureModelId,

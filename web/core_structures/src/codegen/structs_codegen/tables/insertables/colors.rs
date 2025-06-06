@@ -28,9 +28,9 @@ pub struct InsertableColor {
 impl InsertableColor {}
 #[derive(Default)]
 pub struct InsertableColorBuilder {
-    name: Option<String>,
-    hexadecimal_value: Option<String>,
-    description: Option<String>,
+    pub(crate) name: Option<String>,
+    pub(crate) hexadecimal_value: Option<String>,
+    pub(crate) description: Option<String>,
 }
 impl InsertableColorBuilder {
     pub fn name<P>(

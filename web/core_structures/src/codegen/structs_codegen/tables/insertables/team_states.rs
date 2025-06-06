@@ -64,10 +64,10 @@ impl InsertableTeamState {
 }
 #[derive(Default)]
 pub struct InsertableTeamStateBuilder {
-    name: Option<String>,
-    description: Option<String>,
-    icon: Option<String>,
-    color_id: Option<i16>,
+    pub(crate) name: Option<String>,
+    pub(crate) description: Option<String>,
+    pub(crate) icon: Option<String>,
+    pub(crate) color_id: Option<i16>,
 }
 impl InsertableTeamStateBuilder {
     pub fn name<P>(

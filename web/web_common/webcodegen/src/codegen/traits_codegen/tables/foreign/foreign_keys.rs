@@ -83,7 +83,15 @@ impl Codegen<'_> {
             let table_path = table.import_struct_path()?;
             let foreign_keys_trait_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let snake_case_ident = table.snake_case_ident()?;
-            let foreign_keys = table.foreign_keys(conn)?;
+            let mut foreign_keys = table.foreign_keys(conn)?;
+
+            for column in table.columns(conn)? {
+                if let Some(foreign_key) = column.requires_partial_builder(conn)? {
+                    // We remove this foreign key from the list of foreign keys
+                    // to avoid including functionally useless foreign keys.
+                    foreign_keys.retain(|fk| fk != &foreign_key);
+                }
+            }
 
             if foreign_keys.is_empty() {
                 continue;

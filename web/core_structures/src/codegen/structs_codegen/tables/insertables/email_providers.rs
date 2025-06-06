@@ -94,8 +94,8 @@ impl InsertableEmailProvider {
 }
 #[derive(Default)]
 pub struct InsertableEmailProviderBuilder {
-    email_id: Option<i32>,
-    login_provider_id: Option<i16>,
+    pub(crate) email_id: Option<i32>,
+    pub(crate) login_provider_id: Option<i16>,
 }
 impl InsertableEmailProviderBuilder {
     pub fn email_id<P>(

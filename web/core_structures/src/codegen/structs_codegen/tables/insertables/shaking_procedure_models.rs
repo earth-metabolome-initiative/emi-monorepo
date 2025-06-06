@@ -69,8 +69,9 @@ impl InsertableShakingProcedureModel {
 }
 #[derive(Default)]
 pub struct InsertableShakingProcedureModelBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    seconds: Option<f32>,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) seconds: Option<f32>,
 }
 impl InsertableShakingProcedureModelBuilder {
     pub fn seconds<P>(
@@ -245,11 +246,10 @@ impl InsertableShakingProcedureModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableShakingProcedureModel {
-            seconds: self.seconds.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableShakingProcedureModelAttributes::Seconds,
-            ))?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let seconds = self.seconds.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            InsertableShakingProcedureModelAttributes::Seconds,
+        ))?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableShakingProcedureModel { id, seconds })
     }
 }

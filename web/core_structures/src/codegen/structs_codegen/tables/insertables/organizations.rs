@@ -41,12 +41,12 @@ pub struct InsertableOrganization {
 impl InsertableOrganization {}
 #[derive(Default)]
 pub struct InsertableOrganizationBuilder {
-    name: Option<String>,
-    url: Option<String>,
-    country: Option<String>,
-    alpha_two_code: Option<::iso_codes::CountryCode>,
-    state_province: Option<String>,
-    domain: Option<String>,
+    pub(crate) name: Option<String>,
+    pub(crate) url: Option<String>,
+    pub(crate) country: Option<String>,
+    pub(crate) alpha_two_code: Option<::iso_codes::CountryCode>,
+    pub(crate) state_province: Option<String>,
+    pub(crate) domain: Option<String>,
 }
 impl InsertableOrganizationBuilder {
     pub fn name<P>(

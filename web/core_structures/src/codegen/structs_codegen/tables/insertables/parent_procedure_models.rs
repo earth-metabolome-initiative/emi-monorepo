@@ -151,14 +151,14 @@ impl InsertableParentProcedureModel {
     }
 }
 pub struct InsertableParentProcedureModelBuilder {
-    parent_procedure_model_id: Option<i32>,
-    child_procedure_model_id: Option<i32>,
-    snoozable: Option<bool>,
-    copiable: Option<bool>,
-    repeatable: Option<bool>,
-    skippable: Option<bool>,
-    created_by: Option<i32>,
-    created_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) parent_procedure_model_id: Option<i32>,
+    pub(crate) child_procedure_model_id: Option<i32>,
+    pub(crate) snoozable: Option<bool>,
+    pub(crate) copiable: Option<bool>,
+    pub(crate) repeatable: Option<bool>,
+    pub(crate) skippable: Option<bool>,
+    pub(crate) created_by: Option<i32>,
+    pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
 impl Default for InsertableParentProcedureModelBuilder {
     fn default() -> Self {

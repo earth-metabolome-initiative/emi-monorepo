@@ -212,9 +212,10 @@ impl InsertableProcessingProcedure {
 }
 #[derive(Default)]
 pub struct InsertableProcessingProcedureBuilder {
-    procedure_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    processable_id: Option<::rosetta_uuid::Uuid>,
-    instrument_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
+    pub(crate) processable_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) instrument_id: Option<::rosetta_uuid::Uuid>,
 }
 impl InsertableProcessingProcedureBuilder {
     pub fn processable_id<P>(
@@ -370,22 +371,16 @@ impl InsertableProcessingProcedureBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableProcessingProcedure {
-            processable_id: self.processable_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcessingProcedureAttributes::ProcessableId,
-                ),
-            )?,
-            instrument_id: self.instrument_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcessingProcedureAttributes::InstrumentId,
-                ),
-            )?,
-            procedure_id: self
-                .procedure_id
-                .insert(user_id, conn)
-                .map_err(|err| err.into_field_name())?
-                .id(),
-        })
+        let processable_id =
+            self.processable_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableProcessingProcedureAttributes::ProcessableId,
+            ))?;
+        let instrument_id =
+            self.instrument_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableProcessingProcedureAttributes::InstrumentId,
+            ))?;
+        let procedure_id =
+            self.procedure_id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableProcessingProcedure { procedure_id, processable_id, instrument_id })
     }
 }

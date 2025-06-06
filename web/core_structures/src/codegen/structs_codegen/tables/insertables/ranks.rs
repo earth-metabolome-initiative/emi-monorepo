@@ -25,8 +25,8 @@ pub struct InsertableRank {
 impl InsertableRank {}
 #[derive(Default)]
 pub struct InsertableRankBuilder {
-    name: Option<String>,
-    description: Option<String>,
+    pub(crate) name: Option<String>,
+    pub(crate) description: Option<String>,
 }
 impl InsertableRankBuilder {
     pub fn name<P>(

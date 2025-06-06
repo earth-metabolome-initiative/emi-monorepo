@@ -64,10 +64,10 @@ impl InsertableUnit {
 }
 #[derive(Default)]
 pub struct InsertableUnitBuilder {
-    name: Option<String>,
-    unit: Option<String>,
-    icon: Option<String>,
-    color_id: Option<i16>,
+    pub(crate) name: Option<String>,
+    pub(crate) unit: Option<String>,
+    pub(crate) icon: Option<String>,
+    pub(crate) color_id: Option<i16>,
 }
 impl InsertableUnitBuilder {
     pub fn name<P>(

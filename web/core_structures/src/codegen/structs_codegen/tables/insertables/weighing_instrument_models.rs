@@ -82,10 +82,11 @@ impl InsertableWeighingInstrumentModel {
 }
 #[derive(Default)]
 pub struct InsertableWeighingInstrumentModelBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder,
-    error_kilograms: Option<f32>,
-    minimum_measurable_kilograms: Option<f32>,
-    maximum_measurable_kilograms: Option<f32>,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder,
+    pub(crate) error_kilograms: Option<f32>,
+    pub(crate) minimum_measurable_kilograms: Option<f32>,
+    pub(crate) maximum_measurable_kilograms: Option<f32>,
 }
 impl InsertableWeighingInstrumentModelBuilder {
     pub fn error_kilograms<P>(
@@ -398,23 +399,26 @@ impl InsertableWeighingInstrumentModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
+        let error_kilograms =
+            self.error_kilograms.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableWeighingInstrumentModelAttributes::ErrorKilograms,
+            ))?;
+        let minimum_measurable_kilograms = self.minimum_measurable_kilograms.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableWeighingInstrumentModelAttributes::MinimumMeasurableKilograms,
+            ),
+        )?;
+        let maximum_measurable_kilograms = self.maximum_measurable_kilograms.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableWeighingInstrumentModelAttributes::MaximumMeasurableKilograms,
+            ),
+        )?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
         Ok(InsertableWeighingInstrumentModel {
-            error_kilograms: self.error_kilograms.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableWeighingInstrumentModelAttributes::ErrorKilograms,
-                ),
-            )?,
-            minimum_measurable_kilograms: self.minimum_measurable_kilograms.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableWeighingInstrumentModelAttributes::MinimumMeasurableKilograms,
-                ),
-            )?,
-            maximum_measurable_kilograms: self.maximum_measurable_kilograms.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableWeighingInstrumentModelAttributes::MaximumMeasurableKilograms,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
+            id,
+            error_kilograms,
+            minimum_measurable_kilograms,
+            maximum_measurable_kilograms,
         })
     }
 }

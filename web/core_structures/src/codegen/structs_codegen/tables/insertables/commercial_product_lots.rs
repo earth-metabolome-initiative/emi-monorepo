@@ -106,9 +106,9 @@ impl InsertableCommercialProductLot {
 }
 #[derive(Default)]
 pub struct InsertableCommercialProductLotBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    lot: Option<String>,
-    product_model_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    pub(crate) lot: Option<String>,
+    pub(crate) product_model_id: Option<::rosetta_uuid::Uuid>,
 }
 impl InsertableCommercialProductLotBuilder {
     pub fn lot<P>(
@@ -302,16 +302,14 @@ impl InsertableCommercialProductLotBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableCommercialProductLot {
-            lot: self.lot.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableCommercialProductLotAttributes::Lot,
-            ))?,
-            product_model_id: self.product_model_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableCommercialProductLotAttributes::ProductModelId,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let lot = self.lot.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            InsertableCommercialProductLotAttributes::Lot,
+        ))?;
+        let product_model_id =
+            self.product_model_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableCommercialProductLotAttributes::ProductModelId,
+            ))?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableCommercialProductLot { id, lot, product_model_id })
     }
 }

@@ -137,10 +137,10 @@ impl InsertableSharedProcedureModelTrackable {
     }
 }
 pub struct InsertableSharedProcedureModelTrackableBuilder {
-    parent_id: Option<i32>,
-    child_id: Option<i32>,
-    created_by: Option<i32>,
-    created_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) parent_id: Option<i32>,
+    pub(crate) child_id: Option<i32>,
+    pub(crate) created_by: Option<i32>,
+    pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
 impl Default for InsertableSharedProcedureModelTrackableBuilder {
     fn default() -> Self {

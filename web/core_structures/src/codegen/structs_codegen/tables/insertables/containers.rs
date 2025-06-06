@@ -101,8 +101,8 @@ impl InsertableContainer {
 }
 #[derive(Default)]
 pub struct InsertableContainerBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    container_model_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    pub(crate) container_model_id: Option<::rosetta_uuid::Uuid>,
 }
 impl InsertableContainerBuilder {
     pub fn container_model_id<P>(
@@ -246,13 +246,12 @@ impl InsertableContainerBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableContainer {
-            container_model_id: self.container_model_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableContainerAttributes::ContainerModelId,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let container_model_id = self.container_model_id.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableContainerAttributes::ContainerModelId,
+            ),
+        )?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableContainer { id, container_model_id })
     }
 }

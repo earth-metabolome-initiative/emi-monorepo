@@ -74,9 +74,10 @@ impl InsertableCentrifugeProcedureModel {
 }
 #[derive(Default)]
 pub struct InsertableCentrifugeProcedureModelBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    seconds: Option<f32>,
-    rotation_per_minute: Option<f32>,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) seconds: Option<f32>,
+    pub(crate) rotation_per_minute: Option<f32>,
 }
 impl InsertableCentrifugeProcedureModelBuilder {
     pub fn seconds<P>(
@@ -283,16 +284,15 @@ impl InsertableCentrifugeProcedureModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableCentrifugeProcedureModel {
-            seconds: self.seconds.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableCentrifugeProcedureModelAttributes::Seconds,
-            ))?,
-            rotation_per_minute: self.rotation_per_minute.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableCentrifugeProcedureModelAttributes::RotationPerMinute,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let seconds = self.seconds.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            InsertableCentrifugeProcedureModelAttributes::Seconds,
+        ))?;
+        let rotation_per_minute = self.rotation_per_minute.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableCentrifugeProcedureModelAttributes::RotationPerMinute,
+            ),
+        )?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableCentrifugeProcedureModel { id, seconds, rotation_per_minute })
     }
 }

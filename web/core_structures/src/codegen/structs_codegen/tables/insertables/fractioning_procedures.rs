@@ -286,11 +286,12 @@ impl InsertableFractioningProcedure {
 }
 #[derive(Default)]
 pub struct InsertableFractioningProcedureBuilder {
-    procedure_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    source_processable_id: Option<::rosetta_uuid::Uuid>,
-    destination_processable_id: Option<::rosetta_uuid::Uuid>,
-    instrument_id: Option<::rosetta_uuid::Uuid>,
-    kilograms: Option<f32>,
+    pub(crate) procedure_id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
+    pub(crate) source_processable_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) destination_processable_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) instrument_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) kilograms: Option<f32>,
 }
 impl InsertableFractioningProcedureBuilder {
     pub fn source_processable_id<P>(
@@ -489,32 +490,32 @@ impl InsertableFractioningProcedureBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
+        let source_processable_id = self.source_processable_id.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableFractioningProcedureAttributes::SourceProcessableId,
+            ),
+        )?;
+        let destination_processable_id = self.destination_processable_id.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableFractioningProcedureAttributes::DestinationProcessableId,
+            ),
+        )?;
+        let instrument_id =
+            self.instrument_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableFractioningProcedureAttributes::InstrumentId,
+            ))?;
+        let kilograms =
+            self.kilograms.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableFractioningProcedureAttributes::Kilograms,
+            ))?;
+        let procedure_id =
+            self.procedure_id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
         Ok(InsertableFractioningProcedure {
-            source_processable_id: self.source_processable_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableFractioningProcedureAttributes::SourceProcessableId,
-                ),
-            )?,
-            destination_processable_id: self.destination_processable_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableFractioningProcedureAttributes::DestinationProcessableId,
-                ),
-            )?,
-            instrument_id: self.instrument_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableFractioningProcedureAttributes::InstrumentId,
-                ),
-            )?,
-            kilograms: self.kilograms.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableFractioningProcedureAttributes::Kilograms,
-                ),
-            )?,
-            procedure_id: self
-                .procedure_id
-                .insert(user_id, conn)
-                .map_err(|err| err.into_field_name())?
-                .id(),
+            procedure_id,
+            source_processable_id,
+            destination_processable_id,
+            instrument_id,
+            kilograms,
         })
     }
 }

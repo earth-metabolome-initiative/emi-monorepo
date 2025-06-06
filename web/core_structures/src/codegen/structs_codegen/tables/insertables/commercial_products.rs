@@ -106,9 +106,9 @@ impl InsertableCommercialProduct {
 }
 #[derive(Default)]
 pub struct InsertableCommercialProductBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    deprecation_date: Option<::rosetta_timestamp::TimestampUTC>,
-    brand_id: Option<i32>,
+    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    pub(crate) deprecation_date: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) brand_id: Option<i32>,
 }
 impl InsertableCommercialProductBuilder {
     pub fn deprecation_date<P>(
@@ -267,14 +267,11 @@ impl InsertableCommercialProductBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableCommercialProduct {
-            deprecation_date: self.deprecation_date,
-            brand_id: self.brand_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableCommercialProductAttributes::BrandId,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let brand_id =
+            self.brand_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableCommercialProductAttributes::BrandId,
+            ))?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableCommercialProduct { id, deprecation_date: self.deprecation_date, brand_id })
     }
 }

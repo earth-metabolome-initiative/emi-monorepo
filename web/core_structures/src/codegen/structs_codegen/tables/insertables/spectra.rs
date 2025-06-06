@@ -60,8 +60,8 @@ impl InsertableSpectrum {
 }
 #[derive(Default)]
 pub struct InsertableSpectrumBuilder {
-    id: Option<i32>,
-    spectra_collection_id: Option<i32>,
+    pub(crate) id: Option<i32>,
+    pub(crate) spectra_collection_id: Option<i32>,
 }
 impl InsertableSpectrumBuilder {
     pub fn id<P>(

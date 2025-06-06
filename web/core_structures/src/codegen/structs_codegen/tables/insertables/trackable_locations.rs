@@ -148,13 +148,13 @@ impl InsertableTrackableLocation {
     }
 }
 pub struct InsertableTrackableLocationBuilder {
-    id: Option<::rosetta_uuid::Uuid>,
-    trackable_id: Option<::rosetta_uuid::Uuid>,
-    container_id: Option<::rosetta_uuid::Uuid>,
-    geolocation: Option<postgis_diesel::types::Point>,
-    inferred: Option<bool>,
-    created_at: Option<::rosetta_timestamp::TimestampUTC>,
-    created_by: Option<i32>,
+    pub(crate) id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) trackable_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) container_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) geolocation: Option<postgis_diesel::types::Point>,
+    pub(crate) inferred: Option<bool>,
+    pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) created_by: Option<i32>,
 }
 impl Default for InsertableTrackableLocationBuilder {
     fn default() -> Self {

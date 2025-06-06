@@ -976,28 +976,33 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<Option<Table>, WebCodeGenError> {
         let primary_key_columns = self.primary_key_columns(conn)?;
-        if primary_key_columns.len() != 1 {
+
+        if primary_key_columns.iter().any(|c| c.is_always_automatically_generated()) {
             return Ok(None);
         }
 
-        let first_column = &primary_key_columns[0];
-
-        if first_column.is_always_automatically_generated() {
-            return Ok(None);
-        }
-
-        let foreign_keys = first_column.foreign_keys(conn)?;
-
-        for foreign_key in foreign_keys {
-            // If the foreign key is involving several columns, we skip it.
-            let columns = foreign_key.columns(conn)?;
-            if columns.len() != 1 {
-                continue;
+        let mut extended_table = None;
+        for foreign_key in self.foreign_keys(conn)? {
+            if foreign_key.is_foreign_primary_key(conn)?
+                && foreign_key.columns(conn)? == primary_key_columns
+            {
+                let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
+                if extended_table.is_some() && extended_table.as_ref() != Some(&foreign_table) {
+                    unimplemented!(
+                        "Multiple extension tables in table `{}.{}` are not supported yet: found `{}.{}` and `{}.{}`",
+                        self.table_schema,
+                        self.table_name,
+                        extended_table.as_ref().unwrap().table_schema,
+                        extended_table.as_ref().unwrap().table_name,
+                        &foreign_table.table_schema,
+                        &foreign_table.table_name,
+                    );
+                }
+                extended_table = Some(foreign_table);
             }
-            return Ok(foreign_key.foreign_table(conn)?);
         }
 
-        Ok(None)
+        Ok(extended_table)
     }
 
     /// Returns the tables this table extends, if any.

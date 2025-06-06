@@ -11,7 +11,7 @@ use crate::{ReferentialConstraint, errors::WebCodeGenError};
 /// about columns that are constrained by a unique or primary key constraint.
 ///
 /// For more details, see [`PostgreSQL`](https://www.postgresql.org/docs/current/infoschema-key-column-usage.html)
-#[derive(Queryable, QueryableByName, Selectable, Debug)]
+#[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone)]
 #[diesel(table_name = crate::schema::key_column_usage)]
 pub struct KeyColumnUsage {
     /// The name of the database that contains the constraint.
@@ -291,6 +291,7 @@ impl KeyColumnUsage {
     /// * If an error occurs while querying the database
     pub fn is_foreign_primary_key(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         let foreign_table = self.foreign_table(conn)?;
+
         if let Some(foreign_table) = foreign_table {
             // Check if the foreign table has a primary key
             let primary_keys = foreign_table.primary_key_columns(conn)?;
@@ -299,6 +300,20 @@ impl KeyColumnUsage {
         } else {
             Ok(false)
         }
+    }
+
+    /// Returns the number of columns in this key column usage
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn number_of_columns(&self, conn: &mut PgConnection) -> Result<usize, WebCodeGenError> {
+        let columns = self.columns(conn)?;
+        Ok(columns.len())
     }
 
     /// Returns the standardized getter name for this key column usage

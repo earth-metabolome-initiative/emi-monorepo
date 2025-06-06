@@ -1,14 +1,14 @@
 //! Submodule defining the structs supporting the [`Insertable`] and
 //! [`Insertable`]-adjacent traits.
 
-use std::path::Path;
+use std::{collections::HashMap, path::Path};
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use syn::Ident;
 
 use crate::{
-    Codegen, Column, Table,
+    Codegen, Column, KeyColumnUsage, Table,
     codegen::{
         CODEGEN_DIRECTORY, CODEGEN_INSERTABLES_PATH, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
     },
@@ -119,7 +119,10 @@ impl Table {
     /// # Errors
     ///
     /// * If the database connection fails.
-    fn insertable_columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
+    pub(crate) fn insertable_columns(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Column>, WebCodeGenError> {
         let all_columns = self.columns(conn)?;
         Ok(all_columns
             .into_iter()
@@ -195,10 +198,17 @@ impl Codegen<'_> {
         for table in tables {
             let extension_table = table.extension_table(conn)?;
             let primary_key_columns = table.primary_key_columns(conn)?;
+            let all_columns = table.columns(conn)?;
+            let mut partial_builder_columns: HashMap<&Column, KeyColumnUsage> = HashMap::new();
+            for column in &all_columns {
+                if let Some(foreign_key) = column.requires_partial_builder(conn)? {
+                    partial_builder_columns.insert(column, foreign_key);
+                }
+            }
             let extension_pk =
                 if extension_table.is_some() { Some(primary_key_columns[0].clone()) } else { None };
             let nullable_extension_pk = extension_pk.as_ref().map(|column| column.to_nullable());
-            let all_columns = table.columns(conn)?;
+
             let insertable_columns = table.insertable_columns(conn)?;
             let nullable_insertable_columns: Vec<Column> =
                 insertable_columns.iter().map(|column| column.to_nullable()).collect();
@@ -216,6 +226,12 @@ impl Codegen<'_> {
                         quote::quote! {
                             #enum_variant(#extension_enum_type)
                         }
+                    } else if let Some(foreign_key) = partial_builder_columns.get(column) {
+                        let foreign_table_enum =
+                            foreign_key.foreign_table(conn)?.unwrap().insertable_enum_ty()?;
+                        quote::quote! {
+                            #enum_variant(#foreign_table_enum)
+                        }
                     } else {
                         quote::quote! {
                             #enum_variant
@@ -229,7 +245,7 @@ impl Codegen<'_> {
                 .map(|column| {
                     let enum_variant = column.camel_case_ident()?;
                     let column_ident = column.snake_case_ident()?;
-                    if extension_pk.as_ref() == Some(column) {
+                    if extension_pk.as_ref() == Some(column) || partial_builder_columns.contains_key(column){
                         Ok(quote::quote! {
                             #insertable_enum::#enum_variant(#column_ident) => write!(f, "{}", #column_ident)
                         })
@@ -260,11 +276,15 @@ impl Codegen<'_> {
                 let column_name = column.snake_case_ident()?;
                 let column_type = if nullable_extension_pk.as_ref() == Some(column) {
                     extension_table.as_ref().unwrap().insertable_builder_ty()?
+                } else if let Some(foreign_key) =
+                    partial_builder_columns.get(&column.to_non_nullable())
+                {
+                    foreign_key.foreign_table(conn)?.unwrap().insertable_builder_ty()?
                 } else {
                     column.rust_data_type(conn)?
                 };
                 insertable_builder_attributes.push(quote::quote! {
-                    #column_name: #column_type
+                    pub(crate) #column_name: #column_type
                 });
             }
             let mut insertable_builder_methods: Vec<TokenStream> = Vec::new();
@@ -273,6 +293,11 @@ impl Codegen<'_> {
                 if extension_pk.as_ref() == Some(column) {
                     // We skip the extension primary key column, as it is handled
                     // by the extension table.
+                    continue;
+                }
+                if partial_builder_columns.contains_key(column) {
+                    // We skip the columns that require a partial builder, as they
+                    // are handled by the foreign table.
                     continue;
                 }
 
@@ -357,6 +382,49 @@ impl Codegen<'_> {
                 });
             }
 
+            // We proceed to generate the methods to set the partial builder columns.
+            for (column, foreign_key) in &partial_builder_columns {
+                let column_name = column.snake_case_ident()?;
+                let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
+                let builder_ident = foreign_table.insertable_builder_ty()?;
+                let insertable_enum = foreign_table.insertable_enum_ty()?;
+
+                // We determine the list of attributes which we must check that are not set
+                // already in the builder, as we will overwrite them and this may hide some
+                // unexpected behavior if the user has already set them.
+                let attribute_checks: Vec<TokenStream> = foreign_key
+                    .foreign_columns(conn)?
+                    .iter()
+                    .skip(1)
+                    .map(|column| {
+                        let column_ident = column.snake_case_ident()?;
+                        let camel_cased = column.camel_case_ident()?;
+                        Ok(quote::quote! {
+                            if #column_name.#column_ident.is_some() {
+                                return Err(
+                                    web_common_traits::database::InsertError::BuilderError(
+                                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                            #insertable_enum::#camel_cased.into()
+                                        )
+                                    )
+                                );
+                            }
+                        })
+                    })
+                    .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+
+                insertable_builder_methods.push(quote::quote! {
+                    pub fn #column_name(
+                        mut self, #column_name: #builder_ident
+                    ) -> Result<Self, web_common_traits::database::InsertError<#insertable_enum>>
+                    {
+                        #(#attribute_checks)*
+                        self.#column_name = #column_name;
+                        Ok(self)
+                    }
+                });
+            }
+
             // We re-export all of the setter methods associated with the extended
             // table, if any.
             if let (Some(extension_table), Some(extension_pk)) = (&extension_table, &extension_pk) {
@@ -426,11 +494,14 @@ impl Codegen<'_> {
                 TokenStream::new()
             };
 
-            let maybe_enum_from_impl = if let (Some(extension_table), Some(extension_pk)) =
+            let mut implemented_enum_from = Vec::new();
+
+            let mut maybe_enum_from_impl = if let (Some(extension_table), Some(extension_pk)) =
                 (&extension_table, &extension_pk)
             {
                 let extension_table_enum = extension_table.insertable_enum_ty()?;
                 let extension_enum_variant = extension_pk.camel_case_ident()?;
+                implemented_enum_from.push(extension_table.table_name.to_string());
                 quote::quote! {
                     impl From<#extension_table_enum> for #insertable_enum {
                         fn from(extension: #extension_table_enum) -> Self {
@@ -442,6 +513,27 @@ impl Codegen<'_> {
                 TokenStream::new()
             };
 
+            // We extend the `maybe_enum_from_impl` with the `From` traits associated
+            // with the partial builder columns, if any.
+            for (column, foreign_key) in &partial_builder_columns {
+                let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
+                if implemented_enum_from.contains(&foreign_table.table_name.to_string()) {
+                    // We skip the foreign table if we have already implemented the `From` trait
+                    // for it.
+                    continue;
+                }
+                let foreign_table_enum = foreign_table.insertable_enum_ty()?;
+                let foreign_enum_variant = column.camel_case_ident()?;
+                implemented_enum_from.push(foreign_table.table_name.to_string());
+                maybe_enum_from_impl.extend(quote::quote! {
+                    impl From<#foreign_table_enum> for #insertable_enum {
+                        fn from(foreign: #foreign_table_enum) -> Self {
+                            Self::#foreign_enum_variant(foreign)
+                        }
+                    }
+                });
+            }
+
             // When the table associated with the struct we are generating is not an
             // extension, we can implement the `TryFrom` trait to convert the insertable
             // builder into the insertable variant, which we will then be able to directly
@@ -449,24 +541,80 @@ impl Codegen<'_> {
             let try_into_insert_impl = if let (Some(extension_table), Some(extension_pk)) =
                 (&extension_table, &extension_pk)
             {
+                let mut variable_availability_checks = TokenStream::new();
                 let populating_product = insertable_columns.iter().map(|column| {
-                    if extension_pk == column {
-                        // We skip the extension primary key column, as it is handled
-                        // by the extension table.
-                        return Ok(TokenStream::new());
-                    }
                     let column_ident = column.snake_case_ident()?;
                     Ok(if column.is_nullable() {
                         quote::quote! {
                             #column_ident: self.#column_ident,
                         }
                     } else {
-                        let camel_cased_column_ident = column.camel_case_ident()?;
+                        if column != extension_pk && !partial_builder_columns.contains_key(column) {
+                            let camel_cased_column_ident = column.camel_case_ident()?;
+                            variable_availability_checks.extend(quote::quote! {
+                                let #column_ident = self.#column_ident.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(#insertable_enum::#camel_cased_column_ident))?;
+                            });         
+                        }
                         quote::quote! {
-                            #column_ident: self.#column_ident.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(#insertable_enum::#camel_cased_column_ident))?,
+                            #column_ident,
                         }
                     })
                 }).collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+
+                let complete_partial_builder_columns = partial_builder_columns.iter().map(|(column, foreign_key)| {
+                    let column_ident = column.snake_case_ident()?;
+                    let columns = foreign_key.columns(conn)?;
+                    let foreign_key_columns = foreign_key.foreign_columns(conn)?;
+
+                    // We skip the first column, which is expected to be equal to the current column.
+                    let mut coupled_iterator = columns.iter().zip(foreign_key_columns.iter());
+                    let Some((first_column, _foreign_column)) = coupled_iterator.next() else {
+                        unreachable!("The foreign key columns must have at least one column.");
+                    };
+                    assert_eq!(&first_column, column, "The first column of the foreign key must be equal to the current column.");
+                    let setters = coupled_iterator.map(|(column, foreign_column)| {
+                        let column_ident = column.snake_case_ident()?;
+                        let foreign_column_ident = foreign_column.snake_case_ident()?;
+                        Ok(quote::quote! {
+                            .#foreign_column_ident(#column_ident).map_err(|err| {
+                                err.into_field_name()
+                            })?
+                        })
+                    }).collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+
+                    Ok(quote::quote! {
+                        let #column_ident = self.#column_ident
+                            #(#setters)*
+                            .insert(user_id, conn)
+                            .map_err(|err| {
+                                err.into_field_name()
+                            })?.id();
+                    })
+                }).collect::<Result<TokenStream, WebCodeGenError>>()?;
+
+                let mut covered_tables = Vec::new();
+                let mut additional_where_clause = Vec::new();
+
+                for foreign_key in partial_builder_columns.values() {
+                    let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
+                    if covered_tables.contains(&foreign_table.table_name) {
+                        // We skip the foreign table if we have already covered it.
+                        continue;
+                    }
+                    covered_tables.push(foreign_table.table_name.to_string());
+                    let foreign_table_insertable_builder = foreign_table.insertable_builder_ty()?;
+                    let foreign_table_enum = foreign_table.insertable_enum_ty()?;
+                    let foreign_table_path = foreign_table.import_struct_path()?;
+                    additional_where_clause.push(quote::quote! {
+                        #foreign_table_insertable_builder: web_common_traits::database::InsertableVariant<
+                            C,
+                            UserId = #user_id_type,
+                            Row = #foreign_table_path,
+                            Error = web_common_traits::database::InsertError<#foreign_table_enum>
+                        >
+                    });
+                }
+
                 let extension_insertable_builder = extension_table.insertable_builder_ty()?;
                 let extension_pk_ident = extension_pk.snake_case_ident()?;
                 let extension_row = extension_table.import_struct_path()?;
@@ -488,14 +636,17 @@ impl Codegen<'_> {
                                     Row = #extension_row,
                                     Error = web_common_traits::database::InsertError<#extension_attributes_enum>
                                 >,
+                                #(#additional_where_clause),*
                         {
                             use web_common_traits::database::InsertableVariant;
                             use diesel::associations::Identifiable;
+                            #variable_availability_checks
+                            let #extension_pk_ident = self.#extension_pk_ident.insert(user_id, conn).map_err(|err| {
+                                err.into_field_name()
+                            })?.id();
+                            #complete_partial_builder_columns
                             Ok(#insertable_variant_ident {
                                 #(#populating_product)*
-                                #extension_pk_ident: self.#extension_pk_ident.insert(user_id, conn).map_err(|err| {
-                                    err.into_field_name()
-                                })?.id()
                             })
                         }
                     }

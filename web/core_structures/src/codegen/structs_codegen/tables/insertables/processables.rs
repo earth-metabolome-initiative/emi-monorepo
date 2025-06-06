@@ -69,8 +69,8 @@ impl InsertableProcessable {
 }
 #[derive(Default)]
 pub struct InsertableProcessableBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    kilograms: Option<f32>,
+    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    pub(crate) kilograms: Option<f32>,
 }
 impl InsertableProcessableBuilder {
     pub fn kilograms<P>(
@@ -214,13 +214,11 @@ impl InsertableProcessableBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableProcessable {
-            kilograms: self.kilograms.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcessableAttributes::Kilograms,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let kilograms =
+            self.kilograms.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableProcessableAttributes::Kilograms,
+            ))?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableProcessable { id, kilograms })
     }
 }

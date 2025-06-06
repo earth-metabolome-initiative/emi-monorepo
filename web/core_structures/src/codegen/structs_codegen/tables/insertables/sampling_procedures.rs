@@ -212,9 +212,10 @@ impl InsertableSamplingProcedure {
 }
 #[derive(Default)]
 pub struct InsertableSamplingProcedureBuilder {
-    procedure_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    processable_id: Option<::rosetta_uuid::Uuid>,
-    trackable_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
+    pub(crate) processable_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) trackable_id: Option<::rosetta_uuid::Uuid>,
 }
 impl InsertableSamplingProcedureBuilder {
     pub fn processable_id<P>(
@@ -346,22 +347,16 @@ impl InsertableSamplingProcedureBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableSamplingProcedure {
-            processable_id: self.processable_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableSamplingProcedureAttributes::ProcessableId,
-                ),
-            )?,
-            trackable_id: self.trackable_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableSamplingProcedureAttributes::TrackableId,
-                ),
-            )?,
-            procedure_id: self
-                .procedure_id
-                .insert(user_id, conn)
-                .map_err(|err| err.into_field_name())?
-                .id(),
-        })
+        let processable_id =
+            self.processable_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableSamplingProcedureAttributes::ProcessableId,
+            ))?;
+        let trackable_id =
+            self.trackable_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableSamplingProcedureAttributes::TrackableId,
+            ))?;
+        let procedure_id =
+            self.procedure_id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableSamplingProcedure { procedure_id, processable_id, trackable_id })
     }
 }

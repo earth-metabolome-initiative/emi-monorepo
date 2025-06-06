@@ -72,9 +72,10 @@ impl InsertableBallMillProcedureModel {
 }
 #[derive(Default)]
 pub struct InsertableBallMillProcedureModelBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    seconds: Option<f32>,
-    hertz: Option<f32>,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) seconds: Option<f32>,
+    pub(crate) hertz: Option<f32>,
 }
 impl InsertableBallMillProcedureModelBuilder {
     pub fn seconds<P>(
@@ -276,14 +277,13 @@ impl InsertableBallMillProcedureModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableBallMillProcedureModel {
-            seconds: self.seconds.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableBallMillProcedureModelAttributes::Seconds,
-            ))?,
-            hertz: self.hertz.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableBallMillProcedureModelAttributes::Hertz,
-            ))?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let seconds = self.seconds.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            InsertableBallMillProcedureModelAttributes::Seconds,
+        ))?;
+        let hertz = self.hertz.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            InsertableBallMillProcedureModelAttributes::Hertz,
+        ))?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableBallMillProcedureModel { id, seconds, hertz })
     }
 }

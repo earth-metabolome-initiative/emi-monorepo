@@ -39,12 +39,12 @@ pub struct InsertableLoginProvider {
 impl InsertableLoginProvider {}
 #[derive(Default)]
 pub struct InsertableLoginProviderBuilder {
-    name: Option<String>,
-    icon: Option<String>,
-    client_id: Option<String>,
-    redirect_uri: Option<String>,
-    oauth_url: Option<String>,
-    scope: Option<String>,
+    pub(crate) name: Option<String>,
+    pub(crate) icon: Option<String>,
+    pub(crate) client_id: Option<String>,
+    pub(crate) redirect_uri: Option<String>,
+    pub(crate) oauth_url: Option<String>,
+    pub(crate) scope: Option<String>,
 }
 impl InsertableLoginProviderBuilder {
     pub fn name<P>(

@@ -133,10 +133,10 @@ impl InsertableProcedureTrackable {
     }
 }
 pub struct InsertableProcedureTrackableBuilder {
-    procedure_id: Option<::rosetta_uuid::Uuid>,
-    trackable_id: Option<::rosetta_uuid::Uuid>,
-    created_by: Option<i32>,
-    created_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) procedure_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) trackable_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) created_by: Option<i32>,
+    pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
 impl Default for InsertableProcedureTrackableBuilder {
     fn default() -> Self {

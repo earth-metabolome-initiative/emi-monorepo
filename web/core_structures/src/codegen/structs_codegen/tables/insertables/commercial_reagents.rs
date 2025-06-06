@@ -103,8 +103,9 @@ impl InsertableCommercialReagent {
 }
 #[derive(Default)]
 pub struct InsertableCommercialReagentBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder,
-    commercial_product_lot_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder,
+    pub(crate) commercial_product_lot_id: Option<::rosetta_uuid::Uuid>,
 }
 impl InsertableCommercialReagentBuilder {
     pub fn commercial_product_lot_id<P>(
@@ -260,13 +261,12 @@ impl InsertableCommercialReagentBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableCommercialReagent {
-            commercial_product_lot_id: self.commercial_product_lot_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableCommercialReagentAttributes::CommercialProductLotId,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let commercial_product_lot_id = self.commercial_product_lot_id.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableCommercialReagentAttributes::CommercialProductLotId,
+            ),
+        )?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableCommercialReagent { id, commercial_product_lot_id })
     }
 }

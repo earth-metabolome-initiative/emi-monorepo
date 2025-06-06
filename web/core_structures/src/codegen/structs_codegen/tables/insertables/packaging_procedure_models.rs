@@ -103,8 +103,9 @@ impl InsertablePackagingProcedureModel {
 }
 #[derive(Default)]
 pub struct InsertablePackagingProcedureModelBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    packaging_model_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) packaging_model_id: Option<::rosetta_uuid::Uuid>,
 }
 impl InsertablePackagingProcedureModelBuilder {
     pub fn packaging_model_id<P>(
@@ -280,13 +281,12 @@ impl InsertablePackagingProcedureModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertablePackagingProcedureModel {
-            packaging_model_id: self.packaging_model_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertablePackagingProcedureModelAttributes::PackagingModelId,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let packaging_model_id = self.packaging_model_id.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertablePackagingProcedureModelAttributes::PackagingModelId,
+            ),
+        )?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertablePackagingProcedureModel { id, packaging_model_id })
     }
 }

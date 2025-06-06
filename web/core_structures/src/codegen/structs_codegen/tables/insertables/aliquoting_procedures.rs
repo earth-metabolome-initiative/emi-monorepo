@@ -283,10 +283,11 @@ impl InsertableAliquotingProcedure {
 }
 #[derive(Default)]
 pub struct InsertableAliquotingProcedureBuilder {
-    procedure_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    source_processable_id: Option<::rosetta_uuid::Uuid>,
-    destination_processable_id: Option<::rosetta_uuid::Uuid>,
-    instrument_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
+    pub(crate) source_processable_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) destination_processable_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) instrument_id: Option<::rosetta_uuid::Uuid>,
 }
 impl InsertableAliquotingProcedureBuilder {
     pub fn source_processable_id<P>(
@@ -463,27 +464,27 @@ impl InsertableAliquotingProcedureBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
+        let source_processable_id = self.source_processable_id.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableAliquotingProcedureAttributes::SourceProcessableId,
+            ),
+        )?;
+        let destination_processable_id = self.destination_processable_id.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableAliquotingProcedureAttributes::DestinationProcessableId,
+            ),
+        )?;
+        let instrument_id =
+            self.instrument_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableAliquotingProcedureAttributes::InstrumentId,
+            ))?;
+        let procedure_id =
+            self.procedure_id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
         Ok(InsertableAliquotingProcedure {
-            source_processable_id: self.source_processable_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableAliquotingProcedureAttributes::SourceProcessableId,
-                ),
-            )?,
-            destination_processable_id: self.destination_processable_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableAliquotingProcedureAttributes::DestinationProcessableId,
-                ),
-            )?,
-            instrument_id: self.instrument_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableAliquotingProcedureAttributes::InstrumentId,
-                ),
-            )?,
-            procedure_id: self
-                .procedure_id
-                .insert(user_id, conn)
-                .map_err(|err| err.into_field_name())?
-                .id(),
+            procedure_id,
+            source_processable_id,
+            destination_processable_id,
+            instrument_id,
         })
     }
 }

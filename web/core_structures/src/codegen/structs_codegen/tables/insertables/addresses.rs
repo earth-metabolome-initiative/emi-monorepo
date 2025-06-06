@@ -67,11 +67,11 @@ impl InsertableAddress {
 }
 #[derive(Default)]
 pub struct InsertableAddressBuilder {
-    city_id: Option<i32>,
-    street_name: Option<String>,
-    street_number: Option<String>,
-    postal_code: Option<String>,
-    geolocation: Option<postgis_diesel::types::Point>,
+    pub(crate) city_id: Option<i32>,
+    pub(crate) street_name: Option<String>,
+    pub(crate) street_number: Option<String>,
+    pub(crate) postal_code: Option<String>,
+    pub(crate) geolocation: Option<postgis_diesel::types::Point>,
 }
 impl InsertableAddressBuilder {
     pub fn city_id<P>(

@@ -25,8 +25,8 @@ pub struct InsertableCountry {
 impl InsertableCountry {}
 #[derive(Default)]
 pub struct InsertableCountryBuilder {
-    iso: Option<::iso_codes::CountryCode>,
-    name: Option<String>,
+    pub(crate) iso: Option<::iso_codes::CountryCode>,
+    pub(crate) name: Option<String>,
 }
 impl InsertableCountryBuilder {
     pub fn iso<P>(

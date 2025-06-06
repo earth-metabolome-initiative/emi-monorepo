@@ -64,10 +64,10 @@ impl InsertableTaxon {
 }
 #[derive(Default)]
 pub struct InsertableTaxonBuilder {
-    id: Option<i32>,
-    name: Option<String>,
-    parent_id: Option<i32>,
-    rank_id: Option<i16>,
+    pub(crate) id: Option<i32>,
+    pub(crate) name: Option<String>,
+    pub(crate) parent_id: Option<i32>,
+    pub(crate) rank_id: Option<i16>,
 }
 impl InsertableTaxonBuilder {
     pub fn id<P>(

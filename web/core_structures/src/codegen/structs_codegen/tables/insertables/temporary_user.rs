@@ -62,8 +62,8 @@ impl InsertableTemporaryUser {
 }
 #[derive(Default)]
 pub struct InsertableTemporaryUserBuilder {
-    email: Option<String>,
-    login_provider_id: Option<i16>,
+    pub(crate) email: Option<String>,
+    pub(crate) login_provider_id: Option<i16>,
 }
 impl InsertableTemporaryUserBuilder {
     pub fn email<P>(

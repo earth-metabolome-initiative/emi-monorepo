@@ -108,9 +108,10 @@ impl InsertableWeighingProcedureModel {
 }
 #[derive(Default)]
 pub struct InsertableWeighingProcedureModelBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    kilograms: Option<f32>,
-    instrument_id: Option<i32>,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) kilograms: Option<f32>,
+    pub(crate) instrument_id: Option<i32>,
 }
 impl InsertableWeighingProcedureModelBuilder {
     pub fn kilograms<P>(
@@ -304,18 +305,15 @@ impl InsertableWeighingProcedureModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableWeighingProcedureModel {
-            kilograms: self.kilograms.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableWeighingProcedureModelAttributes::Kilograms,
-                ),
-            )?,
-            instrument_id: self.instrument_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableWeighingProcedureModelAttributes::InstrumentId,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let kilograms =
+            self.kilograms.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableWeighingProcedureModelAttributes::Kilograms,
+            ))?;
+        let instrument_id =
+            self.instrument_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableWeighingProcedureModelAttributes::InstrumentId,
+            ))?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableWeighingProcedureModel { id, kilograms, instrument_id })
     }
 }

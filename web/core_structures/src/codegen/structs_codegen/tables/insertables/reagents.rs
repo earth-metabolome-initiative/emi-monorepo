@@ -75,10 +75,10 @@ impl InsertableReagent {
 }
 #[derive(Default)]
 pub struct InsertableReagentBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    purity: Option<f32>,
-    cas_code: Option<::cas_codes::CAS>,
-    molecular_formula: Option<::molecular_formulas::MolecularFormula>,
+    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    pub(crate) purity: Option<f32>,
+    pub(crate) cas_code: Option<::cas_codes::CAS>,
+    pub(crate) molecular_formula: Option<::molecular_formulas::MolecularFormula>,
 }
 impl InsertableReagentBuilder {
     pub fn purity<P>(
@@ -258,21 +258,18 @@ impl InsertableReagentBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableReagent {
-            purity: self.purity.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableReagentAttributes::Purity,
-            ))?,
-            cas_code: self.cas_code.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableReagentAttributes::CasCode,
-                ),
-            )?,
-            molecular_formula: self.molecular_formula.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableReagentAttributes::MolecularFormula,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let purity = self.purity.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            InsertableReagentAttributes::Purity,
+        ))?;
+        let cas_code =
+            self.cas_code.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableReagentAttributes::CasCode,
+            ))?;
+        let molecular_formula =
+            self.molecular_formula.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableReagentAttributes::MolecularFormula,
+            ))?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableReagent { id, purity, cas_code, molecular_formula })
     }
 }

@@ -15,7 +15,6 @@
 pub struct ProcedureModelTrackable {
     pub id: i32,
     pub name: String,
-    pub optional: bool,
     pub procedure_model_id: i32,
     pub trackable_id: ::rosetta_uuid::Uuid,
     pub created_by: i32,
@@ -184,6 +183,28 @@ impl ProcedureModelTrackable {
             .optional()
     }
     #[cfg(feature = "postgres")]
+    pub fn from_procedure_model_id_and_id(
+        procedure_model_id: &i32,
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables;
+        Self::table()
+            .filter(
+                procedure_model_trackables::procedure_model_id
+                    .eq(procedure_model_id)
+                    .and(procedure_model_trackables::id.eq(id)),
+            )
+            .order_by(procedure_model_trackables::id.asc())
+            .first::<Self>(conn)
+            .optional()
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,
@@ -193,19 +214,6 @@ impl ProcedureModelTrackable {
         use crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables;
         Self::table()
             .filter(procedure_model_trackables::name.eq(name))
-            .order_by(procedure_model_trackables::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_optional(
-        optional: &bool,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables;
-        Self::table()
-            .filter(procedure_model_trackables::optional.eq(optional))
             .order_by(procedure_model_trackables::id.asc())
             .load::<Self>(conn)
     }

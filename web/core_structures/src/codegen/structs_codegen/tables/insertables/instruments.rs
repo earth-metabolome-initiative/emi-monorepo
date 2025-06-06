@@ -102,8 +102,8 @@ impl InsertableInstrument {
 }
 #[derive(Default)]
 pub struct InsertableInstrumentBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    instrument_model_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    pub(crate) instrument_model_id: Option<::rosetta_uuid::Uuid>,
 }
 impl InsertableInstrumentBuilder {
     pub fn instrument_model_id<P>(
@@ -247,13 +247,12 @@ impl InsertableInstrumentBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableInstrument {
-            instrument_model_id: self.instrument_model_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableInstrumentAttributes::InstrumentModelId,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let instrument_model_id = self.instrument_model_id.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableInstrumentAttributes::InstrumentModelId,
+            ),
+        )?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableInstrument { id, instrument_model_id })
     }
 }

@@ -69,8 +69,8 @@ impl InsertableOrganism {
 }
 #[derive(Default)]
 pub struct InsertableOrganismBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    nameplate_category: Option<::nameplate_categories::NameplateCategory>,
+    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    pub(crate) nameplate_category: Option<::nameplate_categories::NameplateCategory>,
 }
 impl InsertableOrganismBuilder {
     pub fn nameplate_category<P>(
@@ -215,13 +215,12 @@ impl InsertableOrganismBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableOrganism {
-            nameplate_category: self.nameplate_category.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganismAttributes::NameplateCategory,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let nameplate_category = self.nameplate_category.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableOrganismAttributes::NameplateCategory,
+            ),
+        )?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableOrganism { id, nameplate_category })
     }
 }

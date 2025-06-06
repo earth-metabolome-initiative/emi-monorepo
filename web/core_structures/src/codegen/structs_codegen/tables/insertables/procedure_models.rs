@@ -150,15 +150,15 @@ impl InsertableProcedureModel {
     }
 }
 pub struct InsertableProcedureModelBuilder {
-    name: Option<String>,
-    description: Option<String>,
-    deprecated: Option<bool>,
-    photograph_id: Option<::rosetta_uuid::Uuid>,
-    icon: Option<String>,
-    created_by: Option<i32>,
-    created_at: Option<::rosetta_timestamp::TimestampUTC>,
-    updated_by: Option<i32>,
-    updated_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) name: Option<String>,
+    pub(crate) description: Option<String>,
+    pub(crate) deprecated: Option<bool>,
+    pub(crate) photograph_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) icon: Option<String>,
+    pub(crate) created_by: Option<i32>,
+    pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) updated_by: Option<i32>,
+    pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
 impl Default for InsertableProcedureModelBuilder {
     fn default() -> Self {

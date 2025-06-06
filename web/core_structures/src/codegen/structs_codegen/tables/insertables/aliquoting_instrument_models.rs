@@ -82,10 +82,11 @@ impl InsertableAliquotingInstrumentModel {
 }
 #[derive(Default)]
 pub struct InsertableAliquotingInstrumentModelBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder,
-    error_liters: Option<f32>,
-    minimum_measurable_liters: Option<f32>,
-    maximum_measurable_liters: Option<f32>,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder,
+    pub(crate) error_liters: Option<f32>,
+    pub(crate) minimum_measurable_liters: Option<f32>,
+    pub(crate) maximum_measurable_liters: Option<f32>,
 }
 impl InsertableAliquotingInstrumentModelBuilder {
     pub fn error_liters<P>(
@@ -386,23 +387,26 @@ impl InsertableAliquotingInstrumentModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
+        let error_liters =
+            self.error_liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableAliquotingInstrumentModelAttributes::ErrorLiters,
+            ))?;
+        let minimum_measurable_liters = self.minimum_measurable_liters.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableAliquotingInstrumentModelAttributes::MinimumMeasurableLiters,
+            ),
+        )?;
+        let maximum_measurable_liters = self.maximum_measurable_liters.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableAliquotingInstrumentModelAttributes::MaximumMeasurableLiters,
+            ),
+        )?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
         Ok(InsertableAliquotingInstrumentModel {
-            error_liters: self.error_liters.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableAliquotingInstrumentModelAttributes::ErrorLiters,
-                ),
-            )?,
-            minimum_measurable_liters: self.minimum_measurable_liters.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableAliquotingInstrumentModelAttributes::MinimumMeasurableLiters,
-                ),
-            )?,
-            maximum_measurable_liters: self.maximum_measurable_liters.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableAliquotingInstrumentModelAttributes::MaximumMeasurableLiters,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
+            id,
+            error_liters,
+            minimum_measurable_liters,
+            maximum_measurable_liters,
         })
     }
 }

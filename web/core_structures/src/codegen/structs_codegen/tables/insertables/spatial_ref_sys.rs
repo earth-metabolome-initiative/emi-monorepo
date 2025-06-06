@@ -36,11 +36,11 @@ pub struct InsertableSpatialRefSy {
 impl InsertableSpatialRefSy {}
 #[derive(Default)]
 pub struct InsertableSpatialRefSyBuilder {
-    srid: Option<i32>,
-    auth_name: Option<String>,
-    auth_srid: Option<i32>,
-    srtext: Option<String>,
-    proj4text: Option<String>,
+    pub(crate) srid: Option<i32>,
+    pub(crate) auth_name: Option<String>,
+    pub(crate) auth_srid: Option<i32>,
+    pub(crate) srtext: Option<String>,
+    pub(crate) proj4text: Option<String>,
 }
 impl InsertableSpatialRefSyBuilder {
     pub fn srid<P>(

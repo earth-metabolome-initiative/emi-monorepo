@@ -72,9 +72,10 @@ impl InsertableAliquotingProcedureModel {
 }
 #[derive(Default)]
 pub struct InsertableAliquotingProcedureModelBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    liters: Option<f32>,
-    error: Option<f32>,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) liters: Option<f32>,
+    pub(crate) error: Option<f32>,
 }
 impl InsertableAliquotingProcedureModelBuilder {
     pub fn liters<P>(
@@ -284,14 +285,13 @@ impl InsertableAliquotingProcedureModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableAliquotingProcedureModel {
-            liters: self.liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableAliquotingProcedureModelAttributes::Liters,
-            ))?,
-            error: self.error.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableAliquotingProcedureModelAttributes::Error,
-            ))?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let liters = self.liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            InsertableAliquotingProcedureModelAttributes::Liters,
+        ))?;
+        let error = self.error.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            InsertableAliquotingProcedureModelAttributes::Error,
+        ))?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableAliquotingProcedureModel { id, liters, error })
     }
 }

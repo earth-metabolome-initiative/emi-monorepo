@@ -71,8 +71,9 @@ impl InsertablePackagingModel {
 }
 #[derive(Default)]
 pub struct InsertablePackagingModelBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder,
-    kilograms: Option<f32>,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder,
+    pub(crate) kilograms: Option<f32>,
 }
 impl InsertablePackagingModelBuilder {
     pub fn kilograms<P>(
@@ -240,13 +241,11 @@ impl InsertablePackagingModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertablePackagingModel {
-            kilograms: self.kilograms.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertablePackagingModelAttributes::Kilograms,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let kilograms =
+            self.kilograms.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertablePackagingModelAttributes::Kilograms,
+            ))?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertablePackagingModel { id, kilograms })
     }
 }

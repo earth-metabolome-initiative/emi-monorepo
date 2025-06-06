@@ -94,8 +94,8 @@ impl InsertableUserOrganization {
 }
 #[derive(Default)]
 pub struct InsertableUserOrganizationBuilder {
-    user_id: Option<i32>,
-    organization_id: Option<i16>,
+    pub(crate) user_id: Option<i32>,
+    pub(crate) organization_id: Option<i16>,
 }
 impl InsertableUserOrganizationBuilder {
     pub fn user_id<P>(

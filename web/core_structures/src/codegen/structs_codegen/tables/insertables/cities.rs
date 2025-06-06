@@ -58,8 +58,8 @@ impl InsertableCity {
 }
 #[derive(Default)]
 pub struct InsertableCityBuilder {
-    name: Option<String>,
-    iso: Option<::iso_codes::CountryCode>,
+    pub(crate) name: Option<String>,
+    pub(crate) iso: Option<::iso_codes::CountryCode>,
 }
 impl InsertableCityBuilder {
     pub fn name<P>(

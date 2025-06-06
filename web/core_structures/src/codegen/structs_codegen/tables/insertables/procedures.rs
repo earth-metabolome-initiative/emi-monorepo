@@ -135,12 +135,12 @@ impl InsertableProcedure {
     }
 }
 pub struct InsertableProcedureBuilder {
-    id: Option<::rosetta_uuid::Uuid>,
-    procedure_model_id: Option<i32>,
-    created_by: Option<i32>,
-    created_at: Option<::rosetta_timestamp::TimestampUTC>,
-    updated_by: Option<i32>,
-    updated_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_model_id: Option<i32>,
+    pub(crate) created_by: Option<i32>,
+    pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) updated_by: Option<i32>,
+    pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
 impl Default for InsertableProcedureBuilder {
     fn default() -> Self {

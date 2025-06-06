@@ -6,7 +6,7 @@ use std::{collections::HashMap, path::Path};
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 
-use crate::{Codegen, Table};
+use crate::{Codegen, Column, KeyColumnUsage, Table};
 
 impl Codegen<'_> {
     #[allow(clippy::too_many_lines)]
@@ -137,7 +137,9 @@ impl Codegen<'_> {
                 quote::quote! { #(#constraints),*, }
             };
 
-            let maybe_insert_recursion = if let Some(extension_table) = extension_table {
+            let attributes_enum = table.insertable_enum_ty()?;
+
+            let maybe_insert_recursion = if let Some(extension_table) = &extension_table {
                 let extension_insertable_builder = extension_table.insertable_builder_ty()?;
                 let extension_row = extension_table.import_struct_path()?;
                 let extension_attributes_enum = extension_table.insertable_enum_ty()?;
@@ -149,9 +151,41 @@ impl Codegen<'_> {
                         C,
                         UserId = #user_id_type,
                         Row = #extension_row,
-                        Error = web_common_traits::database::InsertError<#extension_attributes_enum>
+                        Error = web_common_traits::database::InsertError<#extension_attributes_enum>,
                     >,
                 });
+
+                let mut partial_builder_columns: HashMap<Column, KeyColumnUsage> = HashMap::new();
+                for column in table.columns(conn)? {
+                    if let Some(foreign_key) = column.requires_partial_builder(conn)? {
+                        partial_builder_columns.insert(column, foreign_key);
+                    }
+                }
+
+                let mut covered_implementations = vec![extension_table.table_name.clone()];
+
+                for foreign_key in partial_builder_columns.values() {
+                    let foreign_table =
+                        foreign_key.foreign_table(conn)?.expect("Foreign table not found");
+
+                    if covered_implementations.contains(&foreign_table.table_name) {
+                        continue;
+                    }
+
+                    covered_implementations.push(foreign_table.table_name.clone());
+                    let foreign_table_path = foreign_table.import_struct_path()?;
+                    let attributes_enum = foreign_table.insertable_enum_ty()?;
+                    let builder = foreign_table.insertable_builder_ty()?;
+
+                    additional_where_clause.extend(quote::quote! {
+                        #builder: web_common_traits::database::InsertableVariant<
+                            C,
+                            UserId = #user_id_type,
+                            Row = #foreign_table_path,
+                            Error = web_common_traits::database::InsertError<#attributes_enum>,
+                        >,
+                    });
+                }
 
                 quote::quote! {
                     let insertable_struct: #insertable_struct = self.try_insert(#user_id, conn)?;
@@ -161,8 +195,6 @@ impl Codegen<'_> {
                     let insertable_struct: #insertable_struct = self.try_into()?;
                 }
             };
-
-            let attributes_enum = table.insertable_enum_ty()?;
 
             std::fs::write(&table_file, self.beautify_code(&quote::quote!{
 				impl<C: diesel::connection::LoadConnection> web_common_traits::database::InsertableVariant<C> for #insertable_builder

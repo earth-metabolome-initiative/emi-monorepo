@@ -104,8 +104,9 @@ impl Table {
             } else {
                 let where_statement = foreign_key_constraint.where_statement(true, true, conn)?;
                 foreign_key_methods.extend(quote! {
-                    pub fn #method_ident<C: diesel::connection::LoadConnection>(
-                        &self, conn: &mut C
+                    #[cfg(feature = "postgres")]
+                    pub fn #method_ident(
+                        &self, conn: &mut diesel::PgConnection
                     ) -> Result<#return_statement, diesel::result::Error> {
                         use diesel::RunQueryDsl;
                         use diesel::associations::HasTable;

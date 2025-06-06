@@ -71,8 +71,9 @@ impl InsertableFractioningProcedureModel {
 }
 #[derive(Default)]
 pub struct InsertableFractioningProcedureModelBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    kilograms: Option<f32>,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) kilograms: Option<f32>,
 }
 impl InsertableFractioningProcedureModelBuilder {
     pub fn kilograms<P>(
@@ -248,13 +249,11 @@ impl InsertableFractioningProcedureModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableFractioningProcedureModel {
-            kilograms: self.kilograms.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableFractioningProcedureModelAttributes::Kilograms,
-                ),
-            )?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let kilograms =
+            self.kilograms.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableFractioningProcedureModelAttributes::Kilograms,
+            ))?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableFractioningProcedureModel { id, kilograms })
     }
 }

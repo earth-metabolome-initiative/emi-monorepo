@@ -40,14 +40,14 @@ CREATE TABLE IF NOT EXISTS next_procedure_models (
 CREATE TABLE IF NOT EXISTS procedure_model_trackables (
 	id SERIAL PRIMARY KEY,
 	name TEXT NOT NULL CHECK (must_be_paragraph(name)),
-	optional BOOLEAN NOT NULL DEFAULT FALSE,
 	procedure_model_id INTEGER NOT NULL REFERENCES procedure_models(id) ON DELETE CASCADE,
 	trackable_id UUID NOT NULL REFERENCES trackables(id) ON DELETE CASCADE,
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INTEGER NOT NULL REFERENCES users(id),
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	UNIQUE (procedure_model_id, name)
+	UNIQUE (procedure_model_id, name),
+	UNIQUE (id, procedure_model_id)
 );
 
 CREATE TABLE IF NOT EXISTS shared_procedure_model_trackables (
@@ -74,17 +74,33 @@ CREATE TABLE IF NOT EXISTS packaging_procedure_models (
 
 CREATE TABLE IF NOT EXISTS pouring_procedure_models (
 	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
-	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters))
+	measured_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	source INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	destination INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters)),
+	FOREIGN KEY (measured_with, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	FOREIGN KEY (source, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	FOREIGN KEY (destination, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS mix_solid_procedure_models (
 	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
-	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms))
+	measured_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	source INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	destination INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms)),
+	FOREIGN KEY (measured_with, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	FOREIGN KEY (source, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	FOREIGN KEY (destination, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS mix_countable_procedure_models (
 	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
-	quantity SMALLINT NOT NULL CHECK (must_be_strictly_positive_i16(quantity))
+	source INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	destination INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	quantity SMALLINT NOT NULL CHECK (must_be_strictly_positive_i16(quantity)),
+	FOREIGN KEY (source, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	FOREIGN KEY (destination, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS aliquoting_procedure_models (

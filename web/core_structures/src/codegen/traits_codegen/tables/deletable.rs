@@ -1,8 +1,11 @@
 mod brands;
 mod documents;
+mod mix_countable_procedure_models;
+mod mix_solid_procedure_models;
 mod next_procedure_models;
 mod organism_observations;
 mod parent_procedure_models;
+mod pouring_procedure_models;
 mod procedure_model_trackables;
 mod procedure_models;
 mod procedures;

@@ -92,8 +92,8 @@ impl InsertableTeamProject {
 }
 #[derive(Default)]
 pub struct InsertableTeamProjectBuilder {
-    team_id: Option<i32>,
-    project_id: Option<i32>,
+    pub(crate) team_id: Option<i32>,
+    pub(crate) project_id: Option<i32>,
 }
 impl InsertableTeamProjectBuilder {
     pub fn team_id<P>(

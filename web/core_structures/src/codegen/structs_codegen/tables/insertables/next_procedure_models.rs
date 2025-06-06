@@ -234,11 +234,11 @@ impl InsertableNextProcedureModel {
     }
 }
 pub struct InsertableNextProcedureModelBuilder {
-    parent_id: Option<i32>,
-    current_id: Option<i32>,
-    successor_id: Option<i32>,
-    created_by: Option<i32>,
-    created_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) parent_id: Option<i32>,
+    pub(crate) current_id: Option<i32>,
+    pub(crate) successor_id: Option<i32>,
+    pub(crate) created_by: Option<i32>,
+    pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
 impl Default for InsertableNextProcedureModelBuilder {
     fn default() -> Self {

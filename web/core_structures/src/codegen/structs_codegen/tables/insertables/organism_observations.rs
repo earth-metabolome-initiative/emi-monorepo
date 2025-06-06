@@ -213,16 +213,16 @@ impl InsertableOrganismObservation {
     }
 }
 pub struct InsertableOrganismObservationBuilder {
-    id: Option<::rosetta_uuid::Uuid>,
-    wild: Option<bool>,
-    project_id: Option<i32>,
-    organism_id: Option<::rosetta_uuid::Uuid>,
-    subject_id: Option<i16>,
-    picture: Option<Vec<u8>>,
-    created_by: Option<i32>,
-    created_at: Option<::rosetta_timestamp::TimestampUTC>,
-    updated_by: Option<i32>,
-    updated_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) wild: Option<bool>,
+    pub(crate) project_id: Option<i32>,
+    pub(crate) organism_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) subject_id: Option<i16>,
+    pub(crate) picture: Option<Vec<u8>>,
+    pub(crate) created_by: Option<i32>,
+    pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) updated_by: Option<i32>,
+    pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
 impl Default for InsertableOrganismObservationBuilder {
     fn default() -> Self {

@@ -77,10 +77,11 @@ impl InsertableFreezeDryingProcedureModel {
 }
 #[derive(Default)]
 pub struct InsertableFreezeDryingProcedureModelBuilder {
-    id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    kelvin: Option<f32>,
-    pascal: Option<f32>,
-    seconds: Option<f32>,
+    pub(crate) id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) kelvin: Option<f32>,
+    pub(crate) pascal: Option<f32>,
+    pub(crate) seconds: Option<f32>,
 }
 impl InsertableFreezeDryingProcedureModelBuilder {
     pub fn kelvin<P>(
@@ -301,17 +302,16 @@ impl InsertableFreezeDryingProcedureModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        Ok(InsertableFreezeDryingProcedureModel {
-            kelvin: self.kelvin.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableFreezeDryingProcedureModelAttributes::Kelvin,
-            ))?,
-            pascal: self.pascal.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableFreezeDryingProcedureModelAttributes::Pascal,
-            ))?,
-            seconds: self.seconds.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableFreezeDryingProcedureModelAttributes::Seconds,
-            ))?,
-            id: self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id(),
-        })
+        let kelvin = self.kelvin.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            InsertableFreezeDryingProcedureModelAttributes::Kelvin,
+        ))?;
+        let pascal = self.pascal.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            InsertableFreezeDryingProcedureModelAttributes::Pascal,
+        ))?;
+        let seconds = self.seconds.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            InsertableFreezeDryingProcedureModelAttributes::Seconds,
+        ))?;
+        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        Ok(InsertableFreezeDryingProcedureModel { id, kelvin, pascal, seconds })
     }
 }

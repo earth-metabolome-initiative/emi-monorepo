@@ -129,10 +129,10 @@ impl InsertableOrganismTaxon {
     }
 }
 pub struct InsertableOrganismTaxonBuilder {
-    created_by: Option<i32>,
-    created_at: Option<::rosetta_timestamp::TimestampUTC>,
-    organism_id: Option<::rosetta_uuid::Uuid>,
-    taxon_id: Option<i32>,
+    pub(crate) created_by: Option<i32>,
+    pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) organism_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) taxon_id: Option<i32>,
 }
 impl Default for InsertableOrganismTaxonBuilder {
     fn default() -> Self {
