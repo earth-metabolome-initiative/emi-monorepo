@@ -5,7 +5,7 @@
     diesel::Insertable,
     diesel::AsChangeset,
     diesel::Queryable,
-    diesel::Identifiable,
+    diesel::Identifiable
 )]
 #[diesel(primary_key(token))]
 #[diesel(
@@ -13,13 +13,16 @@
 )]
 pub struct DirectusSession {
     pub token: String,
-    pub user: Option<rosetta_uuid::Uuid>,
-    pub expires: rosetta_timestamp::TimestampUTC,
+    pub user: Option<::rosetta_uuid::Uuid>,
+    pub expires: ::rosetta_timestamp::TimestampUTC,
     pub ip: Option<String>,
     pub user_agent: Option<String>,
-    pub share: Option<rosetta_uuid::Uuid>,
+    pub share: Option<::rosetta_uuid::Uuid>,
     pub origin: Option<String>,
     pub next_token: Option<String>,
+}
+impl web_common_traits::prelude::TableName for DirectusSession {
+    const TABLE_NAME: &'static str = "directus_sessions";
 }
 impl diesel::Identifiable for DirectusSession {
     type Id = String;
@@ -28,74 +31,181 @@ impl diesel::Identifiable for DirectusSession {
     }
 }
 impl DirectusSession {
-    #[cfg(feature = "postgres")]
-    pub async fn user(
+    pub fn share<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
-        diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-        let Some(user) = self.user.as_ref() else {
-            return Ok(None);
-        };
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
-                    .eq(user),
-            )
-            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
-            .await
-            .map(Some)
-    }
-    #[cfg(feature = "postgres")]
-    pub async fn share(
-        &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut C,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::directus_shares::DirectusShare>,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-        let Some(share) = self.share.as_ref() else {
+    >
+    where
+        crate::codegen::structs_codegen::tables::directus_shares::DirectusShare: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::directus_shares::DirectusShare as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::directus_shares::DirectusShare as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::directus_shares::DirectusShare as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::directus_shares::DirectusShare as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::directus_shares::DirectusShare as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::directus_shares::DirectusShare as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::directus_shares::DirectusShare,
+        >,
+    {
+        use diesel::associations::HasTable;
+        use diesel::{RunQueryDsl, QueryDsl};
+        let Some(share) = self.share else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::directus_shares::DirectusShare::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_shares::directus_shares::dsl::id
-                    .eq(share),
+        RunQueryDsl::first(
+                QueryDsl::find(
+                    crate::codegen::structs_codegen::tables::directus_shares::DirectusShare::table(),
+                    share,
+                ),
+                conn,
             )
-            .first::<crate::codegen::structs_codegen::tables::directus_shares::DirectusShare>(conn)
-            .await
+            .map(Some)
+    }
+    pub fn user<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+        >,
+    {
+        use diesel::associations::HasTable;
+        use diesel::{RunQueryDsl, QueryDsl};
+        let Some(user) = self.user else {
+            return Ok(None);
+        };
+        RunQueryDsl::first(
+                QueryDsl::find(
+                    crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table(),
+                    user,
+                ),
+                conn,
+            )
             .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_user(
+    pub fn from_user(
+        user: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
-        user: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions::dsl::user
-                    .eq(user.id),
-            )
+            .filter(directus_sessions::user.eq(user))
+            .order_by(directus_sessions::token.asc())
             .load::<Self>(conn)
-            .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_share(
+    pub fn from_expires(
+        expires: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
-        share: &crate::codegen::structs_codegen::tables::directus_shares::DirectusShare,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions::dsl::share
-                    .eq(share.id),
-            )
+            .filter(directus_sessions::expires.eq(expires))
+            .order_by(directus_sessions::token.asc())
             .load::<Self>(conn)
-            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_ip(
+        ip: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions;
+        Self::table()
+            .filter(directus_sessions::ip.eq(ip))
+            .order_by(directus_sessions::token.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_user_agent(
+        user_agent: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions;
+        Self::table()
+            .filter(directus_sessions::user_agent.eq(user_agent))
+            .order_by(directus_sessions::token.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_share(
+        share: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions;
+        Self::table()
+            .filter(directus_sessions::share.eq(share))
+            .order_by(directus_sessions::token.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_origin(
+        origin: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions;
+        Self::table()
+            .filter(directus_sessions::origin.eq(origin))
+            .order_by(directus_sessions::token.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_next_token(
+        next_token: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::directus_sessions::directus_sessions;
+        Self::table()
+            .filter(directus_sessions::next_token.eq(next_token))
+            .order_by(directus_sessions::token.asc())
+            .load::<Self>(conn)
+    }
+}
+impl AsRef<DirectusSession> for DirectusSession {
+    fn as_ref(&self) -> &DirectusSession {
+        self
     }
 }

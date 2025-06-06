@@ -5,7 +5,7 @@
     diesel::Insertable,
     diesel::AsChangeset,
     diesel::Queryable,
-    diesel::Identifiable,
+    diesel::Identifiable
 )]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -14,13 +14,16 @@
 pub struct ContainerRule {
     pub id: i32,
     pub status: Option<String>,
-    pub user_created: Option<rosetta_uuid::Uuid>,
-    pub date_created: Option<rosetta_timestamp::TimestampUTC>,
-    pub user_updated: Option<rosetta_uuid::Uuid>,
-    pub date_updated: Option<rosetta_timestamp::TimestampUTC>,
+    pub user_created: Option<::rosetta_uuid::Uuid>,
+    pub date_created: Option<::rosetta_timestamp::TimestampUTC>,
+    pub user_updated: Option<::rosetta_uuid::Uuid>,
+    pub date_updated: Option<::rosetta_timestamp::TimestampUTC>,
     pub child_container: i32,
     pub parent_container: i32,
     pub rule_name: String,
+}
+impl web_common_traits::prelude::TableName for ContainerRule {
+    const TABLE_NAME: &'static str = "Container_Rules";
 }
 impl diesel::Identifiable for ContainerRule {
     type Id = i32;
@@ -29,140 +32,261 @@ impl diesel::Identifiable for ContainerRule {
     }
 }
 impl ContainerRule {
-    #[cfg(feature = "postgres")]
-    pub async fn user_created(
+    pub fn user_created<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut C,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-        let Some(user_created) = self.user_created.as_ref() else {
+    >
+    where
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+        >,
+    {
+        use diesel::associations::HasTable;
+        use diesel::{RunQueryDsl, QueryDsl};
+        let Some(user_created) = self.user_created else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
-                    .eq(user_created),
+        RunQueryDsl::first(
+                QueryDsl::find(
+                    crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table(),
+                    user_created,
+                ),
+                conn,
             )
-            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
-            .await
             .map(Some)
     }
-    #[cfg(feature = "postgres")]
-    pub async fn user_updated(
+    pub fn user_updated<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut C,
     ) -> Result<
         Option<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-        let Some(user_updated) = self.user_updated.as_ref() else {
+    >
+    where
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::directus_users::DirectusUser as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
+        >,
+    {
+        use diesel::associations::HasTable;
+        use diesel::{RunQueryDsl, QueryDsl};
+        let Some(user_updated) = self.user_updated else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_users::directus_users::dsl::id
-                    .eq(user_updated),
+        RunQueryDsl::first(
+                QueryDsl::find(
+                    crate::codegen::structs_codegen::tables::directus_users::DirectusUser::table(),
+                    user_updated,
+                ),
+                conn,
             )
-            .first::<crate::codegen::structs_codegen::tables::directus_users::DirectusUser>(conn)
-            .await
             .map(Some)
     }
-    #[cfg(feature = "postgres")]
-    pub async fn child_container(
+    pub fn child_container<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::container_models::ContainerModel,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::id
-                    .eq(&self.child_container),
-            )
-            .first::<crate::codegen::structs_codegen::tables::container_models::ContainerModel>(
-                conn,
-            )
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        >,
+    {
+        use diesel::associations::HasTable;
+        use diesel::{RunQueryDsl, QueryDsl};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::container_models::ContainerModel::table(),
+                self.child_container,
+            ),
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub async fn parent_container(
+    pub fn parent_container<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::container_models::ContainerModel,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::container_models::container_models::dsl::id
-                    .eq(&self.parent_container),
-            )
-            .first::<crate::codegen::structs_codegen::tables::container_models::ContainerModel>(
-                conn,
-            )
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        >,
+    {
+        use diesel::associations::HasTable;
+        use diesel::{RunQueryDsl, QueryDsl};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::container_models::ContainerModel::table(),
+                self.parent_container,
+            ),
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_user_created(
+    pub fn from_status(
+        status: &str,
         conn: &mut diesel::PgConnection,
-        user_created: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::container_rules::container_rules;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::container_rules::container_rules::dsl::user_created
-                    .eq(user_created.id),
-            )
+            .filter(container_rules::status.eq(status))
+            .order_by(container_rules::id.asc())
             .load::<Self>(conn)
-            .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_user_updated(
+    pub fn from_user_created(
+        user_created: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
-        user_updated: &crate::codegen::structs_codegen::tables::directus_users::DirectusUser,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::container_rules::container_rules;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::container_rules::container_rules::dsl::user_updated
-                    .eq(user_updated.id),
-            )
+            .filter(container_rules::user_created.eq(user_created))
+            .order_by(container_rules::id.asc())
             .load::<Self>(conn)
-            .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_child_container(
+    pub fn from_date_created(
+        date_created: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
-        child_container: &crate::codegen::structs_codegen::tables::container_models::ContainerModel,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::container_rules::container_rules;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::container_rules::container_rules::dsl::child_container
-                    .eq(child_container.id),
-            )
+            .filter(container_rules::date_created.eq(date_created))
+            .order_by(container_rules::id.asc())
             .load::<Self>(conn)
-            .await
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_parent_container(
+    pub fn from_user_updated(
+        user_updated: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
-        parent_container: &crate::codegen::structs_codegen::tables::container_models::ContainerModel,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::container_rules::container_rules;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::container_rules::container_rules::dsl::parent_container
-                    .eq(parent_container.id),
-            )
+            .filter(container_rules::user_updated.eq(user_updated))
+            .order_by(container_rules::id.asc())
             .load::<Self>(conn)
-            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_date_updated(
+        date_updated: &::rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::container_rules::container_rules;
+        Self::table()
+            .filter(container_rules::date_updated.eq(date_updated))
+            .order_by(container_rules::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_child_container(
+        child_container: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::container_rules::container_rules;
+        Self::table()
+            .filter(container_rules::child_container.eq(child_container))
+            .order_by(container_rules::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_container(
+        parent_container: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::container_rules::container_rules;
+        Self::table()
+            .filter(container_rules::parent_container.eq(parent_container))
+            .order_by(container_rules::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_rule_name(
+        rule_name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::container_rules::container_rules;
+        Self::table()
+            .filter(container_rules::rule_name.eq(rule_name))
+            .order_by(container_rules::id.asc())
+            .load::<Self>(conn)
+    }
+}
+impl AsRef<ContainerRule> for ContainerRule {
+    fn as_ref(&self) -> &ContainerRule {
+        self
     }
 }

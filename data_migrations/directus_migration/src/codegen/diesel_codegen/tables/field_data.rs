@@ -1,9 +1,9 @@
 diesel::table! {
-    #[sql_name = "Field_Data"] public.field_data(id) { id -> diesel::sql_types::Integer,
-    user_created -> diesel::sql_types::Nullable < rosetta_uuid::diesel_impls::Uuid >,
+    #[sql_name = "Field_Data"] field_data(id) { id -> diesel::sql_types::Integer,
+    user_created -> diesel::sql_types::Nullable < ::rosetta_uuid::diesel_impls::Uuid >,
     date_created -> diesel::sql_types::Nullable <
     rosetta_timestamp::diesel_impls::TimestampUTC >, user_updated ->
-    diesel::sql_types::Nullable < rosetta_uuid::diesel_impls::Uuid >, date_updated ->
+    diesel::sql_types::Nullable < ::rosetta_uuid::diesel_impls::Uuid >, date_updated ->
     diesel::sql_types::Nullable < rosetta_timestamp::diesel_impls::TimestampUTC >,
     collector_fullname -> diesel::sql_types::Nullable < diesel::sql_types::Text >,
     observation_subject -> diesel::sql_types::Nullable < diesel::sql_types::Text >,
@@ -39,6 +39,7 @@ diesel::table! {
     diesel::sql_types::Nullable < diesel::sql_types::Float >, #[sql_name =
     "temperature_°C"] temperature_celsius -> diesel::sql_types::Nullable <
     diesel::sql_types::Float >, geometry -> diesel::sql_types::Nullable <
-    postgis_diesel::sql_types::Geometry >, date -> diesel::sql_types::Nullable <
-    diesel::sql_types::BigInt > }
+    ::postgis_diesel::sql_types::Geometry >, date -> diesel::sql_types::Nullable <
+    diesel::sql_types::BigInt >, soil_type -> diesel::sql_types::Nullable <
+    diesel::sql_types::Text > }
 }

@@ -1,6 +1,6 @@
 diesel::table! {
-    public.directus_panels(id) { id -> rosetta_uuid::diesel_impls::Uuid, dashboard ->
-    rosetta_uuid::diesel_impls::Uuid, name -> diesel::sql_types::Nullable <
+    directus_panels(id) { id -> ::rosetta_uuid::diesel_impls::Uuid, dashboard ->
+    ::rosetta_uuid::diesel_impls::Uuid, name -> diesel::sql_types::Nullable <
     diesel::sql_types::Text >, icon -> diesel::sql_types::Nullable <
     diesel::sql_types::Text >, color -> diesel::sql_types::Nullable <
     diesel::sql_types::Text >, show_header -> diesel::sql_types::Bool, note ->
@@ -10,5 +10,5 @@ diesel::table! {
     diesel::sql_types::Integer, options -> diesel::sql_types::Nullable <
     diesel::sql_types::Json >, date_created -> diesel::sql_types::Nullable <
     rosetta_timestamp::diesel_impls::TimestampUTC >, user_created ->
-    diesel::sql_types::Nullable < rosetta_uuid::diesel_impls::Uuid > }
+    diesel::sql_types::Nullable < ::rosetta_uuid::diesel_impls::Uuid > }
 }

@@ -5,7 +5,7 @@
     diesel::Insertable,
     diesel::AsChangeset,
     diesel::Queryable,
-    diesel::Identifiable,
+    diesel::Identifiable
 )]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -15,11 +15,14 @@ pub struct DirectusPermission {
     pub id: i32,
     pub collection: String,
     pub action: String,
-    pub permissions: Option<serde_json::Value>,
-    pub validation: Option<serde_json::Value>,
-    pub presets: Option<serde_json::Value>,
+    pub permissions: Option<::serde_json::Value>,
+    pub validation: Option<::serde_json::Value>,
+    pub presets: Option<::serde_json::Value>,
     pub fields: Option<String>,
-    pub policy: rosetta_uuid::Uuid,
+    pub policy: ::rosetta_uuid::Uuid,
+}
+impl web_common_traits::prelude::TableName for DirectusPermission {
+    const TABLE_NAME: &'static str = "directus_permissions";
 }
 impl diesel::Identifiable for DirectusPermission {
     type Id = i32;
@@ -28,37 +31,98 @@ impl diesel::Identifiable for DirectusPermission {
     }
 }
 impl DirectusPermission {
-    #[cfg(feature = "postgres")]
-    pub async fn policy(
+    pub fn policy<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy,
         diesel::result::Error,
-    > {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-        crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_policies::directus_policies::dsl::id
-                    .eq(&self.policy),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy,
-            >(conn)
-            .await
+    >
+    where
+        crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy,
+        >,
+    {
+        use diesel::associations::HasTable;
+        use diesel::{RunQueryDsl, QueryDsl};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy::table(),
+                self.policy,
+            ),
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
-    pub async fn from_policy(
+    pub fn from_collection(
+        collection: &str,
         conn: &mut diesel::PgConnection,
-        policy: &crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::directus_permissions::directus_permissions;
         Self::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::directus_permissions::directus_permissions::dsl::policy
-                    .eq(policy.id),
-            )
+            .filter(directus_permissions::collection.eq(collection))
+            .order_by(directus_permissions::id.asc())
             .load::<Self>(conn)
-            .await
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_action(
+        action: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::directus_permissions::directus_permissions;
+        Self::table()
+            .filter(directus_permissions::action.eq(action))
+            .order_by(directus_permissions::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_fields(
+        fields: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::directus_permissions::directus_permissions;
+        Self::table()
+            .filter(directus_permissions::fields.eq(fields))
+            .order_by(directus_permissions::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_policy(
+        policy: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, ExpressionMethods};
+        use crate::codegen::diesel_codegen::tables::directus_permissions::directus_permissions;
+        Self::table()
+            .filter(directus_permissions::policy.eq(policy))
+            .order_by(directus_permissions::id.asc())
+            .load::<Self>(conn)
+    }
+}
+impl AsRef<DirectusPermission> for DirectusPermission {
+    fn as_ref(&self) -> &DirectusPermission {
+        self
     }
 }

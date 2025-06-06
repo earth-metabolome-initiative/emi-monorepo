@@ -1,5 +1,5 @@
 diesel::table! {
-    public.directus_relations(id) { id -> diesel::sql_types::Integer, many_collection ->
+    directus_relations(id) { id -> diesel::sql_types::Integer, many_collection ->
     diesel::sql_types::Text, many_field -> diesel::sql_types::Text, one_collection ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, one_field ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, one_collection_field ->

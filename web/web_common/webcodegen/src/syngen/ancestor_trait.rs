@@ -21,11 +21,7 @@ impl crate::Table {
         }
 
         if homogeneous_parent_columns.len() > 1 {
-            unimplemented!(
-                "Ancestor trait cannot be implemented for table `{}.{}` with multiple homogeneous parent columns",
-                self.table_schema,
-                self.table_name
-            );
+            return Ok(None);
         }
 
         // If any of the homogeneous parent columns are multiple, we do not know, at

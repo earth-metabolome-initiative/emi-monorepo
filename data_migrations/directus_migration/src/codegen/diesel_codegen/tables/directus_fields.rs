@@ -1,5 +1,5 @@
 diesel::table! {
-    public.directus_fields(id) { id -> diesel::sql_types::Integer, collection ->
+    directus_fields(id) { id -> diesel::sql_types::Integer, collection ->
     diesel::sql_types::Text, field -> diesel::sql_types::Text, special ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, interface ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, options ->

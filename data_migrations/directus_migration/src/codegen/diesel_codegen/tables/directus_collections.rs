@@ -1,6 +1,6 @@
 diesel::table! {
-    public.directus_collections(collection) { collection -> diesel::sql_types::Text, icon
-    -> diesel::sql_types::Nullable < diesel::sql_types::Text >, note ->
+    directus_collections(collection) { collection -> diesel::sql_types::Text, icon ->
+    diesel::sql_types::Nullable < diesel::sql_types::Text >, note ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, display_template ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, hidden ->
     diesel::sql_types::Bool, singleton -> diesel::sql_types::Bool, translations ->
