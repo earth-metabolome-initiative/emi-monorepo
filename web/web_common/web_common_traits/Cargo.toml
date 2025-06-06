@@ -14,10 +14,7 @@ instrument_categories.workspace = true
 
 [features]
 sqlite = ["diesel/sqlite", "instrument_categories/sqlite"]
-postgres = [
-  "diesel/postgres",
-  "instrument_categories/postgres",
-]
+postgres = ["diesel/postgres", "instrument_categories/postgres"]
 frontend = ["sqlite"]
 backend = ["postgres"]
 

@@ -17,11 +17,11 @@ use diesel::PgConnection;
 // mod weighing_procedure;
 mod dbgi_plan;
 pub use dbgi_plan::DBGI_PLAN;
-mod collection_preparation_procedures;
-mod sample_collection_procedures;
-mod observation_procedures;
 mod analysis_procedures;
+mod collection_preparation_procedures;
 mod data_enrichment_procedures;
+mod observation_procedures;
+mod sample_collection_procedures;
 
 // pub(crate) use
 // aliquoting_mass_spec_extracts_procedure::ALIQUOTING_MASS_SPEC_EXTRACTS;

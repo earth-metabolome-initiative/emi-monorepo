@@ -553,7 +553,7 @@ impl Codegen<'_> {
                             let camel_cased_column_ident = column.camel_case_ident()?;
                             variable_availability_checks.extend(quote::quote! {
                                 let #column_ident = self.#column_ident.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(#insertable_enum::#camel_cased_column_ident))?;
-                            });         
+                            });
                         }
                         quote::quote! {
                             #column_ident,

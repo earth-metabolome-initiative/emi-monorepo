@@ -22,11 +22,11 @@ pub(super) fn init_full_organism_collection(user: &User, conn: &mut diesel::PgCo
         .name(FULL_ORGANISM_COLLECTION)
         .unwrap()
         .description(
-			"Procedure model for collecting a full organism, including all its parts and tissues.",
+            "Procedure model for collecting a full organism, including all its parts and tissues.",
         )
         .unwrap()
         .created_by(user.id)
         .unwrap()
         .insert(user.id, conn)
-		.unwrap();
+        .unwrap();
 }

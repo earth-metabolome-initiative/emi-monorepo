@@ -22,11 +22,11 @@ pub(super) fn init_part_of_organism_collection(user: &User, conn: &mut diesel::P
         .name(PART_OF_ORGANISM)
         .unwrap()
         .description(
-			"Procedure model to collect part of organisms, such as leaves, stems, or roots.",
+            "Procedure model to collect part of organisms, such as leaves, stems, or roots.",
         )
         .unwrap()
         .created_by(user.id)
         .unwrap()
         .insert(user.id, conn)
-		.unwrap();
+        .unwrap();
 }
