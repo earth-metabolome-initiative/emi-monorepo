@@ -3,10 +3,7 @@
 
 use core_structures::Brand as PortalBrand;
 use diesel::PgConnection;
-use web_common_traits::{
-    database::{AsyncBoundedRead, Insertable, InsertableVariant},
-    prelude::Builder,
-};
+use web_common_traits::database::{BoundedRead, Insertable, InsertableVariant};
 
 use super::get_user;
 use crate::codegen::Brand as DirectusBrand;
@@ -21,45 +18,41 @@ use crate::codegen::Brand as DirectusBrand;
 /// # Errors
 ///
 /// * If the insertion fails, an error of type `error::Error` is returned.
-pub async fn insert_missing_brands(
+pub fn insert_missing_brands(
     directus_conn: &mut PgConnection,
     portal_conn: &mut PgConnection,
 ) -> Result<(), crate::error::Error> {
-    let directus_brands = DirectusBrand::read_all_async(directus_conn).await?;
+    let directus_brands = DirectusBrand::bounded_read(0, u16::MAX, directus_conn)?;
 
     for directus_brand in directus_brands {
-        if PortalBrand::from_name(&directus_brand.brand, portal_conn).await?.is_some() {
+        if PortalBrand::from_name(&directus_brand.brand, portal_conn)?.is_some() {
             continue;
         }
 
-        let directus_created_by =
-            directus_brand.user_created(directus_conn).await?.ok_or_else(|| {
-                crate::error::Error::BrandWithMissingUser(Box::from(directus_brand.clone()))
-            })?;
-        let portal_created_by =
-            match get_user(&directus_created_by, directus_conn, portal_conn).await {
-                Ok(user) => user,
-                Err(crate::error::Error::UserNeverLoggedIn(_)) => {
-                    continue;
-                }
-                Err(error) => {
-                    return Err(error);
-                }
-            };
+        let directus_created_by = directus_brand.user_created(directus_conn)?.ok_or_else(|| {
+            crate::error::Error::BrandWithMissingUser(Box::from(directus_brand.clone()))
+        })?;
+        let portal_created_by = match get_user(&directus_created_by, directus_conn, portal_conn) {
+            Ok(user) => user,
+            Err(crate::error::Error::UserNeverLoggedIn(_)) => {
+                continue;
+            }
+            Err(error) => {
+                return Err(error);
+            }
+        };
         let directus_updated_by = directus_brand
-            .user_updated(directus_conn)
-            .await?
+            .user_updated(directus_conn)?
             .unwrap_or_else(|| directus_created_by.clone());
-        let portal_updated_by =
-            match get_user(&directus_updated_by, directus_conn, portal_conn).await {
-                Ok(user) => user,
-                Err(crate::error::Error::UserNeverLoggedIn(_)) => {
-                    continue;
-                }
-                Err(error) => {
-                    return Err(error);
-                }
-            };
+        let portal_updated_by = match get_user(&directus_updated_by, directus_conn, portal_conn) {
+            Ok(user) => user,
+            Err(crate::error::Error::UserNeverLoggedIn(_)) => {
+                continue;
+            }
+            Err(error) => {
+                return Err(error);
+            }
+        };
 
         let created_at = directus_brand.date_created.ok_or_else(|| {
             crate::error::Error::MissingDate(
@@ -74,9 +67,7 @@ pub async fn insert_missing_brands(
             .updated_at(directus_brand.date_updated.unwrap_or(created_at))?
             .updated_by(portal_updated_by.id)?
             .name(directus_brand.brand.clone())?
-            .build()?
-            .insert(&portal_created_by.id, portal_conn)
-            .await?;
+            .insert(portal_created_by.id, portal_conn)?;
     }
 
     Ok(())

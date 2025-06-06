@@ -58,7 +58,7 @@ impl DirectusComment {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection::table(),
-                self.collection,
+                self.collection.clone(),
             ),
             conn,
         )

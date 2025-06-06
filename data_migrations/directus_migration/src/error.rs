@@ -5,8 +5,7 @@ use core_structures::{
     tables::insertables::{
         InsertableAddressAttributes, InsertableBrandAttributes, InsertableCityAttributes,
         InsertableCommercialProductAttributes, InsertableInstrumentAttributes,
-        InsertableInstrumentLocationAttributes, InsertableInstrumentModelAttributes,
-        InsertableInstrumentModelCategoryAttributes, InsertableRoomAttributes,
+        InsertableInstrumentModelAttributes, InsertableRoomAttributes,
         InsertableUserEmailAttributes,
     },
 };
@@ -76,10 +75,6 @@ pub enum Error {
     AddressInsert(InsertError<InsertableAddressAttributes>),
     /// Failed to insert a new room
     RoomInsert(InsertError<InsertableRoomAttributes>),
-    /// Failed to insert a new instrument location.
-    InstrumentLocationInsert(InsertError<InsertableInstrumentLocationAttributes>),
-    /// Failed to insert a new instrument model category.
-    InstrumentModelCategoryInsert(InsertError<InsertableInstrumentModelCategoryAttributes>),
     /// User never logged in
     UserNeverLoggedIn(Box<DirectusUser>),
 }
@@ -144,20 +139,8 @@ impl From<InsertError<InsertableRoomAttributes>> for Error {
     }
 }
 
-impl From<InsertError<InsertableInstrumentLocationAttributes>> for Error {
-    fn from(value: InsertError<InsertableInstrumentLocationAttributes>) -> Self {
-        Error::InstrumentLocationInsert(value)
-    }
-}
-
 impl From<InsertError<InsertableCommercialProductAttributes>> for Error {
     fn from(value: InsertError<InsertableCommercialProductAttributes>) -> Self {
         Error::ProductInsert(value)
-    }
-}
-
-impl From<InsertError<InsertableInstrumentModelCategoryAttributes>> for Error {
-    fn from(value: InsertError<InsertableInstrumentModelCategoryAttributes>) -> Self {
-        Error::InstrumentModelCategoryInsert(value)
     }
 }

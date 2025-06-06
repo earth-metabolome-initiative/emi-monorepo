@@ -3,14 +3,10 @@
 
 use core_structures::{
     CommercialProduct as CommercialProductProduct, Instrument as PortalInstrument,
-    InstrumentLocation as PortalInstrumentLocation, InstrumentModel as PortalInstrumentModel,
-    InstrumentState as PortalInstrumentState,
+    InstrumentModel as PortalInstrumentModel, InstrumentState as PortalInstrumentState,
 };
 use diesel::PgConnection;
-use web_common_traits::{
-    database::{AsyncBoundedRead, Insertable, InsertableVariant},
-    prelude::Builder,
-};
+use web_common_traits::database::{BoundedRead, Insertable, InsertableVariant, Read};
 
 use super::{get_room, get_user};
 use crate::codegen::Instrument as DirectusInstrument;
@@ -26,78 +22,58 @@ use crate::codegen::Instrument as DirectusInstrument;
 /// # Errors
 ///
 /// * If the database operations fail, an error is returned.
-pub(crate) async fn insert_missing_instruments(
+pub(crate) fn insert_missing_instruments(
     directus_conn: &mut PgConnection,
     portal_conn: &mut PgConnection,
 ) -> Result<(), crate::error::Error> {
-    let directus_instruments = DirectusInstrument::read_all_async(directus_conn).await?;
+    let directus_instruments = DirectusInstrument::bounded_read(0, u16::MAX, directus_conn)?;
     for directus_instrument in directus_instruments {
-        let user_created =
-            directus_instrument.user_created(directus_conn).await?.ok_or_else(|| {
-                crate::error::Error::InstrumentWithMissingUser(Box::from(
-                    directus_instrument.clone(),
-                ))
-            })?;
+        let user_created = directus_instrument.user_created(directus_conn)?.ok_or_else(|| {
+            crate::error::Error::InstrumentWithMissingUser(Box::from(directus_instrument.clone()))
+        })?;
         let user_updated = directus_instrument
-            .user_updated(directus_conn)
-            .await?
+            .user_updated(directus_conn)?
             .unwrap_or_else(|| user_created.clone());
 
-        let created_by = get_user(&user_created, directus_conn, portal_conn).await?;
-        let updated_by = get_user(&user_updated, directus_conn, portal_conn).await?;
+        let created_by = get_user(&user_created, directus_conn, portal_conn)?;
+        let updated_by = get_user(&user_updated, directus_conn, portal_conn)?;
         let created_at = directus_instrument.date_created.ok_or(
             crate::error::Error::MissingDate("instruments".to_owned(), "date_created".to_owned()),
         )?;
         let updated_at = directus_instrument.date_updated.unwrap_or(created_at);
 
-        let instrument_state =
-            PortalInstrumentState::from_name(&directus_instrument.status, portal_conn)
-                .await?
+        let _instrument_state =
+            PortalInstrumentState::from_name(&directus_instrument.status, portal_conn)?
                 .ok_or_else(|| {
                     crate::error::Error::UnknownInstrumentState(directus_instrument.status.clone())
                 })?;
-        let directus_instrument_model = directus_instrument.instrument_model(directus_conn).await?;
+        let directus_instrument_model = directus_instrument.instrument_model(directus_conn)?;
         let portal_product = CommercialProductProduct::from_name(
             &directus_instrument_model.instrument_model,
             portal_conn,
-        )
-        .await?
+        )?
         .ok_or_else(|| {
             crate::error::Error::UnknownInstrumentModel(Box::from(
                 directus_instrument_model.clone(),
             ))
         })?;
 
-        let portal_instrument_model =
-            PortalInstrumentModel::from_id(portal_conn, &portal_product).await.map_err(|_| {
-                crate::error::Error::UnknownInstrumentModel(Box::from(
-                    directus_instrument_model.clone(),
-                ))
-            })?;
+        let _portal_instrument_model = PortalInstrumentModel::read(portal_product.id, portal_conn)
+            .map_err(|_| {
+            crate::error::Error::UnknownInstrumentModel(Box::from(
+                directus_instrument_model.clone(),
+            ))
+        })?;
 
-        let portal_instrument = PortalInstrument::new()
+        let _portal_instrument = PortalInstrument::new()
             .created_by(created_by.id)?
             .updated_by(updated_by.id)?
             .created_at(created_at)?
             .updated_at(updated_at)?
-            .instrument_state_id(instrument_state.id)?
-            .instrument_model_id(portal_instrument_model.id)?
-            .qrcode(directus_instrument.uuid_instrument)?
-            .build()?
-            .insert(&created_by.id, portal_conn)
-            .await?;
+            .insert(created_by.id, portal_conn)?;
 
-        let directus_room = directus_instrument.instrument_location(directus_conn).await?;
-        let portal_room = get_room(&directus_room, directus_conn, portal_conn).await?;
-
-        let _instrument_location = PortalInstrumentLocation::new()
-            .instrument_id(portal_instrument.id)?
-            .room_id(portal_room.id)?
-            .created_by(created_by.id)?
-            .created_at(created_at)?
-            .build()?
-            .insert(&created_by.id, portal_conn)
-            .await?;
+        let directus_room = directus_instrument.instrument_location(directus_conn)?;
+        let _portal_room = get_room(&directus_room, directus_conn, portal_conn)?;
     }
     Ok(())
 }

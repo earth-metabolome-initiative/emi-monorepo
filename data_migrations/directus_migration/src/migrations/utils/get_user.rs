@@ -2,15 +2,12 @@
 
 use core_structures::{User, UserEmail};
 use diesel::PgConnection;
-use web_common_traits::{
-    database::{Insertable, InsertableVariant},
-    prelude::Builder,
-};
+use web_common_traits::database::{Insertable, InsertableVariant, UncheckedInsertableVariant};
 
 use crate::codegen::{DirectusUser, FieldDatum as DirectusFieldDatum};
 
 /// This module provides a method to retrieve or insert a user in the database.
-pub async fn get_user(
+pub fn get_user(
     directus_user: &DirectusUser,
     directus_conn: &mut PgConnection,
     portal_conn: &mut PgConnection,
@@ -19,16 +16,15 @@ pub async fn get_user(
         .email
         .as_deref()
         .ok_or(crate::error::Error::MissingEmail(directus_user.id))?;
-    if let Some(stored_email) = UserEmail::from_email(email, portal_conn).await? {
-        return Ok(stored_email.created_by(portal_conn).await?);
+    if let Some(stored_email) = UserEmail::from_email(email, portal_conn)? {
+        return Ok(stored_email.created_by(portal_conn)?);
     }
 
     let last_access = directus_user
         .last_access
         .ok_or(crate::error::Error::UserNeverLoggedIn(Box::from(directus_user.clone())))?;
 
-    let imputed_created_at = DirectusFieldDatum::from_user_created(directus_conn, directus_user)
-        .await?
+    let imputed_created_at = DirectusFieldDatum::from_user_created(&directus_user.id, directus_conn)?
         .into_iter()
         .filter_map(|field_datum| field_datum.date_created)
         .min()
@@ -49,9 +45,7 @@ pub async fn get_user(
         )?
         .created_at(imputed_created_at)?
         .updated_at(last_access)?
-        .build()?
-        .backend_insert(portal_conn)
-        .await?;
+        .unchecked_insert(portal_conn)?;
 
     let _new_email = UserEmail::new()
         .created_by(new_user.id)?
@@ -63,9 +57,7 @@ pub async fn get_user(
         )?
         .created_at(imputed_created_at)?
         .primary_email(true)?
-        .build()?
-        .insert(&new_user.id, portal_conn)
-        .await?;
+        .insert(new_user.id, portal_conn)?;
 
     Ok(new_user)
 }

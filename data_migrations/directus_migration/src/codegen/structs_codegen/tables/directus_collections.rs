@@ -93,7 +93,7 @@ impl DirectusCollection {
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        let Some(group) = self.group else {
+        let Some(group) = self.group.clone() else {
             return Ok(None);
         };
         RunQueryDsl::first(

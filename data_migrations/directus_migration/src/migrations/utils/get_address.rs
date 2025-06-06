@@ -3,31 +3,27 @@
 use core_structures::{Address as PortalAddress, City as PortalCity, Country as PortalCountry};
 use diesel::PgConnection;
 use web_common_traits::{
-    database::{Insertable, InsertableVariant},
-    prelude::Builder,
+    database::{Insertable, UncheckedInsertableVariant},
 };
 
 use crate::codegen::Address as DirectusAddress;
 
 /// Returns (potentially newly created) address for a Directus address.
-pub(crate) async fn get_address(
+pub(crate) fn get_address(
     directus_address: &DirectusAddress,
     portal_conn: &mut PgConnection,
 ) -> Result<PortalAddress, crate::error::Error> {
-    let country = PortalCountry::from_name(&directus_address.country, portal_conn)
-        .await?
+    let country = PortalCountry::from_name(&directus_address.country, portal_conn)?
         .ok_or_else(|| crate::error::Error::UnknownCountry(directus_address.country.clone()))?;
 
-    let city = match PortalCity::from_name(&directus_address.city, portal_conn).await?.pop() {
+    let city = match PortalCity::from_name(&directus_address.city, portal_conn)?.pop() {
         Some(city) => city,
         None => {
             // We need to insert the city
             PortalCity::new()
                 .name(directus_address.city.clone())?
                 .iso(country.iso)?
-                .build()?
-                .backend_insert(portal_conn)
-                .await?
+                .unchecked_insert(portal_conn)?
         }
     };
 
@@ -36,9 +32,7 @@ pub(crate) async fn get_address(
         &directus_address.street,
         &directus_address.street_number,
         portal_conn,
-    )
-    .await?
-    {
+    )? {
         Ok(address)
     } else {
         // Otherwise we need to insert the address
@@ -55,8 +49,6 @@ pub(crate) async fn get_address(
                     ));
                 }
             })?
-            .build()?
-            .backend_insert(portal_conn)
-            .await?)
+            .unchecked_insert(portal_conn)?)
     }
 }

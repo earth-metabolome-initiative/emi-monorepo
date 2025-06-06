@@ -26,28 +26,24 @@ const PORTAL_DATABASE_URL: &str = const_format::formatcp!(
 
 /// Executes the data migration from the Directus database to the portal
 /// database.
-async fn transact_migration(
+fn transact_migration(
     directus_conn: &mut PgConnection,
     portal_conn: &mut PgConnection,
 ) -> Result<(), error::Error> {
-    insert_missing_users(directus_conn, portal_conn).await?;
-    insert_missing_brands(directus_conn, portal_conn).await?;
-    insert_missing_instrument_models(directus_conn, portal_conn).await?;
-    insert_missing_instruments(directus_conn, portal_conn).await?;
+    insert_missing_users(directus_conn, portal_conn)?;
+    insert_missing_brands(directus_conn, portal_conn)?;
+    insert_missing_instrument_models(directus_conn, portal_conn)?;
+    insert_missing_instruments(directus_conn, portal_conn)?;
 
     Ok(())
 }
 
 #[tokio::main]
 async fn main() -> Result<(), error::Error> {
-    let mut directus_conn = PgConnection::establish(DIRECTUS_DATABASE_URL).await?;
-    let mut portal_conn = PgConnection::establish(PORTAL_DATABASE_URL).await?;
+    let mut directus_conn = PgConnection::establish(DIRECTUS_DATABASE_URL)?;
+    let mut portal_conn = PgConnection::establish(PORTAL_DATABASE_URL)?;
 
-    portal_conn
-        .transaction(|portal_conn| {
-            Box::pin(async move { transact_migration(&mut directus_conn, portal_conn).await })
-        })
-        .await?;
+    portal_conn.transaction(|portal_conn| transact_migration(&mut directus_conn, portal_conn))?;
 
     Ok(())
 }
