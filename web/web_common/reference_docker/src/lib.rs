@@ -207,13 +207,13 @@ fn establish_connection_to_postgres<C: Connection>(
 /// # Example
 ///
 /// ```rust
-/// use diesel_async::AsyncPgConnection;
+/// use diesel::PgConnection;
 /// use reference_docker::reference_docker_with_connection;
 ///
 /// #[tokio::main]
 /// async fn main() {
 ///     let (docker, conn) =
-///         reference_docker_with_connection::<AsyncPgConnection>("test_db", 6437).await.unwrap();
+///         reference_docker_with_connection::<PgConnection>("test_db", 6437).await.unwrap();
 /// }
 /// ```
 pub async fn reference_docker_with_connection<C: Connection>(

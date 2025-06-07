@@ -20,9 +20,9 @@ pub fn must_be_smaller_than_utc(
     right: rosetta_timestamp::TimestampUTC,
 ) -> Result<(), validation_errors::DoubleFieldError> {
     if left <= right {
-        Err(validation_errors::DoubleFieldError::MustBeSmallerThan((), ()))
-    } else {
         Ok(())
+    } else {
+        Err(validation_errors::DoubleFieldError::MustBeSmallerThan((), ()))
     }
 }
 
@@ -45,9 +45,9 @@ pub fn must_be_strictly_smaller_than_utc(
     right: rosetta_timestamp::TimestampUTC,
 ) -> Result<(), validation_errors::DoubleFieldError> {
     if left < right {
-        Err(validation_errors::DoubleFieldError::MustBeSmallerThan((), ()))
-    } else {
         Ok(())
+    } else {
+        Err(validation_errors::DoubleFieldError::MustBeSmallerThan((), ()))
     }
 }
 
