@@ -6,7 +6,7 @@ use syn::Ident;
 
 use crate::Backend;
 
-/// Struct marker for the SQLite backend.
+/// Struct marker for the `SQLite` backend.
 pub(crate) struct SQLite;
 
 impl Backend for SQLite {

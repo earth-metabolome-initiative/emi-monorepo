@@ -112,6 +112,16 @@ impl super::MostAbundantIsotope for CaliforniumIsotope {
         Self::Cf256
     }
 }
+impl From<CaliforniumIsotope> for crate::Isotope {
+    fn from(isotope: CaliforniumIsotope) -> Self {
+        crate::Isotope::Cf(isotope)
+    }
+}
+impl From<CaliforniumIsotope> for crate::Element {
+    fn from(_isotope: CaliforniumIsotope) -> Self {
+        crate::Element::Cf
+    }
+}
 impl TryFrom<u16> for CaliforniumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

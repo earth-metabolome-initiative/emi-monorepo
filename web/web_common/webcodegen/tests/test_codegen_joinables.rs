@@ -17,7 +17,6 @@ async fn test_codegen_joinables() {
         .enable_tables_schema()
         .beautify()
         .generate(&mut conn, &database_name, None)
-        .await
         .unwrap();
 
     docker.stop().await.unwrap();

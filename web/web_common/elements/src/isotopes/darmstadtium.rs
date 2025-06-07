@@ -92,6 +92,16 @@ impl super::MostAbundantIsotope for DarmstadtiumIsotope {
         Self::Ds281
     }
 }
+impl From<DarmstadtiumIsotope> for crate::Isotope {
+    fn from(isotope: DarmstadtiumIsotope) -> Self {
+        crate::Isotope::Ds(isotope)
+    }
+}
+impl From<DarmstadtiumIsotope> for crate::Element {
+    fn from(_isotope: DarmstadtiumIsotope) -> Self {
+        crate::Element::Ds
+    }
+}
 impl TryFrom<u16> for DarmstadtiumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

@@ -1,6 +1,6 @@
 //! Primary method to convert a Table to a struct and associated impls.
 
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
@@ -8,17 +8,14 @@ use syn::Ident;
 use crate::{Table, errors::WebCodeGenError};
 
 impl Table {
-    async fn identifiable_impl(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<TokenStream, WebCodeGenError> {
-        if !self.has_primary_keys(conn).await? {
+    fn identifiable_impl(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
+        if !self.has_primary_keys(conn)? {
             return Ok(TokenStream::new());
         }
 
         let struct_name: Ident = self.struct_ident()?;
-        let primary_key = self.primary_key_type(conn).await?;
-        let primary_key_attribute = self.primary_key_attributes(true, conn).await?;
+        let primary_key = self.primary_key_type(conn)?;
+        let primary_key_attribute = self.primary_key_attributes(true, conn)?;
 
         Ok(quote! {
             impl diesel::Identifiable for #struct_name {
@@ -41,15 +38,15 @@ impl Table {
     ///
     /// * If the provided connection is not valid.
     /// * If the number of columns exceeds 128.
-    pub async fn to_syn(
+    pub fn to_syn(
         &self,
         enable_yew: bool,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
-        if self.columns(conn).await?.len() > 128 {
+        if self.columns(conn)?.len() > 128 {
             return Err(WebCodeGenError::ExcessiveNumberOfColumns(
                 Box::new(self.clone()),
-                self.columns(conn).await?.len(),
+                self.columns(conn)?.len(),
             ));
         }
 
@@ -58,37 +55,41 @@ impl Table {
 
         let mut attributes = Vec::new();
 
-        for column in self.columns(conn).await? {
+        for column in self.columns(conn)? {
             let column_attribute: Ident = column.snake_case_ident()?;
-            let column_type = column.rust_data_type(conn).await?;
+            let column_type = column.rust_data_type(conn)?;
             attributes.push(quote! {
                 pub #column_attribute: #column_type
             });
         }
-        let mut diesel_derives_decorator = self.diesel_derives_decorator(conn).await?;
-        let primary_key_decorator = self.primary_key_decorator(conn).await?;
+        let mut diesel_derives_decorator = self.diesel_derives_decorator(conn)?;
+        let primary_key_decorator = self.primary_key_decorator(conn)?;
         let mut default_derives = vec![quote!(Debug), quote!(Clone), quote!(PartialEq)];
-        if self.supports_copy(conn).await? {
+        if self.supports_copy(conn)? {
             default_derives.push(quote!(Copy));
         }
-        if self.supports_eq(conn).await? {
+        if self.supports_eq(conn)? {
             default_derives.push(quote!(Eq));
         }
-        if self.supports_ord(conn).await? {
+        if self.supports_ord(conn)? {
             default_derives.push(quote!(PartialOrd));
             default_derives.push(quote!(Ord));
         }
-        if self.supports_hash(conn).await? {
+        if self.supports_hash(conn)? {
             default_derives.push(quote!(Hash));
         }
 
-        let identifiable_impl = self.identifiable_impl(conn).await?;
+        let identifiable_impl = self.identifiable_impl(conn)?;
 
         if enable_yew {
             diesel_derives_decorator.extend(quote! {
                 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
             });
         }
+
+        let extensions_impls = self.extension_traits_impls(conn)?;
+        let ancestor_impl = self.ancestor_traits_impl(conn)?;
+        let table_name = self.table_name.clone();
 
         Ok(quote! {
             #[derive(#(#default_derives),*)]
@@ -100,6 +101,12 @@ impl Table {
                 #(#attributes),*
             }
 
+            impl web_common_traits::prelude::TableName for #struct_name {
+                const TABLE_NAME: &'static str = #table_name;
+            }
+
+            #(#extensions_impls)*
+            #ancestor_impl
             #identifiable_impl
         })
     }

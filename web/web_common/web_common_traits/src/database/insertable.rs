@@ -2,17 +2,17 @@
 //! rows.
 use std::convert::Infallible;
 
-use backend_request_errors::BackendRequestError;
 use common_traits::prelude::BuilderError;
+use generic_backend_request_errors::GenericBackendRequestError;
 
 /// A trait for types that can be inserted into the database.
 pub trait Insertable {
-    /// The associated type which can be constructed in the frontend or backend
-    /// to execute the insert operation.
-    type InsertableVariant: InsertableVariant<Row = Self>;
     /// The associated builder type which can be constructed in the frontend or
     /// backend to create the insertable variant.
-    type InsertableBuilder: InsertableBuilder<Row = Self, Product = Self::InsertableVariant>;
+    type InsertableBuilder: Default;
+    /// The associated insertable variant type which can be constructed in the
+    /// frontend or backend to execute the insert operation.
+    type InsertableVariant;
 
     #[must_use]
     /// Returns a new insertable variant builder.
@@ -23,14 +23,17 @@ pub trait Insertable {
 
 /// A trait for types that can be constructed in the frontend or backend to
 /// execute the insert operation.
-pub trait InsertableVariant {
+pub trait InsertableVariant<C>: Sized {
     /// The associated row type which can be inserted into the database.
-    type Row: Insertable<InsertableVariant = Self, InsertableBuilder = Self::InsertableBuilder>;
-    /// The type of connection to the database.
-    type Conn;
-    /// The builder type which can be constructed in the frontend or backend to
-    /// create the insertable variant.
-    type InsertableBuilder: InsertableBuilder<Row = Self::Row, Product = Self>;
+    type Row: Insertable<
+            InsertableBuilder = Self,
+            InsertableVariant = <Self as InsertableVariant<C>>::InsertableVariant,
+        > + diesel::associations::HasTable;
+    /// The associated insertable variant type which can be constructed in the
+    /// frontend or backend to execute the insert operation.
+    type InsertableVariant: diesel::Insertable<<Self::Row as diesel::associations::HasTable>::Table>;
+    /// The error type which may occur during the insert operation.
+    type Error: From<diesel::result::Error>;
     /// The expected user ID type.
     type UserId;
 
@@ -49,22 +52,24 @@ pub trait InsertableVariant {
     ///
     /// * If the row cannot be inserted.
     /// * If the user is not authorized to insert the row.
-    fn insert(
-        self,
-        user_id: &Self::UserId,
-        conn: &mut Self::Conn,
-    ) -> impl core::future::Future<
-        Output = Result<
-            Self::Row,
-            InsertError<<Self::InsertableBuilder as common_traits::prelude::Builder>::Attribute>,
-        >,
-    >;
+    fn insert(self, user_id: Self::UserId, conn: &mut C) -> Result<Self::Row, Self::Error>;
 }
 
-#[cfg(feature = "backend")]
-/// A trait for types that can be constructed in the backend only to
-/// execute the insert operation without a user ID.
-pub trait BackendInsertableVariant: InsertableVariant {
+#[cfg(feature = "postgres")]
+/// A trait for types that can be constructed solely in the backend to
+/// execute the insert operation.
+pub trait UncheckedInsertableVariant:
+    InsertableVariant<diesel::pg::PgConnection> + TryInto<Self::InsertableVariant>
+where
+    <Self as InsertableVariant<diesel::pg::PgConnection>>::Error:
+        From<<Self as TryInto<Self::InsertableVariant>>::Error>,
+    diesel::query_builder::InsertStatement<
+        <Self::Row as diesel::associations::HasTable>::Table,
+        <Self::InsertableVariant as diesel::Insertable<
+            <Self::Row as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, diesel::pg::PgConnection, Self::Row>,
+{
     /// Inserts the row into the database.
     ///
     /// # Arguments
@@ -78,32 +83,40 @@ pub trait BackendInsertableVariant: InsertableVariant {
     /// # Errors
     ///
     /// * If the row cannot be inserted.
-    fn backend_insert(
+    ///
+    /// # Safety
+    ///
+    /// This method is unsafe because it does not perform a check
+    /// on the user ID on the applicative side. It is meant to be
+    /// used on structural tables which are not meant to be inserted
+    /// or modified by users, but rather by the backend itself.
+    fn unchecked_insert(
         self,
-        conn: &mut Self::Conn,
-    ) -> impl core::future::Future<
-        Output = Result<
-            Self::Row,
-            InsertError<<Self::InsertableBuilder as common_traits::prelude::Builder>::Attribute>,
-        >,
-    >;
+        conn: &mut diesel::pg::PgConnection,
+    ) -> Result<Self::Row, <Self as InsertableVariant<diesel::pg::PgConnection>>::Error> {
+        use diesel::{RunQueryDsl, associations::HasTable};
+        let insertable_struct: Self::InsertableVariant = self.try_into()?;
+        Ok(diesel::insert_into(Self::Row::table()).values(insertable_struct).get_result(conn)?)
+    }
 }
 
-/// A trait for types that can be constructed in the frontend or backend to
-/// create the insertable variant.
-pub trait InsertableBuilder:
-    common_traits::prelude::Builder<
-        Object = <Self as InsertableBuilder>::Product,
-        Error = InsertError<<Self as common_traits::prelude::Builder>::Attribute>,
-    >
+#[cfg(feature = "postgres")]
+impl<T> UncheckedInsertableVariant for T
+where
+    T: InsertableVariant<diesel::pg::PgConnection> + TryInto<Self::InsertableVariant>,
+    <Self as InsertableVariant<diesel::pg::PgConnection>>::Error:
+        From<<Self as TryInto<Self::InsertableVariant>>::Error>,
+    diesel::query_builder::InsertStatement<
+        <Self::Row as diesel::associations::HasTable>::Table,
+        <Self::InsertableVariant as diesel::Insertable<
+            <Self::Row as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, diesel::pg::PgConnection, Self::Row>,
 {
-    /// The associated row type which can be inserted into the database.
-    type Row: Insertable<InsertableBuilder = Self, InsertableVariant = Self::Product>;
-    /// The product that can be created by the builder.
-    type Product: InsertableVariant<Row = Self::Row, InsertableBuilder = Self>
-        + TryInto<Self, Error = Self::Error>;
+    // The implementation is provided by the trait definition.
 }
 
+#[derive(Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]
 /// Enumeration of the possible errors associated to the frontend insert
 /// operations.
 pub enum InsertError<FieldName> {
@@ -112,9 +125,27 @@ pub enum InsertError<FieldName> {
     /// A validation error occurred.
     ValidationError(validation_errors::Error<FieldName>),
     /// A diesel error occurred.
-    DieselError(diesel::result::Error),
+    DieselError(String),
     /// A server error occurred.
-    ServerError(BackendRequestError),
+    ServerError(GenericBackendRequestError),
+}
+
+impl<FieldName> InsertError<FieldName> {
+    /// Converts the `InsertError` into a new `InsertError` with a different
+    /// field name.
+    pub fn into_field_name<NewFieldName>(self) -> InsertError<NewFieldName>
+    where
+        NewFieldName: From<FieldName>,
+    {
+        match self {
+            InsertError::BuilderError(error) => InsertError::BuilderError(error.into_field_name()),
+            InsertError::ValidationError(error) => {
+                InsertError::ValidationError(error.into_field_name())
+            }
+            InsertError::DieselError(error) => InsertError::DieselError(error),
+            InsertError::ServerError(error) => InsertError::ServerError(error),
+        }
+    }
 }
 
 impl<FieldName: core::fmt::Debug + core::fmt::Display> core::error::Error
@@ -132,10 +163,10 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName
                 <validation_errors::Error<FieldName> as core::fmt::Display>::fmt(error, f)
             }
             InsertError::DieselError(error) => {
-                <diesel::result::Error as core::fmt::Display>::fmt(error, f)
+                write!(f, "Diesel error: {error}")
             }
             InsertError::ServerError(error) => {
-                <BackendRequestError as core::fmt::Display>::fmt(error, f)
+                <GenericBackendRequestError as core::fmt::Display>::fmt(error, f)
             }
         }
     }
@@ -151,10 +182,10 @@ impl<FieldName: core::fmt::Debug> core::fmt::Debug for InsertError<FieldName> {
                 <validation_errors::Error<FieldName> as core::fmt::Debug>::fmt(error, f)
             }
             InsertError::DieselError(error) => {
-                <diesel::result::Error as core::fmt::Debug>::fmt(error, f)
+                write!(f, "Diesel error: {error:?}")
             }
             InsertError::ServerError(error) => {
-                <BackendRequestError as core::fmt::Debug>::fmt(error, f)
+                <GenericBackendRequestError as core::fmt::Debug>::fmt(error, f)
             }
         }
     }
@@ -188,12 +219,12 @@ impl<FieldName> From<validation_errors::DoubleFieldError<FieldName>> for InsertE
 
 impl<FieldName> From<diesel::result::Error> for InsertError<FieldName> {
     fn from(error: diesel::result::Error) -> Self {
-        InsertError::DieselError(error)
+        InsertError::DieselError(error.to_string())
     }
 }
 
-impl<FieldName> From<BackendRequestError> for InsertError<FieldName> {
-    fn from(error: BackendRequestError) -> Self {
+impl<FieldName> From<GenericBackendRequestError> for InsertError<FieldName> {
+    fn from(error: GenericBackendRequestError) -> Self {
         InsertError::ServerError(error)
     }
 }

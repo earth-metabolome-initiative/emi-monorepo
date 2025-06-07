@@ -1,7 +1,0 @@
-[package]
-name = "macro-utils"
-version = "0.1.0"
-edition = "2024"
-
-[lints]
-workspace = true

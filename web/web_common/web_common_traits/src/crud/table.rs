@@ -1,6 +1,5 @@
 //! Crud operations which have a Tabular entry as a payload.
 
-mod r#async;
 mod sync;
 
 use super::{CRUD, CrudOperation};

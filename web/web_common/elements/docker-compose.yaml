@@ -14,5 +14,5 @@ services:
       - ../../..:/workspace  # Mount the entire monorepo
       - ./extension:/home/appuser/extension # Output directory
     working_dir: /workspace/web/web_common/elements
-    entrypoint: ["/workspace/web/web_common/elements/build.sh"]
+    entrypoint: ["/workspace/shared_docker_files/pgrx_build.sh"]
     user: "${USER_ID}:${GROUP_ID}"

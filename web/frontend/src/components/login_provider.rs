@@ -2,7 +2,7 @@
 use core_structures::LoginProvider as OAuthLoginProvider;
 use yew::prelude::*;
 
-// use super::FAIcon;
+use super::BrandIcon;
 use crate::{traits::AssignedComponent, utils::AssignedConnectorProps};
 
 #[function_component(LoginProvider)]
@@ -20,7 +20,7 @@ pub fn login_provider(provider: &AssignedConnectorProps<OAuthLoginProvider>) -> 
 
     html! {
         <a class="login-provider" href={url}>
-            // <FAIcon ..provider.row.icon.clone() />
+            <BrandIcon icon={provider.row.icon.clone()} />
             {format!("Login with {}", provider.row.name)}
         </a>
     }

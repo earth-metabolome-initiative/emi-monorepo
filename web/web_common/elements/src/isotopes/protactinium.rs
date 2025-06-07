@@ -183,6 +183,16 @@ impl super::MostAbundantIsotope for ProtactiniumIsotope {
         Self::Pa231
     }
 }
+impl From<ProtactiniumIsotope> for crate::Isotope {
+    fn from(isotope: ProtactiniumIsotope) -> Self {
+        crate::Isotope::Pa(isotope)
+    }
+}
+impl From<ProtactiniumIsotope> for crate::Element {
+    fn from(_isotope: ProtactiniumIsotope) -> Self {
+        crate::Element::Pa
+    }
+}
 impl TryFrom<u16> for ProtactiniumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

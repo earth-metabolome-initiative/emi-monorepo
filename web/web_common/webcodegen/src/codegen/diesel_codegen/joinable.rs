@@ -2,12 +2,12 @@
 
 use std::{collections::HashMap, path::Path};
 
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use syn::Ident;
 
 use super::Codegen;
-use crate::Table;
+use crate::{Column, Table};
 
 impl Codegen<'_> {
     /// Generate implementations of the `joinable` diesel macro.
@@ -17,11 +17,11 @@ impl Codegen<'_> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(crate) async fn generate_joinable_macro(
+    pub(crate) fn generate_joinable_macro(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         // As a first step, we create a directory for the generated code.
         std::fs::create_dir_all(root)?;
@@ -37,12 +37,10 @@ impl Codegen<'_> {
 
             let mut table_hashmap: HashMap<&Table, Option<TokenStream>> = HashMap::new();
 
-            for foreign_key in table.foreign_keys(conn).await? {
+            for foreign_key in table.foreign_keys(conn)? {
                 // For each table we retrieve the foreign key(s).
                 // First we fetch the foreign table (and its primary key)
-                let Some((foreign_table, _foreign_table_pk)) =
-                    foreign_key.foreign_table(conn).await?
-                else {
+                let Some(foreign_table) = foreign_key.foreign_table(conn)? else {
                     continue;
                 };
 
@@ -73,16 +71,23 @@ impl Codegen<'_> {
                 let foreign_table_identifier =
                     Ident::new(&foreign_table.snake_case_name()?, proc_macro2::Span::call_site());
                 // We retrieve the foreign_key identifer
-                let foreign_key_identifier = foreign_key.snake_case_ident()?;
+                let columns = foreign_key.columns(conn)?;
+                let foreign_key_identifiers =
+                    columns.iter().map(Column::snake_case_ident).collect::<Result<Vec<_>, _>>()?;
                 // Using TokeStream we write the  joinable!(table -> foreign_table
                 // (foreign_key));
+
+                // At the time of writing, diesel only supports non-composite foreign keys
+                if foreign_key_identifiers.len() > 1 {
+                    continue;
+                }
 
                 let foreign_table_path = foreign_table_ref.import_diesel_path()?;
 
                 table_hashmap.insert(foreign_table_ref, Some(quote::quote! {
                     use #foreign_table_path;
 
-                    diesel::joinable!(#table_identifier -> #foreign_table_identifier (#foreign_key_identifier));
+                    diesel::joinable!(#table_identifier -> #foreign_table_identifier (#(#foreign_key_identifiers),*));
                 }
             )
         );

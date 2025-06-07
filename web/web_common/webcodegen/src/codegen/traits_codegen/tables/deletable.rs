@@ -3,7 +3,7 @@
 
 use std::path::Path;
 
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 
@@ -17,11 +17,11 @@ impl Codegen<'_> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(super) async fn generate_deletable_impls(
+    pub(super) fn generate_deletable_impls(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
         // We generate each table in a separate document under the provided root, and we
@@ -29,14 +29,14 @@ impl Codegen<'_> {
         let mut table_deletable_main_module = TokenStream::new();
         let syntax = Syntax::PostgreSQL;
         let feature_flag = syntax.as_feature_flag();
-        let connection_type = syntax.as_connection_type(true);
+        let connection_type = syntax.as_connection_type();
         let Some(user_table) = self.users_table else {
             return Err(crate::errors::CodeGenerationError::UserTableNotProvided.into());
         };
-        let user_table_id = user_table.primary_key_type(conn).await?;
+        let user_table_id = user_table.primary_key_type(conn)?;
         for table in tables {
             // First we need to check wether the table has a PK
-            if !table.allows_updatable(conn).await? {
+            if !table.allows_updatable(conn)? {
                 continue;
             }
 
@@ -52,21 +52,21 @@ impl Codegen<'_> {
                     type Conn = #connection_type;
                     type UserId = #user_table_id;
 
-                    async fn delete(
+                    fn delete(
                         &self,
-                        user_id: &Self::UserId,
+                        user_id: Self::UserId,
                         conn: &mut Self::Conn
                     ) -> Result<bool, web_common_traits::database::DeleteError> {
-                        use diesel_async::RunQueryDsl;
+                        use diesel::RunQueryDsl;
                         use diesel::{QueryDsl, Identifiable};
                         use diesel::associations::HasTable;
                         use web_common_traits::database::Updatable;
 
-                        if !self.can_update(user_id, conn).await? {
-                            return Err(backend_request_errors::BackendRequestError::Unauthorized.into());
+                        if !self.can_update(user_id, conn)? {
+                            return Err(generic_backend_request_errors::GenericBackendRequestError::Unauthorized.into());
                         }
 
-                        Ok(diesel::delete(Self::table().find(<&Self as Identifiable>::id(self))).execute(conn).await.map(|x| x > 0)?)
+                        Ok(diesel::delete(Self::table().find(<&Self as Identifiable>::id(self))).execute(conn).map(|x| x > 0)?)
                     }
                 }
             })?)?;

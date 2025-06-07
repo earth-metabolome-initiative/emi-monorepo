@@ -19,9 +19,9 @@ use super::{
 pub mod listen_notify;
 
 const CSV_MIGRATIONS: &str =
-    sqlite_migration_generator::load_sqlite_from_csvs!("../../data-migrations/init-db/csvs");
+    sqlite_migration_generator::load_sqlite_from_csvs!("../../data_migrations/init_db/csvs");
 const MIGRATIONS: &str = sqlite_migration_generator::load_sqlite_from_migrations!(
-    "../../data-migrations/init-db/migrations"
+    "../../data_migrations/init_db/migrations"
 );
 
 impl DBWSWorker {

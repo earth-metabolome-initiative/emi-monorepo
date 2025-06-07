@@ -1,0 +1,4 @@
+[package]
+name = "snake_case_sanitizer"
+version = "0.1.0"
+edition = "2024"

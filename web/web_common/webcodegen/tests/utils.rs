@@ -6,7 +6,7 @@ use std::{
     io::Write,
 };
 
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use diesel_migrations_utils::prelude::MigrationDirectory;
 use quote::quote;
 use reference_docker::reference_docker_with_connection;
@@ -47,7 +47,7 @@ pub fn add_main_to_file(file_path: &str) {
 /// * If the container cannot be started.
 pub async fn setup_database_with_default_migrations(
     test_name: &str,
-) -> Result<(ContainerAsync<GenericImage>, AsyncPgConnection, String), diesel::ConnectionError> {
+) -> Result<(ContainerAsync<GenericImage>, PgConnection, String), diesel::ConnectionError> {
     setup_database_with_migrations(
         test_name,
         MigrationDirectory::try_from("./test_migrations").unwrap(),
@@ -71,13 +71,13 @@ pub async fn setup_database_with_default_migrations(
 pub async fn setup_database_with_migrations(
     test_name: &str,
     migrations: MigrationDirectory,
-) -> Result<(ContainerAsync<GenericImage>, AsyncPgConnection, String), diesel::ConnectionError> {
+) -> Result<(ContainerAsync<GenericImage>, PgConnection, String), diesel::ConnectionError> {
     let port = random_port(test_name);
     let database_name = format!("{test_name}_db");
     let (docker, mut conn) = reference_docker_with_connection(&database_name, port)
         .await
         .expect("Failed to start container");
-    migrations.execute_ups::<diesel_async::AsyncPgConnection>(&mut conn).await.unwrap();
+    migrations.execute_ups::<diesel::PgConnection>(&mut conn).unwrap();
     Ok((docker, conn, database_name))
 }
 

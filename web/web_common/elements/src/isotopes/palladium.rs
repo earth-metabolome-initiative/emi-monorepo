@@ -223,6 +223,16 @@ impl super::MostAbundantIsotope for PalladiumIsotope {
         Self::Pd106
     }
 }
+impl From<PalladiumIsotope> for crate::Isotope {
+    fn from(isotope: PalladiumIsotope) -> Self {
+        crate::Isotope::Pd(isotope)
+    }
+}
+impl From<PalladiumIsotope> for crate::Element {
+    fn from(_isotope: PalladiumIsotope) -> Self {
+        crate::Element::Pd
+    }
+}
 impl TryFrom<u16> for PalladiumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

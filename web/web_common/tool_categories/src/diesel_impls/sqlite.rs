@@ -1,6 +1,6 @@
 #![cfg(feature = "sqlite")]
 //! Submodule providing the diesel implementations for tool categories for the
-//! SQLite backend.
+//! `SQLite` backend.
 
 impl diesel::deserialize::FromSql<crate::diesel_impls::ToolCategory, diesel::sqlite::Sqlite>
     for crate::ToolCategory

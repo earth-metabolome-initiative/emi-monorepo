@@ -13,10 +13,12 @@ use futures_util::{
 };
 use tokio::{sync::mpsc, time::interval};
 use web_common_traits::{
-    crud::{AsyncExecuteCrudOperation, CrudOperation},
+    crud::{CrudOperation, ExecuteCrudOperation},
     database::Tabular,
 };
 use ws_messages::{B2FMessage, F2BMessage};
+
+use crate::api::oauth::jwt_cookies::MaybeUser;
 
 /// How often heartbeat pings are sent
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
@@ -24,22 +26,22 @@ const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 /// How long before lack of client response causes a timeout
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
 
+#[allow(clippy::too_many_lines)]
 /// Echo text & binary messages received from the client, respond to ping
 /// messages, and monitor connection health to detect network issues and free up
 /// resources.
 pub(super) async fn portal_ws(
     mut session: actix_ws::Session,
     diesel_pool: web::Data<crate::DBPool>,
-    redis_client: web::Data<redis::Client>,
     listen_notify_handle: crate::ListenNotifyHandle,
     msg_stream: actix_ws::MessageStream,
+    user: MaybeUser,
 ) {
-    log::info!("connected");
+    log::debug!("portal_ws: user={user:?}");
 
-    // let mut name = None;
     let mut last_heartbeat = Instant::now();
     let mut interval = interval(HEARTBEAT_INTERVAL);
-    let mut conn = diesel_pool.get().await.unwrap();
+    let mut conn = diesel_pool.get().unwrap();
 
     let (listen_notify_sender, mut listen_notify_receiver) = mpsc::unbounded_channel();
 
@@ -92,7 +94,7 @@ pub(super) async fn portal_ws(
                                 }
                                 let crud = *ops.as_ref();
 
-                                match ops.execute(&mut conn).await {
+                                match ops.execute(&mut conn) {
                                     Ok(None) => {}
                                     Ok(Some(row)) => {
                                         session
@@ -117,7 +119,7 @@ pub(super) async fn portal_ws(
                                         .unwrap();
                                 }
                                 let crud = *ops.as_ref();
-                                match ops.execute(&mut conn).await {
+                                match ops.execute(&mut conn) {
                                     Ok(rows) => {
                                         if !rows.is_empty() {
                                             session
@@ -179,7 +181,7 @@ pub(super) async fn portal_ws(
                 // send heartbeat ping
                 let _ = session.ping(b"").await;
             }
-        };
+        }
     };
 
     let _ = listen_notify_handle.disconnect(session_id).await;

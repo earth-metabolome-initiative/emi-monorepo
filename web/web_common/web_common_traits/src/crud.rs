@@ -62,22 +62,3 @@ pub trait ExecuteCrudOperation<C: Connection>: CrudOperation {
     /// * If the connection fails.
     fn execute(self, conn: &mut C) -> Result<Self::Payload, diesel::result::Error>;
 }
-
-#[cfg(feature = "diesel-async")]
-/// Trait representing an asynchronously executable CRUD operation.
-pub trait AsyncExecuteCrudOperation<C: diesel_async::AsyncConnection>: CrudOperation {
-    /// Executes the operation using the provided connection.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The connection to use for executing the operation.
-    ///
-    /// # Errors
-    ///
-    /// * If the operation fails.
-    /// * If the connection fails.
-    fn execute(
-        self,
-        conn: &mut C,
-    ) -> impl Future<Output = Result<Self::Payload, diesel::result::Error>>;
-}

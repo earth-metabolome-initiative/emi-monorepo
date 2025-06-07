@@ -96,6 +96,16 @@ impl super::MostAbundantIsotope for SeaborgiumIsotope {
         Self::Sg273
     }
 }
+impl From<SeaborgiumIsotope> for crate::Isotope {
+    fn from(isotope: SeaborgiumIsotope) -> Self {
+        crate::Isotope::Sg(isotope)
+    }
+}
+impl From<SeaborgiumIsotope> for crate::Element {
+    fn from(_isotope: SeaborgiumIsotope) -> Self {
+        crate::Element::Sg
+    }
+}
 impl TryFrom<u16> for SeaborgiumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

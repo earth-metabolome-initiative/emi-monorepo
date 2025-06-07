@@ -1,0 +1,16 @@
+[package]
+name = "core_structures_builder"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio.workspace = true
+time_requirements.workspace = true
+quote.workspace = true
+webcodegen.workspace = true
+reference_docker.workspace = true
+init_db.workspace = true
+diesel = { workspace = true, features = ["postgres"] }
+
+[lints]
+workspace = true

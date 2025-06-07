@@ -16,6 +16,10 @@ pub enum DefaultTypes {
     I32(i32),
     /// When the default value is a i64.
     I64(i64),
+    /// When the default value is a f32.
+    F32(f32),
+    /// When the default value is a f64.
+    F64(f64),
     /// When the default value is a boolean.
     Bool(bool),
     /// When the default value is a string.
@@ -46,6 +50,14 @@ impl DefaultTypes {
                 let value = default_value.parse::<bool>()?;
                 Ok(DefaultTypes::Bool(value))
             }
+            "f32" => {
+                let value = default_value.parse::<f32>()?;
+                Ok(DefaultTypes::F32(value))
+            }
+            "f64" => {
+                let value = default_value.parse::<f64>()?;
+                Ok(DefaultTypes::F64(value))
+            }
             "String" => {
                 if let Some(value) =
                     default_value.strip_prefix('\'').and_then(|s| s.strip_suffix("\'::text"))
@@ -57,7 +69,7 @@ impl DefaultTypes {
                     );
                 }
             }
-            "rosetta_uuid::Uuid" => {
+            "::rosetta_uuid::Uuid" | "rosetta_uuid::Uuid" => {
                 match default_value {
                     "gen_random_uuid()" => {
                         Ok(DefaultTypes::Uuid(quote::quote! {rosetta_uuid::Uuid::new_v4()}))

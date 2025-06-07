@@ -25,3 +25,6 @@ pg15 = ["pgrx", "pgrx/pg15"]
 pg16 = ["pgrx", "pgrx/pg16"]
 pg17 = ["pgrx", "pgrx/pg17"]
 sqlite = ["diesel/sqlite", "diesel_pgrx/sqlite"]
+
+[lints]
+workspace = true

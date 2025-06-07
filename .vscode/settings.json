@@ -1,8 +1,10 @@
 {
 	"cSpell.words": [
 		"actix",
+		"cdylib",
 		"certbot",
 		"chrono",
+		"clippy",
 		"DBWS",
 		"directus",
 		"honggfuzz",
@@ -18,9 +20,11 @@
 		"Metabolome",
 		"pgrx",
 		"pychache",
+		"qcelp",
 		"rustc",
 		"serde",
 		"Tarjan",
+		"trackables",
 		"trybuild",
 		"yewdux"
 	]

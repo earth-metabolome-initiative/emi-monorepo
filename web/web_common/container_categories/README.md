@@ -1,5 +1,7 @@
 # Container categories
 
+[![PGRX Build](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-build-container_categories.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-build-container_categories.yml)
+
 Crate providing a container categories enumeration, with integration to [`diesel`](https://github.com/diesel-rs/diesel) with both `SQLite` and `PostgreSQL` backends, and additionally support for [`pgrx`](https://github.com/pgcentralfoundation/pgrx).
 
 ## Compiling the PGRX extension

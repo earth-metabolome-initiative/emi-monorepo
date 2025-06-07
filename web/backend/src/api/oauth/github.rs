@@ -1,25 +1,26 @@
 //! Login API for GitHub OAuth
 use std::env;
 
-use actix_web::{HttpResponse, get};
+use actix_web::{HttpResponse, web};
+use actix_web_codegen::get;
 use core_structures::LoginProvider;
 use redis::Client as RedisClient;
 use reqwest::Client;
 use serde::Deserialize;
 
 use crate::{
-    api::oauth::{jwt_cookies::build_login_response, *},
+    api::oauth::{QueryCode, jwt_cookies::build_login_response},
     errors::BackendError,
 };
 
-/// Struct representing the GitHub OAuth2 configuration.
+/// Struct representing the GitHub `OAuth2` configuration.
 struct GitHubConfig {
     client_secret: String,
     provider: LoginProvider,
 }
 
 impl GitHubConfig {
-    /// Function to retrieve the GitHub OAuth2 configuration from the
+    /// Function to retrieve the GitHub `OAuth2` configuration from the
     /// environment.
     ///
     /// # Returns
@@ -31,9 +32,8 @@ impl GitHubConfig {
     ///
     /// * If the environment variables are not set, an error is returned.
     /// * If the `LoginProvider` cannot be retrieved, an error is returned.
-    async fn from_env(connection: &mut crate::Conn) -> Result<GitHubConfig, BackendError> {
-        let provider = LoginProvider::from_name("GitHub", connection)
-            .await?
+    fn from_env(connection: &mut crate::Conn) -> Result<GitHubConfig, BackendError> {
+        let provider = LoginProvider::from_name("GitHub", connection)?
             .ok_or_else(|| BackendError::UnknownLoginProvider("GitHub".to_string()))?;
         Ok(GitHubConfig { client_secret: env::var("GITHUB_CLIENT_SECRET")?, provider })
     }
@@ -66,14 +66,14 @@ async fn github_oauth_handler(
         return BackendError::Unauthorized.into();
     }
 
-    let mut connection = match pool.get().await.map_err(BackendError::from) {
+    let mut connection = match pool.get().map_err(BackendError::from) {
         Ok(connection) => connection,
         Err(error) => {
             return error.into();
         }
     };
 
-    let github_config = match GitHubConfig::from_env(&mut connection).await {
+    let github_config = match GitHubConfig::from_env(&mut connection) {
         Ok(config) => config,
         Err(error) => {
             return error.into();
@@ -95,27 +95,32 @@ async fn github_oauth_handler(
         }
     };
 
-    let emails = emails
-        .into_iter()
-        .filter(|email| email.verified)
-        .map(|email| email.email)
-        .collect::<Vec<String>>();
-
-    if emails.is_empty() {
+    let Some(primary_email) = emails.iter().find(|email| email.primary) else {
         return BackendError::Unauthorized.into();
-    }
+    };
 
-    build_login_response(
+    let emails = emails
+        .iter()
+        .filter(|email| email.verified)
+        .map(|email| email.email.as_str())
+        .collect::<Vec<&str>>();
+
+    match build_login_response(
         emails.as_slice(),
+        primary_email.email.as_str(),
         &github_config.provider,
         state,
         &redis_client,
         &mut connection,
     )
     .await
+    {
+        Ok(response) => response,
+        Err(error) => error.into(),
+    }
 }
 
-pub async fn get_github_oauth_token(
+async fn get_github_oauth_token(
     authorization_code: &str,
     github_config: &GitHubConfig,
 ) -> Result<GitHubOauthToken, BackendError> {

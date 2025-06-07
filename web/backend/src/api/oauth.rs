@@ -1,4 +1,4 @@
-//! Submodule for OAuth2 authentication.
+//! Submodule for `OAuth2` authentication.
 
 mod github;
 pub(crate) mod jwt_cookies;
@@ -8,12 +8,12 @@ use actix_web::web;
 pub(crate) use jwt_cookies::access_token_validator;
 
 #[derive(serde::Deserialize)]
-/// Struct representing the query parameters for the OAuth2 login request.
+/// Struct representing the query parameters for the `OAuth2` login request.
 ///
 /// This struct is NEVER instantiated within the application, it is solely
-/// used to define the parameters received from the OAuth2 provider.
+/// used to define the parameters received from the `OAuth2` provider.
 pub(crate) struct QueryCode {
-    /// The authorization code returned by the OAuth2 provider.
+    /// The authorization code returned by the `OAuth2` provider.
     pub code: String,
     /// The original location from where the request started, such as the Login
     /// page.

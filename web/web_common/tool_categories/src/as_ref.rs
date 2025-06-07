@@ -8,12 +8,16 @@ impl AsRef<str> for crate::ToolCategory {
             Self::InsectTrap => "InsectTrap",
             Self::CuttingTool => "CuttingTool",
             Self::Wrapper => "Wrapper",
+            Self::EmpiricalMeasurementTool => "EmpiricalMeasurementTool",
             Self::PreciseManipulationTool => "PreciseManipulationTool",
             Self::BreakingBeads => "BreakingBeads",
             Self::Gloves => "Gloves",
-            Self::HandCleaningAgent => "HandCleaningAgent",
+            Self::LiquidDispenser => "LiquidDispenser",
             Self::PaperTowels => "PaperTowels",
-            Self::VolumeMeasuringTool => "VolumeMeasuringTool",
+            Self::GraduatedCylinder => "GraduatedCylinder",
+            Self::Pipette => "Pipette",
+            Self::PipetteTip => "PipetteTip",
+            Self::PipettingContainer => "PipettingContainer",
         }
     }
 }

@@ -4,12 +4,11 @@ use std::path::Path;
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use strum::IntoEnumIterator;
 use syn::Ident;
 
 use crate::{
     Codegen, Table,
-    codegen::{CODEGEN_DIRECTORY, CODEGEN_TABLES_PATH, Syntax},
+    codegen::{CODEGEN_DIRECTORY, CODEGEN_TABLES_PATH},
 };
 
 impl Codegen<'_> {
@@ -38,7 +37,7 @@ impl Codegen<'_> {
         &self,
         root: &Path,
         tables: &[Table],
-        _conn: &mut diesel_async::AsyncPgConnection,
+        _conn: &mut diesel::PgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
         let table_name_enum_path = Self::table_names_enum_path();
@@ -168,10 +167,10 @@ impl Codegen<'_> {
             )?;
         }
 
-        let mut trait_modules: Vec<(&str, TokenStream)> = Vec::new();
+        let mut trait_modules: Vec<(String, TokenStream)> = Vec::new();
 
         trait_modules.push((
-            "from_row",
+            "from_row".to_owned(),
             quote::quote! {
                 impl From<super::Row> for #rows_enum_path {
                     fn from(value: super::Row) -> Self {
@@ -184,7 +183,7 @@ impl Codegen<'_> {
         ));
 
         trait_modules.push((
-            "tabular",
+            "tabular".to_owned(),
             quote::quote! {
                 impl web_common_traits::prelude::Tabular for super::Row {
                     type TableName = #table_name_enum_path;
@@ -200,86 +199,50 @@ impl Codegen<'_> {
             },
         ));
 
-        Syntax::iter()
-            .try_for_each(|syntax| {
-                let feature_flag = syntax.as_feature_flag();
-                let table_primary_keys_path = table_primary_keys_path.clone();
-                let sync_connection = syntax.as_connection_type(false);
-                let async_connection = syntax.as_connection_type(true);
-                if syntax.is_sqlite() {
-                    let read_impls: Vec<TokenStream> = tables
-                        .iter()
-                        .map(|table| {
-                            let struct_ident = table.struct_ident()?;
-                            let struct_path = table.import_struct_path()?;
-                            Ok(quote::quote! {
-                                #table_primary_keys_path::#struct_ident(primary_key) => {
-                                    Ok(<#struct_path as web_common_traits::database::Read<#sync_connection>>::read(primary_key, conn)?
-                                        .map(super::Row::from))
-                                }
-                            })
-                        })
-                        .collect::<Result<Vec<_>, crate::errors::WebCodeGenError>>()?;
-                    trait_modules.push((
-                        "sqlite_read_dispatch",
-                        quote::quote! {
-                            #feature_flag
-                            impl web_common_traits::prelude::ReadDispatch<#sync_connection> for super::Row {
-                                type PrimaryKey = #table_primary_keys_path;
+        let table_primary_keys_path = table_primary_keys_path.clone();
+        let mut where_statements = Vec::new();
+        let read_impls: Vec<TokenStream> = tables
+            .iter()
+            .map(|table| {
+                let struct_ident = table.struct_ident()?;
+                let struct_path = table.import_struct_path()?;
+                where_statements.push(quote::quote! {
+                    #struct_path: web_common_traits::database::Read<C>
+                });
+                Ok(quote::quote! {
+                    #table_primary_keys_path::#struct_ident(primary_key) => {
+                        #struct_path::read(primary_key, conn)?.map(super::Row::from)
+                    }
+                })
+            })
+            .collect::<Result<Vec<_>, crate::errors::WebCodeGenError>>()?;
+        trait_modules.push((
+            "read_dispatch".to_owned(),
+            quote::quote! {
+                impl<C> web_common_traits::prelude::ReadDispatch<C> for super::Row
+                    where
+                        #(#where_statements),*
+                {
+                    type PrimaryKey = #table_primary_keys_path;
 
-                                fn read(
-                                    primary_key: Self::PrimaryKey,
-                                    conn: &mut #sync_connection,
-                                ) -> Result<Option<Self>, diesel::result::Error> {
-                                    match primary_key {
-                                        #(
-                                            #read_impls
-                                        )*
-                                    }
-                                }
-                            }
+                    fn read(
+                        primary_key: Self::PrimaryKey,
+                        conn: &mut C,
+                    ) -> Result<Option<Self>, diesel::result::Error> {
+                        use web_common_traits::database::Read;
+                        Ok(match primary_key {
+                            #(
+                                #read_impls
+                            )*
                         })
-                    );
-                } else {
-                    let async_read_impls: Vec<TokenStream> = tables
-                        .iter()
-                        .map(|table| {
-                            let struct_ident = table.struct_ident()?;
-                            let struct_path = table.import_struct_path()?;
-                            Ok(quote::quote! {
-                                #table_primary_keys_path::#struct_ident(primary_key) => {
-                                    Ok(<#struct_path as web_common_traits::database::AsyncRead<#async_connection>>::read_async(primary_key, conn).await?
-                                        .map(super::Row::from))
-                                }
-                            })
-                        })
-                        .collect::<Result<Vec<_>, crate::errors::WebCodeGenError>>()?;
-                    trait_modules.push((
-                        "postgres_async_read_dispatch",
-                        quote::quote! {
-                        #feature_flag
-                        impl web_common_traits::prelude::AsyncReadDispatch<#async_connection> for super::Row {
-                            type PrimaryKey = #table_primary_keys_path;
-
-                            async fn read(
-                                primary_key: Self::PrimaryKey,
-                                conn: &mut #async_connection,
-                            ) -> Result<Option<Self>, diesel::result::Error> {
-                                match primary_key {
-                                    #(
-                                        #async_read_impls
-                                    )*
-                                }
-                            }
-                        }
-                    }));
+                    }
                 }
-                Ok::<(), crate::errors::WebCodeGenError>(())
-            })?;
+            },
+        ));
 
         for (trait_module_name, trait_impl) in trait_modules {
             let trait_file = root.join(format!("{trait_module_name}.rs"));
-            let trait_module_ident = Ident::new(trait_module_name, proc_macro2::Span::call_site());
+            let trait_module_ident = Ident::new(&trait_module_name, proc_macro2::Span::call_site());
             std::fs::write(
                 &trait_file,
                 self.beautify_code(&quote! {

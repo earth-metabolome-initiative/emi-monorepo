@@ -8,7 +8,10 @@ use ws_messages::{DBMessage, Subscription};
 
 use crate::errors::BackendError;
 
-pub enum LNCommand {
+/// Listen Notify command messages.
+///
+/// These are commands sent from the sessions to the listen notify server.
+pub(crate) enum LNCommand {
     Subscribe(Subscription, u64, oneshot::Sender<()>),
     Unsubscribe(Subscription, u64, oneshot::Sender<()>),
     DB(DBMessage, oneshot::Sender<()>),
@@ -17,6 +20,7 @@ pub enum LNCommand {
 }
 
 #[allow(clippy::type_complexity)]
+/// Listen Notify server.
 pub struct ListenNotifyServer {
     sessions: HashMap<
         u64,
@@ -29,6 +33,8 @@ pub struct ListenNotifyServer {
 }
 
 impl ListenNotifyServer {
+    #[must_use]
+    /// Create a new Listen Notify server.
     pub fn new() -> (Self, ListenNotifyHandle) {
         let (subscriptions_sender, subscriptions_receiver) = tokio::sync::mpsc::unbounded_channel();
 
@@ -46,10 +52,10 @@ impl ListenNotifyServer {
     /// Register new session and assign unique ID to this session
     fn connect(&mut self, db_sender: tokio::sync::mpsc::UnboundedSender<DBMessage>) -> u64 {
         // register session with random connection ID
-        let mut thread_rng = rand::thread_rng();
-        let mut new_session_id = thread_rng.r#gen();
+        let mut thread_rng = rand::rng();
+        let mut new_session_id = thread_rng.random();
         while self.sessions.contains_key(&new_session_id) {
-            new_session_id = thread_rng.r#gen();
+            new_session_id = thread_rng.random();
         }
 
         log::info!("{new_session_id} joined");
@@ -79,52 +85,52 @@ impl ListenNotifyServer {
         }
     }
 
-    fn subscribe(&mut self, subscription: Subscription, session_id: u64) {
+    fn subscribe(&mut self, subscription: &Subscription, session_id: u64) {
         match subscription {
             Subscription::Table(table_name) => {
                 if let Some((_, table_listeners, _)) = self.sessions.get_mut(&session_id) {
-                    table_listeners.push(table_name);
-                    self.table_listeners.entry(table_name).or_default().push(session_id);
+                    table_listeners.push(*table_name);
+                    self.table_listeners.entry(*table_name).or_default().push(session_id);
                 }
             }
             Subscription::Row(row_key) => {
                 if let Some((_, _, row_listeners)) = self.sessions.get_mut(&session_id) {
-                    row_listeners.push(row_key);
-                    self.row_listeners.entry(row_key).or_default().push(session_id);
+                    row_listeners.push(*row_key);
+                    self.row_listeners.entry(*row_key).or_default().push(session_id);
                 }
             }
         }
     }
 
-    fn unsubscribe(&mut self, subscription: Subscription, session_id: u64) {
+    fn unsubscribe(&mut self, subscription: &Subscription, session_id: u64) {
         match subscription {
             Subscription::Table(table_name) => {
                 if let Some((_, table_listeners, _)) = self.sessions.get_mut(&session_id) {
-                    table_listeners.retain(|name| name != &table_name);
+                    table_listeners.retain(|name| name != table_name);
                     let mut orphan_sorce = false;
-                    if let Some(listeners) = self.table_listeners.get_mut(&table_name) {
+                    if let Some(listeners) = self.table_listeners.get_mut(table_name) {
                         listeners.retain(|&id| id != session_id);
                         if listeners.is_empty() {
                             orphan_sorce = true;
                         }
                     }
                     if orphan_sorce {
-                        self.table_listeners.remove(&table_name);
+                        self.table_listeners.remove(table_name);
                     }
                 }
             }
             Subscription::Row(row_key) => {
                 if let Some((_, _, row_listeners)) = self.sessions.get_mut(&session_id) {
-                    row_listeners.retain(|key| key != &row_key);
+                    row_listeners.retain(|key| key != row_key);
                     let mut orphan_sorce = false;
-                    if let Some(listeners) = self.row_listeners.get_mut(&row_key) {
+                    if let Some(listeners) = self.row_listeners.get_mut(row_key) {
                         listeners.retain(|&id| id != session_id);
                         if listeners.is_empty() {
                             orphan_sorce = true;
                         }
                     }
                     if orphan_sorce {
-                        self.row_listeners.remove(&row_key);
+                        self.row_listeners.remove(row_key);
                     }
                 }
             }
@@ -172,6 +178,11 @@ impl ListenNotifyServer {
         }
     }
 
+    /// Run the listen notify server.
+    ///
+    /// # Errors
+    ///
+    /// * `std::io::Error` - If the server could not be started.
     pub async fn run(mut self) -> std::io::Result<()> {
         while let Some(cmd) = self.subscriptions_receiver.recv().await {
             match cmd {
@@ -186,12 +197,12 @@ impl ListenNotifyServer {
                 }
 
                 LNCommand::Subscribe(subscription, session_id, sender) => {
-                    self.subscribe(subscription, session_id);
+                    self.subscribe(&subscription, session_id);
                     let _ = sender.send(());
                 }
 
                 LNCommand::Unsubscribe(subscription, session_id, sender) => {
-                    self.unsubscribe(subscription, session_id);
+                    self.unsubscribe(&subscription, session_id);
                     let _ = sender.send(());
                 }
 
@@ -222,6 +233,14 @@ impl From<tokio::sync::mpsc::UnboundedSender<LNCommand>> for ListenNotifyHandle 
 
 impl ListenNotifyHandle {
     /// Register client message sender and obtain connection ID.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn_tx` - The message sender to register.
+    ///
+    /// # Errors
+    ///
+    /// * `BackendError` - If the connection could not be established.
     pub async fn connect(
         &self,
         conn_tx: tokio::sync::mpsc::UnboundedSender<DBMessage>,
@@ -237,6 +256,14 @@ impl ListenNotifyHandle {
 
     /// Unregister message sender and broadcast disconnection message to current
     /// room.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the session to disconnect.
+    ///
+    /// # Errors
+    ///
+    /// * `BackendError` - If the disconnection could not be completed.
     pub async fn disconnect(&self, id: u64) -> Result<(), BackendError> {
         let (sender, receiver) = oneshot::channel();
 
@@ -247,7 +274,16 @@ impl ListenNotifyHandle {
         Ok(receiver.await?)
     }
 
-    /// Join `room`, creating it if it does not exist.
+    /// Registers a new subscription to the given table / row.
+    ///
+    /// # Arguments
+    ///
+    /// * `subscription` - The subscription to register.
+    /// * `session_id` - The session ID of the user to register the subscription
+    ///
+    /// # Errors
+    ///
+    /// * `BackendError` - If the subscription could not be registered.
     pub async fn subscribe(
         &self,
         subscription: Subscription,
@@ -262,6 +298,17 @@ impl ListenNotifyHandle {
         Ok(receiver.await?)
     }
 
+    /// Registers a new subscription to the given table / row.
+    ///
+    /// # Arguments
+    ///
+    /// * `subscription` - The subscription to register.
+    /// * `session_id` - The session ID of the user to register the subscription
+    ///   for.
+    ///
+    /// # Errors
+    ///
+    /// * `BackendError` - If the subscription could not be registered.
     pub async fn unsubscribe(
         &self,
         subscription: Subscription,
@@ -276,6 +323,15 @@ impl ListenNotifyHandle {
         Ok(receiver.await?)
     }
 
+    /// Send a message to the chat server.
+    ///
+    /// # Arguments
+    ///
+    /// * `message` - The message to send.
+    ///
+    /// # Errors
+    ///
+    /// * `BackendError` - If the message could not be sent.
     pub async fn notify(&self, message: DBMessage) -> Result<(), BackendError> {
         let (sender, receiver) = oneshot::channel();
 

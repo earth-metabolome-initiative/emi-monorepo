@@ -2,7 +2,7 @@
 
 use std::path::Path;
 
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use proc_macro2::TokenStream;
 
 use super::Codegen;
@@ -16,15 +16,15 @@ impl Codegen<'_> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(crate) async fn generate_types_macro(
+    pub(crate) fn generate_types_macro(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
 
-        let types = Self::required_types(tables, conn).await?;
+        let types = Self::required_types(tables, conn)?;
 
         // We generate each table in a separate document under the provided root, and we
         // collect all of the imported modules in a public one.

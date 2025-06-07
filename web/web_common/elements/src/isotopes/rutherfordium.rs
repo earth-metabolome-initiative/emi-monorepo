@@ -96,6 +96,16 @@ impl super::MostAbundantIsotope for RutherfordiumIsotope {
         Self::Rf268
     }
 }
+impl From<RutherfordiumIsotope> for crate::Isotope {
+    fn from(isotope: RutherfordiumIsotope) -> Self {
+        crate::Isotope::Rf(isotope)
+    }
+}
+impl From<RutherfordiumIsotope> for crate::Element {
+    fn from(_isotope: RutherfordiumIsotope) -> Self {
+        crate::Element::Rf
+    }
+}
 impl TryFrom<u16> for RutherfordiumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

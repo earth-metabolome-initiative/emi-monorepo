@@ -5,36 +5,34 @@ edition = "2024"
 
 [dependencies]
 diesel = { workspace = true, features = ["postgres", "chrono", "uuid"] }
-diesel-async = { workspace = true, features = ["postgres"] }
 itertools = "0.13.0"
 serde.workspace = true
 syn.workspace = true
 quote.workspace = true
 proc-macro2.workspace = true
 prettyplease = "0.2"
-snake-case-sanitizer = { path = "../snake-case-sanitizer" }
-common-traits.workspace = true
+snake_case_sanitizer = { path = "../snake_case_sanitizer" }
+common_traits.workspace = true
 inflector.workspace = true
 futures.workspace = true
-backend-request-errors.workspace = true
-time-requirements.workspace = true
+generic_backend_request_errors.workspace = true
+time_requirements.workspace = true
 sqlparser.workspace = true
 strum.workspace = true
 strum_macros.workspace = true
 iso_codes.workspace = true
 cached.workspace = true
-async-trait.workspace = true
 
 [dev-dependencies]
-reference-docker.workspace = true
+reference_docker.workspace = true
 testcontainers.workspace = true
 tokio.workspace = true
 trybuild.workspace = true
 serde_json.workspace = true
 chrono.workspace = true
 ipnetwork = "0.20.0"
-rosetta-uuid = { workspace = true, features = ["diesel", "serde", "postgres"] }
-rosetta-timestamp = { workspace = true, features = [
+rosetta_uuid = { workspace = true, features = ["diesel", "serde", "postgres"] }
+rosetta_timestamp = { workspace = true, features = [
   "diesel",
   "serde",
   "postgres",
@@ -43,8 +41,8 @@ web_common_traits = { workspace = true, features = ["backend"] }
 macaddr = "1.0.1"
 postgis_diesel.workspace = true
 diesel_full_text_search.workspace = true
-diesel-async = { workspace = true, features = ["postgres", "bb8"] }
-validation-errors.workspace = true
+diesel = { workspace = true, features = ["postgres", "r2d2"] }
+validation_errors.workspace = true
 pgrx_validation.workspace = true
 yew.workspace = true
 diesel_migrations_utils.workspace = true

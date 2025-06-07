@@ -112,6 +112,16 @@ impl super::MostAbundantIsotope for FermiumIsotope {
         Self::Fm260
     }
 }
+impl From<FermiumIsotope> for crate::Isotope {
+    fn from(isotope: FermiumIsotope) -> Self {
+        crate::Isotope::Fm(isotope)
+    }
+}
+impl From<FermiumIsotope> for crate::Element {
+    fn from(_isotope: FermiumIsotope) -> Self {
+        crate::Element::Fm
+    }
+}
 impl TryFrom<u16> for FermiumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

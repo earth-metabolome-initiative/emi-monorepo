@@ -10,7 +10,7 @@ proc-macro2.workspace = true
 
 [dev-dependencies]
 trybuild.workspace = true
-validation-errors.workspace = true
+validation_errors.workspace = true
 
 [lib]
 proc-macro = true

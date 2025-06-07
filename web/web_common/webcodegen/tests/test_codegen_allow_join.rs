@@ -15,8 +15,7 @@ async fn test_codegen_allow_join() {
         .set_output_directory("tests/codegen_allow_join".as_ref())
         .enable_allow_tables_to_appear_in_same_query()
         .beautify()
-        .generate(&mut conn, &database_name, None)
-        .await;
+        .generate(&mut conn, &database_name, None);
 
     docker.stop().await.unwrap();
 

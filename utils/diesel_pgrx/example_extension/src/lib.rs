@@ -3,8 +3,7 @@
 #[cfg(feature = "pgrx")]
 ::pgrx::pg_module_magic!();
 
-#[derive(diesel_pgrx::DieselPGRX)]
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(diesel_pgrx::DieselPGRX, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(
     feature = "pgrx",
     derive(pgrx::PostgresType, pgrx::PostgresEq, pgrx::PostgresOrd, pgrx::PostgresHash)
@@ -23,7 +22,9 @@
     diesel::AsExpression,
 )]
 #[diesel(sql_type = diesel_impls::PositiveU32)]
+/// A struct representing a positive 32-bit unsigned integer.
 pub struct PositiveU32 {
+    /// The field that holds the positive 32-bit unsigned integer value.
     pub field: i32,
 }
 

@@ -1,0 +1,26 @@
+[package]
+name = "init_migration"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+core_structures = { workspace = true, features = ["backend"] }
+diesel.workspace = true
+tokio.workspace = true
+chrono.workspace = true
+cas_codes.workspace = true
+tool_categories = { workspace = true, features = ["postgres"] }
+instrument_categories = { workspace = true, features = ["postgres"] }
+container_categories = { workspace = true, features = ["postgres"] }
+nameplate_categories = { workspace = true, features = ["postgres"] }
+step_model_categories = { workspace = true, features = ["postgres"] }
+web_common_traits = { workspace = true, features = ["backend"] }
+
+[dev-dependencies]
+tokio.workspace = true
+init_db.workspace = true
+reference_docker.workspace = true
+dotenvy.workspace = true
+
+[lints]
+workspace = true

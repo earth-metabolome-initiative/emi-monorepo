@@ -1,7 +1,8 @@
 //! API endpoint to logout the user.
 use std::future::{Ready, ready};
 
-use actix_web::{FromRequest, HttpRequest, HttpResponse, dev::Payload, error::Error, get, web};
+use actix_web::{FromRequest, HttpRequest, HttpResponse, dev::Payload, error::Error, web};
+use actix_web_codegen::get;
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 
 use crate::{
@@ -66,18 +67,12 @@ pub async fn logout(
         }
     }
 
-    let refresh_cookie = match req.cookie(REFRESH_COOKIE_NAME) {
-        Some(cookie) => cookie,
-        None => {
-            return BackendError::Unauthorized.into();
-        }
+    let Some(refresh_cookie) = req.cookie(REFRESH_COOKIE_NAME) else {
+        return BackendError::Unauthorized.into();
     };
 
-    let refresh_token = match JsonRefreshToken::decode(refresh_cookie.value()) {
-        Ok(token) => token,
-        Err(_) => {
-            return BackendError::Unauthorized.into();
-        }
+    let Ok(refresh_token) = JsonRefreshToken::decode(refresh_cookie.value()) else {
+        return BackendError::Unauthorized.into();
     };
 
     if refresh_token.is_still_present_in_redis(&redis_client).await.map_or(true, |present| !present)

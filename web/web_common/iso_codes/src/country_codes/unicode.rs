@@ -3,6 +3,8 @@
 use super::CountryCode;
 
 impl CountryCode {
+    #[must_use]
+    #[allow(clippy::too_many_lines)]
     /// Returns the unicode representation of the country code.
     pub fn unicode(&self) -> &[char; 2] {
         match self {

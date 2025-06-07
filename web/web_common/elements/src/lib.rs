@@ -3,7 +3,6 @@
 #[cfg(feature = "pgrx")]
 ::pgrx::pg_module_magic!();
 
-
 mod as_ref;
 mod bonds_number;
 pub mod diesel_impls;

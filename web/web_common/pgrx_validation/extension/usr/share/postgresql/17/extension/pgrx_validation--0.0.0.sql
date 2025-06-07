@@ -19,6 +19,18 @@ AS 'MODULE_PATHNAME', 'must_be_distinct_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
+-- web/web_common/pgrx_validation/src/int.rs:49
+-- pgrx_validation::int::must_be_distinct_i16
+CREATE  FUNCTION "must_be_distinct_i16"(
+	"left" smallint, /* i16 */
+	"right" smallint /* i16 */
+) RETURNS bool /* bool */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'must_be_distinct_i16_wrapper';
+/* </end connected objects> */
+
+/* <begin connected objects> */
 -- web/web_common/pgrx_validation/src/int.rs:5
 -- pgrx_validation::int::must_be_distinct_i32
 CREATE  FUNCTION "must_be_distinct_i32"(
@@ -43,6 +55,17 @@ AS 'MODULE_PATHNAME', 'must_be_distinct_uuid_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
+-- web/web_common/pgrx_validation/src/str.rs:6
+-- pgrx_validation::str::must_be_email
+CREATE  FUNCTION "must_be_email"(
+	"value" TEXT /* &str */
+) RETURNS bool /* bool */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'must_be_email_wrapper';
+/* </end connected objects> */
+
+/* <begin connected objects> */
 -- web/web_common/pgrx_validation/src/font_awesome_icons.rs:1437
 -- pgrx_validation::font_awesome_icons::must_be_font_awesome_class
 CREATE  FUNCTION "must_be_font_awesome_class"(
@@ -54,7 +77,7 @@ AS 'MODULE_PATHNAME', 'must_be_font_awesome_class_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/float.rs:38
+-- web/web_common/pgrx_validation/src/float.rs:47
 -- pgrx_validation::float::must_be_greater_than_f32
 CREATE  FUNCTION "must_be_greater_than_f32"(
 	"value" real, /* f32 */
@@ -63,17 +86,6 @@ CREATE  FUNCTION "must_be_greater_than_f32"(
 STRICT
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'must_be_greater_than_f32_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/str.rs:6
--- pgrx_validation::str::must_be_mail
-CREATE  FUNCTION "must_be_mail"(
-	"value" TEXT /* &str */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_mail_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
@@ -88,7 +100,7 @@ AS 'MODULE_PATHNAME', 'must_be_paragraph_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/float.rs:61
+-- web/web_common/pgrx_validation/src/float.rs:70
 -- pgrx_validation::float::must_be_smaller_than_f32
 CREATE  FUNCTION "must_be_smaller_than_f32"(
 	"value" real, /* f32 */
@@ -100,7 +112,19 @@ AS 'MODULE_PATHNAME', 'must_be_smaller_than_f32_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/float.rs:84
+-- web/web_common/pgrx_validation/src/chrono.rs:5
+-- pgrx_validation::chrono::must_be_smaller_than_utc
+CREATE  FUNCTION "must_be_smaller_than_utc"(
+	"left" timestamp with time zone, /* rosetta_timestamp::TimestampUTC */
+	"right" timestamp with time zone /* rosetta_timestamp::TimestampUTC */
+) RETURNS bool /* bool */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'must_be_smaller_than_utc_wrapper';
+/* </end connected objects> */
+
+/* <begin connected objects> */
+-- web/web_common/pgrx_validation/src/float.rs:93
 -- pgrx_validation::float::must_be_strictly_greater_than_f32
 CREATE  FUNCTION "must_be_strictly_greater_than_f32"(
 	"value" real, /* f32 */
@@ -112,7 +136,7 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_greater_than_f32_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/float.rs:130
+-- web/web_common/pgrx_validation/src/float.rs:139
 -- pgrx_validation::float::must_be_strictly_greater_than_f64
 CREATE  FUNCTION "must_be_strictly_greater_than_f64"(
 	"value" double precision, /* f64 */
@@ -135,7 +159,7 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_positive_f32_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/float.rs:17
+-- web/web_common/pgrx_validation/src/float.rs:26
 -- pgrx_validation::float::must_be_strictly_positive_f64
 CREATE  FUNCTION "must_be_strictly_positive_f64"(
 	"value" double precision /* f64 */
@@ -146,7 +170,18 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_positive_f64_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/int.rs:29
+-- web/web_common/pgrx_validation/src/int.rs:72
+-- pgrx_validation::int::must_be_strictly_positive_i16
+CREATE  FUNCTION "must_be_strictly_positive_i16"(
+	"value" smallint /* i16 */
+) RETURNS bool /* bool */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'must_be_strictly_positive_i16_wrapper';
+/* </end connected objects> */
+
+/* <begin connected objects> */
+-- web/web_common/pgrx_validation/src/int.rs:28
 -- pgrx_validation::int::must_be_strictly_positive_i32
 CREATE  FUNCTION "must_be_strictly_positive_i32"(
 	"value" INT /* i32 */
@@ -157,7 +192,7 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_positive_i32_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/float.rs:107
+-- web/web_common/pgrx_validation/src/float.rs:116
 -- pgrx_validation::float::must_be_strictly_smaller_than_f32
 CREATE  FUNCTION "must_be_strictly_smaller_than_f32"(
 	"value" real, /* f32 */
@@ -169,7 +204,7 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_smaller_than_f32_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/float.rs:153
+-- web/web_common/pgrx_validation/src/float.rs:162
 -- pgrx_validation::float::must_be_strictly_smaller_than_f64
 CREATE  FUNCTION "must_be_strictly_smaller_than_f64"(
 	"value" double precision, /* f64 */
@@ -178,6 +213,18 @@ CREATE  FUNCTION "must_be_strictly_smaller_than_f64"(
 STRICT
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'must_be_strictly_smaller_than_f64_wrapper';
+/* </end connected objects> */
+
+/* <begin connected objects> */
+-- web/web_common/pgrx_validation/src/chrono.rs:29
+-- pgrx_validation::chrono::must_be_strictly_smaller_than_utc
+CREATE  FUNCTION "must_be_strictly_smaller_than_utc"(
+	"left" timestamp with time zone, /* rosetta_timestamp::TimestampUTC */
+	"right" timestamp with time zone /* rosetta_timestamp::TimestampUTC */
+) RETURNS bool /* bool */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'must_be_strictly_smaller_than_utc_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */

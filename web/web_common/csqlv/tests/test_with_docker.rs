@@ -2,7 +2,7 @@
 use std::path::PathBuf;
 
 use csqlv::{CSVSchemaBuilder, CSVSchemaError, SQLGenerationOptions};
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use testcontainers::{
     ContainerAsync, GenericImage, ImageExt,
     core::{IntoContainerPort, Mount, WaitFor},
@@ -56,8 +56,8 @@ async fn test_independent_csvs() -> Result<(), CSVSchemaError> {
         .unwrap();
 
     let sql_generation_options = SQLGenerationOptions::default().include_population();
-    schema.connect_and_create::<AsyncPgConnection>(DATABASE_URL, &sql_generation_options).await?;
-    schema.connect_and_delete::<AsyncPgConnection>(DATABASE_URL).await?;
+    schema.connect_and_create::<PgConnection>(DATABASE_URL, &sql_generation_options)?;
+    schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
 
     Ok(())
 }
@@ -70,8 +70,8 @@ async fn test_tree_dependent_csvs() -> Result<(), CSVSchemaError> {
         .unwrap();
 
     let sql_generation_options = SQLGenerationOptions::default().include_population();
-    schema.connect_and_create::<AsyncPgConnection>(DATABASE_URL, &sql_generation_options).await?;
-    schema.connect_and_delete::<AsyncPgConnection>(DATABASE_URL).await?;
+    schema.connect_and_create::<PgConnection>(DATABASE_URL, &sql_generation_options)?;
+    schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
 
     Ok(())
 }
@@ -85,8 +85,8 @@ async fn test_dag_dependent_csvs() -> Result<(), CSVSchemaError> {
         .unwrap();
 
     let sql_generation_options = SQLGenerationOptions::default().include_population();
-    schema.connect_and_create::<AsyncPgConnection>(DATABASE_URL, &sql_generation_options).await?;
-    schema.connect_and_delete::<AsyncPgConnection>(DATABASE_URL).await?;
+    schema.connect_and_create::<PgConnection>(DATABASE_URL, &sql_generation_options)?;
+    schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
 
     Ok(())
 }
@@ -100,8 +100,8 @@ async fn test_bands_csvs() -> Result<(), CSVSchemaError> {
         .unwrap();
 
     let sql_generation_options = SQLGenerationOptions::default().include_population();
-    schema.connect_and_create::<AsyncPgConnection>(DATABASE_URL, &sql_generation_options).await?;
-    schema.connect_and_delete::<AsyncPgConnection>(DATABASE_URL).await?;
+    schema.connect_and_create::<PgConnection>(DATABASE_URL, &sql_generation_options)?;
+    schema.connect_and_delete::<PgConnection>(DATABASE_URL)?;
 
     Ok(())
 }

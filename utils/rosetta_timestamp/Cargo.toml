@@ -1,0 +1,21 @@
+[package]
+name = "rosetta_timestamp"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+chrono.workspace = true
+diesel = { workspace = true, optional = true, features = ["chrono"] }
+pgrx-sql-entity-graph = { workspace = true, optional = true }
+pgrx = { workspace = true, optional = true, features = ["pg17"] }
+serde = { workspace = true, optional = true }
+
+[lints]
+workspace = true
+
+[features]
+serde = ["dep:serde"]
+pgrx = ["dep:pgrx", "dep:pgrx-sql-entity-graph"]
+diesel = ["dep:diesel"]
+postgres = ["diesel", "diesel/postgres"]
+sqlite = ["diesel", "diesel/sqlite"]

@@ -1,0 +1,6 @@
+comment = 'step_model_categories:  Created by pgrx'
+default_version = '0.1.0'
+module_pathname = '$libdir/step_model_categories'
+relocatable = false
+superuser = true
+trusted = false

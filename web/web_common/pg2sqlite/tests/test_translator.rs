@@ -1,20 +1,20 @@
-//! Test translating the core migrations used in the `core-structures` crate.
+//! Test translating the core migrations used in the `core_structures` crate.
 
 use diesel::{Connection, SqliteConnection, connection::SimpleConnection};
 use pg2sqlite::prelude::Pg2Sqlite;
 
 #[test]
-/// Test translating the core migrations used in the `core-structures` crate.
+/// Test translating the core migrations used in the `core_structures` crate.
 fn test_translator() {
     let translated_migrations = Pg2Sqlite::default()
         .remove_unsupported_check_constraints()
         .verbose()
-        .ups("../../../data-migrations/init-db/migrations")
+        .ups("../../../data_migrations/init_db/migrations")
         .expect("Failed to load the migrations")
         .translate()
         .expect("Failed to translate the migrations");
 
-    assert_eq!(translated_migrations.len(), 84);
+    assert_eq!(translated_migrations.len(), 85);
 
     // We try to parse the translated migrations using the `sqlparser` crate,
     // for the `SQLite` dialect.

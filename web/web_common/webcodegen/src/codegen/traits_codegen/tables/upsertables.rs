@@ -4,7 +4,7 @@
 
 use std::path::Path;
 
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 use strum::IntoEnumIterator;
@@ -26,18 +26,17 @@ impl Codegen<'_> {
     ///
     /// * If the database connection fails.
     /// * If the file system fails.
-    pub(super) async fn generate_upsertables_impls(
+    pub(super) fn generate_upsertables_impls(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
 
         // We generate each table in a separate document under the provided root, and we
         // collect all of the imported modules in a public one.
         let mut table_upsertable_main_module = TokenStream::new();
-        let run_query_dsl = Syntax::as_run_query_dsl(false);
 
         for table in tables {
             let table_struct = table.import_struct_path()?;
@@ -47,8 +46,7 @@ impl Codegen<'_> {
             let diesel_table_path = table.import_diesel_path()?;
 
             let primary_key_columns: Vec<TokenStream> = table
-                .primary_key_columns(conn)
-                .await?
+                .primary_key_columns(conn)?
                 .into_iter()
                 .map(|primary_key| {
                     let snake_case_column_ident = primary_key.snake_case_ident()?;
@@ -68,7 +66,7 @@ impl Codegen<'_> {
                 }
             };
 
-            let non_primary_key_columns = table.non_primary_key_columns(conn).await?;
+            let non_primary_key_columns = table.non_primary_key_columns(conn)?;
             let mut include_bool_expression_methods = false;
 
             let conflict_clause: TokenStream = if non_primary_key_columns.is_empty() {
@@ -125,7 +123,7 @@ impl Codegen<'_> {
             // impl Deletable for struct_ident
             std::fs::write(&table_file, self.beautify_code(&Syntax::iter().map(|syntax| {
 				let feature_flag = syntax.as_feature_flag();
-				let connection_type = syntax.as_connection_type(false);
+				let connection_type = syntax.as_connection_type();
 				quote! {
 				#feature_flag
                 impl web_common_traits::prelude::Upsertable<#connection_type> for #table_struct{
@@ -134,7 +132,7 @@ impl Codegen<'_> {
 						conn: &mut #connection_type,
 					) -> Result<Option<Self>, diesel::result::Error> {
 						#expression_methods
-						use #run_query_dsl;
+						use diesel::RunQueryDsl;
                         use #diesel_table_path::*;
 						diesel::insert_into(table)
 							.values(self)

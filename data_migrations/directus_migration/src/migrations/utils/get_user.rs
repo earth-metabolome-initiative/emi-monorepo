@@ -1,0 +1,64 @@
+//! Submodule providing a method to retrieve or insert a user in the database.
+
+use core_structures::{User, UserEmail};
+use diesel::PgConnection;
+use web_common_traits::database::{Insertable, InsertableVariant, UncheckedInsertableVariant};
+
+use crate::codegen::{DirectusUser, FieldDatum as DirectusFieldDatum};
+
+/// This module provides a method to retrieve or insert a user in the database.
+pub fn get_user(
+    directus_user: &DirectusUser,
+    directus_conn: &mut PgConnection,
+    portal_conn: &mut PgConnection,
+) -> Result<User, crate::error::Error> {
+    let email: &str = directus_user
+        .email
+        .as_deref()
+        .ok_or(crate::error::Error::MissingEmail(directus_user.id))?;
+    if let Some(stored_email) = UserEmail::from_email(email, portal_conn)? {
+        return Ok(stored_email.created_by(portal_conn)?);
+    }
+
+    let last_access = directus_user
+        .last_access
+        .ok_or(crate::error::Error::UserNeverLoggedIn(Box::from(directus_user.clone())))?;
+
+    let imputed_created_at =
+        DirectusFieldDatum::from_user_created(&directus_user.id, directus_conn)?
+            .into_iter()
+            .filter_map(|field_datum| field_datum.date_created)
+            .min()
+            .unwrap_or(last_access);
+
+    let new_user = User::new()
+        .first_name(
+            directus_user
+                .first_name
+                .clone()
+                .ok_or(crate::error::Error::MissingFirstName(directus_user.id))?,
+        )?
+        .last_name(
+            directus_user
+                .last_name
+                .clone()
+                .ok_or(crate::error::Error::MissingLastName(directus_user.id))?,
+        )?
+        .created_at(imputed_created_at)?
+        .updated_at(last_access)?
+        .unchecked_insert(portal_conn)?;
+
+    let _new_email = UserEmail::new()
+        .created_by(new_user.id)?
+        .email(
+            directus_user
+                .email
+                .clone()
+                .ok_or(crate::error::Error::MissingEmail(directus_user.id))?,
+        )?
+        .created_at(imputed_created_at)?
+        .primary_email(true)?
+        .insert(new_user.id, portal_conn)?;
+
+    Ok(new_user)
+}

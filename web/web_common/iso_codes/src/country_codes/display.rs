@@ -10,7 +10,7 @@ impl Display for super::CountryCode {
     /// ```
     /// use iso_codes::CountryCode;
     ///
-    /// let code = CountryCode::from("US");
+    /// let code = CountryCode::try_from("US").unwrap();
     /// assert_eq!(code.to_string(), "US");
     /// ```
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

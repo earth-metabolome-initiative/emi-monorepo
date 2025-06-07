@@ -140,6 +140,16 @@ impl super::MostAbundantIsotope for NeptuniumIsotope {
         Self::Np245
     }
 }
+impl From<NeptuniumIsotope> for crate::Isotope {
+    fn from(isotope: NeptuniumIsotope) -> Self {
+        crate::Isotope::Np(isotope)
+    }
+}
+impl From<NeptuniumIsotope> for crate::Element {
+    fn from(_isotope: NeptuniumIsotope) -> Self {
+        crate::Element::Np
+    }
+}
 impl TryFrom<u16> for NeptuniumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

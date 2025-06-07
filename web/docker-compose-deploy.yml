@@ -4,7 +4,7 @@ services:
     container_name: ${POSTGRES_DOCKER_NAME}
     build:
       context: ../
-      dockerfile: ./core-structures/Dockerfile
+      dockerfile: ./core_structures/Dockerfile
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -65,8 +65,6 @@ services:
       ACCESS_TOKEN_PUBLIC_KEY: ${ACCESS_TOKEN_PUBLIC_KEY}
       ACCESS_TOKEN_PRIVATE_KEY: ${ACCESS_TOKEN_PRIVATE_KEY}
       ACCESS_TOKEN_MINUTES: ${ACCESS_TOKEN_MINUTES}
-      REFRESH_TOKEN_PUBLIC_KEY: ${REFRESH_TOKEN_PUBLIC_KEY}
-      REFRESH_TOKEN_PRIVATE_KEY: ${REFRESH_TOKEN_PRIVATE_KEY}
       REFRESH_TOKEN_MINUTES: ${REFRESH_TOKEN_MINUTES}
       ACTIX_PORT: ${ACTIX_PORT}
       ACTIX_WORKER_THREADS: ${ACTIX_WORKER_THREADS}

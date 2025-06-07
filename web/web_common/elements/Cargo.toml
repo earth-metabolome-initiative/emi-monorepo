@@ -10,11 +10,11 @@ include = [
   "isotopes_data.json",
 ]
 
-[lib]
-crate-type = ["cdylib", "lib"]
+# [lib]
+# crate-type = ["cdylib", "lib"]
 
 [[bin]]
-name = "pgrx_embed_iso_codes"
+name = "pgrx_embed_elements"
 path = "./src/bin/pgrx_embed.rs"
 
 [dependencies]
@@ -24,13 +24,8 @@ diesel = { workspace = true, optional = true }
 strum_macros.workspace = true
 strum.workspace = true
 diesel_pgrx = { workspace = true, optional = true }
+multi_ranged.workspace = true
 
-[build-dependencies]
-syn.workspace = true
-quote.workspace = true
-serde.workspace = true
-proc-macro2.workspace = true
-serde_json.workspace = true
 
 [features]
 default = ["serde"]

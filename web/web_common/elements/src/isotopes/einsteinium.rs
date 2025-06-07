@@ -112,6 +112,16 @@ impl super::MostAbundantIsotope for EinsteiniumIsotope {
         Self::Es258
     }
 }
+impl From<EinsteiniumIsotope> for crate::Isotope {
+    fn from(isotope: EinsteiniumIsotope) -> Self {
+        crate::Isotope::Es(isotope)
+    }
+}
+impl From<EinsteiniumIsotope> for crate::Element {
+    fn from(_isotope: EinsteiniumIsotope) -> Self {
+        crate::Element::Es
+    }
+}
 impl TryFrom<u16> for EinsteiniumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

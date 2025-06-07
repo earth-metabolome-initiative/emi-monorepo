@@ -1,5 +1,4 @@
-use async_trait::async_trait;
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 
 use super::ConstraintError;
 use crate::{custom_schema_constraints::CustomTableConstraint, errors::WebCodeGenError};
@@ -12,14 +11,13 @@ pub struct CompulsorySiblingColumnConstraint {
     sibling_column_name: String,
 }
 
-#[async_trait]
 impl CustomTableConstraint for CompulsorySiblingColumnConstraint {
-    async fn check_constraint(
+    fn check_constraint(
         &self,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
         table: &crate::Table,
     ) -> Result<(), WebCodeGenError> {
-        if table.columns(conn).await?.into_iter().fold(false, |acc, column| {
+        if table.columns(conn)?.into_iter().fold(false, |acc, column| {
             if column.column_name == self.column_name
                 || column.column_name == self.sibling_column_name
             {

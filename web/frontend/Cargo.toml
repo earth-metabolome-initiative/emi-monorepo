@@ -18,17 +18,17 @@ regex.workspace = true
 chrono.workspace = true
 serde_json.workspace = true
 bincode.workspace = true
-api-path.workspace = true
-ws-messages.workspace = true
-common-traits.workspace = true
+api_path.workspace = true
+ws_messages.workspace = true
+common_traits.workspace = true
 log.workspace = true
 futures.workspace = true
-sqlite-migration-generator.workspace = true
+sqlite_migration_generator.workspace = true
 sqlite-wasm-rs = { version = "0.3.4", default-features = false, features = [
   "precompiled",
 ] }
 web_common_traits = { workspace = true, features = ["frontend"] }
-core-structures = { workspace = true, features = ["frontend"] }
+core_structures = { workspace = true, features = ["frontend"] }
 diesel = { workspace = true, features = [
   "sqlite",
   "returning_clauses_for_sqlite_3_35",
@@ -41,7 +41,7 @@ postgis_diesel = { workspace = true, default-features = false, features = [
 gloo.workspace = true
 gloo-timers.workspace = true
 wasm-bindgen.workspace = true
-rosetta-uuid.workspace = true
+rosetta_uuid.workspace = true
 wasm-bindgen-futures.workspace = true
 yew.workspace = true
 yew-router.workspace = true

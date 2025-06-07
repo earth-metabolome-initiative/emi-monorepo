@@ -1,7 +1,6 @@
 #![doc = include_str!("../README.md")]
 
 pub mod attributes;
-pub mod connection;
 pub mod crud;
 pub mod database;
 pub mod filtrable;
@@ -16,19 +15,14 @@ pub mod session_operation;
 pub mod prelude {
     pub use common_traits::prelude::*;
 
-    #[cfg(feature = "backend")]
-    pub use crate::database::BackendInsertableVariant;
-    #[cfg(feature = "diesel-async")]
-    pub use crate::database::{
-        AsyncBoundedRead, AsyncBoundedReadDispatch, AsyncRead, AsyncReadDispatch,
-    };
+    #[cfg(feature = "postgres")]
+    pub use crate::database::UncheckedInsertableVariant;
     pub use crate::{
         attributes::*,
-        connection::Connection,
         database::{
-            BoundedRead, BoundedReadDispatch, Deletable, Foreign, ForeignKeys, HasForeignKeys,
-            Insertable, InsertableBuilder, InsertableVariant, ReadDispatch, Row, Rows,
-            StaticTabular, Tabular, UpsertVec, Upsertable,
+            Ancestor, AncestorExists, BoundedRead, BoundedReadDispatch, Deletable, Descendant,
+            ExtensionTable, ForeignKeys, HasForeignKeys, Insertable, InsertableVariant,
+            ReadDispatch, Row, Rows, StaticTabular, TableName, Tabular, UpsertVec, Upsertable,
         },
         filtrable::*,
         operation::Operation,

@@ -14,7 +14,7 @@ use validator::ValidateEmail;
 ///
 /// * `validation_errors::SingleFieldError::InvalidMail` if the string is not a
 ///   valid mail address.
-pub fn must_be_mail(value: &str) -> Result<(), validation_errors::SingleFieldError> {
+pub fn must_be_email(value: &str) -> Result<(), validation_errors::SingleFieldError> {
     must_not_be_empty(value)?;
     if value.validate_email() {
         Ok(())
@@ -114,7 +114,7 @@ pub fn must_not_contain_consecutive_whitespace(
 pub fn must_not_contain_control_characters(
     value: &str,
 ) -> Result<(), validation_errors::SingleFieldError> {
-    if value.chars().any(|c| c.is_control()) {
+    if value.chars().any(char::is_control) {
         Err(validation_errors::SingleFieldError::ControlCharacters(()))
     } else {
         Ok(())
@@ -173,18 +173,18 @@ mod tests {
             must_not_be_empty(x).unwrap_err(),
             validation_errors::SingleFieldError::EmptyText(())
         );
-        assert!(must_not_be_empty("marco").is_ok())
+        assert!(must_not_be_empty("marco").is_ok());
     }
 
     #[test]
-    fn test_must_be_mail() {
-        assert!(must_be_mail("marco.visani@unifr.ch").is_ok());
+    fn test_must_be_email() {
+        assert!(must_be_email("marco.visani@unifr.ch").is_ok());
         assert_eq!(
-            must_be_mail("marco").unwrap_err(),
+            must_be_email("marco").unwrap_err(),
             validation_errors::SingleFieldError::InvalidMail(())
         );
         assert_eq!(
-            must_be_mail("").unwrap_err(),
+            must_be_email("").unwrap_err(),
             validation_errors::SingleFieldError::EmptyText(())
         );
     }

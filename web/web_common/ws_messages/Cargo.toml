@@ -1,0 +1,19 @@
+[package]
+name = "ws_messages"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+core_structures = { workspace = true, features = ["serde"] }
+web_common_traits = { workspace = true }
+gloo.workspace = true
+bincode.workspace = true
+serde.workspace = true
+actix-web = { workspace = true, optional = true }
+
+[features]
+frontend = []
+backend = ["dep:actix-web"]
+
+[lints]
+workspace = true

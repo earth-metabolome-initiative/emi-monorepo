@@ -116,6 +116,16 @@ impl super::MostAbundantIsotope for CuriumIsotope {
         Self::Cm252
     }
 }
+impl From<CuriumIsotope> for crate::Isotope {
+    fn from(isotope: CuriumIsotope) -> Self {
+        crate::Isotope::Cm(isotope)
+    }
+}
+impl From<CuriumIsotope> for crate::Element {
+    fn from(_isotope: CuriumIsotope) -> Self {
+        crate::Element::Cm
+    }
+}
 impl TryFrom<u16> for CuriumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

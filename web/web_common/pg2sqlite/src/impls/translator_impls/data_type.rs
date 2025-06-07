@@ -20,7 +20,7 @@ impl Translator for DataType {
             DataType::Varchar(_) => Ok(DataType::Text),
             DataType::Uuid => {
                 // SQLite does not have a UUID type, so we use BLOB instead as
-                // a workaround, as described in the `rosetta-uuid` crate.
+                // a workaround, as described in the `rosetta_uuid` crate.
                 Ok(DataType::Blob(None))
             }
             DataType::Timestamp(None, sqlparser::ast::TimezoneInfo::WithTimeZone) => {
@@ -45,10 +45,14 @@ impl Translator for DataType {
                     }
                     Some(
                         "countrycode" | "CountryCode" | "InstrumentCategory" | "ToolCategory"
-                        | "NameplateCategory" | "ContainerCategory",
+                        | "NameplateCategory" | "ContainerCategory" | "StepModelCategory",
                     ) => {
                         // SQLite does not have a country code type, so we use TEXT instead.
                         Ok(DataType::Text)
+                    }
+                    Some("cas" | "CAS" | "MolecularFormula" | "molecularformula" | "MediaType") => {
+                        // SQLite does not have a CAS type, so we use BLOB instead.
+                        Ok(DataType::Binary(None))
                     }
                     unimplemented => {
                         unimplemented!("The data type {:?} is not supported", unimplemented)

@@ -96,6 +96,16 @@ impl super::MostAbundantIsotope for LawrenciumIsotope {
         Self::Lr266
     }
 }
+impl From<LawrenciumIsotope> for crate::Isotope {
+    fn from(isotope: LawrenciumIsotope) -> Self {
+        crate::Isotope::Lr(isotope)
+    }
+}
+impl From<LawrenciumIsotope> for crate::Element {
+    fn from(_isotope: LawrenciumIsotope) -> Self {
+        crate::Element::Lr
+    }
+}
 impl TryFrom<u16> for LawrenciumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

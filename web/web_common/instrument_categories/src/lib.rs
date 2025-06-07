@@ -3,9 +3,6 @@
 #[cfg(feature = "pgrx")]
 ::pgrx::pg_module_magic!();
 
-#[cfg(feature = "pgrx")]
-use pgrx::FromDatum;
-
 mod as_ref;
 pub mod diesel_impls;
 mod display;
@@ -36,9 +33,12 @@ pub enum InstrumentCategory {
     Dispenser,
     /// Shaker
     Shaker,
+    /// Printer
+    Printer,
 }
 
 impl InstrumentCategory {
+    #[must_use]
     /// Returns the name of the instrument category
     pub fn name(&self) -> &'static str {
         match self {
@@ -49,9 +49,11 @@ impl InstrumentCategory {
             InstrumentCategory::Centrifuge => "Centrifuge",
             InstrumentCategory::Dispenser => "Dispenser",
             InstrumentCategory::Shaker => "Shaker",
+            InstrumentCategory::Printer => "Printer",
         }
     }
 
+    #[must_use]
     /// Returns the description of the instrument category
     pub fn description(&self) -> &'static str {
         match self {
@@ -70,19 +72,21 @@ impl InstrumentCategory {
                 "A device used to dispense a specific amount of liquid or powder."
             }
             InstrumentCategory::Shaker => "A device used to mix or agitate a sample.",
+            InstrumentCategory::Printer => "A device used to print labels.",
         }
     }
 
+    #[must_use]
     /// Returns the icon of the instrument category
     pub fn icon(&self) -> &'static str {
         match self {
-            InstrumentCategory::MassSpectrometer => "microscope",
+            InstrumentCategory::MassSpectrometer | InstrumentCategory::Centrifuge => "microscope",
             InstrumentCategory::WeightScale => "weight-scale",
             InstrumentCategory::FreezeDryer => "snowflake",
             InstrumentCategory::BallMill => "mortar-pestle",
-            InstrumentCategory::Centrifuge => "microscope",
             InstrumentCategory::Dispenser => "eye-dropper",
             InstrumentCategory::Shaker => "vial",
+            InstrumentCategory::Printer => "printer",
         }
     }
 }

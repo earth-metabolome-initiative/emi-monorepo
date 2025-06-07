@@ -1,5 +1,4 @@
-use diesel::{Queryable, QueryableByName};
-use diesel_async::{AsyncPgConnection, RunQueryDsl};
+use diesel::{PgConnection, Queryable, QueryableByName, RunQueryDsl};
 
 /// Represents a row in the `constraint_table_usage` table in the `PostgreSQL`
 /// database.
@@ -39,10 +38,8 @@ impl ConstraintTableUsage {
     /// # Errors
     ///
     /// * If an error occurs while loading the rows from the database.
-    pub async fn load_all(
-        conn: &mut AsyncPgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::constraint_table_usage;
-        constraint_table_usage::table.load::<ConstraintTableUsage>(conn).await
+        constraint_table_usage::table.load::<ConstraintTableUsage>(conn)
     }
 }

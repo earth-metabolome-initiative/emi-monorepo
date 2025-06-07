@@ -1,11 +1,9 @@
 //! Submodule providing the Outcome trait.
 
-use common_traits::basic::Basic;
-
 use crate::prelude::Operation;
 
 /// Trait for outcomes.
-pub trait Outcome: Basic {
+pub trait Outcome {
     /// The operation type associated with the outcome.
     type Operation: Operation<Outcome = Self>;
 

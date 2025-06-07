@@ -486,6 +486,7 @@ allow_tables_to_appear_in_same_query!(
     key_column_usage,
     tables,
     constraint_column_usage,
+    constraint_table_usage,
     columns,
     referential_constraints
 );

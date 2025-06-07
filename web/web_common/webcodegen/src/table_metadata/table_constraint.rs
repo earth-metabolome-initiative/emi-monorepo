@@ -1,13 +1,12 @@
 use std::io::Write;
 
 use diesel::{
-    ExpressionMethods, QueryDsl, Queryable, QueryableByName, Selectable,
+    ExpressionMethods, PgConnection, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
     backend::Backend,
     deserialize::{FromSql, FromSqlRow},
     expression::AsExpression,
     serialize::{IsNull, Output, ToSql},
 };
-use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use serde::{Deserialize, Serialize};
 
 use crate::errors::WebCodeGenError;
@@ -146,9 +145,9 @@ impl TableConstraint {
     /// # Errors
     ///
     /// If an error occurs while loading the constraints from the database
-    pub async fn load_all(conn: &mut AsyncPgConnection) -> Result<Vec<Self>, WebCodeGenError> {
+    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::table_constraints;
-        table_constraints::table.load::<TableConstraint>(conn).await.map_err(WebCodeGenError::from)
+        table_constraints::table.load::<TableConstraint>(conn).map_err(WebCodeGenError::from)
     }
 
     /// Load all the constraints for a given table
@@ -168,8 +167,8 @@ impl TableConstraint {
     /// # Errors
     ///
     /// If an error occurs while loading the constraints from the database
-    pub async fn load_table_constraints(
-        conn: &mut AsyncPgConnection,
+    pub fn load_table_constraints(
+        conn: &mut PgConnection,
         table_name: &str,
         table_schema: Option<&str>,
         table_catalog: &str,
@@ -181,7 +180,6 @@ impl TableConstraint {
             .filter(table_constraints::table_schema.eq(table_schema))
             .filter(table_constraints::table_catalog.eq(table_catalog))
             .load::<TableConstraint>(conn)
-            .await
             .map_err(WebCodeGenError::from)
     }
 

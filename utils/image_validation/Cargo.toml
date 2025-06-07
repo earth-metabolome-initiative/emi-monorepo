@@ -1,0 +1,11 @@
+[package]
+name = "image_validation"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rustfft.workspace = true
+image.workspace = true
+
+[lints]
+workspace = true

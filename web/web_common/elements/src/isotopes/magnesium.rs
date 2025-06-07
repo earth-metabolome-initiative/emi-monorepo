@@ -143,6 +143,16 @@ impl super::MostAbundantIsotope for MagnesiumIsotope {
         Self::Mg24
     }
 }
+impl From<MagnesiumIsotope> for crate::Isotope {
+    fn from(isotope: MagnesiumIsotope) -> Self {
+        crate::Isotope::Mg(isotope)
+    }
+}
+impl From<MagnesiumIsotope> for crate::Element {
+    fn from(_isotope: MagnesiumIsotope) -> Self {
+        crate::Element::Mg
+    }
+}
 impl TryFrom<u16> for MagnesiumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

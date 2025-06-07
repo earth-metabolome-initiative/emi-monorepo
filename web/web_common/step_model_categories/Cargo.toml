@@ -1,0 +1,35 @@
+[package]
+name = "step_model_categories"
+version = "0.1.0"
+edition = "2024"
+
+# [lib]
+# crate-type = ["cdylib", "lib"]
+
+[[bin]]
+name = "pgrx_embed_step_model_categories"
+path = "./src/bin/pgrx_embed.rs"
+
+[dependencies]
+serde = { workspace = true, optional = true }
+pgrx = { workspace = true, optional = true }
+diesel = { workspace = true, optional = true }
+strum_macros.workspace = true
+strum.workspace = true
+
+[features]
+default = ["serde"]
+serde = ["dep:serde"]
+diesel = ["dep:diesel"]
+sqlite = ["diesel", "diesel/sqlite"]
+postgres = ["diesel", "diesel/postgres"]
+diesel_pgrx = ["diesel"]
+pgrx = ["dep:pgrx"]
+pg13 = ["pgrx", "pgrx/pg13"]
+pg14 = ["pgrx", "pgrx/pg14"]
+pg15 = ["pgrx", "pgrx/pg15"]
+pg16 = ["pgrx", "pgrx/pg16"]
+pg17 = ["pgrx", "pgrx/pg17"]
+
+[lints]
+workspace = true

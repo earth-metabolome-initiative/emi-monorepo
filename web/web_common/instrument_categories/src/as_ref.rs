@@ -11,6 +11,7 @@ impl AsRef<str> for crate::InstrumentCategory {
             Self::Centrifuge => "Centrifuge",
             Self::Dispenser => "Dispenser",
             Self::Shaker => "Shaker",
+            Self::Printer => "Printer",
         }
     }
 }

@@ -14,7 +14,7 @@ mod sqlite;
 )]
 #[cfg_attr(
     all(feature = "postgres", feature = "diesel_pgrx"),
-    diesel(postgres_type(name = "NameplateCategory"))
+    diesel(postgres_type(name = "nameplatecategory"))
 )]
 #[cfg_attr(feature = "sqlite", diesel(sqlite_type(name = "Text")))]
 pub struct NameplateCategory;

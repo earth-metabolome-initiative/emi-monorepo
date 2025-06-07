@@ -2,7 +2,7 @@
 
 use std::{collections::HashSet, path::Path};
 
-use diesel_async::AsyncPgConnection;
+use diesel::PgConnection;
 use proc_macro2::TokenStream;
 
 use super::Codegen;
@@ -17,11 +17,11 @@ impl Codegen<'_> {
     /// * `root` - The root path for the generated code.
     /// * `tables` - The list of tables for which to generate the diesel code.
     /// * `conn` - A mutable reference to a `PgConnection`.
-    pub(crate) async fn generate_allow_tables_to_appear_in_same_query(
+    pub(crate) fn generate_allow_tables_to_appear_in_same_query(
         &self,
         root: &Path,
         tables: &[Table],
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         // https://github.com/earth-metabolome-initiative/emi-monorepo/issues/37
 
@@ -45,7 +45,9 @@ impl Codegen<'_> {
         for table in tables {
             let mut submodule_token_stream = TokenStream::new();
             let table_name = table.snake_case_ident()?;
-            for foreign_table in table.foreign_tables(conn).await? {
+            for foreign_table in
+                table.foreign_tables(conn)?.into_iter().chain(table.extension_tables(conn)?)
+            {
                 // if the foreign table is the same as table we continue
                 if &foreign_table == table {
                     continue;

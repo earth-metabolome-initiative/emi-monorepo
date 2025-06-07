@@ -133,6 +133,16 @@ impl super::MostAbundantIsotope for SodiumIsotope {
         Self::Na23
     }
 }
+impl From<SodiumIsotope> for crate::Isotope {
+    fn from(isotope: SodiumIsotope) -> Self {
+        crate::Isotope::Na(isotope)
+    }
+}
+impl From<SodiumIsotope> for crate::Element {
+    fn from(_isotope: SodiumIsotope) -> Self {
+        crate::Element::Na
+    }
+}
 impl TryFrom<u16> for SodiumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

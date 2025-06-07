@@ -6,6 +6,7 @@ use crate::CountryCode;
 impl TryFrom<&[u8]> for CountryCode {
     type Error = crate::errors::UnknownCountryCode;
 
+    #[allow(clippy::too_many_lines)]
     fn try_from(code: &[u8]) -> Result<Self, Self::Error> {
         Ok(match code {
             b"AD" => CountryCode::AD,
@@ -268,6 +269,7 @@ impl TryFrom<&[u8]> for CountryCode {
 impl TryFrom<&[char]> for CountryCode {
     type Error = crate::errors::UnknownCountryCode;
 
+    #[allow(clippy::too_many_lines)]
     fn try_from(code: &[char]) -> Result<Self, Self::Error> {
         Ok(match code {
             ['A', 'D'] => CountryCode::AD,

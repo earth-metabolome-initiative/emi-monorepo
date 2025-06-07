@@ -44,6 +44,16 @@ impl super::MostAbundantIsotope for OganessonIsotope {
         Self::Og295
     }
 }
+impl From<OganessonIsotope> for crate::Isotope {
+    fn from(isotope: OganessonIsotope) -> Self {
+        crate::Isotope::Og(isotope)
+    }
+}
+impl From<OganessonIsotope> for crate::Element {
+    fn from(_isotope: OganessonIsotope) -> Self {
+        crate::Element::Og
+    }
+}
 impl TryFrom<u16> for OganessonIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

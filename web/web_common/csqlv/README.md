@@ -34,7 +34,7 @@ let schema: CSVSchema = CSVSchemaBuilder::default()
     // For supporting running the tests within
     // containers such as Docker
     .singularize()
-    .container_directory("/app/bands")
+    .container_directory("/app/bands".into())
     .from_dir("./tests/bands")
     .unwrap();
 

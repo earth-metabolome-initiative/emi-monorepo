@@ -1,0 +1,83 @@
+[package]
+name = "core_structures"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+postgis_diesel = { workspace = true, features = ["diesel"] }
+rosetta_uuid = { workspace = true, features = ["diesel"] }
+rosetta_timestamp = { workspace = true, features = ["diesel"] }
+chrono.workspace = true
+diesel.workspace = true
+web_common_traits.workspace = true
+serde = { workspace = true, optional = true }
+common_traits.workspace = true
+generic_backend_request_errors.workspace = true
+pgrx_validation.workspace = true
+infer.workspace = true
+image_validation.workspace = true
+iso_codes = { workspace = true, features = ["diesel_pgrx"] }
+step_model_categories = { workspace = true, features = ["diesel_pgrx"] }
+tool_categories = { workspace = true, features = ["diesel_pgrx"] }
+instrument_categories = { workspace = true, features = ["diesel_pgrx"] }
+nameplate_categories = { workspace = true, features = ["diesel_pgrx"] }
+container_categories = { workspace = true, features = ["diesel_pgrx"] }
+validation_errors.workspace = true
+cas_codes = { workspace = true, features = ["diesel_pgrx"] }
+molecular_formulas = { workspace = true, features = ["diesel_pgrx"] }
+media_types = { workspace = true, features = ["diesel_pgrx"] }
+yew = { workspace = true, optional = true }
+
+[features]
+default = ["serde"]
+serde = [
+  "postgis_diesel/serde",
+  "dep:serde",
+  "rosetta_uuid/serde",
+  "rosetta_timestamp/serde",
+  "iso_codes/serde",
+  "step_model_categories/serde",
+  "tool_categories/serde",
+  "instrument_categories/serde",
+  "nameplate_categories/serde",
+  "container_categories/serde",
+  "cas_codes/serde",
+  "molecular_formulas/serde",
+  "media_types/serde",
+]
+yew = ["dep:yew"]
+postgres = [
+  "web_common_traits/postgres",
+  "diesel/postgres",
+  "postgis_diesel/postgres",
+  "rosetta_uuid/postgres",
+  "rosetta_timestamp/postgres",
+  "iso_codes/postgres",
+  "step_model_categories/postgres",
+  "nameplate_categories/postgres",
+  "tool_categories/postgres",
+  "instrument_categories/postgres",
+  "container_categories/postgres",
+  "cas_codes/postgres",
+  "molecular_formulas/postgres",
+  "media_types/postgres",
+]
+sqlite = [
+  "web_common_traits/sqlite",
+  "diesel/sqlite",
+  "postgis_diesel/sqlite",
+  "diesel/returning_clauses_for_sqlite_3_35",
+  "rosetta_uuid/sqlite",
+  "rosetta_timestamp/sqlite",
+  "iso_codes/sqlite",
+  "tool_categories/sqlite",
+  "instrument_categories/sqlite",
+  "step_model_categories/sqlite",
+  "nameplate_categories/sqlite",
+  "container_categories/sqlite",
+  "cas_codes/sqlite",
+  "molecular_formulas/sqlite",
+  "media_types/sqlite",
+]
+backend = ["postgres", "web_common_traits/backend"]
+frontend = ["sqlite", "yew", "web_common_traits/frontend"]

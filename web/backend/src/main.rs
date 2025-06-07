@@ -1,16 +1,14 @@
-extern crate diesel;
+//! Main entrypoint for the web server
 
 use std::path::PathBuf;
 
 use actix_cors::Cors;
 use actix_files::NamedFile;
-use actix_web::{
-    App, HttpRequest, HttpServer, Responder, get, http::header, middleware::Logger, web,
-};
+use actix_web::{App, HttpRequest, HttpServer, Responder, http::header, middleware::Logger, web};
+use actix_web_codegen::get;
 use backend::ListenNotifyServer;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use redis::Client;
-
 /// Entrypoint to load the index.html file
 async fn index() -> impl Responder {
     NamedFile::open("/home/appuser/app/web/frontend/dist/index.html")
@@ -36,23 +34,22 @@ async fn main() -> std::io::Result<()> {
         std::env::var("DOCKER_DATABASE_URL").expect("DOCKER_DATABASE_URL must be set");
 
     // create db connection pool
-    let pool: backend::DBPool = diesel_async::pooled_connection::bb8::Pool::builder()
-        .build(diesel_async::pooled_connection::AsyncDieselConnectionManager::<
-            diesel_async::AsyncPgConnection,
-        >::new(database_url))
-        .await
+    let pool: backend::DBPool = diesel::r2d2::Pool::builder()
+        .build(diesel::r2d2::ConnectionManager::<diesel::PgConnection>::new(database_url))
         .expect("Error creating database pool");
 
     // Run init migrations.
     {
-        let mut connection = pool.get().await.unwrap();
+        let mut connection = pool.get().unwrap();
         let database_name = std::env::var("POSTGRES_DB").expect("POSTGRES_DB must be set");
-        init_db::init_database(&database_name, &mut connection)
-            .await
-            .expect("Error creating database");
-        init_migration::init_migration(&mut connection)
-            .await
-            .expect("Error running init migration");
+        if !init_db::database_exists(&database_name, &mut connection)
+            .expect("Error checking if database exists")
+        {
+            init_db::init_database(&database_name, &mut connection)
+                .await
+                .expect("Error creating database");
+            init_migration::init_migration(&mut connection).expect("Error running init migration");
+        }
     }
 
     let redis_client =

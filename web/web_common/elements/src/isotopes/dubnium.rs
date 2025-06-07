@@ -96,6 +96,16 @@ impl super::MostAbundantIsotope for DubniumIsotope {
         Self::Db270
     }
 }
+impl From<DubniumIsotope> for crate::Isotope {
+    fn from(isotope: DubniumIsotope) -> Self {
+        crate::Isotope::Db(isotope)
+    }
+}
+impl From<DubniumIsotope> for crate::Element {
+    fn from(_isotope: DubniumIsotope) -> Self {
+        crate::Element::Db
+    }
+}
 impl TryFrom<u16> for DubniumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

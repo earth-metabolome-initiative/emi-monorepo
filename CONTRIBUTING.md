@@ -42,7 +42,7 @@ As in any project, and especially any project involving web development, there i
 
 There are two genres of code generation: either simple [procedural macros](https://doc.rust-lang.org/reference/procedural-macros.html), as happens when you simply have a trait that you can often implement automatically, or more complex code generation, as happens when you have a pattern that is repeated in the codebase like in the case of code inferred from the PostgreSQL schema, for instance methods that generate queries for foreign keys of a table, or methods which use available table indices to execute search queries.
 
-The second kind of code generation, both for Rust and SQL, is primarily handled in the [`webcodegen`](`web/web_common/webcodegen`) crate. Whenever you identify a pattern that is repeated in the codebase, please consider whether it can be automated. If you are unsure, please open an issue on the GitHub repository and we will discuss it together.
+The second kind of code generation, both for Rust and SQL, is primarily handled in the [`webcodegen`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/webcodegen) crate. Whenever you identify a pattern that is repeated in the codebase, please consider whether it can be automated. If you are unsure, please open an issue on the GitHub repository and we will discuss it together.
 
 ### Dependency centralization
 
@@ -50,9 +50,9 @@ We try to keep the dependencies centralized in the [`Cargo.toml`](Cargo.toml) fi
 
 ```toml
 [dependencies]
-crate_name.workspace = true
+your_crate_name.workspace = true
 # And if the dependency is optional
-another_crate { workspace = true, optional = true }
+another_crate = { workspace = true, optional = true }
 ```
 
 ### Performance analysis
@@ -63,10 +63,8 @@ One of the best tools available for a rough primary performance analysis is the 
 sudo perf top
 ```
 
-## Contributing to the backend
+## Making a Pull Request
 
-The main backend code is found in [`web/backend`](web/backend). You will find therein another [`CONTRIB.md`](web/backend/CONTRIB.md) file with instructions on how to contribute to the backend.
+We try to follow the [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) for making pull requests. This means that you should create a new branch for your changes, and then create a pull request from that branch to the main branch. Here follows a simple illustration of the process:
 
-## Contributing to the frontend
-
-The main frontend code is found in [`web/frontend`](web/frontend). You will find therein another [`CONTRIB.md`](web/frontend/CONTRIB.md) file with instructions on how to contribute to the frontend.
+![Making a pull request](making_a_pr.jpg)

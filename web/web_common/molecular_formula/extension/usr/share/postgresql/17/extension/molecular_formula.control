@@ -1,6 +1,0 @@
-comment = 'molecular_formula:  Created by pgrx'
-default_version = '0.1.0'
-module_pathname = '$libdir/molecular_formula'
-relocatable = false
-superuser = true
-trusted = false

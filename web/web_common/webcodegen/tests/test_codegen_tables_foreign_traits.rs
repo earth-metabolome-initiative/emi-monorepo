@@ -16,8 +16,7 @@ async fn test_codegen_tables_foreign_traits() {
         .set_output_directory("tests/codegen_tables_foreign_traits".as_ref())
         .enable_foreign_trait()
         .beautify()
-        .generate(&mut conn, &database_name, None)
-        .await;
+        .generate(&mut conn, &database_name, None);
     docker.stop().await.unwrap();
     outcome.unwrap();
 

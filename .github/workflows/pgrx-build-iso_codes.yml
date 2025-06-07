@@ -1,0 +1,15 @@
+name: PGRX Build
+
+on:
+  push:
+    paths:
+      - 'web/web_common/iso_codes/**'
+  pull_request:
+    paths:
+      - 'web/web_common/iso_codes/**'
+
+jobs:
+  call-build:
+    uses: ./.github/workflows/pgrx-build-template.yml
+    with:
+      path: web/web_common/iso_codes

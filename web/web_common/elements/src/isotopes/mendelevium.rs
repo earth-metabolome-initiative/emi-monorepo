@@ -104,6 +104,16 @@ impl super::MostAbundantIsotope for MendeleviumIsotope {
         Self::Md262
     }
 }
+impl From<MendeleviumIsotope> for crate::Isotope {
+    fn from(isotope: MendeleviumIsotope) -> Self {
+        crate::Isotope::Md(isotope)
+    }
+}
+impl From<MendeleviumIsotope> for crate::Element {
+    fn from(_isotope: MendeleviumIsotope) -> Self {
+        crate::Element::Md
+    }
+}
 impl TryFrom<u16> for MendeleviumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

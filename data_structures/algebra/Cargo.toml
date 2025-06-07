@@ -1,0 +1,21 @@
+[package]
+name = "algebra"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+common_traits.workspace = true
+numeric_common_traits.workspace = true
+serde = { workspace = true, optional = true }
+arbitrary = { workspace = true, optional = true }
+iter_utils.workspace = true
+lender.workspace = true
+multi_ranged.workspace = true
+num-traits.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+serde = ["dep:serde", "common_traits/serde"]
+arbitrary = ["dep:arbitrary"]

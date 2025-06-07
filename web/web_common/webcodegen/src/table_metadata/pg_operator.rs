@@ -1,8 +1,7 @@
 use diesel::{
-    ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, Queryable, QueryableByName,
-    Selectable, SelectableHelper,
+    ExpressionMethods, JoinOnDsl, OptionalExtension, PgConnection, QueryDsl, Queryable,
+    QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
-use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
 use super::{PgExtension, PgProc, PgType};
 
@@ -75,16 +74,12 @@ impl PgOperator {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub async fn function(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<PgProc, diesel::result::Error> {
+    pub fn function(&self, conn: &mut PgConnection) -> Result<PgProc, diesel::result::Error> {
         use crate::schema::pg_proc;
         pg_proc::table
             .filter(pg_proc::oid.eq(self.oprcode))
             .select(PgProc::as_select())
             .first::<PgProc>(conn)
-            .await
     }
 
     /// Returns the [`PgExtension`] that contains this function, if any.
@@ -97,9 +92,9 @@ impl PgOperator {
     /// # Errors
     ///
     /// * If the function is not contained in an extension
-    pub async fn extension(
+    pub fn extension(
         &self,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<Option<PgExtension>, diesel::result::Error> {
         use crate::schema::{pg_depend, pg_extension};
         pg_extension::table
@@ -107,7 +102,6 @@ impl PgOperator {
             .filter(pg_depend::objid.eq(self.oid))
             .select(PgExtension::as_select())
             .first::<PgExtension>(conn)
-            .await
             .optional()
     }
 
@@ -120,16 +114,15 @@ impl PgOperator {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub async fn left_operand_type(
+    pub fn left_operand_type(
         &self,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<PgType, diesel::result::Error> {
         use crate::schema::pg_type;
         pg_type::table
             .filter(pg_type::oid.eq(self.oprleft))
             .select(PgType::as_select())
             .first::<PgType>(conn)
-            .await
     }
 
     /// Returns the right operand type [`PgType`] of the operator.
@@ -141,16 +134,15 @@ impl PgOperator {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub async fn right_operand_type(
+    pub fn right_operand_type(
         &self,
-        conn: &mut AsyncPgConnection,
+        conn: &mut PgConnection,
     ) -> Result<PgType, diesel::result::Error> {
         use crate::schema::pg_type;
         pg_type::table
             .filter(pg_type::oid.eq(self.oprright))
             .select(PgType::as_select())
             .first::<PgType>(conn)
-            .await
     }
 
     /// Returns the result type [`PgType`] of the operator.
@@ -162,15 +154,11 @@ impl PgOperator {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub async fn result_type(
-        &self,
-        conn: &mut AsyncPgConnection,
-    ) -> Result<PgType, diesel::result::Error> {
+    pub fn result_type(&self, conn: &mut PgConnection) -> Result<PgType, diesel::result::Error> {
         use crate::schema::pg_type;
         pg_type::table
             .filter(pg_type::oid.eq(self.oprresult))
             .select(PgType::as_select())
             .first::<PgType>(conn)
-            .await
     }
 }

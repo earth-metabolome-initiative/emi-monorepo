@@ -1,0 +1,15 @@
+[package]
+name = "time_requirements"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tabled = "0.18.0"
+serde.workspace = true
+serde_json.workspace = true
+plotters.workspace = true
+chrono.workspace = true
+chrono-humanize = "0.2.3"
+
+[lints]
+workspace = true

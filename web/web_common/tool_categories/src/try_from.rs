@@ -10,12 +10,16 @@ impl TryFrom<&str> for crate::ToolCategory {
             "InsectTrap" => Self::InsectTrap,
             "CuttingTool" => Self::CuttingTool,
             "Wrapper" => Self::Wrapper,
+            "EmpiricalMeasurementTool" => Self::EmpiricalMeasurementTool,
             "PreciseManipulationTool" => Self::PreciseManipulationTool,
             "BreakingBeads" => Self::BreakingBeads,
             "Gloves" => Self::Gloves,
-            "HandCleaningAgent" => Self::HandCleaningAgent,
+            "LiquidDispenser" => Self::LiquidDispenser,
             "PaperTowels" => Self::PaperTowels,
-            "VolumeMeasuringTool" => Self::VolumeMeasuringTool,
+            "GraduatedCylinder" => Self::GraduatedCylinder,
+            "Pipette" => Self::Pipette,
+            "PipetteTip" => Self::PipetteTip,
+            "PipettingContainer" => Self::PipettingContainer,
             _ => return Err(crate::errors::UnknownToolCategory::UnknownString(value.to_string())),
         })
     }
@@ -25,6 +29,14 @@ impl TryFrom<String> for crate::ToolCategory {
     type Error = crate::errors::UnknownToolCategory;
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
+        Self::try_from(value.as_str())
+    }
+}
+
+impl TryFrom<&String> for crate::ToolCategory {
+    type Error = crate::errors::UnknownToolCategory;
+
+    fn try_from(value: &String) -> Result<Self, Self::Error> {
         Self::try_from(value.as_str())
     }
 }

@@ -184,6 +184,16 @@ impl super::MostAbundantIsotope for PromethiumIsotope {
         Self::Pm163
     }
 }
+impl From<PromethiumIsotope> for crate::Isotope {
+    fn from(isotope: PromethiumIsotope) -> Self {
+        crate::Isotope::Pm(isotope)
+    }
+}
+impl From<PromethiumIsotope> for crate::Element {
+    fn from(_isotope: PromethiumIsotope) -> Self {
+        crate::Element::Pm
+    }
+}
 impl TryFrom<u16> for PromethiumIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

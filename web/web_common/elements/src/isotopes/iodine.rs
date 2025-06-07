@@ -228,6 +228,16 @@ impl super::MostAbundantIsotope for IodineIsotope {
         Self::I127
     }
 }
+impl From<IodineIsotope> for crate::Isotope {
+    fn from(isotope: IodineIsotope) -> Self {
+        crate::Isotope::I(isotope)
+    }
+}
+impl From<IodineIsotope> for crate::Element {
+    fn from(_isotope: IodineIsotope) -> Self {
+        crate::Element::I
+    }
+}
 impl TryFrom<u16> for IodineIsotope {
     type Error = crate::errors::Error;
     fn try_from(value: u16) -> Result<Self, Self::Error> {

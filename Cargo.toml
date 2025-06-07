@@ -2,64 +2,75 @@
 resolver = "2"
 
 members = [
-  "bindings/sirius-bindings",
+  "bindings/sirius_bindings",
   "web/backend",
   "web/frontend",
   "web/web_common/web_common_traits",
   "web/web_common/webcodegen",
   "web/web_common/csqlv",
-  "web/web_common/snake-case-sanitizer",
+  "web/web_common/snake_case_sanitizer",
   "web/web_common/pgrx_validation",
   "web/web_common/pgrx_validation_derive",
-  "web/web_common/validation-errors",
-  "web/web_common/backend-request-errors",
+  "web/web_common/validation_errors",
+  "web/web_common/backend_request_errors",
+  "web/web_common/generic_backend_request_errors",
   "web/web_common/pg2sqlite",
-  "data-retrieval/taxonomy-fetcher",
-  "data-retrieval/downloader",
-  "web/core-structures",
-  "web/core-structures/core-structures-builder",
+  "data_retrieval/taxonomy_fetcher",
+  "data_retrieval/downloader",
+  "web/core_structures",
+  "web/core_structures/core_structures_builder",
   "utils/diesel_migrations_utils",
-  "utils/common-traits",
+  "utils/common_traits",
   "utils/inflector",
-  "utils/time-requirements",
-  "data-structures/graph",
-  "data-structures/algebra",
-  "data-migrations/directus-migration/directus-migration-builder",
-  "data-migrations/directus-migration",
-  "data-structures/mass-spectrometry",
-  "utils/functional-properties",
-  "data-structures/rosetta-uuid",
-  "data-structures/sorted-vec",
-  "utils/functional-properties",
-  "utils/image-validation",
-  "utils/mime-types",
-  "web/web_common/ws-messages",
-  "utils/rosetta-timestamp",
-  "utils/iter-utils",
-  "data-migrations/init-migration",
-  "web/web_common/sqlite-migration-generator",
-  "utils/macro-utils",
+  "utils/time_requirements",
+  "data_structures/graph",
+  "data_structures/algebra",
+  "data_migrations/directus_migration/directus_migration_builder",
+  "data_migrations/directus_migration",
+  "data_structures/mass_spectrometry",
+  "utils/functional_properties",
+  "data_structures/rosetta_uuid",
+  "data_structures/sorted_vec",
+  "utils/functional_properties",
+  "utils/image_validation",
+  "web/web_common/media_types",
+  "web/web_common/media_types/media_types_builder",
+  "web/web_common/ws_messages",
+  "utils/rosetta_timestamp",
+  "utils/iter_utils",
+  "data_migrations/init_migration",
+  "web/web_common/sqlite_migration_generator",
+  "utils/macro_utils",
   "web/web_common/iso_codes",
-  "web/web_common/rosetta-url",
-  "data-migrations/init-db",
-  "web/web_common/reference-docker",
+  "web/web_common/rosetta_url",
+  "data_migrations/init_db",
+  "web/web_common/reference_docker",
+  "web/web_common/step_model_categories",
   "web/web_common/tool_categories",
   "web/web_common/instrument_categories",
   "web/web_common/container_categories",
   "web/web_common/nameplate_categories",
-  "web/web_common/cas_code",
+  "web/web_common/cas_codes",
   "utils/diesel_pgrx_derive",
   "utils/diesel_pgrx",
   "web/web_common/elements",
+  "web/web_common/elements/elements_builder",
   "utils/diesel_pgrx/example_extension",
-  "web/web_common/molecular_formula",
+  "web/web_common/molecular_formulas",
+  "utils/numeric_common_traits",
+  "data_structures/multi_ranged",
 ]
 
 [workspace.dependencies]
-actix-web = { version = "4.10", features = ["cookies", "openssl"] }
-actix-ws = "0.3.0"
-init-migration = { path = "data-migrations/init-migration" }
-init-db = { path = "data-migrations/init-db" }
+actix-web = { version = "4.11", features = ["cookies", "openssl"] }
+actix-http = { version = "3.11.0" }
+actix-files = { version = "0.6.6" }
+actix-web-codegen = { version = "4.3.0", git = "https://github.com/LucaCappelletti94/actix-web.git", branch = "macro-doc" }
+actix-web-httpauth = { version = "0.8.2" }
+actix-cors = { version = "0.7.1" }
+actix-ws = { version = "0.3.0" }
+init_migration = { path = "data_migrations/init_migration" }
+init_db = { path = "data_migrations/init_db" }
 syn = { version = "2.0", features = ["full", "visit-mut"] }
 quote = "1.0"
 proc-macro2 = "1.0"
@@ -75,46 +86,48 @@ bytes = "1.10.0"
 bincode = { version = "2", features = ["serde"] }
 sqlparser = { git = "https://github.com/apache/datafusion-sqlparser-rs.git", branch = "main" }
 arbitrary = { version = "1", features = ["derive"] }
-diesel = { git = "https://github.com/LucaCappelletti94/diesel.git", branch = "supports_on_conflict_clause_where", features = [
+diesel = { git = "https://github.com/diesel-rs/diesel", rev = "2cf1642d69a699ddefaa15fabc2d58e37670a735", features = [
   "extras",
+  "sqlite",
+  "returning_clauses_for_sqlite_3_35",
+  "postgres",
+  "i-implement-a-third-party-backend-and-opt-into-breaking-changes",
 ] }
-diesel-async = { git = "https://github.com/LucaCappelletti94/diesel_async", branch = "custom-diesel" }
 diesel_full_text_search = "2.2"
 diesel_pgrx = { path = "utils/diesel_pgrx" }
 diesel_pgrx_derive = { path = "utils/diesel_pgrx_derive" }
 example_extension = { path = "utils/diesel_pgrx/example_extension" }
-redis = { version = "0.30", features = ["tokio-comp"] }
+redis = { version = "0.31", features = ["tokio-comp"] }
 postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel.git", default-features = false, branch = "custom-diesel" }
 chrono = { version = "0.4.39", features = ["serde"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
 strum = { version = "0.27", features = ["derive"] }
-yew = { git = "https://github.com/LucaCappelletti94/yew.git", features = [
+yew = { git = "https://github.com/yewstack/yew.git", features = [
   "csr",
-], branch = "vendoring-yew-agent" }
-yew-router = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "vendoring-yew-agent" }
+], branch = "master" }
+yew-router = { git = "https://github.com/yewstack/yew.git", branch = "master" }
 yewdux = { git = "https://github.com/LucaCappelletti94/yewdux", branch = "custom-yew" }
-yew-agent = { git = "https://github.com/LucaCappelletti94/yew.git", branch = "vendoring-yew-agent" }
-
+yew-agent = { git = "https://github.com/yewstack/yew.git", branch = "master" }
 strum_macros = "0.27"
-zip = "3.0"
-reference-docker = { path = "web/web_common/reference-docker" }
-async-trait = "0.1.88"
+zip = "4.0"
+reference_docker = { path = "web/web_common/reference_docker" }
 pgrx = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }
 pgrx-tests = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }
 pgrx-sql-entity-graph = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }
 image = "0.25.6"
 rsa = { version = "0.9.8" }
-rand = { version = "0.8" }
+rand = { version = "0.9.1" }
 gloo = "0.11.0"
 gloo-timers = "0.3.0"
-criterion = { version = "0.5", features = ["html_reports"] }
-rosetta-uuid = { path = "data-structures/rosetta-uuid" }
-rosetta-timestamp = { path = "utils/rosetta-timestamp" }
-taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
+criterion = { version = "0.6", features = ["html_reports"] }
+rosetta_uuid = { path = "data_structures/rosetta_uuid" }
+rosetta_timestamp = { path = "utils/rosetta_timestamp" }
+taxonomy_fetcher = { path = "data_retrieval/taxonomy_fetcher" }
 csqlv = { path = "web/web_common/csqlv", default-features = false }
 iso_codes = { path = "web/web_common/iso_codes" }
 elements = { path = "web/web_common/elements" }
+step_model_categories = { path = "web/web_common/step_model_categories" }
 tool_categories = { path = "web/web_common/tool_categories" }
 instrument_categories = { path = "web/web_common/instrument_categories" }
 nameplate_categories = { path = "web/web_common/nameplate_categories" }
@@ -123,13 +136,13 @@ testcontainers = { version = "0.24.0" }
 web_common_traits = { path = "web/web_common/web_common_traits" }
 webcodegen = { path = "web/web_common/webcodegen" }
 diesel_migrations_utils = { path = "utils/diesel_migrations_utils" }
-common-traits = { path = "utils/common-traits" }
-functional-properties = { path = "utils/functional-properties" }
+common_traits = { path = "utils/common_traits" }
+functional_properties = { path = "utils/functional_properties" }
 inflector = { path = "utils/inflector" }
-core-structures = { path = "web/core-structures" }
-core-structures-builder = { path = "web/core-structures/core-structures-builder" }
-ws-messages = { path = "web/web_common/ws-messages" }
-iter-utils = { path = "utils/iter-utils" }
+core_structures = { path = "web/core_structures" }
+core_structures_builder = { path = "web/core_structures/core_structures_builder" }
+ws_messages = { path = "web/web_common/ws_messages" }
+iter_utils = { path = "utils/iter_utils" }
 regex = "1.11"
 plotters = "0.3.7"
 futures = "0.3.31"
@@ -140,23 +153,26 @@ trybuild = "1"
 const_format = "0.2.34"
 log = "0.4"
 rustfft = "6.2.0"
-lender = "0.3.1"
+lender = "0.3.2"
 sql_minifier = "0.1.5"
 blake3 = "1.8.2"
+num-traits = "0.2.19"
 phf = { version = "0.11.3", features = ["macros"] }
-api-path = { path = "web/web_common/api-path" }
-time-requirements = { path = "utils/time-requirements" }
-algebra = { path = "data-structures/algebra" }
-graph = { path = "data-structures/graph" }
-sorted-vec = { path = "data-structures/sorted-vec" }
+api_path = { path = "web/web_common/api_path" }
+time_requirements = { path = "utils/time_requirements" }
+numeric_common_traits = { path = "utils/numeric_common_traits" }
+algebra = { path = "data_structures/algebra" }
+graph = { path = "data_structures/graph" }
+sorted_vec = { path = "data_structures/sorted_vec" }
 pgrx_validation = { path = "web/web_common/pgrx_validation" }
 pgrx_validation_derive = { path = "web/web_common/pgrx_validation_derive" }
 pg2sqlite = { path = "web/web_common/pg2sqlite" }
-sqlite-migration-generator = { path = "web/web_common/sqlite-migration-generator" }
-validation-errors = { path = "web/web_common/validation-errors" }
-backend-request-errors = { path = "web/web_common/backend-request-errors" }
-downloader = { path = "data-retrieval/downloader" }
-macro-utils = { path = "utils/macro-utils" }
+sqlite_migration_generator = { path = "web/web_common/sqlite_migration_generator" }
+validation_errors = { path = "web/web_common/validation_errors" }
+backend_request_errors = { path = "web/web_common/backend_request_errors" }
+generic_backend_request_errors = { path = "web/web_common/generic_backend_request_errors" }
+downloader = { path = "data_retrieval/downloader" }
+macro_utils = { path = "utils/macro_utils" }
 lazy_static = { version = "1.5.0" }
 validator = { version = "0.20", features = ["derive"] }
 web-sys = { version = "0.3.77" }
@@ -167,6 +183,11 @@ sophia_api = "0.9.0"
 sophia_sparql_client = "0.9.0"
 fmtastic = "0.2.1"
 byteorder = "1.5.0"
+image_validation = { path = "utils/image_validation" }
+media_types = { path = "web/web_common/media_types" }
+molecular_formulas = { path = "web/web_common/molecular_formulas" }
+cas_codes = { path = "web/web_common/cas_codes" }
+multi_ranged = { path = "data_structures/multi_ranged" }
 
 [workspace.lints.rust]
 missing_docs = "forbid"
@@ -175,6 +196,7 @@ unconditional_recursion = "forbid"
 unreachable_patterns = "forbid"
 unused_import_braces = "forbid"
 unused_must_use = "forbid"
+deprecated = "deny"
 
 [workspace.lints.clippy]
 unreadable_literal = "allow"

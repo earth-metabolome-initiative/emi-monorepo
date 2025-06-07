@@ -15,6 +15,12 @@ proc-macro2.workspace = true
 default = []
 postgres = []
 sqlite = []
+pgrx = []
+
+[dev-dependencies]
+diesel = { workspace = true, features = ["postgres", "sqlite"] }
+serde.workspace = true
+diesel_pgrx = { workspace = true, features = ["postgres", "sqlite"] }
 
 [lints]
 workspace = true
