@@ -17,11 +17,6 @@ pgrx_validation.workspace = true
 infer.workspace = true
 image_validation.workspace = true
 iso_codes = { workspace = true, features = ["diesel_pgrx"] }
-step_model_categories = { workspace = true, features = ["diesel_pgrx"] }
-tool_categories = { workspace = true, features = ["diesel_pgrx"] }
-instrument_categories = { workspace = true, features = ["diesel_pgrx"] }
-nameplate_categories = { workspace = true, features = ["diesel_pgrx"] }
-container_categories = { workspace = true, features = ["diesel_pgrx"] }
 validation_errors.workspace = true
 cas_codes = { workspace = true, features = ["diesel_pgrx"] }
 molecular_formulas = { workspace = true, features = ["diesel_pgrx"] }
@@ -36,11 +31,6 @@ serde = [
   "rosetta_uuid/serde",
   "rosetta_timestamp/serde",
   "iso_codes/serde",
-  "step_model_categories/serde",
-  "tool_categories/serde",
-  "instrument_categories/serde",
-  "nameplate_categories/serde",
-  "container_categories/serde",
   "cas_codes/serde",
   "molecular_formulas/serde",
   "media_types/serde",
@@ -53,11 +43,6 @@ postgres = [
   "rosetta_uuid/postgres",
   "rosetta_timestamp/postgres",
   "iso_codes/postgres",
-  "step_model_categories/postgres",
-  "nameplate_categories/postgres",
-  "tool_categories/postgres",
-  "instrument_categories/postgres",
-  "container_categories/postgres",
   "cas_codes/postgres",
   "molecular_formulas/postgres",
   "media_types/postgres",
@@ -70,11 +55,6 @@ sqlite = [
   "rosetta_uuid/sqlite",
   "rosetta_timestamp/sqlite",
   "iso_codes/sqlite",
-  "tool_categories/sqlite",
-  "instrument_categories/sqlite",
-  "step_model_categories/sqlite",
-  "nameplate_categories/sqlite",
-  "container_categories/sqlite",
   "cas_codes/sqlite",
   "molecular_formulas/sqlite",
   "media_types/sqlite",

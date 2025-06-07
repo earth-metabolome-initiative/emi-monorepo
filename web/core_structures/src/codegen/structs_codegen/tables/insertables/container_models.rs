@@ -3,7 +3,6 @@
 pub enum InsertableContainerModelAttributes {
     Id(crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes),
     Liters,
-    ContainerCategory,
 }
 impl
     From<
@@ -21,9 +20,6 @@ impl core::fmt::Display for InsertableContainerModelAttributes {
         match self {
             InsertableContainerModelAttributes::Id(id) => write!(f, "{}", id),
             InsertableContainerModelAttributes::Liters => write!(f, "liters"),
-            InsertableContainerModelAttributes::ContainerCategory => {
-                write!(f, "container_category")
-            }
         }
     }
 }
@@ -38,7 +34,6 @@ impl core::fmt::Display for InsertableContainerModelAttributes {
 pub struct InsertableContainerModel {
     id: ::rosetta_uuid::Uuid,
     liters: f32,
-    container_category: ::container_categories::ContainerCategory,
 }
 impl InsertableContainerModel {
     pub fn id<C: diesel::connection::LoadConnection>(
@@ -79,7 +74,6 @@ pub struct InsertableContainerModelBuilder {
     pub(crate) id:
         crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder,
     pub(crate) liters: Option<f32>,
-    pub(crate) container_category: Option<::container_categories::ContainerCategory>,
 }
 impl InsertableContainerModelBuilder {
     pub fn liters<P>(
@@ -96,23 +90,6 @@ impl InsertableContainerModelBuilder {
         pgrx_validation::must_be_strictly_positive_f32(liters)
             .map_err(|e| e.rename_field(InsertableContainerModelAttributes::Liters))?;
         self.liters = Some(liters);
-        Ok(self)
-    }
-    pub fn container_category<P>(
-        mut self,
-        container_category: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableContainerModelAttributes>>
-    where
-        P: TryInto<::container_categories::ContainerCategory>,
-        <P as TryInto<::container_categories::ContainerCategory>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let container_category = container_category.try_into().map_err(
-            |err: <P as TryInto<::container_categories::ContainerCategory>>::Error| {
-                Into::into(err).rename_field(InsertableContainerModelAttributes::ContainerCategory)
-            },
-        )?;
-        self.container_category = Some(container_category);
         Ok(self)
     }
     pub fn deprecation_date<P>(
@@ -267,12 +244,7 @@ impl InsertableContainerModelBuilder {
         let liters = self.liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
             InsertableContainerModelAttributes::Liters,
         ))?;
-        let container_category = self.container_category.ok_or(
-            common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableContainerModelAttributes::ContainerCategory,
-            ),
-        )?;
         let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
-        Ok(InsertableContainerModel { id, liters, container_category })
+        Ok(InsertableContainerModel { id, liters })
     }
 }

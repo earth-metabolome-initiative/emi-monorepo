@@ -17,7 +17,7 @@ use crate::{
 };
 
 /// Constant listing types supporting `Copy`.
-pub(crate) const COPY_TYPES: [&str; 13] = [
+pub(crate) const COPY_TYPES: [&str; 9] = [
     "i16",
     "i32",
     "i64",
@@ -27,14 +27,10 @@ pub(crate) const COPY_TYPES: [&str; 13] = [
     "::rosetta_uuid::Uuid",
     "::rosetta_timestamp::TimestampUTC",
     "::iso_codes::CountryCode",
-    "::instrument_categories::InstrumentCategory",
-    "::tool_categories::ToolCategory",
-    "::nameplate_categories::NameplateCategory",
-    "::container_categories::ContainerCategory",
 ];
 
 /// Constant listing types supporting `Eq`.
-pub(crate) const EQ_TYPES: [&str; 13] = [
+pub(crate) const EQ_TYPES: [&str; 10] = [
     "i16",
     "i32",
     "i64",
@@ -44,14 +40,11 @@ pub(crate) const EQ_TYPES: [&str; 13] = [
     "::rosetta_uuid::Uuid",
     "::rosetta_timestamp::TimestampUTC",
     "::iso_codes::CountryCode",
-    "::instrument_categories::InstrumentCategory",
-    "::tool_categories::ToolCategory",
-    "::nameplate_categories::NameplateCategory",
     "::media_types::MediaType",
 ];
 
 /// Constant listing types supporting `Ord`.
-pub(crate) const ORD_TYPES: [&str; 13] = [
+pub(crate) const ORD_TYPES: [&str; 10] = [
     "i16",
     "i32",
     "i64",
@@ -61,14 +54,11 @@ pub(crate) const ORD_TYPES: [&str; 13] = [
     "::rosetta_uuid::Uuid",
     "::rosetta_timestamp::TimestampUTC",
     "::iso_codes::CountryCode",
-    "::instrument_categories::InstrumentCategory",
-    "::tool_categories::ToolCategory",
-    "::nameplate_categories::NameplateCategory",
     "::media_types::MediaType",
 ];
 
 /// Constant listing types supporting `Hash`.
-pub(crate) const HASH_TYPES: [&str; 13] = [
+pub(crate) const HASH_TYPES: [&str; 10] = [
     "i16",
     "i32",
     "i64",
@@ -78,9 +68,6 @@ pub(crate) const HASH_TYPES: [&str; 13] = [
     "::rosetta_uuid::Uuid",
     "::rosetta_timestamp::TimestampUTC",
     "::iso_codes::CountryCode",
-    "::instrument_categories::InstrumentCategory",
-    "::tool_categories::ToolCategory",
-    "::nameplate_categories::NameplateCategory",
     "::media_types::MediaType",
 ];
 
@@ -235,15 +222,6 @@ pub fn rust_type_str<S: AsRef<str>>(
         // ISO Codes
         "countrycode" | "CountryCode" => "::iso_codes::CountryCode",
 
-        // Instrument and Tool Categories
-        "instrumentcategory" | "InstrumentCategory" => {
-            "::instrument_categories::InstrumentCategory"
-        }
-        "toolcategory" | "ToolCategory" => "::tool_categories::ToolCategory",
-        "stepmodelcategory" | "StepModelCategory" => "::step_model_categories::StepModelCategory",
-        "nameplatecategory" | "NameplateCategory" => "::nameplate_categories::NameplateCategory",
-        "containercategory" | "ContainerCategory" => "::container_categories::ContainerCategory",
-
         "cas" => "::cas_codes::CAS",
         "molecularformula" => "::molecular_formulas::MolecularFormula",
 
@@ -331,20 +309,6 @@ pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<String, WebCod
         // ISO Codes
         "countrycode" | "CountryCode" => "::iso_codes::country_codes::diesel_impls::CountryCode",
 
-        // Instrument and Tool Categories
-        "instrumentcategory" | "InstrumentCategory" => {
-            "instrument_categories::diesel_impls::InstrumentCategory"
-        }
-        "toolcategory" | "ToolCategory" => "::tool_categories::diesel_impls::ToolCategory",
-        "stepmodelcategory" | "StepModelCategory" => {
-            "::step_model_categories::diesel_impls::StepModelCategory"
-        }
-        "nameplatecategory" | "NameplateCategory" => {
-            "::nameplate_categories::diesel_impls::NameplateCategory"
-        }
-        "containercategory" | "ContainerCategory" => {
-            "::container_categories::diesel_impls::ContainerCategory"
-        }
         "mediatype" | "MediaType" => "::media_types::diesel_impls::MediaType",
 
         "cas" => "::cas_codes::diesel_impls::CAS",

@@ -60,8 +60,6 @@ pub enum SingleFieldError<FieldName = ()> {
     MustBeSmallerThan(FieldName, f64),
     /// The float is not strictly smaller than the expected amount.
     MustBeGreaterThan(FieldName, f64),
-    /// The provided text is not a valid instrument category.
-    UnknownInstrumentCategory(FieldName),
     /// The provided text is not a valid cas code.
     InvalidCasCode(FieldName, cas_codes::errors::Error),
     /// The provided text is not a valid Molecular Formula.
@@ -94,9 +92,6 @@ impl SingleFieldError {
             }
             SingleFieldError::MustBeGreaterThan((), expected_value) => {
                 SingleFieldError::MustBeGreaterThan(field_name, expected_value)
-            }
-            SingleFieldError::UnknownInstrumentCategory(()) => {
-                SingleFieldError::UnknownInstrumentCategory(field_name)
             }
             SingleFieldError::InvalidCasCode((), error) => {
                 SingleFieldError::InvalidCasCode(field_name, error)
@@ -134,7 +129,6 @@ impl SingleFieldError {
             | SingleFieldError::ControlCharacters(())
             | SingleFieldError::InvalidFontAwesomeClass((), _)
             | SingleFieldError::InvalidMail(())
-            | SingleFieldError::UnknownInstrumentCategory(())
             | SingleFieldError::InvalidCasCode((), _)
             | SingleFieldError::InvalidMolecularFormula((), _)
             | SingleFieldError::InvalidMediaType((), _)
@@ -178,9 +172,6 @@ impl<FieldName> SingleFieldError<FieldName> {
             }
             SingleFieldError::MustBeGreaterThan(field_name, expected_value) => {
                 SingleFieldError::MustBeGreaterThan(field_name.into(), expected_value)
-            }
-            SingleFieldError::UnknownInstrumentCategory(field_name) => {
-                SingleFieldError::UnknownInstrumentCategory(field_name.into())
             }
             SingleFieldError::InvalidCasCode(field_name, error) => {
                 SingleFieldError::InvalidCasCode(field_name.into(), error)
@@ -259,9 +250,6 @@ impl<A: core::fmt::Display> core::fmt::Display for SingleFieldError<A> {
             }
             SingleFieldError::MustBeGreaterThan(field_name, expected_value) => {
                 write!(f, "The {field_name} field must be greater than {expected_value}.")
-            }
-            SingleFieldError::UnknownInstrumentCategory(field_name) => {
-                write!(f, "The {field_name} field must be a valid instrument category.")
             }
             SingleFieldError::InvalidCasCode(field_name, error) => {
                 write!(f, "The {field_name} field must be a valid CAS code. Error: {error}")

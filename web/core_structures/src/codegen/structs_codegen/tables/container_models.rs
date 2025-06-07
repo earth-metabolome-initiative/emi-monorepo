@@ -15,7 +15,6 @@
 pub struct ContainerModel {
     pub id: ::rosetta_uuid::Uuid,
     pub liters: f32,
-    pub container_category: ::container_categories::ContainerCategory,
 }
 impl web_common_traits::prelude::TableName for ContainerModel {
     const TABLE_NAME: &'static str = "container_models";
