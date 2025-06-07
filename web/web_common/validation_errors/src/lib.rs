@@ -74,37 +74,37 @@ impl SingleFieldError {
     /// Renames the field name.
     pub fn rename_field<FieldName>(self, field_name: FieldName) -> SingleFieldError<FieldName> {
         match self {
-            SingleFieldError::EmptyText(_) => SingleFieldError::EmptyText(field_name),
-            SingleFieldError::PaddedText(_) => SingleFieldError::PaddedText(field_name),
-            SingleFieldError::ConsecutiveWhitespace(_) => {
+            SingleFieldError::EmptyText(()) => SingleFieldError::EmptyText(field_name),
+            SingleFieldError::PaddedText(()) => SingleFieldError::PaddedText(field_name),
+            SingleFieldError::ConsecutiveWhitespace(()) => {
                 SingleFieldError::ConsecutiveWhitespace(field_name)
             }
-            SingleFieldError::ControlCharacters(_) => {
+            SingleFieldError::ControlCharacters(()) => {
                 SingleFieldError::ControlCharacters(field_name)
             }
-            SingleFieldError::InvalidMail(_) => SingleFieldError::InvalidMail(field_name),
-            SingleFieldError::InvalidFontAwesomeClass(_, icon) => {
+            SingleFieldError::InvalidMail(()) => SingleFieldError::InvalidMail(field_name),
+            SingleFieldError::InvalidFontAwesomeClass((), icon) => {
                 SingleFieldError::InvalidFontAwesomeClass(field_name, icon)
             }
-            SingleFieldError::UnexpectedNegativeOrZeroValue(_) => {
+            SingleFieldError::UnexpectedNegativeOrZeroValue(()) => {
                 SingleFieldError::UnexpectedNegativeOrZeroValue(field_name)
             }
-            SingleFieldError::MustBeSmallerThan(_, expected_value) => {
+            SingleFieldError::MustBeSmallerThan((), expected_value) => {
                 SingleFieldError::MustBeSmallerThan(field_name, expected_value)
             }
-            SingleFieldError::MustBeGreaterThan(_, expected_value) => {
+            SingleFieldError::MustBeGreaterThan((), expected_value) => {
                 SingleFieldError::MustBeGreaterThan(field_name, expected_value)
             }
-            SingleFieldError::UnknownInstrumentCategory(_) => {
+            SingleFieldError::UnknownInstrumentCategory(()) => {
                 SingleFieldError::UnknownInstrumentCategory(field_name)
             }
-            SingleFieldError::InvalidCasCode(_, error) => {
+            SingleFieldError::InvalidCasCode((), error) => {
                 SingleFieldError::InvalidCasCode(field_name, error)
             }
-            SingleFieldError::InvalidMolecularFormula(_, error) => {
+            SingleFieldError::InvalidMolecularFormula((), error) => {
                 SingleFieldError::InvalidMolecularFormula(field_name, error)
             }
-            SingleFieldError::InvalidMediaType(_, error) => {
+            SingleFieldError::InvalidMediaType((), error) => {
                 SingleFieldError::InvalidMediaType(field_name, error)
             }
         }
@@ -122,23 +122,23 @@ impl SingleFieldError {
         right: FieldName,
     ) -> DoubleFieldError<FieldName> {
         match self {
-            SingleFieldError::MustBeSmallerThan(_, _) => {
+            SingleFieldError::MustBeSmallerThan((), _) => {
                 DoubleFieldError::MustBeSmallerThan(left, right)
             }
-            SingleFieldError::MustBeGreaterThan(_, _) => {
+            SingleFieldError::MustBeGreaterThan((), _) => {
                 DoubleFieldError::MustBeGreaterThan(left, right)
             }
-            SingleFieldError::EmptyText(_)
-            | SingleFieldError::PaddedText(_)
-            | SingleFieldError::ConsecutiveWhitespace(_)
-            | SingleFieldError::ControlCharacters(_)
-            | SingleFieldError::InvalidFontAwesomeClass(_, _)
-            | SingleFieldError::InvalidMail(_)
-            | SingleFieldError::UnknownInstrumentCategory(_)
-            | SingleFieldError::InvalidCasCode(_, _)
-            | SingleFieldError::InvalidMolecularFormula(_, _)
-            | SingleFieldError::InvalidMediaType(_, _)
-            | SingleFieldError::UnexpectedNegativeOrZeroValue(_) => {
+            SingleFieldError::EmptyText(())
+            | SingleFieldError::PaddedText(())
+            | SingleFieldError::ConsecutiveWhitespace(())
+            | SingleFieldError::ControlCharacters(())
+            | SingleFieldError::InvalidFontAwesomeClass((), _)
+            | SingleFieldError::InvalidMail(())
+            | SingleFieldError::UnknownInstrumentCategory(())
+            | SingleFieldError::InvalidCasCode((), _)
+            | SingleFieldError::InvalidMolecularFormula((), _)
+            | SingleFieldError::InvalidMediaType((), _)
+            | SingleFieldError::UnexpectedNegativeOrZeroValue(()) => {
                 unimplemented!("Cannot convert the variant error into a double field error.")
             }
         }
@@ -303,11 +303,11 @@ impl DoubleFieldError {
         right: FieldName,
     ) -> DoubleFieldError<FieldName> {
         match self {
-            DoubleFieldError::NotDistinct(_, _) => DoubleFieldError::NotDistinct(left, right),
-            DoubleFieldError::MustBeSmallerThan(_, _) => {
+            DoubleFieldError::NotDistinct((), ()) => DoubleFieldError::NotDistinct(left, right),
+            DoubleFieldError::MustBeSmallerThan((), ()) => {
                 DoubleFieldError::MustBeSmallerThan(left, right)
             }
-            DoubleFieldError::MustBeGreaterThan(_, _) => {
+            DoubleFieldError::MustBeGreaterThan((), ()) => {
                 DoubleFieldError::MustBeGreaterThan(left, right)
             }
         }

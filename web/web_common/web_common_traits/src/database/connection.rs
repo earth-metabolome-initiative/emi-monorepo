@@ -3,11 +3,12 @@
 use diesel::QueryResult;
 
 #[derive(diesel::MultiConnection)]
-/// An enum representing a connection to either a PostgreSQL or SQLite database.
+/// An enum representing a connection to either a `PostgreSQL` or `SQLite`
+/// database.
 pub enum AnyConnection {
-    /// A connection to a PostgreSQL database.
+    /// A connection to a `PostgreSQL` database.
     Postgresql(diesel::PgConnection),
-    /// A connection to a SQLite database.
+    /// A connection to a `SQLite` database.
     Sqlite(diesel::SqliteConnection),
 }
 

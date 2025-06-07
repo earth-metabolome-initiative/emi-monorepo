@@ -19,7 +19,7 @@ pub const E70_ETHANOL: &str = "Ethanol 70 percent";
 /// * If the procedure model building fails.
 pub(super) fn init_ethanol_70_percent(user: &User, conn: &mut diesel::PgConnection) {
     ProcedureModel::new()
-        .name("Ethanol 70 percent Solvent")
+        .name(E70_ETHANOL)
         .unwrap()
         .description(
 			"Procedure model for Ethanol 70 percent Solvent preparation, used in various cleaning procedures.",

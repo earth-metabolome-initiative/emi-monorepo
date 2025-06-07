@@ -28,9 +28,9 @@ pub fn init_migration(portal_conn: &mut PgConnection) -> Result<(), error::Error
     portal_conn.transaction(|portal_conn| {
         init_login_providers(portal_conn)?;
         let darwin = init_root_user(portal_conn)?;
-        init_trackables(&darwin, portal_conn)?;
-        init_brands(&darwin, portal_conn)?;
-        init_procedure_models(&darwin, portal_conn)?;
+        init_trackables(&darwin, portal_conn);
+        init_brands(&darwin, portal_conn);
+        init_procedure_models(&darwin, portal_conn);
         Ok(())
     })
 }

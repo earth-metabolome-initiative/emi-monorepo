@@ -5,6 +5,8 @@ use quote::quote;
 use crate::{Column, Table, errors::WebCodeGenError};
 
 impl crate::Table {
+    #[allow(clippy::too_many_lines)]
+    #[allow(clippy::type_complexity)]
     /// Generate the `from_{x}` methods for the attributes of the struct
     /// which are not a unique index or a foreign key.
     ///
@@ -150,7 +152,7 @@ impl crate::Table {
                     "from_{}",
                     columns
                         .iter()
-                        .map(|c| c.snake_case_name())
+                        .map(Column::snake_case_name)
                         .collect::<Result<Vec<String>, _>>()?
                         .join("_and_")
                 ),
@@ -159,7 +161,7 @@ impl crate::Table {
 
             let mut additional_imports = tables
                 .iter()
-                .map(|table| table.import_diesel_path())
+                .map(Table::import_diesel_path)
                 .collect::<Result<Vec<_>, WebCodeGenError>>()?;
 
             let ok_return_type = if is_unique {

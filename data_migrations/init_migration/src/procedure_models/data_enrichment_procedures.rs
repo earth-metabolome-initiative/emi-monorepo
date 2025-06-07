@@ -13,7 +13,7 @@
 /// * If the connection fails to insert the procedure models.
 /// * If the procedure model building fails.
 pub(super) fn init_data_enrichment_procedures(
-    user: &core_structures::User,
-    conn: &mut diesel::PgConnection,
+    _user: &core_structures::User,
+    _conn: &mut diesel::PgConnection,
 ) {
 }

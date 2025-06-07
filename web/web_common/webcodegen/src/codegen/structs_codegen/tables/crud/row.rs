@@ -4,12 +4,11 @@ use std::path::Path;
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use strum::IntoEnumIterator;
 use syn::Ident;
 
 use crate::{
     Codegen, Table,
-    codegen::{CODEGEN_DIRECTORY, CODEGEN_TABLES_PATH, Syntax},
+    codegen::{CODEGEN_DIRECTORY, CODEGEN_TABLES_PATH},
 };
 
 impl Codegen<'_> {
@@ -201,43 +200,45 @@ impl Codegen<'_> {
         ));
 
         let table_primary_keys_path = table_primary_keys_path.clone();
-        for syntax in Syntax::iter() {
-            let connection_type = syntax.as_connection_type();
-            let feature_flag = syntax.as_feature_flag();
-            let read_impls: Vec<TokenStream> = tables
+        let mut where_statements = Vec::new();
+        let read_impls: Vec<TokenStream> = tables
             .iter()
             .map(|table| {
                 let struct_ident = table.struct_ident()?;
                 let struct_path = table.import_struct_path()?;
+                where_statements.push(quote::quote! {
+                    #struct_path: web_common_traits::database::Read<C>
+                });
                 Ok(quote::quote! {
                     #table_primary_keys_path::#struct_ident(primary_key) => {
-                        Ok(<#struct_path as web_common_traits::database::Read<#connection_type>>::read(primary_key, conn)?
-                            .map(super::Row::from))
+                        #struct_path::read(primary_key, conn)?.map(super::Row::from)
                     }
                 })
             })
             .collect::<Result<Vec<_>, crate::errors::WebCodeGenError>>()?;
-            trait_modules.push((
-                format!("{}_read_dispatch", syntax.as_str()),
-                quote::quote! {
-                    #feature_flag
-                    impl web_common_traits::prelude::ReadDispatch<#connection_type> for super::Row {
-                        type PrimaryKey = #table_primary_keys_path;
+        trait_modules.push((
+            "read_dispatch".to_owned(),
+            quote::quote! {
+                impl<C> web_common_traits::prelude::ReadDispatch<C> for super::Row
+                    where
+                        #(#where_statements),*
+                {
+                    type PrimaryKey = #table_primary_keys_path;
 
-                        fn read(
-                            primary_key: Self::PrimaryKey,
-                            conn: &mut #connection_type,
-                        ) -> Result<Option<Self>, diesel::result::Error> {
-                            match primary_key {
-                                #(
-                                    #read_impls
-                                )*
-                            }
-                        }
+                    fn read(
+                        primary_key: Self::PrimaryKey,
+                        conn: &mut C,
+                    ) -> Result<Option<Self>, diesel::result::Error> {
+                        use web_common_traits::database::Read;
+                        Ok(match primary_key {
+                            #(
+                                #read_impls
+                            )*
+                        })
                     }
-                },
-            ));
-        }
+                }
+            },
+        ));
 
         for (trait_module_name, trait_impl) in trait_modules {
             let trait_file = root.join(format!("{trait_module_name}.rs"));

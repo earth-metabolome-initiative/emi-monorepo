@@ -24,11 +24,12 @@ pub fn get_user(
         .last_access
         .ok_or(crate::error::Error::UserNeverLoggedIn(Box::from(directus_user.clone())))?;
 
-    let imputed_created_at = DirectusFieldDatum::from_user_created(&directus_user.id, directus_conn)?
-        .into_iter()
-        .filter_map(|field_datum| field_datum.date_created)
-        .min()
-        .unwrap_or(last_access);
+    let imputed_created_at =
+        DirectusFieldDatum::from_user_created(&directus_user.id, directus_conn)?
+            .into_iter()
+            .filter_map(|field_datum| field_datum.date_created)
+            .min()
+            .unwrap_or(last_access);
 
     let new_user = User::new()
         .first_name(

@@ -91,7 +91,7 @@ impl Codegen<'_> {
 
                 let current_constraints = parent_check_trait_requirements
                     .entry(parent_table.clone())
-                    .or_insert_with(|| TokenStream::new());
+                    .or_insert_with(TokenStream::new);
 
                 if current_constraints.is_empty() {
                     current_constraints.extend(

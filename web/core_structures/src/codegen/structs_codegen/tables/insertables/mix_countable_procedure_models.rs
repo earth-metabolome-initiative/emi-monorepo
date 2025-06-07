@@ -247,8 +247,7 @@ impl InsertableMixCountableProcedureModelBuilder {
             return Err(
                 web_common_traits::database::InsertError::BuilderError(
                     web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId
-                            .into(),
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
                     ),
                 ),
             );
@@ -269,8 +268,7 @@ impl InsertableMixCountableProcedureModelBuilder {
             return Err(
                 web_common_traits::database::InsertError::BuilderError(
                     web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId
-                            .into(),
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
                     ),
                 ),
             );

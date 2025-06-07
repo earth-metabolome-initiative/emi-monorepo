@@ -1,9 +1,9 @@
-//! Submodule defining the sample collection procedures in the
+//! Submodule defining the analysis procedures in the
 //! database.
 
 mod lcms_procedures;
 
-/// Initializes the sample collection procedures in the database.
+/// Initializes the analysis procedures in the database.
 ///
 /// # Arguments
 ///
@@ -14,8 +14,8 @@ mod lcms_procedures;
 ///
 /// * If the connection fails to insert the procedure models.
 /// * If the procedure model building fails.
-pub(super) fn init_sample_collection_procedures(
-    user: &core_structures::User,
-    conn: &mut diesel::PgConnection,
+pub(super) fn init_analysis_procedures(
+    _user: &core_structures::User,
+    _conn: &mut diesel::PgConnection,
 ) {
 }

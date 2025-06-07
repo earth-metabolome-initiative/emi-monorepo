@@ -216,17 +216,35 @@ impl KeyColumnUsage {
     }
 
     /// Returns whether any column involved in the constraint is nullable
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while loading the key column usages from the
+    ///   database
     pub fn is_nullable(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
-        self.columns(conn).map(|columns| columns.iter().any(|column| column.is_nullable()))
+        self.columns(conn).map(|columns| columns.iter().any(Column::is_nullable))
     }
 
     /// Returns whether any foreign column involved in the constraint is
     /// nullable
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while loading the foreign key column usages from
+    ///   the database
     pub fn foreign_is_nullable(
         &self,
         conn: &mut PgConnection,
     ) -> Result<bool, diesel::result::Error> {
-        self.foreign_columns(conn).map(|columns| columns.iter().any(|column| column.is_nullable()))
+        self.foreign_columns(conn).map(|columns| columns.iter().any(Column::is_nullable))
     }
 
     /// Returns the columns in the foreign table that are referenced by this key
@@ -329,10 +347,10 @@ impl KeyColumnUsage {
         let columns = self.columns(conn)?;
         if columns.len() == 1 {
             // If there is only one column, we use the column name as the getter name
-            return Ok(columns[0].getter_name()?);
+            return columns[0].getter_name();
         }
 
-        Ok(self.constraint_name.to_owned())
+        Ok(self.constraint_name.clone())
     }
 
     /// Returns the identifier for this key column usage getter.

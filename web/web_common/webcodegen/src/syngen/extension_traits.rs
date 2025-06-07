@@ -9,6 +9,14 @@ use crate::errors::WebCodeGenError;
 impl crate::Table {
     /// Creates the extension trait implementations for the table, if it is
     /// extending tables.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    ///
+    /// # Errors
+    ///
+    /// * If the connection to the database fails.
     pub fn extension_traits_impls(
         &self,
         conn: &mut PgConnection,

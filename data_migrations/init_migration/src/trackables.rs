@@ -16,12 +16,7 @@ pub mod reagents;
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(super) fn init_trackables(
-    user: &User,
-    portal_conn: &mut PgConnection,
-) -> Result<(), crate::error::Error> {
-    reagents::init_reagents(user, portal_conn)?;
-    containers::init_containers(user, portal_conn)?;
-
-    Ok(())
+pub(super) fn init_trackables(user: &User, portal_conn: &mut PgConnection) {
+    reagents::init_reagents(user, portal_conn);
+    containers::init_containers(user, portal_conn);
 }

@@ -1,10 +1,6 @@
 //! Submodule defining the DBGI plan procedure model.
 
-use core_structures::{
-    ProcedureModel, User,
-    traits::{ChildOptions, ParentProcedureModel},
-};
-use web_common_traits::database::{Insertable, InsertableVariant};
+use core_structures::User;
 mod organism_observation_procedure;
 
 /// Initializes the DBGI plan procedure model in the database.

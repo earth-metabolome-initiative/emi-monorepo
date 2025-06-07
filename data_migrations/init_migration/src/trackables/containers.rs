@@ -9,10 +9,7 @@ pub const BOX: &str = "Box";
 pub const SPRAYER: &str = "Sprayer";
 pub const POLYSTYRENE_BOX: &str = "Polystyrene Box";
 
-pub(crate) fn init_containers(
-    user: &User,
-    portal_conn: &mut PgConnection,
-) -> Result<(), crate::error::Error> {
+pub(crate) fn init_containers(user: &User, portal_conn: &mut PgConnection) {
     let container = core_structures::Trackable::new()
         .name(Some("Container".to_owned()))
         .unwrap()
@@ -74,6 +71,4 @@ pub(crate) fn init_containers(
         .unwrap()
         .insert(user.id, portal_conn)
         .unwrap();
-
-    Ok(())
 }

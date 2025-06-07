@@ -57,12 +57,7 @@ pub(crate) fn acros_organics(
 }
 
 /// Initializes the brands in the database.
-pub(crate) fn init_brands(
-    user: &User,
-    portal_conn: &mut PgConnection,
-) -> Result<(), crate::error::Error> {
-    let _fisher_scientific = fisher_scientific(user, portal_conn)?;
-    let _acros_organics = acros_organics(user, portal_conn)?;
-
-    Ok(())
+pub(crate) fn init_brands(user: &User, portal_conn: &mut PgConnection) {
+    let _fisher_scientific = fisher_scientific(user, portal_conn);
+    let _acros_organics = acros_organics(user, portal_conn);
 }

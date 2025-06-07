@@ -20,15 +20,15 @@ use diesel::PgConnection;
 ///
 /// * If the insertion fails, an error of type `error::Error` is returned.
 pub fn insert_directus_collection_procedures(
-    directus_conn: &mut PgConnection,
-    portal_conn: &mut PgConnection,
+    _directus_conn: &mut PgConnection,
+    _portal_conn: &mut PgConnection,
 ) -> Result<(), crate::error::Error> {
-    let gloves_product_brand = "weitaglove";
-    let gloves_product_models = "NITRIL STRONG BLUE";
-    let falcon_product_brand = "greiner BIO-ONE";
-    let falcon_product_model = "TUBE, 50 ML, PP, 30/115 MM, CONICAL BOTTOM";
-    let falcon_rack_product_brand = "";
-    let falcon_rack_product_model = "";
+    let _gloves_product_brand = "weitaglove";
+    let _gloves_product_models = "NITRIL STRONG BLUE";
+    let _falcon_product_brand = "greiner BIO-ONE";
+    let _falcon_product_model = "TUBE, 50 ML, PP, 30/115 MM, CONICAL BOTTOM";
+    let _falcon_rack_product_brand = "";
+    let _falcon_rack_product_model = "";
 
     // Levels of tracking:
     // T0: Category-level tracking
@@ -128,45 +128,6 @@ pub fn insert_directus_collection_procedures(
     // 		- Weather data retrieval
     // 		- MGF data enrichment
     // - Storage
-
-    Ok(())
-}
-
-/// Inserts DBGI collection procedures.
-///
-/// # Arguments
-///
-/// * `directus_conn` - A mutable reference to the Directus database connection.
-/// * `portal_conn` - A mutable reference to the portal database connection.
-///
-/// # Errors
-///
-/// * If the insertion fails, an error of type `error::Error` is returned.
-pub fn insert_dbgi_collection_procedures(
-    directus_conn: &mut PgConnection,
-    portal_conn: &mut PgConnection,
-) -> Result<(), crate::error::Error> {
-    // - Lab collection preparation (?)
-    // 		- Prepare the 70% ethanol (we call this trackable category E70)
-    // 		- Prepare the EMI solvent (we call this trackable category ES)
-    // - Field collection preparation
-    // 		- Box filled with 3 liters of liquid nitrogen
-    // 		- Put E70 into the sprayer (S70)
-    // 		- (skippable) Scan the QR code representing the batch of coffee filters
-    //     (CF) to store which commercial product batch is used
-    // 		- (skippable) Scan the Gloves batch which will be used in the collection
-    // - Collection
-    // 		- Requires:
-    // 			- Gloves (non-trackable tool)
-    // 			- Cutting utensil (non-trackable tool)
-    // 			- We use the CF from previous field prep (non-trackable tool)
-    // 			- Paper-towel (non-trackable tool)
-    // 			- S70 sprayer (non-trackable tool)
-    // - Extraction
-    // 		- Requires:
-    // 			- EMI solvent (ES, imputable when done recently)
-    // 			- Pipette tips (PT, imputable when done recently)
-    //
 
     Ok(())
 }

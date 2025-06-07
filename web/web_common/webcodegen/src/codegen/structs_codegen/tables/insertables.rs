@@ -207,11 +207,11 @@ impl Codegen<'_> {
             }
             let extension_pk =
                 if extension_table.is_some() { Some(primary_key_columns[0].clone()) } else { None };
-            let nullable_extension_pk = extension_pk.as_ref().map(|column| column.to_nullable());
+            let nullable_extension_pk = extension_pk.as_ref().map(Column::to_nullable);
 
             let insertable_columns = table.insertable_columns(conn)?;
             let nullable_insertable_columns: Vec<Column> =
-                insertable_columns.iter().map(|column| column.to_nullable()).collect();
+                insertable_columns.iter().map(Column::to_nullable).collect();
 
             let insertable_enum = table.insertable_enum_ident()?;
             let insertable_variant_ident = table.insertable_variant_ident()?;
@@ -325,7 +325,7 @@ impl Codegen<'_> {
                     )) = &outcome
                     {
                         if all_columns.contains(unknown_column.as_ref())
-                            && !insertable_columns.contains(&unknown_column.as_ref())
+                            && !insertable_columns.contains(unknown_column.as_ref())
                         {
                             continue;
                         }
@@ -404,7 +404,7 @@ impl Codegen<'_> {
                                 return Err(
                                     web_common_traits::database::InsertError::BuilderError(
                                         web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                                            #insertable_enum::#camel_cased.into()
+                                            #insertable_enum::#camel_cased
                                         )
                                     )
                                 );
@@ -451,7 +451,7 @@ impl Codegen<'_> {
             }
 
             let table_diesel_ident = table.import_diesel_path()?;
-            let has_default_types = insertable_columns.iter().any(|column| column.has_default());
+            let has_default_types = insertable_columns.iter().any(Column::has_default);
 
             let insertable_builder_default_derive = if has_default_types {
                 // We need to manually implement Default for the insertable variant

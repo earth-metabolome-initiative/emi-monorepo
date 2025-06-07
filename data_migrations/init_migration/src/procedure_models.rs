@@ -35,15 +35,14 @@ mod sample_collection_procedures;
 // REFRIGERATED_SAMPLE_BOX}; pub(crate) use
 // weighing_procedure::WEIGHING_PROCEDURE;
 
-pub(crate) fn init_procedure_models(
-    user: &User,
-    conn: &mut PgConnection,
-) -> Result<(), crate::error::Error> {
+pub(crate) fn init_procedure_models(user: &User, conn: &mut PgConnection) {
     // emi_solvent_procedure::init_emi_solvent_procedure_models(user, conn)?;
     // ethanol_70_percent::init_ethanol_70_percent(user, conn)?;
     sample_collection_procedures::init_sample_collection_procedures(user, conn);
     observation_procedures::init_observation_procedures(user, conn);
     collection_preparation_procedures::init_collection_preparation_procedures(user, conn);
+    analysis_procedures::init_analysis_procedures(user, conn);
+    data_enrichment_procedures::init_data_enrichment_procedures(user, conn);
     dbgi_plan::init_dbgi_plan(user, conn);
 
     // precollection_procedure::init_precollection_procedure_model(user,
@@ -61,6 +60,4 @@ pub(crate) fn init_procedure_models(
     // mass_spec_procedure::init_mass_spec_procedure(user, conn)?;
     // data_enrichment_procedure::init_data_enrichment_procedure(user,
     // conn)?;
-
-    Ok(())
 }

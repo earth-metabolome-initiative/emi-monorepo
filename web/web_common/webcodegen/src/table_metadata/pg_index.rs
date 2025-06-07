@@ -103,6 +103,7 @@ impl PgIndex {
         self.indisunique
     }
 
+    #[must_use]
     /// Returns whether the index is a primary key
     pub fn is_primary_key(&self) -> bool {
         self.indisprimary

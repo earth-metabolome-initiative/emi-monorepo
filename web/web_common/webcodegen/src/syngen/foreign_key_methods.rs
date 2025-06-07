@@ -6,7 +6,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
 
-use crate::{Table, errors::WebCodeGenError};
+use crate::{Column, Table, errors::WebCodeGenError};
 
 impl Table {
     /// Returns the Syn `TokenStream` for the foreign key methods.
@@ -39,7 +39,7 @@ impl Table {
 
             let foreign_key_struct_path = foreign_key_table.import_struct_path()?;
 
-            let (return_statement, optional) = if columns.iter().any(|c| c.is_nullable()) {
+            let (return_statement, optional) = if columns.iter().any(Column::is_nullable) {
                 (syn::parse_quote! { Option<#foreign_key_struct_path> }, quote! { .map(Some) })
             } else {
                 (foreign_key_struct_path.clone(), TokenStream::new())

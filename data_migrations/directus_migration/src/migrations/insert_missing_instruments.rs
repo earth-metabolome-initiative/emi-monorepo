@@ -60,10 +60,10 @@ pub(crate) fn insert_missing_instruments(
 
         let _portal_instrument_model = PortalInstrumentModel::read(portal_product.id, portal_conn)
             .map_err(|_| {
-            crate::error::Error::UnknownInstrumentModel(Box::from(
-                directus_instrument_model.clone(),
-            ))
-        })?;
+                crate::error::Error::UnknownInstrumentModel(Box::from(
+                    directus_instrument_model.clone(),
+                ))
+            })?;
 
         let _portal_instrument = PortalInstrument::new()
             .created_by(created_by.id)?

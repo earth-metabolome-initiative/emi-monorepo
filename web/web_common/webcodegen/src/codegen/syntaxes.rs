@@ -22,10 +22,8 @@ impl Syntax {
 
     /// Returns the feature flag for the syntax.
     pub(crate) fn as_feature_flag(self) -> TokenStream {
-        match self {
-            Syntax::PostgreSQL => quote::quote! { #[cfg(feature = "postgres")] },
-            Syntax::SQLite => quote::quote! { #[cfg(feature = "sqlite")] },
-        }
+        let flag_name = self.as_str();
+        quote::quote! { #[cfg(feature = #flag_name)] }
     }
 
     /// Returns the diesel connection type for the syntax.

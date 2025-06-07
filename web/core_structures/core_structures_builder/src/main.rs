@@ -10,7 +10,7 @@ use webcodegen::{Codegen, PgExtension, Table, errors::WebCodeGenError};
 pub(crate) const DATABASE_NAME: &str = "development.db";
 pub(crate) const DATABASE_PORT: u16 = 17032;
 
-async fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, WebCodeGenError> {
+fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, WebCodeGenError> {
     // Generate the code associated with the database
     let out_dir = Path::new("../src");
     let users = Table::load(conn, "users", None, DATABASE_NAME)?;
@@ -70,7 +70,7 @@ pub async fn main() {
     // We save the time tracker
     time_tracker.save(Path::new("./time_tracker")).unwrap();
 
-    match build_core_structures(&mut conn).await {
+    match build_core_structures(&mut conn) {
         Ok(tracker) => {
             time_tracker.extend(tracker);
         }

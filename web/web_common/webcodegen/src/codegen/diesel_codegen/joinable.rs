@@ -7,7 +7,7 @@ use proc_macro2::TokenStream;
 use syn::Ident;
 
 use super::Codegen;
-use crate::Table;
+use crate::{Column, Table};
 
 impl Codegen<'_> {
     /// Generate implementations of the `joinable` diesel macro.
@@ -73,7 +73,7 @@ impl Codegen<'_> {
                 // We retrieve the foreign_key identifer
                 let columns = foreign_key.columns(conn)?;
                 let foreign_key_identifiers =
-                    columns.iter().map(|c| c.snake_case_ident()).collect::<Result<Vec<_>, _>>()?;
+                    columns.iter().map(Column::snake_case_ident).collect::<Result<Vec<_>, _>>()?;
                 // Using TokeStream we write the  joinable!(table -> foreign_table
                 // (foreign_key));
 

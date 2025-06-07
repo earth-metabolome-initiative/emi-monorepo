@@ -46,7 +46,7 @@ where
     /// # Errors
     ///
     /// * If an error occurs while retrieving the nodes, it returns a
-    ///  `diesel::result::Error`.
+    ///   `diesel::result::Error`.
     fn trackable_nodes(
         &self,
         conn: &mut PgConnection,

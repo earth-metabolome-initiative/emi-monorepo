@@ -977,7 +977,7 @@ impl Table {
     ) -> Result<Option<Table>, WebCodeGenError> {
         let primary_key_columns = self.primary_key_columns(conn)?;
 
-        if primary_key_columns.iter().any(|c| c.is_always_automatically_generated()) {
+        if primary_key_columns.iter().any(Column::is_always_automatically_generated) {
             return Ok(None);
         }
 

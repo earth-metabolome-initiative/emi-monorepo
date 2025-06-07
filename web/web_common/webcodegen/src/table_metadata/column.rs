@@ -749,6 +749,14 @@ impl Column {
 
     /// Returns whether the column contains the update user and is defined by
     /// the SESSION user
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
     pub fn is_updated_by(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(self.column_name == "updated_by"
             && self.foreign_keys(conn)?.into_iter().any(|key| {
@@ -764,6 +772,14 @@ impl Column {
 
     /// Returns whether the column contains the creation user and is defined by
     /// the SESSION user
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
     pub fn is_created_by(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(self.column_name == "created_by"
             && self.foreign_keys(conn)?.into_iter().any(|key| {

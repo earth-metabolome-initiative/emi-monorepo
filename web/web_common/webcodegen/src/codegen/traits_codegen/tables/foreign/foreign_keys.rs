@@ -7,7 +7,7 @@ use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use syn::Ident;
 
-use crate::{Codegen, KeyColumnUsage, Table, errors::WebCodeGenError};
+use crate::{Codegen, Column, KeyColumnUsage, Table, errors::WebCodeGenError};
 
 impl Codegen<'_> {
     /// Returns the identifier for the struct which implements the `ForeignKeys`
@@ -17,6 +17,7 @@ impl Codegen<'_> {
         Ok(Ident::new(&format!("{table_name}ForeignKeys"), proc_macro2::Span::call_site()))
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     fn build_dispatch(
         foreign_keys: &[&KeyColumnUsage],
         foreign_table: &Table,
@@ -150,7 +151,7 @@ impl Codegen<'_> {
                         )?;
 
                     let getter_ident = foreign_key.getter_ident(conn)?;
-                    if columns.iter().any(|c| c.is_nullable()) {
+                    if columns.iter().any(Column::is_nullable) {
                         Ok((
                             quote::quote! {
                                 foreign_keys.#getter_ident.is_some() || #attributes
@@ -231,7 +232,7 @@ impl Codegen<'_> {
                         ));
                     };
 
-                    Ok(if columns.iter().any(|c| c.is_nullable()) {
+                    Ok(if columns.iter().any(Column::is_nullable) {
                         let optional_idents = columns
                             .iter()
                             .filter(|c| c.is_nullable())

@@ -14,28 +14,28 @@ mod from_impls;
 /// High-level errors that may occur in the Server.
 pub enum BackendError {
     /// An error that occurred while trying to access the redis database.
-    RedisError(redis::RedisError),
+    Redis(redis::RedisError),
     /// An error that occurred while trying to connect to the Postgres database.
-    PostgresConnectionError(diesel::ConnectionError),
+    PostgresConnection(diesel::ConnectionError),
     /// The connection pool timed out while trying to execute a query.
-    PostgresPoolTimeoutError,
+    PostgresPool(diesel::r2d2::PoolError),
     /// An error that occurred while trying to execute a query on the Postgres
     /// database.
-    PostgresQueryError(diesel::result::Error),
+    PostgresQuery(diesel::result::Error),
     /// An error that occurred due to some error mis-configuration.
-    EnvironmentError(std::env::VarError),
+    Environment(std::env::VarError),
     /// The user attempted an unauthorized action.
     Unauthorized,
     /// A third-party service returned an error.
-    RequestError(reqwest::Error),
+    Request(reqwest::Error),
     /// An error happened while parsing a value to an integer.
-    ParseIntError(std::num::ParseIntError),
+    ParseInt(std::num::ParseIntError),
     /// An error happened while trying to decode a base64 value.
-    Base64DecodeError(base64::DecodeError),
+    Base64Decode(base64::DecodeError),
     /// An error happened while trying to decode a JSON value.
-    FromUtf8Error(std::string::FromUtf8Error),
+    FromUtf8(std::string::FromUtf8Error),
     /// An error occurred while encoding or decoding a `JSONWebToken`.
-    JWTError(jsonwebtoken::errors::Error),
+    JWT(jsonwebtoken::errors::Error),
     /// When inserting a new user email failed.
     UserEmailInsert(InsertError<InsertableUserEmailAttributes>),
     /// When inserting a new email provider failed.
