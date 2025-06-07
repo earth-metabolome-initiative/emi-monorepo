@@ -1,0 +1,28 @@
+name: Cargo Check
+
+on:
+  workflow_run:
+    workflows: ["Cargo Format"]
+    types:
+      - completed
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+        - uses: actions/checkout@v4
+        - name: Install OS dependencies
+          run: sudo apt-get update && sudo apt-get install -y libfontconfig-dev
+        - name: Set up Rust
+          uses: actions-rs/toolchain@v1
+          with:
+            toolchain: stable
+            override: true
+        - name: Run check
+          run: cargo check
+

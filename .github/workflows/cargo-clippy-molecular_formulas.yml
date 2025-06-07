@@ -1,0 +1,15 @@
+name: Clippy
+
+on:
+  push:
+    paths:
+      - 'web/web_common/molecular_formulas/**'
+  pull_request:
+    paths:
+      - 'web/web_common/molecular_formulas/**'
+
+jobs:
+  clippy:
+    uses: ./.github/workflows/cargo-clippy-template.yml
+    with:
+      path: 'web/web_common/molecular_formulas'

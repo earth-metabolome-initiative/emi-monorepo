@@ -1,0 +1,32 @@
+name: Cargo Clippy
+
+
+on:
+  workflow_run:
+    workflows: ["Cargo Check"]
+    types:
+      - completed
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  clippy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install OS dependencies
+        run: sudo apt-get update && sudo apt-get install -y libfontconfig-dev
+      - name: Install Clippy
+        run:
+          rustup toolchain install stable --component clippy
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Run clippy
+        run: cargo clippy
+
