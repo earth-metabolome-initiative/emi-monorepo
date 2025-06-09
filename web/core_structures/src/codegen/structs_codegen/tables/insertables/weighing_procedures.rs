@@ -1,14 +1,15 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableProcessingProcedureAttributes {
+pub enum InsertableWeighingProcedureAttributes {
     ProcedureId(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
     ),
-    ProcessableId,
+    ProcedureModelId,
     InstrumentId,
+    Kilograms,
 }
 impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes>
-    for InsertableProcessingProcedureAttributes
+    for InsertableWeighingProcedureAttributes
 {
     fn from(
         extension: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
@@ -16,18 +17,19 @@ impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProced
         Self::ProcedureId(extension)
     }
 }
-impl core::fmt::Display for InsertableProcessingProcedureAttributes {
+impl core::fmt::Display for InsertableWeighingProcedureAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableProcessingProcedureAttributes::ProcedureId(procedure_id) => {
+            InsertableWeighingProcedureAttributes::ProcedureId(procedure_id) => {
                 write!(f, "{}", procedure_id)
             }
-            InsertableProcessingProcedureAttributes::ProcessableId => {
-                write!(f, "processable_id")
+            InsertableWeighingProcedureAttributes::ProcedureModelId => {
+                write!(f, "procedure_model_id")
             }
-            InsertableProcessingProcedureAttributes::InstrumentId => {
+            InsertableWeighingProcedureAttributes::InstrumentId => {
                 write!(f, "instrument_id")
             }
+            InsertableWeighingProcedureAttributes::Kilograms => write!(f, "kilograms"),
         }
     }
 }
@@ -35,43 +37,44 @@ impl core::fmt::Display for InsertableProcessingProcedureAttributes {
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
     diesel(
-        table_name = crate::codegen::diesel_codegen::tables::processing_procedures::processing_procedures
+        table_name = crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures
     )
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct InsertableProcessingProcedure {
+pub struct InsertableWeighingProcedure {
     procedure_id: ::rosetta_uuid::Uuid,
-    processable_id: ::rosetta_uuid::Uuid,
+    procedure_model_id: i32,
     instrument_id: ::rosetta_uuid::Uuid,
+    kilograms: f32,
 }
-impl InsertableProcessingProcedure {
+impl InsertableWeighingProcedure {
     pub fn instrument<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::instruments::Instrument,
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::instruments::Instrument: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::instruments::Instrument as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::instruments::Instrument as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::instruments::Instrument as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::instruments::Instrument as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::instruments::Instrument as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::instruments::Instrument as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::instruments::Instrument,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::instruments::Instrument::table(),
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
                 self.instrument_id,
             ),
             conn,
@@ -109,7 +112,7 @@ impl InsertableProcessingProcedure {
             conn,
         )
     }
-    pub fn processing_procedures_procedure_id_instrument_id_fkey<
+    pub fn weighing_procedures_procedure_id_instrument_id_fkey<
         C: diesel::connection::LoadConnection,
     >(
         &self,
@@ -143,126 +146,126 @@ impl InsertableProcessingProcedure {
             conn,
         )
     }
-    pub fn processing_procedures_procedure_id_processable_id_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    #[cfg(feature = "postgres")]
+    pub fn weighing_procedures_procedure_id_procedure_model_id_fkey(
         &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
-        >,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable::table(),
-                (self.procedure_id, self.processable_id),
-            ),
-            conn,
-        )
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::id
+                    .eq(&self.procedure_id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_model_id
+                            .eq(&self.procedure_model_id),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
     }
-    pub fn processable<C: diesel::connection::LoadConnection>(
+    pub fn procedure_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::processables::Processable,
+        crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::processables::Processable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::processables::Processable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::processables::Processable as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::processables::Processable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::processables::Processable as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::processables::Processable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::processables::Processable as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::processables::Processable,
+            crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::processables::Processable::table(),
-                self.processable_id,
+                crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel::table(),
+                self.procedure_model_id,
             ),
             conn,
         )
     }
 }
 #[derive(Default)]
-pub struct InsertableProcessingProcedureBuilder {
+pub struct InsertableWeighingProcedureBuilder {
     pub(crate) procedure_id:
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    pub(crate) processable_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_model_id: Option<i32>,
     pub(crate) instrument_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) kilograms: Option<f32>,
 }
-impl InsertableProcessingProcedureBuilder {
-    pub fn processable_id<P>(
+impl InsertableWeighingProcedureBuilder {
+    pub fn procedure_model_id<P>(
         mut self,
-        processable_id: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcessingProcedureAttributes>,
-    >
+        procedure_model_id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
     where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let processable_id = processable_id.try_into().map_err(
-            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-                Into::into(err).rename_field(InsertableProcessingProcedureAttributes::ProcessableId)
-            },
-        )?;
-        self.processable_id = Some(processable_id);
+        let procedure_model_id =
+            procedure_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableWeighingProcedureAttributes::ProcedureModelId)
+            })?;
+        self.procedure_model_id = Some(procedure_model_id);
+        self.procedure_id = self
+            .procedure_id
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| err.into_field_name())?;
         Ok(self)
     }
     pub fn instrument_id<P>(
         mut self,
         instrument_id: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcessingProcedureAttributes>,
-    >
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
     where
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let instrument_id = instrument_id.try_into().map_err(
             |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-                Into::into(err).rename_field(InsertableProcessingProcedureAttributes::InstrumentId)
+                Into::into(err).rename_field(InsertableWeighingProcedureAttributes::InstrumentId)
             },
         )?;
         self.instrument_id = Some(instrument_id);
         Ok(self)
     }
+    pub fn kilograms<P>(
+        mut self,
+        kilograms: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let kilograms = kilograms.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+            Into::into(err).rename_field(InsertableWeighingProcedureAttributes::Kilograms)
+        })?;
+        pgrx_validation::must_be_strictly_positive_f32(kilograms)
+            .map_err(|e| e.rename_field(InsertableWeighingProcedureAttributes::Kilograms))?;
+        self.kilograms = Some(kilograms);
+        Ok(self)
+    }
     pub fn id<P>(
         mut self,
         id: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcessingProcedureAttributes>,
-    >
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
     where
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
@@ -270,30 +273,10 @@ impl InsertableProcessingProcedureBuilder {
         self.procedure_id = self.procedure_id.id(id).map_err(|err| err.into_field_name())?;
         Ok(self)
     }
-    pub fn procedure_model_id<P>(
-        mut self,
-        procedure_model_id: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcessingProcedureAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_id = self
-            .procedure_id
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| err.into_field_name())?;
-        Ok(self)
-    }
     pub fn created_by<P>(
         mut self,
         created_by: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcessingProcedureAttributes>,
-    >
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -305,10 +288,7 @@ impl InsertableProcessingProcedureBuilder {
     pub fn created_at<P>(
         mut self,
         created_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcessingProcedureAttributes>,
-    >
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -321,10 +301,7 @@ impl InsertableProcessingProcedureBuilder {
     pub fn updated_by<P>(
         mut self,
         updated_by: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcessingProcedureAttributes>,
-    >
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
     where
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
@@ -336,10 +313,7 @@ impl InsertableProcessingProcedureBuilder {
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcessingProcedureAttributes>,
-    >
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
@@ -350,14 +324,14 @@ impl InsertableProcessingProcedureBuilder {
         Ok(self)
     }
 }
-impl InsertableProcessingProcedureBuilder {
+impl InsertableWeighingProcedureBuilder {
     pub(crate) fn try_insert<C>(
         self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<
-        InsertableProcessingProcedure,
-        web_common_traits::database::InsertError<InsertableProcessingProcedureAttributes>,
+        InsertableWeighingProcedure,
+        web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>,
     >
     where
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder: web_common_traits::database::InsertableVariant<
@@ -371,16 +345,26 @@ impl InsertableProcessingProcedureBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let processable_id =
-            self.processable_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableProcessingProcedureAttributes::ProcessableId,
-            ))?;
+        let procedure_model_id = self.procedure_model_id.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableWeighingProcedureAttributes::ProcedureModelId,
+            ),
+        )?;
         let instrument_id =
             self.instrument_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableProcessingProcedureAttributes::InstrumentId,
+                InsertableWeighingProcedureAttributes::InstrumentId,
+            ))?;
+        let kilograms =
+            self.kilograms.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableWeighingProcedureAttributes::Kilograms,
             ))?;
         let procedure_id =
             self.procedure_id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
-        Ok(InsertableProcessingProcedure { procedure_id, processable_id, instrument_id })
+        Ok(InsertableWeighingProcedure {
+            procedure_id,
+            procedure_model_id,
+            instrument_id,
+            kilograms,
+        })
     }
 }

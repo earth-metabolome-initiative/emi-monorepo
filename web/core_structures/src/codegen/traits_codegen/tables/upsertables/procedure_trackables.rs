@@ -17,7 +17,15 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .on_conflict((procedure_id, trackable_id))
             .do_update()
             .set(self)
-            .filter(created_by.ne(excluded(created_by)).or(created_at.ne(excluded(created_at))))
+            .filter(
+                procedure_model_id
+                    .ne(excluded(procedure_model_id))
+                    .or(procedure_model_trackable_id.ne(excluded(procedure_model_trackable_id)))
+                    .or(ancestor_trackable_id.ne(excluded(ancestor_trackable_id)))
+                    .or(parent_trackable_id.ne(excluded(parent_trackable_id)))
+                    .or(created_by.ne(excluded(created_by)))
+                    .or(created_at.ne(excluded(created_at))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -41,7 +49,15 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .on_conflict((procedure_id, trackable_id))
             .do_update()
             .set(self)
-            .filter(created_by.ne(excluded(created_by)).or(created_at.ne(excluded(created_at))))
+            .filter(
+                procedure_model_id
+                    .ne(excluded(procedure_model_id))
+                    .or(procedure_model_trackable_id.ne(excluded(procedure_model_trackable_id)))
+                    .or(ancestor_trackable_id.ne(excluded(ancestor_trackable_id)))
+                    .or(parent_trackable_id.ne(excluded(parent_trackable_id)))
+                    .or(created_by.ne(excluded(created_by)))
+                    .or(created_at.ne(excluded(created_at))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }

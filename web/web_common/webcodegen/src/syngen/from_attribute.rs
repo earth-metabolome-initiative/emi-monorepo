@@ -63,13 +63,16 @@ impl crate::Table {
             from_methods.push((vec![self.clone()], columns, true, None));
         }
 
+        let mut same_as_constraints = Vec::new();
+
         for column in self.columns(conn)? {
-            // If the column is a UNIQUE index or a foreign key, skip it, as
+            // If the column is a UNIQUE index skip it, as
             // the method generation is already taken care of elsewhere.
             if column.is_unique(conn)? || !column.supports_eq(conn)? {
                 continue;
             }
 
+            same_as_constraints.extend(column.same_as_constraints(conn)?);
             from_methods.push((vec![self.clone()], vec![column], false, None));
         }
 
@@ -105,6 +108,10 @@ impl crate::Table {
 
                 let columns = index.columns(conn)?;
 
+                if columns.len() == 1 && same_as_constraints.iter().any(|(_, c)| c == &columns[0]) {
+                    continue;
+                }
+
                 from_methods.push((
                     vec![self.clone(), extension_table.clone()],
                     columns,
@@ -117,6 +124,12 @@ impl crate::Table {
                 // If the column is a UNIQUE index or a foreign key, skip it, as
                 // the method generation is already taken care of elsewhere.
                 if column.is_unique(conn)? || !column.supports_eq(conn)? {
+                    continue;
+                }
+
+                // If the column appears in the same-as constraints,
+                // we skip it, as the method generation is already taken care of elsewhere.
+                if same_as_constraints.iter().any(|(_, c)| c == &column) {
                     continue;
                 }
 

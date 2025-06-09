@@ -4,7 +4,6 @@ pub enum TablePrimaryKey {
     Address(i32),
     AliquotingInstrumentModel(::rosetta_uuid::Uuid),
     AliquotingProcedureModel(i32),
-    AliquotingProcedure(::rosetta_uuid::Uuid),
     BallMillProcedureModel(i32),
     Brand(i32),
     CentrifugeProcedureModel(i32),
@@ -20,7 +19,6 @@ pub enum TablePrimaryKey {
     Document(::rosetta_uuid::Uuid),
     EmailProvider((i32, i16)),
     FractioningProcedureModel(i32),
-    FractioningProcedure(::rosetta_uuid::Uuid),
     FreezeDryingProcedureModel(i32),
     InstrumentModel(::rosetta_uuid::Uuid),
     InstrumentState(i16),
@@ -45,7 +43,6 @@ pub enum TablePrimaryKey {
     ProcedureTrackable((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
     Procedure(::rosetta_uuid::Uuid),
     Processable(::rosetta_uuid::Uuid),
-    ProcessingProcedure(::rosetta_uuid::Uuid),
     ProjectState(i16),
     Project(i32),
     Rank(i16),
@@ -54,7 +51,6 @@ pub enum TablePrimaryKey {
     Room(i32),
     SampleState(i16),
     SamplingProcedureModel(i32),
-    SamplingProcedure(::rosetta_uuid::Uuid),
     ShakingProcedureModel(i32),
     SharedProcedureModelTrackable((i32, i32)),
     SpatialRefSy(i32),
@@ -75,6 +71,7 @@ pub enum TablePrimaryKey {
     VolumetricProcessable(::rosetta_uuid::Uuid),
     WeighingInstrumentModel(::rosetta_uuid::Uuid),
     WeighingProcedureModel(i32),
+    WeighingProcedure(::rosetta_uuid::Uuid),
 }
 impl web_common_traits::prelude::Tabular for TablePrimaryKey {
     type TableName = crate::codegen::tables::table_names::TableName;
@@ -86,9 +83,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::AliquotingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::AliquotingProcedureModel
-            }
-            TablePrimaryKey::AliquotingProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::AliquotingProcedure
             }
             TablePrimaryKey::BallMillProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::BallMillProcedureModel
@@ -126,9 +120,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::FractioningProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::FractioningProcedureModel
-            }
-            TablePrimaryKey::FractioningProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::FractioningProcedure
             }
             TablePrimaryKey::FreezeDryingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::FreezeDryingProcedureModel
@@ -202,9 +193,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::Processable(_) => {
                 crate::codegen::tables::table_names::TableName::Processable
             }
-            TablePrimaryKey::ProcessingProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::ProcessingProcedure
-            }
             TablePrimaryKey::ProjectState(_) => {
                 crate::codegen::tables::table_names::TableName::ProjectState
             }
@@ -218,9 +206,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::SamplingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::SamplingProcedureModel
-            }
-            TablePrimaryKey::SamplingProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::SamplingProcedure
             }
             TablePrimaryKey::ShakingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::ShakingProcedureModel
@@ -273,6 +258,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::WeighingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::WeighingProcedureModel
+            }
+            TablePrimaryKey::WeighingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::WeighingProcedure
             }
         }
     }

@@ -205,6 +205,28 @@ impl ProcedureModelTrackable {
             .optional()
     }
     #[cfg(feature = "postgres")]
+    pub fn from_trackable_id_and_id(
+        trackable_id: &::rosetta_uuid::Uuid,
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables;
+        Self::table()
+            .filter(
+                procedure_model_trackables::trackable_id
+                    .eq(trackable_id)
+                    .and(procedure_model_trackables::id.eq(id)),
+            )
+            .order_by(procedure_model_trackables::id.asc())
+            .first::<Self>(conn)
+            .optional()
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,

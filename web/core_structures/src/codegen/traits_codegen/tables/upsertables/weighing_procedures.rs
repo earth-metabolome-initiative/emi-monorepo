@@ -1,6 +1,6 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-    for crate::codegen::structs_codegen::tables::processing_procedures::ProcessingProcedure
+    for crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure
 {
     fn upsert(
         &self,
@@ -11,16 +11,17 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             upsert::excluded,
         };
 
-        use crate::codegen::diesel_codegen::tables::processing_procedures::processing_procedures::*;
+        use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures::*;
         diesel::insert_into(table)
             .values(self)
             .on_conflict(procedure_id)
             .do_update()
             .set(self)
             .filter(
-                processable_id
-                    .ne(excluded(processable_id))
-                    .or(instrument_id.ne(excluded(instrument_id))),
+                procedure_model_id
+                    .ne(excluded(procedure_model_id))
+                    .or(instrument_id.ne(excluded(instrument_id)))
+                    .or(kilograms.ne(excluded(kilograms))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -28,7 +29,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::codegen::structs_codegen::tables::processing_procedures::ProcessingProcedure
+    for crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure
 {
     fn upsert(
         &self,
@@ -39,16 +40,17 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             upsert::excluded,
         };
 
-        use crate::codegen::diesel_codegen::tables::processing_procedures::processing_procedures::*;
+        use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures::*;
         diesel::insert_into(table)
             .values(self)
             .on_conflict(procedure_id)
             .do_update()
             .set(self)
             .filter(
-                processable_id
-                    .ne(excluded(processable_id))
-                    .or(instrument_id.ne(excluded(instrument_id))),
+                procedure_model_id
+                    .ne(excluded(procedure_model_id))
+                    .or(instrument_id.ne(excluded(instrument_id)))
+                    .or(kilograms.ne(excluded(kilograms))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

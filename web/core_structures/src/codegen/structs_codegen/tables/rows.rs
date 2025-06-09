@@ -1,7 +1,6 @@
 mod addresses;
 mod aliquoting_instrument_models;
 mod aliquoting_procedure_models;
-mod aliquoting_procedures;
 mod ball_mill_procedure_models;
 mod bounded_read_dispatch;
 mod brands;
@@ -18,7 +17,6 @@ mod disposal_procedure_models;
 mod documents;
 mod email_providers;
 mod fractioning_procedure_models;
-mod fractioning_procedures;
 mod freeze_drying_procedure_models;
 mod instrument_models;
 mod instrument_states;
@@ -45,7 +43,6 @@ mod procedure_models;
 mod procedure_trackables;
 mod procedures;
 mod processables;
-mod processing_procedures;
 mod project_states;
 mod projects;
 mod ranks;
@@ -54,7 +51,6 @@ mod roles;
 mod rooms;
 mod sample_states;
 mod sampling_procedure_models;
-mod sampling_procedures;
 mod shaking_procedure_models;
 mod shared_procedure_model_trackables;
 mod spatial_ref_sys;
@@ -76,6 +72,7 @@ mod users;
 mod volumetric_processables;
 mod weighing_instrument_models;
 mod weighing_procedure_models;
+mod weighing_procedures;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Rows {
@@ -88,11 +85,6 @@ pub enum Rows {
     AliquotingProcedureModel(
         Vec<
             crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
-        >,
-    ),
-    AliquotingProcedure(
-        Vec<
-            crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure,
         >,
     ),
     BallMillProcedureModel(
@@ -140,11 +132,6 @@ pub enum Rows {
     FractioningProcedureModel(
         Vec<
             crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel,
-        >,
-    ),
-    FractioningProcedure(
-        Vec<
-            crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure,
         >,
     ),
     FreezeDryingProcedureModel(
@@ -233,11 +220,6 @@ pub enum Rows {
     ),
     Procedure(Vec<crate::codegen::structs_codegen::tables::procedures::Procedure>),
     Processable(Vec<crate::codegen::structs_codegen::tables::processables::Processable>),
-    ProcessingProcedure(
-        Vec<
-            crate::codegen::structs_codegen::tables::processing_procedures::ProcessingProcedure,
-        >,
-    ),
     ProjectState(
         Vec<crate::codegen::structs_codegen::tables::project_states::ProjectState>,
     ),
@@ -252,11 +234,6 @@ pub enum Rows {
     SamplingProcedureModel(
         Vec<
             crate::codegen::structs_codegen::tables::sampling_procedure_models::SamplingProcedureModel,
-        >,
-    ),
-    SamplingProcedure(
-        Vec<
-            crate::codegen::structs_codegen::tables::sampling_procedures::SamplingProcedure,
         >,
     ),
     ShakingProcedureModel(
@@ -317,6 +294,11 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel,
         >,
     ),
+    WeighingProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure,
+        >,
+    ),
 }
 impl Rows {
     #[cfg(feature = "sqlite")]
@@ -343,13 +325,6 @@ impl Rows {
             }
             Rows::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 aliquoting_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::AliquotingProcedure(aliquoting_procedures) => {
-                aliquoting_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -455,13 +430,6 @@ impl Rows {
             }
             Rows::FractioningProcedureModel(fractioning_procedure_models) => {
                 fractioning_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::FractioningProcedure(fractioning_procedures) => {
-                fractioning_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -635,13 +603,6 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::ProcessingProcedure(processing_procedures) => {
-                processing_procedures
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
             Rows::ProjectState(project_states) => {
                 project_states
                     .iter()
@@ -693,13 +654,6 @@ impl Rows {
             }
             Rows::SamplingProcedureModel(sampling_procedure_models) => {
                 sampling_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::SamplingProcedure(sampling_procedures) => {
-                sampling_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -844,6 +798,13 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::WeighingProcedure(weighing_procedures) => {
+                weighing_procedures
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
         })
     }
 }
@@ -857,9 +818,6 @@ impl web_common_traits::prelude::Rows for Rows {
             }
             Rows::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 aliquoting_procedure_models.primary_keys()
-            }
-            Rows::AliquotingProcedure(aliquoting_procedures) => {
-                aliquoting_procedures.primary_keys()
             }
             Rows::BallMillProcedureModel(ball_mill_procedure_models) => {
                 ball_mill_procedure_models.primary_keys()
@@ -885,9 +843,6 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::EmailProvider(email_providers) => email_providers.primary_keys(),
             Rows::FractioningProcedureModel(fractioning_procedure_models) => {
                 fractioning_procedure_models.primary_keys()
-            }
-            Rows::FractioningProcedure(fractioning_procedures) => {
-                fractioning_procedures.primary_keys()
             }
             Rows::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
                 freeze_drying_procedure_models.primary_keys()
@@ -929,9 +884,6 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::ProcedureTrackable(procedure_trackables) => procedure_trackables.primary_keys(),
             Rows::Procedure(procedures) => procedures.primary_keys(),
             Rows::Processable(processables) => processables.primary_keys(),
-            Rows::ProcessingProcedure(processing_procedures) => {
-                processing_procedures.primary_keys()
-            }
             Rows::ProjectState(project_states) => project_states.primary_keys(),
             Rows::Project(projects) => projects.primary_keys(),
             Rows::Rank(ranks) => ranks.primary_keys(),
@@ -942,7 +894,6 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::SamplingProcedureModel(sampling_procedure_models) => {
                 sampling_procedure_models.primary_keys()
             }
-            Rows::SamplingProcedure(sampling_procedures) => sampling_procedures.primary_keys(),
             Rows::ShakingProcedureModel(shaking_procedure_models) => {
                 shaking_procedure_models.primary_keys()
             }
@@ -973,6 +924,7 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::WeighingProcedureModel(weighing_procedure_models) => {
                 weighing_procedure_models.primary_keys()
             }
+            Rows::WeighingProcedure(weighing_procedures) => weighing_procedures.primary_keys(),
         }
     }
 }

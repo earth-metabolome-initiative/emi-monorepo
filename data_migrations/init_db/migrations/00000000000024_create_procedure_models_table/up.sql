@@ -48,16 +48,37 @@ CREATE TABLE IF NOT EXISTS procedure_model_trackables (
 	updated_by INTEGER NOT NULL REFERENCES users(id),
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	UNIQUE (procedure_model_id, name),
-	UNIQUE (id, procedure_model_id)
+	UNIQUE (id, procedure_model_id),
+	UNIQUE (id, trackable_id),
+	CHECK (must_be_smaller_than_utc(created_at, updated_at))
 );
 
 CREATE TABLE IF NOT EXISTS shared_procedure_model_trackables (
 	parent_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	parent_trackable_id UUID NOT NULL REFERENCES trackables(id) ON DELETE CASCADE,
+	parent_procedure_model_id INTEGER NOT NULL REFERENCES procedure_models(id) ON DELETE CASCADE,
 	child_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	child_trackable_id UUID NOT NULL REFERENCES trackables(id) ON DELETE CASCADE,
+	child_procedure_model_id INTEGER NOT NULL REFERENCES procedure_models(id) ON DELETE CASCADE,
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (parent_id, child_id),
+	-- This foreign key ensures that the the `trackable_id` existing in the `parent_trackable_id` row
+	-- is indeed the same as the one in the `procedure_model_trackables` table.
+	FOREIGN KEY (parent_id, parent_trackable_id) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
+	-- And this one is the analogous one for the `child_trackable_id`.
+	FOREIGN KEY (child_id, child_trackable_id) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
+	-- This foreign key ensures that the `parent_procedure_model_id` is indeed the same as the one in the `procedure_models` table.
+	FOREIGN KEY (parent_id, parent_procedure_model_id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	-- And this one is the analogous one for the `child_procedure_model_id`.
+	FOREIGN KEY (child_id, child_procedure_model_id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	-- Furthermore, we want to check that `parent_procedure_model_id` is indeed the parent of `child_procedure_model_id`
+	-- as defined by the `parent_procedure_models` table.
+	FOREIGN KEY (parent_procedure_model_id, child_procedure_model_id) REFERENCES parent_procedure_models(parent_procedure_model_id, child_procedure_model_id) ON DELETE CASCADE,
 	CHECK (must_be_distinct_i32(parent_id, child_id))
+	-- TODO: add a check that ensures that the `parent_trackable_id` is compatible with the `child_trackable_id` as
+	-- defined by the `trackables` table hierarchy. Specifically, the `parent_trackable_id` should be a descendant
+	-- of the `child_trackable_id` as the child procedures are generally meant to be **less** specific than the parent ones.
 );
 
 --------------------------------------------------------
@@ -126,8 +147,10 @@ CREATE TABLE IF NOT EXISTS freeze_drying_procedure_models (
 
 CREATE TABLE IF NOT EXISTS weighing_procedure_models (
 	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
-	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms)),
-	instrument_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE
+	instrument_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- We check that the `instrument_id` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (instrument_id, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE
+	-- TODO: find an appropriate check to ensure that the `instrument_id` is indeed a weighing instrument.
 );
 
 CREATE TABLE IF NOT EXISTS fractioning_procedure_models (

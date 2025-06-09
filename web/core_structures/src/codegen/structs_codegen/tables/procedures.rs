@@ -129,6 +129,26 @@ impl Procedure {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn from_procedure_model_id_and_id(
+        procedure_model_id: &i32,
+        id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::procedures::procedures;
+        Self::table()
+            .filter(
+                procedures::procedure_model_id.eq(procedure_model_id).and(procedures::id.eq(id)),
+            )
+            .order_by(procedures::id.asc())
+            .first::<Self>(conn)
+            .optional()
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_procedure_model_id(
         procedure_model_id: &i32,
         conn: &mut diesel::PgConnection,

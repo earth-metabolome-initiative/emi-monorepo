@@ -17,8 +17,14 @@ for crate::codegen::structs_codegen::tables::shared_procedure_model_trackables::
             .do_update()
             .set(self)
             .filter(
-                created_by
-                    .ne(excluded(created_by))
+                parent_trackable_id
+                    .ne(excluded(parent_trackable_id))
+                    .or(
+                        parent_procedure_model_id.ne(excluded(parent_procedure_model_id)),
+                    )
+                    .or(child_trackable_id.ne(excluded(child_trackable_id)))
+                    .or(child_procedure_model_id.ne(excluded(child_procedure_model_id)))
+                    .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at))),
             )
             .get_results(conn)
@@ -44,8 +50,14 @@ for crate::codegen::structs_codegen::tables::shared_procedure_model_trackables::
             .do_update()
             .set(self)
             .filter(
-                created_by
-                    .ne(excluded(created_by))
+                parent_trackable_id
+                    .ne(excluded(parent_trackable_id))
+                    .or(
+                        parent_procedure_model_id.ne(excluded(parent_procedure_model_id)),
+                    )
+                    .or(child_trackable_id.ne(excluded(child_trackable_id)))
+                    .or(child_procedure_model_id.ne(excluded(child_procedure_model_id)))
+                    .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at))),
             )
             .get_results(conn)

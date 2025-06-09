@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Copy)]
+#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(
     diesel::Selectable,
@@ -14,7 +14,6 @@
 )]
 pub struct WeighingProcedureModel {
     pub id: i32,
-    pub kilograms: f32,
     pub instrument_id: i32,
 }
 impl web_common_traits::prelude::TableName for WeighingProcedureModel {
@@ -100,6 +99,30 @@ impl WeighingProcedureModel {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn weighing_procedure_models_instrument_id_id_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
+                    .eq(&self.instrument_id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
+                            .eq(&self.id),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_instrument_id(
         instrument_id: &i32,
         conn: &mut diesel::PgConnection,
@@ -109,6 +132,26 @@ impl WeighingProcedureModel {
         use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
         Self::table()
             .filter(weighing_procedure_models::instrument_id.eq(instrument_id))
+            .order_by(weighing_procedure_models::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_instrument_id_and_id(
+        instrument_id: &i32,
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
+        Self::table()
+            .filter(
+                weighing_procedure_models::instrument_id
+                    .eq(instrument_id)
+                    .and(weighing_procedure_models::id.eq(id)),
+            )
             .order_by(weighing_procedure_models::id.asc())
             .load::<Self>(conn)
     }

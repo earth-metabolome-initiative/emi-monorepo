@@ -9,7 +9,6 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         use diesel::ExpressionMethods;
         use diesel::query_dsl::methods::FilterDsl;
         use diesel::upsert::excluded;
-        use diesel::BoolExpressionMethods;
         use diesel::RunQueryDsl;
         use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models::*;
         diesel::insert_into(table)
@@ -17,7 +16,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(kilograms.ne(excluded(kilograms)).or(instrument_id.ne(excluded(instrument_id))))
+            .filter(instrument_id.ne(excluded(instrument_id)))
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -33,7 +32,6 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         use diesel::ExpressionMethods;
         use diesel::query_dsl::methods::FilterDsl;
         use diesel::upsert::excluded;
-        use diesel::BoolExpressionMethods;
         use diesel::RunQueryDsl;
         use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models::*;
         diesel::insert_into(table)
@@ -41,7 +39,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(kilograms.ne(excluded(kilograms)).or(instrument_id.ne(excluded(instrument_id))))
+            .filter(instrument_id.ne(excluded(instrument_id)))
             .get_results(conn)
             .map(|mut result| result.pop())
     }
