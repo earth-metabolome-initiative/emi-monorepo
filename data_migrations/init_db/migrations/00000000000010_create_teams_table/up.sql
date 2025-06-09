@@ -10,18 +10,17 @@ CREATE TABLE IF NOT EXISTS teams (
     state_id SMALLINT NOT NULL DEFAULT 1,
     parent_team_id INTEGER,
     -- The user who created the team
-    created_by INTEGER NOT NULL,
+    created_by INTEGER NOT NULL REFERENCES users(id),
     -- The date the team was created
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_by INTEGER NOT NULL,
+    updated_by INTEGER NOT NULL REFERENCES users(id),
     -- The date the team was last updated
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (color_id) REFERENCES colors(id),
     FOREIGN KEY (state_id) REFERENCES team_states(id),
     FOREIGN KEY (parent_team_id) REFERENCES teams(id) ON DELETE CASCADE,
-    FOREIGN KEY (created_by) REFERENCES users(id),
-    FOREIGN KEY (updated_by) REFERENCES users(id),
-    CONSTRAINT parent_team_circularity CHECK (must_be_distinct_i32(parent_team_id, id))
+    CHECK (must_be_distinct_i32(parent_team_id, id)),
+    CHECK (must_be_smaller_than_utc(created_at, updated_at))
 );
 
 CREATE TABLE IF NOT EXISTS team_members (

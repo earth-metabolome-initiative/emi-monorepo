@@ -1,3 +1,4 @@
+#![cfg(feature = "postgres")]
 //! Submodule proving the implementations of the traits relative to Diesel with
 //! `PostgreSQL` as the backend.
 
