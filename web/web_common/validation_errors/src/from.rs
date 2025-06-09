@@ -22,18 +22,6 @@ impl From<Infallible> for DoubleFieldError {
     }
 }
 
-impl From<instrument_categories::errors::UnknownInstrumentCategory> for Error {
-    fn from(error: instrument_categories::errors::UnknownInstrumentCategory) -> Self {
-        Self::SingleField(error.into())
-    }
-}
-
-impl From<instrument_categories::errors::UnknownInstrumentCategory> for SingleFieldError {
-    fn from(_error: instrument_categories::errors::UnknownInstrumentCategory) -> Self {
-        Self::UnknownInstrumentCategory(())
-    }
-}
-
 impl From<cas_codes::errors::Error> for SingleFieldError {
     fn from(error: cas_codes::errors::Error) -> Self {
         Self::InvalidCasCode((), error)

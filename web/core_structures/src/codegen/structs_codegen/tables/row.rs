@@ -1,7 +1,6 @@
 mod addresses;
 mod aliquoting_instrument_models;
 mod aliquoting_procedure_models;
-mod aliquoting_procedures;
 mod ball_mill_procedure_models;
 mod brands;
 mod centrifuge_procedure_models;
@@ -17,7 +16,6 @@ mod disposal_procedure_models;
 mod documents;
 mod email_providers;
 mod fractioning_procedure_models;
-mod fractioning_procedures;
 mod freeze_drying_procedure_models;
 mod from_row;
 mod instrument_models;
@@ -43,7 +41,6 @@ mod procedure_models;
 mod procedure_trackables;
 mod procedures;
 mod processables;
-mod processing_procedures;
 mod project_states;
 mod projects;
 mod ranks;
@@ -53,7 +50,6 @@ mod roles;
 mod rooms;
 mod sample_states;
 mod sampling_procedure_models;
-mod sampling_procedures;
 mod shaking_procedure_models;
 mod shared_procedure_model_trackables;
 mod spatial_ref_sys;
@@ -75,6 +71,7 @@ mod users;
 mod volumetric_processables;
 mod weighing_instrument_models;
 mod weighing_procedure_models;
+mod weighing_procedures;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Row {
@@ -84,9 +81,6 @@ pub enum Row {
     ),
     AliquotingProcedureModel(
         crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
-    ),
-    AliquotingProcedure(
-        crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure,
     ),
     BallMillProcedureModel(
         crate::codegen::structs_codegen::tables::ball_mill_procedure_models::BallMillProcedureModel,
@@ -120,9 +114,6 @@ pub enum Row {
     ),
     FractioningProcedureModel(
         crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel,
-    ),
-    FractioningProcedure(
-        crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure,
     ),
     FreezeDryingProcedureModel(
         crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel,
@@ -182,9 +173,6 @@ pub enum Row {
     ),
     Procedure(crate::codegen::structs_codegen::tables::procedures::Procedure),
     Processable(crate::codegen::structs_codegen::tables::processables::Processable),
-    ProcessingProcedure(
-        crate::codegen::structs_codegen::tables::processing_procedures::ProcessingProcedure,
-    ),
     ProjectState(crate::codegen::structs_codegen::tables::project_states::ProjectState),
     Project(crate::codegen::structs_codegen::tables::projects::Project),
     Rank(crate::codegen::structs_codegen::tables::ranks::Rank),
@@ -194,9 +182,6 @@ pub enum Row {
     SampleState(crate::codegen::structs_codegen::tables::sample_states::SampleState),
     SamplingProcedureModel(
         crate::codegen::structs_codegen::tables::sampling_procedure_models::SamplingProcedureModel,
-    ),
-    SamplingProcedure(
-        crate::codegen::structs_codegen::tables::sampling_procedures::SamplingProcedure,
     ),
     ShakingProcedureModel(
         crate::codegen::structs_codegen::tables::shaking_procedure_models::ShakingProcedureModel,
@@ -236,6 +221,9 @@ pub enum Row {
     WeighingProcedureModel(
         crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel,
     ),
+    WeighingProcedure(
+        crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure,
+    ),
 }
 impl Row {
     #[cfg(feature = "sqlite")]
@@ -252,9 +240,6 @@ impl Row {
             }
             Row::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 aliquoting_procedure_models.upsert(conn)?.map(Row::from)
-            }
-            Row::AliquotingProcedure(aliquoting_procedures) => {
-                aliquoting_procedures.upsert(conn)?.map(Row::from)
             }
             Row::BallMillProcedureModel(ball_mill_procedure_models) => {
                 ball_mill_procedure_models.upsert(conn)?.map(Row::from)
@@ -284,9 +269,6 @@ impl Row {
             Row::EmailProvider(email_providers) => email_providers.upsert(conn)?.map(Row::from),
             Row::FractioningProcedureModel(fractioning_procedure_models) => {
                 fractioning_procedure_models.upsert(conn)?.map(Row::from)
-            }
-            Row::FractioningProcedure(fractioning_procedures) => {
-                fractioning_procedures.upsert(conn)?.map(Row::from)
             }
             Row::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
                 freeze_drying_procedure_models.upsert(conn)?.map(Row::from)
@@ -340,9 +322,6 @@ impl Row {
             }
             Row::Procedure(procedures) => procedures.upsert(conn)?.map(Row::from),
             Row::Processable(processables) => processables.upsert(conn)?.map(Row::from),
-            Row::ProcessingProcedure(processing_procedures) => {
-                processing_procedures.upsert(conn)?.map(Row::from)
-            }
             Row::ProjectState(project_states) => project_states.upsert(conn)?.map(Row::from),
             Row::Project(projects) => projects.upsert(conn)?.map(Row::from),
             Row::Rank(ranks) => ranks.upsert(conn)?.map(Row::from),
@@ -352,9 +331,6 @@ impl Row {
             Row::SampleState(sample_states) => sample_states.upsert(conn)?.map(Row::from),
             Row::SamplingProcedureModel(sampling_procedure_models) => {
                 sampling_procedure_models.upsert(conn)?.map(Row::from)
-            }
-            Row::SamplingProcedure(sampling_procedures) => {
-                sampling_procedures.upsert(conn)?.map(Row::from)
             }
             Row::ShakingProcedureModel(shaking_procedure_models) => {
                 shaking_procedure_models.upsert(conn)?.map(Row::from)
@@ -392,6 +368,9 @@ impl Row {
             Row::WeighingProcedureModel(weighing_procedure_models) => {
                 weighing_procedure_models.upsert(conn)?.map(Row::from)
             }
+            Row::WeighingProcedure(weighing_procedures) => {
+                weighing_procedures.upsert(conn)?.map(Row::from)
+            }
         })
     }
 }
@@ -406,7 +385,6 @@ impl web_common_traits::prelude::Row for Row {
             Row::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 aliquoting_procedure_models.primary_key()
             }
-            Row::AliquotingProcedure(aliquoting_procedures) => aliquoting_procedures.primary_key(),
             Row::BallMillProcedureModel(ball_mill_procedure_models) => {
                 ball_mill_procedure_models.primary_key()
             }
@@ -431,9 +409,6 @@ impl web_common_traits::prelude::Row for Row {
             Row::EmailProvider(email_providers) => email_providers.primary_key(),
             Row::FractioningProcedureModel(fractioning_procedure_models) => {
                 fractioning_procedure_models.primary_key()
-            }
-            Row::FractioningProcedure(fractioning_procedures) => {
-                fractioning_procedures.primary_key()
             }
             Row::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
                 freeze_drying_procedure_models.primary_key()
@@ -473,7 +448,6 @@ impl web_common_traits::prelude::Row for Row {
             Row::ProcedureTrackable(procedure_trackables) => procedure_trackables.primary_key(),
             Row::Procedure(procedures) => procedures.primary_key(),
             Row::Processable(processables) => processables.primary_key(),
-            Row::ProcessingProcedure(processing_procedures) => processing_procedures.primary_key(),
             Row::ProjectState(project_states) => project_states.primary_key(),
             Row::Project(projects) => projects.primary_key(),
             Row::Rank(ranks) => ranks.primary_key(),
@@ -484,7 +458,6 @@ impl web_common_traits::prelude::Row for Row {
             Row::SamplingProcedureModel(sampling_procedure_models) => {
                 sampling_procedure_models.primary_key()
             }
-            Row::SamplingProcedure(sampling_procedures) => sampling_procedures.primary_key(),
             Row::ShakingProcedureModel(shaking_procedure_models) => {
                 shaking_procedure_models.primary_key()
             }
@@ -515,6 +488,7 @@ impl web_common_traits::prelude::Row for Row {
             Row::WeighingProcedureModel(weighing_procedure_models) => {
                 weighing_procedure_models.primary_key()
             }
+            Row::WeighingProcedure(weighing_procedures) => weighing_procedures.primary_key(),
         }
     }
 }

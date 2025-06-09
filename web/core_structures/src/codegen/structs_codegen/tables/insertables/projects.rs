@@ -465,6 +465,14 @@ impl InsertableProjectBuilder {
                 Into::into(err).rename_field(InsertableProjectAttributes::CreatedAt)
             },
         )?;
+        if let Some(updated_at) = self.updated_at {
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+                e.rename_fields(
+                    InsertableProjectAttributes::CreatedAt,
+                    InsertableProjectAttributes::UpdatedAt,
+                )
+            })?;
+        }
         self.created_at = Some(created_at);
         Ok(self)
     }
@@ -496,6 +504,14 @@ impl InsertableProjectBuilder {
                 Into::into(err).rename_field(InsertableProjectAttributes::UpdatedAt)
             },
         )?;
+        if let Some(created_at) = self.created_at {
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+                e.rename_fields(
+                    InsertableProjectAttributes::CreatedAt,
+                    InsertableProjectAttributes::UpdatedAt,
+                )
+            })?;
+        }
         self.updated_at = Some(updated_at);
         Ok(self)
     }

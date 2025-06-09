@@ -30,7 +30,7 @@ impl From<
     fn from(
         foreign: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ) -> Self {
-        Self::Destination(foreign)
+        Self::Source(foreign)
     }
 }
 impl core::fmt::Display for InsertableMixSolidProcedureModelAttributes {
@@ -297,27 +297,6 @@ impl InsertableMixSolidProcedureModelBuilder {
         self.kilograms = Some(kilograms);
         Ok(self)
     }
-    pub fn destination(
-        mut self,
-        destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    >{
-        if destination.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                    ),
-                ),
-            );
-        }
-        self.destination = destination;
-        Ok(self)
-    }
     pub fn source(
         mut self,
         source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -358,6 +337,27 @@ impl InsertableMixSolidProcedureModelBuilder {
             );
         }
         self.measured_with = measured_with;
+        Ok(self)
+    }
+    pub fn destination(
+        mut self,
+        destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    >{
+        if destination.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                    ),
+                ),
+            );
+        }
+        self.destination = destination;
         Ok(self)
     }
     pub fn name<P>(
@@ -526,13 +526,6 @@ impl InsertableMixSolidProcedureModelBuilder {
                 InsertableMixSolidProcedureModelAttributes::Kilograms,
             ))?;
         let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
-        let destination = self
-            .destination
-            .procedure_model_id(id)
-            .map_err(|err| err.into_field_name())?
-            .insert(user_id, conn)
-            .map_err(|err| err.into_field_name())?
-            .id();
         let source = self
             .source
             .procedure_model_id(id)
@@ -542,6 +535,13 @@ impl InsertableMixSolidProcedureModelBuilder {
             .id();
         let measured_with = self
             .measured_with
+            .procedure_model_id(id)
+            .map_err(|err| err.into_field_name())?
+            .insert(user_id, conn)
+            .map_err(|err| err.into_field_name())?
+            .id();
+        let destination = self
+            .destination
             .procedure_model_id(id)
             .map_err(|err| err.into_field_name())?
             .insert(user_id, conn)

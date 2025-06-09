@@ -320,6 +320,38 @@ impl KeyColumnUsage {
         }
     }
 
+    /// Returns whether the key column usage refers to a foreign unique key
+    /// constraint
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn is_foreign_unique_key(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        let foreign_table = self.foreign_table(conn)?;
+        let foreign_columns = self.foreign_columns(conn)?;
+
+        if let Some(foreign_table) = foreign_table {
+            // Check if the foreign table has a unique key constraint
+            let unique_constraints = foreign_table.unique_indices(conn)?;
+            for unique_constraint in unique_constraints {
+                // Check if the foreign columns match the unique constraint columns
+                let unique_columns = unique_constraint.columns(conn)?;
+                if unique_columns.len() == foreign_columns.len()
+                    && unique_columns.iter().all(|c| foreign_columns.contains(c))
+                {
+                    return Ok(true);
+                }
+            }
+            Ok(false)
+        } else {
+            Ok(false)
+        }
+    }
+
     /// Returns the number of columns in this key column usage
     ///
     /// # Arguments

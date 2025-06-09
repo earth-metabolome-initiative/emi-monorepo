@@ -8,9 +8,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(aliquoting_procedure_models)
             }
-            super::Row::AliquotingProcedure(aliquoting_procedures) => {
-                crate::codegen::tables::rows::Rows::from(aliquoting_procedures)
-            }
             super::Row::BallMillProcedureModel(ball_mill_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(ball_mill_procedure_models)
             }
@@ -45,9 +42,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::FractioningProcedureModel(fractioning_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(fractioning_procedure_models)
-            }
-            super::Row::FractioningProcedure(fractioning_procedures) => {
-                crate::codegen::tables::rows::Rows::from(fractioning_procedures)
             }
             super::Row::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(freeze_drying_procedure_models)
@@ -117,9 +111,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::Processable(processables) => {
                 crate::codegen::tables::rows::Rows::from(processables)
             }
-            super::Row::ProcessingProcedure(processing_procedures) => {
-                crate::codegen::tables::rows::Rows::from(processing_procedures)
-            }
             super::Row::ProjectState(project_states) => {
                 crate::codegen::tables::rows::Rows::from(project_states)
             }
@@ -133,9 +124,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::SamplingProcedureModel(sampling_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(sampling_procedure_models)
-            }
-            super::Row::SamplingProcedure(sampling_procedures) => {
-                crate::codegen::tables::rows::Rows::from(sampling_procedures)
             }
             super::Row::ShakingProcedureModel(shaking_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(shaking_procedure_models)
@@ -186,6 +174,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::WeighingProcedureModel(weighing_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(weighing_procedure_models)
+            }
+            super::Row::WeighingProcedure(weighing_procedures) => {
+                crate::codegen::tables::rows::Rows::from(weighing_procedures)
             }
         }
     }

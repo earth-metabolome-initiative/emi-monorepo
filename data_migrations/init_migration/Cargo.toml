@@ -9,11 +9,6 @@ diesel.workspace = true
 tokio.workspace = true
 chrono.workspace = true
 cas_codes.workspace = true
-tool_categories = { workspace = true, features = ["postgres"] }
-instrument_categories = { workspace = true, features = ["postgres"] }
-container_categories = { workspace = true, features = ["postgres"] }
-nameplate_categories = { workspace = true, features = ["postgres"] }
-step_model_categories = { workspace = true, features = ["postgres"] }
 web_common_traits = { workspace = true, features = ["backend"] }
 
 [dev-dependencies]

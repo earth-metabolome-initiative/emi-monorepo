@@ -10,11 +10,6 @@ pub use aliquoting_procedure_models::{
     InsertableAliquotingProcedureModel, InsertableAliquotingProcedureModelAttributes,
     InsertableAliquotingProcedureModelBuilder,
 };
-mod aliquoting_procedures;
-pub use aliquoting_procedures::{
-    InsertableAliquotingProcedure, InsertableAliquotingProcedureAttributes,
-    InsertableAliquotingProcedureBuilder,
-};
 mod ball_mill_procedure_models;
 pub use ball_mill_procedure_models::{
     InsertableBallMillProcedureModel, InsertableBallMillProcedureModelAttributes,
@@ -71,11 +66,6 @@ mod fractioning_procedure_models;
 pub use fractioning_procedure_models::{
     InsertableFractioningProcedureModel, InsertableFractioningProcedureModelAttributes,
     InsertableFractioningProcedureModelBuilder,
-};
-mod fractioning_procedures;
-pub use fractioning_procedures::{
-    InsertableFractioningProcedure, InsertableFractioningProcedureAttributes,
-    InsertableFractioningProcedureBuilder,
 };
 mod freeze_drying_procedure_models;
 pub use freeze_drying_procedure_models::{
@@ -183,11 +173,6 @@ mod processables;
 pub use processables::{
     InsertableProcessable, InsertableProcessableAttributes, InsertableProcessableBuilder,
 };
-mod processing_procedures;
-pub use processing_procedures::{
-    InsertableProcessingProcedure, InsertableProcessingProcedureAttributes,
-    InsertableProcessingProcedureBuilder,
-};
 mod project_states;
 pub use project_states::{
     InsertableProjectState, InsertableProjectStateAttributes, InsertableProjectStateBuilder,
@@ -210,11 +195,6 @@ mod sampling_procedure_models;
 pub use sampling_procedure_models::{
     InsertableSamplingProcedureModel, InsertableSamplingProcedureModelAttributes,
     InsertableSamplingProcedureModelBuilder,
-};
-mod sampling_procedures;
-pub use sampling_procedures::{
-    InsertableSamplingProcedure, InsertableSamplingProcedureAttributes,
-    InsertableSamplingProcedureBuilder,
 };
 mod shaking_procedure_models;
 pub use shaking_procedure_models::{
@@ -293,4 +273,9 @@ mod weighing_procedure_models;
 pub use weighing_procedure_models::{
     InsertableWeighingProcedureModel, InsertableWeighingProcedureModelAttributes,
     InsertableWeighingProcedureModelBuilder,
+};
+mod weighing_procedures;
+pub use weighing_procedures::{
+    InsertableWeighingProcedure, InsertableWeighingProcedureAttributes,
+    InsertableWeighingProcedureBuilder,
 };

@@ -86,11 +86,18 @@ impl Codegen<'_> {
             let snake_case_ident = table.snake_case_ident()?;
             let mut foreign_keys = table.foreign_keys(conn)?;
 
+            // We only keep foreign key constraints that are associated with foreign primary
+            // keys.
+            foreign_keys.retain(|fk| fk.is_foreign_primary_key(conn).unwrap_or(false));
+
             for column in table.columns(conn)? {
                 if let Some(foreign_key) = column.requires_partial_builder(conn)? {
                     // We remove this foreign key from the list of foreign keys
                     // to avoid including functionally useless foreign keys.
                     foreign_keys.retain(|fk| fk != &foreign_key);
+                }
+                for (same_as_forein_keys, _) in column.same_as_constraints(conn)? {
+                    foreign_keys.retain(|fk| fk != &same_as_forein_keys);
                 }
             }
 

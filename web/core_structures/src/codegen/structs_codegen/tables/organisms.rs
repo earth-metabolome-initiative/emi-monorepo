@@ -1,18 +1,11 @@
 #[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(
-    diesel::Selectable,
-    diesel::Insertable,
-    diesel::AsChangeset,
-    diesel::Queryable,
-    diesel::Identifiable,
-)]
+#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::organisms::organisms)]
 pub struct Organism {
     pub id: ::rosetta_uuid::Uuid,
-    pub nameplate_category: ::nameplate_categories::NameplateCategory,
 }
 impl web_common_traits::prelude::TableName for Organism {
     const TABLE_NAME: &'static str = "organisms";
@@ -63,19 +56,6 @@ impl Organism {
             ),
             conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_nameplate_category(
-        nameplate_category: &::nameplate_categories::NameplateCategory,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::organisms::organisms;
-        Self::table()
-            .filter(organisms::nameplate_category.eq(nameplate_category))
-            .order_by(organisms::id.asc())
-            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(

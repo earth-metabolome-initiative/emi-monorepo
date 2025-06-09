@@ -4,7 +4,6 @@ impl super::Rows {
             super::Rows::Address(rows) => rows.len(),
             super::Rows::AliquotingInstrumentModel(rows) => rows.len(),
             super::Rows::AliquotingProcedureModel(rows) => rows.len(),
-            super::Rows::AliquotingProcedure(rows) => rows.len(),
             super::Rows::BallMillProcedureModel(rows) => rows.len(),
             super::Rows::Brand(rows) => rows.len(),
             super::Rows::CentrifugeProcedureModel(rows) => rows.len(),
@@ -20,7 +19,6 @@ impl super::Rows {
             super::Rows::Document(rows) => rows.len(),
             super::Rows::EmailProvider(rows) => rows.len(),
             super::Rows::FractioningProcedureModel(rows) => rows.len(),
-            super::Rows::FractioningProcedure(rows) => rows.len(),
             super::Rows::FreezeDryingProcedureModel(rows) => rows.len(),
             super::Rows::InstrumentModel(rows) => rows.len(),
             super::Rows::InstrumentState(rows) => rows.len(),
@@ -45,7 +43,6 @@ impl super::Rows {
             super::Rows::ProcedureTrackable(rows) => rows.len(),
             super::Rows::Procedure(rows) => rows.len(),
             super::Rows::Processable(rows) => rows.len(),
-            super::Rows::ProcessingProcedure(rows) => rows.len(),
             super::Rows::ProjectState(rows) => rows.len(),
             super::Rows::Project(rows) => rows.len(),
             super::Rows::Rank(rows) => rows.len(),
@@ -54,7 +51,6 @@ impl super::Rows {
             super::Rows::Room(rows) => rows.len(),
             super::Rows::SampleState(rows) => rows.len(),
             super::Rows::SamplingProcedureModel(rows) => rows.len(),
-            super::Rows::SamplingProcedure(rows) => rows.len(),
             super::Rows::ShakingProcedureModel(rows) => rows.len(),
             super::Rows::SharedProcedureModelTrackable(rows) => rows.len(),
             super::Rows::SpatialRefSy(rows) => rows.len(),
@@ -75,6 +71,7 @@ impl super::Rows {
             super::Rows::VolumetricProcessable(rows) => rows.len(),
             super::Rows::WeighingInstrumentModel(rows) => rows.len(),
             super::Rows::WeighingProcedureModel(rows) => rows.len(),
+            super::Rows::WeighingProcedure(rows) => rows.len(),
         }
     }
     pub fn is_empty(&self) -> bool {

@@ -9,9 +9,6 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::AliquotingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::AliquotingProcedureModel
             }
-            super::Rows::AliquotingProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::AliquotingProcedure
-            }
             super::Rows::BallMillProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::BallMillProcedureModel
             }
@@ -44,9 +41,6 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             }
             super::Rows::FractioningProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::FractioningProcedureModel
-            }
-            super::Rows::FractioningProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::FractioningProcedure
             }
             super::Rows::FreezeDryingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::FreezeDryingProcedureModel
@@ -114,9 +108,6 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::Processable(_) => {
                 crate::codegen::tables::table_names::TableName::Processable
             }
-            super::Rows::ProcessingProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::ProcessingProcedure
-            }
             super::Rows::ProjectState(_) => {
                 crate::codegen::tables::table_names::TableName::ProjectState
             }
@@ -130,9 +121,6 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             }
             super::Rows::SamplingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::SamplingProcedureModel
-            }
-            super::Rows::SamplingProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::SamplingProcedure
             }
             super::Rows::ShakingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::ShakingProcedureModel
@@ -177,6 +165,9 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             }
             super::Rows::WeighingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::WeighingProcedureModel
+            }
+            super::Rows::WeighingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::WeighingProcedure
             }
         }
     }

@@ -9,9 +9,6 @@ where
     crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
-    crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::ball_mill_procedure_models::BallMillProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -55,9 +52,6 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel: web_common_traits::prelude::BoundedRead<
@@ -132,9 +126,6 @@ where
     crate::codegen::structs_codegen::tables::processables::Processable: web_common_traits::prelude::BoundedRead<
         C,
     >,
-    crate::codegen::structs_codegen::tables::processing_procedures::ProcessingProcedure: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::project_states::ProjectState: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -157,9 +148,6 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::sampling_procedure_models::SamplingProcedureModel: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::sampling_procedures::SamplingProcedure: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::shaking_procedure_models::ShakingProcedureModel: web_common_traits::prelude::BoundedRead<
@@ -222,6 +210,9 @@ where
     crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
+    crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
 {
     type TableName = crate::codegen::tables::table_names::TableName;
     fn bounded_read(
@@ -250,14 +241,6 @@ where
             }
             crate::codegen::tables::table_names::TableName::AliquotingProcedureModel => {
                 crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::AliquotingProcedure => {
-                crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -378,14 +361,6 @@ where
             }
             crate::codegen::tables::table_names::TableName::FractioningProcedureModel => {
                 crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::FractioningProcedure => {
-                crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -584,14 +559,6 @@ where
                     )
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::ProcessingProcedure => {
-                crate::codegen::structs_codegen::tables::processing_procedures::ProcessingProcedure::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
             crate::codegen::tables::table_names::TableName::ProjectState => {
                 crate::codegen::structs_codegen::tables::project_states::ProjectState::bounded_read(
                         offset,
@@ -650,14 +617,6 @@ where
             }
             crate::codegen::tables::table_names::TableName::SamplingProcedureModel => {
                 crate::codegen::structs_codegen::tables::sampling_procedure_models::SamplingProcedureModel::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::SamplingProcedure => {
-                crate::codegen::structs_codegen::tables::sampling_procedures::SamplingProcedure::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -818,6 +777,14 @@ where
             }
             crate::codegen::tables::table_names::TableName::WeighingProcedureModel => {
                 crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::WeighingProcedure => {
+                crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure::bounded_read(
                         offset,
                         limit,
                         conn,

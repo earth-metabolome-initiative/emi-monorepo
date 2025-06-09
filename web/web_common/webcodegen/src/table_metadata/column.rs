@@ -1154,4 +1154,100 @@ impl Column {
 
         Ok(found_composite_fk)
     }
+
+    /// Returns the `same-as` UNIQUE constraints for the column, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    ///
+    /// # Implementation details
+    ///
+    /// The `same-as` constraints are defined as:
+    ///
+    /// * A column is a `same-as` constraint if is part of a `composite` foreign
+    ///   key which refers to a "tautological" composite UNIQUE constraint which
+    ///   is composed of the primary key of the foreign table and the column
+    ///   itself. An important corner case to take into account is that the
+    ///   foreign table's composite UNIQUE constraint may be the COMPOSITE
+    ///   PRIMARY KEY of the foreign table itself, and not the primary key plus
+    ///   something else.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing a `Vec` of tuples, each containing a
+    /// `KeyColumnUsage` and the foreign `Column` that the current column is
+    /// a `same-as` constraint for.
+    pub fn same_as_constraints(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<(KeyColumnUsage, Column)>, WebCodeGenError> {
+        let foreign_keys = self.foreign_keys(conn)?;
+        let mut same_as_constraints = Vec::new();
+        for foreign_key in foreign_keys {
+            // First, we check whether the foreign key is a composite foreign key
+            if !foreign_key.is_composite(conn)? {
+                // If the foreign key is not a composite foreign key, we skip it
+                continue;
+            }
+
+            // Next, we check whether the foreign key is referring to a UNIQUE constraint
+            if !foreign_key.is_foreign_unique_key(conn)? {
+                // If the foreign key is not referring to a UNIQUE constraint, we skip it
+                continue;
+            };
+
+            let foreign_key_columns = foreign_key.foreign_columns(conn)?;
+            // We identify the foreign column curresponding to the current column.
+            let Some(foreign_column) =
+                foreign_key.columns(conn)?.into_iter().zip(foreign_key_columns.iter()).find_map(
+                    |(col, foreign_col)| {
+                        if col.column_name == self.column_name { Some(foreign_col) } else { None }
+                    },
+                )
+            else {
+                // If we cannot find the foreign column corresponding to the current column,
+                // Something is wrong with the current implementation and we panic.
+                panic!(
+                    "Column \"{}\".\"{}\" is part of a composite foreign key which refers to a UNIQUE constraint, but the foreign column could not be found.",
+                    self.table_name, self.column_name
+                );
+            };
+
+            // Finally, if the UNIQUE constraint is composed of the primary key
+            // of the foreign table and the foreign column
+            // associated with the current column, we consider it a `same-as`
+            // constraint.
+            let Some(foreign_table) = foreign_key.foreign_table(conn)? else {
+                unreachable!(
+                    "Column \"{}\".\"{}\" is part of a composite foreign key which refers to a UNIQUE constraint, but the foreign table could not be found.",
+                    self.table_name, self.column_name
+                );
+            };
+
+            let mut expected_foreign_columns = foreign_table.primary_key_columns(conn)?;
+
+            // If the foreign column is not part of the foreign table's primary key, we add
+            // it
+            if !expected_foreign_columns.contains(&foreign_column) {
+                expected_foreign_columns.push(foreign_column.clone());
+            }
+
+            // If the foreign key's foreign columns are not the same as the expected foreign
+            // columns, then this constraint is not a `same-as` constraint.
+            if foreign_key_columns != expected_foreign_columns {
+                continue;
+            }
+
+            // Otherwise, we have identified a `same-as` constraint and we add it to the
+            // list
+            same_as_constraints.push((foreign_key, foreign_column.clone()));
+        }
+
+        Ok(same_as_constraints)
+    }
 }

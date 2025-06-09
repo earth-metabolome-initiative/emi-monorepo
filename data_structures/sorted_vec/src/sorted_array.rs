@@ -73,7 +73,7 @@ impl<V, const N: usize> SortedArray<V, N> {
     }
 
     /// Returns an iterator over the vector.
-    pub fn iter(&self) -> core::slice::Iter<V> {
+    pub fn iter(&self) -> core::slice::Iter<'_, V> {
         self.into_iter()
     }
 }

@@ -43,10 +43,7 @@ impl Translator for DataType {
                         // `geography` types, both of which use `BLOB` in SQLite.
                         Ok(DataType::Blob(None))
                     }
-                    Some(
-                        "countrycode" | "CountryCode" | "InstrumentCategory" | "ToolCategory"
-                        | "NameplateCategory" | "ContainerCategory" | "StepModelCategory",
-                    ) => {
+                    Some("countrycode" | "CountryCode") => {
                         // SQLite does not have a country code type, so we use TEXT instead.
                         Ok(DataType::Text)
                     }

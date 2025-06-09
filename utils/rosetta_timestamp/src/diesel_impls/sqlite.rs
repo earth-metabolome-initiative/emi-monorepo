@@ -1,3 +1,4 @@
+#![cfg(feature = "sqlite")]
 //! Submodule proving the implementations of the traits relative to Diesel with
 //! `SQLite` as the backend.
 

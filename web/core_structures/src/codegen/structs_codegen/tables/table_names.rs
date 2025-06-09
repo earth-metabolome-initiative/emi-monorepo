@@ -4,7 +4,6 @@ pub enum TableName {
     Address,
     AliquotingInstrumentModel,
     AliquotingProcedureModel,
-    AliquotingProcedure,
     BallMillProcedureModel,
     Brand,
     CentrifugeProcedureModel,
@@ -20,7 +19,6 @@ pub enum TableName {
     Document,
     EmailProvider,
     FractioningProcedureModel,
-    FractioningProcedure,
     FreezeDryingProcedureModel,
     InstrumentModel,
     InstrumentState,
@@ -45,7 +43,6 @@ pub enum TableName {
     ProcedureTrackable,
     Procedure,
     Processable,
-    ProcessingProcedure,
     ProjectState,
     Project,
     Rank,
@@ -54,7 +51,6 @@ pub enum TableName {
     Room,
     SampleState,
     SamplingProcedureModel,
-    SamplingProcedure,
     ShakingProcedureModel,
     SharedProcedureModelTrackable,
     SpatialRefSy,
@@ -75,6 +71,7 @@ pub enum TableName {
     VolumetricProcessable,
     WeighingInstrumentModel,
     WeighingProcedureModel,
+    WeighingProcedure,
 }
 impl core::fmt::Display for TableName {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -86,7 +83,6 @@ impl core::fmt::Display for TableName {
             TableName::AliquotingProcedureModel => {
                 write!(f, stringify!(AliquotingProcedureModel))
             }
-            TableName::AliquotingProcedure => write!(f, stringify!(AliquotingProcedure)),
             TableName::BallMillProcedureModel => {
                 write!(f, stringify!(BallMillProcedureModel))
             }
@@ -111,9 +107,6 @@ impl core::fmt::Display for TableName {
             TableName::EmailProvider => write!(f, stringify!(EmailProvider)),
             TableName::FractioningProcedureModel => {
                 write!(f, stringify!(FractioningProcedureModel))
-            }
-            TableName::FractioningProcedure => {
-                write!(f, stringify!(FractioningProcedure))
             }
             TableName::FreezeDryingProcedureModel => {
                 write!(f, stringify!(FreezeDryingProcedureModel))
@@ -153,7 +146,6 @@ impl core::fmt::Display for TableName {
             TableName::ProcedureTrackable => write!(f, stringify!(ProcedureTrackable)),
             TableName::Procedure => write!(f, stringify!(Procedure)),
             TableName::Processable => write!(f, stringify!(Processable)),
-            TableName::ProcessingProcedure => write!(f, stringify!(ProcessingProcedure)),
             TableName::ProjectState => write!(f, stringify!(ProjectState)),
             TableName::Project => write!(f, stringify!(Project)),
             TableName::Rank => write!(f, stringify!(Rank)),
@@ -164,7 +156,6 @@ impl core::fmt::Display for TableName {
             TableName::SamplingProcedureModel => {
                 write!(f, stringify!(SamplingProcedureModel))
             }
-            TableName::SamplingProcedure => write!(f, stringify!(SamplingProcedure)),
             TableName::ShakingProcedureModel => {
                 write!(f, stringify!(ShakingProcedureModel))
             }
@@ -195,6 +186,7 @@ impl core::fmt::Display for TableName {
             TableName::WeighingProcedureModel => {
                 write!(f, stringify!(WeighingProcedureModel))
             }
+            TableName::WeighingProcedure => write!(f, stringify!(WeighingProcedure)),
         }
     }
 }

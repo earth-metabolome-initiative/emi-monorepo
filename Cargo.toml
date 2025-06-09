@@ -45,11 +45,6 @@ members = [
   "web/web_common/rosetta_url",
   "data_migrations/init_db",
   "web/web_common/reference_docker",
-  "web/web_common/step_model_categories",
-  "web/web_common/tool_categories",
-  "web/web_common/instrument_categories",
-  "web/web_common/container_categories",
-  "web/web_common/nameplate_categories",
   "web/web_common/cas_codes",
   "utils/diesel_pgrx_derive",
   "utils/diesel_pgrx",
@@ -127,11 +122,6 @@ taxonomy_fetcher = { path = "data_retrieval/taxonomy_fetcher" }
 csqlv = { path = "web/web_common/csqlv", default-features = false }
 iso_codes = { path = "web/web_common/iso_codes" }
 elements = { path = "web/web_common/elements" }
-step_model_categories = { path = "web/web_common/step_model_categories" }
-tool_categories = { path = "web/web_common/tool_categories" }
-instrument_categories = { path = "web/web_common/instrument_categories" }
-nameplate_categories = { path = "web/web_common/nameplate_categories" }
-container_categories = { path = "web/web_common/container_categories" }
 testcontainers = { version = "0.24.0" }
 web_common_traits = { path = "web/web_common/web_common_traits" }
 webcodegen = { path = "web/web_common/webcodegen" }

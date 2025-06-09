@@ -1,6 +1,0 @@
-comment = 'tool_categories:  Created by pgrx'
-default_version = '@CARGO_VERSION@'
-module_pathname = '$libdir/tool_categories'
-relocatable = false
-superuser = true
-trusted = false

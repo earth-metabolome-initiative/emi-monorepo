@@ -1,9 +1,12 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableWeighingProcedureModelAttributes {
-    Id(crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes),
-    Kilograms,
-    InstrumentId,
+    Id(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
+    ),
+    InstrumentId(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+    ),
 }
 impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes>
     for InsertableWeighingProcedureModelAttributes
@@ -14,15 +17,21 @@ impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProced
         Self::Id(extension)
     }
 }
+impl From<
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+> for InsertableWeighingProcedureModelAttributes {
+    fn from(
+        foreign: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+    ) -> Self {
+        Self::InstrumentId(foreign)
+    }
+}
 impl core::fmt::Display for InsertableWeighingProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertableWeighingProcedureModelAttributes::Id(id) => write!(f, "{}", id),
-            InsertableWeighingProcedureModelAttributes::Kilograms => {
-                write!(f, "kilograms")
-            }
-            InsertableWeighingProcedureModelAttributes::InstrumentId => {
-                write!(f, "instrument_id")
+            InsertableWeighingProcedureModelAttributes::InstrumentId(instrument_id) => {
+                write!(f, "{}", instrument_id)
             }
         }
     }
@@ -37,7 +46,6 @@ impl core::fmt::Display for InsertableWeighingProcedureModelAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableWeighingProcedureModel {
     id: i32,
-    kilograms: f32,
     instrument_id: i32,
 }
 impl InsertableWeighingProcedureModel {
@@ -105,51 +113,56 @@ impl InsertableWeighingProcedureModel {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn weighing_procedure_models_instrument_id_id_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
+                    .eq(&self.instrument_id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
+                            .eq(&self.id),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            >(conn)
+    }
 }
 #[derive(Default)]
 pub struct InsertableWeighingProcedureModelBuilder {
-    pub(crate) id:
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    pub(crate) kilograms: Option<f32>,
-    pub(crate) instrument_id: Option<i32>,
+    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) instrument_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
 }
 impl InsertableWeighingProcedureModelBuilder {
-    pub fn kilograms<P>(
+    pub fn instrument_id(
         mut self,
-        kilograms: P,
+        instrument_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let kilograms = kilograms.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
-            Into::into(err).rename_field(InsertableWeighingProcedureModelAttributes::Kilograms)
-        })?;
-        pgrx_validation::must_be_strictly_positive_f32(kilograms)
-            .map_err(|e| e.rename_field(InsertableWeighingProcedureModelAttributes::Kilograms))?;
-        self.kilograms = Some(kilograms);
-        Ok(self)
-    }
-    pub fn instrument_id<P>(
-        mut self,
-        instrument_id: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let instrument_id =
-            instrument_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-                Into::into(err)
-                    .rename_field(InsertableWeighingProcedureModelAttributes::InstrumentId)
-            })?;
-        self.instrument_id = Some(instrument_id);
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    >{
+        if instrument_id.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                    ),
+                ),
+            );
+        }
+        self.instrument_id = instrument_id;
         Ok(self)
     }
     pub fn name<P>(
@@ -302,18 +315,25 @@ impl InsertableWeighingProcedureModelBuilder {
                 crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
             >,
         >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+            >,
+        >,
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let kilograms =
-            self.kilograms.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableWeighingProcedureModelAttributes::Kilograms,
-            ))?;
-        let instrument_id =
-            self.instrument_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableWeighingProcedureModelAttributes::InstrumentId,
-            ))?;
         let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
-        Ok(InsertableWeighingProcedureModel { id, kilograms, instrument_id })
+        let instrument_id = self
+            .instrument_id
+            .procedure_model_id(id)
+            .map_err(|err| err.into_field_name())?
+            .insert(user_id, conn)
+            .map_err(|err| err.into_field_name())?
+            .id();
+        Ok(InsertableWeighingProcedureModel { id, instrument_id })
     }
 }

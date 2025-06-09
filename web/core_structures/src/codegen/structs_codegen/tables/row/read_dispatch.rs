@@ -9,9 +9,6 @@ where
     crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure: web_common_traits::database::Read<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::ball_mill_procedure_models::BallMillProcedureModel: web_common_traits::database::Read<
         C,
     >,
@@ -55,9 +52,6 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel: web_common_traits::database::Read<
@@ -132,9 +126,6 @@ where
     crate::codegen::structs_codegen::tables::processables::Processable: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::processing_procedures::ProcessingProcedure: web_common_traits::database::Read<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::project_states::ProjectState: web_common_traits::database::Read<
         C,
     >,
@@ -157,9 +148,6 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::sampling_procedure_models::SamplingProcedureModel: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::sampling_procedures::SamplingProcedure: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::shaking_procedure_models::ShakingProcedureModel: web_common_traits::database::Read<
@@ -222,6 +210,9 @@ where
     crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure: web_common_traits::database::Read<
+        C,
+    >,
 {
     type PrimaryKey = crate::codegen::tables::table_primary_keys::TablePrimaryKey;
     fn read(
@@ -253,15 +244,6 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::AliquotingProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure::read(
                             primary_key,
                             conn,
                         )?
@@ -397,15 +379,6 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FractioningProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure::read(
                             primary_key,
                             conn,
                         )?
@@ -627,15 +600,6 @@ where
                         )?
                         .map(super::Row::from)
                 }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcessingProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::processing_procedures::ProcessingProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProjectState(
                     primary_key,
                 ) => {
@@ -703,15 +667,6 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::sampling_procedure_models::SamplingProcedureModel::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::SamplingProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::sampling_procedures::SamplingProcedure::read(
                             primary_key,
                             conn,
                         )?
@@ -892,6 +847,15 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure::read(
                             primary_key,
                             conn,
                         )?

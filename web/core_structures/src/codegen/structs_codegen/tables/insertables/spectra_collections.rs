@@ -235,6 +235,14 @@ impl InsertableSpectraCollectionBuilder {
                 Into::into(err).rename_field(InsertableSpectraCollectionAttributes::CreatedAt)
             },
         )?;
+        if let Some(updated_at) = self.updated_at {
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+                e.rename_fields(
+                    InsertableSpectraCollectionAttributes::CreatedAt,
+                    InsertableSpectraCollectionAttributes::UpdatedAt,
+                )
+            })?;
+        }
         self.created_at = Some(created_at);
         Ok(self)
     }
@@ -266,6 +274,14 @@ impl InsertableSpectraCollectionBuilder {
                 Into::into(err).rename_field(InsertableSpectraCollectionAttributes::UpdatedAt)
             },
         )?;
+        if let Some(created_at) = self.created_at {
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+                e.rename_fields(
+                    InsertableSpectraCollectionAttributes::CreatedAt,
+                    InsertableSpectraCollectionAttributes::UpdatedAt,
+                )
+            })?;
+        }
         self.updated_at = Some(updated_at);
         Ok(self)
     }

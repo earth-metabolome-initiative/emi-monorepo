@@ -1,8 +1,7 @@
+#![cfg(feature = "diesel")]
 //! Submodule proving the implementations of the diesel-related traits.
 
-#[cfg(feature = "postgres")]
 mod postgres;
-#[cfg(feature = "sqlite")]
 mod sqlite;
 
 /// The [`TimestampUTC`] SQL type.

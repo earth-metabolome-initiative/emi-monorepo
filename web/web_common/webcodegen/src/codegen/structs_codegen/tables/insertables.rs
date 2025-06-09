@@ -288,6 +288,8 @@ impl Codegen<'_> {
                 });
             }
             let mut insertable_builder_methods: Vec<TokenStream> = Vec::new();
+            let mut same_as_extension_columns = Vec::new();
+            let mut same_as_partial_builder_columns = Vec::new();
 
             for column in &insertable_columns {
                 if extension_pk.as_ref() == Some(column) {
@@ -301,7 +303,7 @@ impl Codegen<'_> {
                     continue;
                 }
 
-                let column_name = column.snake_case_ident()?;
+                let column_ident = column.snake_case_ident()?;
                 let column_type = column.rust_data_type(conn)?;
 
                 let mut check_constraints = TokenStream::new();
@@ -335,11 +337,11 @@ impl Codegen<'_> {
 
                 let column_assignment = if column.is_nullable() {
                     quote::quote! {
-                        self.#column_name = #column_name;
+                        self.#column_ident = #column_ident;
                     }
                 } else {
                     quote::quote! {
-                        self.#column_name = Some(#column_name);
+                        self.#column_ident = Some(#column_ident);
                     }
                 };
 
@@ -349,7 +351,7 @@ impl Codegen<'_> {
                 let updated_by_exception =
                     if column.is_created_by(conn)? && table.has_updated_by_column(conn)? {
                         quote::quote! {
-                            self = self.updated_by(#column_name)?;
+                            self = self.updated_by(#column_ident)?;
                         }
                     } else {
                         TokenStream::new()
@@ -360,15 +362,61 @@ impl Codegen<'_> {
                     quote::quote! { #insertable_enum::#camel_cased }
                 };
 
+                // If the current column appears in a `same-as` unique constraint with
+                // either the extended table or any of the partial builder tables, we need
+                // to sub-dispatch the setting call to the respective sub-builders.
+                let mut same_as_exception = TokenStream::new();
+                for (same_as_constraint, foreign_same_as_column) in
+                    column.same_as_constraints(conn)?
+                {
+                    let foreign_table = same_as_constraint.foreign_table(conn)?.unwrap();
+
+                    let foreign_same_as_column_ident = foreign_same_as_column.snake_case_ident()?;
+
+                    // If the foreign table is the extension table, we need to extend the
+                    // `same_as_extension_columns` list to include the column.
+                    if Some(&foreign_table) == extension_table.as_ref() {
+                        same_as_extension_columns.push(foreign_same_as_column.clone());
+                        let extension_pk_ident =
+                            extension_pk.as_ref().unwrap().snake_case_ident()?;
+                        // And we automatically update the field in the extension builder, since the
+                        // two values are expected to be the same.
+                        same_as_exception.extend(quote::quote! {
+                            self.#extension_pk_ident = self.#extension_pk_ident.#foreign_same_as_column_ident(#column_ident).map_err(|err| {
+                                err.into_field_name()
+                            })?;
+                        });
+                    }
+
+                    // If the foreign table is a partial builder table, we need to
+                    // extend the `same_as_partial_builder_columns` list to include the column.
+                    for (partial_builder_column, partial_builder_foreign_key) in
+                        &partial_builder_columns
+                    {
+                        let partial_builder_foreign_table =
+                            partial_builder_foreign_key.foreign_table(conn)?.unwrap();
+                        if &partial_builder_foreign_table == &foreign_table {
+                            let partial_builder_column_ident =
+                                partial_builder_column.snake_case_ident()?;
+                            same_as_partial_builder_columns.push(foreign_same_as_column.clone());
+                            same_as_exception.extend(quote::quote! {
+                                self.#partial_builder_column_ident = self.#partial_builder_column_ident.#column_ident(#column_ident).map_err(|err| {
+                                    err.into_field_name()
+                                })?;
+                            });
+                        }
+                    }
+                }
+
                 insertable_builder_methods.push(quote::quote! {
-                    pub fn #column_name<P>(
-                        mut self, #column_name: P
+                    pub fn #column_ident<P>(
+                        mut self, #column_ident: P
                     ) -> Result<Self, web_common_traits::database::InsertError<#insertable_enum>>
                     where
                         P: TryInto<#column_type>,
                         <P as TryInto<#column_type>>::Error: Into<validation_errors::SingleFieldError>,
                     {
-                        let #column_name = #column_name
+                        let #column_ident = #column_ident
                             .try_into()
                             .map_err(|err: <P as TryInto<#column_type>>::Error| {
                                 Into::into(err)
@@ -376,6 +424,7 @@ impl Codegen<'_> {
                             })?;
                         #check_constraints
                         #column_assignment
+                        #same_as_exception
                         #updated_by_exception
                         Ok(self)
                     }
@@ -386,13 +435,14 @@ impl Codegen<'_> {
             for (column, foreign_key) in &partial_builder_columns {
                 let column_name = column.snake_case_ident()?;
                 let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
+                let foreign_table_columns = foreign_table.columns(conn)?;
                 let builder_ident = foreign_table.insertable_builder_ty()?;
                 let insertable_enum = foreign_table.insertable_enum_ty()?;
 
                 // We determine the list of attributes which we must check that are not set
                 // already in the builder, as we will overwrite them and this may hide some
                 // unexpected behavior if the user has already set them.
-                let attribute_checks: Vec<TokenStream> = foreign_key
+                let mut attribute_checks: Vec<TokenStream> = foreign_key
                     .foreign_columns(conn)?
                     .iter()
                     .skip(1)
@@ -413,6 +463,27 @@ impl Codegen<'_> {
                     })
                     .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
+                // We add attribute checks also for all the `foreign_table_columns` which
+                // are part of a `same-as` unique constraint with the current table, since
+                // we do not want to silently overwrite them.
+                for foreign_column in foreign_table_columns {
+                    if same_as_partial_builder_columns.contains(&foreign_column) {
+                        let column_ident = foreign_column.snake_case_ident()?;
+                        let camel_cased = foreign_column.camel_case_ident()?;
+                        attribute_checks.push(quote::quote! {
+                            if #column_name.#column_ident.is_some() {
+                                return Err(
+                                    web_common_traits::database::InsertError::BuilderError(
+                                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                            #insertable_enum::#camel_cased
+                                        )
+                                    )
+                                );
+                            }
+                        });
+                    }
+                }
+
                 insertable_builder_methods.push(quote::quote! {
                     pub fn #column_name(
                         mut self, #column_name: #builder_ident
@@ -432,6 +503,13 @@ impl Codegen<'_> {
                 for column in extension_table.insertable_columns_with_extension(conn)? {
                     let column_name = column.snake_case_ident()?;
                     let column_type = column.rust_data_type(conn)?;
+
+                    // If the current column is part of a `same-as` unique constraint with the
+                    // current table, we need to skip it as it is already handled by the current
+                    // table's insertable builder.
+                    if same_as_extension_columns.contains(&column) {
+                        continue;
+                    }
 
                     insertable_builder_methods.push(quote::quote! {
                         pub fn #column_name<P>(

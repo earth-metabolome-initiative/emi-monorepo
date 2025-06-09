@@ -2,7 +2,6 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableOrganismAttributes {
     Id(crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes),
-    NameplateCategory,
 }
 impl From<crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes>
     for InsertableOrganismAttributes
@@ -17,9 +16,6 @@ impl core::fmt::Display for InsertableOrganismAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertableOrganismAttributes::Id(id) => write!(f, "{}", id),
-            InsertableOrganismAttributes::NameplateCategory => {
-                write!(f, "nameplate_category")
-            }
         }
     }
 }
@@ -31,7 +27,6 @@ impl core::fmt::Display for InsertableOrganismAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableOrganism {
     id: ::rosetta_uuid::Uuid,
-    nameplate_category: ::nameplate_categories::NameplateCategory,
 }
 impl InsertableOrganism {
     pub fn id<C: diesel::connection::LoadConnection>(
@@ -70,26 +65,8 @@ impl InsertableOrganism {
 #[derive(Default)]
 pub struct InsertableOrganismBuilder {
     pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    pub(crate) nameplate_category: Option<::nameplate_categories::NameplateCategory>,
 }
 impl InsertableOrganismBuilder {
-    pub fn nameplate_category<P>(
-        mut self,
-        nameplate_category: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismAttributes>>
-    where
-        P: TryInto<::nameplate_categories::NameplateCategory>,
-        <P as TryInto<::nameplate_categories::NameplateCategory>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let nameplate_category = nameplate_category.try_into().map_err(
-            |err: <P as TryInto<::nameplate_categories::NameplateCategory>>::Error| {
-                Into::into(err).rename_field(InsertableOrganismAttributes::NameplateCategory)
-            },
-        )?;
-        self.nameplate_category = Some(nameplate_category);
-        Ok(self)
-    }
     pub fn id<P>(
         mut self,
         id: P,
@@ -215,12 +192,7 @@ impl InsertableOrganismBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let nameplate_category = self.nameplate_category.ok_or(
-            common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableOrganismAttributes::NameplateCategory,
-            ),
-        )?;
         let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
-        Ok(InsertableOrganism { id, nameplate_category })
+        Ok(InsertableOrganism { id })
     }
 }
