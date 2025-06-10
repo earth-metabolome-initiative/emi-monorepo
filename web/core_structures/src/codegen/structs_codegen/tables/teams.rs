@@ -80,7 +80,8 @@ impl Team {
             crate::codegen::structs_codegen::tables::colors::Color,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::colors::Color::table(),
@@ -112,7 +113,8 @@ impl Team {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -144,7 +146,8 @@ impl Team {
             crate::codegen::structs_codegen::tables::teams::Team,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         let Some(parent_team_id) = self.parent_team_id else {
             return Ok(None);
         };
@@ -180,7 +183,8 @@ impl Team {
             crate::codegen::structs_codegen::tables::team_states::TeamState,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::team_states::TeamState::table(),
@@ -212,7 +216,8 @@ impl Team {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -226,11 +231,11 @@ impl Team {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::teams::teams;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(teams::name.eq(name))
             .order_by(teams::id.asc())
@@ -242,9 +247,10 @@ impl Team {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::teams::teams;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(teams::description.eq(description))
             .order_by(teams::id.asc())
@@ -255,9 +261,10 @@ impl Team {
         icon: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::teams::teams;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table().filter(teams::icon.eq(icon)).order_by(teams::id.asc()).load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -265,9 +272,10 @@ impl Team {
         color_id: &i16,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::teams::teams;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(teams::color_id.eq(color_id))
             .order_by(teams::id.asc())
@@ -278,9 +286,10 @@ impl Team {
         state_id: &i16,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::teams::teams;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(teams::state_id.eq(state_id))
             .order_by(teams::id.asc())
@@ -291,9 +300,10 @@ impl Team {
         parent_team_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::teams::teams;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(teams::parent_team_id.eq(parent_team_id))
             .order_by(teams::id.asc())
@@ -304,9 +314,10 @@ impl Team {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::teams::teams;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(teams::created_by.eq(created_by))
             .order_by(teams::id.asc())
@@ -317,9 +328,10 @@ impl Team {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::teams::teams;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(teams::created_at.eq(created_at))
             .order_by(teams::id.asc())
@@ -330,9 +342,10 @@ impl Team {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::teams::teams;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(teams::updated_by.eq(updated_by))
             .order_by(teams::id.asc())
@@ -343,9 +356,10 @@ impl Team {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::teams::teams;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(teams::updated_at.eq(updated_at))
             .order_by(teams::id.asc())

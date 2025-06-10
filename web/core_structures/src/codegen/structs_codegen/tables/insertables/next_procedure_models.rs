@@ -59,7 +59,8 @@ impl InsertableNextProcedureModel {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -91,7 +92,8 @@ impl InsertableNextProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -125,7 +127,8 @@ impl InsertableNextProcedureModel {
             crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel::table(),
@@ -157,7 +160,8 @@ impl InsertableNextProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -191,7 +195,8 @@ impl InsertableNextProcedureModel {
             crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel::table(),
@@ -223,7 +228,8 @@ impl InsertableNextProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -243,10 +249,10 @@ pub struct InsertableNextProcedureModelBuilder {
 impl Default for InsertableNextProcedureModelBuilder {
     fn default() -> Self {
         Self {
-            parent_id: None,
-            current_id: None,
-            successor_id: None,
-            created_by: None,
+            parent_id: Default::default(),
+            current_id: Default::default(),
+            successor_id: Default::default(),
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
         }
     }

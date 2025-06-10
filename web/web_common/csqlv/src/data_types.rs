@@ -121,11 +121,9 @@ impl DataType {
             DataType::SmallInt | DataType::SmallSerial => Ok(DataType::SmallSerial),
             DataType::Integer | DataType::Serial => Ok(DataType::Serial),
             DataType::BigSerial | DataType::BigInt => Ok(DataType::BigSerial),
-            error => {
-                Err(CSVSchemaError::UnknownDataType(format!(
-                    "Unknown Serial variant for {error:?}",
-                )))
-            }
+            error => Err(CSVSchemaError::UnknownDataType(format!(
+                "Unknown Serial variant for {error:?}",
+            ))),
         }
     }
 

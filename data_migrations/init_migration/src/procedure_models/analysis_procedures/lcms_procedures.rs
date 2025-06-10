@@ -1,2 +1,4 @@
 mod negative_ionization_lcms_procedure;
 mod positive_ionization_lcms_procedure;
+pub(crate) use negative_ionization_lcms_procedure::init_negative_ionization_lcms_procedure;
+pub(crate) use positive_ionization_lcms_procedure::init_positive_ionization_lcms_procedure;

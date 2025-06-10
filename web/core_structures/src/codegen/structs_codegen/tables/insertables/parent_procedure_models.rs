@@ -76,7 +76,8 @@ impl InsertableParentProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -108,7 +109,8 @@ impl InsertableParentProcedureModel {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -140,7 +142,8 @@ impl InsertableParentProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -163,13 +166,13 @@ pub struct InsertableParentProcedureModelBuilder {
 impl Default for InsertableParentProcedureModelBuilder {
     fn default() -> Self {
         Self {
-            parent_procedure_model_id: None,
-            child_procedure_model_id: None,
+            parent_procedure_model_id: Default::default(),
+            child_procedure_model_id: Default::default(),
             snoozable: Some(false),
             copiable: Some(false),
             repeatable: Some(false),
             skippable: Some(false),
-            created_by: None,
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
         }
     }

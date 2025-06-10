@@ -54,7 +54,8 @@ impl TrackableLocation {
             crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         let Some(container_id) = self.container_id else {
             return Ok(None);
         };
@@ -90,7 +91,8 @@ impl TrackableLocation {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -122,7 +124,8 @@ impl TrackableLocation {
             crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
@@ -136,9 +139,10 @@ impl TrackableLocation {
         trackable_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::trackable_locations::trackable_locations;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(trackable_locations::trackable_id.eq(trackable_id))
             .order_by(trackable_locations::id.asc())
@@ -149,9 +153,10 @@ impl TrackableLocation {
         container_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::trackable_locations::trackable_locations;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(trackable_locations::container_id.eq(container_id))
             .order_by(trackable_locations::id.asc())
@@ -162,9 +167,10 @@ impl TrackableLocation {
         inferred: &bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::trackable_locations::trackable_locations;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(trackable_locations::inferred.eq(inferred))
             .order_by(trackable_locations::id.asc())
@@ -175,9 +181,10 @@ impl TrackableLocation {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::trackable_locations::trackable_locations;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(trackable_locations::created_at.eq(created_at))
             .order_by(trackable_locations::id.asc())
@@ -188,9 +195,10 @@ impl TrackableLocation {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::trackable_locations::trackable_locations;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(trackable_locations::created_by.eq(created_by))
             .order_by(trackable_locations::id.asc())

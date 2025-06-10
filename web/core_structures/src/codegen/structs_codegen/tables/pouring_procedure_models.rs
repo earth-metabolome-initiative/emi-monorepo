@@ -60,7 +60,8 @@ impl PouringProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
@@ -77,9 +78,10 @@ impl PouringProcedureModel {
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
@@ -116,7 +118,8 @@ impl PouringProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -148,7 +151,8 @@ impl PouringProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
@@ -165,9 +169,10 @@ impl PouringProcedureModel {
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
@@ -204,7 +209,8 @@ impl PouringProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
@@ -221,9 +227,10 @@ impl PouringProcedureModel {
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
@@ -242,9 +249,10 @@ impl PouringProcedureModel {
         measured_with: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(pouring_procedure_models::measured_with.eq(measured_with))
             .order_by(pouring_procedure_models::id.asc())
@@ -255,9 +263,10 @@ impl PouringProcedureModel {
         source: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(pouring_procedure_models::source.eq(source))
             .order_by(pouring_procedure_models::id.asc())
@@ -268,9 +277,10 @@ impl PouringProcedureModel {
         destination: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(pouring_procedure_models::destination.eq(destination))
             .order_by(pouring_procedure_models::id.asc())
@@ -282,11 +292,11 @@ impl PouringProcedureModel {
         id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(
                 pouring_procedure_models::destination
@@ -302,11 +312,11 @@ impl PouringProcedureModel {
         id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(
                 pouring_procedure_models::measured_with
@@ -322,11 +332,11 @@ impl PouringProcedureModel {
         id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(
                 pouring_procedure_models::source
@@ -341,14 +351,12 @@ impl PouringProcedureModel {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
-            SelectableHelper, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            pouring_procedure_models::pouring_procedure_models, procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(pouring_procedure_models::id.eq(procedure_models::id)),
@@ -364,14 +372,11 @@ impl PouringProcedureModel {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            pouring_procedure_models::pouring_procedure_models, procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(pouring_procedure_models::id.eq(procedure_models::id)),
@@ -386,14 +391,11 @@ impl PouringProcedureModel {
         deprecated: &bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            pouring_procedure_models::pouring_procedure_models, procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(pouring_procedure_models::id.eq(procedure_models::id)),
@@ -408,14 +410,11 @@ impl PouringProcedureModel {
         photograph_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            pouring_procedure_models::pouring_procedure_models, procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(pouring_procedure_models::id.eq(procedure_models::id)),
@@ -430,14 +429,11 @@ impl PouringProcedureModel {
         icon: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            pouring_procedure_models::pouring_procedure_models, procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(pouring_procedure_models::id.eq(procedure_models::id)),
@@ -452,14 +448,11 @@ impl PouringProcedureModel {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            pouring_procedure_models::pouring_procedure_models, procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(pouring_procedure_models::id.eq(procedure_models::id)),
@@ -474,14 +467,11 @@ impl PouringProcedureModel {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            pouring_procedure_models::pouring_procedure_models, procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(pouring_procedure_models::id.eq(procedure_models::id)),
@@ -496,14 +486,11 @@ impl PouringProcedureModel {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            pouring_procedure_models::pouring_procedure_models, procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(pouring_procedure_models::id.eq(procedure_models::id)),
@@ -518,14 +505,11 @@ impl PouringProcedureModel {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            pouring_procedure_models::pouring_procedure_models, procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(pouring_procedure_models::id.eq(procedure_models::id)),

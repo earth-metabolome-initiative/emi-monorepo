@@ -17,6 +17,7 @@ pub mod documents;
 pub mod email_providers;
 pub mod fractioning_procedure_models;
 pub mod freeze_drying_procedure_models;
+pub mod freezing_procedure_models;
 pub mod instrument_models;
 pub mod instrument_states;
 pub mod instruments;

@@ -49,7 +49,8 @@ impl Taxon {
             crate::codegen::structs_codegen::tables::ranks::Rank,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::ranks::Rank::table(),
@@ -63,9 +64,10 @@ impl Taxon {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::taxa::taxa;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table().filter(taxa::name.eq(name)).order_by(taxa::id.asc()).load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -73,9 +75,10 @@ impl Taxon {
         parent_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::taxa::taxa;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(taxa::parent_id.eq(parent_id))
             .order_by(taxa::id.asc())
@@ -86,9 +89,10 @@ impl Taxon {
         rank_id: &i16,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::taxa::taxa;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table().filter(taxa::rank_id.eq(rank_id)).order_by(taxa::id.asc()).load::<Self>(conn)
     }
 }

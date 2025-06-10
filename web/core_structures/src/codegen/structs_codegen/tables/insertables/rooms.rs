@@ -67,7 +67,8 @@ impl InsertableRoom {
             crate::codegen::structs_codegen::tables::addresses::Address,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::addresses::Address::table(),
@@ -99,7 +100,8 @@ impl InsertableRoom {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -131,7 +133,8 @@ impl InsertableRoom {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -155,14 +158,14 @@ pub struct InsertableRoomBuilder {
 impl Default for InsertableRoomBuilder {
     fn default() -> Self {
         Self {
-            name: None,
-            description: None,
-            qrcode: None,
-            addresses_id: None,
-            geolocation: None,
-            created_by: None,
+            name: Default::default(),
+            description: Default::default(),
+            qrcode: Default::default(),
+            addresses_id: Default::default(),
+            geolocation: Default::default(),
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: None,
+            updated_by: Default::default(),
             updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
         }
     }

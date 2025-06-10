@@ -20,6 +20,7 @@ pub enum TableName {
     EmailProvider,
     FractioningProcedureModel,
     FreezeDryingProcedureModel,
+    FreezingProcedureModel,
     InstrumentModel,
     InstrumentState,
     Instrument,
@@ -110,6 +111,9 @@ impl core::fmt::Display for TableName {
             }
             TableName::FreezeDryingProcedureModel => {
                 write!(f, stringify!(FreezeDryingProcedureModel))
+            }
+            TableName::FreezingProcedureModel => {
+                write!(f, stringify!(FreezingProcedureModel))
             }
             TableName::InstrumentModel => write!(f, stringify!(InstrumentModel)),
             TableName::InstrumentState => write!(f, stringify!(InstrumentState)),

@@ -1,6 +1,5 @@
-use crate::codegen::diesel_codegen::tables::{
-    procedure_trackables::procedure_trackables, weighing_procedures::weighing_procedures,
-};
+use crate::codegen::diesel_codegen::tables::procedure_trackables::procedure_trackables;
+use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
 diesel::allow_tables_to_appear_in_same_query!(weighing_procedures, procedure_trackables);
 use crate::codegen::diesel_codegen::tables::procedures::procedures;
 diesel::allow_tables_to_appear_in_same_query!(weighing_procedures, procedures);

@@ -89,7 +89,8 @@ impl InsertableProject {
             crate::codegen::structs_codegen::tables::colors::Color,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::colors::Color::table(),
@@ -121,7 +122,8 @@ impl InsertableProject {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -153,7 +155,8 @@ impl InsertableProject {
             crate::codegen::structs_codegen::tables::projects::Project,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         let Some(parent_project_id) = self.parent_project_id else {
             return Ok(None);
         };
@@ -189,7 +192,8 @@ impl InsertableProject {
             crate::codegen::structs_codegen::tables::project_states::ProjectState,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::project_states::ProjectState::table(),
@@ -221,7 +225,8 @@ impl InsertableProject {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -251,21 +256,21 @@ pub struct InsertableProjectBuilder {
 impl Default for InsertableProjectBuilder {
     fn default() -> Self {
         Self {
-            id: None,
-            name: None,
-            description: None,
+            id: Default::default(),
+            name: Default::default(),
+            description: Default::default(),
             state_id: Some(1i16),
-            icon: None,
+            icon: Default::default(),
             color_id: Some(1i16),
-            parent_project_id: None,
-            budget: None,
-            expenses: None,
-            created_by: None,
+            parent_project_id: Default::default(),
+            budget: Default::default(),
+            expenses: Default::default(),
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: None,
+            updated_by: Default::default(),
             updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            expected_end_date: None,
-            end_date: None,
+            expected_end_date: Default::default(),
+            end_date: Default::default(),
         }
     }
 }

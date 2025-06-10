@@ -58,7 +58,8 @@ impl InsertableDocument {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -90,7 +91,8 @@ impl InsertableDocument {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -112,10 +114,10 @@ impl Default for InsertableDocumentBuilder {
     fn default() -> Self {
         Self {
             id: Some(rosetta_uuid::Uuid::new_v4()),
-            mime_type: None,
-            created_by: None,
+            mime_type: Default::default(),
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: None,
+            updated_by: Default::default(),
             updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
         }
     }

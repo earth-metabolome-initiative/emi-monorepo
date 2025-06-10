@@ -46,6 +46,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(freeze_drying_procedure_models)
             }
+            super::Row::FreezingProcedureModel(freezing_procedure_models) => {
+                crate::codegen::tables::rows::Rows::from(freezing_procedure_models)
+            }
             super::Row::InstrumentModel(instrument_models) => {
                 crate::codegen::tables::rows::Rows::from(instrument_models)
             }

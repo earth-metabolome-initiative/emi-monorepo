@@ -51,7 +51,8 @@ impl Document {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -83,7 +84,8 @@ impl Document {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -97,9 +99,10 @@ impl Document {
         mime_type: &::media_types::MediaType,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::documents::documents;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(documents::mime_type.eq(mime_type))
             .order_by(documents::id.asc())
@@ -110,9 +113,10 @@ impl Document {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::documents::documents;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(documents::created_by.eq(created_by))
             .order_by(documents::id.asc())
@@ -123,9 +127,10 @@ impl Document {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::documents::documents;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(documents::created_at.eq(created_at))
             .order_by(documents::id.asc())
@@ -136,9 +141,10 @@ impl Document {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::documents::documents;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(documents::updated_by.eq(updated_by))
             .order_by(documents::id.asc())
@@ -149,9 +155,10 @@ impl Document {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::documents::documents;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(documents::updated_at.eq(updated_at))
             .order_by(documents::id.asc())

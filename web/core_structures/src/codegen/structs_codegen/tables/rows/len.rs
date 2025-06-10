@@ -20,6 +20,7 @@ impl super::Rows {
             super::Rows::EmailProvider(rows) => rows.len(),
             super::Rows::FractioningProcedureModel(rows) => rows.len(),
             super::Rows::FreezeDryingProcedureModel(rows) => rows.len(),
+            super::Rows::FreezingProcedureModel(rows) => rows.len(),
             super::Rows::InstrumentModel(rows) => rows.len(),
             super::Rows::InstrumentState(rows) => rows.len(),
             super::Rows::Instrument(rows) => rows.len(),

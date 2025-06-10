@@ -52,7 +52,8 @@ impl NextProcedureModel {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -84,7 +85,8 @@ impl NextProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -118,7 +120,8 @@ impl NextProcedureModel {
             crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel::table(),
@@ -150,7 +153,8 @@ impl NextProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -184,7 +188,8 @@ impl NextProcedureModel {
             crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel::table(),
@@ -216,7 +221,8 @@ impl NextProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -230,9 +236,10 @@ impl NextProcedureModel {
         parent_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::next_procedure_models::next_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(next_procedure_models::parent_id.eq(parent_id))
             .order_by((
@@ -247,9 +254,10 @@ impl NextProcedureModel {
         current_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::next_procedure_models::next_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(next_procedure_models::current_id.eq(current_id))
             .order_by((
@@ -264,9 +272,10 @@ impl NextProcedureModel {
         successor_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::next_procedure_models::next_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(next_procedure_models::successor_id.eq(successor_id))
             .order_by((
@@ -281,9 +290,10 @@ impl NextProcedureModel {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::next_procedure_models::next_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(next_procedure_models::created_by.eq(created_by))
             .order_by((
@@ -298,9 +308,10 @@ impl NextProcedureModel {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::next_procedure_models::next_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(next_procedure_models::created_at.eq(created_at))
             .order_by((
@@ -316,11 +327,11 @@ impl NextProcedureModel {
         current_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::next_procedure_models::next_procedure_models;
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(
                 next_procedure_models::parent_id
@@ -340,11 +351,11 @@ impl NextProcedureModel {
         successor_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::next_procedure_models::next_procedure_models;
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(
                 next_procedure_models::parent_id

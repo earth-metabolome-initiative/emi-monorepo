@@ -20,6 +20,7 @@ pub enum TablePrimaryKey {
     EmailProvider((i32, i16)),
     FractioningProcedureModel(i32),
     FreezeDryingProcedureModel(i32),
+    FreezingProcedureModel(i32),
     InstrumentModel(::rosetta_uuid::Uuid),
     InstrumentState(i16),
     Instrument(::rosetta_uuid::Uuid),
@@ -123,6 +124,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::FreezeDryingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::FreezeDryingProcedureModel
+            }
+            TablePrimaryKey::FreezingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::FreezingProcedureModel
             }
             TablePrimaryKey::InstrumentModel(_) => {
                 crate::codegen::tables::table_names::TableName::InstrumentModel

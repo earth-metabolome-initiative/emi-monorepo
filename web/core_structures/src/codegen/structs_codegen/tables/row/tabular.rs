@@ -45,6 +45,9 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::FreezeDryingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::FreezeDryingProcedureModel
             }
+            super::Row::FreezingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::FreezingProcedureModel
+            }
             super::Row::InstrumentModel(_) => {
                 crate::codegen::tables::table_names::TableName::InstrumentModel
             }

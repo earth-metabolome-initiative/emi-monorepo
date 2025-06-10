@@ -59,7 +59,8 @@ impl MixCountableProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
@@ -76,9 +77,10 @@ impl MixCountableProcedureModel {
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
@@ -115,7 +117,8 @@ impl MixCountableProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -147,7 +150,8 @@ impl MixCountableProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
@@ -164,9 +168,10 @@ impl MixCountableProcedureModel {
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
@@ -185,9 +190,10 @@ impl MixCountableProcedureModel {
         source: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(mix_countable_procedure_models::source.eq(source))
             .order_by(mix_countable_procedure_models::id.asc())
@@ -198,9 +204,10 @@ impl MixCountableProcedureModel {
         destination: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(mix_countable_procedure_models::destination.eq(destination))
             .order_by(mix_countable_procedure_models::id.asc())
@@ -211,9 +218,10 @@ impl MixCountableProcedureModel {
         quantity: &i16,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(mix_countable_procedure_models::quantity.eq(quantity))
             .order_by(mix_countable_procedure_models::id.asc())
@@ -225,11 +233,11 @@ impl MixCountableProcedureModel {
         id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(
                 mix_countable_procedure_models::destination
@@ -245,11 +253,11 @@ impl MixCountableProcedureModel {
         id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(
                 mix_countable_procedure_models::source
@@ -264,15 +272,12 @@ impl MixCountableProcedureModel {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
-            SelectableHelper, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_countable_procedure_models::mix_countable_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -289,15 +294,11 @@ impl MixCountableProcedureModel {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_countable_procedure_models::mix_countable_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -313,15 +314,11 @@ impl MixCountableProcedureModel {
         deprecated: &bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_countable_procedure_models::mix_countable_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -337,15 +334,11 @@ impl MixCountableProcedureModel {
         photograph_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_countable_procedure_models::mix_countable_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -361,15 +354,11 @@ impl MixCountableProcedureModel {
         icon: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_countable_procedure_models::mix_countable_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -385,15 +374,11 @@ impl MixCountableProcedureModel {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_countable_procedure_models::mix_countable_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -409,15 +394,11 @@ impl MixCountableProcedureModel {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_countable_procedure_models::mix_countable_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -433,15 +414,11 @@ impl MixCountableProcedureModel {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_countable_procedure_models::mix_countable_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -457,15 +434,11 @@ impl MixCountableProcedureModel {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_countable_procedure_models::mix_countable_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table

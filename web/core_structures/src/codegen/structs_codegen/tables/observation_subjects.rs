@@ -52,7 +52,8 @@ impl ObservationSubject {
             crate::codegen::structs_codegen::tables::colors::Color,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::colors::Color::table(),
@@ -66,11 +67,11 @@ impl ObservationSubject {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::observation_subjects::observation_subjects;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(observation_subjects::name.eq(name))
             .order_by(observation_subjects::id.asc())
@@ -82,11 +83,11 @@ impl ObservationSubject {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::observation_subjects::observation_subjects;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(observation_subjects::description.eq(description))
             .order_by(observation_subjects::id.asc())
@@ -98,11 +99,11 @@ impl ObservationSubject {
         icon: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::observation_subjects::observation_subjects;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(observation_subjects::icon.eq(icon))
             .order_by(observation_subjects::id.asc())
@@ -114,9 +115,10 @@ impl ObservationSubject {
         color_id: &i16,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::observation_subjects::observation_subjects;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(observation_subjects::color_id.eq(color_id))
             .order_by(observation_subjects::id.asc())

@@ -69,18 +69,16 @@ impl DefaultTypes {
                     );
                 }
             }
-            "::rosetta_uuid::Uuid" | "rosetta_uuid::Uuid" => {
-                match default_value {
-                    "gen_random_uuid()" => {
-                        Ok(DefaultTypes::Uuid(quote::quote! {rosetta_uuid::Uuid::new_v4()}))
-                    }
-                    _ => {
-                        unimplemented!(
-                            "Default type `{default_value}` for column type `{column_rust_type}` is not implemented",
-                        )
-                    }
+            "::rosetta_uuid::Uuid" | "rosetta_uuid::Uuid" => match default_value {
+                "gen_random_uuid()" => {
+                    Ok(DefaultTypes::Uuid(quote::quote! {rosetta_uuid::Uuid::new_v4()}))
                 }
-            }
+                _ => {
+                    unimplemented!(
+                        "Default type `{default_value}` for column type `{column_rust_type}` is not implemented",
+                    )
+                }
+            },
             _ => {
                 unimplemented!(
                     "Default type `{default_value}` for column type `{column_rust_type}` is not implemented",

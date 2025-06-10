@@ -52,7 +52,8 @@ impl InsertableTaxon {
             crate::codegen::structs_codegen::tables::ranks::Rank,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::ranks::Rank::table(),

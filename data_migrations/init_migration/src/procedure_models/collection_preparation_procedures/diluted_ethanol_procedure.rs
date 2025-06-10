@@ -17,7 +17,14 @@ pub const E70_ETHANOL: &str = "Ethanol 70 percent";
 ///
 /// * If the connection fails to insert the procedure model.
 /// * If the procedure model building fails.
-pub(super) fn init_ethanol_70_percent(user: &User, conn: &mut diesel::PgConnection) {
+pub(crate) fn init_ethanol_70_percent(
+    user: &User,
+    conn: &mut diesel::PgConnection,
+) -> ProcedureModel {
+    if let Some(procedure) = ProcedureModel::from_name(E70_ETHANOL, conn).unwrap() {
+        return procedure;
+    }
+
     ProcedureModel::new()
         .name(E70_ETHANOL)
         .unwrap()
@@ -28,5 +35,5 @@ pub(super) fn init_ethanol_70_percent(user: &User, conn: &mut diesel::PgConnecti
         .created_by(user.id)
         .unwrap()
         .insert(user.id, conn)
-		.unwrap();
+		.unwrap()
 }

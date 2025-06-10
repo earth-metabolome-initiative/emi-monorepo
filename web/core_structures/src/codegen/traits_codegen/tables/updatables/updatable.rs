@@ -1,5 +1,7 @@
 mod brands;
 mod documents;
+mod freeze_drying_procedure_models;
+mod freezing_procedure_models;
 mod mix_countable_procedure_models;
 mod mix_solid_procedure_models;
 mod next_procedure_models;

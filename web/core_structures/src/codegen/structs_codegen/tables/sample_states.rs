@@ -52,7 +52,8 @@ impl SampleState {
             crate::codegen::structs_codegen::tables::colors::Color,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::colors::Color::table(),
@@ -66,11 +67,11 @@ impl SampleState {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::sample_states::sample_states;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(sample_states::name.eq(name))
             .order_by(sample_states::id.asc())
@@ -82,11 +83,11 @@ impl SampleState {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::sample_states::sample_states;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(sample_states::description.eq(description))
             .order_by(sample_states::id.asc())
@@ -98,11 +99,11 @@ impl SampleState {
         icon: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::sample_states::sample_states;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(sample_states::icon.eq(icon))
             .order_by(sample_states::id.asc())
@@ -114,11 +115,11 @@ impl SampleState {
         color_id: &i16,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::sample_states::sample_states;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(sample_states::color_id.eq(color_id))
             .order_by(sample_states::id.asc())

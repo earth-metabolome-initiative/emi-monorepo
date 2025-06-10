@@ -51,7 +51,8 @@ impl OrganismTaxon {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -83,7 +84,8 @@ impl OrganismTaxon {
             crate::codegen::structs_codegen::tables::organisms::Organism,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::organisms::Organism::table(),
@@ -115,7 +117,8 @@ impl OrganismTaxon {
             crate::codegen::structs_codegen::tables::taxa::Taxon,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::taxa::Taxon::table(),
@@ -129,9 +132,10 @@ impl OrganismTaxon {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(organism_taxa::created_by.eq(created_by))
             .order_by((organism_taxa::organism_id.asc(), organism_taxa::taxon_id.asc()))
@@ -142,9 +146,10 @@ impl OrganismTaxon {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(organism_taxa::created_at.eq(created_at))
             .order_by((organism_taxa::organism_id.asc(), organism_taxa::taxon_id.asc()))
@@ -155,9 +160,10 @@ impl OrganismTaxon {
         organism_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(organism_taxa::organism_id.eq(organism_id))
             .order_by((organism_taxa::organism_id.asc(), organism_taxa::taxon_id.asc()))
@@ -168,9 +174,10 @@ impl OrganismTaxon {
         taxon_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(organism_taxa::taxon_id.eq(taxon_id))
             .order_by((organism_taxa::organism_id.asc(), organism_taxa::taxon_id.asc()))

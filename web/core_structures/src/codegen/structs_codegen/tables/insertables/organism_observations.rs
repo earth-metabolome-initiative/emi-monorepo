@@ -74,7 +74,8 @@ impl InsertableOrganismObservation {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -106,7 +107,8 @@ impl InsertableOrganismObservation {
             crate::codegen::structs_codegen::tables::organisms::Organism,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::organisms::Organism::table(),
@@ -138,7 +140,8 @@ impl InsertableOrganismObservation {
             crate::codegen::structs_codegen::tables::projects::Project,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::projects::Project::table(),
@@ -170,7 +173,8 @@ impl InsertableOrganismObservation {
             crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject::table(),
@@ -202,7 +206,8 @@ impl InsertableOrganismObservation {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -227,15 +232,15 @@ pub struct InsertableOrganismObservationBuilder {
 impl Default for InsertableOrganismObservationBuilder {
     fn default() -> Self {
         Self {
-            id: None,
+            id: Default::default(),
             wild: Some(true),
-            project_id: None,
-            organism_id: None,
-            subject_id: None,
-            picture: None,
-            created_by: None,
+            project_id: Default::default(),
+            organism_id: Default::default(),
+            subject_id: Default::default(),
+            picture: Default::default(),
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: None,
+            updated_by: Default::default(),
             updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
         }
     }

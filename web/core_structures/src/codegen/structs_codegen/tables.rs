@@ -36,6 +36,8 @@ pub mod fractioning_procedure_models;
 pub use fractioning_procedure_models::FractioningProcedureModel;
 pub mod freeze_drying_procedure_models;
 pub use freeze_drying_procedure_models::FreezeDryingProcedureModel;
+pub mod freezing_procedure_models;
+pub use freezing_procedure_models::FreezingProcedureModel;
 pub mod instrument_models;
 pub use instrument_models::InstrumentModel;
 pub mod instrument_states;

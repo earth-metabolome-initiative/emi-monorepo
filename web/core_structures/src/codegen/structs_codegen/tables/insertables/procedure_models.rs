@@ -71,7 +71,8 @@ impl InsertableProcedureModel {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -103,7 +104,8 @@ impl InsertableProcedureModel {
             crate::codegen::structs_codegen::tables::documents::Document,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         let Some(photograph_id) = self.photograph_id else {
             return Ok(None);
         };
@@ -139,7 +141,8 @@ impl InsertableProcedureModel {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -163,14 +166,14 @@ pub struct InsertableProcedureModelBuilder {
 impl Default for InsertableProcedureModelBuilder {
     fn default() -> Self {
         Self {
-            name: None,
-            description: None,
+            name: Default::default(),
+            description: Default::default(),
             deprecated: Some(false),
-            photograph_id: None,
+            photograph_id: Default::default(),
             icon: Some("book".to_owned()),
-            created_by: None,
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: None,
+            updated_by: Default::default(),
             updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
         }
     }

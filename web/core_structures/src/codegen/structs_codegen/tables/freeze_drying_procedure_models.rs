@@ -17,6 +17,7 @@ pub struct FreezeDryingProcedureModel {
     pub kelvin: f32,
     pub pascal: f32,
     pub seconds: f32,
+    pub freeze_dried_with: i32,
 }
 impl web_common_traits::prelude::TableName for FreezeDryingProcedureModel {
     const TABLE_NAME: &'static str = "freeze_drying_procedure_models";
@@ -36,6 +37,64 @@ impl diesel::Identifiable for FreezeDryingProcedureModel {
     }
 }
 impl FreezeDryingProcedureModel {
+    pub fn freeze_dried_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        >,
+    {
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.freeze_dried_with,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freeze_drying_procedure_models_freeze_dried_with_id_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >{
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
+                    .eq(&self.freeze_dried_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
+                            .eq(&self.id),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            >(conn)
+    }
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -59,7 +118,8 @@ impl FreezeDryingProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -69,19 +129,50 @@ impl FreezeDryingProcedureModel {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn from_freeze_dried_with(
+        freeze_dried_with: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
+        Self::table()
+            .filter(freeze_drying_procedure_models::freeze_dried_with.eq(freeze_dried_with))
+            .order_by(freeze_drying_procedure_models::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_freeze_dried_with_and_id(
+        freeze_dried_with: &i32,
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models;
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
+        Self::table()
+            .filter(
+                freeze_drying_procedure_models::freeze_dried_with
+                    .eq(freeze_dried_with)
+                    .and(freeze_drying_procedure_models::id.eq(id)),
+            )
+            .order_by(freeze_drying_procedure_models::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
-            SelectableHelper, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            freeze_drying_procedure_models::freeze_drying_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -98,15 +189,11 @@ impl FreezeDryingProcedureModel {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            freeze_drying_procedure_models::freeze_drying_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -122,15 +209,11 @@ impl FreezeDryingProcedureModel {
         deprecated: &bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            freeze_drying_procedure_models::freeze_drying_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -146,15 +229,11 @@ impl FreezeDryingProcedureModel {
         photograph_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            freeze_drying_procedure_models::freeze_drying_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -170,15 +249,11 @@ impl FreezeDryingProcedureModel {
         icon: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            freeze_drying_procedure_models::freeze_drying_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -194,15 +269,11 @@ impl FreezeDryingProcedureModel {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            freeze_drying_procedure_models::freeze_drying_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -218,15 +289,11 @@ impl FreezeDryingProcedureModel {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            freeze_drying_procedure_models::freeze_drying_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -242,15 +309,11 @@ impl FreezeDryingProcedureModel {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            freeze_drying_procedure_models::freeze_drying_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -266,15 +329,11 @@ impl FreezeDryingProcedureModel {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            freeze_drying_procedure_models::freeze_drying_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table

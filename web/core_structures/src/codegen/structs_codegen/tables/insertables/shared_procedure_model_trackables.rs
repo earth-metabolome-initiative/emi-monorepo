@@ -67,9 +67,10 @@ impl InsertableSharedProcedureModelTrackable {
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
@@ -91,9 +92,10 @@ impl InsertableSharedProcedureModelTrackable {
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
@@ -115,9 +117,10 @@ impl InsertableSharedProcedureModelTrackable {
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
@@ -156,7 +159,8 @@ impl InsertableSharedProcedureModelTrackable {
             crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel::table(),
@@ -173,9 +177,10 @@ impl InsertableSharedProcedureModelTrackable {
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
@@ -212,7 +217,8 @@ impl InsertableSharedProcedureModelTrackable {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -244,7 +250,8 @@ impl InsertableSharedProcedureModelTrackable {
             crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
@@ -276,7 +283,8 @@ impl InsertableSharedProcedureModelTrackable {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -308,7 +316,8 @@ impl InsertableSharedProcedureModelTrackable {
             crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
@@ -340,7 +349,8 @@ impl InsertableSharedProcedureModelTrackable {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -372,7 +382,8 @@ impl InsertableSharedProcedureModelTrackable {
             crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
@@ -404,7 +415,8 @@ impl InsertableSharedProcedureModelTrackable {
             crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
@@ -427,13 +439,13 @@ pub struct InsertableSharedProcedureModelTrackableBuilder {
 impl Default for InsertableSharedProcedureModelTrackableBuilder {
     fn default() -> Self {
         Self {
-            parent_id: None,
-            parent_trackable_id: None,
-            parent_procedure_model_id: None,
-            child_id: None,
-            child_trackable_id: None,
-            child_procedure_model_id: None,
-            created_by: None,
+            parent_id: Default::default(),
+            parent_trackable_id: Default::default(),
+            parent_procedure_model_id: Default::default(),
+            child_id: Default::default(),
+            child_trackable_id: Default::default(),
+            child_procedure_model_id: Default::default(),
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
         }
     }

@@ -54,7 +54,8 @@ impl InsertableOrganismTaxon {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -86,7 +87,8 @@ impl InsertableOrganismTaxon {
             crate::codegen::structs_codegen::tables::organisms::Organism,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::organisms::Organism::table(),
@@ -118,7 +120,8 @@ impl InsertableOrganismTaxon {
             crate::codegen::structs_codegen::tables::taxa::Taxon,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::taxa::Taxon::table(),
@@ -137,10 +140,10 @@ pub struct InsertableOrganismTaxonBuilder {
 impl Default for InsertableOrganismTaxonBuilder {
     fn default() -> Self {
         Self {
-            created_by: None,
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            organism_id: None,
-            taxon_id: None,
+            organism_id: Default::default(),
+            taxon_id: Default::default(),
         }
     }
 }

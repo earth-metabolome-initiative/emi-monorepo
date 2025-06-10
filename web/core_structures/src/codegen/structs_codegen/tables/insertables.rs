@@ -72,6 +72,11 @@ pub use freeze_drying_procedure_models::{
     InsertableFreezeDryingProcedureModel, InsertableFreezeDryingProcedureModelAttributes,
     InsertableFreezeDryingProcedureModelBuilder,
 };
+mod freezing_procedure_models;
+pub use freezing_procedure_models::{
+    InsertableFreezingProcedureModel, InsertableFreezingProcedureModelAttributes,
+    InsertableFreezingProcedureModelBuilder,
+};
 mod instrument_models;
 pub use instrument_models::{
     InsertableInstrumentModel, InsertableInstrumentModelAttributes,

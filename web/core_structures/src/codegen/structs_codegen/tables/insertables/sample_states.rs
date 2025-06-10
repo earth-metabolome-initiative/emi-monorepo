@@ -54,7 +54,8 @@ impl InsertableSampleState {
             crate::codegen::structs_codegen::tables::colors::Color,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::colors::Color::table(),

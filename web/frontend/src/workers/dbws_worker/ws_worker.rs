@@ -23,13 +23,11 @@ impl super::DBWSWorker {
         M: Into<WSInternalMessage>,
     {
         match ws_message.into() {
-            WSInternalMessage::B2F(message) => {
-                match message {
-                    B2FMessage::DB(db_message) => {
-                        scope.send_message(DBInternalMessage::DB(db_message));
-                    }
+            WSInternalMessage::B2F(message) => match message {
+                B2FMessage::DB(db_message) => {
+                    scope.send_message(DBInternalMessage::DB(db_message));
                 }
-            }
+            },
             WSInternalMessage::F2B(message) => {
                 if let Some(websocket) = self.websocket.as_mut() {
                     if let Err(err) = websocket.try_send(message) {
@@ -81,16 +79,14 @@ impl super::DBWSWorker {
                     spawn_local(async move {
                         while let Some(backend_message) = read.next().await {
                             match backend_message {
-                                Ok(message) => {
-                                    match message.try_into() {
-                                        Ok(message) => {
-                                            scope.send_message(WSInternalMessage::B2F(message));
-                                        }
-                                        Err(err) => {
-                                            scope.send_message(err);
-                                        }
+                                Ok(message) => match message.try_into() {
+                                    Ok(message) => {
+                                        scope.send_message(WSInternalMessage::B2F(message));
                                     }
-                                }
+                                    Err(err) => {
+                                        scope.send_message(err);
+                                    }
+                                },
                                 Err(err) => {
                                     scope.send_message(err);
                                     break;

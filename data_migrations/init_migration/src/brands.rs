@@ -21,12 +21,10 @@ pub(crate) fn fisher_scientific(
 ) -> Result<Brand, crate::error::Error> {
     match Brand::from_name("Fisher Scientific", portal_conn)? {
         Some(brand) => Ok(brand),
-        None => {
-            Ok(Brand::new()
-                .name("Fisher Scientific")?
-                .created_by(user.id)?
-                .insert(user.id, portal_conn)?)
-        }
+        None => Ok(Brand::new()
+            .name("Fisher Scientific")?
+            .created_by(user.id)?
+            .insert(user.id, portal_conn)?),
     }
 }
 
@@ -47,12 +45,10 @@ pub(crate) fn acros_organics(
 ) -> Result<Brand, crate::error::Error> {
     match Brand::from_name("Acros Organics", portal_conn)? {
         Some(brand) => Ok(brand),
-        None => {
-            Ok(Brand::new()
-                .name("Acros Organics")?
-                .created_by(user.id)?
-                .insert(user.id, portal_conn)?)
-        }
+        None => Ok(Brand::new()
+            .name("Acros Organics")?
+            .created_by(user.id)?
+            .insert(user.id, portal_conn)?),
     }
 }
 

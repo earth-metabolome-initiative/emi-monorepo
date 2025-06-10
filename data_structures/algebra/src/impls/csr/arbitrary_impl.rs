@@ -35,14 +35,12 @@ where
         for (row, column) in edges {
             match csr.add((row, column)) {
                 Ok(_) => {}
-                Err(err) => {
-                    match err {
-                        MutabilityError::MaxedOutSparseIndex
-                        | MutabilityError::MaxedOutRowIndex
-                        | MutabilityError::MaxedOutColumnIndex => continue,
-                        _ => return Err(arbitrary::Error::IncorrectFormat),
-                    }
-                }
+                Err(err) => match err {
+                    MutabilityError::MaxedOutSparseIndex
+                    | MutabilityError::MaxedOutRowIndex
+                    | MutabilityError::MaxedOutColumnIndex => continue,
+                    _ => return Err(arbitrary::Error::IncorrectFormat),
+                },
             }
         }
 

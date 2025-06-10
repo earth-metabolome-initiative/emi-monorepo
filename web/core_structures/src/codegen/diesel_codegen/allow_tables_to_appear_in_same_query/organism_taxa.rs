@@ -1,4 +1,5 @@
-use crate::codegen::diesel_codegen::tables::{organism_taxa::organism_taxa, organisms::organisms};
+use crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa;
+use crate::codegen::diesel_codegen::tables::organisms::organisms;
 diesel::allow_tables_to_appear_in_same_query!(organism_taxa, organisms);
 use crate::codegen::diesel_codegen::tables::taxa::taxa;
 diesel::allow_tables_to_appear_in_same_query!(organism_taxa, taxa);

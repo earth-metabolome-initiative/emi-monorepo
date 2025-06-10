@@ -480,17 +480,15 @@ where
             sqlparser::ast::Value::Boolean(value) => {
                 Ok((quote::quote! { #value }, ReturningType::Boolean))
             }
-            sqlparser::ast::Value::Number(value, _) => {
-                match type_hint {
-                    Some(type_hint) => Ok((type_hint.cast(value)?, type_hint.clone())),
-                    None => {
-                        unimplemented!(
-                            "Number without type hint not supported: {:?}",
-                            self.check_constraint
-                        );
-                    }
+            sqlparser::ast::Value::Number(value, _) => match type_hint {
+                Some(type_hint) => Ok((type_hint.cast(value)?, type_hint.clone())),
+                None => {
+                    unimplemented!(
+                        "Number without type hint not supported: {:?}",
+                        self.check_constraint
+                    );
                 }
-            }
+            },
             sqlparser::ast::Value::SingleQuotedString(value) => {
                 Ok((quote::quote! { #value }, ReturningType::Textual))
             }
@@ -553,94 +551,127 @@ where
                     ReturningType::try_from_pg_type(involved_column.pg_type(conn)?, conn)?,
                 ))
             }
-            Expr::BinaryOp { left, op, right } => {
-                match op {
-                    BinaryOperator::And => {
-                        let (left, left_scoped_columns, left_returning_type) =
-                            self.parse(left, None, conn)?;
-                        let (right, right_scoped_columns, right_returning_type) =
-                            self.parse(right, None, conn)?;
-                        if !left_scoped_columns.is_empty() || !right_scoped_columns.is_empty() {
-                            unimplemented!("Scoped columns not supported");
-                        }
-                        if matches!(left_returning_type, ReturningType::Boolean)
-                            && matches!(right_returning_type, ReturningType::Boolean)
-                        {
-                            Ok((
-                                quote::quote! {
-                                    #left && #right
-                                },
-                                Vec::new(),
-                                ReturningType::Boolean,
-                            ))
-                        } else if matches!(left_returning_type, ReturningType::Result)
-                            || matches!(right_returning_type, ReturningType::Result)
-                        {
-                            Ok((
-                                quote::quote! {
-                                    #left.and_then(|_| #right)
-                                },
-                                Vec::new(),
-                                ReturningType::Result,
-                            ))
-                        } else {
-                            unimplemented!("Unsupported binary operation");
-                        }
+            Expr::BinaryOp { left, op, right } => match op {
+                BinaryOperator::And => {
+                    let (left, left_scoped_columns, left_returning_type) =
+                        self.parse(left, None, conn)?;
+                    let (right, right_scoped_columns, right_returning_type) =
+                        self.parse(right, None, conn)?;
+                    if !left_scoped_columns.is_empty() || !right_scoped_columns.is_empty() {
+                        unimplemented!("Scoped columns not supported");
                     }
-                    BinaryOperator::Or => {
-                        let (left, left_scoped_columns, left_returning_type) =
-                            self.parse(left, None, conn)?;
-                        let (right, right_scoped_columns, right_returning_type) =
-                            self.parse(right, None, conn)?;
-                        if !left_scoped_columns.is_empty() || !right_scoped_columns.is_empty() {
-                            unimplemented!("Scoped columns not supported");
-                        }
-                        if matches!(left_returning_type, ReturningType::Boolean)
-                            && matches!(right_returning_type, ReturningType::Boolean)
-                        {
-                            Ok((
-                                quote::quote! {
-                                    #left || #right
-                                },
-                                Vec::new(),
-                                ReturningType::Boolean,
-                            ))
-                        } else if matches!(left_returning_type, ReturningType::Result)
-                            || matches!(right_returning_type, ReturningType::Result)
-                        {
-                            Ok((
-                                quote::quote! {
-                                    #left.or_else(|_| #right)
-                                },
-                                Vec::new(),
-                                ReturningType::Result,
-                            ))
-                        } else {
-                            unimplemented!("Unsupported binary operation");
-                        }
+                    if matches!(left_returning_type, ReturningType::Boolean)
+                        && matches!(right_returning_type, ReturningType::Boolean)
+                    {
+                        Ok((
+                            quote::quote! {
+                                #left && #right
+                            },
+                            Vec::new(),
+                            ReturningType::Boolean,
+                        ))
+                    } else if matches!(left_returning_type, ReturningType::Result)
+                        || matches!(right_returning_type, ReturningType::Result)
+                    {
+                        Ok((
+                            quote::quote! {
+                                #left.and_then(|_| #right)
+                            },
+                            Vec::new(),
+                            ReturningType::Result,
+                        ))
+                    } else {
+                        unimplemented!("Unsupported binary operation");
                     }
-                    BinaryOperator::NotEq
-                    | BinaryOperator::Eq
-                    | BinaryOperator::Gt
-                    | BinaryOperator::Lt
-                    | BinaryOperator::GtEq
-                    | BinaryOperator::LtEq => {
-                        let (left, _, left_returning_type) = self.parse(left, None, conn)?;
-                        let (right, _, right_returning_type) =
-                            self.parse(right, Some(&left_returning_type), conn)?;
-                        if left_returning_type != right_returning_type {
-                            unimplemented!(
-                                "Equality between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}",
-                                self.check_constraint
-                            );
-                        }
+                }
+                BinaryOperator::Or => {
+                    let (left, left_scoped_columns, left_returning_type) =
+                        self.parse(left, None, conn)?;
+                    let (right, right_scoped_columns, right_returning_type) =
+                        self.parse(right, None, conn)?;
+                    if !left_scoped_columns.is_empty() || !right_scoped_columns.is_empty() {
+                        unimplemented!("Scoped columns not supported");
+                    }
+                    if matches!(left_returning_type, ReturningType::Boolean)
+                        && matches!(right_returning_type, ReturningType::Boolean)
+                    {
+                        Ok((
+                            quote::quote! {
+                                #left || #right
+                            },
+                            Vec::new(),
+                            ReturningType::Boolean,
+                        ))
+                    } else if matches!(left_returning_type, ReturningType::Result)
+                        || matches!(right_returning_type, ReturningType::Result)
+                    {
+                        Ok((
+                            quote::quote! {
+                                #left.or_else(|_| #right)
+                            },
+                            Vec::new(),
+                            ReturningType::Result,
+                        ))
+                    } else {
+                        unimplemented!("Unsupported binary operation");
+                    }
+                }
+                BinaryOperator::NotEq
+                | BinaryOperator::Eq
+                | BinaryOperator::Gt
+                | BinaryOperator::Lt
+                | BinaryOperator::GtEq
+                | BinaryOperator::LtEq => {
+                    let (left, _, left_returning_type) = self.parse(left, None, conn)?;
+                    let (right, _, right_returning_type) =
+                        self.parse(right, Some(&left_returning_type), conn)?;
+                    if left_returning_type != right_returning_type {
+                        unimplemented!(
+                            "Equality between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}",
+                            self.check_constraint
+                        );
+                    }
+                    let operator_symbol: syn::BinOp = match op {
+                        BinaryOperator::Eq => syn::BinOp::Eq(syn::token::EqEq::default()),
+                        BinaryOperator::NotEq => syn::BinOp::Ne(syn::token::Ne::default()),
+                        BinaryOperator::Gt => syn::BinOp::Gt(syn::token::Gt::default()),
+                        BinaryOperator::Lt => syn::BinOp::Lt(syn::token::Lt::default()),
+                        BinaryOperator::GtEq => syn::BinOp::Ge(syn::token::Ge::default()),
+                        BinaryOperator::LtEq => syn::BinOp::Le(syn::token::Le::default()),
+                        _ => unreachable!(),
+                    };
+                    Ok((
+                        quote::quote! {
+                            #left #operator_symbol #right
+                        },
+                        Vec::new(),
+                        ReturningType::Boolean,
+                    ))
+                }
+                BinaryOperator::Plus
+                | BinaryOperator::Minus
+                | BinaryOperator::Multiply
+                | BinaryOperator::Divide
+                | BinaryOperator::Modulo => {
+                    let (left, _, left_returning_type) = self.parse(left, type_hint, conn)?;
+                    let (right, _, right_returning_type) = self.parse(right, type_hint, conn)?;
+                    if left_returning_type != right_returning_type {
+                        unimplemented!(
+                            "Binary operation between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}",
+                            self.check_constraint
+                        );
+                    }
+                    if left_returning_type.is_numeric() && right_returning_type.is_numeric() {
                         let operator_symbol: syn::BinOp = match op {
-                            BinaryOperator::Eq => syn::BinOp::Eq(syn::token::EqEq::default()),
-                            BinaryOperator::NotEq => syn::BinOp::Ne(syn::token::Ne::default()),
-                            BinaryOperator::Gt => syn::BinOp::Gt(syn::token::Gt::default()),
-                            BinaryOperator::Lt => syn::BinOp::Lt(syn::token::Lt::default()),
-                            BinaryOperator::GtEq => syn::BinOp::Ge(syn::token::Ge::default()),
-                            BinaryOperator::LtEq => syn::BinOp::Le(syn::token::Le::default()),
+                            BinaryOperator::Plus => syn::BinOp::Add(syn::token::Plus::default()),
+                            BinaryOperator::Minus => syn::BinOp::Sub(syn::token::Minus::default()),
+                            BinaryOperator::Multiply => {
+                                syn::BinOp::Mul(syn::token::Star::default())
+                            }
+                            BinaryOperator::Divide => syn::BinOp::Div(syn::token::Slash::default()),
+                            BinaryOperator::Modulo => {
+                                syn::BinOp::Rem(syn::token::Percent::default())
+                            }
                             _ => unreachable!(),
                         };
                         Ok((
@@ -648,63 +679,21 @@ where
                                 #left #operator_symbol #right
                             },
                             Vec::new(),
-                            ReturningType::Boolean,
+                            left_returning_type,
                         ))
-                    }
-                    BinaryOperator::Plus
-                    | BinaryOperator::Minus
-                    | BinaryOperator::Multiply
-                    | BinaryOperator::Divide
-                    | BinaryOperator::Modulo => {
-                        let (left, _, left_returning_type) = self.parse(left, type_hint, conn)?;
-                        let (right, _, right_returning_type) =
-                            self.parse(right, type_hint, conn)?;
-                        if left_returning_type != right_returning_type {
-                            unimplemented!(
-                                "Binary operation between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}",
-                                self.check_constraint
-                            );
-                        }
-                        if left_returning_type.is_numeric() && right_returning_type.is_numeric() {
-                            let operator_symbol: syn::BinOp = match op {
-                                BinaryOperator::Plus => {
-                                    syn::BinOp::Add(syn::token::Plus::default())
-                                }
-                                BinaryOperator::Minus => {
-                                    syn::BinOp::Sub(syn::token::Minus::default())
-                                }
-                                BinaryOperator::Multiply => {
-                                    syn::BinOp::Mul(syn::token::Star::default())
-                                }
-                                BinaryOperator::Divide => {
-                                    syn::BinOp::Div(syn::token::Slash::default())
-                                }
-                                BinaryOperator::Modulo => {
-                                    syn::BinOp::Rem(syn::token::Percent::default())
-                                }
-                                _ => unreachable!(),
-                            };
-                            Ok((
-                                quote::quote! {
-                                    #left #operator_symbol #right
-                                },
-                                Vec::new(),
-                                left_returning_type,
-                            ))
-                        } else {
-                            unimplemented!(
-                                "Unsupported binary operation {} between {:?} and {:?}",
-                                op,
-                                left_returning_type,
-                                right_returning_type
-                            );
-                        }
-                    }
-                    operator => {
-                        unimplemented!("Unsupported binary operator: {operator:?}");
+                    } else {
+                        unimplemented!(
+                            "Unsupported binary operation {} between {:?} and {:?}",
+                            op,
+                            left_returning_type,
+                            right_returning_type
+                        );
                     }
                 }
-            }
+                operator => {
+                    unimplemented!("Unsupported binary operator: {operator:?}");
+                }
+            },
             Expr::Value(value) => {
                 let (token_stream, returning_type) =
                     self.parse_value_with_span(value, type_hint)?;

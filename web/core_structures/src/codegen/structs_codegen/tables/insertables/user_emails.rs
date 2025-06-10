@@ -52,7 +52,8 @@ impl InsertableUserEmail {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -71,8 +72,8 @@ pub struct InsertableUserEmailBuilder {
 impl Default for InsertableUserEmailBuilder {
     fn default() -> Self {
         Self {
-            email: None,
-            created_by: None,
+            email: Default::default(),
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             primary_email: Some(true),
         }

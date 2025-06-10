@@ -1,6 +1,10 @@
 //! Submodule defining the DBGI collection preparation procedure model.
 
-use core_structures::{ProcedureModel, User};
+use crate::procedure_models::{init_ethanol_70_percent, init_sample_extraction_solvent_procedure};
+use core_structures::{
+    ProcedureModel, User,
+    traits::{AppendProcedureModel, ChildOptions, ParentProcedureModel},
+};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
 /// The name of the DBGI Collection preparation procedure model.
@@ -21,7 +25,7 @@ pub(super) fn init_dbgi_collection_preparation(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> ProcedureModel {
-    ProcedureModel::new()
+    let dbgi_collection_preparation = ProcedureModel::new()
         .name(DBGI_COLLECTION_PREPARATION)
         .unwrap()
         .description("DBGI Collection preparation procedure model")
@@ -29,5 +33,20 @@ pub(super) fn init_dbgi_collection_preparation(
         .created_by(user.id)
         .unwrap()
         .insert(user.id, conn)
-        .unwrap()
+        .unwrap();
+
+    let make_ethanol_70 = init_ethanol_70_percent(user, conn);
+    let make_solvent = init_sample_extraction_solvent_procedure(user, conn);
+
+    dbgi_collection_preparation
+        .child(&make_ethanol_70, ChildOptions::default().inherit_trackables(), user, conn)
+        .unwrap();
+
+    dbgi_collection_preparation
+        .child(&make_solvent, ChildOptions::default().inherit_trackables(), user, conn)
+        .unwrap();
+
+    dbgi_collection_preparation.extend(&[&make_ethanol_70, &make_solvent], user, conn).unwrap();
+
+    dbgi_collection_preparation
 }

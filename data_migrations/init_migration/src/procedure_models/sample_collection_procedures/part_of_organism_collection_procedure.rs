@@ -4,7 +4,7 @@ use core_structures::{ProcedureModel, User};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
 /// The name of the part of organism collection procedure model.
-pub const PART_OF_ORGANISM: &str = "Part of organisms collection procedure";
+const PART_OF_ORGANISM: &str = "Part of organisms collection procedure";
 
 /// Initializes the part of organism collection procedure model in the database.
 ///
@@ -17,7 +17,14 @@ pub const PART_OF_ORGANISM: &str = "Part of organisms collection procedure";
 ///
 /// * If the connection fails to insert the procedure model.
 /// * If the procedure model building fails.
-pub(super) fn init_part_of_organism_collection(user: &User, conn: &mut diesel::PgConnection) {
+pub(crate) fn init_part_of_organism_collection(
+    user: &User,
+    conn: &mut diesel::PgConnection,
+) -> ProcedureModel {
+    if let Some(existing) = ProcedureModel::from_name(PART_OF_ORGANISM, conn).unwrap() {
+        return existing;
+    }
+
     ProcedureModel::new()
         .name(PART_OF_ORGANISM)
         .unwrap()
@@ -28,5 +35,5 @@ pub(super) fn init_part_of_organism_collection(user: &User, conn: &mut diesel::P
         .created_by(user.id)
         .unwrap()
         .insert(user.id, conn)
-        .unwrap();
+        .unwrap()
 }

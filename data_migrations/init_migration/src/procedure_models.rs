@@ -22,6 +22,15 @@ mod collection_preparation_procedures;
 mod data_enrichment_procedures;
 mod observation_procedures;
 mod sample_collection_procedures;
+pub(crate) use analysis_procedures::{
+    init_negative_ionization_lcms_procedure, init_positive_ionization_lcms_procedure,
+};
+pub(crate) use collection_preparation_procedures::{
+    init_ethanol_70_percent, init_sample_extraction_solvent_procedure,
+};
+pub(crate) use sample_collection_procedures::{
+    init_full_organism_collection, init_part_of_organism_collection,
+};
 
 // pub(crate) use
 // aliquoting_mass_spec_extracts_procedure::ALIQUOTING_MASS_SPEC_EXTRACTS;
@@ -38,10 +47,7 @@ mod sample_collection_procedures;
 pub(crate) fn init_procedure_models(user: &User, conn: &mut PgConnection) {
     // emi_solvent_procedure::init_emi_solvent_procedure_models(user, conn)?;
     // ethanol_70_percent::init_ethanol_70_percent(user, conn)?;
-    sample_collection_procedures::init_sample_collection_procedures(user, conn);
     observation_procedures::init_observation_procedures(user, conn);
-    collection_preparation_procedures::init_collection_preparation_procedures(user, conn);
-    analysis_procedures::init_analysis_procedures(user, conn);
     data_enrichment_procedures::init_data_enrichment_procedures(user, conn);
     dbgi_plan::init_dbgi_plan(user, conn);
 

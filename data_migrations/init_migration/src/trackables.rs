@@ -4,6 +4,7 @@ use core_structures::User;
 use diesel::PgConnection;
 
 pub mod containers;
+pub mod instruments;
 pub mod reagents;
 
 /// Initializes the trackable categories for the user.
@@ -19,4 +20,5 @@ pub mod reagents;
 pub(super) fn init_trackables(user: &User, portal_conn: &mut PgConnection) {
     reagents::init_reagents(user, portal_conn);
     containers::init_containers(user, portal_conn);
+    instruments::init_instruments(user, portal_conn);
 }

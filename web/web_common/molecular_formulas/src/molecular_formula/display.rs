@@ -47,12 +47,10 @@ impl Display for MolecularFormula {
             Self::Greek(greek) => {
                 write!(f, "{greek}-")
             }
-            Self::Radical(formula, side) => {
-                match side {
-                    Side::Left => write!(f, "•{formula}"),
-                    Side::Right => write!(f, "{formula}•"),
-                }
-            }
+            Self::Radical(formula, side) => match side {
+                Side::Left => write!(f, "•{formula}"),
+                Side::Right => write!(f, "{formula}•"),
+            },
         }
     }
 }

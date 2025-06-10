@@ -214,15 +214,13 @@ impl Report {
 
     /// Returns an iterator over the sub-reports.
     fn sub_reports(&self) -> impl Iterator<Item = Report> + '_ {
-        self.time_tracker.sub_trackers().iter().cloned().map(|time_tracker| {
-            Self {
-                previous_reports: self
-                    .previous_reports
-                    .iter()
-                    .filter_map(|report| report.sub_tracker_by_name(time_tracker.name()).cloned())
-                    .collect(),
-                time_tracker,
-            }
+        self.time_tracker.sub_trackers().iter().cloned().map(|time_tracker| Self {
+            previous_reports: self
+                .previous_reports
+                .iter()
+                .filter_map(|report| report.sub_tracker_by_name(time_tracker.name()).cloned())
+                .collect(),
+            time_tracker,
         })
     }
 
@@ -230,16 +228,11 @@ impl Report {
     /// Returns the text of the report.
     fn text(&self, depth: usize) -> String {
         let total_time = self.time_tracker.total_time().num_seconds() as f64;
-        let rows = self.time_tracker.tasks().map(|task| {
-            TableRow {
-                name: task.name(),
-                time: HumanTime::from(task.time()).to_text_en(Accuracy::Rough, Tense::Present),
-                percentage: format!(
-                    "{:.2}%",
-                    task.time().num_seconds() as f64 / total_time * 100.0
-                ),
-                comment: self.task_comment(task).unwrap_or_default(),
-            }
+        let rows = self.time_tracker.tasks().map(|task| TableRow {
+            name: task.name(),
+            time: HumanTime::from(task.time()).to_text_en(Accuracy::Rough, Tense::Present),
+            percentage: format!("{:.2}%", task.time().num_seconds() as f64 / total_time * 100.0),
+            comment: self.task_comment(task).unwrap_or_default(),
         });
         let mut table = Table::new(rows);
         table.with(Style::markdown());

@@ -57,6 +57,9 @@ where
     crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::freezing_procedure_models::FreezingProcedureModel: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel: web_common_traits::database::Read<
         C,
     >,
@@ -388,6 +391,15 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezingProcedureModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::freezing_procedure_models::FreezingProcedureModel::read(
                             primary_key,
                             conn,
                         )?

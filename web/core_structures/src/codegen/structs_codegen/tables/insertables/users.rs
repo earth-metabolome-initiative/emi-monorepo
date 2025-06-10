@@ -38,8 +38,8 @@ pub struct InsertableUserBuilder {
 impl Default for InsertableUserBuilder {
     fn default() -> Self {
         Self {
-            first_name: None,
-            last_name: None,
+            first_name: Default::default(),
+            last_name: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
         }

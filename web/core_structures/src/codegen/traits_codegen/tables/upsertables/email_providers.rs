@@ -6,9 +6,8 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-
         use crate::codegen::diesel_codegen::tables::email_providers::email_providers::*;
+        use diesel::RunQueryDsl;
         diesel::insert_into(table)
             .values(self)
             .on_conflict((email_id, login_provider_id))
@@ -25,9 +24,8 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-
         use crate::codegen::diesel_codegen::tables::email_providers::email_providers::*;
+        use diesel::RunQueryDsl;
         diesel::insert_into(table)
             .values(self)
             .on_conflict((email_id, login_provider_id))

@@ -36,14 +36,12 @@ where
         for edge in edges {
             match csr.add(edge) {
                 Ok(_) => {}
-                Err(err) => {
-                    match err {
-                        MutabilityError::MaxedOutSparseIndex
-                        | MutabilityError::MaxedOutRowIndex
-                        | MutabilityError::MaxedOutColumnIndex => continue,
-                        _ => return Err(arbitrary::Error::IncorrectFormat),
-                    }
-                }
+                Err(err) => match err {
+                    MutabilityError::MaxedOutSparseIndex
+                    | MutabilityError::MaxedOutRowIndex
+                    | MutabilityError::MaxedOutColumnIndex => continue,
+                    _ => return Err(arbitrary::Error::IncorrectFormat),
+                },
             }
         }
 

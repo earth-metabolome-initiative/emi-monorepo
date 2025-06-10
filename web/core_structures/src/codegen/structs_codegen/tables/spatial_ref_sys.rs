@@ -34,9 +34,10 @@ impl SpatialRefSy {
         auth_name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::spatial_ref_sys::spatial_ref_sys;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(spatial_ref_sys::auth_name.eq(auth_name))
             .order_by(spatial_ref_sys::srid.asc())
@@ -47,9 +48,10 @@ impl SpatialRefSy {
         auth_srid: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::spatial_ref_sys::spatial_ref_sys;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(spatial_ref_sys::auth_srid.eq(auth_srid))
             .order_by(spatial_ref_sys::srid.asc())
@@ -60,9 +62,10 @@ impl SpatialRefSy {
         srtext: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::spatial_ref_sys::spatial_ref_sys;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(spatial_ref_sys::srtext.eq(srtext))
             .order_by(spatial_ref_sys::srid.asc())
@@ -73,9 +76,10 @@ impl SpatialRefSy {
         proj4text: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::spatial_ref_sys::spatial_ref_sys;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(spatial_ref_sys::proj4text.eq(proj4text))
             .order_by(spatial_ref_sys::srid.asc())

@@ -60,7 +60,8 @@ impl MixSolidProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
@@ -77,9 +78,10 @@ impl MixSolidProcedureModel {
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
@@ -116,7 +118,8 @@ impl MixSolidProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -148,7 +151,8 @@ impl MixSolidProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
@@ -165,9 +169,10 @@ impl MixSolidProcedureModel {
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
@@ -204,7 +209,8 @@ impl MixSolidProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
@@ -221,9 +227,10 @@ impl MixSolidProcedureModel {
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
@@ -242,9 +249,10 @@ impl MixSolidProcedureModel {
         measured_with: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(mix_solid_procedure_models::measured_with.eq(measured_with))
             .order_by(mix_solid_procedure_models::id.asc())
@@ -255,9 +263,10 @@ impl MixSolidProcedureModel {
         source: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(mix_solid_procedure_models::source.eq(source))
             .order_by(mix_solid_procedure_models::id.asc())
@@ -268,9 +277,10 @@ impl MixSolidProcedureModel {
         destination: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(mix_solid_procedure_models::destination.eq(destination))
             .order_by(mix_solid_procedure_models::id.asc())
@@ -282,11 +292,11 @@ impl MixSolidProcedureModel {
         id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(
                 mix_solid_procedure_models::destination
@@ -302,11 +312,11 @@ impl MixSolidProcedureModel {
         id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(
                 mix_solid_procedure_models::measured_with
@@ -322,11 +332,11 @@ impl MixSolidProcedureModel {
         id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
         use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(
                 mix_solid_procedure_models::source
@@ -341,15 +351,12 @@ impl MixSolidProcedureModel {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
-            SelectableHelper, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_solid_procedure_models::mix_solid_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
@@ -365,15 +372,11 @@ impl MixSolidProcedureModel {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_solid_procedure_models::mix_solid_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
@@ -388,15 +391,11 @@ impl MixSolidProcedureModel {
         deprecated: &bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_solid_procedure_models::mix_solid_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
@@ -411,15 +410,11 @@ impl MixSolidProcedureModel {
         photograph_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_solid_procedure_models::mix_solid_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
@@ -434,15 +429,11 @@ impl MixSolidProcedureModel {
         icon: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_solid_procedure_models::mix_solid_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
@@ -457,15 +448,11 @@ impl MixSolidProcedureModel {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_solid_procedure_models::mix_solid_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
@@ -480,15 +467,11 @@ impl MixSolidProcedureModel {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_solid_procedure_models::mix_solid_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
@@ -503,15 +486,11 @@ impl MixSolidProcedureModel {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_solid_procedure_models::mix_solid_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
@@ -526,15 +505,11 @@ impl MixSolidProcedureModel {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            mix_solid_procedure_models::mix_solid_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),

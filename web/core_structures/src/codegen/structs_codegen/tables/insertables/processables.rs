@@ -57,7 +57,8 @@ impl InsertableProcessable {
             crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::trackables::Trackable::table(),

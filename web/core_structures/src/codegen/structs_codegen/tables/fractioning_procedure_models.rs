@@ -57,7 +57,8 @@ impl FractioningProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -71,15 +72,12 @@ impl FractioningProcedureModel {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
-            SelectableHelper, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            fractioning_procedure_models::fractioning_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::fractioning_procedure_models::fractioning_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -96,15 +94,11 @@ impl FractioningProcedureModel {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            fractioning_procedure_models::fractioning_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::fractioning_procedure_models::fractioning_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -120,15 +114,11 @@ impl FractioningProcedureModel {
         deprecated: &bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            fractioning_procedure_models::fractioning_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::fractioning_procedure_models::fractioning_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -144,15 +134,11 @@ impl FractioningProcedureModel {
         photograph_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            fractioning_procedure_models::fractioning_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::fractioning_procedure_models::fractioning_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -168,15 +154,11 @@ impl FractioningProcedureModel {
         icon: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            fractioning_procedure_models::fractioning_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::fractioning_procedure_models::fractioning_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -192,15 +174,11 @@ impl FractioningProcedureModel {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            fractioning_procedure_models::fractioning_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::fractioning_procedure_models::fractioning_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -216,15 +194,11 @@ impl FractioningProcedureModel {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            fractioning_procedure_models::fractioning_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::fractioning_procedure_models::fractioning_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -240,15 +214,11 @@ impl FractioningProcedureModel {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            fractioning_procedure_models::fractioning_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::fractioning_procedure_models::fractioning_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table
@@ -264,15 +234,11 @@ impl FractioningProcedureModel {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            fractioning_procedure_models::fractioning_procedure_models,
-            procedure_models::procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::fractioning_procedure_models::fractioning_procedure_models;
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table

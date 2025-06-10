@@ -15,11 +15,10 @@ impl MolecularFormula {
         match self {
             Self::Element(element) => Ok(element.standard_atomic_weight()),
             Self::Isotope(isotope) => Ok(isotope.element().standard_atomic_weight()),
-            Self::Ion(ion) => {
-                ion.entry.molar_mass().map(|molar_mass| {
-                    molar_mass - f64::from(ion.charge) * crate::ion::ELECTRON_MASS
-                })
-            }
+            Self::Ion(ion) => ion
+                .entry
+                .molar_mass()
+                .map(|molar_mass| molar_mass - f64::from(ion.charge) * crate::ion::ELECTRON_MASS),
             Self::Count(formula, count) => {
                 formula.molar_mass().map(|molar_mass| molar_mass * f64::from(*count))
             }

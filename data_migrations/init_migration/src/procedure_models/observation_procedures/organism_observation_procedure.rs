@@ -2,7 +2,7 @@ use core_structures::{ProcedureModel, User};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
 /// The name of the Organism observation procedure model.
-pub const ORGANISM_OBSERVATION: &str = "Organism observation procedure";
+const ORGANISM_OBSERVATION: &str = "Organism observation procedure";
 
 /// Initializes the Organism observation procedure model in the database.
 ///
@@ -15,7 +15,14 @@ pub const ORGANISM_OBSERVATION: &str = "Organism observation procedure";
 ///
 /// * If the connection fails to insert the procedure model.
 /// * If the procedure model building fails.
-pub(super) fn init_organism_observation_procedure(user: &User, conn: &mut diesel::PgConnection) {
+pub(super) fn init_organism_observation_procedure(
+    user: &User,
+    conn: &mut diesel::PgConnection,
+) -> ProcedureModel {
+    if let Some(existing) = ProcedureModel::from_name(ORGANISM_OBSERVATION, conn).unwrap() {
+        return existing;
+    }
+
     ProcedureModel::new()
         .name(ORGANISM_OBSERVATION)
         .unwrap()
@@ -26,5 +33,5 @@ pub(super) fn init_organism_observation_procedure(user: &User, conn: &mut diesel
         .created_by(user.id)
         .unwrap()
         .insert(user.id, conn)
-		.unwrap();
+		.unwrap()
 }

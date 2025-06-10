@@ -137,13 +137,11 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
         let inputs = &sig.inputs;
 
         // Collect argument names to be passed along when calling the inner function.
-        let arg_names = inputs.iter().map(|arg| {
-            match arg {
-                syn::FnArg::Receiver(_) => quote! { self },
-                syn::FnArg::Typed(pat_type) => {
-                    let pat = &pat_type.pat;
-                    quote! { #pat }
-                }
+        let arg_names = inputs.iter().map(|arg| match arg {
+            syn::FnArg::Receiver(_) => quote! { self },
+            syn::FnArg::Typed(pat_type) => {
+                let pat = &pat_type.pat;
+                quote! { #pat }
             }
         });
 

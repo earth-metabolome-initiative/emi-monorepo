@@ -73,7 +73,8 @@ impl InsertableTeam {
             crate::codegen::structs_codegen::tables::colors::Color,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::colors::Color::table(),
@@ -105,7 +106,8 @@ impl InsertableTeam {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -137,7 +139,8 @@ impl InsertableTeam {
             crate::codegen::structs_codegen::tables::teams::Team,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         let Some(parent_team_id) = self.parent_team_id else {
             return Ok(None);
         };
@@ -173,7 +176,8 @@ impl InsertableTeam {
             crate::codegen::structs_codegen::tables::team_states::TeamState,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::team_states::TeamState::table(),
@@ -205,7 +209,8 @@ impl InsertableTeam {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -231,16 +236,16 @@ pub struct InsertableTeamBuilder {
 impl Default for InsertableTeamBuilder {
     fn default() -> Self {
         Self {
-            id: None,
-            name: None,
-            description: None,
-            icon: None,
+            id: Default::default(),
+            name: Default::default(),
+            description: Default::default(),
+            icon: Default::default(),
             color_id: Some(15i16),
             state_id: Some(1i16),
-            parent_team_id: None,
-            created_by: None,
+            parent_team_id: Default::default(),
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: None,
+            updated_by: Default::default(),
             updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
         }
     }

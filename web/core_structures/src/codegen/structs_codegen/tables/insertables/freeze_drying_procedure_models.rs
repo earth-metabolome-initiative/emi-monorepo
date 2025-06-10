@@ -1,10 +1,15 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableFreezeDryingProcedureModelAttributes {
-    Id(crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes),
+    Id(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
+    ),
     Kelvin,
     Pascal,
     Seconds,
+    FreezeDriedWith(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+    ),
 }
 impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes>
     for InsertableFreezeDryingProcedureModelAttributes
@@ -15,6 +20,15 @@ impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProced
         Self::Id(extension)
     }
 }
+impl From<
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+> for InsertableFreezeDryingProcedureModelAttributes {
+    fn from(
+        foreign: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+    ) -> Self {
+        Self::FreezeDriedWith(foreign)
+    }
+}
 impl core::fmt::Display for InsertableFreezeDryingProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -23,6 +37,9 @@ impl core::fmt::Display for InsertableFreezeDryingProcedureModelAttributes {
             InsertableFreezeDryingProcedureModelAttributes::Pascal => write!(f, "pascal"),
             InsertableFreezeDryingProcedureModelAttributes::Seconds => {
                 write!(f, "seconds")
+            }
+            InsertableFreezeDryingProcedureModelAttributes::FreezeDriedWith(freeze_dried_with) => {
+                write!(f, "{}", freeze_dried_with)
             }
         }
     }
@@ -40,8 +57,67 @@ pub struct InsertableFreezeDryingProcedureModel {
     kelvin: f32,
     pascal: f32,
     seconds: f32,
+    freeze_dried_with: i32,
 }
 impl InsertableFreezeDryingProcedureModel {
+    pub fn freeze_dried_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        >,
+    {
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.freeze_dried_with,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freeze_drying_procedure_models_freeze_dried_with_id_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >{
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
+                    .eq(&self.freeze_dried_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
+                            .eq(&self.id),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            >(conn)
+    }
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -65,7 +141,8 @@ impl InsertableFreezeDryingProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -75,13 +152,23 @@ impl InsertableFreezeDryingProcedureModel {
         )
     }
 }
-#[derive(Default)]
 pub struct InsertableFreezeDryingProcedureModelBuilder {
-    pub(crate) id:
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     pub(crate) kelvin: Option<f32>,
     pub(crate) pascal: Option<f32>,
     pub(crate) seconds: Option<f32>,
+    pub(crate) freeze_dried_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+}
+impl Default for InsertableFreezeDryingProcedureModelBuilder {
+    fn default() -> Self {
+        Self {
+            id: Default::default(),
+            kelvin: Some(213.15f32),
+            pascal: Some(4f32),
+            seconds: Some(259200f32),
+            freeze_dried_with: Default::default(),
+        }
+    }
 }
 impl InsertableFreezeDryingProcedureModelBuilder {
     pub fn kelvin<P>(
@@ -121,7 +208,7 @@ impl InsertableFreezeDryingProcedureModelBuilder {
         })?;
         pgrx_validation::must_be_strictly_positive_f32(pascal)
             .map_err(|e| e.rename_field(InsertableFreezeDryingProcedureModelAttributes::Pascal))?;
-        pgrx_validation::must_be_strictly_smaller_than_f32(pascal, 100f32)
+        pgrx_validation::must_be_strictly_smaller_than_f32(pascal, 500f32)
             .map_err(|e| e.rename_field(InsertableFreezeDryingProcedureModelAttributes::Pascal))?;
         self.pascal = Some(pascal);
         Ok(self)
@@ -147,6 +234,27 @@ impl InsertableFreezeDryingProcedureModelBuilder {
         pgrx_validation::must_be_strictly_smaller_than_f32(seconds, 604800f32)
             .map_err(|e| e.rename_field(InsertableFreezeDryingProcedureModelAttributes::Seconds))?;
         self.seconds = Some(seconds);
+        Ok(self)
+    }
+    pub fn freeze_dried_with(
+        mut self,
+        freeze_dried_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    >{
+        if freeze_dried_with.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                    ),
+                ),
+            );
+        }
+        self.freeze_dried_with = freeze_dried_with;
         Ok(self)
     }
     pub fn name<P>(
@@ -299,6 +407,14 @@ impl InsertableFreezeDryingProcedureModelBuilder {
                 crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
             >,
         >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+            >,
+        >,
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
@@ -312,6 +428,13 @@ impl InsertableFreezeDryingProcedureModelBuilder {
             InsertableFreezeDryingProcedureModelAttributes::Seconds,
         ))?;
         let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
-        Ok(InsertableFreezeDryingProcedureModel { id, kelvin, pascal, seconds })
+        let freeze_dried_with = self
+            .freeze_dried_with
+            .procedure_model_id(id)
+            .map_err(|err| err.into_field_name())?
+            .insert(user_id, conn)
+            .map_err(|err| err.into_field_name())?
+            .id();
+        Ok(InsertableFreezeDryingProcedureModel { id, kelvin, pascal, seconds, freeze_dried_with })
     }
 }

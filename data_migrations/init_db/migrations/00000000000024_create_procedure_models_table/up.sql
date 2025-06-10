@@ -132,17 +132,47 @@ CREATE TABLE IF NOT EXISTS aliquoting_procedure_models (
 	CHECK (must_be_smaller_than_f32(error, liters))
 );
 
+CREATE TABLE IF NOT EXISTS freezing_procedure_models (
+	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
+	-- We use a default of 203.15 K (-70 °C) for the temperature in the freezing chamber.
+	kelvin REAL NOT NULL DEFAULT 203.15 CHECK (must_be_strictly_positive_f32(kelvin)),
+	-- We use a default of 43200 seconds (12 hours) for the freezing procedure.
+	seconds REAL NOT NULL DEFAULT 43200.0 CHECK (must_be_strictly_positive_f32(seconds)),
+	frozen_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	CHECK (must_be_strictly_smaller_than_f32(kelvin, 223.15)),
+	-- Should always be greater than 30 minutes
+	CHECK (must_be_strictly_greater_than_f32(seconds, 1800.0)),
+	-- We check that the `frozen_with` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (frozen_with, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS freeze_drying_procedure_models (
 	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
-	kelvin REAL NOT NULL CHECK (must_be_strictly_positive_f32(kelvin)),
-	pascal REAL NOT NULL CHECK (must_be_strictly_positive_f32(pascal)),
-	seconds REAL NOT NULL CHECK (must_be_strictly_positive_f32(seconds)),
+	-- We use a default of 213.15 K (-60 °C) for the temperature in the freeze-drying chamber.
+	kelvin REAL NOT NULL DEFAULT 213.15 CHECK (must_be_strictly_positive_f32(kelvin)),
+	-- We use a default of 4 Pa for the pressure in the freeze-drying chamber.
+	pascal REAL NOT NULL DEFAULT 4.0 CHECK (must_be_strictly_positive_f32(pascal)),
+	-- We use a default of 3 days (259200 seconds) for the freeze-drying procedure.
+	seconds REAL NOT NULL DEFAULT 259200.0 CHECK (must_be_strictly_positive_f32(seconds)),
+	freeze_dried_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- A freeze dryer should always be used at a temperature lower than 250 K (-23 °C).
 	CHECK (must_be_strictly_smaller_than_f32(kelvin, 250.0)),
-	CHECK (must_be_strictly_smaller_than_f32(pascal, 100.0)),
+	-- A freeze trier should always be used at a pressure lower than 500 Pa.
+	CHECK (must_be_strictly_smaller_than_f32(pascal, 500.0)),
 	-- Should always be greater than 2 hours
 	CHECK (must_be_strictly_greater_than_f32(seconds, 7200.0)),
 	-- Should always be less than 7 days
-	CHECK (must_be_strictly_smaller_than_f32(seconds, 604800.0))
+	CHECK (must_be_strictly_smaller_than_f32(seconds, 604800.0)),
+	-- We check that the `freeze_dried_with` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (freeze_dried_with, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS weighing_procedure_models (
+	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
+	instrument_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- We check that the `instrument_id` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (instrument_id, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE
+	-- TODO: find an appropriate check to ensure that the `instrument_id` is indeed a weighing instrument.
 );
 
 CREATE TABLE IF NOT EXISTS weighing_procedure_models (

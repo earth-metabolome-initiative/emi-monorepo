@@ -65,7 +65,8 @@ impl PackagingModel {
             crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::table(),
@@ -79,14 +80,12 @@ impl PackagingModel {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
-            SelectableHelper, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            packaging_models::packaging_models, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::packaging_models::packaging_models;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
             .filter(trackables::name.eq(name))
@@ -100,14 +99,11 @@ impl PackagingModel {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            packaging_models::packaging_models, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::packaging_models::packaging_models;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
             .filter(trackables::description.eq(description))
@@ -120,14 +116,11 @@ impl PackagingModel {
         photograph_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            packaging_models::packaging_models, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::packaging_models::packaging_models;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
             .filter(trackables::photograph_id.eq(photograph_id))
@@ -140,14 +133,11 @@ impl PackagingModel {
         parent_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            packaging_models::packaging_models, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::packaging_models::packaging_models;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
             .filter(trackables::parent_id.eq(parent_id))
@@ -160,14 +150,11 @@ impl PackagingModel {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            packaging_models::packaging_models, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::packaging_models::packaging_models;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
             .filter(trackables::created_by.eq(created_by))
@@ -180,14 +167,11 @@ impl PackagingModel {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            packaging_models::packaging_models, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::packaging_models::packaging_models;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
             .filter(trackables::created_at.eq(created_at))
@@ -200,14 +184,11 @@ impl PackagingModel {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            packaging_models::packaging_models, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::packaging_models::packaging_models;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
             .filter(trackables::updated_by.eq(updated_by))
@@ -220,14 +201,11 @@ impl PackagingModel {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            packaging_models::packaging_models, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::packaging_models::packaging_models;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
             .filter(trackables::updated_at.eq(updated_at))
@@ -240,14 +218,11 @@ impl PackagingModel {
         deprecation_date: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            commercial_products::commercial_products, packaging_models::packaging_models,
-        };
+        use crate::codegen::diesel_codegen::tables::commercial_products::commercial_products;
+        use crate::codegen::diesel_codegen::tables::packaging_models::packaging_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 commercial_products::table.on(packaging_models::id.eq(commercial_products::id)),
@@ -262,14 +237,11 @@ impl PackagingModel {
         brand_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            commercial_products::commercial_products, packaging_models::packaging_models,
-        };
+        use crate::codegen::diesel_codegen::tables::commercial_products::commercial_products;
+        use crate::codegen::diesel_codegen::tables::packaging_models::packaging_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 commercial_products::table.on(packaging_models::id.eq(commercial_products::id)),

@@ -17,6 +17,7 @@ mod documents;
 mod email_providers;
 mod fractioning_procedure_models;
 mod freeze_drying_procedure_models;
+mod freezing_procedure_models;
 mod instrument_models;
 mod instrument_states;
 mod instruments;

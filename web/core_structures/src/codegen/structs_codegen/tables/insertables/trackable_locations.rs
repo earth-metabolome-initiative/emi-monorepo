@@ -69,7 +69,8 @@ impl InsertableTrackableLocation {
             crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         let Some(container_id) = self.container_id else {
             return Ok(None);
         };
@@ -105,7 +106,8 @@ impl InsertableTrackableLocation {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -137,7 +139,8 @@ impl InsertableTrackableLocation {
             crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
@@ -159,13 +162,13 @@ pub struct InsertableTrackableLocationBuilder {
 impl Default for InsertableTrackableLocationBuilder {
     fn default() -> Self {
         Self {
-            id: None,
-            trackable_id: None,
-            container_id: None,
-            geolocation: None,
+            id: Default::default(),
+            trackable_id: Default::default(),
+            container_id: Default::default(),
+            geolocation: Default::default(),
             inferred: Some(false),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            created_by: None,
+            created_by: Default::default(),
         }
     }
 }

@@ -113,7 +113,8 @@ where
     ) -> Result<Vec<SharedProcedureModelTrackable>, diesel::result::Error> {
         use diesel::Identifiable;
 
-        let mut shared_trackables = SharedProcedureModelTrackable::from_parent_id(self.id(), conn)?;
+        let mut shared_trackables =
+            SharedProcedureModelTrackable::from_parent_procedure_model_id(self.id(), conn)?;
         for child_procedure in self.procedures_nodes(conn)? {
             shared_trackables.extend(child_procedure.shared_trackable_edges(conn)?);
         }

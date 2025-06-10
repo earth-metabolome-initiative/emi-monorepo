@@ -72,7 +72,8 @@ impl InsertableWeighingProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -104,7 +105,8 @@ impl InsertableWeighingProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
@@ -121,9 +123,10 @@ impl InsertableWeighingProcedureModel {
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+        use diesel::BoolExpressionMethods;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id

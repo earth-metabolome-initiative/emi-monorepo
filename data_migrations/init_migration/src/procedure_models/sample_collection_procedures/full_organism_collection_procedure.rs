@@ -4,7 +4,7 @@ use core_structures::{ProcedureModel, User};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
 /// The name of the full organism collection procedure model.
-pub const FULL_ORGANISM_COLLECTION: &str = "Full organism collection procedure";
+const FULL_ORGANISM_COLLECTION: &str = "Full organism collection procedure";
 
 /// Initializes the full organism collection procedure model in the database.
 ///
@@ -17,7 +17,14 @@ pub const FULL_ORGANISM_COLLECTION: &str = "Full organism collection procedure";
 ///
 /// * If the connection fails to insert the procedure model.
 /// * If the procedure model building fails.
-pub(super) fn init_full_organism_collection(user: &User, conn: &mut diesel::PgConnection) {
+pub(crate) fn init_full_organism_collection(
+    user: &User,
+    conn: &mut diesel::PgConnection,
+) -> ProcedureModel {
+    if let Some(existing) = ProcedureModel::from_name(FULL_ORGANISM_COLLECTION, conn).unwrap() {
+        return existing;
+    }
+
     ProcedureModel::new()
         .name(FULL_ORGANISM_COLLECTION)
         .unwrap()
@@ -28,5 +35,5 @@ pub(super) fn init_full_organism_collection(user: &User, conn: &mut diesel::PgCo
         .created_by(user.id)
         .unwrap()
         .insert(user.id, conn)
-        .unwrap();
+        .unwrap()
 }

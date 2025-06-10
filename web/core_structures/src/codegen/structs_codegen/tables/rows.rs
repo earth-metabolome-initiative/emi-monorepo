@@ -18,6 +18,7 @@ mod documents;
 mod email_providers;
 mod fractioning_procedure_models;
 mod freeze_drying_procedure_models;
+mod freezing_procedure_models;
 mod instrument_models;
 mod instrument_states;
 mod instruments;
@@ -137,6 +138,11 @@ pub enum Rows {
     FreezeDryingProcedureModel(
         Vec<
             crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel,
+        >,
+    ),
+    FreezingProcedureModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::freezing_procedure_models::FreezingProcedureModel,
         >,
     ),
     InstrumentModel(
@@ -309,13 +315,11 @@ impl Rows {
     ) -> Result<Rows, diesel::result::Error> {
         use web_common_traits::database::Upsertable;
         Ok(match self {
-            Rows::Address(addresses) => {
-                addresses
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
+            Rows::Address(addresses) => addresses
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
             Rows::AliquotingInstrumentModel(aliquoting_instrument_models) => {
                 aliquoting_instrument_models
                     .iter()
@@ -330,20 +334,16 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::BallMillProcedureModel(ball_mill_procedure_models) => {
-                ball_mill_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Brand(brands) => {
-                brands
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
+            Rows::BallMillProcedureModel(ball_mill_procedure_models) => ball_mill_procedure_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Brand(brands) => brands
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
             Rows::CentrifugeProcedureModel(centrifuge_procedure_models) => {
                 centrifuge_procedure_models
                     .iter()
@@ -351,83 +351,61 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::City(cities) => {
-                cities
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Color(colors) => {
-                colors
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::CommercialProductLot(commercial_product_lots) => {
-                commercial_product_lots
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::CommercialProduct(commercial_products) => {
-                commercial_products
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::CommercialReagent(commercial_reagents) => {
-                commercial_reagents
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ContainerModel(container_models) => {
-                container_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Container(containers) => {
-                containers
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Country(countries) => {
-                countries
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::DisposalProcedureModel(disposal_procedure_models) => {
-                disposal_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Document(documents) => {
-                documents
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::EmailProvider(email_providers) => {
-                email_providers
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
+            Rows::City(cities) => cities
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Color(colors) => colors
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::CommercialProductLot(commercial_product_lots) => commercial_product_lots
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::CommercialProduct(commercial_products) => commercial_products
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::CommercialReagent(commercial_reagents) => commercial_reagents
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::ContainerModel(container_models) => container_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Container(containers) => containers
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Country(countries) => countries
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::DisposalProcedureModel(disposal_procedure_models) => disposal_procedure_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Document(documents) => documents
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::EmailProvider(email_providers) => email_providers
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
             Rows::FractioningProcedureModel(fractioning_procedure_models) => {
                 fractioning_procedure_models
                     .iter()
@@ -442,41 +420,36 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::InstrumentModel(instrument_models) => {
-                instrument_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::InstrumentState(instrument_states) => {
-                instrument_states
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Instrument(instruments) => {
-                instruments
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::LoginProvider(login_providers) => {
-                login_providers
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Material(materials) => {
-                materials
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
+            Rows::FreezingProcedureModel(freezing_procedure_models) => freezing_procedure_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::InstrumentModel(instrument_models) => instrument_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::InstrumentState(instrument_states) => instrument_states
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Instrument(instruments) => instruments
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::LoginProvider(login_providers) => login_providers
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Material(materials) => materials
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
             Rows::MixCountableProcedureModel(mix_countable_procedure_models) => {
                 mix_countable_procedure_models
                     .iter()
@@ -484,188 +457,136 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::MixSolidProcedureModel(mix_solid_procedure_models) => {
-                mix_solid_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::NextProcedureModel(next_procedure_models) => {
-                next_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ObservationSubject(observation_subjects) => {
-                observation_subjects
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::OrganismObservation(organism_observations) => {
-                organism_observations
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::OrganismTaxon(organism_taxa) => {
-                organism_taxa
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Organism(organisms) => {
-                organisms
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Organization(organizations) => {
-                organizations
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::PackagingModel(packaging_models) => {
-                packaging_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::PackagingProcedureModel(packaging_procedure_models) => {
-                packaging_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ParentProcedureModel(parent_procedure_models) => {
-                parent_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::PermanenceCategory(permanence_categories) => {
-                permanence_categories
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::PouringProcedureModel(pouring_procedure_models) => {
-                pouring_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ProcedureModelTrackable(procedure_model_trackables) => {
-                procedure_model_trackables
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ProcedureModel(procedure_models) => {
-                procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ProcedureTrackable(procedure_trackables) => {
-                procedure_trackables
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Procedure(procedures) => {
-                procedures
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Processable(processables) => {
-                processables
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ProjectState(project_states) => {
-                project_states
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Project(projects) => {
-                projects
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Rank(ranks) => {
-                ranks
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Reagent(reagents) => {
-                reagents
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Role(roles) => {
-                roles
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Room(rooms) => {
-                rooms
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::SampleState(sample_states) => {
-                sample_states
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::SamplingProcedureModel(sampling_procedure_models) => {
-                sampling_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ShakingProcedureModel(shaking_procedure_models) => {
-                shaking_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
+            Rows::MixSolidProcedureModel(mix_solid_procedure_models) => mix_solid_procedure_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::NextProcedureModel(next_procedure_models) => next_procedure_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::ObservationSubject(observation_subjects) => observation_subjects
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::OrganismObservation(organism_observations) => organism_observations
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::OrganismTaxon(organism_taxa) => organism_taxa
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Organism(organisms) => organisms
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Organization(organizations) => organizations
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::PackagingModel(packaging_models) => packaging_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::PackagingProcedureModel(packaging_procedure_models) => packaging_procedure_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::ParentProcedureModel(parent_procedure_models) => parent_procedure_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::PermanenceCategory(permanence_categories) => permanence_categories
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::PouringProcedureModel(pouring_procedure_models) => pouring_procedure_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::ProcedureModelTrackable(procedure_model_trackables) => procedure_model_trackables
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::ProcedureModel(procedure_models) => procedure_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::ProcedureTrackable(procedure_trackables) => procedure_trackables
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Procedure(procedures) => procedures
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Processable(processables) => processables
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::ProjectState(project_states) => project_states
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Project(projects) => projects
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Rank(ranks) => ranks
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Reagent(reagents) => reagents
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Role(roles) => roles
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Room(rooms) => rooms
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::SampleState(sample_states) => sample_states
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::SamplingProcedureModel(sampling_procedure_models) => sampling_procedure_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::ShakingProcedureModel(shaking_procedure_models) => shaking_procedure_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
             Rows::SharedProcedureModelTrackable(shared_procedure_model_trackables) => {
                 shared_procedure_model_trackables
                     .iter()
@@ -673,138 +594,101 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::SpatialRefSy(spatial_ref_sys) => {
-                spatial_ref_sys
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Spectrum(spectra) => {
-                spectra
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::SpectraCollection(spectra_collections) => {
-                spectra_collections
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Taxon(taxa) => {
-                taxa.iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::TeamMember(team_members) => {
-                team_members
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::TeamProject(team_projects) => {
-                team_projects
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::TeamState(team_states) => {
-                team_states
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Team(teams) => {
-                teams
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::TemporaryUser(temporary_user) => {
-                temporary_user
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::TrackableLocation(trackable_locations) => {
-                trackable_locations
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Trackable(trackables) => {
-                trackables
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Unit(units) => {
-                units
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::UserEmail(user_emails) => {
-                user_emails
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::UserOrganization(user_organizations) => {
-                user_organizations
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::User(users) => {
-                users
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::VolumetricProcessable(volumetric_processables) => {
-                volumetric_processables
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::WeighingInstrumentModel(weighing_instrument_models) => {
-                weighing_instrument_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::WeighingProcedureModel(weighing_procedure_models) => {
-                weighing_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::WeighingProcedure(weighing_procedures) => {
-                weighing_procedures
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
+            Rows::SpatialRefSy(spatial_ref_sys) => spatial_ref_sys
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Spectrum(spectra) => spectra
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::SpectraCollection(spectra_collections) => spectra_collections
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Taxon(taxa) => taxa
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::TeamMember(team_members) => team_members
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::TeamProject(team_projects) => team_projects
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::TeamState(team_states) => team_states
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Team(teams) => teams
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::TemporaryUser(temporary_user) => temporary_user
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::TrackableLocation(trackable_locations) => trackable_locations
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Trackable(trackables) => trackables
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::Unit(units) => units
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::UserEmail(user_emails) => user_emails
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::UserOrganization(user_organizations) => user_organizations
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::User(users) => users
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::VolumetricProcessable(volumetric_processables) => volumetric_processables
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::WeighingInstrumentModel(weighing_instrument_models) => weighing_instrument_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::WeighingProcedureModel(weighing_procedure_models) => weighing_procedure_models
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
+            Rows::WeighingProcedure(weighing_procedures) => weighing_procedures
+                .iter()
+                .filter_map(|entry| entry.upsert(conn).transpose())
+                .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                .into(),
         })
     }
 }
@@ -846,6 +730,9 @@ impl web_common_traits::prelude::Rows for Rows {
             }
             Rows::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
                 freeze_drying_procedure_models.primary_keys()
+            }
+            Rows::FreezingProcedureModel(freezing_procedure_models) => {
+                freezing_procedure_models.primary_keys()
             }
             Rows::InstrumentModel(instrument_models) => instrument_models.primary_keys(),
             Rows::InstrumentState(instrument_states) => instrument_states.primary_keys(),

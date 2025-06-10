@@ -43,7 +43,8 @@ impl TeamProject {
             crate::codegen::structs_codegen::tables::projects::Project,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::projects::Project::table(),
@@ -75,7 +76,8 @@ impl TeamProject {
             crate::codegen::structs_codegen::tables::teams::Team,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::teams::Team::table(),
@@ -89,9 +91,10 @@ impl TeamProject {
         team_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::team_projects::team_projects;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(team_projects::team_id.eq(team_id))
             .order_by((team_projects::team_id.asc(), team_projects::project_id.asc()))
@@ -102,9 +105,10 @@ impl TeamProject {
         project_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::team_projects::team_projects;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(team_projects::project_id.eq(project_id))
             .order_by((team_projects::team_id.asc(), team_projects::project_id.asc()))

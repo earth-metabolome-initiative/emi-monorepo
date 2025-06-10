@@ -2,12 +2,4 @@
 //! used to extract samples.
 
 mod sample_extraction_solvent_procedure;
-
-/// Method initializing the procedure models for creating solvents used in
-/// sample extraction.
-pub(super) fn init_sample_extraction_solvent_procedures(
-    user: &core_structures::User,
-    conn: &mut diesel::PgConnection,
-) {
-    sample_extraction_solvent_procedure::init_sample_extraction_solvent_procedure(user, conn);
-}
+pub(crate) use sample_extraction_solvent_procedure::init_sample_extraction_solvent_procedure;

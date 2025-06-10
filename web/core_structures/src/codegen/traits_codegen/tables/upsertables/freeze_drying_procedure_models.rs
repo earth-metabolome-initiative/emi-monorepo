@@ -20,7 +20,8 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
                 kelvin
                     .ne(excluded(kelvin))
                     .or(pascal.ne(excluded(pascal)))
-                    .or(seconds.ne(excluded(seconds))),
+                    .or(seconds.ne(excluded(seconds)))
+                    .or(freeze_dried_with.ne(excluded(freeze_dried_with))),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })
@@ -48,7 +49,8 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
                 kelvin
                     .ne(excluded(kelvin))
                     .or(pascal.ne(excluded(pascal)))
-                    .or(seconds.ne(excluded(seconds))),
+                    .or(seconds.ne(excluded(seconds)))
+                    .or(freeze_dried_with.ne(excluded(freeze_dried_with))),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })

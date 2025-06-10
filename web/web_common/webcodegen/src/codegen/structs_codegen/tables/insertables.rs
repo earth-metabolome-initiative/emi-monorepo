@@ -554,7 +554,7 @@ impl Codegen<'_> {
                         });
                     } else {
                         default_impl_attributes.push(quote::quote! {
-                            #column_name: None
+                            #column_name: Default::default()
                         });
                     }
                 }

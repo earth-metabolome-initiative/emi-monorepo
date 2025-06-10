@@ -55,7 +55,8 @@ impl Instrument {
             crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
@@ -87,7 +88,8 @@ impl Instrument {
             crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel::table(
@@ -102,9 +104,10 @@ impl Instrument {
         instrument_model_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
         use crate::codegen::diesel_codegen::tables::instruments::instruments;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(instruments::instrument_model_id.eq(instrument_model_id))
             .order_by(instruments::id.asc())
@@ -115,14 +118,12 @@ impl Instrument {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
-            SelectableHelper, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            instruments::instruments, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::instruments::instruments;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(instruments::id.eq(trackables::id)))
             .filter(trackables::name.eq(name))
@@ -136,14 +137,11 @@ impl Instrument {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            instruments::instruments, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::instruments::instruments;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(instruments::id.eq(trackables::id)))
             .filter(trackables::description.eq(description))
@@ -156,14 +154,11 @@ impl Instrument {
         photograph_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            instruments::instruments, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::instruments::instruments;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(instruments::id.eq(trackables::id)))
             .filter(trackables::photograph_id.eq(photograph_id))
@@ -176,14 +171,11 @@ impl Instrument {
         parent_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            instruments::instruments, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::instruments::instruments;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(instruments::id.eq(trackables::id)))
             .filter(trackables::parent_id.eq(parent_id))
@@ -196,14 +188,11 @@ impl Instrument {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            instruments::instruments, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::instruments::instruments;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(instruments::id.eq(trackables::id)))
             .filter(trackables::created_by.eq(created_by))
@@ -216,14 +205,11 @@ impl Instrument {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            instruments::instruments, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::instruments::instruments;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(instruments::id.eq(trackables::id)))
             .filter(trackables::created_at.eq(created_at))
@@ -236,14 +222,11 @@ impl Instrument {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            instruments::instruments, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::instruments::instruments;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(instruments::id.eq(trackables::id)))
             .filter(trackables::updated_by.eq(updated_by))
@@ -256,14 +239,11 @@ impl Instrument {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            instruments::instruments, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::instruments::instruments;
+        use crate::codegen::diesel_codegen::tables::trackables::trackables;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(trackables::table.on(instruments::id.eq(trackables::id)))
             .filter(trackables::updated_at.eq(updated_at))

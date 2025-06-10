@@ -50,7 +50,8 @@ impl SamplingProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::associations::HasTable;
+        use diesel::{QueryDsl, RunQueryDsl};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -64,15 +65,12 @@ impl SamplingProcedureModel {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
-            SelectableHelper, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            procedure_models::procedure_models,
-            sampling_procedure_models::sampling_procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use crate::codegen::diesel_codegen::tables::sampling_procedure_models::sampling_procedure_models;
+        use diesel::OptionalExtension;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(sampling_procedure_models::id.eq(procedure_models::id)),
@@ -88,15 +86,11 @@ impl SamplingProcedureModel {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            procedure_models::procedure_models,
-            sampling_procedure_models::sampling_procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use crate::codegen::diesel_codegen::tables::sampling_procedure_models::sampling_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(sampling_procedure_models::id.eq(procedure_models::id)),
@@ -111,15 +105,11 @@ impl SamplingProcedureModel {
         deprecated: &bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            procedure_models::procedure_models,
-            sampling_procedure_models::sampling_procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use crate::codegen::diesel_codegen::tables::sampling_procedure_models::sampling_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(sampling_procedure_models::id.eq(procedure_models::id)),
@@ -134,15 +124,11 @@ impl SamplingProcedureModel {
         photograph_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            procedure_models::procedure_models,
-            sampling_procedure_models::sampling_procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use crate::codegen::diesel_codegen::tables::sampling_procedure_models::sampling_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(sampling_procedure_models::id.eq(procedure_models::id)),
@@ -157,15 +143,11 @@ impl SamplingProcedureModel {
         icon: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            procedure_models::procedure_models,
-            sampling_procedure_models::sampling_procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use crate::codegen::diesel_codegen::tables::sampling_procedure_models::sampling_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(sampling_procedure_models::id.eq(procedure_models::id)),
@@ -180,15 +162,11 @@ impl SamplingProcedureModel {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            procedure_models::procedure_models,
-            sampling_procedure_models::sampling_procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use crate::codegen::diesel_codegen::tables::sampling_procedure_models::sampling_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(sampling_procedure_models::id.eq(procedure_models::id)),
@@ -203,15 +181,11 @@ impl SamplingProcedureModel {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            procedure_models::procedure_models,
-            sampling_procedure_models::sampling_procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use crate::codegen::diesel_codegen::tables::sampling_procedure_models::sampling_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(sampling_procedure_models::id.eq(procedure_models::id)),
@@ -226,15 +200,11 @@ impl SamplingProcedureModel {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            procedure_models::procedure_models,
-            sampling_procedure_models::sampling_procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use crate::codegen::diesel_codegen::tables::sampling_procedure_models::sampling_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(sampling_procedure_models::id.eq(procedure_models::id)),
@@ -249,15 +219,11 @@ impl SamplingProcedureModel {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            procedure_models::procedure_models,
-            sampling_procedure_models::sampling_procedure_models,
-        };
+        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
+        use crate::codegen::diesel_codegen::tables::sampling_procedure_models::sampling_procedure_models;
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
         Self::table()
             .inner_join(
                 procedure_models::table.on(sampling_procedure_models::id.eq(procedure_models::id)),

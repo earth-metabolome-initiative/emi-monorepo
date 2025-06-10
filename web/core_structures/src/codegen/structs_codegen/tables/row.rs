@@ -17,6 +17,7 @@ mod documents;
 mod email_providers;
 mod fractioning_procedure_models;
 mod freeze_drying_procedure_models;
+mod freezing_procedure_models;
 mod from_row;
 mod instrument_models;
 mod instrument_states;
@@ -117,6 +118,9 @@ pub enum Row {
     ),
     FreezeDryingProcedureModel(
         crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel,
+    ),
+    FreezingProcedureModel(
+        crate::codegen::structs_codegen::tables::freezing_procedure_models::FreezingProcedureModel,
     ),
     InstrumentModel(
         crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
@@ -273,6 +277,9 @@ impl Row {
             Row::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
                 freeze_drying_procedure_models.upsert(conn)?.map(Row::from)
             }
+            Row::FreezingProcedureModel(freezing_procedure_models) => {
+                freezing_procedure_models.upsert(conn)?.map(Row::from)
+            }
             Row::InstrumentModel(instrument_models) => {
                 instrument_models.upsert(conn)?.map(Row::from)
             }
@@ -412,6 +419,9 @@ impl web_common_traits::prelude::Row for Row {
             }
             Row::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
                 freeze_drying_procedure_models.primary_key()
+            }
+            Row::FreezingProcedureModel(freezing_procedure_models) => {
+                freezing_procedure_models.primary_key()
             }
             Row::InstrumentModel(instrument_models) => instrument_models.primary_key(),
             Row::InstrumentState(instrument_states) => instrument_states.primary_key(),

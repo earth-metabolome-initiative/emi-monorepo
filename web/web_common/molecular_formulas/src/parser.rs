@@ -60,15 +60,13 @@ impl Parser<'_> {
                     });
                 }
                 match inner_formula {
-                    MolecularFormula::Sequence(sequence) => {
-                        Some(MolecularFormula::Count(
-                            MolecularFormula::RepeatingUnit(Box::new(MolecularFormula::Sequence(
-                                sequence,
-                            )))
-                            .into(),
-                            count,
-                        ))
-                    }
+                    MolecularFormula::Sequence(sequence) => Some(MolecularFormula::Count(
+                        MolecularFormula::RepeatingUnit(Box::new(MolecularFormula::Sequence(
+                            sequence,
+                        )))
+                        .into(),
+                        count,
+                    )),
                     _ => Some(inner_formula.add_count_to_first_subformula(count)?),
                 }
             }
