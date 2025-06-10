@@ -1199,7 +1199,7 @@ impl Column {
             if !foreign_key.is_foreign_unique_key(conn)? {
                 // If the foreign key is not referring to a UNIQUE constraint, we skip it
                 continue;
-            };
+            }
 
             let foreign_key_columns = foreign_key.foreign_columns(conn)?;
             // We identify the foreign column curresponding to the current column.
@@ -1233,7 +1233,7 @@ impl Column {
 
             // If the foreign column is not part of the foreign table's primary key, we add
             // it
-            if !expected_foreign_columns.contains(&foreign_column) {
+            if !expected_foreign_columns.contains(foreign_column) {
                 expected_foreign_columns.push(foreign_column.clone());
             }
 

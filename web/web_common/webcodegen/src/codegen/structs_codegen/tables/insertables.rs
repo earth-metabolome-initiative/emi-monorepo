@@ -395,7 +395,7 @@ impl Codegen<'_> {
                     {
                         let partial_builder_foreign_table =
                             partial_builder_foreign_key.foreign_table(conn)?.unwrap();
-                        if &partial_builder_foreign_table == &foreign_table {
+                        if partial_builder_foreign_table == foreign_table {
                             let partial_builder_column_ident =
                                 partial_builder_column.snake_case_ident()?;
                             same_as_partial_builder_columns.push(foreign_same_as_column.clone());
