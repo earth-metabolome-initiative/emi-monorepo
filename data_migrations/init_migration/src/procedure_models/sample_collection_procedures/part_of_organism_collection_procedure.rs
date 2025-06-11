@@ -4,7 +4,7 @@ use core_structures::{ProcedureModel, User};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
 /// The name of the part of organism collection procedure model.
-const PART_OF_ORGANISM: &str = "Part of organisms collection procedure";
+const PART_OF_ORGANISM: &str = "Part-of organisms collection procedure";
 
 /// Initializes the part of organism collection procedure model in the database.
 ///

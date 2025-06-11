@@ -63,15 +63,16 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .insert(user.id, conn)
         .unwrap();
 
-    let fractioning_procedure = FractioningProcedureModel::new()
-        .name("DBGI Fractioning")
-        .unwrap()
-        .description("DBGI Fractioning procedure model")
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+    // TODO: resume from here!
+    // let fractioning_procedure = FractioningProcedureModel::new()
+    //     .name("DBGI Fractioning")
+    //     .unwrap()
+    //     .description("DBGI Fractioning procedure model")
+    //     .unwrap()
+    //     .created_by(user.id)
+    //     .unwrap()
+    //     .insert(user.id, conn)
+    //     .unwrap();
 
     dbgi_sample_processing_procedure
         .child(
