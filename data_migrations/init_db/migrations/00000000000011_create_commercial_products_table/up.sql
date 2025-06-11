@@ -26,11 +26,6 @@ CREATE TABLE IF NOT EXISTS aliquoting_instrument_models (
 	CHECK (must_be_strictly_smaller_than_f32(minimum_measurable_liters, maximum_measurable_liters))
 );
 
-CREATE TABLE IF NOT EXISTS container_models (
-	id UUID PRIMARY KEY REFERENCES commercial_products(id),
-	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters))
-);
-
 CREATE TABLE IF NOT EXISTS packaging_models (
 	id UUID PRIMARY KEY REFERENCES commercial_products(id),
 	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms))

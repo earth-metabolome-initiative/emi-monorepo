@@ -1,5 +1,4 @@
-use crate::codegen::diesel_codegen::tables::commercial_products::commercial_products;
-use crate::codegen::diesel_codegen::tables::container_models::container_models;
-diesel::allow_tables_to_appear_in_same_query!(container_models, commercial_products);
-use crate::codegen::diesel_codegen::tables::trackables::trackables;
+use crate::codegen::diesel_codegen::tables::{
+    container_models::container_models, trackables::trackables,
+};
 diesel::allow_tables_to_appear_in_same_query!(container_models, trackables);

@@ -71,9 +71,11 @@ impl FromStr for TaxonomyNameClass {
             "includes" => Ok(TaxonomyNameClass::Includes),
             "common name" => Ok(TaxonomyNameClass::CommonName),
             "acronym" => Ok(TaxonomyNameClass::Acronym),
-            _ => Err(crate::errors::TaxonEntryBuilderError::UnknownTaxonomicalNameClass(
-                s.to_owned(),
-            )),
+            _ => {
+                Err(crate::errors::TaxonEntryBuilderError::UnknownTaxonomicalNameClass(
+                    s.to_owned(),
+                ))
+            }
         }
     }
 }

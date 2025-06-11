@@ -1,5 +1,10 @@
+mod aliquoting_procedure_models;
+mod ball_mill_procedure_models;
 mod brands;
+mod centrifuge_procedure_models;
+mod disposal_procedure_models;
 mod documents;
+mod fractioning_procedure_models;
 mod freeze_drying_procedure_models;
 mod freezing_procedure_models;
 mod mix_countable_procedure_models;

@@ -57,8 +57,7 @@ impl PackagingProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -90,8 +89,7 @@ impl PackagingProcedureModel {
             crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::table(),
@@ -105,10 +103,9 @@ impl PackagingProcedureModel {
         packaging_model_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::packaging_procedure_models::packaging_procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(packaging_procedure_models::packaging_model_id.eq(packaging_model_id))
             .order_by(packaging_procedure_models::id.asc())
@@ -119,12 +116,15 @@ impl PackagingProcedureModel {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_models::packaging_procedure_models;
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
+            SelectableHelper, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            packaging_procedure_models::packaging_procedure_models,
+            procedure_models::procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(packaging_procedure_models::id.eq(procedure_models::id)),
@@ -140,11 +140,15 @@ impl PackagingProcedureModel {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_models::packaging_procedure_models;
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            packaging_procedure_models::packaging_procedure_models,
+            procedure_models::procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(packaging_procedure_models::id.eq(procedure_models::id)),
@@ -159,11 +163,15 @@ impl PackagingProcedureModel {
         deprecated: &bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_models::packaging_procedure_models;
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            packaging_procedure_models::packaging_procedure_models,
+            procedure_models::procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(packaging_procedure_models::id.eq(procedure_models::id)),
@@ -178,11 +186,15 @@ impl PackagingProcedureModel {
         photograph_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_models::packaging_procedure_models;
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            packaging_procedure_models::packaging_procedure_models,
+            procedure_models::procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(packaging_procedure_models::id.eq(procedure_models::id)),
@@ -197,11 +209,15 @@ impl PackagingProcedureModel {
         icon: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_models::packaging_procedure_models;
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            packaging_procedure_models::packaging_procedure_models,
+            procedure_models::procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(packaging_procedure_models::id.eq(procedure_models::id)),
@@ -216,11 +232,15 @@ impl PackagingProcedureModel {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_models::packaging_procedure_models;
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            packaging_procedure_models::packaging_procedure_models,
+            procedure_models::procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(packaging_procedure_models::id.eq(procedure_models::id)),
@@ -235,11 +255,15 @@ impl PackagingProcedureModel {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_models::packaging_procedure_models;
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            packaging_procedure_models::packaging_procedure_models,
+            procedure_models::procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(packaging_procedure_models::id.eq(procedure_models::id)),
@@ -254,11 +278,15 @@ impl PackagingProcedureModel {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_models::packaging_procedure_models;
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            packaging_procedure_models::packaging_procedure_models,
+            procedure_models::procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(packaging_procedure_models::id.eq(procedure_models::id)),
@@ -273,11 +301,15 @@ impl PackagingProcedureModel {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_models::packaging_procedure_models;
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            packaging_procedure_models::packaging_procedure_models,
+            procedure_models::procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(packaging_procedure_models::id.eq(procedure_models::id)),

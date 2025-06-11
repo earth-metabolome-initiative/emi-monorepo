@@ -50,8 +50,7 @@ impl InsertableEmailProvider {
             crate::codegen::structs_codegen::tables::user_emails::UserEmail,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::user_emails::UserEmail::table(),
@@ -83,8 +82,7 @@ impl InsertableEmailProvider {
             crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::login_providers::LoginProvider::table(),

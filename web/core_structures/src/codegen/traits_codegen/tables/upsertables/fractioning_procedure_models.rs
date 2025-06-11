@@ -8,6 +8,7 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_models::Fract
         use diesel::ExpressionMethods;
         use diesel::query_dsl::methods::FilterDsl;
         use diesel::upsert::excluded;
+        use diesel::BoolExpressionMethods;
         use diesel::RunQueryDsl;
         use crate::codegen::diesel_codegen::tables::fractioning_procedure_models::fractioning_procedure_models::*;
         diesel::insert_into(table)
@@ -15,7 +16,13 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_models::Fract
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(kilograms.ne(excluded(kilograms)))
+            .filter(
+                kilograms
+                    .ne(excluded(kilograms))
+                    .or(weighed_with.ne(excluded(weighed_with)))
+                    .or(source.ne(excluded(source)))
+                    .or(destination.ne(excluded(destination))),
+            )
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }
@@ -30,6 +37,7 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_models::Fract
         use diesel::ExpressionMethods;
         use diesel::query_dsl::methods::FilterDsl;
         use diesel::upsert::excluded;
+        use diesel::BoolExpressionMethods;
         use diesel::RunQueryDsl;
         use crate::codegen::diesel_codegen::tables::fractioning_procedure_models::fractioning_procedure_models::*;
         diesel::insert_into(table)
@@ -37,7 +45,13 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_models::Fract
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(kilograms.ne(excluded(kilograms)))
+            .filter(
+                kilograms
+                    .ne(excluded(kilograms))
+                    .or(weighed_with.ne(excluded(weighed_with)))
+                    .or(source.ne(excluded(source)))
+                    .or(destination.ne(excluded(destination))),
+            )
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }

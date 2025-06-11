@@ -20,6 +20,7 @@ pub use dbgi_plan::DBGI_PLAN;
 mod analysis_procedures;
 mod collection_preparation_procedures;
 mod data_enrichment_procedures;
+pub(crate) use data_enrichment_procedures::init_data_enrichment_procedure;
 mod observation_procedures;
 mod sample_collection_procedures;
 pub(crate) use analysis_procedures::{
@@ -47,8 +48,6 @@ pub(crate) use sample_collection_procedures::{
 pub(crate) fn init_procedure_models(user: &User, conn: &mut PgConnection) {
     // emi_solvent_procedure::init_emi_solvent_procedure_models(user, conn)?;
     // ethanol_70_percent::init_ethanol_70_percent(user, conn)?;
-    observation_procedures::init_observation_procedures(user, conn);
-    data_enrichment_procedures::init_data_enrichment_procedures(user, conn);
     dbgi_plan::init_dbgi_plan(user, conn);
 
     // precollection_procedure::init_precollection_procedure_model(user,

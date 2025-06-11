@@ -200,7 +200,7 @@ where
         // We link shared trackables to child procedures
         for shared in &self.shared_trackable_edges(conn)? {
             dot.push_str(&format!(
-                "    T{} -> T{} [style=dashed, color=green, label=\"Same as\"];\n",
+                "    T{} -> T{} [dir=both, style=dashed, color=green, label=\"Same as\"];\n",
                 shared.parent(conn)?.id(),
                 shared.child(conn)?.id()
             ));

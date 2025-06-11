@@ -77,66 +77,71 @@ pub(super) async fn portal_ws(
                         log::warn!("unexpected text message");
                     }
 
-                    AggregatedMessage::Binary(bytes) => match F2BMessage::try_from(bytes) {
-                        Ok(F2BMessage::Unsubscribe(unsubscribe)) => {
-                            listen_notify_handle
-                                .unsubscribe(unsubscribe, session_id)
-                                .await
-                                .unwrap();
-                        }
-                        Ok(F2BMessage::Row(ops)) => {
-                            if ops.requires_subscription() {
+                    AggregatedMessage::Binary(bytes) => {
+                        match F2BMessage::try_from(bytes) {
+                            Ok(F2BMessage::Unsubscribe(unsubscribe)) => {
                                 listen_notify_handle
-                                    .subscribe(ops.table_name().into(), session_id)
+                                    .unsubscribe(unsubscribe, session_id)
                                     .await
                                     .unwrap();
                             }
-                            let crud = *ops.as_ref();
-
-                            match ops.execute(&mut conn) {
-                                Ok(None) => {}
-                                Ok(Some(row)) => {
-                                    session
-                                        .binary(B2FMessage::from((row.clone(), crud)))
+                            Ok(F2BMessage::Row(ops)) => {
+                                if ops.requires_subscription() {
+                                    listen_notify_handle
+                                        .subscribe(ops.table_name().into(), session_id)
                                         .await
                                         .unwrap();
-                                    listen_notify_handle.notify((row, crud).into()).await.unwrap();
                                 }
-                                Err(_error) => {
-                                    todo!("Handle ops error");
-                                }
-                            }
-                        }
-                        Ok(F2BMessage::Table(ops)) => {
-                            if ops.requires_subscription() {
-                                listen_notify_handle
-                                    .subscribe(ops.table_name().into(), session_id)
-                                    .await
-                                    .unwrap();
-                            }
-                            let crud = *ops.as_ref();
-                            match ops.execute(&mut conn) {
-                                Ok(rows) => {
-                                    if !rows.is_empty() {
+                                let crud = *ops.as_ref();
+
+                                match ops.execute(&mut conn) {
+                                    Ok(None) => {}
+                                    Ok(Some(row)) => {
                                         session
-                                            .binary(B2FMessage::from((rows.clone(), crud)))
+                                            .binary(B2FMessage::from((row.clone(), crud)))
                                             .await
                                             .unwrap();
                                         listen_notify_handle
-                                            .notify((rows, crud).into())
+                                            .notify((row, crud).into())
                                             .await
                                             .unwrap();
                                     }
-                                }
-                                Err(_error) => {
-                                    todo!("Handle ops error");
+                                    Err(_error) => {
+                                        todo!("Handle ops error");
+                                    }
                                 }
                             }
+                            Ok(F2BMessage::Table(ops)) => {
+                                if ops.requires_subscription() {
+                                    listen_notify_handle
+                                        .subscribe(ops.table_name().into(), session_id)
+                                        .await
+                                        .unwrap();
+                                }
+                                let crud = *ops.as_ref();
+                                match ops.execute(&mut conn) {
+                                    Ok(rows) => {
+                                        if !rows.is_empty() {
+                                            session
+                                                .binary(B2FMessage::from((rows.clone(), crud)))
+                                                .await
+                                                .unwrap();
+                                            listen_notify_handle
+                                                .notify((rows, crud).into())
+                                                .await
+                                                .unwrap();
+                                        }
+                                    }
+                                    Err(_error) => {
+                                        todo!("Handle ops error");
+                                    }
+                                }
+                            }
+                            Err(err) => {
+                                log::warn!("failed to parse message: {err}");
+                            }
                         }
-                        Err(err) => {
-                            log::warn!("failed to parse message: {err}");
-                        }
-                    },
+                    }
 
                     AggregatedMessage::Close(reason) => break reason,
                 }

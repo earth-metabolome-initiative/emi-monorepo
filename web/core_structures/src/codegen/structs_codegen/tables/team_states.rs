@@ -50,8 +50,7 @@ impl TeamState {
             crate::codegen::structs_codegen::tables::colors::Color,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::colors::Color::table(),
@@ -65,11 +64,11 @@ impl TeamState {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
         use crate::codegen::diesel_codegen::tables::team_states::team_states;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(team_states::name.eq(name))
             .order_by(team_states::id.asc())
@@ -81,11 +80,11 @@ impl TeamState {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
         use crate::codegen::diesel_codegen::tables::team_states::team_states;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(team_states::description.eq(description))
             .order_by(team_states::id.asc())
@@ -97,11 +96,11 @@ impl TeamState {
         icon: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
         use crate::codegen::diesel_codegen::tables::team_states::team_states;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(team_states::icon.eq(icon))
             .order_by(team_states::id.asc())
@@ -113,11 +112,11 @@ impl TeamState {
         color_id: &i16,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
         use crate::codegen::diesel_codegen::tables::team_states::team_states;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(team_states::color_id.eq(color_id))
             .order_by(team_states::id.asc())

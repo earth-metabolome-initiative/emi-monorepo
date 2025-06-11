@@ -50,8 +50,7 @@ impl TemporaryUser {
             crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::login_providers::LoginProvider::table(),
@@ -66,12 +65,12 @@ impl TemporaryUser {
         login_provider_id: &i16,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+
         use crate::codegen::diesel_codegen::tables::temporary_user::temporary_user;
-        use diesel::BoolExpressionMethods;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(
                 temporary_user::email
@@ -87,10 +86,9 @@ impl TemporaryUser {
         email: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::temporary_user::temporary_user;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(temporary_user::email.eq(email))
             .order_by(temporary_user::id.asc())
@@ -101,10 +99,9 @@ impl TemporaryUser {
         login_provider_id: &i16,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::temporary_user::temporary_user;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(temporary_user::login_provider_id.eq(login_provider_id))
             .order_by(temporary_user::id.asc())

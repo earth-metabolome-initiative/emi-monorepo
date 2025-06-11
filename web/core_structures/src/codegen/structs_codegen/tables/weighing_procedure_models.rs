@@ -57,8 +57,7 @@ impl WeighingProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -90,8 +89,7 @@ impl WeighingProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
@@ -108,10 +106,9 @@ impl WeighingProcedureModel {
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >{
-        use diesel::BoolExpressionMethods;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
@@ -130,10 +127,9 @@ impl WeighingProcedureModel {
         instrument_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(weighing_procedure_models::instrument_id.eq(instrument_id))
             .order_by(weighing_procedure_models::id.asc())
@@ -145,11 +141,11 @@ impl WeighingProcedureModel {
         id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
         use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
-        use diesel::BoolExpressionMethods;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(
                 weighing_procedure_models::instrument_id
@@ -164,12 +160,15 @@ impl WeighingProcedureModel {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
+            SelectableHelper, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            procedure_models::procedure_models,
+            weighing_procedure_models::weighing_procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
@@ -185,11 +184,15 @@ impl WeighingProcedureModel {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            procedure_models::procedure_models,
+            weighing_procedure_models::weighing_procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
@@ -204,11 +207,15 @@ impl WeighingProcedureModel {
         deprecated: &bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            procedure_models::procedure_models,
+            weighing_procedure_models::weighing_procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
@@ -223,11 +230,15 @@ impl WeighingProcedureModel {
         photograph_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            procedure_models::procedure_models,
+            weighing_procedure_models::weighing_procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
@@ -242,11 +253,15 @@ impl WeighingProcedureModel {
         icon: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            procedure_models::procedure_models,
+            weighing_procedure_models::weighing_procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
@@ -261,11 +276,15 @@ impl WeighingProcedureModel {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            procedure_models::procedure_models,
+            weighing_procedure_models::weighing_procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
@@ -280,11 +299,15 @@ impl WeighingProcedureModel {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            procedure_models::procedure_models,
+            weighing_procedure_models::weighing_procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
@@ -299,11 +322,15 @@ impl WeighingProcedureModel {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            procedure_models::procedure_models,
+            weighing_procedure_models::weighing_procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
@@ -318,11 +345,15 @@ impl WeighingProcedureModel {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
-        use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            procedure_models::procedure_models,
+            weighing_procedure_models::weighing_procedure_models,
+        };
         Self::table()
             .inner_join(
                 procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),

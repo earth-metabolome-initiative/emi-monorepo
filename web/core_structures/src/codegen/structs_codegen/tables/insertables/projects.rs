@@ -89,8 +89,7 @@ impl InsertableProject {
             crate::codegen::structs_codegen::tables::colors::Color,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::colors::Color::table(),
@@ -122,8 +121,7 @@ impl InsertableProject {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -155,8 +153,7 @@ impl InsertableProject {
             crate::codegen::structs_codegen::tables::projects::Project,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         let Some(parent_project_id) = self.parent_project_id else {
             return Ok(None);
         };
@@ -192,8 +189,7 @@ impl InsertableProject {
             crate::codegen::structs_codegen::tables::project_states::ProjectState,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::project_states::ProjectState::table(),
@@ -225,8 +221,7 @@ impl InsertableProject {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),

@@ -19,7 +19,9 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_models::Centri
             .filter(
                 seconds
                     .ne(excluded(seconds))
-                    .or(rotation_per_minute.ne(excluded(rotation_per_minute))),
+                    .or(rotation_per_minute.ne(excluded(rotation_per_minute)))
+                    .or(centrifuged_with.ne(excluded(centrifuged_with)))
+                    .or(container_id.ne(excluded(container_id))),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })
@@ -46,7 +48,9 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_models::Centri
             .filter(
                 seconds
                     .ne(excluded(seconds))
-                    .or(rotation_per_minute.ne(excluded(rotation_per_minute))),
+                    .or(rotation_per_minute.ne(excluded(rotation_per_minute)))
+                    .or(centrifuged_with.ne(excluded(centrifuged_with)))
+                    .or(container_id.ne(excluded(container_id))),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })

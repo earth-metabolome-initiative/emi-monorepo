@@ -65,8 +65,7 @@ impl VolumetricProcessable {
             crate::codegen::structs_codegen::tables::processables::Processable,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::processables::Processable::table(),
@@ -80,12 +79,14 @@ impl VolumetricProcessable {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use crate::codegen::diesel_codegen::tables::volumetric_processables::volumetric_processables;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
+            SelectableHelper, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            trackables::trackables, volumetric_processables::volumetric_processables,
+        };
         Self::table()
             .inner_join(trackables::table.on(volumetric_processables::id.eq(trackables::id)))
             .filter(trackables::name.eq(name))
@@ -99,11 +100,14 @@ impl VolumetricProcessable {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use crate::codegen::diesel_codegen::tables::volumetric_processables::volumetric_processables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            trackables::trackables, volumetric_processables::volumetric_processables,
+        };
         Self::table()
             .inner_join(trackables::table.on(volumetric_processables::id.eq(trackables::id)))
             .filter(trackables::description.eq(description))
@@ -116,11 +120,14 @@ impl VolumetricProcessable {
         photograph_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use crate::codegen::diesel_codegen::tables::volumetric_processables::volumetric_processables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            trackables::trackables, volumetric_processables::volumetric_processables,
+        };
         Self::table()
             .inner_join(trackables::table.on(volumetric_processables::id.eq(trackables::id)))
             .filter(trackables::photograph_id.eq(photograph_id))
@@ -133,11 +140,14 @@ impl VolumetricProcessable {
         parent_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use crate::codegen::diesel_codegen::tables::volumetric_processables::volumetric_processables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            trackables::trackables, volumetric_processables::volumetric_processables,
+        };
         Self::table()
             .inner_join(trackables::table.on(volumetric_processables::id.eq(trackables::id)))
             .filter(trackables::parent_id.eq(parent_id))
@@ -150,11 +160,14 @@ impl VolumetricProcessable {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use crate::codegen::diesel_codegen::tables::volumetric_processables::volumetric_processables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            trackables::trackables, volumetric_processables::volumetric_processables,
+        };
         Self::table()
             .inner_join(trackables::table.on(volumetric_processables::id.eq(trackables::id)))
             .filter(trackables::created_by.eq(created_by))
@@ -167,11 +180,14 @@ impl VolumetricProcessable {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use crate::codegen::diesel_codegen::tables::volumetric_processables::volumetric_processables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            trackables::trackables, volumetric_processables::volumetric_processables,
+        };
         Self::table()
             .inner_join(trackables::table.on(volumetric_processables::id.eq(trackables::id)))
             .filter(trackables::created_at.eq(created_at))
@@ -184,11 +200,14 @@ impl VolumetricProcessable {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use crate::codegen::diesel_codegen::tables::volumetric_processables::volumetric_processables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            trackables::trackables, volumetric_processables::volumetric_processables,
+        };
         Self::table()
             .inner_join(trackables::table.on(volumetric_processables::id.eq(trackables::id)))
             .filter(trackables::updated_by.eq(updated_by))
@@ -201,11 +220,14 @@ impl VolumetricProcessable {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use crate::codegen::diesel_codegen::tables::volumetric_processables::volumetric_processables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            trackables::trackables, volumetric_processables::volumetric_processables,
+        };
         Self::table()
             .inner_join(trackables::table.on(volumetric_processables::id.eq(trackables::id)))
             .filter(trackables::updated_at.eq(updated_at))

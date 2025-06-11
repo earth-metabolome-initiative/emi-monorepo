@@ -127,9 +127,24 @@ CREATE TABLE IF NOT EXISTS mix_countable_procedure_models (
 
 CREATE TABLE IF NOT EXISTS aliquoting_procedure_models (
 	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
+	-- The amount of liters that should be aliquoted.
 	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters)),
+	-- The error in liters that is allowed for the aliquoting procedure.
 	error REAL NOT NULL CHECK (must_be_strictly_positive_f32(error)),
-	CHECK (must_be_smaller_than_f32(error, liters))
+	-- Source container from which the aliquot is taken.
+	source INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- Destination container to which the aliquot is transferred.
+	destination INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- The device used for the aliquoting procedure.
+	aliquoted_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- We check that the `liters` is indeed a positive float.
+	CHECK (must_be_smaller_than_f32(error, liters)),
+	-- We check that the `aliquoted_with` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (aliquoted_with, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	-- We check that the `source` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (source, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	-- We check that the `destination` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (destination, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS freezing_procedure_models (
@@ -175,17 +190,71 @@ CREATE TABLE IF NOT EXISTS weighing_procedure_models (
 	-- TODO: find an appropriate check to ensure that the `instrument_id` is indeed a weighing instrument.
 );
 
-CREATE TABLE IF NOT EXISTS weighing_procedure_models (
-	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
-	instrument_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
-	-- We check that the `instrument_id` is indeed a trackable that is compatible with the procedure model.
-	FOREIGN KEY (instrument_id, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE
-	-- TODO: find an appropriate check to ensure that the `instrument_id` is indeed a weighing instrument.
-);
-
 CREATE TABLE IF NOT EXISTS fractioning_procedure_models (
 	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
-	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms))
+	-- Expected amount of the fraction to be collected in kilograms.
+	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms)),
+	-- The scale used to measure the fraction in kilograms.
+	weighed_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- Source container from which the fraction is taken.
+	source INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- Destination container to which the fraction is transferred.
+	destination INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- Foreign key to ensure that the `weighed_with` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (weighed_with, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	-- Foreign key to ensure that the `source` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (source, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	-- Foreign key to ensure that the `destination` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (destination, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS ball_mill_procedure_models (
+	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
+	-- The time in seconds that the ball mill should be used for the procedure.
+	-- By default, we set it to 150 seconds (2.5 minutes).
+	seconds REAL NOT NULL DEFAULT 150.0,
+	-- The time in seconds that the ball mill should be used for the procedure.
+	hertz REAL NOT NULL DEFAULT 25.0,
+	-- The ball mill used for the procedure.
+	milled_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- The container that is milled.
+	container_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- We check that we are not milling for more than 15 minutes.
+	CHECK (must_be_strictly_smaller_than_f32(seconds, 900.0)),
+	-- We check that we are milling for at least 30 seconds.
+	CHECK (must_be_strictly_greater_than_f32(seconds, 30.0)),
+	-- We check that the frequency is not greater than 50 Hz.
+	CHECK (must_be_strictly_smaller_than_f32(hertz, 50.0)),
+	-- We check that the frequency is not less than 15 Hz.
+	CHECK (must_be_strictly_greater_than_f32(hertz, 15.0)),
+	-- We check that the `milled_with` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (milled_with, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	-- We check that the `container_id` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (container_id, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS centrifuge_procedure_models (
+	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
+	-- The time in seconds that the centrifuge should be used for the procedure.
+	seconds REAL NOT NULL DEFAULT 120.0,
+	-- The RPMs (rotations per minute) of the centrifuge.
+	rotation_per_minute REAL NOT NULL DEFAULT 13000.0,
+	-- The device used for the centrifuge procedure.
+	centrifuged_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- The container that is centrifuged.
+	container_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- We check that the centrifuge is not used for more than 30 minutes.
+	CHECK (must_be_strictly_smaller_than_f32(seconds, 1800.0)),
+	-- We check that the centrifuge is used for at least 30 seconds.
+	CHECK (must_be_greater_than_f32(seconds, 30.0)),
+	-- We check that the rotation per minute is not greater than 30000 RPM.
+	CHECK (must_be_smaller_than_f32(rotation_per_minute, 30000.0)),
+	-- We check that the rotation per minute is not less than 5000 RPM.
+	CHECK (must_be_greater_than_f32(rotation_per_minute, 5000.0)),
+	-- We check that the `centrifuged_with` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (centrifuged_with, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	-- We check that the `container_id` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (container_id, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS shaking_procedure_models (
@@ -194,25 +263,9 @@ CREATE TABLE IF NOT EXISTS shaking_procedure_models (
 );
 
 CREATE TABLE IF NOT EXISTS disposal_procedure_models (
-	id INTEGER PRIMARY KEY REFERENCES procedure_models(id)
-);
-
-CREATE TABLE IF NOT EXISTS ball_mill_procedure_models (
 	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
-	seconds REAL NOT NULL CHECK (must_be_strictly_positive_f32(seconds)),
-	hertz REAL NOT NULL CHECK (must_be_strictly_positive_f32(hertz)),
-	CHECK (must_be_strictly_smaller_than_f32(seconds, 1800.0)),
-	CHECK (must_be_strictly_greater_than_f32(seconds, 10.0)),
-	CHECK (must_be_strictly_smaller_than_f32(hertz, 100.0)),
-	CHECK (must_be_strictly_greater_than_f32(hertz, 0.0))
-);
-
-CREATE TABLE IF NOT EXISTS centrifuge_procedure_models (
-	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
-	seconds REAL NOT NULL CHECK (must_be_strictly_positive_f32(seconds)),
-	rotation_per_minute REAL NOT NULL CHECK (must_be_strictly_positive_f32(rotation_per_minute)),
-	CHECK (must_be_strictly_smaller_than_f32(seconds, 3600.0)),
-	CHECK (must_be_greater_than_f32(seconds, 30.0)),
-	CHECK (must_be_smaller_than_f32(rotation_per_minute, 30000.0)),
-	CHECK (must_be_greater_than_f32(rotation_per_minute, 5000.0))
+	-- The disposed trackable is the one that is being disposed of.
+	disposed_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- The disposal procedure model should always have a trackable that is compatible with it.
+	FOREIGN KEY (disposed_id, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE
 );

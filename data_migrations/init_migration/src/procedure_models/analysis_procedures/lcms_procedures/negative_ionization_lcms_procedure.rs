@@ -1,8 +1,7 @@
 //! Submodule for negative ionization LC-MS procedures.
 
 use core_structures::{ProcedureModel, User};
-use web_common_traits::database::Insertable;
-use web_common_traits::database::InsertableVariant;
+use web_common_traits::database::{Insertable, InsertableVariant};
 
 const NEGATIVE_IONIZATION_LCMS: &str = "Negative Ionization LC-MS";
 

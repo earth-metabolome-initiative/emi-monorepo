@@ -15,7 +15,7 @@ const ORGANISM_OBSERVATION: &str = "Organism observation procedure";
 ///
 /// * If the connection fails to insert the procedure model.
 /// * If the procedure model building fails.
-pub(super) fn init_organism_observation_procedure(
+pub(crate) fn init_organism_observation_procedure(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> ProcedureModel {

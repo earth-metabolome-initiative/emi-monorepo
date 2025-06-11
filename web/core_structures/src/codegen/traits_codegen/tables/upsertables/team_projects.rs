@@ -6,8 +6,9 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::team_projects::team_projects::*;
         use diesel::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::team_projects::team_projects::*;
         diesel::insert_into(table)
             .values(self)
             .on_conflict((team_id, project_id))
@@ -24,8 +25,9 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::team_projects::team_projects::*;
         use diesel::RunQueryDsl;
+
+        use crate::codegen::diesel_codegen::tables::team_projects::team_projects::*;
         diesel::insert_into(table)
             .values(self)
             .on_conflict((team_id, project_id))

@@ -48,8 +48,7 @@ impl InsertableTeamProject {
             crate::codegen::structs_codegen::tables::projects::Project,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::projects::Project::table(),
@@ -81,8 +80,7 @@ impl InsertableTeamProject {
             crate::codegen::structs_codegen::tables::teams::Team,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::teams::Team::table(),

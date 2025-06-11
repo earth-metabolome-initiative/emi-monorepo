@@ -50,8 +50,7 @@ impl UserEmail {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -65,11 +64,11 @@ impl UserEmail {
         email: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
         use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(user_emails::email.eq(email))
             .order_by(user_emails::id.asc())
@@ -82,12 +81,12 @@ impl UserEmail {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+
         use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
-        use diesel::BoolExpressionMethods;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(user_emails::email.eq(email).and(user_emails::created_by.eq(created_by)))
             .order_by(user_emails::id.asc())
@@ -100,12 +99,12 @@ impl UserEmail {
         primary_email: &bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+
         use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
-        use diesel::BoolExpressionMethods;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(
                 user_emails::created_by
@@ -121,10 +120,9 @@ impl UserEmail {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(user_emails::created_by.eq(created_by))
             .order_by(user_emails::id.asc())
@@ -135,10 +133,9 @@ impl UserEmail {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(user_emails::created_at.eq(created_at))
             .order_by(user_emails::id.asc())
@@ -149,10 +146,9 @@ impl UserEmail {
         primary_email: &bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(user_emails::primary_email.eq(primary_email))
             .order_by(user_emails::id.asc())

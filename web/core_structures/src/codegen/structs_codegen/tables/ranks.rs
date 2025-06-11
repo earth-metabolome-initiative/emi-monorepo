@@ -30,11 +30,11 @@ impl Rank {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
         use crate::codegen::diesel_codegen::tables::ranks::ranks;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(ranks::name.eq(name))
             .order_by(ranks::id.asc())
@@ -46,11 +46,11 @@ impl Rank {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
         use crate::codegen::diesel_codegen::tables::ranks::ranks;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(ranks::description.eq(description))
             .order_by(ranks::id.asc())

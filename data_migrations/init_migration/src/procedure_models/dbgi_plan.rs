@@ -1,15 +1,15 @@
 //! Submodule defining the DBGI plan procedure model.
 
-use core_structures::traits::AppendProcedureModel;
 use core_structures::{
     ProcedureModel, User,
-    traits::{ChildOptions, ParentProcedureModel},
+    traits::{AppendProcedureModel, ChildOptions, ParentProcedureModel},
 };
 use web_common_traits::database::{Insertable, InsertableVariant};
 
 use crate::procedure_models::{
-    init_full_organism_collection, init_negative_ionization_lcms_procedure,
-    init_part_of_organism_collection, init_positive_ionization_lcms_procedure,
+    init_data_enrichment_procedure, init_full_organism_collection,
+    init_negative_ionization_lcms_procedure, init_part_of_organism_collection,
+    init_positive_ionization_lcms_procedure, observation_procedures,
 };
 mod dbgi_collection_preparation;
 mod sample_processing_procedures;
@@ -45,16 +45,21 @@ pub(super) fn init_dbgi_plan(user: &User, conn: &mut diesel::PgConnection) {
         sample_processing_procedures::init_dbgi_sample_processing_procedures(user, conn);
     let positive_lcms_procedure = init_positive_ionization_lcms_procedure(user, conn);
     let negative_lcms_procedure = init_negative_ionization_lcms_procedure(user, conn);
+    let observation_procedure =
+        observation_procedures::init_organism_observation_procedure(user, conn);
     let full_organism_collection = init_full_organism_collection(user, conn);
     let part_of_organism_collection = init_part_of_organism_collection(user, conn);
+    let data_enrichment = init_data_enrichment_procedure(user, conn);
 
     for procedure in [
         &collection_preparation,
+        &observation_procedure,
         &full_organism_collection,
         &part_of_organism_collection,
         &sample_processing_procedure,
         &positive_lcms_procedure,
         &negative_lcms_procedure,
+        &data_enrichment,
     ] {
         dbgi_plan
             .child(procedure, ChildOptions::default().inherit_trackables(), user, conn)
@@ -65,10 +70,12 @@ pub(super) fn init_dbgi_plan(user: &User, conn: &mut diesel::PgConnection) {
         .extend(
             &[
                 &collection_preparation,
+                &observation_procedure,
                 &full_organism_collection,
                 &sample_processing_procedure,
                 &positive_lcms_procedure,
                 &negative_lcms_procedure,
+                &data_enrichment,
             ],
             user,
             conn,
@@ -77,7 +84,7 @@ pub(super) fn init_dbgi_plan(user: &User, conn: &mut diesel::PgConnection) {
 
     dbgi_plan
         .extend(
-            &[&collection_preparation, &part_of_organism_collection, &sample_processing_procedure],
+            &[&observation_procedure, &part_of_organism_collection, &sample_processing_procedure],
             user,
             conn,
         )

@@ -75,14 +75,16 @@ impl CSVTableMetadata {
             .into_iter()
             .map(CSVColumnMetadata::try_from)
             .map(|col| {
-                col.map_err(|err| match err {
-                    CSVSchemaError::NonUniquePrimaryKey { column_name, .. } => {
-                        CSVSchemaError::NonUniquePrimaryKey {
-                            column_name,
-                            table_name: Some(name.to_owned()),
+                col.map_err(|err| {
+                    match err {
+                        CSVSchemaError::NonUniquePrimaryKey { column_name, .. } => {
+                            CSVSchemaError::NonUniquePrimaryKey {
+                                column_name,
+                                table_name: Some(name.to_owned()),
+                            }
                         }
+                        _ => err,
                     }
-                    _ => err,
                 })
             })
             .collect::<Result<Vec<_>, _>>()?;

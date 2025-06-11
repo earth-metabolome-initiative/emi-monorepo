@@ -5,6 +5,7 @@ use diesel::PgConnection;
 
 pub mod containers;
 pub mod instruments;
+pub mod products;
 pub mod reagents;
 
 /// Initializes the trackable categories for the user.

@@ -48,8 +48,7 @@ impl Organism {
             crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
@@ -63,12 +62,14 @@ impl Organism {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::organisms::organisms;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
+            SelectableHelper, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            organisms::organisms, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
             .filter(trackables::name.eq(name))
@@ -82,11 +83,14 @@ impl Organism {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::organisms::organisms;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            organisms::organisms, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
             .filter(trackables::description.eq(description))
@@ -99,11 +103,14 @@ impl Organism {
         photograph_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::organisms::organisms;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            organisms::organisms, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
             .filter(trackables::photograph_id.eq(photograph_id))
@@ -116,11 +123,14 @@ impl Organism {
         parent_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::organisms::organisms;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            organisms::organisms, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
             .filter(trackables::parent_id.eq(parent_id))
@@ -133,11 +143,14 @@ impl Organism {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::organisms::organisms;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            organisms::organisms, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
             .filter(trackables::created_by.eq(created_by))
@@ -150,11 +163,14 @@ impl Organism {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::organisms::organisms;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            organisms::organisms, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
             .filter(trackables::created_at.eq(created_at))
@@ -167,11 +183,14 @@ impl Organism {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::organisms::organisms;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            organisms::organisms, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
             .filter(trackables::updated_by.eq(updated_by))
@@ -184,11 +203,14 @@ impl Organism {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::organisms::organisms;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            organisms::organisms, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
             .filter(trackables::updated_at.eq(updated_at))

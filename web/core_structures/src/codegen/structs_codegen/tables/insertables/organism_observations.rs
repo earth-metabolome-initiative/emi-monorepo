@@ -74,8 +74,7 @@ impl InsertableOrganismObservation {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
@@ -107,8 +106,7 @@ impl InsertableOrganismObservation {
             crate::codegen::structs_codegen::tables::organisms::Organism,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::organisms::Organism::table(),
@@ -140,8 +138,7 @@ impl InsertableOrganismObservation {
             crate::codegen::structs_codegen::tables::projects::Project,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::projects::Project::table(),
@@ -173,8 +170,7 @@ impl InsertableOrganismObservation {
             crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject::table(),
@@ -206,8 +202,7 @@ impl InsertableOrganismObservation {
             crate::codegen::structs_codegen::tables::users::User,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),

@@ -59,8 +59,7 @@ impl InsertablePackagingModel {
             crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::table(),

@@ -108,12 +108,16 @@ impl<'a> TryFrom<&'a str> for MassDeviation {
         let unit = split.next().ok_or_else(|| "No unit provided".to_string())?;
 
         match unit {
-            "ppm" => Ok(MassDeviation::Ppm(
-                value.parse().map_err(|e| format!("Cannot parse value: {e}"))?,
-            )),
-            "Da" => Ok(MassDeviation::Da(
-                value.parse().map_err(|e| format!("Cannot parse value: {e}"))?,
-            )),
+            "ppm" => {
+                Ok(MassDeviation::Ppm(
+                    value.parse().map_err(|e| format!("Cannot parse value: {e}"))?,
+                ))
+            }
+            "Da" => {
+                Ok(MassDeviation::Da(
+                    value.parse().map_err(|e| format!("Cannot parse value: {e}"))?,
+                ))
+            }
             _ => Err(format!("Unknown unit: {unit}")),
         }
     }

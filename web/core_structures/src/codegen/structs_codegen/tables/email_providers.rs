@@ -43,8 +43,7 @@ impl EmailProvider {
             crate::codegen::structs_codegen::tables::user_emails::UserEmail,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::user_emails::UserEmail::table(),
@@ -76,8 +75,7 @@ impl EmailProvider {
             crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::login_providers::LoginProvider::table(),
@@ -91,10 +89,9 @@ impl EmailProvider {
         email_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::email_providers::email_providers;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(email_providers::email_id.eq(email_id))
             .order_by((email_providers::email_id.asc(), email_providers::login_provider_id.asc()))
@@ -105,10 +102,9 @@ impl EmailProvider {
         login_provider_id: &i16,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::email_providers::email_providers;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(email_providers::login_provider_id.eq(login_provider_id))
             .order_by((email_providers::email_id.asc(), email_providers::login_provider_id.asc()))

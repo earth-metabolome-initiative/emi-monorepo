@@ -16,7 +16,14 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(liters.ne(excluded(liters)).or(error.ne(excluded(error))))
+            .filter(
+                liters
+                    .ne(excluded(liters))
+                    .or(error.ne(excluded(error)))
+                    .or(source.ne(excluded(source)))
+                    .or(destination.ne(excluded(destination)))
+                    .or(aliquoted_with.ne(excluded(aliquoted_with))),
+            )
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }
@@ -39,7 +46,14 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(liters.ne(excluded(liters)).or(error.ne(excluded(error))))
+            .filter(
+                liters
+                    .ne(excluded(liters))
+                    .or(error.ne(excluded(error)))
+                    .or(source.ne(excluded(source)))
+                    .or(destination.ne(excluded(destination)))
+                    .or(aliquoted_with.ne(excluded(aliquoted_with))),
+            )
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }

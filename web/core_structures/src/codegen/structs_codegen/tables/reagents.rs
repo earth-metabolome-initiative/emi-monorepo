@@ -57,8 +57,7 @@ impl Reagent {
             crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
@@ -72,11 +71,11 @@ impl Reagent {
         cas_code: &::cas_codes::CAS,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
         use crate::codegen::diesel_codegen::tables::reagents::reagents;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(reagents::cas_code.eq(cas_code))
             .order_by(reagents::id.asc())
@@ -88,12 +87,12 @@ impl Reagent {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::reagents::reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
+            SelectableHelper, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{reagents::reagents, trackables::trackables};
         Self::table()
             .inner_join(trackables::table.on(reagents::id.eq(trackables::id)))
             .filter(trackables::name.eq(name))
@@ -107,11 +106,12 @@ impl Reagent {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::reagents::reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{reagents::reagents, trackables::trackables};
         Self::table()
             .inner_join(trackables::table.on(reagents::id.eq(trackables::id)))
             .filter(trackables::description.eq(description))
@@ -124,11 +124,12 @@ impl Reagent {
         photograph_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::reagents::reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{reagents::reagents, trackables::trackables};
         Self::table()
             .inner_join(trackables::table.on(reagents::id.eq(trackables::id)))
             .filter(trackables::photograph_id.eq(photograph_id))
@@ -141,11 +142,12 @@ impl Reagent {
         parent_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::reagents::reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{reagents::reagents, trackables::trackables};
         Self::table()
             .inner_join(trackables::table.on(reagents::id.eq(trackables::id)))
             .filter(trackables::parent_id.eq(parent_id))
@@ -158,11 +160,12 @@ impl Reagent {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::reagents::reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{reagents::reagents, trackables::trackables};
         Self::table()
             .inner_join(trackables::table.on(reagents::id.eq(trackables::id)))
             .filter(trackables::created_by.eq(created_by))
@@ -175,11 +178,12 @@ impl Reagent {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::reagents::reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{reagents::reagents, trackables::trackables};
         Self::table()
             .inner_join(trackables::table.on(reagents::id.eq(trackables::id)))
             .filter(trackables::created_at.eq(created_at))
@@ -192,11 +196,12 @@ impl Reagent {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::reagents::reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{reagents::reagents, trackables::trackables};
         Self::table()
             .inner_join(trackables::table.on(reagents::id.eq(trackables::id)))
             .filter(trackables::updated_by.eq(updated_by))
@@ -209,11 +214,12 @@ impl Reagent {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::reagents::reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{reagents::reagents, trackables::trackables};
         Self::table()
             .inner_join(trackables::table.on(reagents::id.eq(trackables::id)))
             .filter(trackables::updated_at.eq(updated_at))

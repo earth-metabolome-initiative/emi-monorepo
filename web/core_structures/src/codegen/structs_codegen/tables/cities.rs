@@ -48,8 +48,7 @@ impl City {
             crate::codegen::structs_codegen::tables::countries::Country,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::countries::Country::table(),
@@ -63,10 +62,9 @@ impl City {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::cities::cities;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table().filter(cities::name.eq(name)).order_by(cities::id.asc()).load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -74,10 +72,9 @@ impl City {
         iso: &::iso_codes::CountryCode,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::cities::cities;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table().filter(cities::iso.eq(iso)).order_by(cities::id.asc()).load::<Self>(conn)
     }
 }

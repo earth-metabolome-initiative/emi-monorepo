@@ -46,8 +46,7 @@ impl InsertableCity {
             crate::codegen::structs_codegen::tables::countries::Country,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::countries::Country::table(),

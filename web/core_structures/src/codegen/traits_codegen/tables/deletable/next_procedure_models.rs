@@ -9,9 +9,7 @@ impl web_common_traits::prelude::Deletable
         user_id: Self::UserId,
         conn: &mut Self::Conn,
     ) -> Result<bool, web_common_traits::database::DeleteError> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{Identifiable, QueryDsl};
+        use diesel::{Identifiable, QueryDsl, RunQueryDsl, associations::HasTable};
         use web_common_traits::database::Updatable;
         if !self.can_update(user_id, conn)? {
             return Err(

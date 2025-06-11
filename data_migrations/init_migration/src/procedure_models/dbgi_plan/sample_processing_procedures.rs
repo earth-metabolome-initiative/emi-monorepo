@@ -1,12 +1,11 @@
 //! Submodule defining procedures which are re-used in sample processing.
 
-use core_structures::ProcedureModelTrackable;
-use core_structures::Trackable;
-use core_structures::traits::AppendProcedureModel;
-use core_structures::traits::ParentProcedureModel;
-use core_structures::{FreezeDryingProcedureModel, FreezingProcedureModel, ProcedureModel};
-use web_common_traits::database::Insertable;
-use web_common_traits::database::InsertableVariant;
+use core_structures::{
+    FractioningProcedureModel, FreezeDryingProcedureModel, FreezingProcedureModel, ProcedureModel,
+    ProcedureModelTrackable, Trackable,
+    traits::{AppendProcedureModel, ParentProcedureModel},
+};
+use web_common_traits::database::{Insertable, InsertableVariant};
 
 use crate::trackables::instruments::{FREEZE_DRYER, FREEZER};
 
@@ -60,6 +59,16 @@ pub(super) fn init_dbgi_sample_processing_procedures(
                 .trackable_id(Trackable::from_name(FREEZE_DRYER, conn).unwrap().unwrap().id)
                 .unwrap(),
         )
+        .unwrap()
+        .insert(user.id, conn)
+        .unwrap();
+
+    let fractioning_procedure = FractioningProcedureModel::new()
+        .name("DBGI Fractioning")
+        .unwrap()
+        .description("DBGI Fractioning procedure model")
+        .unwrap()
+        .created_by(user.id)
         .unwrap()
         .insert(user.id, conn)
         .unwrap();

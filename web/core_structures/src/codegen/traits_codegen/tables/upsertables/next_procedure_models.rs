@@ -6,12 +6,12 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
         use crate::codegen::diesel_codegen::tables::next_procedure_models::next_procedure_models::*;
-        use diesel::BoolExpressionMethods;
-        use diesel::ExpressionMethods;
-        use diesel::RunQueryDsl;
-        use diesel::query_dsl::methods::FilterDsl;
-        use diesel::upsert::excluded;
         diesel::insert_into(table)
             .values(self)
             .on_conflict((parent_id, current_id, successor_id))
@@ -30,12 +30,12 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl,
+            upsert::excluded,
+        };
+
         use crate::codegen::diesel_codegen::tables::next_procedure_models::next_procedure_models::*;
-        use diesel::BoolExpressionMethods;
-        use diesel::ExpressionMethods;
-        use diesel::RunQueryDsl;
-        use diesel::query_dsl::methods::FilterDsl;
-        use diesel::upsert::excluded;
         diesel::insert_into(table)
             .values(self)
             .on_conflict((parent_id, current_id, successor_id))

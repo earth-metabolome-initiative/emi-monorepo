@@ -1,16 +1,14 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableContainerModelAttributes {
-    Id(crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes),
+    Id(crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes),
     Liters,
 }
-impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
-    > for InsertableContainerModelAttributes
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes>
+    for InsertableContainerModelAttributes
 {
     fn from(
-        extension: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
+        extension: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
     ) -> Self {
         Self::Id(extension)
     }
@@ -40,30 +38,29 @@ impl InsertableContainerModel {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::table(),
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
                 self.id,
             ),
             conn,
@@ -72,8 +69,7 @@ impl InsertableContainerModel {
 }
 #[derive(Default)]
 pub struct InsertableContainerModelBuilder {
-    pub(crate) id:
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder,
+    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     pub(crate) liters: Option<f32>,
 }
 impl InsertableContainerModelBuilder {
@@ -91,30 +87,6 @@ impl InsertableContainerModelBuilder {
         pgrx_validation::must_be_strictly_positive_f32(liters)
             .map_err(|e| e.rename_field(InsertableContainerModelAttributes::Liters))?;
         self.liters = Some(liters);
-        Ok(self)
-    }
-    pub fn deprecation_date<P>(
-        mut self,
-        deprecation_date: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableContainerModelAttributes>>
-    where
-        P: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
-        <P as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id =
-            self.id.deprecation_date(deprecation_date).map_err(|err| err.into_field_name())?;
-        Ok(self)
-    }
-    pub fn brand_id<P>(
-        mut self,
-        brand_id: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableContainerModelAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.brand_id(brand_id).map_err(|err| err.into_field_name())?;
         Ok(self)
     }
     pub fn id<P>(
@@ -231,12 +203,12 @@ impl InsertableContainerModelBuilder {
         web_common_traits::database::InsertError<InsertableContainerModelAttributes>,
     >
     where
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder: web_common_traits::database::InsertableVariant<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+            Row = crate::codegen::structs_codegen::tables::trackables::Trackable,
             Error = web_common_traits::database::InsertError<
-                crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
+                crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
             >,
         >,
     {

@@ -22,3 +22,11 @@ CREATE TABLE IF NOT EXISTS trackable_locations (
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	created_by INTEGER NOT NULL REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS container_models (
+    -- We need to use as a parent a trackable and not a commercial product
+    -- because unfortunately in several experimental setups the containers
+    -- are not from known brands.
+	id UUID PRIMARY KEY REFERENCES trackables(id),
+	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters))
+);

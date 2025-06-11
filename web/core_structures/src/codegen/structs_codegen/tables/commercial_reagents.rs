@@ -42,39 +42,6 @@ impl diesel::Identifiable for CommercialReagent {
     }
 }
 impl CommercialReagent {
-    pub fn commercial_product_lot<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-        >,
-    {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::table(),
-                self.commercial_product_lot_id,
-            ),
-            conn,
-        )
-    }
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -98,12 +65,43 @@ impl CommercialReagent {
             crate::codegen::structs_codegen::tables::processables::Processable,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::processables::Processable::table(),
                 self.id,
+            ),
+            conn,
+        )
+    }
+    pub fn commercial_product_lot<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::table(),
+                self.commercial_product_lot_id,
             ),
             conn,
         )
@@ -113,10 +111,9 @@ impl CommercialReagent {
         commercial_product_lot_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::commercial_reagents::commercial_reagents;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(commercial_reagents::commercial_product_lot_id.eq(commercial_product_lot_id))
             .order_by(commercial_reagents::id.asc())
@@ -127,12 +124,14 @@ impl CommercialReagent {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_reagents::commercial_reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
+            SelectableHelper, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_reagents::commercial_reagents, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_reagents::id.eq(trackables::id)))
             .filter(trackables::name.eq(name))
@@ -146,11 +145,14 @@ impl CommercialReagent {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_reagents::commercial_reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_reagents::commercial_reagents, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_reagents::id.eq(trackables::id)))
             .filter(trackables::description.eq(description))
@@ -163,11 +165,14 @@ impl CommercialReagent {
         photograph_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_reagents::commercial_reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_reagents::commercial_reagents, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_reagents::id.eq(trackables::id)))
             .filter(trackables::photograph_id.eq(photograph_id))
@@ -180,11 +185,14 @@ impl CommercialReagent {
         parent_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_reagents::commercial_reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_reagents::commercial_reagents, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_reagents::id.eq(trackables::id)))
             .filter(trackables::parent_id.eq(parent_id))
@@ -197,11 +205,14 @@ impl CommercialReagent {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_reagents::commercial_reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_reagents::commercial_reagents, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_reagents::id.eq(trackables::id)))
             .filter(trackables::created_by.eq(created_by))
@@ -214,11 +225,14 @@ impl CommercialReagent {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_reagents::commercial_reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_reagents::commercial_reagents, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_reagents::id.eq(trackables::id)))
             .filter(trackables::created_at.eq(created_at))
@@ -231,11 +245,14 @@ impl CommercialReagent {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_reagents::commercial_reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_reagents::commercial_reagents, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_reagents::id.eq(trackables::id)))
             .filter(trackables::updated_by.eq(updated_by))
@@ -248,11 +265,14 @@ impl CommercialReagent {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_reagents::commercial_reagents;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_reagents::commercial_reagents, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_reagents::id.eq(trackables::id)))
             .filter(trackables::updated_at.eq(updated_at))

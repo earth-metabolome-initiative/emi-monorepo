@@ -1,11 +1,12 @@
 //! Submodule defining the DBGI collection preparation procedure model.
 
-use crate::procedure_models::{init_ethanol_70_percent, init_sample_extraction_solvent_procedure};
 use core_structures::{
     ProcedureModel, User,
     traits::{AppendProcedureModel, ChildOptions, ParentProcedureModel},
 };
 use web_common_traits::database::{Insertable, InsertableVariant};
+
+use crate::procedure_models::{init_ethanol_70_percent, init_sample_extraction_solvent_procedure};
 
 /// The name of the DBGI Collection preparation procedure model.
 pub const DBGI_COLLECTION_PREPARATION: &str = "DBGI Collection preparation";

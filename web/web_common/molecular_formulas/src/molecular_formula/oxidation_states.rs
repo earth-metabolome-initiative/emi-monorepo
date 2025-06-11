@@ -20,12 +20,14 @@ impl super::MolecularFormula {
                 formula.oxidation_states()?
             }
             Self::Greek(_) => MultiRange::default(),
-            Self::Count(formula, count) => formula
-                .oxidation_states()?
-                .checked_mul(
-                    i16::try_from(*count).map_err(|_| crate::errors::Error::InvalidNumber)?,
-                )
-                .ok_or(crate::errors::Error::InvalidNumber)?,
+            Self::Count(formula, count) => {
+                formula
+                    .oxidation_states()?
+                    .checked_mul(
+                        i16::try_from(*count).map_err(|_| crate::errors::Error::InvalidNumber)?,
+                    )
+                    .ok_or(crate::errors::Error::InvalidNumber)?
+            }
             Self::Ion(ion) => MultiRange::from(ion.charge),
             Self::Mixture(formulas) | Self::Sequence(formulas) => {
                 let mut oxidation_states = formulas.first().unwrap().oxidation_states()?;
@@ -79,22 +81,26 @@ impl super::MolecularFormula {
             Self::Complex(formula) | Self::RepeatingUnit(formula) | Self::Radical(formula, _) => {
                 formula.is_valid_oxidation_state(oxidation_state)
             }
-            Self::Count(formula, _) => Ok(if formula.is_valid_oxidation_state(oxidation_state)? {
-                true
-            } else {
-                self.oxidation_states()?.contains(oxidation_state)
-            }),
-            Self::Greek(_) => Ok(true),
-            Self::Ion(ion) => Ok(ion.charge == oxidation_state),
-            Self::Mixture(formulas) | Self::Sequence(formulas) => Ok(
-                if formulas.iter().any(|formula| {
-                    formula.is_valid_oxidation_state(oxidation_state).unwrap_or(false)
-                }) {
+            Self::Count(formula, _) => {
+                Ok(if formula.is_valid_oxidation_state(oxidation_state)? {
                     true
                 } else {
                     self.oxidation_states()?.contains(oxidation_state)
-                },
-            ),
+                })
+            }
+            Self::Greek(_) => Ok(true),
+            Self::Ion(ion) => Ok(ion.charge == oxidation_state),
+            Self::Mixture(formulas) | Self::Sequence(formulas) => {
+                Ok(
+                    if formulas.iter().any(|formula| {
+                        formula.is_valid_oxidation_state(oxidation_state).unwrap_or(false)
+                    }) {
+                        true
+                    } else {
+                        self.oxidation_states()?.contains(oxidation_state)
+                    },
+                )
+            }
             Self::Residual => Err(crate::errors::Error::InvalidOperationForResidual),
         }
     }

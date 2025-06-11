@@ -295,9 +295,11 @@ impl Migration {
             Migration { name: self.name.clone(), number, number_of_digits: self.number_of_digits };
         let updated_migration_directory = parent.join(updated_migration.directory());
         std::fs::rename(&current_migration_directory, &updated_migration_directory).map_err(
-            |_| Error::MovingMigrationFailed {
-                source: current_migration_directory.to_string_lossy().to_string(),
-                destination: updated_migration_directory.to_string_lossy().to_string(),
+            |_| {
+                Error::MovingMigrationFailed {
+                    source: current_migration_directory.to_string_lossy().to_string(),
+                    destination: updated_migration_directory.to_string_lossy().to_string(),
+                }
             },
         )?;
         Ok(updated_migration)

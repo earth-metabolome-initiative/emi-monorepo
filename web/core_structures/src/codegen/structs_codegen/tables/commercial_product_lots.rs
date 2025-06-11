@@ -58,8 +58,7 @@ impl CommercialProductLot {
             crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
@@ -91,8 +90,7 @@ impl CommercialProductLot {
             crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::table(),
@@ -107,12 +105,12 @@ impl CommercialProductLot {
         product_model_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+
         use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
-        use diesel::BoolExpressionMethods;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(
                 commercial_product_lots::lot
@@ -128,10 +126,9 @@ impl CommercialProductLot {
         lot: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(commercial_product_lots::lot.eq(lot))
             .order_by(commercial_product_lots::id.asc())
@@ -142,10 +139,9 @@ impl CommercialProductLot {
         product_model_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(commercial_product_lots::product_model_id.eq(product_model_id))
             .order_by(commercial_product_lots::id.asc())
@@ -156,12 +152,14 @@ impl CommercialProductLot {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::OptionalExtension;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
+            SelectableHelper, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
             .filter(trackables::name.eq(name))
@@ -175,11 +173,14 @@ impl CommercialProductLot {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
             .filter(trackables::description.eq(description))
@@ -192,11 +193,14 @@ impl CommercialProductLot {
         photograph_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
             .filter(trackables::photograph_id.eq(photograph_id))
@@ -209,11 +213,14 @@ impl CommercialProductLot {
         parent_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
             .filter(trackables::parent_id.eq(parent_id))
@@ -226,11 +233,14 @@ impl CommercialProductLot {
         created_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
             .filter(trackables::created_by.eq(created_by))
@@ -243,11 +253,14 @@ impl CommercialProductLot {
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
             .filter(trackables::created_at.eq(created_at))
@@ -260,11 +273,14 @@ impl CommercialProductLot {
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
             .filter(trackables::updated_by.eq(updated_by))
@@ -277,11 +293,14 @@ impl CommercialProductLot {
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots, trackables::trackables,
+        };
         Self::table()
             .inner_join(trackables::table.on(commercial_product_lots::id.eq(trackables::id)))
             .filter(trackables::updated_at.eq(updated_at))

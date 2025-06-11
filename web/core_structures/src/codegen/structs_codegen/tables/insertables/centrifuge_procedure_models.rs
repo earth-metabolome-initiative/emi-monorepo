@@ -1,9 +1,17 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableCentrifugeProcedureModelAttributes {
-    Id(crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes),
+    Id(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
+    ),
     Seconds,
     RotationPerMinute,
+    CentrifugedWith(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+    ),
+    ContainerId(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+    ),
 }
 impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes>
     for InsertableCentrifugeProcedureModelAttributes
@@ -14,6 +22,15 @@ impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProced
         Self::Id(extension)
     }
 }
+impl From<
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+> for InsertableCentrifugeProcedureModelAttributes {
+    fn from(
+        foreign: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+    ) -> Self {
+        Self::CentrifugedWith(foreign)
+    }
+}
 impl core::fmt::Display for InsertableCentrifugeProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -21,6 +38,12 @@ impl core::fmt::Display for InsertableCentrifugeProcedureModelAttributes {
             InsertableCentrifugeProcedureModelAttributes::Seconds => write!(f, "seconds"),
             InsertableCentrifugeProcedureModelAttributes::RotationPerMinute => {
                 write!(f, "rotation_per_minute")
+            }
+            InsertableCentrifugeProcedureModelAttributes::CentrifugedWith(centrifuged_with) => {
+                write!(f, "{}", centrifuged_with)
+            }
+            InsertableCentrifugeProcedureModelAttributes::ContainerId(container_id) => {
+                write!(f, "{}", container_id)
             }
         }
     }
@@ -37,8 +60,122 @@ pub struct InsertableCentrifugeProcedureModel {
     id: i32,
     seconds: f32,
     rotation_per_minute: f32,
+    centrifuged_with: i32,
+    container_id: i32,
 }
 impl InsertableCentrifugeProcedureModel {
+    pub fn centrifuged_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.centrifuged_with,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn centrifuge_procedure_models_centrifuged_with_id_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
+                    .eq(&self.centrifuged_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
+                            .eq(&self.id),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            >(conn)
+    }
+    pub fn container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.container_id,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn centrifuge_procedure_models_container_id_id_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
+                    .eq(&self.container_id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
+                            .eq(&self.id),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            >(conn)
+    }
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -62,8 +199,7 @@ impl InsertableCentrifugeProcedureModel {
             crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
@@ -73,12 +209,23 @@ impl InsertableCentrifugeProcedureModel {
         )
     }
 }
-#[derive(Default)]
 pub struct InsertableCentrifugeProcedureModelBuilder {
-    pub(crate) id:
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     pub(crate) seconds: Option<f32>,
     pub(crate) rotation_per_minute: Option<f32>,
+    pub(crate) centrifuged_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+}
+impl Default for InsertableCentrifugeProcedureModelBuilder {
+    fn default() -> Self {
+        Self {
+            id: Default::default(),
+            seconds: Some(120f32),
+            rotation_per_minute: Some(13000f32),
+            centrifuged_with: Default::default(),
+            container_id: Default::default(),
+        }
+    }
 }
 impl InsertableCentrifugeProcedureModelBuilder {
     pub fn seconds<P>(
@@ -95,9 +242,7 @@ impl InsertableCentrifugeProcedureModelBuilder {
         let seconds = seconds.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
             Into::into(err).rename_field(InsertableCentrifugeProcedureModelAttributes::Seconds)
         })?;
-        pgrx_validation::must_be_strictly_positive_f32(seconds)
-            .map_err(|e| e.rename_field(InsertableCentrifugeProcedureModelAttributes::Seconds))?;
-        pgrx_validation::must_be_strictly_smaller_than_f32(seconds, 3600f32)
+        pgrx_validation::must_be_strictly_smaller_than_f32(seconds, 1800f32)
             .map_err(|e| e.rename_field(InsertableCentrifugeProcedureModelAttributes::Seconds))?;
         pgrx_validation::must_be_greater_than_f32(seconds, 30f32)
             .map_err(|e| e.rename_field(InsertableCentrifugeProcedureModelAttributes::Seconds))?;
@@ -120,9 +265,6 @@ impl InsertableCentrifugeProcedureModelBuilder {
                 Into::into(err)
                     .rename_field(InsertableCentrifugeProcedureModelAttributes::RotationPerMinute)
             })?;
-        pgrx_validation::must_be_strictly_positive_f32(rotation_per_minute).map_err(|e| {
-            e.rename_field(InsertableCentrifugeProcedureModelAttributes::RotationPerMinute)
-        })?;
         pgrx_validation::must_be_smaller_than_f32(rotation_per_minute, 30000f32).map_err(|e| {
             e.rename_field(InsertableCentrifugeProcedureModelAttributes::RotationPerMinute)
         })?;
@@ -130,6 +272,48 @@ impl InsertableCentrifugeProcedureModelBuilder {
             e.rename_field(InsertableCentrifugeProcedureModelAttributes::RotationPerMinute)
         })?;
         self.rotation_per_minute = Some(rotation_per_minute);
+        Ok(self)
+    }
+    pub fn centrifuged_with(
+        mut self,
+        centrifuged_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    >{
+        if centrifuged_with.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                    ),
+                ),
+            );
+        }
+        self.centrifuged_with = centrifuged_with;
+        Ok(self)
+    }
+    pub fn container_id(
+        mut self,
+        container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    >{
+        if container_id.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                    ),
+                ),
+            );
+        }
+        self.container_id = container_id;
         Ok(self)
     }
     pub fn name<P>(
@@ -282,6 +466,14 @@ impl InsertableCentrifugeProcedureModelBuilder {
                 crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
             >,
         >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+            >,
+        >,
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
@@ -294,6 +486,26 @@ impl InsertableCentrifugeProcedureModelBuilder {
             ),
         )?;
         let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
-        Ok(InsertableCentrifugeProcedureModel { id, seconds, rotation_per_minute })
+        let centrifuged_with = self
+            .centrifuged_with
+            .procedure_model_id(id)
+            .map_err(|err| err.into_field_name())?
+            .insert(user_id, conn)
+            .map_err(|err| err.into_field_name())?
+            .id();
+        let container_id = self
+            .container_id
+            .procedure_model_id(id)
+            .map_err(|err| err.into_field_name())?
+            .insert(user_id, conn)
+            .map_err(|err| err.into_field_name())?
+            .id();
+        Ok(InsertableCentrifugeProcedureModel {
+            id,
+            seconds,
+            rotation_per_minute,
+            centrifuged_with,
+            container_id,
+        })
     }
 }

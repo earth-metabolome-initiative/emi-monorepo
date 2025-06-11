@@ -47,8 +47,7 @@ impl Spectrum {
             crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
         >,
     {
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, RunQueryDsl};
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection::table(),
@@ -62,10 +61,9 @@ impl Spectrum {
         spectra_collection_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::spectra::spectra;
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{ExpressionMethods, QueryDsl};
         Self::table()
             .filter(spectra::spectra_collection_id.eq(spectra_collection_id))
             .order_by(spectra::id.asc())

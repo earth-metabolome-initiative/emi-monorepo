@@ -17,7 +17,13 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(seconds.ne(excluded(seconds)).or(hertz.ne(excluded(hertz))))
+            .filter(
+                seconds
+                    .ne(excluded(seconds))
+                    .or(hertz.ne(excluded(hertz)))
+                    .or(milled_with.ne(excluded(milled_with)))
+                    .or(container_id.ne(excluded(container_id))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -41,7 +47,13 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(seconds.ne(excluded(seconds)).or(hertz.ne(excluded(hertz))))
+            .filter(
+                seconds
+                    .ne(excluded(seconds))
+                    .or(hertz.ne(excluded(hertz)))
+                    .or(milled_with.ne(excluded(milled_with)))
+                    .or(container_id.ne(excluded(container_id))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }
