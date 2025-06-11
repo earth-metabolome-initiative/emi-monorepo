@@ -49,7 +49,14 @@ where
                 ParentProcedureModel::from_parent_procedure_model_id(self.id(), conn)?
                     .into_iter()
                     .filter_map(|procedure| {
-                        procedure.child_procedure_model(conn).ok()?.nodes(conn).ok()
+                        let child = procedure.child_procedure_model(conn).ok()?;
+                        let mut nodes = child.nodes(conn).ok()?;
+
+                        if nodes.is_empty() {
+                            nodes.push(format!("P{}", child.id));
+                        }
+
+                        Some(nodes)
                     })
                     .flatten(),
             )
@@ -164,7 +171,8 @@ where
                 // If the child procedure has no trackables and no children, we display it as a box
                 dot.push_str(&format!(
                     "    P{} [label=\"{}\", shape=box, color={RED}];\n",
-                    child_procedure.id, child_procedure.name(conn)?,
+                    child_procedure.id,
+                    child_procedure.name(conn)?,
                 ));
                 procedures.insert(child_procedure.id, None);
             } else {
@@ -303,7 +311,6 @@ where
                 attributes.join(", ")
             ));
         }
-
 
         dot.push_str("}\n");
 

@@ -15,7 +15,14 @@ digraph G {
     T6 [label="Sample\nFreeze\nDryer", shape=box, color="#00ad43"];
     T5 -> T3 [dir=both, style=dashed, color="#00ad43", label="Same as"];
     T6 -> T4 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    P2 [label="DBGI Collection preparation", shape=box, color="#EF3340"];
+subgraph cluster__0 {
+	label=<<U>DBGI Collection preparation</U>>;
+	style="rounded";
+	color="#EF3340";
+	P3 [label="Ethanol 70 percent", shape=box, color="#EF3340"];
+	P4 [label="Sample extraction solvent", shape=box, color="#EF3340"];
+    P3:s -> P4:n [label="And then", color="#EF3340"];
+}
 subgraph cluster__1 {
 	label=<<U>DBGI Sample Processing</U>>;
 	style="rounded";
@@ -43,11 +50,16 @@ subgraph cluster__1_1 {
     P10 [label="Organism observation procedure", shape=box, color="#EF3340"];
     P11 [label="Full organism collection procedure", shape=box, color="#EF3340"];
     P12 [label="Part-of organisms collection procedure", shape=box, color="#EF3340"];
-    P13 [label="Data Enrichment Procedure", shape=box, color="#EF3340"];
-    P2 -> P10 [label="And then", color="#EF3340"];
+subgraph cluster__7 {
+	label=<<U>Data Enrichment Procedure</U>>;
+	style="rounded";
+	color="#EF3340";
+	P14 [label="Weather Retrieval Procedure", shape=box, color="#EF3340"];
+}
+    P4 -> P10 [label="And then", color="#EF3340", ltail=cluster__0];
     T2 -> P8 [label="And then", color="#EF3340", ltail=cluster__1];
     P8 -> P9 [label="And then", color="#EF3340"];
-    P9 -> P13 [label="And then", color="#EF3340"];
+    P9 -> P14 [label="And then", color="#EF3340", lhead=cluster__7];
     P10 -> P11 [label="And then", color="#EF3340"];
     P10 -> P12 [label="And then", color="#EF3340"];
     P11 -> T3 [label="And then", color="#EF3340", lhead=cluster__1];
