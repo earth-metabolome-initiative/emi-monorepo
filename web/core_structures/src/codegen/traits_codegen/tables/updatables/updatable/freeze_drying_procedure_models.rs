@@ -50,6 +50,9 @@ where
         if !self.freeze_dried_with(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
+        if !self.source_container(conn)?.can_update(user_id, conn)? {
+            return Ok(false);
+        }
         Ok(true)
     }
 }

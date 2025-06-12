@@ -209,6 +209,8 @@ impl InsertableCentrifugeProcedureModel {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCentrifugeProcedureModelBuilder {
     pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     pub(crate) seconds: Option<f32>,

@@ -6,8 +6,8 @@ use web_common_traits::database::{Insertable, InsertableVariant};
 
 pub mod wet_lab_containers;
 pub(crate) use wet_lab_containers::{
-    CONICAL_CENTRIFUGAL_TUBE_50ML, CONICAL_CENTRIFUGAL_TUBE_RACK, SAFELOCK_TUBE_2ML, VIAL_1_5ML,
-    VIAL_1_5ML_CAP_SPLITTED, VIAL_1_5ML_SEALED_CAP, VIAL_INSERT_200UL,
+    CONICAL_CENTRIFUGAL_TUBE_50ML, SAFELOCK_TUBE_2ML, VIAL_1_5ML, VIAL_1_5ML_CAP_SPLITTED,
+    VIAL_1_5ML_SEALED_CAP, VIAL_INSERT_200UL,
 };
 
 pub const BOTTLE: &str = "Bottle";

@@ -92,7 +92,8 @@ impl InsertableEmailProvider {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableEmailProviderBuilder {
     pub(crate) email_id: Option<i32>,
     pub(crate) login_provider_id: Option<i16>,

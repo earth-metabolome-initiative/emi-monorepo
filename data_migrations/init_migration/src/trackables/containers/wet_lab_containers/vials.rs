@@ -29,7 +29,7 @@ pub(super) fn init_vials(
         .insert(user.id, portal_conn)
         .unwrap();
 
-    let _vial_2ml = ContainerModel::new()
+    let _vial_1_5ml = ContainerModel::new()
         .name(Some(VIAL_1_5ML.to_owned()))
         .unwrap()
         .description(Some(

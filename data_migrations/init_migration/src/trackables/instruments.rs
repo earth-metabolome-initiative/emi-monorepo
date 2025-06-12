@@ -7,7 +7,9 @@ use web_common_traits::database::{Insertable, InsertableVariant};
 pub mod ball_mill_instrument;
 pub mod centrifuge_instrument;
 pub mod pipette_1000;
+pub(crate) use pipette_1000::{init_gilson_pipette_1000, init_sarstedt_pipette_tip_1000};
 pub mod pipette_200;
+pub(crate) use pipette_200::{init_gilson_pipette_200, init_sarstedt_pipette_tip_200};
 
 pub const FREEZER: &str = "Freezer";
 pub const FREEZE_DRYER: &str = "Freeze Dryer";

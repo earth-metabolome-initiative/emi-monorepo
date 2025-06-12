@@ -69,7 +69,8 @@ impl InsertablePackagingModel {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertablePackagingModelBuilder {
     pub(crate) id:
         crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder,

@@ -6,7 +6,7 @@ use web_common_traits::database::{Insertable, InsertableVariant};
 
 const CONICAL_CENTRIFUGAL_TUBE: &str = "Conical Tube";
 pub const CONICAL_CENTRIFUGAL_TUBE_50ML: &str = "Conical Tube 50ml";
-pub const CONICAL_CENTRIFUGAL_TUBE_RACK: &str = "Conical Tube Rack";
+pub const CONICAL_CENTRIFUGAL_TUBE_50ML_RACK: &str = "Conical Tube Rack 50ml";
 
 pub(super) fn init_conical_centrifugal_tubes(
     user: &User,
@@ -41,7 +41,7 @@ pub(super) fn init_conical_centrifugal_tubes(
         .unwrap();
 
     let _conical_tube_rack = Trackable::new()
-        .name(Some(CONICAL_CENTRIFUGAL_TUBE_RACK.to_owned()))
+        .name(Some(CONICAL_CENTRIFUGAL_TUBE_50ML_RACK.to_owned()))
         .unwrap()
         .description(Some("Conical tube rack, a common container for conical tubes".to_owned()))
         .unwrap()

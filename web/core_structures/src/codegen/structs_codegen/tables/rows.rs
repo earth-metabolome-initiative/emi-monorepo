@@ -4,6 +4,7 @@ mod aliquoting_procedure_models;
 mod ball_mill_procedure_models;
 mod bounded_read_dispatch;
 mod brands;
+mod capping_procedure_models;
 mod centrifuge_procedure_models;
 mod cities;
 mod colors;
@@ -28,6 +29,7 @@ mod login_providers;
 mod materials;
 mod mix_countable_procedure_models;
 mod mix_solid_procedure_models;
+mod mount_tip_procedure_models;
 mod next_procedure_models;
 mod observation_subjects;
 mod organism_observations;
@@ -57,6 +59,8 @@ mod shared_procedure_model_trackables;
 mod spatial_ref_sys;
 mod spectra;
 mod spectra_collections;
+mod storage_procedure_models;
+mod supernatant_procedure_models;
 mod tabular;
 mod taxa;
 mod team_members;
@@ -94,6 +98,11 @@ pub enum Rows {
         >,
     ),
     Brand(Vec<crate::codegen::structs_codegen::tables::brands::Brand>),
+    CappingProcedureModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel,
+        >,
+    ),
     CentrifugeProcedureModel(
         Vec<
             crate::codegen::structs_codegen::tables::centrifuge_procedure_models::CentrifugeProcedureModel,
@@ -164,6 +173,11 @@ pub enum Rows {
     MixSolidProcedureModel(
         Vec<
             crate::codegen::structs_codegen::tables::mix_solid_procedure_models::MixSolidProcedureModel,
+        >,
+    ),
+    MountTipProcedureModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::mount_tip_procedure_models::MountTipProcedureModel,
         >,
     ),
     NextProcedureModel(
@@ -261,6 +275,16 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
         >,
     ),
+    StorageProcedureModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel,
+        >,
+    ),
+    SupernatantProcedureModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel,
+        >,
+    ),
     Taxon(Vec<crate::codegen::structs_codegen::tables::taxa::Taxon>),
     TeamMember(Vec<crate::codegen::structs_codegen::tables::team_members::TeamMember>),
     TeamProject(
@@ -345,6 +369,13 @@ impl Rows {
             }
             Rows::Brand(brands) => {
                 brands
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CappingProcedureModel(capping_procedure_models) => {
+                capping_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -499,6 +530,13 @@ impl Rows {
             }
             Rows::MixSolidProcedureModel(mix_solid_procedure_models) => {
                 mix_solid_procedure_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::MountTipProcedureModel(mount_tip_procedure_models) => {
+                mount_tip_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -707,6 +745,20 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::StorageProcedureModel(storage_procedure_models) => {
+                storage_procedure_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::SupernatantProcedureModel(supernatant_procedure_models) => {
+                supernatant_procedure_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::Taxon(taxa) => {
                 taxa.iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
@@ -836,6 +888,9 @@ impl web_common_traits::prelude::Rows for Rows {
                 ball_mill_procedure_models.primary_keys()
             }
             Rows::Brand(brands) => brands.primary_keys(),
+            Rows::CappingProcedureModel(capping_procedure_models) => {
+                capping_procedure_models.primary_keys()
+            }
             Rows::CentrifugeProcedureModel(centrifuge_procedure_models) => {
                 centrifuge_procedure_models.primary_keys()
             }
@@ -873,6 +928,9 @@ impl web_common_traits::prelude::Rows for Rows {
             }
             Rows::MixSolidProcedureModel(mix_solid_procedure_models) => {
                 mix_solid_procedure_models.primary_keys()
+            }
+            Rows::MountTipProcedureModel(mount_tip_procedure_models) => {
+                mount_tip_procedure_models.primary_keys()
             }
             Rows::NextProcedureModel(next_procedure_models) => next_procedure_models.primary_keys(),
             Rows::ObservationSubject(observation_subjects) => observation_subjects.primary_keys(),
@@ -919,6 +977,12 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::SpatialRefSy(spatial_ref_sys) => spatial_ref_sys.primary_keys(),
             Rows::Spectrum(spectra) => spectra.primary_keys(),
             Rows::SpectraCollection(spectra_collections) => spectra_collections.primary_keys(),
+            Rows::StorageProcedureModel(storage_procedure_models) => {
+                storage_procedure_models.primary_keys()
+            }
+            Rows::SupernatantProcedureModel(supernatant_procedure_models) => {
+                supernatant_procedure_models.primary_keys()
+            }
             Rows::Taxon(taxa) => taxa.primary_keys(),
             Rows::TeamMember(team_members) => team_members.primary_keys(),
             Rows::TeamProject(team_projects) => team_projects.primary_keys(),

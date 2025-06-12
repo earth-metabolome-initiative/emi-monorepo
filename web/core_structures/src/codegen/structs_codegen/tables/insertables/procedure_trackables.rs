@@ -350,6 +350,8 @@ impl InsertableProcedureTrackable {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureTrackableBuilder {
     pub(crate) procedure_id: Option<::rosetta_uuid::Uuid>,
     pub(crate) procedure_model_id: Option<i32>,

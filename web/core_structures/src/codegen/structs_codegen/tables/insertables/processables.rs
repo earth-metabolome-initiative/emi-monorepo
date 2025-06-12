@@ -67,7 +67,8 @@ impl InsertableProcessable {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcessableBuilder {
     pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     pub(crate) kilograms: Option<f32>,

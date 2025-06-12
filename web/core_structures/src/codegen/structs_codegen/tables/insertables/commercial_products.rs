@@ -104,7 +104,8 @@ impl InsertableCommercialProduct {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialProductBuilder {
     pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     pub(crate) deprecation_date: Option<::rosetta_timestamp::TimestampUTC>,

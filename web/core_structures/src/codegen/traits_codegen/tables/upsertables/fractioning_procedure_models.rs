@@ -19,6 +19,7 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_models::Fract
             .filter(
                 kilograms
                     .ne(excluded(kilograms))
+                    .or(tolerance_percentage.ne(excluded(tolerance_percentage)))
                     .or(weighed_with.ne(excluded(weighed_with)))
                     .or(source.ne(excluded(source)))
                     .or(destination.ne(excluded(destination))),
@@ -48,6 +49,7 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_models::Fract
             .filter(
                 kilograms
                     .ne(excluded(kilograms))
+                    .or(tolerance_percentage.ne(excluded(tolerance_percentage)))
                     .or(weighed_with.ne(excluded(weighed_with)))
                     .or(source.ne(excluded(source)))
                     .or(destination.ne(excluded(destination))),

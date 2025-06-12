@@ -138,7 +138,8 @@ impl InsertableDisposalProcedureModel {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableDisposalProcedureModelBuilder {
     pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     pub(crate) disposed_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,

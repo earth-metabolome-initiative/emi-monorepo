@@ -92,7 +92,8 @@ impl InsertableUserOrganization {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableUserOrganizationBuilder {
     pub(crate) user_id: Option<i32>,
     pub(crate) organization_id: Option<i16>,

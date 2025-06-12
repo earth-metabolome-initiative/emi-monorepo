@@ -6,6 +6,7 @@ pub enum TableName {
     AliquotingProcedureModel,
     BallMillProcedureModel,
     Brand,
+    CappingProcedureModel,
     CentrifugeProcedureModel,
     City,
     Color,
@@ -28,6 +29,7 @@ pub enum TableName {
     Material,
     MixCountableProcedureModel,
     MixSolidProcedureModel,
+    MountTipProcedureModel,
     NextProcedureModel,
     ObservationSubject,
     OrganismObservation,
@@ -57,6 +59,8 @@ pub enum TableName {
     SpatialRefSy,
     Spectrum,
     SpectraCollection,
+    StorageProcedureModel,
+    SupernatantProcedureModel,
     Taxon,
     TeamMember,
     TeamProject,
@@ -88,6 +92,9 @@ impl core::fmt::Display for TableName {
                 write!(f, stringify!(BallMillProcedureModel))
             }
             TableName::Brand => write!(f, stringify!(Brand)),
+            TableName::CappingProcedureModel => {
+                write!(f, stringify!(CappingProcedureModel))
+            }
             TableName::CentrifugeProcedureModel => {
                 write!(f, stringify!(CentrifugeProcedureModel))
             }
@@ -125,6 +132,9 @@ impl core::fmt::Display for TableName {
             }
             TableName::MixSolidProcedureModel => {
                 write!(f, stringify!(MixSolidProcedureModel))
+            }
+            TableName::MountTipProcedureModel => {
+                write!(f, stringify!(MountTipProcedureModel))
             }
             TableName::NextProcedureModel => write!(f, stringify!(NextProcedureModel)),
             TableName::ObservationSubject => write!(f, stringify!(ObservationSubject)),
@@ -169,6 +179,12 @@ impl core::fmt::Display for TableName {
             TableName::SpatialRefSy => write!(f, stringify!(SpatialRefSy)),
             TableName::Spectrum => write!(f, stringify!(Spectrum)),
             TableName::SpectraCollection => write!(f, stringify!(SpectraCollection)),
+            TableName::StorageProcedureModel => {
+                write!(f, stringify!(StorageProcedureModel))
+            }
+            TableName::SupernatantProcedureModel => {
+                write!(f, stringify!(SupernatantProcedureModel))
+            }
             TableName::Taxon => write!(f, stringify!(Taxon)),
             TableName::TeamMember => write!(f, stringify!(TeamMember)),
             TableName::TeamProject => write!(f, stringify!(TeamProject)),

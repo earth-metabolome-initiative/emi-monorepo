@@ -150,6 +150,8 @@ impl InsertableParentProcedureModel {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableParentProcedureModelBuilder {
     pub(crate) parent_procedure_model_id: Option<i32>,
     pub(crate) child_procedure_model_id: Option<i32>,

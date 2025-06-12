@@ -65,7 +65,8 @@ impl InsertableAddress {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableAddressBuilder {
     pub(crate) city_id: Option<i32>,
     pub(crate) street_name: Option<String>,

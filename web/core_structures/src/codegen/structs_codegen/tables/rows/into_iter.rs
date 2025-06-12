@@ -22,6 +22,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::Brand(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Brand).collect::<Vec<_>>()
             }
+            super::Rows::CappingProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::CappingProcedureModel)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::CentrifugeProcedureModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::CentrifugeProcedureModel)
@@ -120,6 +125,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::MixSolidProcedureModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::MixSolidProcedureModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::MountTipProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::MountTipProcedureModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::NextProcedureModel(rows) => {
@@ -251,6 +261,16 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::SpectraCollection(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::SpectraCollection)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::StorageProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::StorageProcedureModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::SupernatantProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::SupernatantProcedureModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::Taxon(rows) => {

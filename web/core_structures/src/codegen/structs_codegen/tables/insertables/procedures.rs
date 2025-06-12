@@ -134,6 +134,8 @@ impl InsertableProcedure {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureBuilder {
     pub(crate) id: Option<::rosetta_uuid::Uuid>,
     pub(crate) procedure_model_id: Option<i32>,

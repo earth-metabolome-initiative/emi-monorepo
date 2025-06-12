@@ -4,13 +4,13 @@
 
 use std::collections::HashMap;
 
+use diesel::{Identifiable, PgConnection};
+use web_common_traits::{database::Read, prelude::ExtensionTable};
+
 use crate::{
     NextProcedureModel, ParentProcedureModel, ProcedureModel, ProcedureModelTrackable,
     SharedProcedureModelTrackable,
 };
-use diesel::Identifiable;
-use diesel::PgConnection;
-use web_common_traits::{database::Read, prelude::ExtensionTable};
 
 const RED: &str = "\"#EF3340\"";
 const GREEN: &str = "\"#00ad43\"";
@@ -67,7 +67,8 @@ where
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a `PgConnection` for database operations.
+    /// * `conn` - A mutable reference to a `PgConnection` for database
+    ///   operations.
     ///
     /// # Errors
     ///
@@ -87,7 +88,7 @@ where
     /// # Errors
     ///
     /// * If an error occurs while retrieving the first node ID, it returns a
-    ///  `diesel::result::Error`.
+    ///   `diesel::result::Error`.
     fn first_node(&self, conn: &mut PgConnection) -> Result<Option<String>, diesel::result::Error> {
         Ok(self.nodes(conn)?.first().cloned())
     }
@@ -102,8 +103,7 @@ where
     /// # Errors
     ///
     /// * If an error occurs while retrieving the trackable nodes, it returns a
-    ///  `diesel::result::Error`.
-    ///
+    ///   `diesel::result::Error`.
     fn trackable_nodes(&self, conn: &mut PgConnection) -> Result<String, diesel::result::Error> {
         let mut dot = String::new();
         for procedure_trackable in
@@ -119,7 +119,8 @@ where
         Ok(dot)
     }
 
-    /// Returns the shareable trackable edges associated with the procedure model.
+    /// Returns the shareable trackable edges associated with the procedure
+    /// model.
     ///
     /// # Arguments
     ///
@@ -128,9 +129,8 @@ where
     ///
     /// # Errors
     ///
-    /// * If an error occurs while retrieving the shared trackable edges, it returns a
-    ///   `diesel::result::Error`.
-    ///
+    /// * If an error occurs while retrieving the shared trackable edges, it
+    ///   returns a `diesel::result::Error`.
     fn shared_trackable_edges(
         &self,
         conn: &mut PgConnection,
@@ -168,7 +168,8 @@ where
             let child_procedure = subprocedure.child_procedure_model(conn)?;
 
             if child_procedure.last_node(conn)?.is_none() {
-                // If the child procedure has no trackables and no children, we display it as a box
+                // If the child procedure has no trackables and no children, we display it as a
+                // box
                 dot.push_str(&format!(
                     "    P{} [label=\"{}\", shape=box, color={RED}];\n",
                     child_procedure.id,
@@ -237,7 +238,8 @@ where
         conn: &mut PgConnection,
     ) -> Result<String, diesel::result::Error> {
         if self.last_node(conn)?.is_none() {
-            // If the procedure model has no trackables and no children, we display it as a box
+            // If the procedure model has no trackables and no children, we display it as a
+            // box
             return Ok(format!(
                 "    P{} [label=\"{}\", shape=box, color={RED}];\n",
                 self.id(),
@@ -265,7 +267,8 @@ where
             let child_procedure = subprocedure.child_procedure_model(conn)?;
 
             if child_procedure.last_node(conn)?.is_none() {
-                // If the child procedure has no trackables and no children, we display it as a box
+                // If the child procedure has no trackables and no children, we display it as a
+                // box
                 dot.push_str(&format!(
                     "\tP{} [label=\"{}\", shape=box, color={RED}];\n",
                     child_procedure.id,

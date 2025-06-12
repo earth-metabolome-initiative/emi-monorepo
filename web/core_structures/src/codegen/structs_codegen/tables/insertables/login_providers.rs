@@ -37,7 +37,8 @@ pub struct InsertableLoginProvider {
     scope: String,
 }
 impl InsertableLoginProvider {}
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableLoginProviderBuilder {
     pub(crate) name: Option<String>,
     pub(crate) icon: Option<String>,

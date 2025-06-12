@@ -28,7 +28,7 @@ impl From<
     fn from(
         foreign: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ) -> Self {
-        Self::ContainerId(foreign)
+        Self::MilledWith(foreign)
     }
 }
 impl core::fmt::Display for InsertableBallMillProcedureModelAttributes {
@@ -207,6 +207,8 @@ impl InsertableBallMillProcedureModel {
             >(conn)
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableBallMillProcedureModelBuilder {
     pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     pub(crate) seconds: Option<f32>,
@@ -268,27 +270,6 @@ impl InsertableBallMillProcedureModelBuilder {
         self.hertz = Some(hertz);
         Ok(self)
     }
-    pub fn container_id(
-        mut self,
-        container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    >{
-        if container_id.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                    ),
-                ),
-            );
-        }
-        self.container_id = container_id;
-        Ok(self)
-    }
     pub fn milled_with(
         mut self,
         milled_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -308,6 +289,27 @@ impl InsertableBallMillProcedureModelBuilder {
             );
         }
         self.milled_with = milled_with;
+        Ok(self)
+    }
+    pub fn container_id(
+        mut self,
+        container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    >{
+        if container_id.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                    ),
+                ),
+            );
+        }
+        self.container_id = container_id;
         Ok(self)
     }
     pub fn name<P>(
@@ -478,15 +480,15 @@ impl InsertableBallMillProcedureModelBuilder {
             InsertableBallMillProcedureModelAttributes::Hertz,
         ))?;
         let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
-        let container_id = self
-            .container_id
+        let milled_with = self
+            .milled_with
             .procedure_model_id(id)
             .map_err(|err| err.into_field_name())?
             .insert(user_id, conn)
             .map_err(|err| err.into_field_name())?
             .id();
-        let milled_with = self
-            .milled_with
+        let container_id = self
+            .container_id
             .procedure_model_id(id)
             .map_err(|err| err.into_field_name())?
             .insert(user_id, conn)

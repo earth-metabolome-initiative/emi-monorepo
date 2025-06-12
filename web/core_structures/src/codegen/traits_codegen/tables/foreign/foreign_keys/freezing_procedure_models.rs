@@ -7,6 +7,9 @@ pub struct FreezingProcedureModelForeignKeys {
     pub id: Option<
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     >,
+    pub source_container: Option<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+    >,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::freezing_procedure_models::FreezingProcedureModel
@@ -25,9 +28,16 @@ impl web_common_traits::prelude::HasForeignKeys
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(self.id),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
+                self.source_container,
+            ),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.frozen_with.is_some() && foreign_keys.id.is_some()
+        foreign_keys.frozen_with.is_some()
+            && foreign_keys.id.is_some()
+            && foreign_keys.source_container.is_some()
     }
     fn update(
         &self,
@@ -46,7 +56,11 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.frozen_with == procedure_model_trackables.id {
-                    foreign_keys.frozen_with = Some(procedure_model_trackables);
+                    foreign_keys.frozen_with = Some(procedure_model_trackables.clone());
+                    updated = true;
+                }
+                if self.source_container == procedure_model_trackables.id {
+                    foreign_keys.source_container = Some(procedure_model_trackables.clone());
                     updated = true;
                 }
             }
@@ -58,6 +72,10 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if self.frozen_with == procedure_model_trackables.id {
                     foreign_keys.frozen_with = None;
+                    updated = true;
+                }
+                if self.source_container == procedure_model_trackables.id {
+                    foreign_keys.source_container = None;
                     updated = true;
                 }
             }

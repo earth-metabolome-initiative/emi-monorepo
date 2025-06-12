@@ -99,7 +99,8 @@ impl InsertableContainer {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableContainerBuilder {
     pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     pub(crate) container_model_id: Option<::rosetta_uuid::Uuid>,

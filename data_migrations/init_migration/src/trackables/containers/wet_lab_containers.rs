@@ -5,7 +5,7 @@ use diesel::PgConnection;
 
 pub mod conical_centrifugal_tubes;
 pub(crate) use conical_centrifugal_tubes::{
-    CONICAL_CENTRIFUGAL_TUBE_50ML, CONICAL_CENTRIFUGAL_TUBE_RACK,
+    CONICAL_CENTRIFUGAL_TUBE_50ML, CONICAL_CENTRIFUGAL_TUBE_50ML_RACK,
 };
 pub mod safelock_tubes;
 pub(crate) use safelock_tubes::SAFELOCK_TUBE_2ML;

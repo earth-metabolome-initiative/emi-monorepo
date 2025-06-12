@@ -181,6 +181,8 @@ impl InsertableProcedureModelTrackable {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureModelTrackableBuilder {
     pub(crate) name: Option<String>,
     pub(crate) procedure_model_id: Option<i32>,

@@ -19,7 +19,6 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
             .filter(
                 liters
                     .ne(excluded(liters))
-                    .or(error.ne(excluded(error)))
                     .or(source.ne(excluded(source)))
                     .or(destination.ne(excluded(destination)))
                     .or(aliquoted_with.ne(excluded(aliquoted_with))),
@@ -49,7 +48,6 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
             .filter(
                 liters
                     .ne(excluded(liters))
-                    .or(error.ne(excluded(error)))
                     .or(source.ne(excluded(source)))
                     .or(destination.ne(excluded(destination)))
                     .or(aliquoted_with.ne(excluded(aliquoted_with))),

@@ -9,16 +9,16 @@ use crate::{brands::retsch, trackables::instruments::BALL_MILL_MACHINE};
 
 /// Returns and possibly initializes the Retsch MM 400 Ball Mill instrument
 /// trackable in the database.
-pub(crate) fn init_retsch_mm400(user: &User, portal_conn: &mut PgConnection) -> CommercialProduct {
+pub(crate) fn init_retsch_mm400(user: &User, conn: &mut PgConnection) -> CommercialProduct {
     let device_name = "Retsch MM 400 Ball Mill";
-    if let Some(instrument) = CommercialProduct::from_name(device_name, portal_conn).unwrap() {
+    if let Some(instrument) = CommercialProduct::from_name(device_name, conn).unwrap() {
         return instrument;
     }
 
-    let ball_mill = Trackable::from_name(BALL_MILL_MACHINE, portal_conn)
+    let ball_mill = Trackable::from_name(BALL_MILL_MACHINE, conn)
         .unwrap()
         .expect("Ball Mill Machine trackable should exist");
-    let brand = retsch(user, portal_conn).unwrap();
+    let brand = retsch(user, conn).unwrap();
 
     CommercialProduct::new()
         .name(Some(device_name.to_owned()))
@@ -33,6 +33,6 @@ pub(crate) fn init_retsch_mm400(user: &User, portal_conn: &mut PgConnection) -> 
         .unwrap()
         .brand_id(brand.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap()
 }

@@ -212,6 +212,8 @@ impl InsertableOrganismObservation {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableOrganismObservationBuilder {
     pub(crate) id: Option<::rosetta_uuid::Uuid>,
     pub(crate) wild: Option<bool>,

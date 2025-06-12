@@ -15,6 +15,7 @@
 pub struct FractioningProcedureModel {
     pub id: i32,
     pub kilograms: f32,
+    pub tolerance_percentage: f32,
     pub weighed_with: i32,
     pub source: i32,
     pub destination: i32,
@@ -38,7 +39,7 @@ impl diesel::Identifiable for FractioningProcedureModel {
 }
 impl FractioningProcedureModel {
     #[cfg(feature = "postgres")]
-    pub fn fractioning_procedure_models_weighed_with_id_fkey(
+    pub fn fractioning_procedure_models_destination_id_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
@@ -51,7 +52,7 @@ impl FractioningProcedureModel {
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
-                    .eq(&self.weighed_with)
+                    .eq(&self.destination)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
                             .eq(&self.id),
@@ -190,6 +191,30 @@ impl FractioningProcedureModel {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn fractioning_procedure_models_weighed_with_id_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
+                    .eq(&self.weighed_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
+                            .eq(&self.id),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn fractioning_procedure_models_source_id_fkey(
         &self,
         conn: &mut diesel::PgConnection,
@@ -204,30 +229,6 @@ impl FractioningProcedureModel {
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
                     .eq(&self.source)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
-                            .eq(&self.id),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn fractioning_procedure_models_destination_id_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
-                    .eq(&self.destination)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
                             .eq(&self.id),
@@ -277,6 +278,26 @@ impl FractioningProcedureModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_destination_and_id(
+        destination: &i32,
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::fractioning_procedure_models::fractioning_procedure_models;
+        Self::table()
+            .filter(
+                fractioning_procedure_models::destination
+                    .eq(destination)
+                    .and(fractioning_procedure_models::id.eq(id)),
+            )
+            .order_by(fractioning_procedure_models::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_weighed_with_and_id(
         weighed_with: &i32,
         id: &i32,
@@ -311,26 +332,6 @@ impl FractioningProcedureModel {
             .filter(
                 fractioning_procedure_models::source
                     .eq(source)
-                    .and(fractioning_procedure_models::id.eq(id)),
-            )
-            .order_by(fractioning_procedure_models::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_destination_and_id(
-        destination: &i32,
-        id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::fractioning_procedure_models::fractioning_procedure_models;
-        Self::table()
-            .filter(
-                fractioning_procedure_models::destination
-                    .eq(destination)
                     .and(fractioning_procedure_models::id.eq(id)),
             )
             .order_by(fractioning_procedure_models::id.asc())

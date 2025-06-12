@@ -100,6 +100,8 @@ impl InsertableDocument {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableDocumentBuilder {
     pub(crate) id: Option<::rosetta_uuid::Uuid>,
     pub(crate) mime_type: Option<::media_types::MediaType>,

@@ -231,6 +231,8 @@ impl InsertableProject {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProjectBuilder {
     pub(crate) id: Option<i32>,
     pub(crate) name: Option<String>,

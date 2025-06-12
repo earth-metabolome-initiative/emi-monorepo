@@ -7,6 +7,9 @@ pub struct WeighingProcedureModelForeignKeys {
     pub instrument: Option<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
+    pub sample_container: Option<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+    >,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel
@@ -25,9 +28,16 @@ impl web_common_traits::prelude::HasForeignKeys
                 self.instrument_id,
             ),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
+                self.sample_container,
+            ),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.id.is_some() && foreign_keys.instrument.is_some()
+        foreign_keys.id.is_some()
+            && foreign_keys.instrument.is_some()
+            && foreign_keys.sample_container.is_some()
     }
     fn update(
         &self,
@@ -46,7 +56,11 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.instrument_id == procedure_model_trackables.id {
-                    foreign_keys.instrument = Some(procedure_model_trackables);
+                    foreign_keys.instrument = Some(procedure_model_trackables.clone());
+                    updated = true;
+                }
+                if self.sample_container == procedure_model_trackables.id {
+                    foreign_keys.sample_container = Some(procedure_model_trackables.clone());
                     updated = true;
                 }
             }
@@ -58,6 +72,10 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if self.instrument_id == procedure_model_trackables.id {
                     foreign_keys.instrument = None;
+                    updated = true;
+                }
+                if self.sample_container == procedure_model_trackables.id {
+                    foreign_keys.sample_container = None;
                     updated = true;
                 }
             }

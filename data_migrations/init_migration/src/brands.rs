@@ -81,7 +81,7 @@ pub(crate) fn greiner_bio_one(
 ///
 /// * If the connection to the database fails.
 /// * If the brand cannot be created.
-pub(crate) fn machinery_nagel(
+pub(crate) fn macherey_nagel(
     user: &User,
     portal_conn: &mut PgConnection,
 ) -> Result<Brand, crate::error::Error> {
@@ -247,6 +247,29 @@ pub(crate) fn retsch(
     portal_conn: &mut PgConnection,
 ) -> Result<Brand, crate::error::Error> {
     let brand_name = "Retsch MILLING & SIEVING";
+    if let Some(brand) = Brand::from_name(brand_name, portal_conn)? {
+        return Ok(brand);
+    }
+
+    Ok(Brand::new().name(brand_name)?.created_by(user.id)?.insert(user.id, portal_conn)?)
+}
+
+/// Initializes Fisherbrand brand in the database.
+///
+/// # Arguments
+///
+/// * `user` - The user who is creating the brand.
+/// * `portal_conn` - The database connection.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+/// * If the brand cannot be created.
+pub(crate) fn fisherbrand(
+    user: &User,
+    portal_conn: &mut PgConnection,
+) -> Result<Brand, crate::error::Error> {
+    let brand_name = "Fisherbrand";
     if let Some(brand) = Brand::from_name(brand_name, portal_conn)? {
         return Ok(brand);
     }

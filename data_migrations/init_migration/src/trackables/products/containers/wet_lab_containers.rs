@@ -6,6 +6,6 @@ pub mod eppendorfs;
 pub(crate) use eppendorfs::init_eppendorf_safelock_tube;
 pub mod vials;
 pub(crate) use vials::{
-    init_avion_interchim_sealed_cap, init_machinery_nagel_splitted_cap, init_machinery_nagel_vial,
+    init_advion_interchim_sealed_cap, init_macherey_nagel_splitted_cap, init_macherey_nagel_vial,
     init_vici_schweiz_insert,
 };

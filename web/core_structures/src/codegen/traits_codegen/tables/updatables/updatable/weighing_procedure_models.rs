@@ -50,6 +50,9 @@ where
         if !self.instrument(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
+        if !self.sample_container(conn)?.can_update(user_id, conn)? {
+            return Ok(false);
+        }
         Ok(true)
     }
 }

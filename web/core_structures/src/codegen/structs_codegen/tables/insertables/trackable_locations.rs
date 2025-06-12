@@ -147,6 +147,8 @@ impl InsertableTrackableLocation {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTrackableLocationBuilder {
     pub(crate) id: Option<::rosetta_uuid::Uuid>,
     pub(crate) trackable_id: Option<::rosetta_uuid::Uuid>,

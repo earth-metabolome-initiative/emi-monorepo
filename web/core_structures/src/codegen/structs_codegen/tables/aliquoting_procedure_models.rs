@@ -15,7 +15,6 @@
 pub struct AliquotingProcedureModel {
     pub id: i32,
     pub liters: f32,
-    pub error: f32,
     pub source: i32,
     pub destination: i32,
     pub aliquoted_with: i32,

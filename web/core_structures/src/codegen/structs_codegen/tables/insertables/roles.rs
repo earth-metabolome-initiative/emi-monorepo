@@ -62,7 +62,8 @@ impl InsertableRole {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableRoleBuilder {
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,

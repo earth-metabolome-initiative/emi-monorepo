@@ -414,6 +414,8 @@ impl InsertableSharedProcedureModelTrackable {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableSharedProcedureModelTrackableBuilder {
     pub(crate) parent_id: Option<i32>,
     pub(crate) parent_trackable_id: Option<::rosetta_uuid::Uuid>,

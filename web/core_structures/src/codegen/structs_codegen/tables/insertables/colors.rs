@@ -26,7 +26,8 @@ pub struct InsertableColor {
     description: String,
 }
 impl InsertableColor {}
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableColorBuilder {
     pub(crate) name: Option<String>,
     pub(crate) hexadecimal_value: Option<String>,

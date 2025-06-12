@@ -6,6 +6,7 @@ pub enum TablePrimaryKey {
     AliquotingProcedureModel(i32),
     BallMillProcedureModel(i32),
     Brand(i32),
+    CappingProcedureModel(i32),
     CentrifugeProcedureModel(i32),
     City(i32),
     Color(i16),
@@ -28,6 +29,7 @@ pub enum TablePrimaryKey {
     Material(i16),
     MixCountableProcedureModel(i32),
     MixSolidProcedureModel(i32),
+    MountTipProcedureModel(i32),
     NextProcedureModel((i32, i32, i32)),
     ObservationSubject(i16),
     OrganismObservation(::rosetta_uuid::Uuid),
@@ -57,6 +59,8 @@ pub enum TablePrimaryKey {
     SpatialRefSy(i32),
     Spectrum(i32),
     SpectraCollection(i32),
+    StorageProcedureModel(i32),
+    SupernatantProcedureModel(i32),
     Taxon(i32),
     TeamMember((i32, i32)),
     TeamProject((i32, i32)),
@@ -89,6 +93,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
                 crate::codegen::tables::table_names::TableName::BallMillProcedureModel
             }
             TablePrimaryKey::Brand(_) => crate::codegen::tables::table_names::TableName::Brand,
+            TablePrimaryKey::CappingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::CappingProcedureModel
+            }
             TablePrimaryKey::CentrifugeProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::CentrifugeProcedureModel
             }
@@ -148,6 +155,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::MixSolidProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::MixSolidProcedureModel
+            }
+            TablePrimaryKey::MountTipProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::MountTipProcedureModel
             }
             TablePrimaryKey::NextProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::NextProcedureModel
@@ -225,6 +235,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::SpectraCollection(_) => {
                 crate::codegen::tables::table_names::TableName::SpectraCollection
+            }
+            TablePrimaryKey::StorageProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::StorageProcedureModel
+            }
+            TablePrimaryKey::SupernatantProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::SupernatantProcedureModel
             }
             TablePrimaryKey::Taxon(_) => crate::codegen::tables::table_names::TableName::Taxon,
             TablePrimaryKey::TeamMember(_) => {

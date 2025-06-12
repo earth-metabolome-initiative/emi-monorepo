@@ -21,7 +21,8 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                 kelvin
                     .ne(excluded(kelvin))
                     .or(seconds.ne(excluded(seconds)))
-                    .or(frozen_with.ne(excluded(frozen_with))),
+                    .or(frozen_with.ne(excluded(frozen_with)))
+                    .or(source_container.ne(excluded(source_container))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -50,7 +51,8 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                 kelvin
                     .ne(excluded(kelvin))
                     .or(seconds.ne(excluded(seconds)))
-                    .or(frozen_with.ne(excluded(frozen_with))),
+                    .or(frozen_with.ne(excluded(frozen_with)))
+                    .or(source_container.ne(excluded(source_container))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

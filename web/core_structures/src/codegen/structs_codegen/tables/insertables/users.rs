@@ -29,6 +29,8 @@ pub struct InsertableUser {
     updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableUser {}
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableUserBuilder {
     pub(crate) first_name: Option<String>,
     pub(crate) last_name: Option<String>,

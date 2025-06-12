@@ -101,7 +101,8 @@ impl InsertableCommercialReagent {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialReagentBuilder {
     pub(crate) id:
         crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder,

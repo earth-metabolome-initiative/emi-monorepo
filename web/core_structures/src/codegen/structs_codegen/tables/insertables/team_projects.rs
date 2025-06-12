@@ -90,7 +90,8 @@ impl InsertableTeamProject {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTeamProjectBuilder {
     pub(crate) team_id: Option<i32>,
     pub(crate) project_id: Option<i32>,

@@ -62,6 +62,8 @@ impl InsertableUserEmail {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableUserEmailBuilder {
     pub(crate) email: Option<String>,
     pub(crate) created_by: Option<i32>,

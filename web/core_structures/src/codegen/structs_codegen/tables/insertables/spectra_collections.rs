@@ -139,6 +139,8 @@ impl InsertableSpectraCollection {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableSpectraCollectionBuilder {
     pub(crate) id: Option<i32>,
     pub(crate) notes: Option<String>,

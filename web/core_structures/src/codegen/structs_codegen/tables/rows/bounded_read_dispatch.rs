@@ -15,6 +15,9 @@ where
     crate::codegen::structs_codegen::tables::brands::Brand: web_common_traits::prelude::BoundedRead<
         C,
     >,
+    crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::centrifuge_procedure_models::CentrifugeProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -79,6 +82,9 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::mix_solid_procedure_models::MixSolidProcedureModel: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::mount_tip_procedure_models::MountTipProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::next_procedure_models::NextProcedureModel: web_common_traits::prelude::BoundedRead<
@@ -166,6 +172,12 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::taxa::Taxon: web_common_traits::prelude::BoundedRead<
@@ -260,6 +272,14 @@ where
             }
             crate::codegen::tables::table_names::TableName::Brand => {
                 crate::codegen::structs_codegen::tables::brands::Brand::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::CappingProcedureModel => {
+                crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -436,6 +456,14 @@ where
             }
             crate::codegen::tables::table_names::TableName::MixSolidProcedureModel => {
                 crate::codegen::structs_codegen::tables::mix_solid_procedure_models::MixSolidProcedureModel::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::MountTipProcedureModel => {
+                crate::codegen::structs_codegen::tables::mount_tip_procedure_models::MountTipProcedureModel::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -668,6 +696,22 @@ where
             }
             crate::codegen::tables::table_names::TableName::SpectraCollection => {
                 crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::StorageProcedureModel => {
+                crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::SupernatantProcedureModel => {
+                crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel::bounded_read(
                         offset,
                         limit,
                         conn,

@@ -201,7 +201,8 @@ impl InsertableWeighingProcedure {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableWeighingProcedureBuilder {
     pub(crate) procedure_id:
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,

@@ -181,6 +181,8 @@ impl InsertableTrackable {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTrackableBuilder {
     pub(crate) id: Option<::rosetta_uuid::Uuid>,
     pub(crate) name: Option<String>,

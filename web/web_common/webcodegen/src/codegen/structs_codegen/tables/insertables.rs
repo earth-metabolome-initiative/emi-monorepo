@@ -789,6 +789,8 @@ impl Codegen<'_> {
                         }
 
                         #insertable_builder_default_derive
+                        #[derive(Clone, Debug)]
+                        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
                         pub struct #insertable_builder_ident {
                             #(#insertable_builder_attributes),*
                         }

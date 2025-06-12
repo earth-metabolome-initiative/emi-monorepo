@@ -5,6 +5,7 @@ pub enum InsertableFractioningProcedureModelAttributes {
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
     ),
     Kilograms,
+    TolerancePercentage,
     WeighedWith(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
@@ -30,7 +31,7 @@ impl From<
     fn from(
         foreign: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ) -> Self {
-        Self::WeighedWith(foreign)
+        Self::Source(foreign)
     }
 }
 impl core::fmt::Display for InsertableFractioningProcedureModelAttributes {
@@ -39,6 +40,9 @@ impl core::fmt::Display for InsertableFractioningProcedureModelAttributes {
             InsertableFractioningProcedureModelAttributes::Id(id) => write!(f, "{}", id),
             InsertableFractioningProcedureModelAttributes::Kilograms => {
                 write!(f, "kilograms")
+            }
+            InsertableFractioningProcedureModelAttributes::TolerancePercentage => {
+                write!(f, "tolerance_percentage")
             }
             InsertableFractioningProcedureModelAttributes::WeighedWith(weighed_with) => {
                 write!(f, "{}", weighed_with)
@@ -63,6 +67,7 @@ impl core::fmt::Display for InsertableFractioningProcedureModelAttributes {
 pub struct InsertableFractioningProcedureModel {
     id: i32,
     kilograms: f32,
+    tolerance_percentage: f32,
     weighed_with: i32,
     source: i32,
     destination: i32,
@@ -269,10 +274,12 @@ impl InsertableFractioningProcedureModel {
             >(conn)
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableFractioningProcedureModelBuilder {
     pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     pub(crate) kilograms: Option<f32>,
+    pub(crate) tolerance_percentage: Option<f32>,
     pub(crate) weighed_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     pub(crate) source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     pub(crate) destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -298,25 +305,30 @@ impl InsertableFractioningProcedureModelBuilder {
         self.kilograms = Some(kilograms);
         Ok(self)
     }
-    pub fn weighed_with(
+    pub fn tolerance_percentage<P>(
         mut self,
-        weighed_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        tolerance_percentage: P,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    >{
-        if weighed_with.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                    ),
-                ),
-            );
-        }
-        self.weighed_with = weighed_with;
+        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let tolerance_percentage =
+            tolerance_percentage.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+                Into::into(err).rename_field(
+                    InsertableFractioningProcedureModelAttributes::TolerancePercentage,
+                )
+            })?;
+        pgrx_validation::must_be_strictly_positive_f32(tolerance_percentage).map_err(|e| {
+            e.rename_field(InsertableFractioningProcedureModelAttributes::TolerancePercentage)
+        })?;
+        pgrx_validation::must_be_smaller_than_f32(tolerance_percentage, 100f32).map_err(|e| {
+            e.rename_field(InsertableFractioningProcedureModelAttributes::TolerancePercentage)
+        })?;
+        self.tolerance_percentage = Some(tolerance_percentage);
         Ok(self)
     }
     pub fn source(
@@ -359,6 +371,27 @@ impl InsertableFractioningProcedureModelBuilder {
             );
         }
         self.destination = destination;
+        Ok(self)
+    }
+    pub fn weighed_with(
+        mut self,
+        weighed_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    >{
+        if weighed_with.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                    ),
+                ),
+            );
+        }
+        self.weighed_with = weighed_with;
         Ok(self)
     }
     pub fn name<P>(
@@ -526,14 +559,12 @@ impl InsertableFractioningProcedureModelBuilder {
             self.kilograms.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableFractioningProcedureModelAttributes::Kilograms,
             ))?;
+        let tolerance_percentage = self.tolerance_percentage.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableFractioningProcedureModelAttributes::TolerancePercentage,
+            ),
+        )?;
         let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
-        let weighed_with = self
-            .weighed_with
-            .procedure_model_id(id)
-            .map_err(|err| err.into_field_name())?
-            .insert(user_id, conn)
-            .map_err(|err| err.into_field_name())?
-            .id();
         let source = self
             .source
             .procedure_model_id(id)
@@ -548,6 +579,20 @@ impl InsertableFractioningProcedureModelBuilder {
             .insert(user_id, conn)
             .map_err(|err| err.into_field_name())?
             .id();
-        Ok(InsertableFractioningProcedureModel { id, kilograms, weighed_with, source, destination })
+        let weighed_with = self
+            .weighed_with
+            .procedure_model_id(id)
+            .map_err(|err| err.into_field_name())?
+            .insert(user_id, conn)
+            .map_err(|err| err.into_field_name())?
+            .id();
+        Ok(InsertableFractioningProcedureModel {
+            id,
+            kilograms,
+            tolerance_percentage,
+            weighed_with,
+            source,
+            destination,
+        })
     }
 }

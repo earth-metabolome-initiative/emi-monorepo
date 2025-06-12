@@ -18,6 +18,7 @@ pub struct FreezeDryingProcedureModel {
     pub pascal: f32,
     pub seconds: f32,
     pub freeze_dried_with: i32,
+    pub source_container: i32,
 }
 impl web_common_traits::prelude::TableName for FreezeDryingProcedureModel {
     const TABLE_NAME: &'static str = "freeze_drying_procedure_models";
@@ -101,6 +102,38 @@ impl FreezeDryingProcedureModel {
             conn,
         )
     }
+    pub fn source_container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.source_container,
+            ),
+            conn,
+        )
+    }
     #[cfg(feature = "postgres")]
     pub fn freeze_drying_procedure_models_freeze_dried_with_id_fkey(
         &self,
@@ -126,6 +159,30 @@ impl FreezeDryingProcedureModel {
             >(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn freeze_drying_procedure_models_source_container_id_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
+                    .eq(&self.source_container)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
+                            .eq(&self.id),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_freeze_dried_with(
         freeze_dried_with: &i32,
         conn: &mut diesel::PgConnection,
@@ -135,6 +192,19 @@ impl FreezeDryingProcedureModel {
         use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models;
         Self::table()
             .filter(freeze_drying_procedure_models::freeze_dried_with.eq(freeze_dried_with))
+            .order_by(freeze_drying_procedure_models::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_source_container(
+        source_container: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models;
+        Self::table()
+            .filter(freeze_drying_procedure_models::source_container.eq(source_container))
             .order_by(freeze_drying_procedure_models::id.asc())
             .load::<Self>(conn)
     }
@@ -153,6 +223,26 @@ impl FreezeDryingProcedureModel {
             .filter(
                 freeze_drying_procedure_models::freeze_dried_with
                     .eq(freeze_dried_with)
+                    .and(freeze_drying_procedure_models::id.eq(id)),
+            )
+            .order_by(freeze_drying_procedure_models::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_source_container_and_id(
+        source_container: &i32,
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models;
+        Self::table()
+            .filter(
+                freeze_drying_procedure_models::source_container
+                    .eq(source_container)
                     .and(freeze_drying_procedure_models::id.eq(id)),
             )
             .order_by(freeze_drying_procedure_models::id.asc())

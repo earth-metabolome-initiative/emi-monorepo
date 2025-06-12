@@ -3,6 +3,7 @@ mod aliquoting_instrument_models;
 mod aliquoting_procedure_models;
 mod ball_mill_procedure_models;
 mod brands;
+mod capping_procedure_models;
 mod centrifuge_procedure_models;
 mod cities;
 mod colors;
@@ -26,6 +27,7 @@ mod login_providers;
 mod materials;
 mod mix_countable_procedure_models;
 mod mix_solid_procedure_models;
+mod mount_tip_procedure_models;
 mod next_procedure_models;
 mod observation_subjects;
 mod organism_observations;
@@ -56,6 +58,8 @@ mod shared_procedure_model_trackables;
 mod spatial_ref_sys;
 mod spectra;
 mod spectra_collections;
+mod storage_procedure_models;
+mod supernatant_procedure_models;
 mod tabular;
 mod taxa;
 mod team_members;
@@ -87,6 +91,9 @@ pub enum Row {
         crate::codegen::structs_codegen::tables::ball_mill_procedure_models::BallMillProcedureModel,
     ),
     Brand(crate::codegen::structs_codegen::tables::brands::Brand),
+    CappingProcedureModel(
+        crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel,
+    ),
     CentrifugeProcedureModel(
         crate::codegen::structs_codegen::tables::centrifuge_procedure_models::CentrifugeProcedureModel,
     ),
@@ -138,6 +145,9 @@ pub enum Row {
     ),
     MixSolidProcedureModel(
         crate::codegen::structs_codegen::tables::mix_solid_procedure_models::MixSolidProcedureModel,
+    ),
+    MountTipProcedureModel(
+        crate::codegen::structs_codegen::tables::mount_tip_procedure_models::MountTipProcedureModel,
     ),
     NextProcedureModel(
         crate::codegen::structs_codegen::tables::next_procedure_models::NextProcedureModel,
@@ -198,6 +208,12 @@ pub enum Row {
     SpectraCollection(
         crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
     ),
+    StorageProcedureModel(
+        crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel,
+    ),
+    SupernatantProcedureModel(
+        crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel,
+    ),
     Taxon(crate::codegen::structs_codegen::tables::taxa::Taxon),
     TeamMember(crate::codegen::structs_codegen::tables::team_members::TeamMember),
     TeamProject(crate::codegen::structs_codegen::tables::team_projects::TeamProject),
@@ -249,6 +265,9 @@ impl Row {
                 ball_mill_procedure_models.upsert(conn)?.map(Row::from)
             }
             Row::Brand(brands) => brands.upsert(conn)?.map(Row::from),
+            Row::CappingProcedureModel(capping_procedure_models) => {
+                capping_procedure_models.upsert(conn)?.map(Row::from)
+            }
             Row::CentrifugeProcedureModel(centrifuge_procedure_models) => {
                 centrifuge_procedure_models.upsert(conn)?.map(Row::from)
             }
@@ -294,6 +313,9 @@ impl Row {
             }
             Row::MixSolidProcedureModel(mix_solid_procedure_models) => {
                 mix_solid_procedure_models.upsert(conn)?.map(Row::from)
+            }
+            Row::MountTipProcedureModel(mount_tip_procedure_models) => {
+                mount_tip_procedure_models.upsert(conn)?.map(Row::from)
             }
             Row::NextProcedureModel(next_procedure_models) => {
                 next_procedure_models.upsert(conn)?.map(Row::from)
@@ -350,6 +372,12 @@ impl Row {
             Row::SpectraCollection(spectra_collections) => {
                 spectra_collections.upsert(conn)?.map(Row::from)
             }
+            Row::StorageProcedureModel(storage_procedure_models) => {
+                storage_procedure_models.upsert(conn)?.map(Row::from)
+            }
+            Row::SupernatantProcedureModel(supernatant_procedure_models) => {
+                supernatant_procedure_models.upsert(conn)?.map(Row::from)
+            }
             Row::Taxon(taxa) => taxa.upsert(conn)?.map(Row::from),
             Row::TeamMember(team_members) => team_members.upsert(conn)?.map(Row::from),
             Row::TeamProject(team_projects) => team_projects.upsert(conn)?.map(Row::from),
@@ -396,6 +424,9 @@ impl web_common_traits::prelude::Row for Row {
                 ball_mill_procedure_models.primary_key()
             }
             Row::Brand(brands) => brands.primary_key(),
+            Row::CappingProcedureModel(capping_procedure_models) => {
+                capping_procedure_models.primary_key()
+            }
             Row::CentrifugeProcedureModel(centrifuge_procedure_models) => {
                 centrifuge_procedure_models.primary_key()
             }
@@ -433,6 +464,9 @@ impl web_common_traits::prelude::Row for Row {
             }
             Row::MixSolidProcedureModel(mix_solid_procedure_models) => {
                 mix_solid_procedure_models.primary_key()
+            }
+            Row::MountTipProcedureModel(mount_tip_procedure_models) => {
+                mount_tip_procedure_models.primary_key()
             }
             Row::NextProcedureModel(next_procedure_models) => next_procedure_models.primary_key(),
             Row::ObservationSubject(observation_subjects) => observation_subjects.primary_key(),
@@ -477,6 +511,12 @@ impl web_common_traits::prelude::Row for Row {
             Row::SpatialRefSy(spatial_ref_sys) => spatial_ref_sys.primary_key(),
             Row::Spectrum(spectra) => spectra.primary_key(),
             Row::SpectraCollection(spectra_collections) => spectra_collections.primary_key(),
+            Row::StorageProcedureModel(storage_procedure_models) => {
+                storage_procedure_models.primary_key()
+            }
+            Row::SupernatantProcedureModel(supernatant_procedure_models) => {
+                supernatant_procedure_models.primary_key()
+            }
             Row::Taxon(taxa) => taxa.primary_key(),
             Row::TeamMember(team_members) => team_members.primary_key(),
             Row::TeamProject(team_projects) => team_projects.primary_key(),

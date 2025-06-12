@@ -8,7 +8,7 @@ mod procedure_models;
 mod trackables;
 mod users;
 
-pub(crate) use brands::{acros_organics, fisher_scientific, greiner_bio_one};
+pub(crate) use brands::{acros_organics, fisher_scientific, fisherbrand, greiner_bio_one};
 use login_providers::init_login_providers;
 pub use procedure_models::DBGI_PLAN;
 use procedure_models::init_procedure_models;

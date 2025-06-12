@@ -12,6 +12,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
                 crate::codegen::tables::rows::Rows::from(ball_mill_procedure_models)
             }
             super::Row::Brand(brands) => crate::codegen::tables::rows::Rows::from(brands),
+            super::Row::CappingProcedureModel(capping_procedure_models) => {
+                crate::codegen::tables::rows::Rows::from(capping_procedure_models)
+            }
             super::Row::CentrifugeProcedureModel(centrifuge_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(centrifuge_procedure_models)
             }
@@ -67,6 +70,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::MixSolidProcedureModel(mix_solid_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(mix_solid_procedure_models)
+            }
+            super::Row::MountTipProcedureModel(mount_tip_procedure_models) => {
+                crate::codegen::tables::rows::Rows::from(mount_tip_procedure_models)
             }
             super::Row::NextProcedureModel(next_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(next_procedure_models)
@@ -140,6 +146,12 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::Spectrum(spectra) => crate::codegen::tables::rows::Rows::from(spectra),
             super::Row::SpectraCollection(spectra_collections) => {
                 crate::codegen::tables::rows::Rows::from(spectra_collections)
+            }
+            super::Row::StorageProcedureModel(storage_procedure_models) => {
+                crate::codegen::tables::rows::Rows::from(storage_procedure_models)
+            }
+            super::Row::SupernatantProcedureModel(supernatant_procedure_models) => {
+                crate::codegen::tables::rows::Rows::from(supernatant_procedure_models)
             }
             super::Row::Taxon(taxa) => crate::codegen::tables::rows::Rows::from(taxa),
             super::Row::TeamMember(team_members) => {

@@ -13,6 +13,9 @@ impl web_common_traits::prelude::Tabular for super::Rows {
                 crate::codegen::tables::table_names::TableName::BallMillProcedureModel
             }
             super::Rows::Brand(_) => crate::codegen::tables::table_names::TableName::Brand,
+            super::Rows::CappingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::CappingProcedureModel
+            }
             super::Rows::CentrifugeProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::CentrifugeProcedureModel
             }
@@ -66,6 +69,9 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             }
             super::Rows::MixSolidProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::MixSolidProcedureModel
+            }
+            super::Rows::MountTipProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::MountTipProcedureModel
             }
             super::Rows::NextProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::NextProcedureModel
@@ -137,6 +143,12 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::Spectrum(_) => crate::codegen::tables::table_names::TableName::Spectrum,
             super::Rows::SpectraCollection(_) => {
                 crate::codegen::tables::table_names::TableName::SpectraCollection
+            }
+            super::Rows::StorageProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::StorageProcedureModel
+            }
+            super::Rows::SupernatantProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::SupernatantProcedureModel
             }
             super::Rows::Taxon(_) => crate::codegen::tables::table_names::TableName::Taxon,
             super::Rows::TeamMember(_) => {

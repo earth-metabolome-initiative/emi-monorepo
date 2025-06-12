@@ -39,7 +39,8 @@ pub struct InsertableOrganization {
     domain: String,
 }
 impl InsertableOrganization {}
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableOrganizationBuilder {
     pub(crate) name: Option<String>,
     pub(crate) url: Option<String>,

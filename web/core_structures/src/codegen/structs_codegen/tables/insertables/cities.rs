@@ -56,7 +56,8 @@ impl InsertableCity {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCityBuilder {
     pub(crate) name: Option<String>,
     pub(crate) iso: Option<::iso_codes::CountryCode>,

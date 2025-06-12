@@ -233,6 +233,8 @@ impl InsertableNextProcedureModel {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableNextProcedureModelBuilder {
     pub(crate) parent_id: Option<i32>,
     pub(crate) current_id: Option<i32>,

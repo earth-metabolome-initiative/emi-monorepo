@@ -100,7 +100,8 @@ impl InsertableInstrument {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableInstrumentBuilder {
     pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     pub(crate) instrument_model_id: Option<::rosetta_uuid::Uuid>,

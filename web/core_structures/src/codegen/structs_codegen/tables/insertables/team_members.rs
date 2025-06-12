@@ -90,7 +90,8 @@ impl InsertableTeamMember {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTeamMemberBuilder {
     pub(crate) team_id: Option<i32>,
     pub(crate) member_id: Option<i32>,

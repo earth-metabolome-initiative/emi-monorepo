@@ -17,6 +17,11 @@ pub use ball_mill_procedure_models::{
 };
 mod brands;
 pub use brands::{InsertableBrand, InsertableBrandAttributes, InsertableBrandBuilder};
+mod capping_procedure_models;
+pub use capping_procedure_models::{
+    InsertableCappingProcedureModel, InsertableCappingProcedureModelAttributes,
+    InsertableCappingProcedureModelBuilder,
+};
 mod centrifuge_procedure_models;
 pub use centrifuge_procedure_models::{
     InsertableCentrifugeProcedureModel, InsertableCentrifugeProcedureModelAttributes,
@@ -106,6 +111,11 @@ mod mix_solid_procedure_models;
 pub use mix_solid_procedure_models::{
     InsertableMixSolidProcedureModel, InsertableMixSolidProcedureModelAttributes,
     InsertableMixSolidProcedureModelBuilder,
+};
+mod mount_tip_procedure_models;
+pub use mount_tip_procedure_models::{
+    InsertableMountTipProcedureModel, InsertableMountTipProcedureModelAttributes,
+    InsertableMountTipProcedureModelBuilder,
 };
 mod next_procedure_models;
 pub use next_procedure_models::{
@@ -221,6 +231,16 @@ mod spectra_collections;
 pub use spectra_collections::{
     InsertableSpectraCollection, InsertableSpectraCollectionAttributes,
     InsertableSpectraCollectionBuilder,
+};
+mod storage_procedure_models;
+pub use storage_procedure_models::{
+    InsertableStorageProcedureModel, InsertableStorageProcedureModelAttributes,
+    InsertableStorageProcedureModelBuilder,
+};
+mod supernatant_procedure_models;
+pub use supernatant_procedure_models::{
+    InsertableSupernatantProcedureModel, InsertableSupernatantProcedureModelAttributes,
+    InsertableSupernatantProcedureModelBuilder,
 };
 mod taxa;
 pub use taxa::{InsertableTaxon, InsertableTaxonAttributes, InsertableTaxonBuilder};
