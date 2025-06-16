@@ -113,27 +113,35 @@ where
     ///   `diesel::result::Error`.
     fn nodes(&self, conn: &mut PgConnection) -> Result<Vec<String>, diesel::result::Error> {
         let graph = self.graph(conn)?;
-        let ordering = if graph.has_nodes() { graph.edges().kahn().unwrap() } else { Vec::new() };
+        let ordering = if graph.has_nodes() {
+            graph.edges().kahn().unwrap()
+        } else {
+            let trackables = ProcedureModelTrackable::from_procedure_model_id(self.id(), conn)?
+                .into_iter()
+                .map(|trackable| format!("T{}", trackable.id))
+                .collect::<Vec<String>>();
+
+            if trackables.is_empty() {
+                return Ok(vec![]);
+            }
+
+            return Ok(vec![trackables[trackables.len() / 2].clone()]);
+        };
         let procedures_vocabulary = graph.nodes_vocabulary();
 
-        Ok(ProcedureModelTrackable::from_procedure_model_id(self.id(), conn)?
+        Ok(ordering
             .into_iter()
-            .map(|trackable| format!("T{}", trackable.id))
-            .chain(
-                ordering
-                    .into_iter()
-                    .filter_map(|id| {
-                        let child_procedure = procedures_vocabulary.get(id).unwrap();
-                        let mut nodes = child_procedure.nodes(conn).ok()?;
+            .filter_map(|id| {
+                let child_procedure = procedures_vocabulary.get(id).unwrap();
+                let mut nodes = child_procedure.nodes(conn).ok()?;
 
-                        if nodes.is_empty() {
-                            nodes.push(format!("P{}", child_procedure.id));
-                        }
+                if nodes.is_empty() {
+                    nodes.push(format!("P{}", child_procedure.id));
+                }
 
-                        Some(nodes)
-                    })
-                    .flatten(),
-            )
+                Some(nodes)
+            })
+            .flatten()
             .collect())
     }
 
@@ -328,8 +336,10 @@ where
         dot.push_str("\tstyle=\"rounded\";\n");
         dot.push_str(&format!("\tcolor={RED};\n"));
 
-        dot.push_str(self.trackable_nodes(conn)?.as_str());
-        dot.push_str(self.shared_trackable_edges(conn)?.as_str());
+        if ParentProcedureModel::from_parent_procedure_model_id(self.id(), conn)?.is_empty() {
+            dot.push_str(self.trackable_nodes(conn)?.as_str());
+        }
+        // dot.push_str(self.shared_trackable_edges(conn)?.as_str());
 
         let mut procedures = HashMap::new();
 
@@ -427,8 +437,8 @@ where
 
         dot.push_str("\tnode [style=rounded, fontname=\"Helvetica\"];\n");
         dot.push_str("\tedge [fontname=\"Helvetica\"];\n");
-        dot.push_str(&self.trackable_nodes(conn)?);
-        dot.push_str(&self.shared_trackable_edges(conn)?);
+        // dot.push_str(&self.trackable_nodes(conn)?);
+        // dot.push_str(&self.shared_trackable_edges(conn)?);
 
         dot.push_str(self.procedure_nodes_and_edges("", conn)?.as_str());
 
