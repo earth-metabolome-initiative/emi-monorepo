@@ -1,6 +1,6 @@
 //! Submodule for initializing the
 
-use core_structures::{CommercialProduct, Trackable, User};
+use core_structures::{CappingRule, CommercialProduct, StorageRule, Trackable, User};
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -14,7 +14,7 @@ use crate::{
 
 /// Returns and possibly creates a Machinery Nagel Vial 1.5ml product.
 pub(crate) fn init_macherey_nagel_vial(user: &User, conn: &mut PgConnection) -> CommercialProduct {
-    let vial = "Machinery Nagel Vial 1.5ml";
+    let vial = "Macherey Nagel Vial 1.5ml";
     if let Some(vial) = CommercialProduct::from_name(vial, conn).unwrap() {
         return vial;
     }
@@ -25,7 +25,7 @@ pub(crate) fn init_macherey_nagel_vial(user: &User, conn: &mut PgConnection) -> 
         .name(Some(vial.to_owned()))
         .unwrap()
         .description(Some(
-            "Machinery Nagel Vial 1.5ml, used for extract library and mass spectrometry analysis."
+            "Macherey Nagel Vial 1.5ml, used for extract library and mass spectrometry analysis."
                 .to_owned(),
         ))
         .unwrap()
@@ -85,7 +85,7 @@ pub(crate) fn init_macherey_nagel_splitted_cap(
     let splitted_cap_trackable =
         Trackable::from_name(VIAL_1_5ML_CAP_SPLITTED, conn).unwrap().expect("Cap should exist");
     let macherey_nagel = macherey_nagel(user, conn).unwrap();
-    CommercialProduct::new()
+    let cap = CommercialProduct::new()
         .name(Some(splitted_cap.to_owned()))
         .unwrap()
         .description(Some("Machinery Nagel Splitted Cap 1.5ml, used to partially seal Vial 1.5ml and allows mass spectrometry analysis.".to_owned()))
@@ -97,7 +97,19 @@ pub(crate) fn init_macherey_nagel_splitted_cap(
         .parent_id(splitted_cap_trackable.id)
         .unwrap()
         .insert(user.id, conn)
+        .unwrap();
+
+    // We register that the cap can be used with the vial
+    let init_macherey_nagel_vial = init_macherey_nagel_vial(user, conn);
+    CappingRule::new()
+        .cap_id(cap.id)
         .unwrap()
+        .container_id(init_macherey_nagel_vial.id)
+        .unwrap()
+        .insert(user.id, conn)
+        .unwrap();
+
+    cap
 }
 
 /// Returns and possibly creates a sealed cap
@@ -139,7 +151,7 @@ pub(crate) fn init_vici_schweiz_insert(user: &User, conn: &mut PgConnection) -> 
 
     let insert_trackable =
         Trackable::from_name(VIAL_INSERT_200UL, conn).unwrap().expect("Insert should exist");
-    let vici_schweiz = macherey_nagel(user, conn).unwrap();
+    let vici_schweiz = vici_schweiz(user, conn).unwrap();
     CommercialProduct::new()
         .name(Some(insert.to_owned()))
         .unwrap()

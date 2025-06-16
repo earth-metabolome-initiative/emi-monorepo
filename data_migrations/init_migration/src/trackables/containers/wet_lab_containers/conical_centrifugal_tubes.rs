@@ -1,6 +1,6 @@
 //! Submodule to initialize the sample containers in the database.
 
-use core_structures::{ContainerModel, Trackable, User};
+use core_structures::{ContainerModel, StorageRule, Trackable, User, VolumetricContainerModel};
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -12,7 +12,7 @@ pub(super) fn init_conical_centrifugal_tubes(
     user: &User,
     container: &Trackable,
     wet_lab_container: &Trackable,
-    portal_conn: &mut PgConnection,
+    conn: &mut PgConnection,
 ) {
     let conical_tube = Trackable::new()
         .name(Some(CONICAL_CENTRIFUGAL_TUBE.to_owned()))
@@ -23,10 +23,10 @@ pub(super) fn init_conical_centrifugal_tubes(
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
-    let _conical_tube_50ml = ContainerModel::new()
+    let conical_tube_50ml = VolumetricContainerModel::new()
         .name(Some(CONICAL_CENTRIFUGAL_TUBE_50ML.to_owned()))
         .unwrap()
         .description(Some("Conical tube of 50ml, used for sample collection.".to_owned()))
@@ -37,10 +37,10 @@ pub(super) fn init_conical_centrifugal_tubes(
         .unwrap()
         .liters(0.05)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
-    let _conical_tube_rack = Trackable::new()
+    let conical_tube_rack = ContainerModel::new()
         .name(Some(CONICAL_CENTRIFUGAL_TUBE_50ML_RACK.to_owned()))
         .unwrap()
         .description(Some("Conical tube rack, a common container for conical tubes".to_owned()))
@@ -49,6 +49,17 @@ pub(super) fn init_conical_centrifugal_tubes(
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
+        .unwrap();
+
+    StorageRule::new()
+        .parent_container_id(conical_tube_rack.id)
+        .unwrap()
+        .child_container_id(conical_tube_50ml.id)
+        .unwrap()
+        // TODO! ACTUALLY SET THE CORRECT QUANTITY
+        .quantity(24i16)
+        .unwrap()
+        .insert(user.id, conn)
         .unwrap();
 }

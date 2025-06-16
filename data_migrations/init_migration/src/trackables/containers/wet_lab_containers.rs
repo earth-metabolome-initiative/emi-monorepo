@@ -18,14 +18,14 @@ pub(super) fn init_wet_lab_containers(
     user: &User,
     container: &Trackable,
     wet_lab_container: &Trackable,
-    portal_conn: &mut PgConnection,
+    conn: &mut PgConnection,
 ) {
     conical_centrifugal_tubes::init_conical_centrifugal_tubes(
         user,
         container,
         wet_lab_container,
-        portal_conn,
+        conn,
     );
-    safelock_tubes::init_safelock_tubes(user, wet_lab_container, portal_conn);
-    vials::init_vials(user, container, wet_lab_container, portal_conn);
+    safelock_tubes::init_safelock_tubes(user, wet_lab_container, conn);
+    vials::init_vials(user, container, wet_lab_container, conn);
 }

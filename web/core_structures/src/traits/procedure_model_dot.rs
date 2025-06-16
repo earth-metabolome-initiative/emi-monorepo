@@ -4,8 +4,20 @@
 
 use std::collections::HashMap;
 
+use ::graph::{
+    prelude::{DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder},
+    traits::{
+        EdgesBuilder, Graph, MonopartiteGraph, MonopartiteGraphBuilder, MonoplexGraph,
+        MonoplexGraphBuilder,
+    },
+};
+use algebra::{impls::SquareCSR2D, prelude::Kahn};
 use diesel::{Identifiable, PgConnection};
-use web_common_traits::{database::Read, prelude::ExtensionTable};
+use sorted_vec::prelude::SortedVec;
+use web_common_traits::{
+    database::Read,
+    prelude::{Builder, ExtensionTable},
+};
 
 use crate::{
     NextProcedureModel, ParentProcedureModel, ProcedureModel, ProcedureModelTrackable,
@@ -30,6 +42,64 @@ where
         }
     }
 
+    /// Returns the topological graph of the procedure models.
+    fn graph(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<DiGraph<ProcedureModel>, diesel::result::Error> {
+        let mut child_procedures =
+            ParentProcedureModel::from_parent_procedure_model_id(self.id(), conn)?
+                .into_iter()
+                .filter_map(|procedure| {
+                    let child_procedure = procedure.child_procedure_model(conn).ok()?;
+                    let mut child_procedures =
+                        ParentProcedureModel::from_parent_procedure_model_id(
+                            &child_procedure.id,
+                            conn,
+                        )
+                        .ok()?
+                        .into_iter()
+                        .filter_map(|p| p.child_procedure_model(conn).ok())
+                        .collect::<Vec<_>>();
+
+                    if child_procedures.is_empty() {
+                        child_procedures.push(child_procedure);
+                    }
+
+                    Some(child_procedures)
+                })
+                .flatten()
+                .collect::<Vec<_>>();
+
+        child_procedures.sort_unstable();
+
+        let child_procedures: SortedVec<ProcedureModel> =
+            SortedVec::try_from(child_procedures).unwrap();
+
+        let edges: SquareCSR2D<_> = DiEdgesBuilder::default()
+            .expected_shape(child_procedures.len())
+            .edges(NextProcedureModel::from_parent_id(self.id(), conn)?.into_iter().filter_map(
+                |next| {
+                    let current = next.current(conn).ok()?;
+                    let successor = next.successor(conn).ok()?;
+                    Some((
+                        child_procedures.binary_search(&current).unwrap(),
+                        child_procedures.binary_search(&successor).unwrap(),
+                    ))
+                },
+            ))
+            .build()
+            .unwrap();
+
+        let graph: DiGraph<ProcedureModel> = GenericMonoplexMonopartiteGraphBuilder::default()
+            .nodes(child_procedures)
+            .edges(edges)
+            .build()
+            .unwrap();
+
+        Ok(graph)
+    }
+
     /// Returns the IDs of the nodes in the procedure model, if any.
     ///
     /// # Arguments
@@ -42,18 +112,22 @@ where
     /// * If an error occurs while retrieving the ID, it returns a
     ///   `diesel::result::Error`.
     fn nodes(&self, conn: &mut PgConnection) -> Result<Vec<String>, diesel::result::Error> {
+        let graph = self.graph(conn)?;
+        let ordering = if graph.has_nodes() { graph.edges().kahn().unwrap() } else { Vec::new() };
+        let procedures_vocabulary = graph.nodes_vocabulary();
+
         Ok(ProcedureModelTrackable::from_procedure_model_id(self.id(), conn)?
             .into_iter()
             .map(|trackable| format!("T{}", trackable.id))
             .chain(
-                ParentProcedureModel::from_parent_procedure_model_id(self.id(), conn)?
+                ordering
                     .into_iter()
-                    .filter_map(|procedure| {
-                        let child = procedure.child_procedure_model(conn).ok()?;
-                        let mut nodes = child.nodes(conn).ok()?;
+                    .filter_map(|id| {
+                        let child_procedure = procedures_vocabulary.get(id).unwrap();
+                        let mut nodes = child_procedure.nodes(conn).ok()?;
 
                         if nodes.is_empty() {
-                            nodes.push(format!("P{}", child.id));
+                            nodes.push(format!("P{}", child_procedure.id));
                         }
 
                         Some(nodes)
@@ -88,7 +162,7 @@ where
     /// # Errors
     ///
     /// * If an error occurs while retrieving the first node ID, it returns a
-    ///   `diesel::result::Error`.
+    ///  `diesel::result::Error`.
     fn first_node(&self, conn: &mut PgConnection) -> Result<Option<String>, diesel::result::Error> {
         Ok(self.nodes(conn)?.first().cloned())
     }
@@ -103,7 +177,7 @@ where
     /// # Errors
     ///
     /// * If an error occurs while retrieving the trackable nodes, it returns a
-    ///   `diesel::result::Error`.
+    ///  `diesel::result::Error`.
     fn trackable_nodes(&self, conn: &mut PgConnection) -> Result<String, diesel::result::Error> {
         let mut dot = String::new();
         for procedure_trackable in

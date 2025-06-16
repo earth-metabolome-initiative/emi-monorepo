@@ -31,16 +31,16 @@ pub enum BuilderError<A> {
 impl<FieldName> BuilderError<FieldName> {
     /// Converts the `BuilderError` into a new `BuilderError` with a different
     /// field name.
-    pub fn into_field_name<NewFieldName>(self) -> BuilderError<NewFieldName>
+    pub fn into_field_name<F, NewFieldName>(self, convert: F) -> BuilderError<NewFieldName>
     where
-        NewFieldName: From<FieldName>,
+        F: Fn(FieldName) -> NewFieldName,
     {
         match self {
             BuilderError::IncompleteBuild(missing_attribute) => {
-                BuilderError::IncompleteBuild(missing_attribute.into())
+                BuilderError::IncompleteBuild(convert(missing_attribute))
             }
             BuilderError::UnexpectedAttribute(unexpected_attribute) => {
-                BuilderError::UnexpectedAttribute(unexpected_attribute.into())
+                BuilderError::UnexpectedAttribute(convert(unexpected_attribute))
             }
         }
     }
@@ -50,12 +50,12 @@ impl<A: core::fmt::Display> core::fmt::Display for BuilderError<A> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::IncompleteBuild(missing_attribute) => {
-                write!(f, "Incomplete build: missing attribute: {missing_attribute}")
+                write!(f, "Incomplete build: missing attribute: `{missing_attribute}`")
             }
             Self::UnexpectedAttribute(unexpected_attribute) => {
                 write!(
                     f,
-                    "Unexpected attribute: the attribute {unexpected_attribute} was set, but it should not have been, as it will be overwritten."
+                    "Unexpected attribute: the attribute `{unexpected_attribute}` was set, but it should not have been, as it will be overwritten."
                 )
             }
         }
@@ -66,12 +66,12 @@ impl<A: core::fmt::Debug> core::fmt::Debug for BuilderError<A> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::IncompleteBuild(missing_attribute) => {
-                write!(f, "Incomplete build: missing attribute: {missing_attribute:?}")
+                write!(f, "Incomplete build: missing attribute: `{missing_attribute:?}`")
             }
             Self::UnexpectedAttribute(unexpected_attribute) => {
                 write!(
                     f,
-                    "Unexpected attribute: the attribute {unexpected_attribute:?} was set, but it should not have been, as it will be overwritten."
+                    "Unexpected attribute: the attribute `{unexpected_attribute:?}` was set, but it should not have been, as it will be overwritten."
                 )
             }
         }

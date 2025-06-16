@@ -18,6 +18,9 @@ where
     crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::capping_rules::CappingRule: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::centrifuge_procedure_models::CentrifugeProcedureModel: web_common_traits::database::Read<
         C,
     >,
@@ -177,6 +180,9 @@ where
     crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::storage_rules::StorageRule: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel: web_common_traits::database::Read<
         C,
     >,
@@ -214,6 +220,9 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable: web_common_traits::database::Read<
@@ -286,6 +295,15 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CappingRule(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::capping_rules::CappingRule::read(
                             primary_key,
                             conn,
                         )?
@@ -768,6 +786,15 @@ where
                         )?
                         .map(super::Row::from)
                 }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::StorageRule(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::storage_rules::StorageRule::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::SupernatantProcedureModel(
                     primary_key,
                 ) => {
@@ -880,6 +907,15 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::users::User::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
                             primary_key,
                             conn,
                         )?

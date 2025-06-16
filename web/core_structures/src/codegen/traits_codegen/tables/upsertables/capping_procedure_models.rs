@@ -18,7 +18,11 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .do_update()
             .set(self)
             .filter(
-                container_id.ne(excluded(container_id)).or(capped_with.ne(excluded(capped_with))),
+                container_id
+                    .ne(excluded(container_id))
+                    .or(procedure_container_id.ne(excluded(procedure_container_id)))
+                    .or(capped_with.ne(excluded(capped_with)))
+                    .or(procedure_capped_with.ne(excluded(procedure_capped_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -44,7 +48,11 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .do_update()
             .set(self)
             .filter(
-                container_id.ne(excluded(container_id)).or(capped_with.ne(excluded(capped_with))),
+                container_id
+                    .ne(excluded(container_id))
+                    .or(procedure_container_id.ne(excluded(procedure_container_id)))
+                    .or(capped_with.ne(excluded(capped_with)))
+                    .or(procedure_capped_with.ne(excluded(procedure_capped_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

@@ -10,7 +10,7 @@ pub const FORMIC_ACID: &str = "Formic acid, 98+%";
 pub const DISTILLED_WATER: &str = "Distilled water";
 pub const LIQUID_NITROGEN: &str = "Liquid nitrogen";
 
-pub(crate) fn init_reagents(user: &User, portal_conn: &mut PgConnection) {
+pub(crate) fn init_reagents(user: &User, conn: &mut PgConnection) {
     let reagent_category = core_structures::Trackable::new()
         .name(Some("Reagent".to_owned()))
         .unwrap()
@@ -18,7 +18,7 @@ pub(crate) fn init_reagents(user: &User, portal_conn: &mut PgConnection) {
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
     let _ethanol = Reagent::new()
@@ -36,7 +36,7 @@ pub(crate) fn init_reagents(user: &User, portal_conn: &mut PgConnection) {
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
     let _methanol = Reagent::new()
@@ -54,7 +54,7 @@ pub(crate) fn init_reagents(user: &User, portal_conn: &mut PgConnection) {
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
     let _formic_acid = Reagent::new()
@@ -72,7 +72,7 @@ pub(crate) fn init_reagents(user: &User, portal_conn: &mut PgConnection) {
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
     let _distilled_water = Reagent::new()
@@ -90,7 +90,7 @@ pub(crate) fn init_reagents(user: &User, portal_conn: &mut PgConnection) {
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
     let _liquid_nitrogen = Reagent::new()
@@ -108,6 +108,6 @@ pub(crate) fn init_reagents(user: &User, portal_conn: &mut PgConnection) {
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 }

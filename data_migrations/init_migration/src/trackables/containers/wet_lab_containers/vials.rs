@@ -1,6 +1,8 @@
 //! Submodule to initialize the
 
-use core_structures::{ContainerModel, Trackable, User};
+use core_structures::{
+    CappingRule, ContainerModel, StorageRule, Trackable, User, VolumetricContainerModel,
+};
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -15,7 +17,7 @@ pub(super) fn init_vials(
     user: &User,
     container: &Trackable,
     wet_lab_container: &Trackable,
-    portal_conn: &mut PgConnection,
+    conn: &mut PgConnection,
 ) {
     let vial = Trackable::new()
         .name(Some("Vial".to_owned()))
@@ -26,10 +28,10 @@ pub(super) fn init_vials(
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
-    let _vial_1_5ml = ContainerModel::new()
+    let vial_1_5ml = VolumetricContainerModel::new()
         .name(Some(VIAL_1_5ML.to_owned()))
         .unwrap()
         .description(Some(
@@ -42,7 +44,7 @@ pub(super) fn init_vials(
         .unwrap()
         .liters(0.0015)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
     let vial_cap = Trackable::new()
@@ -54,7 +56,7 @@ pub(super) fn init_vials(
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
     let splitted_vial_cap = Trackable::new()
@@ -66,10 +68,10 @@ pub(super) fn init_vials(
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
-    let _vial_1_5ml_splitted_cap = ContainerModel::new()
+    let _vial_1_5ml_splitted_cap = VolumetricContainerModel::new()
         .name(Some(VIAL_1_5ML_CAP_SPLITTED.to_owned()))
         .unwrap()
         .description(Some("Splitted vial cap of 1.5ml, used to partially seal vials.".to_owned()))
@@ -80,7 +82,7 @@ pub(super) fn init_vials(
         .unwrap()
         .liters(0.0015)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
     let sealed_vial_cap = Trackable::new()
@@ -92,10 +94,10 @@ pub(super) fn init_vials(
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
-    let _vial_1_5ml_sealed_cap = ContainerModel::new()
+    let vial_1_5ml_sealed_cap = VolumetricContainerModel::new()
         .name(Some(VIAL_1_5ML_SEALED_CAP.to_owned()))
         .unwrap()
         .description(Some("Sealed vial cap of 1.5ml, used to seal vials.".to_owned()))
@@ -106,10 +108,19 @@ pub(super) fn init_vials(
         .unwrap()
         .liters(0.0015)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
-    let vial_insert = Trackable::new()
+    // We register that the cap can be used with the vial
+    CappingRule::new()
+        .cap_id(vial_1_5ml_sealed_cap.id)
+        .unwrap()
+        .container_id(vial_1_5ml.id)
+        .unwrap()
+        .insert(user.id, conn)
+        .unwrap();
+
+    let vial_insert = VolumetricContainerModel::new()
         .name(Some(VIAL_INSERT.to_owned()))
         .unwrap()
         .description(Some("Vial insert, used to hold samples in vials".to_owned()))
@@ -118,10 +129,13 @@ pub(super) fn init_vials(
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        // TODO!: Set the correct volume
+        .liters(0.0002)
+        .unwrap()
+        .insert(user.id, conn)
         .unwrap();
 
-    let _vial_insert_200ul = ContainerModel::new()
+    let _vial_insert_200ul = VolumetricContainerModel::new()
         .name(Some(VIAL_INSERT_200UL.to_owned()))
         .unwrap()
         .description(Some("Vial insert of 200μl, used to hold samples in vials.".to_owned()))
@@ -132,10 +146,10 @@ pub(super) fn init_vials(
         .unwrap()
         .liters(0.0002)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
-    let _vial_box = Trackable::new()
+    let vial_box = ContainerModel::new()
         .name(Some(VIAL_BOX.to_owned()))
         .unwrap()
         .description(Some("Vial box, used to store vials".to_owned()))
@@ -144,6 +158,17 @@ pub(super) fn init_vials(
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
+        .unwrap();
+
+    StorageRule::new()
+        .parent_container_id(vial_box.id)
+        .unwrap()
+        .child_container_id(vial_1_5ml.id)
+        .unwrap()
+        // TODO!: Set the correct quantity
+        .quantity(24i16)
+        .unwrap()
+        .insert(user.id, conn)
         .unwrap();
 }

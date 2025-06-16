@@ -4,15 +4,6 @@ pub enum InsertableProcessableAttributes {
     Id(crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes),
     Kilograms,
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes>
-    for InsertableProcessableAttributes
-{
-    fn from(
-        extension: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
-    ) -> Self {
-        Self::Id(extension)
-    }
-}
 impl core::fmt::Display for InsertableProcessableAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -98,7 +89,10 @@ impl InsertableProcessableBuilder {
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.id(id).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .id(id)
+            .map_err(|err| err.into_field_name(InsertableProcessableAttributes::Id))?;
         Ok(self)
     }
     pub fn name<P>(
@@ -109,7 +103,10 @@ impl InsertableProcessableBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.name(name).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .name(name)
+            .map_err(|err| err.into_field_name(InsertableProcessableAttributes::Id))?;
         Ok(self)
     }
     pub fn description<P>(
@@ -120,7 +117,10 @@ impl InsertableProcessableBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.description(description).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .description(description)
+            .map_err(|err| err.into_field_name(InsertableProcessableAttributes::Id))?;
         Ok(self)
     }
     pub fn photograph_id<P>(
@@ -132,7 +132,10 @@ impl InsertableProcessableBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.photograph_id(photograph_id).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .photograph_id(photograph_id)
+            .map_err(|err| err.into_field_name(InsertableProcessableAttributes::Id))?;
         Ok(self)
     }
     pub fn parent_id<P>(
@@ -144,7 +147,10 @@ impl InsertableProcessableBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.parent_id(parent_id).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .parent_id(parent_id)
+            .map_err(|err| err.into_field_name(InsertableProcessableAttributes::Id))?;
         Ok(self)
     }
     pub fn created_by<P>(
@@ -155,7 +161,10 @@ impl InsertableProcessableBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_by(created_by).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .created_by(created_by)
+            .map_err(|err| err.into_field_name(InsertableProcessableAttributes::Id))?;
         Ok(self)
     }
     pub fn created_at<P>(
@@ -167,7 +176,10 @@ impl InsertableProcessableBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_at(created_at).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .created_at(created_at)
+            .map_err(|err| err.into_field_name(InsertableProcessableAttributes::Id))?;
         Ok(self)
     }
     pub fn updated_by<P>(
@@ -178,7 +190,10 @@ impl InsertableProcessableBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_by(updated_by).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .updated_by(updated_by)
+            .map_err(|err| err.into_field_name(InsertableProcessableAttributes::Id))?;
         Ok(self)
     }
     pub fn updated_at<P>(
@@ -190,7 +205,10 @@ impl InsertableProcessableBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_at(updated_at).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .updated_at(updated_at)
+            .map_err(|err| err.into_field_name(InsertableProcessableAttributes::Id))?;
         Ok(self)
     }
 }
@@ -219,7 +237,11 @@ impl InsertableProcessableBuilder {
             self.kilograms.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableProcessableAttributes::Kilograms,
             ))?;
-        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        let id = self
+            .id
+            .insert(user_id, conn)
+            .map_err(|err| err.into_field_name(InsertableProcessableAttributes::Id))?
+            .id();
         Ok(InsertableProcessable { id, kilograms })
     }
 }

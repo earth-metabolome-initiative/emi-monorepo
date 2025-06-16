@@ -133,14 +133,16 @@ pub enum InsertError<FieldName> {
 impl<FieldName> InsertError<FieldName> {
     /// Converts the `InsertError` into a new `InsertError` with a different
     /// field name.
-    pub fn into_field_name<NewFieldName>(self) -> InsertError<NewFieldName>
+    pub fn into_field_name<F, NewFieldName>(self, convert: F) -> InsertError<NewFieldName>
     where
-        NewFieldName: From<FieldName>,
+        F: Fn(FieldName) -> NewFieldName,
     {
         match self {
-            InsertError::BuilderError(error) => InsertError::BuilderError(error.into_field_name()),
+            InsertError::BuilderError(error) => {
+                InsertError::BuilderError(error.into_field_name(convert))
+            }
             InsertError::ValidationError(error) => {
-                InsertError::ValidationError(error.into_field_name())
+                InsertError::ValidationError(error.into_field_name(convert))
             }
             InsertError::DieselError(error) => InsertError::DieselError(error),
             InsertError::ServerError(error) => InsertError::ServerError(error),

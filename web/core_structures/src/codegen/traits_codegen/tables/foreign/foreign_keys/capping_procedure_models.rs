@@ -1,14 +1,20 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CappingProcedureModelForeignKeys {
-    pub capped_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-    >,
-    pub container: Option<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-    >,
     pub id: Option<
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
+    >,
+    pub container: Option<
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+    >,
+    pub procedure_container: Option<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+    >,
+    pub capped_with: Option<
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
+    >,
+    pub procedure_capped_with: Option<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -21,23 +27,35 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(self.id),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerModel(
+                self.container_id,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
+                self.procedure_container_id,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Trackable(
                 self.capped_with,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
-                self.container_id,
+                self.procedure_capped_with,
             ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(self.id),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.capped_with.is_some()
+        foreign_keys.id.is_some()
             && foreign_keys.container.is_some()
-            && foreign_keys.id.is_some()
+            && foreign_keys.procedure_container.is_some()
+            && foreign_keys.capped_with.is_some()
+            && foreign_keys.procedure_capped_with.is_some()
     }
     fn update(
         &self,
@@ -48,6 +66,26 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
+                crate::codegen::tables::row::Row::ContainerModel(container_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.container_id == container_models.id {
+                    foreign_keys.container = Some(container_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ContainerModel(container_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.container_id == container_models.id {
+                    foreign_keys.container = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::ProcedureModelTrackable(
                     procedure_model_trackables,
                 ),
@@ -55,12 +93,12 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.capped_with == procedure_model_trackables.id {
-                    foreign_keys.capped_with = Some(procedure_model_trackables.clone());
+                if self.procedure_container_id == procedure_model_trackables.id {
+                    foreign_keys.procedure_container = Some(procedure_model_trackables.clone());
                     updated = true;
                 }
-                if self.container_id == procedure_model_trackables.id {
-                    foreign_keys.container = Some(procedure_model_trackables.clone());
+                if self.procedure_capped_with == procedure_model_trackables.id {
+                    foreign_keys.procedure_capped_with = Some(procedure_model_trackables.clone());
                     updated = true;
                 }
             }
@@ -70,12 +108,12 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.capped_with == procedure_model_trackables.id {
-                    foreign_keys.capped_with = None;
+                if self.procedure_container_id == procedure_model_trackables.id {
+                    foreign_keys.procedure_container = None;
                     updated = true;
                 }
-                if self.container_id == procedure_model_trackables.id {
-                    foreign_keys.container = None;
+                if self.procedure_capped_with == procedure_model_trackables.id {
+                    foreign_keys.procedure_capped_with = None;
                     updated = true;
                 }
             }
@@ -96,6 +134,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if self.id == procedure_models.id {
                     foreign_keys.id = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Trackable(trackables),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.capped_with == trackables.id {
+                    foreign_keys.capped_with = Some(trackables);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Trackable(trackables),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.capped_with == trackables.id {
+                    foreign_keys.capped_with = None;
                     updated = true;
                 }
             }

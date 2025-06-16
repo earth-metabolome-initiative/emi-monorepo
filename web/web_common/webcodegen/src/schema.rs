@@ -481,6 +481,43 @@ table! {
     }
 }
 
+table! {
+    pg_stat_statements (userid, dbid, queryid) {
+        userid -> diesel::sql_types::Oid,
+        dbid -> diesel::sql_types::Oid,
+        toplevel -> Bool,
+        queryid -> BigInt,
+        query -> Text,
+        calls -> BigInt,
+        plans -> BigInt,
+        total_plan_time -> Double,
+        min_plan_time -> Double,
+        max_plan_time -> Double,
+        mean_plan_time -> Double,
+        stddev_plan_time -> Double,
+        total_exec_time -> Double,
+        min_exec_time -> Double,
+        max_exec_time -> Double,
+        mean_exec_time -> Double,
+        stddev_exec_time -> Double,
+        rows -> BigInt,
+        shared_blks_hit -> BigInt,
+        shared_blks_read -> BigInt,
+        shared_blks_dirtied -> BigInt,
+        shared_blks_written -> BigInt,
+        local_blks_hit -> BigInt,
+        local_blks_read -> BigInt,
+        local_blks_dirtied -> BigInt,
+        local_blks_written -> BigInt,
+        temp_blks_read -> BigInt,
+        temp_blks_written -> BigInt,
+        shared_blk_read_time -> Double,
+        shared_blk_write_time -> Double,
+        local_blk_read_time -> Double,
+        local_blk_write_time -> Double,
+    }
+}
+
 allow_tables_to_appear_in_same_query!(
     table_constraints,
     key_column_usage,

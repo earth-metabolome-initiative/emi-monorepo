@@ -1,11 +1,11 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WeighingProcedureForeignKeys {
-    pub instrument: Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
     pub procedure: Option<crate::codegen::structs_codegen::tables::procedures::Procedure>,
     pub procedure_model: Option<
         crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel,
     >,
+    pub instrument: Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure
@@ -17,11 +17,6 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Trackable(
-                self.instrument_id,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(
                 self.procedure_id,
             ),
@@ -31,11 +26,16 @@ impl web_common_traits::prelude::HasForeignKeys
                 self.procedure_model_id,
             ),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Trackable(
+                self.instrument_id,
+            ),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.instrument.is_some()
-            && foreign_keys.procedure.is_some()
+        foreign_keys.procedure.is_some()
             && foreign_keys.procedure_model.is_some()
+            && foreign_keys.instrument.is_some()
     }
     fn update(
         &self,

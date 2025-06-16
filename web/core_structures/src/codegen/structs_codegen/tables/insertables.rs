@@ -22,6 +22,10 @@ pub use capping_procedure_models::{
     InsertableCappingProcedureModel, InsertableCappingProcedureModelAttributes,
     InsertableCappingProcedureModelBuilder,
 };
+mod capping_rules;
+pub use capping_rules::{
+    InsertableCappingRule, InsertableCappingRuleAttributes, InsertableCappingRuleBuilder,
+};
 mod centrifuge_procedure_models;
 pub use centrifuge_procedure_models::{
     InsertableCentrifugeProcedureModel, InsertableCentrifugeProcedureModelAttributes,
@@ -237,6 +241,10 @@ pub use storage_procedure_models::{
     InsertableStorageProcedureModel, InsertableStorageProcedureModelAttributes,
     InsertableStorageProcedureModelBuilder,
 };
+mod storage_rules;
+pub use storage_rules::{
+    InsertableStorageRule, InsertableStorageRuleAttributes, InsertableStorageRuleBuilder,
+};
 mod supernatant_procedure_models;
 pub use supernatant_procedure_models::{
     InsertableSupernatantProcedureModel, InsertableSupernatantProcedureModelAttributes,
@@ -284,6 +292,11 @@ pub use user_organizations::{
 };
 mod users;
 pub use users::{InsertableUser, InsertableUserAttributes, InsertableUserBuilder};
+mod volumetric_container_models;
+pub use volumetric_container_models::{
+    InsertableVolumetricContainerModel, InsertableVolumetricContainerModelAttributes,
+    InsertableVolumetricContainerModelBuilder,
+};
 mod volumetric_processables;
 pub use volumetric_processables::{
     InsertableVolumetricProcessable, InsertableVolumetricProcessableAttributes,

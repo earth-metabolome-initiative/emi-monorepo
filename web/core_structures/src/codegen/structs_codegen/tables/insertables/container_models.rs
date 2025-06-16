@@ -2,22 +2,11 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableContainerModelAttributes {
     Id(crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes),
-    Liters,
-}
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes>
-    for InsertableContainerModelAttributes
-{
-    fn from(
-        extension: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
-    ) -> Self {
-        Self::Id(extension)
-    }
 }
 impl core::fmt::Display for InsertableContainerModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertableContainerModelAttributes::Id(id) => write!(f, "{}", id),
-            InsertableContainerModelAttributes::Liters => write!(f, "liters"),
         }
     }
 }
@@ -31,7 +20,6 @@ impl core::fmt::Display for InsertableContainerModelAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableContainerModel {
     id: ::rosetta_uuid::Uuid,
-    liters: f32,
 }
 impl InsertableContainerModel {
     pub fn id<C: diesel::connection::LoadConnection>(
@@ -71,25 +59,8 @@ impl InsertableContainerModel {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableContainerModelBuilder {
     pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    pub(crate) liters: Option<f32>,
 }
 impl InsertableContainerModelBuilder {
-    pub fn liters<P>(
-        mut self,
-        liters: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableContainerModelAttributes>>
-    where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let liters = liters.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
-            Into::into(err).rename_field(InsertableContainerModelAttributes::Liters)
-        })?;
-        pgrx_validation::must_be_strictly_positive_f32(liters)
-            .map_err(|e| e.rename_field(InsertableContainerModelAttributes::Liters))?;
-        self.liters = Some(liters);
-        Ok(self)
-    }
     pub fn id<P>(
         mut self,
         id: P,
@@ -98,7 +69,10 @@ impl InsertableContainerModelBuilder {
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.id(id).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .id(id)
+            .map_err(|err| err.into_field_name(InsertableContainerModelAttributes::Id))?;
         Ok(self)
     }
     pub fn name<P>(
@@ -109,7 +83,10 @@ impl InsertableContainerModelBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.name(name).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .name(name)
+            .map_err(|err| err.into_field_name(InsertableContainerModelAttributes::Id))?;
         Ok(self)
     }
     pub fn description<P>(
@@ -120,7 +97,10 @@ impl InsertableContainerModelBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.description(description).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .description(description)
+            .map_err(|err| err.into_field_name(InsertableContainerModelAttributes::Id))?;
         Ok(self)
     }
     pub fn photograph_id<P>(
@@ -132,7 +112,10 @@ impl InsertableContainerModelBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.photograph_id(photograph_id).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .photograph_id(photograph_id)
+            .map_err(|err| err.into_field_name(InsertableContainerModelAttributes::Id))?;
         Ok(self)
     }
     pub fn parent_id<P>(
@@ -144,7 +127,10 @@ impl InsertableContainerModelBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.parent_id(parent_id).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .parent_id(parent_id)
+            .map_err(|err| err.into_field_name(InsertableContainerModelAttributes::Id))?;
         Ok(self)
     }
     pub fn created_by<P>(
@@ -155,7 +141,10 @@ impl InsertableContainerModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_by(created_by).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .created_by(created_by)
+            .map_err(|err| err.into_field_name(InsertableContainerModelAttributes::Id))?;
         Ok(self)
     }
     pub fn created_at<P>(
@@ -167,7 +156,10 @@ impl InsertableContainerModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_at(created_at).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .created_at(created_at)
+            .map_err(|err| err.into_field_name(InsertableContainerModelAttributes::Id))?;
         Ok(self)
     }
     pub fn updated_by<P>(
@@ -178,7 +170,10 @@ impl InsertableContainerModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_by(updated_by).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .updated_by(updated_by)
+            .map_err(|err| err.into_field_name(InsertableContainerModelAttributes::Id))?;
         Ok(self)
     }
     pub fn updated_at<P>(
@@ -190,7 +185,10 @@ impl InsertableContainerModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_at(updated_at).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .updated_at(updated_at)
+            .map_err(|err| err.into_field_name(InsertableContainerModelAttributes::Id))?;
         Ok(self)
     }
 }
@@ -215,10 +213,11 @@ impl InsertableContainerModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let liters = self.liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-            InsertableContainerModelAttributes::Liters,
-        ))?;
-        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
-        Ok(InsertableContainerModel { id, liters })
+        let id = self
+            .id
+            .insert(user_id, conn)
+            .map_err(|err| err.into_field_name(InsertableContainerModelAttributes::Id))?
+            .id();
+        Ok(InsertableContainerModel { id })
     }
 }

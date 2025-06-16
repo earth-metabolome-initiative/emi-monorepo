@@ -108,6 +108,22 @@ impl<V> SortedVec<V> {
     pub fn first(&self) -> Option<&V> {
         self.vec.first()
     }
+
+    /// Binary searches this slice for a given element.
+    /// If the slice is not sorted, the returned result is unspecified and
+    /// meaningless.
+    /// 
+    /// # Errors
+    /// 
+    /// * `Err(usize)` if the value is not found, containing the index where it
+    ///   could be inserted to maintain sorted order.
+    /// * `Ok(usize)` if the value is found, containing the index of the value.
+    pub fn binary_search(&self, value: &V) -> Result<usize, usize>
+    where
+        V: Ord,
+    {
+        self.vec.binary_search(value)
+    }
 }
 
 impl<V: PartialOrd> SortedVec<V> {

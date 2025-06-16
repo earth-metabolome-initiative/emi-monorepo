@@ -18,6 +18,9 @@ where
     crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
+    crate::codegen::structs_codegen::tables::capping_rules::CappingRule: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::centrifuge_procedure_models::CentrifugeProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -177,6 +180,9 @@ where
     crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
+    crate::codegen::structs_codegen::tables::storage_rules::StorageRule: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -214,6 +220,9 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::users::User: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable: web_common_traits::prelude::BoundedRead<
@@ -280,6 +289,14 @@ where
             }
             crate::codegen::tables::table_names::TableName::CappingProcedureModel => {
                 crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::CappingRule => {
+                crate::codegen::structs_codegen::tables::capping_rules::CappingRule::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -710,6 +727,14 @@ where
                     )
                     .map(super::Rows::from)
             }
+            crate::codegen::tables::table_names::TableName::StorageRule => {
+                crate::codegen::structs_codegen::tables::storage_rules::StorageRule::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
             crate::codegen::tables::table_names::TableName::SupernatantProcedureModel => {
                 crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel::bounded_read(
                         offset,
@@ -808,6 +833,14 @@ where
             }
             crate::codegen::tables::table_names::TableName::User => {
                 crate::codegen::structs_codegen::tables::users::User::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::VolumetricContainerModel => {
+                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::bounded_read(
                         offset,
                         limit,
                         conn,

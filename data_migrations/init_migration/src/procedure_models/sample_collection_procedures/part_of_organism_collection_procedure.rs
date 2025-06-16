@@ -36,4 +36,17 @@ pub(crate) fn init_part_of_organism_collection(
         .unwrap()
         .insert(user.id, conn)
         .unwrap()
+
+    // Remind the user to wear gloves
+
+    // Remind the user to sterilize the scalpel and gloves with ethanol 70
+    // percent
+
+    // Cut the part of the organism to be collected with a sterile scalpel
+
+    // Wrapping procedure with coffee filter paper
+
+    // Placing the wrapped sample in the conical centrifugal tube
+
+    // Put it in the storage box
 }

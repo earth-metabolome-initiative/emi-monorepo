@@ -16,6 +16,9 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::CappingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::CappingProcedureModel
             }
+            super::Row::CappingRule(_) => {
+                crate::codegen::tables::table_names::TableName::CappingRule
+            }
             super::Row::CentrifugeProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::CentrifugeProcedureModel
             }
@@ -145,6 +148,9 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::StorageProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::StorageProcedureModel
             }
+            super::Row::StorageRule(_) => {
+                crate::codegen::tables::table_names::TableName::StorageRule
+            }
             super::Row::SupernatantProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::SupernatantProcedureModel
             }
@@ -168,6 +174,9 @@ impl web_common_traits::prelude::Tabular for super::Row {
                 crate::codegen::tables::table_names::TableName::UserOrganization
             }
             super::Row::User(_) => crate::codegen::tables::table_names::TableName::User,
+            super::Row::VolumetricContainerModel(_) => {
+                crate::codegen::tables::table_names::TableName::VolumetricContainerModel
+            }
             super::Row::VolumetricProcessable(_) => {
                 crate::codegen::tables::table_names::TableName::VolumetricProcessable
             }

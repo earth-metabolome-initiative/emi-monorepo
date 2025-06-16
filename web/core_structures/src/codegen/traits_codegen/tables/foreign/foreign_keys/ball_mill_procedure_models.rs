@@ -1,13 +1,13 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BallMillProcedureModelForeignKeys {
-    pub container: Option<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-    >,
     pub id: Option<
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     >,
     pub milled_with: Option<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+    >,
+    pub container: Option<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
 }
@@ -21,11 +21,6 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
-                self.container_id,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(self.id),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -33,11 +28,16 @@ impl web_common_traits::prelude::HasForeignKeys
                 self.milled_with,
             ),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
+                self.container_id,
+            ),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.container.is_some()
-            && foreign_keys.id.is_some()
+        foreign_keys.id.is_some()
             && foreign_keys.milled_with.is_some()
+            && foreign_keys.container.is_some()
     }
     fn update(
         &self,
@@ -55,12 +55,12 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.container_id == procedure_model_trackables.id {
-                    foreign_keys.container = Some(procedure_model_trackables.clone());
-                    updated = true;
-                }
                 if self.milled_with == procedure_model_trackables.id {
                     foreign_keys.milled_with = Some(procedure_model_trackables.clone());
+                    updated = true;
+                }
+                if self.container_id == procedure_model_trackables.id {
+                    foreign_keys.container = Some(procedure_model_trackables.clone());
                     updated = true;
                 }
             }
@@ -70,12 +70,12 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.container_id == procedure_model_trackables.id {
-                    foreign_keys.container = None;
-                    updated = true;
-                }
                 if self.milled_with == procedure_model_trackables.id {
                     foreign_keys.milled_with = None;
+                    updated = true;
+                }
+                if self.container_id == procedure_model_trackables.id {
+                    foreign_keys.container = None;
                     updated = true;
                 }
             }

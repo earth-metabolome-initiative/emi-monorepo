@@ -23,7 +23,7 @@ pub(crate) fn init_organism_observation_procedure(
         return existing;
     }
 
-    ProcedureModel::new()
+    let observation_procedure = ProcedureModel::new()
         .name(ORGANISM_OBSERVATION)
         .unwrap()
         .description(
@@ -33,5 +33,16 @@ pub(crate) fn init_organism_observation_procedure(
         .created_by(user.id)
         .unwrap()
         .insert(user.id, conn)
-		.unwrap()
+		.unwrap();
+
+    // Take a picture of organism and surrounding ecosystem
+
+    // Take a picture of the full organism
+
+    // Take one of more picture of details of the organism to facilitate
+    // identification (e.g. flowers)
+
+    // Logging geolocation
+
+    observation_procedure
 }

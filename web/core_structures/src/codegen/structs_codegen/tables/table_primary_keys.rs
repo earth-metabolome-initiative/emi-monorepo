@@ -7,6 +7,7 @@ pub enum TablePrimaryKey {
     BallMillProcedureModel(i32),
     Brand(i32),
     CappingProcedureModel(i32),
+    CappingRule((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
     CentrifugeProcedureModel(i32),
     City(i32),
     Color(i16),
@@ -60,6 +61,7 @@ pub enum TablePrimaryKey {
     Spectrum(i32),
     SpectraCollection(i32),
     StorageProcedureModel(i32),
+    StorageRule((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
     SupernatantProcedureModel(i32),
     Taxon(i32),
     TeamMember((i32, i32)),
@@ -73,6 +75,7 @@ pub enum TablePrimaryKey {
     UserEmail(i32),
     UserOrganization((i32, i16)),
     User(i32),
+    VolumetricContainerModel(::rosetta_uuid::Uuid),
     VolumetricProcessable(::rosetta_uuid::Uuid),
     WeighingInstrumentModel(::rosetta_uuid::Uuid),
     WeighingProcedureModel(i32),
@@ -95,6 +98,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::Brand(_) => crate::codegen::tables::table_names::TableName::Brand,
             TablePrimaryKey::CappingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::CappingProcedureModel
+            }
+            TablePrimaryKey::CappingRule(_) => {
+                crate::codegen::tables::table_names::TableName::CappingRule
             }
             TablePrimaryKey::CentrifugeProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::CentrifugeProcedureModel
@@ -239,6 +245,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::StorageProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::StorageProcedureModel
             }
+            TablePrimaryKey::StorageRule(_) => {
+                crate::codegen::tables::table_names::TableName::StorageRule
+            }
             TablePrimaryKey::SupernatantProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::SupernatantProcedureModel
             }
@@ -270,6 +279,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
                 crate::codegen::tables::table_names::TableName::UserOrganization
             }
             TablePrimaryKey::User(_) => crate::codegen::tables::table_names::TableName::User,
+            TablePrimaryKey::VolumetricContainerModel(_) => {
+                crate::codegen::tables::table_names::TableName::VolumetricContainerModel
+            }
             TablePrimaryKey::VolumetricProcessable(_) => {
                 crate::codegen::tables::table_names::TableName::VolumetricProcessable
             }

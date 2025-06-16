@@ -1,11 +1,11 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OrganismObservationForeignKeys {
-    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
-    pub organism: Option<crate::codegen::structs_codegen::tables::organisms::Organism>,
     pub project: Option<crate::codegen::structs_codegen::tables::projects::Project>,
+    pub organism: Option<crate::codegen::structs_codegen::tables::organisms::Organism>,
     pub subject:
         Option<crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
     pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -18,13 +18,10 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Project(self.project_id),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Organism(self.organism_id),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Project(self.project_id),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ObservationSubject(
@@ -32,14 +29,17 @@ impl web_common_traits::prelude::HasForeignKeys
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.updated_by),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.created_by.is_some()
+        foreign_keys.project.is_some()
             && foreign_keys.organism.is_some()
-            && foreign_keys.project.is_some()
             && foreign_keys.subject.is_some()
+            && foreign_keys.created_by.is_some()
             && foreign_keys.updated_by.is_some()
     }
     fn update(

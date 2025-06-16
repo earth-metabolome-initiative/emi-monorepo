@@ -15,6 +15,9 @@ common_traits.workspace = true
 generic_backend_request_errors.workspace = true
 pgrx_validation.workspace = true
 infer.workspace = true
+graph.workspace = true
+algebra.workspace = true
+sorted_vec.workspace = true
 image_validation.workspace = true
 iso_codes = { workspace = true, features = ["diesel_pgrx"] }
 validation_errors.workspace = true

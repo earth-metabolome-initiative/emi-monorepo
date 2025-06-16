@@ -1,8 +1,8 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UserOrganizationForeignKeys {
-    pub organization: Option<crate::codegen::structs_codegen::tables::organizations::Organization>,
     pub user: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub organization: Option<crate::codegen::structs_codegen::tables::organizations::Organization>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::user_organizations::UserOrganization
@@ -14,16 +14,16 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.user_id),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Organization(
                 self.organization_id,
             ),
         ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.user_id),
-        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.organization.is_some() && foreign_keys.user.is_some()
+        foreign_keys.user.is_some() && foreign_keys.organization.is_some()
     }
     fn update(
         &self,

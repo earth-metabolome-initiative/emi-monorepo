@@ -1,7 +1,6 @@
 mod aliquoting_procedure_models;
 mod ball_mill_procedure_models;
 mod brands;
-mod capping_procedure_models;
 mod centrifuge_procedure_models;
 mod disposal_procedure_models;
 mod documents;
@@ -25,7 +24,6 @@ mod rooms;
 mod shared_procedure_model_trackables;
 mod spectra;
 mod spectra_collections;
-mod storage_procedure_models;
 mod supernatant_procedure_models;
 mod team_projects;
 mod teams;

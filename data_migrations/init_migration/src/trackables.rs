@@ -14,14 +14,14 @@ pub mod tools;
 /// # Arguments
 ///
 /// * `user` - The user for whom the trackable categories are being initialized.
-/// * `portal_conn` - The database connection.
+/// * `conn` - The database connection.
 ///
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(super) fn init_trackables(user: &User, portal_conn: &mut PgConnection) {
-    reagents::init_reagents(user, portal_conn);
-    containers::init_containers(user, portal_conn);
-    instruments::init_instruments(user, portal_conn);
-    tools::init_tools(user, portal_conn);
+pub(super) fn init_trackables(user: &User, conn: &mut PgConnection) {
+    reagents::init_reagents(user, conn);
+    containers::init_containers(user, conn);
+    instruments::init_instruments(user, conn);
+    tools::init_tools(user, conn);
 }

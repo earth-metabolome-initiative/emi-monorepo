@@ -1,11 +1,11 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FreezeDryingProcedureModelForeignKeys {
-    pub freeze_dried_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-    >,
     pub id: Option<
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
+    >,
+    pub freeze_dried_with: Option<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
     pub source_container: Option<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
@@ -22,16 +22,16 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
-                        self.freeze_dried_with,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(
+                        self.id,
                     ),
                 ),
             );
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(
-                        self.id,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
+                        self.freeze_dried_with,
                     ),
                 ),
             );
@@ -45,7 +45,7 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.freeze_dried_with.is_some() && foreign_keys.id.is_some()
+        foreign_keys.id.is_some() && foreign_keys.freeze_dried_with.is_some()
             && foreign_keys.source_container.is_some()
     }
     fn update(

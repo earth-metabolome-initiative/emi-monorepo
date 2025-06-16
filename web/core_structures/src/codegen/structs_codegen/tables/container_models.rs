@@ -1,12 +1,6 @@
-#[derive(Debug, Clone, PartialEq, Copy)]
+#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(
-    diesel::Selectable,
-    diesel::Insertable,
-    diesel::AsChangeset,
-    diesel::Queryable,
-    diesel::Identifiable,
-)]
+#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -14,7 +8,6 @@
 )]
 pub struct ContainerModel {
     pub id: ::rosetta_uuid::Uuid,
-    pub liters: f32,
 }
 impl web_common_traits::prelude::TableName for ContainerModel {
     const TABLE_NAME: &'static str = "container_models";
@@ -25,6 +18,10 @@ impl
     > for ContainerModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
+}
+impl web_common_traits::prelude::ExtensionTable<Self> for ContainerModel where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {
 }
 impl diesel::Identifiable for ContainerModel {

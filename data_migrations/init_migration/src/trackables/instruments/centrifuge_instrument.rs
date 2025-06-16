@@ -5,7 +5,7 @@ use core_structures::{CommercialProduct, Trackable, User};
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-use crate::{brands::eppendorf, trackables::instruments::CENTRIFUGE};
+use crate::{brands::eppendorf, trackables::instruments::SAFELOCK_CENTRIFUGE};
 
 /// Returns and possibly initializes the Eppendorf centrifuge instrument
 /// trackable in the database.
@@ -15,8 +15,9 @@ pub(crate) fn init_eppendorf_centrifuge(user: &User, conn: &mut PgConnection) ->
         return instrument;
     }
 
-    let centrifuge =
-        Trackable::from_name(CENTRIFUGE, conn).unwrap().expect("Centrifuge trackable should exist");
+    let centrifuge = Trackable::from_name(SAFELOCK_CENTRIFUGE, conn)
+        .unwrap()
+        .expect("Centrifuge trackable should exist");
     let brand = eppendorf(user, conn).unwrap();
 
     CommercialProduct::new()

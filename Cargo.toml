@@ -198,3 +198,6 @@ pedantic = { level = "deny", priority = -1 }
 
 [profile.bench]
 debug = true # Include debug info.
+
+[profile.release]
+debug = true # Include debug info.

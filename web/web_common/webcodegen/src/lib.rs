@@ -25,5 +25,5 @@ pub use postgis::{GeographyColumn, GeometryColumn};
 pub use table_metadata::{
     CheckConstraint, Column, ConstraintColumnUsage, ConstraintTableUsage, DomainConstraint,
     KeyColumnUsage, PGClass, PgAttribute, PgDepend, PgEnum, PgExtension, PgIndex, PgProc,
-    PgSetting, PgType, ReferentialConstraint, Table, TableConstraint,
+    PgSetting, PgStatStatement, PgType, ReferentialConstraint, Table, TableConstraint,
 };

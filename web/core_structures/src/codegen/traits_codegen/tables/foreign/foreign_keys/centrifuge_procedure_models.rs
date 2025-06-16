@@ -1,14 +1,14 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CentrifugeProcedureModelForeignKeys {
+    pub id: Option<
+        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
+    >,
     pub centrifuged_with: Option<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
     pub container: Option<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-    >,
-    pub id: Option<
-        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -19,6 +19,14 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_models::Centri
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(
+                        self.id,
+                    ),
+                ),
+            );
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -35,18 +43,10 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_models::Centri
                     ),
                 ),
             );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(
-                        self.id,
-                    ),
-                ),
-            );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.centrifuged_with.is_some() && foreign_keys.container.is_some()
-            && foreign_keys.id.is_some()
+        foreign_keys.id.is_some() && foreign_keys.centrifuged_with.is_some()
+            && foreign_keys.container.is_some()
     }
     fn update(
         &self,

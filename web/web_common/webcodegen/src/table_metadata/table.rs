@@ -1,9 +1,9 @@
 use std::collections::{HashMap, HashSet};
 
+use cached::proc_macro::cached;
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, NullableExpressionMethods, PgConnection,
     QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
-    result::Error as DieselError,
 };
 use itertools::Itertools;
 use proc_macro2::TokenStream;
@@ -18,6 +18,258 @@ use crate::{
     },
     errors::WebCodeGenError,
 };
+
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}", table.table_catalog, table.table_schema, table.table_name) }"#
+)]
+fn columns(table: &Table, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
+    use crate::schema::columns;
+    columns::table
+        .filter(columns::table_name.eq(&table.table_name))
+        .filter(columns::table_schema.eq(&table.table_schema))
+        .filter(columns::table_catalog.eq(&table.table_catalog))
+        .order_by(columns::ordinal_position)
+        .load::<Column>(conn)
+}
+
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}", table.table_catalog, table.table_schema, table.table_name) }"#
+)]
+fn children_tables(
+    table: &Table,
+    conn: &mut PgConnection,
+) -> Result<Vec<Table>, diesel::result::Error> {
+    use crate::schema::{key_column_usage, referential_constraints, table_constraints, tables};
+    tables::table
+        .inner_join(
+            table_constraints::table.on(tables::table_catalog
+                .eq(table_constraints::table_catalog)
+                .and(tables::table_schema.eq(table_constraints::table_schema))
+                .and(tables::table_name.eq(table_constraints::table_name))),
+        )
+        .inner_join(
+            referential_constraints::table.on(table_constraints::constraint_catalog
+                .eq(referential_constraints::constraint_catalog)
+                .and(
+                    table_constraints::constraint_schema
+                        .eq(referential_constraints::constraint_schema),
+                )
+                .and(
+                    table_constraints::constraint_name.eq(referential_constraints::constraint_name),
+                )),
+        )
+        .inner_join(
+            key_column_usage::table.on(referential_constraints::unique_constraint_catalog
+                .eq(key_column_usage::constraint_catalog.nullable())
+                .and(
+                    referential_constraints::unique_constraint_schema
+                        .eq(key_column_usage::constraint_schema.nullable()),
+                )
+                .and(
+                    referential_constraints::unique_constraint_name
+                        .eq(key_column_usage::constraint_name.nullable()),
+                )),
+        )
+        .filter(
+            key_column_usage::table_catalog
+                .eq(&table.table_catalog)
+                .and(key_column_usage::table_schema.eq(&table.table_schema))
+                .and(key_column_usage::table_name.eq(&table.table_name)),
+        )
+        .select(Table::as_select())
+        .load(conn)
+}
+
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}", table.table_catalog, table.table_schema, table.table_name) }"#
+)]
+fn unique_columns(
+    table: &Table,
+    conn: &mut PgConnection,
+) -> Result<Vec<Vec<Column>>, diesel::result::Error> {
+    use crate::schema::{columns, key_column_usage, table_constraints};
+    key_column_usage::table
+        .inner_join(
+            columns::table.on(key_column_usage::table_name
+                .nullable()
+                .eq(columns::table_name.nullable())
+                .and(key_column_usage::table_schema.nullable().eq(columns::table_schema.nullable()))
+                .and(
+                    key_column_usage::table_catalog
+                        .nullable()
+                        .eq(columns::table_catalog.nullable()),
+                )
+                .and(key_column_usage::column_name.nullable().eq(columns::column_name.nullable()))),
+        )
+        .inner_join(
+            table_constraints::table.on(key_column_usage::constraint_name
+                .nullable()
+                .eq(table_constraints::constraint_name.nullable())
+                .and(
+                    key_column_usage::constraint_schema
+                        .nullable()
+                        .eq(table_constraints::constraint_schema.nullable()),
+                )
+                .and(
+                    key_column_usage::constraint_catalog
+                        .nullable()
+                        .eq(table_constraints::constraint_catalog.nullable()),
+                )
+                .and(
+                    key_column_usage::table_name
+                        .nullable()
+                        .eq(table_constraints::table_name.nullable()),
+                )
+                .and(
+                    key_column_usage::table_schema
+                        .nullable()
+                        .eq(table_constraints::table_schema.nullable()),
+                )
+                .and(
+                    key_column_usage::table_catalog
+                        .nullable()
+                        .eq(table_constraints::table_catalog.nullable()),
+                )),
+        )
+        .filter(key_column_usage::table_name.eq(&table.table_name))
+        .filter(key_column_usage::table_schema.eq(&table.table_schema))
+        .filter(key_column_usage::table_catalog.eq(&table.table_catalog))
+        .filter(table_constraints::constraint_type.eq("UNIQUE"))
+        .order_by(table_constraints::constraint_name)
+        .select((TableConstraint::as_select(), Column::as_select()))
+        .load::<(TableConstraint, Column)>(conn)
+        .map(|rows| {
+            rows.into_iter()
+                .chunk_by(|(constraint, _)| constraint.constraint_name.clone())
+                .into_iter()
+                .map(|(_, group)| {
+                    group.into_iter().map(|(_, column)| column).collect::<Vec<Column>>()
+                })
+                .collect()
+        })
+}
+
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}", table.table_catalog, table.table_schema, table.table_name) }"#
+)]
+fn primary_key_columns(
+    table: &Table,
+    conn: &mut PgConnection,
+) -> Result<Vec<Column>, diesel::result::Error> {
+    use crate::schema::{columns, key_column_usage, table_constraints};
+    key_column_usage::table
+        .inner_join(
+            columns::table.on(key_column_usage::table_name
+                .nullable()
+                .eq(columns::table_name.nullable())
+                .and(key_column_usage::table_schema.nullable().eq(columns::table_schema.nullable()))
+                .and(
+                    key_column_usage::table_catalog
+                        .nullable()
+                        .eq(columns::table_catalog.nullable()),
+                )
+                .and(key_column_usage::column_name.nullable().eq(columns::column_name.nullable()))),
+        )
+        .inner_join(
+            table_constraints::table.on(key_column_usage::constraint_name
+                .nullable()
+                .eq(table_constraints::constraint_name.nullable())
+                .and(
+                    key_column_usage::constraint_schema
+                        .nullable()
+                        .eq(table_constraints::constraint_schema.nullable()),
+                )
+                .and(
+                    key_column_usage::constraint_catalog
+                        .nullable()
+                        .eq(table_constraints::constraint_catalog.nullable()),
+                )
+                .and(
+                    key_column_usage::table_name
+                        .nullable()
+                        .eq(table_constraints::table_name.nullable()),
+                )
+                .and(
+                    key_column_usage::table_schema
+                        .nullable()
+                        .eq(table_constraints::table_schema.nullable()),
+                )
+                .and(
+                    key_column_usage::table_catalog
+                        .nullable()
+                        .eq(table_constraints::table_catalog.nullable()),
+                )),
+        )
+        .filter(key_column_usage::table_name.eq(&table.table_name))
+        .filter(key_column_usage::table_schema.eq(&table.table_schema))
+        .filter(key_column_usage::table_catalog.eq(&table.table_catalog))
+        .filter(table_constraints::constraint_type.eq("PRIMARY KEY"))
+        .select(Column::as_select())
+        .load::<Column>(conn)
+}
+
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}", table.table_catalog, table.table_schema, table.table_name) }"#
+)]
+fn foreign_keys(
+    table: &Table,
+    conn: &mut PgConnection,
+) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
+    use crate::schema::{key_column_usage, referential_constraints};
+    key_column_usage::table
+        .inner_join(
+            referential_constraints::table.on(key_column_usage::constraint_name
+                .eq(referential_constraints::constraint_name)
+                .and(
+                    key_column_usage::constraint_schema
+                        .eq(referential_constraints::constraint_schema),
+                )
+                .and(
+                    key_column_usage::constraint_catalog
+                        .eq(referential_constraints::constraint_catalog),
+                )),
+        )
+        .filter(key_column_usage::table_name.eq(&table.table_name))
+        .filter(key_column_usage::table_schema.eq(&table.table_schema))
+        .filter(key_column_usage::table_catalog.eq(&table.table_catalog))
+        .filter(key_column_usage::ordinal_position.eq(1))
+        .select(KeyColumnUsage::as_select())
+        .load::<KeyColumnUsage>(conn)
+}
+
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}", table.table_catalog, table.table_schema, table.table_name) }"#
+)]
+fn unique_indices(
+    table: &Table,
+    conn: &mut PgConnection,
+) -> Result<Vec<PgIndex>, diesel::result::Error> {
+    use crate::schema::{pg_class, pg_index};
+
+    let (pg_class1, pg_class2) = diesel::alias!(pg_class as pg_class1, pg_class as pg_class2);
+
+    pg_index::table
+        .inner_join(pg_class1.on(pg_class1.field(pg_class::oid).eq(pg_index::indexrelid)))
+        .inner_join(pg_class2.on(pg_class2.field(pg_class::oid).eq(pg_index::indrelid)))
+        .filter(pg_class2.field(pg_class::relname).eq(&table.table_name).and(
+            pg_class2.field(pg_class::relnamespace).eq(pg_class1.field(pg_class::relnamespace)),
+        ))
+        .filter(pg_index::indisunique.eq(true))
+        .select(PgIndex::as_select())
+        .load::<PgIndex>(conn)
+}
 
 /// Reserved Rust words that cannot be used as identifiers.
 pub const RESERVED_RUST_WORDS: [&str; 49] = [
@@ -296,26 +548,7 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
-        use crate::schema::{key_column_usage, referential_constraints};
-        key_column_usage::table
-            .inner_join(
-                referential_constraints::table.on(key_column_usage::constraint_name
-                    .eq(referential_constraints::constraint_name)
-                    .and(
-                        key_column_usage::constraint_schema
-                            .eq(referential_constraints::constraint_schema),
-                    )
-                    .and(
-                        key_column_usage::constraint_catalog
-                            .eq(referential_constraints::constraint_catalog),
-                    )),
-            )
-            .filter(key_column_usage::table_name.eq(&self.table_name))
-            .filter(key_column_usage::table_schema.eq(&self.table_schema))
-            .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
-            .filter(key_column_usage::ordinal_position.eq(1))
-            .select(KeyColumnUsage::as_select())
-            .load::<KeyColumnUsage>(conn)
+        foreign_keys(self, conn)
     }
 
     /// Returns the parent keys of the table.
@@ -453,47 +686,7 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<Table>, diesel::result::Error> {
-        use crate::schema::{key_column_usage, referential_constraints, table_constraints, tables};
-        tables::table
-            .inner_join(
-                table_constraints::table.on(tables::table_catalog
-                    .eq(table_constraints::table_catalog)
-                    .and(tables::table_schema.eq(table_constraints::table_schema))
-                    .and(tables::table_name.eq(table_constraints::table_name))),
-            )
-            .inner_join(
-                referential_constraints::table.on(table_constraints::constraint_catalog
-                    .eq(referential_constraints::constraint_catalog)
-                    .and(
-                        table_constraints::constraint_schema
-                            .eq(referential_constraints::constraint_schema),
-                    )
-                    .and(
-                        table_constraints::constraint_name
-                            .eq(referential_constraints::constraint_name),
-                    )),
-            )
-            .inner_join(
-                key_column_usage::table.on(referential_constraints::unique_constraint_catalog
-                    .eq(key_column_usage::constraint_catalog.nullable())
-                    .and(
-                        referential_constraints::unique_constraint_schema
-                            .eq(key_column_usage::constraint_schema.nullable()),
-                    )
-                    .and(
-                        referential_constraints::unique_constraint_name
-                            .eq(key_column_usage::constraint_name.nullable()),
-                    )),
-            )
-            .filter(
-                key_column_usage::table_catalog
-                    .eq(&self.table_catalog)
-                    .and(key_column_usage::table_schema.eq(&self.table_schema))
-                    .and(key_column_usage::table_name.eq(&self.table_name)),
-            )
-            .select(tables::all_columns)
-            .distinct()
-            .load(conn)
+        children_tables(self, conn)
     }
 
     /// Returns the set of sibling tables of the table.
@@ -570,20 +763,11 @@ impl Table {
     /// # Errors
     ///
     /// * If the indices cannot be loaded from the database.
-    pub fn unique_indices(&self, conn: &mut PgConnection) -> Result<Vec<PgIndex>, DieselError> {
-        use crate::schema::{pg_class, pg_index};
-
-        let (pg_class1, pg_class2) = diesel::alias!(pg_class as pg_class1, pg_class as pg_class2);
-
-        pg_index::table
-            .inner_join(pg_class1.on(pg_class1.field(pg_class::oid).eq(pg_index::indexrelid)))
-            .inner_join(pg_class2.on(pg_class2.field(pg_class::oid).eq(pg_index::indrelid)))
-            .filter(pg_class2.field(pg_class::relname).eq(&self.table_name).and(
-                pg_class2.field(pg_class::relnamespace).eq(pg_class1.field(pg_class::relnamespace)),
-            ))
-            .filter(pg_index::indisunique.eq(true))
-            .select(PgIndex::as_select())
-            .load::<PgIndex>(conn)
+    pub fn unique_indices(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<PgIndex>, diesel::result::Error> {
+        unique_indices(self, conn)
     }
 
     /// Returns all tables in the database.
@@ -605,7 +789,7 @@ impl Table {
         conn: &mut PgConnection,
         table_catalog: &str,
         table_schema: Option<&str>,
-    ) -> Result<Vec<Self>, DieselError> {
+    ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::tables;
         tables::table
             .filter(tables::table_catalog.eq(table_catalog))
@@ -773,7 +957,7 @@ impl Table {
         table_name: &str,
         table_schema: Option<&str>,
         table_catalog: &str,
-    ) -> Result<Self, DieselError> {
+    ) -> Result<Self, diesel::result::Error> {
         use crate::schema::tables;
         let table_schema = table_schema.unwrap_or("public");
         tables::table
@@ -796,14 +980,8 @@ impl Table {
     /// # Errors
     ///
     /// * If the columns cannot be loaded from the database.
-    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
-        use crate::schema::columns;
-        Ok(columns::table
-            .filter(columns::table_name.eq(&self.table_name))
-            .filter(columns::table_schema.eq(&self.table_schema))
-            .filter(columns::table_catalog.eq(&self.table_catalog))
-            .order_by(columns::ordinal_position)
-            .load::<Column>(conn)?)
+    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
+        columns(self, conn)
     }
 
     /// Returns the column by name.
@@ -824,7 +1002,7 @@ impl Table {
         &self,
         conn: &mut PgConnection,
         column_name: &str,
-    ) -> Result<Column, DieselError> {
+    ) -> Result<Column, diesel::result::Error> {
         use crate::schema::columns;
         columns::table
             .filter(columns::table_name.eq(&self.table_name))
@@ -850,75 +1028,8 @@ impl Table {
     pub fn unique_columns(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<Vec<Column>>, WebCodeGenError> {
-        use crate::schema::{columns, key_column_usage, table_constraints};
-        Ok(key_column_usage::table
-            .inner_join(
-                columns::table.on(key_column_usage::table_name
-                    .nullable()
-                    .eq(columns::table_name.nullable())
-                    .and(
-                        key_column_usage::table_schema
-                            .nullable()
-                            .eq(columns::table_schema.nullable()),
-                    )
-                    .and(
-                        key_column_usage::table_catalog
-                            .nullable()
-                            .eq(columns::table_catalog.nullable()),
-                    )
-                    .and(
-                        key_column_usage::column_name
-                            .nullable()
-                            .eq(columns::column_name.nullable()),
-                    )),
-            )
-            .inner_join(
-                table_constraints::table.on(key_column_usage::constraint_name
-                    .nullable()
-                    .eq(table_constraints::constraint_name.nullable())
-                    .and(
-                        key_column_usage::constraint_schema
-                            .nullable()
-                            .eq(table_constraints::constraint_schema.nullable()),
-                    )
-                    .and(
-                        key_column_usage::constraint_catalog
-                            .nullable()
-                            .eq(table_constraints::constraint_catalog.nullable()),
-                    )
-                    .and(
-                        key_column_usage::table_name
-                            .nullable()
-                            .eq(table_constraints::table_name.nullable()),
-                    )
-                    .and(
-                        key_column_usage::table_schema
-                            .nullable()
-                            .eq(table_constraints::table_schema.nullable()),
-                    )
-                    .and(
-                        key_column_usage::table_catalog
-                            .nullable()
-                            .eq(table_constraints::table_catalog.nullable()),
-                    )),
-            )
-            .filter(key_column_usage::table_name.eq(&self.table_name))
-            .filter(key_column_usage::table_schema.eq(&self.table_schema))
-            .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
-            .filter(table_constraints::constraint_type.eq("UNIQUE"))
-            .order_by(table_constraints::constraint_name)
-            .select((TableConstraint::as_select(), Column::as_select()))
-            .load::<(TableConstraint, Column)>(conn)
-            .map(|rows| {
-                rows.into_iter()
-                    .chunk_by(|(constraint, _)| constraint.constraint_name.clone())
-                    .into_iter()
-                    .map(|(_, group)| {
-                        group.into_iter().map(|(_, column)| column).collect::<Vec<Column>>()
-                    })
-                    .collect()
-            })?)
+    ) -> Result<Vec<Vec<Column>>, diesel::result::Error> {
+        unique_columns(self, conn)
     }
 
     /// Returns whether the table has primary keys.
@@ -934,7 +1045,7 @@ impl Table {
     /// # Errors
     ///
     /// * If the primary key columns cannot be loaded from the database.
-    pub fn has_primary_keys(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+    pub fn has_primary_keys(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
         self.primary_key_columns(conn).map(|columns| !columns.is_empty())
     }
 
@@ -1175,65 +1286,8 @@ impl Table {
     pub fn primary_key_columns(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<Column>, WebCodeGenError> {
-        use crate::schema::{columns, key_column_usage, table_constraints};
-        Ok(key_column_usage::table
-            .inner_join(
-                columns::table.on(key_column_usage::table_name
-                    .nullable()
-                    .eq(columns::table_name.nullable())
-                    .and(
-                        key_column_usage::table_schema
-                            .nullable()
-                            .eq(columns::table_schema.nullable()),
-                    )
-                    .and(
-                        key_column_usage::table_catalog
-                            .nullable()
-                            .eq(columns::table_catalog.nullable()),
-                    )
-                    .and(
-                        key_column_usage::column_name
-                            .nullable()
-                            .eq(columns::column_name.nullable()),
-                    )),
-            )
-            .inner_join(
-                table_constraints::table.on(key_column_usage::constraint_name
-                    .nullable()
-                    .eq(table_constraints::constraint_name.nullable())
-                    .and(
-                        key_column_usage::constraint_schema
-                            .nullable()
-                            .eq(table_constraints::constraint_schema.nullable()),
-                    )
-                    .and(
-                        key_column_usage::constraint_catalog
-                            .nullable()
-                            .eq(table_constraints::constraint_catalog.nullable()),
-                    )
-                    .and(
-                        key_column_usage::table_name
-                            .nullable()
-                            .eq(table_constraints::table_name.nullable()),
-                    )
-                    .and(
-                        key_column_usage::table_schema
-                            .nullable()
-                            .eq(table_constraints::table_schema.nullable()),
-                    )
-                    .and(
-                        key_column_usage::table_catalog
-                            .nullable()
-                            .eq(table_constraints::table_catalog.nullable()),
-                    )),
-            )
-            .filter(key_column_usage::table_name.eq(&self.table_name))
-            .filter(key_column_usage::table_schema.eq(&self.table_schema))
-            .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
-            .filter(table_constraints::constraint_type.eq("PRIMARY KEY"))
-            .select(Column::as_select())
-            .load::<Column>(conn)?)
+    ) -> Result<Vec<Column>, diesel::result::Error> {
+        primary_key_columns(self, conn)
     }
 
     /// Returns the check constraints for the table.
@@ -1252,7 +1306,7 @@ impl Table {
     pub fn check_constraints(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<CheckConstraint>, DieselError> {
+    ) -> Result<Vec<CheckConstraint>, diesel::result::Error> {
         use crate::schema::{check_constraints, table_constraints};
 
         check_constraints::table
@@ -1288,7 +1342,10 @@ impl Table {
     /// # Errors
     ///
     /// * If the triggers cannot be loaded from the database.
-    pub fn triggers(&self, conn: &mut PgConnection) -> Result<Vec<PgTrigger>, DieselError> {
+    pub fn triggers(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<PgTrigger>, diesel::result::Error> {
         use crate::schema::{pg_class, pg_namespace, pg_trigger};
         pg_trigger::table
             .inner_join(pg_class::table.on(pg_trigger::tgrelid.eq(pg_class::oid)))

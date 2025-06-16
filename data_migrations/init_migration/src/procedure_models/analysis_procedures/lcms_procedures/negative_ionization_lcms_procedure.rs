@@ -24,4 +24,7 @@ pub(crate) fn init_negative_ionization_lcms_procedure(
 		.unwrap()
 		.insert(user.id, conn)
 		.unwrap()
+
+    // Execute calibration with Thermo Fisher calibration solution
+    // Register one minute of running the LCMS with blank sample
 }

@@ -11,32 +11,36 @@ digraph G {
 	];
 	node [style=rounded, fontname="Helvetica"];
 	edge [fontname="Helvetica"];
-    T38 [label="Sample\nFreezer", shape=box, color="#00ad43"];
-    T39 [label="DBGI\nConical\nTube\nBox", shape=box, color="#00ad43"];
-    T40 [label="Sample\nFreeze\nDryer", shape=box, color="#00ad43"];
-    T41 [label="Weighing\nScale", shape=box, color="#00ad43"];
-    T42 [label="DBGI\nConical\nTube\n(Falcon)", shape=box, color="#00ad43"];
-    T43 [label="DBGI\nEppendorf\nTube", shape=box, color="#00ad43"];
-    T44 [label="Metal\nBeads\n3mm", shape=box, color="#00ad43"];
-    T45 [label="DBGI\nBall\nMill", shape=box, color="#00ad43"];
-    T46 [label="DBGI\nCentrifuge", shape=box, color="#00ad43"];
-    T47 [label="DBGI\nPipette\n1000", shape=box, color="#00ad43"];
-    T48 [label="DBGI\nPipette\nTips\n1000", shape=box, color="#00ad43"];
-    T49 [label="DBGI\nLong\nTerm\nStorage\nVial", shape=box, color="#00ad43"];
-    T50 [label="DBGI\nSealed\nCap", shape=box, color="#00ad43"];
-    T38 -> T25 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T39 -> T26 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T40 -> T27 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T41 -> T28 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T42 -> T29 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T43 -> T30 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T44 -> T31 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T45 -> T32 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T46 -> T33 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T47 -> T34 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T48 -> T35 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T49 -> T36 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T50 -> T37 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T44 [label="Sample\nFreezer", shape=box, color="#00ad43"];
+    T45 [label="DBGI\nConical\nTube\nBox", shape=box, color="#00ad43"];
+    T46 [label="Sample\nFreeze\nDryer", shape=box, color="#00ad43"];
+    T47 [label="DBGI\nConical\nTube\n(Falcon)", shape=box, color="#00ad43"];
+    T48 [label="DBGI\nConical\nTube\nRack", shape=box, color="#00ad43"];
+    T49 [label="Weighing\nScale", shape=box, color="#00ad43"];
+    T50 [label="DBGI\nEppendorf\nTube", shape=box, color="#00ad43"];
+    T51 [label="Metal\nBeads\n3mm", shape=box, color="#00ad43"];
+    T52 [label="DBGI\nBall\nMill", shape=box, color="#00ad43"];
+    T53 [label="DBGI\nCentrifuge", shape=box, color="#00ad43"];
+    T54 [label="DBGI\nPipette\nTips\n1000", shape=box, color="#00ad43"];
+    T55 [label="DBGI\nPipette\n1000", shape=box, color="#00ad43"];
+    T56 [label="DBGI\nLong\nTerm\nStorage\nVial", shape=box, color="#00ad43"];
+    T57 [label="DBGI\nSealed\nCap", shape=box, color="#00ad43"];
+    T58 [label="DBGI\nLong\nTerm\nStorage\nVial\nBox", shape=box, color="#00ad43"];
+    T44 -> T29 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T45 -> T30 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T46 -> T31 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T47 -> T32 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T48 -> T33 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T49 -> T34 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T50 -> T35 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T51 -> T36 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T52 -> T37 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T53 -> T38 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T54 -> T39 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T55 -> T40 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T56 -> T41 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T57 -> T42 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T58 -> T43 [dir=both, style=dashed, color="#00ad43", label="Same as"];
 subgraph cluster__0 {
 	label=<<U>DBGI Collection preparation</U>>;
 	style="rounded";
@@ -49,43 +53,49 @@ subgraph cluster__1 {
 	label=<<U>DBGI Sample Processing</U>>;
 	style="rounded";
 	color="#EF3340";
-    T25 [label="Sample\nFreezer", shape=box, color="#00ad43"];
-    T26 [label="DBGI\nConical\nTube\nBox", shape=box, color="#00ad43"];
-    T27 [label="Sample\nFreeze\nDryer", shape=box, color="#00ad43"];
-    T28 [label="Weighing\nScale", shape=box, color="#00ad43"];
-    T29 [label="DBGI\nConical\nTube\n(Falcon)", shape=box, color="#00ad43"];
-    T30 [label="DBGI\nEppendorf\nTube", shape=box, color="#00ad43"];
-    T31 [label="Metal\nBeads\n3mm", shape=box, color="#00ad43"];
-    T32 [label="DBGI\nBall\nMill", shape=box, color="#00ad43"];
-    T33 [label="DBGI\nCentrifuge", shape=box, color="#00ad43"];
-    T34 [label="DBGI\nPipette\n1000", shape=box, color="#00ad43"];
-    T35 [label="DBGI\nPipette\nTips\n1000", shape=box, color="#00ad43"];
-    T36 [label="DBGI\nLong\nTerm\nStorage\nVial", shape=box, color="#00ad43"];
-    T37 [label="DBGI\nSealed\nCap", shape=box, color="#00ad43"];
-    T25 -> T1 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T26 -> T2 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T26 -> T3 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T27 -> T4 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T28 -> T5 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T29 -> T6 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T30 -> T7 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T30 -> T8 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T30 -> T10 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T30 -> T12 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T30 -> T14 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T30 -> T18 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T30 -> T23 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T31 -> T9 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T32 -> T11 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T32 -> T13 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T33 -> T15 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T34 -> T16 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T34 -> T19 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T29 [label="Sample\nFreezer", shape=box, color="#00ad43"];
+    T30 [label="DBGI\nConical\nTube\nBox", shape=box, color="#00ad43"];
+    T31 [label="Sample\nFreeze\nDryer", shape=box, color="#00ad43"];
+    T32 [label="DBGI\nConical\nTube\n(Falcon)", shape=box, color="#00ad43"];
+    T33 [label="DBGI\nConical\nTube\nRack", shape=box, color="#00ad43"];
+    T34 [label="Weighing\nScale", shape=box, color="#00ad43"];
+    T35 [label="DBGI\nEppendorf\nTube", shape=box, color="#00ad43"];
+    T36 [label="Metal\nBeads\n3mm", shape=box, color="#00ad43"];
+    T37 [label="DBGI\nBall\nMill", shape=box, color="#00ad43"];
+    T38 [label="DBGI\nCentrifuge", shape=box, color="#00ad43"];
+    T39 [label="DBGI\nPipette\nTips\n1000", shape=box, color="#00ad43"];
+    T40 [label="DBGI\nPipette\n1000", shape=box, color="#00ad43"];
+    T41 [label="DBGI\nLong\nTerm\nStorage\nVial", shape=box, color="#00ad43"];
+    T42 [label="DBGI\nSealed\nCap", shape=box, color="#00ad43"];
+    T43 [label="DBGI\nLong\nTerm\nStorage\nVial\nBox", shape=box, color="#00ad43"];
+    T29 -> T1 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T30 -> T2 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T30 -> T4 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T31 -> T3 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T32 -> T5 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T32 -> T8 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T33 -> T6 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T34 -> T7 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T35 -> T9 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T35 -> T10 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T35 -> T12 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T35 -> T14 [dir=both, style=dashed, color="#00ad43", label="Same as"];
     T35 -> T17 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T35 -> T24 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T36 -> T20 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T36 -> T21 [dir=both, style=dashed, color="#00ad43", label="Same as"];
-    T37 -> T22 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T35 -> T22 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T35 -> T27 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T36 -> T11 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T37 -> T13 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T37 -> T15 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T38 -> T16 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T39 -> T18 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T39 -> T28 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T40 -> T19 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T40 -> T21 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T41 -> T20 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T41 -> T23 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T41 -> T25 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T42 -> T24 [dir=both, style=dashed, color="#00ad43", label="Same as"];
+    T43 -> T26 [dir=both, style=dashed, color="#00ad43", label="Same as"];
 subgraph cluster__1_0 {
 	label=<<U>DBGI Freezing</U>>;
 	style="rounded";
@@ -97,108 +107,119 @@ subgraph cluster__1_1 {
 	label=<<U>DBGI Freeze Drying</U>>;
 	style="rounded";
 	color="#EF3340";
-    T3 [label="DBGI\nConical\nTube\nBox", shape=box, color="#00ad43"];
-    T4 [label="Sample\nFreeze\nDryer", shape=box, color="#00ad43"];
+    T3 [label="Sample\nFreeze\nDryer", shape=box, color="#00ad43"];
+    T4 [label="DBGI\nConical\nTube\nBox", shape=box, color="#00ad43"];
 }
 subgraph cluster__1_2 {
+	label=<<U>DBGI Falcon Storage</U>>;
+	style="rounded";
+	color="#EF3340";
+    T5 [label="DBGI\nConical\nTube\n(Falcon)", shape=box, color="#00ad43"];
+    T6 [label="DBGI\nConical\nTube\nRack", shape=box, color="#00ad43"];
+}
+subgraph cluster__1_3 {
 	label=<<U>DBGI Fractioning</U>>;
 	style="rounded";
 	color="#EF3340";
-    T5 [label="Weighing\nScale", shape=box, color="#00ad43"];
-    T6 [label="DBGI\nConical\nTube\n(Falcon)", shape=box, color="#00ad43"];
-    T7 [label="DBGI\nEppendorf\nTube", shape=box, color="#00ad43"];
+    T7 [label="Weighing\nScale", shape=box, color="#00ad43"];
+    T8 [label="DBGI\nConical\nTube\n(Falcon)", shape=box, color="#00ad43"];
+    T9 [label="DBGI\nEppendorf\nTube", shape=box, color="#00ad43"];
 }
-subgraph cluster__1_3 {
+subgraph cluster__1_4 {
 	label=<<U>DBGI Metal Beads Mixing</U>>;
 	style="rounded";
 	color="#EF3340";
-    T8 [label="DBGI\nEppendorf\nTube", shape=box, color="#00ad43"];
-    T9 [label="Metal\nBeads\n3mm", shape=box, color="#00ad43"];
-}
-subgraph cluster__1_4 {
-	label=<<U>DBGI Ball Mill 1</U>>;
-	style="rounded";
-	color="#EF3340";
     T10 [label="DBGI\nEppendorf\nTube", shape=box, color="#00ad43"];
-    T11 [label="DBGI\nBall\nMill", shape=box, color="#00ad43"];
+    T11 [label="Metal\nBeads\n3mm", shape=box, color="#00ad43"];
 }
 subgraph cluster__1_5 {
-	label=<<U>DBGI Ball Mill 2</U>>;
+	label=<<U>DBGI Ball Mill 1</U>>;
 	style="rounded";
 	color="#EF3340";
     T12 [label="DBGI\nEppendorf\nTube", shape=box, color="#00ad43"];
     T13 [label="DBGI\nBall\nMill", shape=box, color="#00ad43"];
 }
 subgraph cluster__1_6 {
-	label=<<U>DBGI Centrifuge</U>>;
+	label=<<U>DBGI Ball Mill 2</U>>;
 	style="rounded";
 	color="#EF3340";
     T14 [label="DBGI\nEppendorf\nTube", shape=box, color="#00ad43"];
-    T15 [label="DBGI\nCentrifuge", shape=box, color="#00ad43"];
+    T15 [label="DBGI\nBall\nMill", shape=box, color="#00ad43"];
 }
 subgraph cluster__1_7 {
+	label=<<U>DBGI Centrifuge</U>>;
+	style="rounded";
+	color="#EF3340";
+    T16 [label="DBGI\nCentrifuge", shape=box, color="#00ad43"];
+    T17 [label="DBGI\nEppendorf\nTube", shape=box, color="#00ad43"];
+}
+subgraph cluster__1_8 {
 	label=<<U>DBGI Mount Tip</U>>;
 	style="rounded";
 	color="#EF3340";
-    T16 [label="DBGI\nPipette\n1000", shape=box, color="#00ad43"];
-    T17 [label="DBGI\nPipette\nTips\n1000", shape=box, color="#00ad43"];
+    T18 [label="DBGI\nPipette\nTips\n1000", shape=box, color="#00ad43"];
+    T19 [label="DBGI\nPipette\n1000", shape=box, color="#00ad43"];
 }
-subgraph cluster__1_8 {
+subgraph cluster__1_9 {
 	label=<<U>DBGI Supernatant</U>>;
 	style="rounded";
 	color="#EF3340";
-    T18 [label="DBGI\nEppendorf\nTube", shape=box, color="#00ad43"];
-    T19 [label="DBGI\nPipette\n1000", shape=box, color="#00ad43"];
     T20 [label="DBGI\nLong\nTerm\nStorage\nVial", shape=box, color="#00ad43"];
+    T21 [label="DBGI\nPipette\n1000", shape=box, color="#00ad43"];
+    T22 [label="DBGI\nEppendorf\nTube", shape=box, color="#00ad43"];
 }
-subgraph cluster__1_9 {
+subgraph cluster__1_10 {
 	label=<<U>DBGI Capping</U>>;
 	style="rounded";
 	color="#EF3340";
-    T21 [label="DBGI\nLong\nTerm\nStorage\nVial", shape=box, color="#00ad43"];
-    T22 [label="DBGI\nSealed\nCap", shape=box, color="#00ad43"];
+    T23 [label="DBGI\nLong\nTerm\nStorage\nVial", shape=box, color="#00ad43"];
+    T24 [label="DBGI\nSealed\nCap", shape=box, color="#00ad43"];
 }
-subgraph cluster__1_10 {
+subgraph cluster__1_11 {
+	label=<<U>DBGI Long Term Storage Vial Storage</U>>;
+	style="rounded";
+	color="#EF3340";
+    T25 [label="DBGI\nLong\nTerm\nStorage\nVial", shape=box, color="#00ad43"];
+    T26 [label="DBGI\nLong\nTerm\nStorage\nVial\nBox", shape=box, color="#00ad43"];
+}
+subgraph cluster__1_12 {
 	label=<<U>DBGI Dispose of Eppendorf Tube</U>>;
 	style="rounded";
 	color="#EF3340";
-    T23 [label="DBGI\nEppendorf\nTube", shape=box, color="#00ad43"];
+    T27 [label="DBGI\nEppendorf\nTube", shape=box, color="#00ad43"];
 }
-subgraph cluster__1_11 {
+subgraph cluster__1_13 {
 	label=<<U>DBGI Dispose of Pipette Tips</U>>;
 	style="rounded";
 	color="#EF3340";
-    T24 [label="DBGI\nPipette\nTips\n1000", shape=box, color="#00ad43"];
+    T28 [label="DBGI\nPipette\nTips\n1000", shape=box, color="#00ad43"];
 }
     T2:s -> T4:n [label="And then", color="#EF3340", ltail=cluster__1_0, lhead=cluster__1_1];
-    T4:s -> T7:n [label="And then", color="#EF3340", ltail=cluster__1_1, lhead=cluster__1_2];
-    T7:s -> T9:n [label="And then", color="#EF3340", ltail=cluster__1_2, lhead=cluster__1_3];
+    T4:s -> T6:n [label="And then", color="#EF3340", ltail=cluster__1_1, lhead=cluster__1_2];
+    T6:s -> T9:n [label="And then", color="#EF3340", ltail=cluster__1_2, lhead=cluster__1_3];
     T9:s -> T11:n [label="And then", color="#EF3340", ltail=cluster__1_3, lhead=cluster__1_4];
     T11:s -> T13:n [label="And then", color="#EF3340", ltail=cluster__1_4, lhead=cluster__1_5];
     T13:s -> T15:n [label="And then", color="#EF3340", ltail=cluster__1_5, lhead=cluster__1_6];
     T15:s -> T17:n [label="And then", color="#EF3340", ltail=cluster__1_6, lhead=cluster__1_7];
-    T17:s -> T20:n [label="And then", color="#EF3340", ltail=cluster__1_7, lhead=cluster__1_8];
-    T20:s -> T23:n [label="And then", color="#EF3340", ltail=cluster__1_8, lhead=cluster__1_10];
-    T23:s -> T24:n [label="And then", color="#EF3340", ltail=cluster__1_10, lhead=cluster__1_11];
-    T24:s -> T22:n [label="And then", color="#EF3340", ltail=cluster__1_11, lhead=cluster__1_9];
+    T17:s -> T19:n [label="And then", color="#EF3340", ltail=cluster__1_7, lhead=cluster__1_8];
+    T19:s -> T22:n [label="And then", color="#EF3340", ltail=cluster__1_8, lhead=cluster__1_9];
+    T22:s -> T27:n [label="And then", color="#EF3340", ltail=cluster__1_9, lhead=cluster__1_12];
+    T24:s -> T26:n [label="And then", color="#EF3340", ltail=cluster__1_10, lhead=cluster__1_11];
+    T27:s -> T28:n [label="And then", color="#EF3340", ltail=cluster__1_12, lhead=cluster__1_13];
+    T28:s -> T24:n [label="And then", color="#EF3340", ltail=cluster__1_13, lhead=cluster__1_10];
 }
-    P18 [label="Positive Ionization LC-MS", shape=box, color="#EF3340"];
-    P19 [label="Negative Ionization LC-MS", shape=box, color="#EF3340"];
-    P20 [label="Organism observation procedure", shape=box, color="#EF3340"];
-    P21 [label="Full organism collection procedure", shape=box, color="#EF3340"];
-    P22 [label="Part-of organisms collection procedure", shape=box, color="#EF3340"];
-subgraph cluster__7 {
-	label=<<U>Data Enrichment Procedure</U>>;
-	style="rounded";
-	color="#EF3340";
-	P24 [label="Weather Retrieval Procedure", shape=box, color="#EF3340"];
-}
-    P4 -> P20 [label="And then", color="#EF3340", ltail=cluster__0];
-    T24 -> P18 [label="And then", color="#EF3340", ltail=cluster__1];
-    P18 -> P19 [label="And then", color="#EF3340"];
-    P19 -> P24 [label="And then", color="#EF3340", lhead=cluster__7];
+    P20 [label="Positive Ionization LC-MS", shape=box, color="#EF3340"];
+    P21 [label="Negative Ionization LC-MS", shape=box, color="#EF3340"];
+    P22 [label="Organism observation procedure", shape=box, color="#EF3340"];
+    P23 [label="Full organism collection procedure", shape=box, color="#EF3340"];
+    P24 [label="Part-of organisms collection procedure", shape=box, color="#EF3340"];
+    P25 [label="Data Enrichment Procedure", shape=box, color="#EF3340"];
+    P4 -> P22 [label="And then", color="#EF3340", ltail=cluster__0];
+    T26 -> P20 [label="And then", color="#EF3340", ltail=cluster__1];
     P20 -> P21 [label="And then", color="#EF3340"];
-    P20 -> P22 [label="And then", color="#EF3340"];
-    P21 -> T25 [label="And then", color="#EF3340", lhead=cluster__1];
-    P22 -> T25 [label="And then", color="#EF3340", lhead=cluster__1];
+    P21 -> P25 [label="And then", color="#EF3340"];
+    P22 -> P23 [label="And then", color="#EF3340"];
+    P22 -> P24 [label="And then", color="#EF3340"];
+    P23 -> T29 [label="And then", color="#EF3340", lhead=cluster__1];
+    P24 -> T29 [label="And then", color="#EF3340", lhead=cluster__1];
 }

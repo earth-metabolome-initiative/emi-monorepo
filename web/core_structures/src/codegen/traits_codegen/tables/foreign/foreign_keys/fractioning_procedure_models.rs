@@ -1,16 +1,16 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FractioningProcedureModelForeignKeys {
-    pub destination: Option<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-    >,
     pub id: Option<
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
+    >,
+    pub weighed_with: Option<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
     pub source: Option<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
-    pub weighed_with: Option<
+    pub destination: Option<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
 }
@@ -25,16 +25,16 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_models::Fract
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
-                        self.destination,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(
+                        self.id,
                     ),
                 ),
             );
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(
-                        self.id,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
+                        self.weighed_with,
                     ),
                 ),
             );
@@ -50,14 +50,14 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_models::Fract
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
-                        self.weighed_with,
+                        self.destination,
                     ),
                 ),
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.destination.is_some() && foreign_keys.id.is_some()
-            && foreign_keys.source.is_some() && foreign_keys.weighed_with.is_some()
+        foreign_keys.id.is_some() && foreign_keys.weighed_with.is_some()
+            && foreign_keys.source.is_some() && foreign_keys.destination.is_some()
     }
     fn update(
         &self,
@@ -75,16 +75,16 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_models::Fract
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.destination == procedure_model_trackables.id {
-                    foreign_keys.destination = Some(procedure_model_trackables.clone());
+                if self.weighed_with == procedure_model_trackables.id {
+                    foreign_keys.weighed_with = Some(procedure_model_trackables.clone());
                     updated = true;
                 }
                 if self.source == procedure_model_trackables.id {
                     foreign_keys.source = Some(procedure_model_trackables.clone());
                     updated = true;
                 }
-                if self.weighed_with == procedure_model_trackables.id {
-                    foreign_keys.weighed_with = Some(procedure_model_trackables.clone());
+                if self.destination == procedure_model_trackables.id {
+                    foreign_keys.destination = Some(procedure_model_trackables.clone());
                     updated = true;
                 }
             }
@@ -94,16 +94,16 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_models::Fract
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.destination == procedure_model_trackables.id {
-                    foreign_keys.destination = None;
+                if self.weighed_with == procedure_model_trackables.id {
+                    foreign_keys.weighed_with = None;
                     updated = true;
                 }
                 if self.source == procedure_model_trackables.id {
                     foreign_keys.source = None;
                     updated = true;
                 }
-                if self.weighed_with == procedure_model_trackables.id {
-                    foreign_keys.weighed_with = None;
+                if self.destination == procedure_model_trackables.id {
+                    foreign_keys.destination = None;
                     updated = true;
                 }
             }

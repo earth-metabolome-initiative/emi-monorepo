@@ -16,7 +16,7 @@ pub const SAMPLE_CONTAINER: &str = "Sample Container";
 pub const SPRAYER: &str = "Sprayer";
 pub const POLYSTYRENE_BOX: &str = "Polystyrene Box";
 
-pub(crate) fn init_containers(user: &User, portal_conn: &mut PgConnection) {
+pub(crate) fn init_containers(user: &User, conn: &mut PgConnection) {
     let container = core_structures::Trackable::new()
         .name(Some("Container".to_owned()))
         .unwrap()
@@ -24,7 +24,7 @@ pub(crate) fn init_containers(user: &User, portal_conn: &mut PgConnection) {
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
     let _bottle = Trackable::new()
@@ -36,7 +36,7 @@ pub(crate) fn init_containers(user: &User, portal_conn: &mut PgConnection) {
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
     let sample_container = Trackable::new()
@@ -48,7 +48,7 @@ pub(crate) fn init_containers(user: &User, portal_conn: &mut PgConnection) {
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
     let r#box = Trackable::new()
@@ -60,7 +60,7 @@ pub(crate) fn init_containers(user: &User, portal_conn: &mut PgConnection) {
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
     let _polystyrene_box = Trackable::new()
@@ -74,7 +74,7 @@ pub(crate) fn init_containers(user: &User, portal_conn: &mut PgConnection) {
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
     let _sprayer = Trackable::new()
@@ -88,8 +88,8 @@ pub(crate) fn init_containers(user: &User, portal_conn: &mut PgConnection) {
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .insert(user.id, portal_conn)
+        .insert(user.id, conn)
         .unwrap();
 
-    wet_lab_containers::init_wet_lab_containers(user, &container, &sample_container, portal_conn);
+    wet_lab_containers::init_wet_lab_containers(user, &container, &sample_container, conn);
 }

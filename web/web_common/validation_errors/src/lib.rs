@@ -13,13 +13,13 @@ pub enum Error<FieldName = ()> {
 
 impl<FieldName> Error<FieldName> {
     /// Converts the error into the provided new attribute type.
-    pub fn into_field_name<NewFieldName>(self) -> Error<NewFieldName>
+    pub fn into_field_name<F, NewFieldName>(self, convert: F) -> Error<NewFieldName>
     where
-        NewFieldName: From<FieldName>,
+        F: Fn(FieldName) -> NewFieldName,
     {
         match self {
-            Error::SingleField(error) => Error::SingleField(error.into_field_name()),
-            Error::DoubleField(error) => Error::DoubleField(error.into_field_name()),
+            Error::SingleField(error) => Error::SingleField(error.into_field_name(convert)),
+            Error::DoubleField(error) => Error::DoubleField(error.into_field_name(convert)),
         }
     }
 }
@@ -141,46 +141,46 @@ impl SingleFieldError {
 
 impl<FieldName> SingleFieldError<FieldName> {
     /// Converts the error into the provided new attribute type.
-    pub fn into_field_name<NewFieldName>(self) -> SingleFieldError<NewFieldName>
+    pub fn into_field_name<F, NewFieldName>(self, convert: F) -> SingleFieldError<NewFieldName>
     where
-        NewFieldName: From<FieldName>,
+        F: Fn(FieldName) -> NewFieldName,
     {
         match self {
             SingleFieldError::EmptyText(field_name) => {
-                SingleFieldError::EmptyText(field_name.into())
+                SingleFieldError::EmptyText(convert(field_name))
             }
             SingleFieldError::PaddedText(field_name) => {
-                SingleFieldError::PaddedText(field_name.into())
+                SingleFieldError::PaddedText(convert(field_name))
             }
             SingleFieldError::ConsecutiveWhitespace(field_name) => {
-                SingleFieldError::ConsecutiveWhitespace(field_name.into())
+                SingleFieldError::ConsecutiveWhitespace(convert(field_name))
             }
             SingleFieldError::ControlCharacters(field_name) => {
-                SingleFieldError::ControlCharacters(field_name.into())
+                SingleFieldError::ControlCharacters(convert(field_name))
             }
             SingleFieldError::InvalidMail(field_name) => {
-                SingleFieldError::InvalidMail(field_name.into())
+                SingleFieldError::InvalidMail(convert(field_name))
             }
             SingleFieldError::InvalidFontAwesomeClass(field_name, icon) => {
-                SingleFieldError::InvalidFontAwesomeClass(field_name.into(), icon)
+                SingleFieldError::InvalidFontAwesomeClass(convert(field_name), icon)
             }
             SingleFieldError::UnexpectedNegativeOrZeroValue(field_name) => {
-                SingleFieldError::UnexpectedNegativeOrZeroValue(field_name.into())
+                SingleFieldError::UnexpectedNegativeOrZeroValue(convert(field_name))
             }
             SingleFieldError::MustBeSmallerThan(field_name, expected_value) => {
-                SingleFieldError::MustBeSmallerThan(field_name.into(), expected_value)
+                SingleFieldError::MustBeSmallerThan(convert(field_name), expected_value)
             }
             SingleFieldError::MustBeGreaterThan(field_name, expected_value) => {
-                SingleFieldError::MustBeGreaterThan(field_name.into(), expected_value)
+                SingleFieldError::MustBeGreaterThan(convert(field_name), expected_value)
             }
             SingleFieldError::InvalidCasCode(field_name, error) => {
-                SingleFieldError::InvalidCasCode(field_name.into(), error)
+                SingleFieldError::InvalidCasCode(convert(field_name), error)
             }
             SingleFieldError::InvalidMolecularFormula(field_name, error) => {
-                SingleFieldError::InvalidMolecularFormula(field_name.into(), error)
+                SingleFieldError::InvalidMolecularFormula(convert(field_name), error)
             }
             SingleFieldError::InvalidMediaType(field_name, error) => {
-                SingleFieldError::InvalidMediaType(field_name.into(), error)
+                SingleFieldError::InvalidMediaType(convert(field_name), error)
             }
         }
     }
@@ -304,19 +304,19 @@ impl DoubleFieldError {
 
 impl<FieldName> DoubleFieldError<FieldName> {
     /// Converts the error into the provided new attribute type.
-    pub fn into_field_name<NewFieldName>(self) -> DoubleFieldError<NewFieldName>
+    pub fn into_field_name<F, NewFieldName>(self, convert: F) -> DoubleFieldError<NewFieldName>
     where
-        NewFieldName: From<FieldName>,
+        F: Fn(FieldName) -> NewFieldName,
     {
         match self {
             DoubleFieldError::NotDistinct(left, right) => {
-                DoubleFieldError::NotDistinct(left.into(), right.into())
+                DoubleFieldError::NotDistinct(convert(left), convert(right))
             }
             DoubleFieldError::MustBeSmallerThan(left, right) => {
-                DoubleFieldError::MustBeSmallerThan(left.into(), right.into())
+                DoubleFieldError::MustBeSmallerThan(convert(left), convert(right))
             }
             DoubleFieldError::MustBeGreaterThan(left, right) => {
-                DoubleFieldError::MustBeGreaterThan(left.into(), right.into())
+                DoubleFieldError::MustBeGreaterThan(convert(left), convert(right))
             }
         }
     }

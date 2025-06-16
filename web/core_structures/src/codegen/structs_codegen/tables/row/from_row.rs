@@ -15,6 +15,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::CappingProcedureModel(capping_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(capping_procedure_models)
             }
+            super::Row::CappingRule(capping_rules) => {
+                crate::codegen::tables::rows::Rows::from(capping_rules)
+            }
             super::Row::CentrifugeProcedureModel(centrifuge_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(centrifuge_procedure_models)
             }
@@ -150,6 +153,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::StorageProcedureModel(storage_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(storage_procedure_models)
             }
+            super::Row::StorageRule(storage_rules) => {
+                crate::codegen::tables::rows::Rows::from(storage_rules)
+            }
             super::Row::SupernatantProcedureModel(supernatant_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(supernatant_procedure_models)
             }
@@ -181,6 +187,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
                 crate::codegen::tables::rows::Rows::from(user_organizations)
             }
             super::Row::User(users) => crate::codegen::tables::rows::Rows::from(users),
+            super::Row::VolumetricContainerModel(volumetric_container_models) => {
+                crate::codegen::tables::rows::Rows::from(volumetric_container_models)
+            }
             super::Row::VolumetricProcessable(volumetric_processables) => {
                 crate::codegen::tables::rows::Rows::from(volumetric_processables)
             }

@@ -13,24 +13,6 @@ pub enum InsertableFreezingProcedureModelAttributes {
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes>
-    for InsertableFreezingProcedureModelAttributes
-{
-    fn from(
-        extension: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
-    ) -> Self {
-        Self::Id(extension)
-    }
-}
-impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-> for InsertableFreezingProcedureModelAttributes {
-    fn from(
-        foreign: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-    ) -> Self {
-        Self::FrozenWith(foreign)
-    }
-}
 impl core::fmt::Display for InsertableFreezingProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -62,62 +44,6 @@ pub struct InsertableFreezingProcedureModel {
     source_container: i32,
 }
 impl InsertableFreezingProcedureModel {
-    pub fn frozen_with<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
-                self.frozen_with,
-            ),
-            conn,
-        )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn freezing_procedure_models_frozen_with_id_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
-                    .eq(&self.frozen_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
-                            .eq(&self.id),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            >(conn)
-    }
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -146,6 +72,38 @@ impl InsertableFreezingProcedureModel {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
                 self.id,
+            ),
+            conn,
+        )
+    }
+    pub fn frozen_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.frozen_with,
             ),
             conn,
         )
@@ -181,6 +139,30 @@ impl InsertableFreezingProcedureModel {
             ),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freezing_procedure_models_frozen_with_id_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
+                    .eq(&self.frozen_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
+                            .eq(&self.id),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn freezing_procedure_models_source_container_id_fkey(
@@ -275,15 +257,15 @@ impl InsertableFreezingProcedureModelBuilder {
         frozen_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    >{
+        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
+    > {
         if frozen_with.procedure_model_id.is_some() {
             return Err(
                 web_common_traits::database::InsertError::BuilderError(
                     web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        InsertableFreezingProcedureModelAttributes::FrozenWith(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
                     ),
                 ),
             );
@@ -296,15 +278,15 @@ impl InsertableFreezingProcedureModelBuilder {
         source_container: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    >{
+        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
+    > {
         if source_container.procedure_model_id.is_some() {
             return Err(
                 web_common_traits::database::InsertError::BuilderError(
                     web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        InsertableFreezingProcedureModelAttributes::SourceContainer(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
                     ),
                 ),
             );
@@ -323,7 +305,10 @@ impl InsertableFreezingProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.name(name).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .name(name)
+            .map_err(|err| err.into_field_name(InsertableFreezingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn description<P>(
@@ -337,7 +322,10 @@ impl InsertableFreezingProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.description(description).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .description(description)
+            .map_err(|err| err.into_field_name(InsertableFreezingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn deprecated<P>(
@@ -351,7 +339,10 @@ impl InsertableFreezingProcedureModelBuilder {
         P: TryInto<bool>,
         <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.deprecated(deprecated).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .deprecated(deprecated)
+            .map_err(|err| err.into_field_name(InsertableFreezingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn photograph_id<P>(
@@ -366,7 +357,10 @@ impl InsertableFreezingProcedureModelBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.photograph_id(photograph_id).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .photograph_id(photograph_id)
+            .map_err(|err| err.into_field_name(InsertableFreezingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn icon<P>(
@@ -380,7 +374,10 @@ impl InsertableFreezingProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.icon(icon).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .icon(icon)
+            .map_err(|err| err.into_field_name(InsertableFreezingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn created_by<P>(
@@ -394,7 +391,10 @@ impl InsertableFreezingProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_by(created_by).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .created_by(created_by)
+            .map_err(|err| err.into_field_name(InsertableFreezingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn created_at<P>(
@@ -409,7 +409,10 @@ impl InsertableFreezingProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_at(created_at).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .created_at(created_at)
+            .map_err(|err| err.into_field_name(InsertableFreezingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn updated_by<P>(
@@ -423,7 +426,10 @@ impl InsertableFreezingProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_by(updated_by).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .updated_by(updated_by)
+            .map_err(|err| err.into_field_name(InsertableFreezingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn updated_at<P>(
@@ -438,7 +444,10 @@ impl InsertableFreezingProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_at(updated_at).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .updated_at(updated_at)
+            .map_err(|err| err.into_field_name(InsertableFreezingProcedureModelAttributes::Id))?;
         Ok(self)
     }
 }
@@ -479,20 +488,32 @@ impl InsertableFreezingProcedureModelBuilder {
         let seconds = self.seconds.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
             InsertableFreezingProcedureModelAttributes::Seconds,
         ))?;
-        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        let id = self
+            .id
+            .insert(user_id, conn)
+            .map_err(|err| err.into_field_name(InsertableFreezingProcedureModelAttributes::Id))?
+            .id();
         let frozen_with = self
             .frozen_with
             .procedure_model_id(id)
-            .map_err(|err| err.into_field_name())?
+            .map_err(|err| {
+                err.into_field_name(InsertableFreezingProcedureModelAttributes::FrozenWith)
+            })?
             .insert(user_id, conn)
-            .map_err(|err| err.into_field_name())?
+            .map_err(|err| {
+                err.into_field_name(InsertableFreezingProcedureModelAttributes::FrozenWith)
+            })?
             .id();
         let source_container = self
             .source_container
             .procedure_model_id(id)
-            .map_err(|err| err.into_field_name())?
+            .map_err(|err| {
+                err.into_field_name(InsertableFreezingProcedureModelAttributes::SourceContainer)
+            })?
             .insert(user_id, conn)
-            .map_err(|err| err.into_field_name())?
+            .map_err(|err| {
+                err.into_field_name(InsertableFreezingProcedureModelAttributes::SourceContainer)
+            })?
             .id();
         Ok(InsertableFreezingProcedureModel { id, kelvin, seconds, frozen_with, source_container })
     }

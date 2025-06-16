@@ -101,30 +101,6 @@ impl SupernatantProcedureModel {
             conn,
         )
     }
-    #[cfg(feature = "postgres")]
-    pub fn supernatant_procedure_models_stratified_source_id_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
-                    .eq(&self.stratified_source)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
-                            .eq(&self.id),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            >(conn)
-    }
     pub fn supernatant_destination<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -156,30 +132,6 @@ impl SupernatantProcedureModel {
             ),
             conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn supernatant_procedure_models_supernatant_destination_id_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
-                    .eq(&self.supernatant_destination)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
-                            .eq(&self.id),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            >(conn)
     }
     pub fn transferred_with<C: diesel::connection::LoadConnection>(
         &self,
@@ -238,6 +190,54 @@ impl SupernatantProcedureModel {
             >(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn supernatant_procedure_models_stratified_source_id_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
+                    .eq(&self.stratified_source)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
+                            .eq(&self.id),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn supernatant_procedure_models_supernatant_destination_id_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
+                    .eq(&self.supernatant_destination)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
+                            .eq(&self.id),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_stratified_source(
         stratified_source: &i32,
         conn: &mut diesel::PgConnection,
@@ -279,6 +279,26 @@ impl SupernatantProcedureModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_transferred_with_and_id(
+        transferred_with: &i32,
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::supernatant_procedure_models::supernatant_procedure_models;
+        Self::table()
+            .filter(
+                supernatant_procedure_models::transferred_with
+                    .eq(transferred_with)
+                    .and(supernatant_procedure_models::id.eq(id)),
+            )
+            .order_by(supernatant_procedure_models::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_stratified_source_and_id(
         stratified_source: &i32,
         id: &i32,
@@ -313,26 +333,6 @@ impl SupernatantProcedureModel {
             .filter(
                 supernatant_procedure_models::supernatant_destination
                     .eq(supernatant_destination)
-                    .and(supernatant_procedure_models::id.eq(id)),
-            )
-            .order_by(supernatant_procedure_models::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_transferred_with_and_id(
-        transferred_with: &i32,
-        id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::supernatant_procedure_models::supernatant_procedure_models;
-        Self::table()
-            .filter(
-                supernatant_procedure_models::transferred_with
-                    .eq(transferred_with)
                     .and(supernatant_procedure_models::id.eq(id)),
             )
             .order_by(supernatant_procedure_models::id.asc())

@@ -27,6 +27,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::CappingProcedureModel)
                     .collect::<Vec<_>>()
             }
+            super::Rows::CappingRule(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::CappingRule)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::CentrifugeProcedureModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::CentrifugeProcedureModel)
@@ -268,6 +273,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::StorageProcedureModel)
                     .collect::<Vec<_>>()
             }
+            super::Rows::StorageRule(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::StorageRule)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::SupernatantProcedureModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::SupernatantProcedureModel)
@@ -324,6 +334,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             }
             super::Rows::User(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::User).collect::<Vec<_>>()
+            }
+            super::Rows::VolumetricContainerModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::VolumetricContainerModel)
+                    .collect::<Vec<_>>()
             }
             super::Rows::VolumetricProcessable(rows) => {
                 rows.into_iter()

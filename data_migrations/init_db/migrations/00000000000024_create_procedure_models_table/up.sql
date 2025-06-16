@@ -176,13 +176,21 @@ CREATE TABLE IF NOT EXISTS mount_tip_procedure_models (
 CREATE TABLE IF NOT EXISTS capping_procedure_models (
 	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
 	-- The container to be capped.
-	container_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	container_id UUID NOT NULL REFERENCES container_models(id) ON DELETE CASCADE,
+	procedure_container_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	-- The cap to be used for the container.
-	capped_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
-	-- We check that the `container_id` is indeed a trackable that is compatible with the procedure model.
-	FOREIGN KEY (container_id, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	capped_with UUID NOT NULL REFERENCES trackables(id) ON DELETE CASCADE,
+	procedure_capped_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- We check that the `procedure_container_id` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (procedure_container_id, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	-- We check that the `procedure_capped_with` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (procedure_capped_with, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	-- We check that the `container_id` is indeed the trackable that is compatible with the procedure model.
+	FOREIGN KEY (procedure_container_id, container_id) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
 	-- We check that the `capped_with` is indeed a trackable that is compatible with the procedure model.
-	FOREIGN KEY (capped_with, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE
+	FOREIGN KEY (procedure_capped_with, capped_with) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
+	-- We check that the `capped_with` is indeed a cap that can be used with the `container_id`.
+	FOREIGN KEY (container_id, capped_with) REFERENCES capping_rules(container_id, cap_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS freezing_procedure_models (
@@ -330,11 +338,19 @@ CREATE TABLE IF NOT EXISTS disposal_procedure_models (
 CREATE TABLE IF NOT EXISTS storage_procedure_models (
 	id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
 	-- The container that is being stored.
-	child_container_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	child_container_id UUID NOT NULL REFERENCES container_models(id) ON DELETE CASCADE,
+	procedure_child_container_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	-- The container that will be used for storage.
-	parent_container_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
-	-- We check that the `parent_container_id` is indeed a trackable that is compatible with the procedure model.
-	FOREIGN KEY (parent_container_id, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
-	-- We check that the `child_container_id` is indeed a trackable that is compatible with the procedure model.
-	FOREIGN KEY (child_container_id, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE
+	parent_container_id UUID NOT NULL REFERENCES container_models(id) ON DELETE CASCADE,
+	procedure_parent_container_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
+	-- We check that the `procedure_parent_container_id` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (procedure_parent_container_id, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	-- We check that the `procedure_child_container_id` is indeed a trackable that is compatible with the procedure model.
+	FOREIGN KEY (procedure_child_container_id, id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
+	-- We check that the `parent_container_id` is indeed a container that is compatible with the procedure model.
+	FOREIGN KEY (procedure_parent_container_id, parent_container_id) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
+	-- We check that the `child_container_id` is indeed a container that is compatible with the procedure model.
+	FOREIGN KEY (procedure_child_container_id, child_container_id) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
+	-- We check that the `parent_container_id` is indeed a container that can hold the `child_container_id`.
+	FOREIGN KEY (parent_container_id, child_container_id) REFERENCES storage_rules(parent_container_id, child_container_id) ON DELETE CASCADE
 );

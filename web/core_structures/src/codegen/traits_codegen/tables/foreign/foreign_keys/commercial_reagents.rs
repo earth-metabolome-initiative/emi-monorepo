@@ -1,10 +1,10 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialReagentForeignKeys {
+    pub id: Option<crate::codegen::structs_codegen::tables::processables::Processable>,
     pub commercial_product_lot: Option<
         crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
     >,
-    pub id: Option<crate::codegen::structs_codegen::tables::processables::Processable>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent
@@ -16,16 +16,16 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Processable(self.id),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialProductLot(
                 self.commercial_product_lot_id,
             ),
         ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Processable(self.id),
-        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.commercial_product_lot.is_some() && foreign_keys.id.is_some()
+        foreign_keys.id.is_some() && foreign_keys.commercial_product_lot.is_some()
     }
     fn update(
         &self,

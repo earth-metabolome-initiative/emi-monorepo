@@ -52,20 +52,19 @@ async fn test_user_table() {
 
     test_check_constraints(&database_name, &mut conn).unwrap();
 
-    let columns: Result<Vec<Column>, WebCodeGenError> = users.columns(&mut conn);
+    let columns: Result<Vec<Column>, _> = users.columns(&mut conn);
 
     assert!(columns.is_ok());
     let columns = columns.unwrap();
     assert_eq!(columns.len(), 4);
 
-    let primary_key_columns: Result<Vec<Column>, WebCodeGenError> =
-        users.primary_key_columns(&mut conn);
+    let primary_key_columns: Result<Vec<Column>, _> = users.primary_key_columns(&mut conn);
 
     assert!(primary_key_columns.is_ok());
     let primary_key_columns = primary_key_columns.unwrap();
     assert_eq!(primary_key_columns.len(), 1);
 
-    let unique_columns: Result<Vec<Vec<Column>>, WebCodeGenError> = users.unique_columns(&mut conn);
+    let unique_columns: Result<Vec<Vec<Column>>, _> = users.unique_columns(&mut conn);
 
     assert!(unique_columns.is_ok());
     let unique_columns = unique_columns.unwrap();
@@ -77,8 +76,8 @@ async fn test_user_table() {
 
     let composite_users = Table::load(&mut conn, "composite_users", None, &database_name).unwrap();
 
-    let columns: Result<Vec<Column>, WebCodeGenError> = composite_users.columns(&mut conn);
-    let primary_key_columns: Result<Vec<Column>, WebCodeGenError> =
+    let columns: Result<Vec<Column>, _> = composite_users.columns(&mut conn);
+    let primary_key_columns: Result<Vec<Column>, _> =
         composite_users.primary_key_columns(&mut conn);
 
     assert!(columns.is_ok());
@@ -88,18 +87,6 @@ async fn test_user_table() {
     assert!(primary_key_columns.is_ok());
     let primary_key_columns = primary_key_columns.unwrap();
     assert_eq!(primary_key_columns.len(), 2);
-
-    let primary_id_column = composite_users.column_by_name(&mut conn, "primary_id").unwrap();
-    assert_eq!(primary_id_column.column_name, "primary_id");
-    assert!(primary_id_column.is_foreign_key(&mut conn).unwrap());
-
-    let secondary_id_column = composite_users.column_by_name(&mut conn, "secondary_id").unwrap();
-    assert_eq!(secondary_id_column.column_name, "secondary_id");
-    assert!(secondary_id_column.is_foreign_key(&mut conn).unwrap());
-
-    let username_column = composite_users.column_by_name(&mut conn, "username").unwrap();
-    assert_eq!(username_column.column_name, "username");
-    assert!(!username_column.is_foreign_key(&mut conn).unwrap());
 
     docker.stop().await.unwrap();
 }

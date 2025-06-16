@@ -1,31 +1,39 @@
+use cached::proc_macro::cached;
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, Queryable,
     QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
 
 use super::Column;
-use crate::errors::WebCodeGenError;
 
-/// Represents a row in the `pg_indexes` view
-#[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq)]
-#[diesel(table_name = crate::schema::pg_indexes)]
-/// Represents a `PostgreSQL` index in the database.
-pub struct Indices {
-    /// The name of the schema containing the index.
-    pub schemaname: String,
-    /// The name of the table associated with the index.
-    pub tablename: String,
-    /// The name of the index.
-    pub indexname: String,
-    /// The name of the tablespace containing the index.
-    pub tablespace: Option<String>,
-    /// The definition of the index.
-    pub indexdef: String,
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}:{}", index.indexrelid, index.indrelid) }"#
+)]
+fn columns(index: &PgIndex, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
+    use crate::schema::{columns, pg_attribute, pg_class, pg_index};
+
+    pg_index::table
+        .inner_join(pg_class::table.on(pg_class::oid.eq(pg_index::indrelid)))
+        .inner_join(pg_attribute::table.on(pg_attribute::attrelid.eq(pg_class::oid)))
+        .inner_join(
+            columns::table.on(columns::table_name
+                .eq(pg_class::relname)
+                .and(columns::column_name.eq(pg_attribute::attname))),
+        )
+        .filter(
+            pg_index::indexrelid
+                .eq(index.indexrelid)
+                .and(pg_attribute::attnum.eq_any(&index.indkey)),
+        )
+        .select(Column::as_select())
+        .load::<Column>(conn)
 }
 
 /// Represents the `pg_index` system catalog table in `PostgreSQL`.
 /// This table stores information about indexes on tables.
-#[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq)]
+#[derive(Clone, Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq)]
 #[diesel(table_name = crate::schema::pg_index)]
 #[allow(clippy::struct_excessive_bools)]
 pub struct PgIndex {
@@ -77,24 +85,8 @@ impl PgIndex {
     /// # Errors
     ///
     /// If an error occurs while loading the columns from the database
-    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
-        use crate::schema::{columns, pg_attribute, pg_class, pg_index};
-
-        Ok(pg_index::table
-            .inner_join(pg_class::table.on(pg_class::oid.eq(pg_index::indrelid)))
-            .inner_join(pg_attribute::table.on(pg_attribute::attrelid.eq(pg_class::oid)))
-            .inner_join(
-                columns::table.on(columns::table_name
-                    .eq(pg_class::relname)
-                    .and(columns::column_name.eq(pg_attribute::attname))),
-            )
-            .filter(
-                pg_index::indexrelid
-                    .eq(self.indexrelid)
-                    .and(pg_attribute::attnum.eq_any(&self.indkey)),
-            )
-            .select(Column::as_select())
-            .load::<Column>(conn)?)
+    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
+        columns(self, conn)
     }
 
     #[must_use]

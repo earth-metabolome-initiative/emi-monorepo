@@ -19,17 +19,17 @@ use users::init_root_user;
 ///
 /// # Arguments
 ///
-/// * `portal_conn` - The connection to the database.
+/// * `conn` - The connection to the database.
 ///
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub fn init_migration(portal_conn: &mut PgConnection) -> Result<(), error::Error> {
-    portal_conn.transaction(|portal_conn| {
-        init_login_providers(portal_conn)?;
-        let darwin = init_root_user(portal_conn)?;
-        init_trackables(&darwin, portal_conn);
-        init_procedure_models(&darwin, portal_conn);
+pub fn init_migration(conn: &mut PgConnection) -> Result<(), error::Error> {
+    conn.transaction(|conn| {
+        init_login_providers(conn)?;
+        let darwin = init_root_user(conn)?;
+        init_trackables(&darwin, conn);
+        init_procedure_models(&darwin, conn);
         Ok(())
     })
 }

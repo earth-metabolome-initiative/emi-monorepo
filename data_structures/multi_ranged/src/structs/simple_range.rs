@@ -132,7 +132,7 @@ impl<N: Step> TryFrom<(N, N)> for SimpleRange<N> {
     type Error = Error<N>;
 
     fn try_from((start, end): (N, N)) -> Result<Self, Self::Error> {
-        if start >= end { Err(Error::OutOfRange(start)) } else { Ok(Self { start, end }) }
+        if start > end { Err(Error::OutOfRange(start)) } else { Ok(Self { start, end }) }
     }
 }
 

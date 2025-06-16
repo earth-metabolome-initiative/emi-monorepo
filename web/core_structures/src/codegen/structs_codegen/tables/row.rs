@@ -4,6 +4,7 @@ mod aliquoting_procedure_models;
 mod ball_mill_procedure_models;
 mod brands;
 mod capping_procedure_models;
+mod capping_rules;
 mod centrifuge_procedure_models;
 mod cities;
 mod colors;
@@ -59,6 +60,7 @@ mod spatial_ref_sys;
 mod spectra;
 mod spectra_collections;
 mod storage_procedure_models;
+mod storage_rules;
 mod supernatant_procedure_models;
 mod tabular;
 mod taxa;
@@ -73,6 +75,7 @@ mod units;
 mod user_emails;
 mod user_organizations;
 mod users;
+mod volumetric_container_models;
 mod volumetric_processables;
 mod weighing_instrument_models;
 mod weighing_procedure_models;
@@ -94,6 +97,7 @@ pub enum Row {
     CappingProcedureModel(
         crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel,
     ),
+    CappingRule(crate::codegen::structs_codegen::tables::capping_rules::CappingRule),
     CentrifugeProcedureModel(
         crate::codegen::structs_codegen::tables::centrifuge_procedure_models::CentrifugeProcedureModel,
     ),
@@ -211,6 +215,7 @@ pub enum Row {
     StorageProcedureModel(
         crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel,
     ),
+    StorageRule(crate::codegen::structs_codegen::tables::storage_rules::StorageRule),
     SupernatantProcedureModel(
         crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel,
     ),
@@ -232,6 +237,9 @@ pub enum Row {
         crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
     ),
     User(crate::codegen::structs_codegen::tables::users::User),
+    VolumetricContainerModel(
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+    ),
     VolumetricProcessable(
         crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
     ),
@@ -268,6 +276,7 @@ impl Row {
             Row::CappingProcedureModel(capping_procedure_models) => {
                 capping_procedure_models.upsert(conn)?.map(Row::from)
             }
+            Row::CappingRule(capping_rules) => capping_rules.upsert(conn)?.map(Row::from),
             Row::CentrifugeProcedureModel(centrifuge_procedure_models) => {
                 centrifuge_procedure_models.upsert(conn)?.map(Row::from)
             }
@@ -375,6 +384,7 @@ impl Row {
             Row::StorageProcedureModel(storage_procedure_models) => {
                 storage_procedure_models.upsert(conn)?.map(Row::from)
             }
+            Row::StorageRule(storage_rules) => storage_rules.upsert(conn)?.map(Row::from),
             Row::SupernatantProcedureModel(supernatant_procedure_models) => {
                 supernatant_procedure_models.upsert(conn)?.map(Row::from)
             }
@@ -394,6 +404,9 @@ impl Row {
                 user_organizations.upsert(conn)?.map(Row::from)
             }
             Row::User(users) => users.upsert(conn)?.map(Row::from),
+            Row::VolumetricContainerModel(volumetric_container_models) => {
+                volumetric_container_models.upsert(conn)?.map(Row::from)
+            }
             Row::VolumetricProcessable(volumetric_processables) => {
                 volumetric_processables.upsert(conn)?.map(Row::from)
             }
@@ -427,6 +440,7 @@ impl web_common_traits::prelude::Row for Row {
             Row::CappingProcedureModel(capping_procedure_models) => {
                 capping_procedure_models.primary_key()
             }
+            Row::CappingRule(capping_rules) => capping_rules.primary_key(),
             Row::CentrifugeProcedureModel(centrifuge_procedure_models) => {
                 centrifuge_procedure_models.primary_key()
             }
@@ -514,6 +528,7 @@ impl web_common_traits::prelude::Row for Row {
             Row::StorageProcedureModel(storage_procedure_models) => {
                 storage_procedure_models.primary_key()
             }
+            Row::StorageRule(storage_rules) => storage_rules.primary_key(),
             Row::SupernatantProcedureModel(supernatant_procedure_models) => {
                 supernatant_procedure_models.primary_key()
             }
@@ -529,6 +544,9 @@ impl web_common_traits::prelude::Row for Row {
             Row::UserEmail(user_emails) => user_emails.primary_key(),
             Row::UserOrganization(user_organizations) => user_organizations.primary_key(),
             Row::User(users) => users.primary_key(),
+            Row::VolumetricContainerModel(volumetric_container_models) => {
+                volumetric_container_models.primary_key()
+            }
             Row::VolumetricProcessable(volumetric_processables) => {
                 volumetric_processables.primary_key()
             }

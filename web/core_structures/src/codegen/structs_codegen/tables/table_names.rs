@@ -7,6 +7,7 @@ pub enum TableName {
     BallMillProcedureModel,
     Brand,
     CappingProcedureModel,
+    CappingRule,
     CentrifugeProcedureModel,
     City,
     Color,
@@ -60,6 +61,7 @@ pub enum TableName {
     Spectrum,
     SpectraCollection,
     StorageProcedureModel,
+    StorageRule,
     SupernatantProcedureModel,
     Taxon,
     TeamMember,
@@ -73,6 +75,7 @@ pub enum TableName {
     UserEmail,
     UserOrganization,
     User,
+    VolumetricContainerModel,
     VolumetricProcessable,
     WeighingInstrumentModel,
     WeighingProcedureModel,
@@ -95,6 +98,7 @@ impl core::fmt::Display for TableName {
             TableName::CappingProcedureModel => {
                 write!(f, stringify!(CappingProcedureModel))
             }
+            TableName::CappingRule => write!(f, stringify!(CappingRule)),
             TableName::CentrifugeProcedureModel => {
                 write!(f, stringify!(CentrifugeProcedureModel))
             }
@@ -182,6 +186,7 @@ impl core::fmt::Display for TableName {
             TableName::StorageProcedureModel => {
                 write!(f, stringify!(StorageProcedureModel))
             }
+            TableName::StorageRule => write!(f, stringify!(StorageRule)),
             TableName::SupernatantProcedureModel => {
                 write!(f, stringify!(SupernatantProcedureModel))
             }
@@ -197,6 +202,9 @@ impl core::fmt::Display for TableName {
             TableName::UserEmail => write!(f, stringify!(UserEmail)),
             TableName::UserOrganization => write!(f, stringify!(UserOrganization)),
             TableName::User => write!(f, stringify!(User)),
+            TableName::VolumetricContainerModel => {
+                write!(f, stringify!(VolumetricContainerModel))
+            }
             TableName::VolumetricProcessable => {
                 write!(f, stringify!(VolumetricProcessable))
             }

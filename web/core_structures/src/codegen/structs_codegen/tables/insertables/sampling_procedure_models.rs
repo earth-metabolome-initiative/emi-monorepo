@@ -3,15 +3,6 @@
 pub enum InsertableSamplingProcedureModelAttributes {
     Id(crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes),
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes>
-    for InsertableSamplingProcedureModelAttributes
-{
-    fn from(
-        extension: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
-    ) -> Self {
-        Self::Id(extension)
-    }
-}
 impl core::fmt::Display for InsertableSamplingProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -82,7 +73,10 @@ impl InsertableSamplingProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.name(name).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .name(name)
+            .map_err(|err| err.into_field_name(InsertableSamplingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn description<P>(
@@ -96,7 +90,10 @@ impl InsertableSamplingProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.description(description).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .description(description)
+            .map_err(|err| err.into_field_name(InsertableSamplingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn deprecated<P>(
@@ -110,7 +107,10 @@ impl InsertableSamplingProcedureModelBuilder {
         P: TryInto<bool>,
         <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.deprecated(deprecated).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .deprecated(deprecated)
+            .map_err(|err| err.into_field_name(InsertableSamplingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn photograph_id<P>(
@@ -125,7 +125,10 @@ impl InsertableSamplingProcedureModelBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.photograph_id(photograph_id).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .photograph_id(photograph_id)
+            .map_err(|err| err.into_field_name(InsertableSamplingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn icon<P>(
@@ -139,7 +142,10 @@ impl InsertableSamplingProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.icon(icon).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .icon(icon)
+            .map_err(|err| err.into_field_name(InsertableSamplingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn created_by<P>(
@@ -153,7 +159,10 @@ impl InsertableSamplingProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_by(created_by).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .created_by(created_by)
+            .map_err(|err| err.into_field_name(InsertableSamplingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn created_at<P>(
@@ -168,7 +177,10 @@ impl InsertableSamplingProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_at(created_at).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .created_at(created_at)
+            .map_err(|err| err.into_field_name(InsertableSamplingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn updated_by<P>(
@@ -182,7 +194,10 @@ impl InsertableSamplingProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_by(updated_by).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .updated_by(updated_by)
+            .map_err(|err| err.into_field_name(InsertableSamplingProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn updated_at<P>(
@@ -197,7 +212,10 @@ impl InsertableSamplingProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_at(updated_at).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .updated_at(updated_at)
+            .map_err(|err| err.into_field_name(InsertableSamplingProcedureModelAttributes::Id))?;
         Ok(self)
     }
 }
@@ -224,7 +242,11 @@ impl InsertableSamplingProcedureModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        let id = self
+            .id
+            .insert(user_id, conn)
+            .map_err(|err| err.into_field_name(InsertableSamplingProcedureModelAttributes::Id))?
+            .id();
         Ok(InsertableSamplingProcedureModel { id })
     }
 }

@@ -5,15 +5,6 @@ pub enum InsertableCommercialProductAttributes {
     DeprecationDate,
     BrandId,
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes>
-    for InsertableCommercialProductAttributes
-{
-    fn from(
-        extension: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
-    ) -> Self {
-        Self::Id(extension)
-    }
-}
 impl core::fmt::Display for InsertableCommercialProductAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -39,38 +30,6 @@ pub struct InsertableCommercialProduct {
     brand_id: i32,
 }
 impl InsertableCommercialProduct {
-    pub fn brand<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::brands::Brand,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::brands::Brand: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::brands::Brand as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::brands::Brand as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::brands::Brand as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::brands::Brand as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::brands::Brand as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::brands::Brand as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::brands::Brand,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::brands::Brand::table(),
-                self.brand_id,
-            ),
-            conn,
-        )
-    }
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -99,6 +58,38 @@ impl InsertableCommercialProduct {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
                 self.id,
+            ),
+            conn,
+        )
+    }
+    pub fn brand<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::brands::Brand,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::brands::Brand: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::brands::Brand as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::brands::Brand as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::brands::Brand as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::brands::Brand as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::brands::Brand as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::brands::Brand as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::brands::Brand,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::brands::Brand::table(),
+                self.brand_id,
             ),
             conn,
         )
@@ -151,7 +142,10 @@ impl InsertableCommercialProductBuilder {
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.id(id).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .id(id)
+            .map_err(|err| err.into_field_name(InsertableCommercialProductAttributes::Id))?;
         Ok(self)
     }
     pub fn name<P>(
@@ -162,7 +156,10 @@ impl InsertableCommercialProductBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.name(name).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .name(name)
+            .map_err(|err| err.into_field_name(InsertableCommercialProductAttributes::Id))?;
         Ok(self)
     }
     pub fn description<P>(
@@ -173,7 +170,10 @@ impl InsertableCommercialProductBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.description(description).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .description(description)
+            .map_err(|err| err.into_field_name(InsertableCommercialProductAttributes::Id))?;
         Ok(self)
     }
     pub fn photograph_id<P>(
@@ -185,7 +185,10 @@ impl InsertableCommercialProductBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.photograph_id(photograph_id).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .photograph_id(photograph_id)
+            .map_err(|err| err.into_field_name(InsertableCommercialProductAttributes::Id))?;
         Ok(self)
     }
     pub fn parent_id<P>(
@@ -197,7 +200,10 @@ impl InsertableCommercialProductBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.parent_id(parent_id).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .parent_id(parent_id)
+            .map_err(|err| err.into_field_name(InsertableCommercialProductAttributes::Id))?;
         Ok(self)
     }
     pub fn created_by<P>(
@@ -208,7 +214,10 @@ impl InsertableCommercialProductBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_by(created_by).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .created_by(created_by)
+            .map_err(|err| err.into_field_name(InsertableCommercialProductAttributes::Id))?;
         Ok(self)
     }
     pub fn created_at<P>(
@@ -220,7 +229,10 @@ impl InsertableCommercialProductBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_at(created_at).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .created_at(created_at)
+            .map_err(|err| err.into_field_name(InsertableCommercialProductAttributes::Id))?;
         Ok(self)
     }
     pub fn updated_by<P>(
@@ -231,7 +243,10 @@ impl InsertableCommercialProductBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_by(updated_by).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .updated_by(updated_by)
+            .map_err(|err| err.into_field_name(InsertableCommercialProductAttributes::Id))?;
         Ok(self)
     }
     pub fn updated_at<P>(
@@ -243,7 +258,10 @@ impl InsertableCommercialProductBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_at(updated_at).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .updated_at(updated_at)
+            .map_err(|err| err.into_field_name(InsertableCommercialProductAttributes::Id))?;
         Ok(self)
     }
 }
@@ -272,7 +290,11 @@ impl InsertableCommercialProductBuilder {
             self.brand_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableCommercialProductAttributes::BrandId,
             ))?;
-        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        let id = self
+            .id
+            .insert(user_id, conn)
+            .map_err(|err| err.into_field_name(InsertableCommercialProductAttributes::Id))?
+            .id();
         Ok(InsertableCommercialProduct { id, deprecation_date: self.deprecation_date, brand_id })
     }
 }

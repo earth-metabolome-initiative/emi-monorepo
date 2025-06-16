@@ -83,13 +83,17 @@ where
                     .into(),
             );
         }
-        if !insertable_struct.child_container(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.procedure_child_container(conn)?.can_update(user_id, conn)?
+        {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
             );
         }
-        if !insertable_struct.parent_container(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct
+            .procedure_parent_container(conn)?
+            .can_update(user_id, conn)?
+        {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),

@@ -1,4 +1,6 @@
 diesel::table! {
     capping_procedure_models(id) { id -> diesel::sql_types::Integer, container_id ->
-    diesel::sql_types::Integer, capped_with -> diesel::sql_types::Integer }
+    ::rosetta_uuid::diesel_impls::Uuid, procedure_container_id ->
+    diesel::sql_types::Integer, capped_with -> ::rosetta_uuid::diesel_impls::Uuid,
+    procedure_capped_with -> diesel::sql_types::Integer }
 }

@@ -8,24 +8,6 @@ pub enum InsertableDisposalProcedureModelAttributes {
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes>
-    for InsertableDisposalProcedureModelAttributes
-{
-    fn from(
-        extension: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
-    ) -> Self {
-        Self::Id(extension)
-    }
-}
-impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-> for InsertableDisposalProcedureModelAttributes {
-    fn from(
-        foreign: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-    ) -> Self {
-        Self::DisposedId(foreign)
-    }
-}
 impl core::fmt::Display for InsertableDisposalProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -49,6 +31,38 @@ pub struct InsertableDisposalProcedureModel {
     disposed_id: i32,
 }
 impl InsertableDisposalProcedureModel {
+    pub fn id<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
+                self.id,
+            ),
+            conn,
+        )
+    }
     pub fn disposed<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -105,38 +119,6 @@ impl InsertableDisposalProcedureModel {
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
             >(conn)
     }
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
-                self.id,
-            ),
-            conn,
-        )
-    }
 }
 #[derive(Default, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -150,15 +132,15 @@ impl InsertableDisposalProcedureModelBuilder {
         disposed_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    >{
+        web_common_traits::database::InsertError<InsertableDisposalProcedureModelAttributes>,
+    > {
         if disposed_id.procedure_model_id.is_some() {
             return Err(
                 web_common_traits::database::InsertError::BuilderError(
                     web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        InsertableDisposalProcedureModelAttributes::DisposedId(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
                     ),
                 ),
             );
@@ -177,7 +159,10 @@ impl InsertableDisposalProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.name(name).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .name(name)
+            .map_err(|err| err.into_field_name(InsertableDisposalProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn description<P>(
@@ -191,7 +176,10 @@ impl InsertableDisposalProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.description(description).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .description(description)
+            .map_err(|err| err.into_field_name(InsertableDisposalProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn deprecated<P>(
@@ -205,7 +193,10 @@ impl InsertableDisposalProcedureModelBuilder {
         P: TryInto<bool>,
         <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.deprecated(deprecated).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .deprecated(deprecated)
+            .map_err(|err| err.into_field_name(InsertableDisposalProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn photograph_id<P>(
@@ -220,7 +211,10 @@ impl InsertableDisposalProcedureModelBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.photograph_id(photograph_id).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .photograph_id(photograph_id)
+            .map_err(|err| err.into_field_name(InsertableDisposalProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn icon<P>(
@@ -234,7 +228,10 @@ impl InsertableDisposalProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.icon(icon).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .icon(icon)
+            .map_err(|err| err.into_field_name(InsertableDisposalProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn created_by<P>(
@@ -248,7 +245,10 @@ impl InsertableDisposalProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_by(created_by).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .created_by(created_by)
+            .map_err(|err| err.into_field_name(InsertableDisposalProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn created_at<P>(
@@ -263,7 +263,10 @@ impl InsertableDisposalProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_at(created_at).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .created_at(created_at)
+            .map_err(|err| err.into_field_name(InsertableDisposalProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn updated_by<P>(
@@ -277,7 +280,10 @@ impl InsertableDisposalProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_by(updated_by).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .updated_by(updated_by)
+            .map_err(|err| err.into_field_name(InsertableDisposalProcedureModelAttributes::Id))?;
         Ok(self)
     }
     pub fn updated_at<P>(
@@ -292,7 +298,10 @@ impl InsertableDisposalProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_at(updated_at).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .updated_at(updated_at)
+            .map_err(|err| err.into_field_name(InsertableDisposalProcedureModelAttributes::Id))?;
         Ok(self)
     }
 }
@@ -327,13 +336,21 @@ impl InsertableDisposalProcedureModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        let id = self
+            .id
+            .insert(user_id, conn)
+            .map_err(|err| err.into_field_name(InsertableDisposalProcedureModelAttributes::Id))?
+            .id();
         let disposed_id = self
             .disposed_id
             .procedure_model_id(id)
-            .map_err(|err| err.into_field_name())?
+            .map_err(|err| {
+                err.into_field_name(InsertableDisposalProcedureModelAttributes::DisposedId)
+            })?
             .insert(user_id, conn)
-            .map_err(|err| err.into_field_name())?
+            .map_err(|err| {
+                err.into_field_name(InsertableDisposalProcedureModelAttributes::DisposedId)
+            })?
             .id();
         Ok(InsertableDisposalProcedureModel { id, disposed_id })
     }

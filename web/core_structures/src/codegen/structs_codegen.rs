@@ -3,7 +3,7 @@ pub mod types;
 #[allow(unused_imports)]
 pub use tables::{
     Address, AliquotingInstrumentModel, AliquotingProcedureModel, BallMillProcedureModel, Brand,
-    CappingProcedureModel, CentrifugeProcedureModel, City, Color, CommercialProduct,
+    CappingProcedureModel, CappingRule, CentrifugeProcedureModel, City, Color, CommercialProduct,
     CommercialProductLot, CommercialReagent, Container, ContainerModel, Country,
     DisposalProcedureModel, Document, EmailProvider, FractioningProcedureModel,
     FreezeDryingProcedureModel, FreezingProcedureModel, Instrument, InstrumentModel,
@@ -13,8 +13,8 @@ pub use tables::{
     PermanenceCategory, PouringProcedureModel, Procedure, ProcedureModel, ProcedureModelTrackable,
     ProcedureTrackable, Processable, Project, ProjectState, Rank, Reagent, Role, Room, SampleState,
     SamplingProcedureModel, ShakingProcedureModel, SharedProcedureModelTrackable, SpatialRefSy,
-    SpectraCollection, Spectrum, StorageProcedureModel, SupernatantProcedureModel, Taxon, Team,
-    TeamMember, TeamProject, TeamState, TemporaryUser, Trackable, TrackableLocation, Unit, User,
-    UserEmail, UserOrganization, VolumetricProcessable, WeighingInstrumentModel, WeighingProcedure,
-    WeighingProcedureModel,
+    SpectraCollection, Spectrum, StorageProcedureModel, StorageRule, SupernatantProcedureModel,
+    Taxon, Team, TeamMember, TeamProject, TeamState, TemporaryUser, Trackable, TrackableLocation,
+    Unit, User, UserEmail, UserOrganization, VolumetricContainerModel, VolumetricProcessable,
+    WeighingInstrumentModel, WeighingProcedure, WeighingProcedureModel,
 };
