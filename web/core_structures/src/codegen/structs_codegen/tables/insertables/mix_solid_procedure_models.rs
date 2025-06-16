@@ -178,78 +178,6 @@ impl InsertableMixSolidProcedureModel {
             conn,
         )
     }
-    #[cfg(feature = "postgres")]
-    pub fn mix_solid_procedure_models_measured_with_id_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
-                    .eq(&self.measured_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
-                            .eq(&self.id),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn mix_solid_procedure_models_source_id_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
-                    .eq(&self.source)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
-                            .eq(&self.id),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn mix_solid_procedure_models_destination_id_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
-                    .eq(&self.destination)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
-                            .eq(&self.id),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            >(conn)
-    }
 }
 #[derive(Default, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -278,27 +206,6 @@ impl InsertableMixSolidProcedureModelBuilder {
         pgrx_validation::must_be_strictly_positive_f32(kilograms)
             .map_err(|e| e.rename_field(InsertableMixSolidProcedureModelAttributes::Kilograms))?;
         self.kilograms = Some(kilograms);
-        Ok(self)
-    }
-    pub fn measured_with(
-        mut self,
-        measured_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableMixSolidProcedureModelAttributes>,
-    > {
-        if measured_with.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableMixSolidProcedureModelAttributes::MeasuredWith(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.measured_with = measured_with;
         Ok(self)
     }
     pub fn source(
@@ -341,6 +248,27 @@ impl InsertableMixSolidProcedureModelBuilder {
             );
         }
         self.destination = destination;
+        Ok(self)
+    }
+    pub fn measured_with(
+        mut self,
+        measured_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableMixSolidProcedureModelAttributes>,
+    > {
+        if measured_with.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertableMixSolidProcedureModelAttributes::MeasuredWith(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        self.measured_with = measured_with;
         Ok(self)
     }
     pub fn name<P>(
@@ -540,17 +468,6 @@ impl InsertableMixSolidProcedureModelBuilder {
             .insert(user_id, conn)
             .map_err(|err| err.into_field_name(InsertableMixSolidProcedureModelAttributes::Id))?
             .id();
-        let measured_with = self
-            .measured_with
-            .procedure_model_id(id)
-            .map_err(|err| {
-                err.into_field_name(InsertableMixSolidProcedureModelAttributes::MeasuredWith)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableMixSolidProcedureModelAttributes::MeasuredWith)
-            })?
-            .id();
         let source = self
             .source
             .procedure_model_id(id)
@@ -567,6 +484,17 @@ impl InsertableMixSolidProcedureModelBuilder {
             .insert(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(InsertableMixSolidProcedureModelAttributes::Destination)
+            })?
+            .id();
+        let measured_with = self
+            .measured_with
+            .procedure_model_id(id)
+            .map_err(|err| {
+                err.into_field_name(InsertableMixSolidProcedureModelAttributes::MeasuredWith)
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(InsertableMixSolidProcedureModelAttributes::MeasuredWith)
             })?
             .id();
         Ok(InsertableMixSolidProcedureModel { id, measured_with, source, destination, kilograms })

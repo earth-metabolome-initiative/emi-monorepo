@@ -538,4 +538,69 @@ impl KeyColumnUsage {
 
         Ok(where_statement)
     }
+
+    /// Returns whether this key column usage is a `same-as` constraint
+    ///
+    /// A `same-as` constraint is a composite foreign key that refers to a
+    /// UNIQUE constraint, where the foreign key's foreign columns are the same
+    /// as the primary key of the foreign table, and the foreign column
+    /// corresponding to the current column is part of the primary key of the
+    /// foreign table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn is_same_as_constraint(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<Column>, WebCodeGenError> {
+        // First, we check whether the foreign key is a composite foreign key
+        if !self.is_composite(conn)? {
+            // If the foreign key is not a composite foreign key, we skip it
+            println!("Not composite foreign key, skipping");
+            return Ok(None);
+        }
+
+        // Next, we check whether the foreign key is referring to a UNIQUE constraint
+        if !self.is_foreign_unique_key(conn)? {
+            println!("Not a foreign unique key, skipping");
+            // If the foreign key is not referring to a UNIQUE constraint, we skip it
+            return Ok(None);
+        }
+
+        let foreign_key_columns = self.foreign_columns(conn)?;
+        // We identify the foreign column corresponding to the current column.
+        for foreign_column in &foreign_key_columns {
+            // Finally, if the UNIQUE constraint is composed of the primary key
+            // of the foreign table and the foreign column
+            // associated with the current column, we consider it a `same-as`
+            // constraint.
+            let Some(foreign_table) = self.foreign_table(conn)? else {
+                unreachable!(
+                    "Column \"{}\".\"{}\" is part of a composite foreign key which refers to a UNIQUE constraint, but the foreign table could not be found.",
+                    self.table_name, self.column_name
+                );
+            };
+
+            let mut expected_foreign_columns = foreign_table.primary_key_columns(conn)?;
+
+            // If the foreign column is not part of the foreign table's primary key, we add
+            // it
+            if !expected_foreign_columns.contains(foreign_column) {
+                expected_foreign_columns.push(foreign_column.clone());
+            }
+
+            // If the foreign key's foreign columns are not the same as the expected foreign
+            // columns, then this constraint is not a `same-as` constraint.
+            if foreign_key_columns == expected_foreign_columns {
+                return Ok(Some(foreign_column.clone()));
+            }
+        }
+
+        Ok(None)
+    }
 }

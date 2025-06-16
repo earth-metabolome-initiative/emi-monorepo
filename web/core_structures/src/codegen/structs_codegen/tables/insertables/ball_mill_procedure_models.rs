@@ -140,54 +140,6 @@ impl InsertableBallMillProcedureModel {
             conn,
         )
     }
-    #[cfg(feature = "postgres")]
-    pub fn ball_mill_procedure_models_milled_with_id_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
-                    .eq(&self.milled_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
-                            .eq(&self.id),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn ball_mill_procedure_models_container_id_id_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
-                    .eq(&self.container_id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
-                            .eq(&self.id),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            >(conn)
-    }
 }
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -252,27 +204,6 @@ impl InsertableBallMillProcedureModelBuilder {
         self.hertz = Some(hertz);
         Ok(self)
     }
-    pub fn container_id(
-        mut self,
-        container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableBallMillProcedureModelAttributes>,
-    > {
-        if container_id.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableBallMillProcedureModelAttributes::ContainerId(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.container_id = container_id;
-        Ok(self)
-    }
     pub fn milled_with(
         mut self,
         milled_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -292,6 +223,27 @@ impl InsertableBallMillProcedureModelBuilder {
             );
         }
         self.milled_with = milled_with;
+        Ok(self)
+    }
+    pub fn container_id(
+        mut self,
+        container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableBallMillProcedureModelAttributes>,
+    > {
+        if container_id.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertableBallMillProcedureModelAttributes::ContainerId(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        self.container_id = container_id;
         Ok(self)
     }
     pub fn name<P>(
@@ -493,17 +445,6 @@ impl InsertableBallMillProcedureModelBuilder {
             .insert(user_id, conn)
             .map_err(|err| err.into_field_name(InsertableBallMillProcedureModelAttributes::Id))?
             .id();
-        let container_id = self
-            .container_id
-            .procedure_model_id(id)
-            .map_err(|err| {
-                err.into_field_name(InsertableBallMillProcedureModelAttributes::ContainerId)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableBallMillProcedureModelAttributes::ContainerId)
-            })?
-            .id();
         let milled_with = self
             .milled_with
             .procedure_model_id(id)
@@ -513,6 +454,17 @@ impl InsertableBallMillProcedureModelBuilder {
             .insert(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(InsertableBallMillProcedureModelAttributes::MilledWith)
+            })?
+            .id();
+        let container_id = self
+            .container_id
+            .procedure_model_id(id)
+            .map_err(|err| {
+                err.into_field_name(InsertableBallMillProcedureModelAttributes::ContainerId)
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(InsertableBallMillProcedureModelAttributes::ContainerId)
             })?
             .id();
         Ok(InsertableBallMillProcedureModel { id, seconds, hertz, milled_with, container_id })

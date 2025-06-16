@@ -145,54 +145,6 @@ impl InsertableFreezeDryingProcedureModel {
             conn,
         )
     }
-    #[cfg(feature = "postgres")]
-    pub fn freeze_drying_procedure_models_freeze_dried_with_id_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
-                    .eq(&self.freeze_dried_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
-                            .eq(&self.id),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn freeze_drying_procedure_models_source_container_id_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
-                    .eq(&self.source_container)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
-                            .eq(&self.id),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            >(conn)
-    }
 }
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

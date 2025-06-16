@@ -5,7 +5,7 @@ use diesel::{
 };
 
 /// Represents a row in the `pg_stat_statements` view, which contains
-/// performance statistics for all SQL statements executed by PostgreSQL.
+/// performance statistics for all SQL statements executed by `PostgreSQL`.
 ///
 /// Only the most relevant 32 columns are included to comply with Diesel’s
 /// default column limit.
@@ -109,6 +109,10 @@ impl PgStatStatement {
     /// # Arguments
     ///
     /// * `connection` - A reference to the database connection.
+    ///
+    /// # Errors
+    ///
+    /// * If the query fails to execute, an error is returned.
     pub fn most_expensive_queries(
         connection: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
@@ -122,8 +126,8 @@ impl PgStatStatement {
 
         // Sort by total_exec_time * calls in descending order
         statements.sort_by(|a, b| {
-            (b.total_exec_time * b.calls as f64)
-                .partial_cmp(&(a.total_exec_time * a.calls as f64))
+            (b.total_exec_time * f64::from(u32::try_from(b.calls).unwrap()))
+                .partial_cmp(&(a.total_exec_time * f64::from(u32::try_from(a.calls).unwrap())))
                 .unwrap_or(std::cmp::Ordering::Equal)
         });
 

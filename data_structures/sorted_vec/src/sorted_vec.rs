@@ -112,9 +112,9 @@ impl<V> SortedVec<V> {
     /// Binary searches this slice for a given element.
     /// If the slice is not sorted, the returned result is unspecified and
     /// meaningless.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * `Err(usize)` if the value is not found, containing the index where it
     ///   could be inserted to maintain sorted order.
     /// * `Ok(usize)` if the value is found, containing the index of the value.

@@ -162,7 +162,7 @@ where
     /// # Errors
     ///
     /// * If an error occurs while retrieving the first node ID, it returns a
-    ///  `diesel::result::Error`.
+    ///   `diesel::result::Error`.
     fn first_node(&self, conn: &mut PgConnection) -> Result<Option<String>, diesel::result::Error> {
         Ok(self.nodes(conn)?.first().cloned())
     }
@@ -177,7 +177,7 @@ where
     /// # Errors
     ///
     /// * If an error occurs while retrieving the trackable nodes, it returns a
-    ///  `diesel::result::Error`.
+    ///   `diesel::result::Error`.
     fn trackable_nodes(&self, conn: &mut PgConnection) -> Result<String, diesel::result::Error> {
         let mut dot = String::new();
         for procedure_trackable in

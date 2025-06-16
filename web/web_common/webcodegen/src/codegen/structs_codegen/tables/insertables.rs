@@ -392,10 +392,8 @@ impl Codegen<'_> {
 
                     // If the foreign table is a partial builder table, we need to
                     // extend the `same_as_partial_builder_columns` list to include the column.
-                    for (partial_builder_column, _partial_builder_foreign_key) in
-                        &partial_builder_columns
-                    {
-                        if same_as_constraint_columns.contains(&partial_builder_column) {
+                    for partial_builder_column in partial_builder_columns.keys() {
+                        if same_as_constraint_columns.contains(partial_builder_column) {
                             let partial_builder_column_ident =
                                 partial_builder_column.snake_case_ident()?;
                             let partial_builder_column_camel_case_ident =

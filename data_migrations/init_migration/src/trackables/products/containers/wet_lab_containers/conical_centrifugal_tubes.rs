@@ -51,7 +51,7 @@ pub(crate) fn init_fisherbrand_cct_rack(user: &User, conn: &mut PgConnection) ->
         .unwrap()
         .expect("Rack should exist");
     let fisherbrand = fisherbrand(user, conn).unwrap();
-    let rack = CommercialProduct::new()
+    CommercialProduct::new()
         .name(Some(conical_tube.to_owned()))
         .unwrap()
         .description(Some(
@@ -65,7 +65,5 @@ pub(crate) fn init_fisherbrand_cct_rack(user: &User, conn: &mut PgConnection) ->
         .parent_id(conical_tube_rack_50ml.id)
         .unwrap()
         .insert(user.id, conn)
-        .unwrap();
-
-    rack
+        .unwrap()
 }
