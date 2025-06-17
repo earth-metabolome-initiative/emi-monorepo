@@ -28,10 +28,6 @@ where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<Self> for CommercialProduct where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
-{
-}
 impl diesel::Identifiable for CommercialProduct {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {

@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PackagingProcedureModelForeignKeys {
     pub id: Option<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
@@ -40,7 +40,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.packaging_model_id == packaging_models.id {
+                if self.packaging_model_id == packaging_models.trackable_id {
                     foreign_keys.packaging_model = Some(packaging_models);
                     updated = true;
                 }
@@ -49,7 +49,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::PackagingModel(packaging_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.packaging_model_id == packaging_models.id {
+                if self.packaging_model_id == packaging_models.trackable_id {
                     foreign_keys.packaging_model = None;
                     updated = true;
                 }

@@ -1,7 +1,7 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableInstrumentModelAttributes {
-    Id(crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes),
+    Id(crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes),
 }
 impl core::fmt::Display for InsertableInstrumentModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -26,29 +26,29 @@ impl InsertableInstrumentModel {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::table(),
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
                 self.id,
             ),
             conn,
@@ -58,39 +58,9 @@ impl InsertableInstrumentModel {
 #[derive(Default, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableInstrumentModelBuilder {
-    pub(crate) id:
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder,
+    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
 }
 impl InsertableInstrumentModelBuilder {
-    pub fn deprecation_date<P>(
-        mut self,
-        deprecation_date: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableInstrumentModelAttributes>>
-    where
-        P: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
-        <P as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self
-            .id
-            .deprecation_date(deprecation_date)
-            .map_err(|err| err.into_field_name(InsertableInstrumentModelAttributes::Id))?;
-        Ok(self)
-    }
-    pub fn brand_id<P>(
-        mut self,
-        brand_id: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableInstrumentModelAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self
-            .id
-            .brand_id(brand_id)
-            .map_err(|err| err.into_field_name(InsertableInstrumentModelAttributes::Id))?;
-        Ok(self)
-    }
     pub fn id<P>(
         mut self,
         id: P,
@@ -232,12 +202,12 @@ impl InsertableInstrumentModelBuilder {
         web_common_traits::database::InsertError<InsertableInstrumentModelAttributes>,
     >
     where
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder: web_common_traits::database::InsertableVariant<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+            Row = crate::codegen::structs_codegen::tables::trackables::Trackable,
             Error = web_common_traits::database::InsertError<
-                crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
+                crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
             >,
         >,
     {

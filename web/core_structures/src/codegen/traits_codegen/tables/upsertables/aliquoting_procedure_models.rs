@@ -13,7 +13,7 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
         use crate::codegen::diesel_codegen::tables::aliquoting_procedure_models::aliquoting_procedure_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
             .filter(
@@ -42,7 +42,7 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
         use crate::codegen::diesel_codegen::tables::aliquoting_procedure_models::aliquoting_procedure_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
             .filter(

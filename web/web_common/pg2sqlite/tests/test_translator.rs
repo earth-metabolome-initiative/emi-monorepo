@@ -14,7 +14,7 @@ fn test_translator() {
         .translate()
         .expect("Failed to translate the migrations");
 
-    assert_eq!(translated_migrations.len(), 60);
+    assert_eq!(translated_migrations.len(), 66);
 
     // We try to parse the translated migrations using the `sqlparser` crate,
     // for the `SQLite` dialect.

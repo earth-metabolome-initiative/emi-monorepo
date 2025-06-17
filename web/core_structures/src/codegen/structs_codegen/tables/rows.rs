@@ -1,11 +1,14 @@
 mod addresses;
-mod aliquoting_instrument_models;
 mod aliquoting_procedure_models;
+mod ball_mill_container_models;
+mod ball_mill_machine_models;
 mod ball_mill_procedure_models;
 mod bounded_read_dispatch;
 mod brands;
 mod capping_procedure_models;
 mod capping_rules;
+mod centrifugable_container_models;
+mod centrifuge_models;
 mod centrifuge_procedure_models;
 mod cities;
 mod colors;
@@ -19,11 +22,12 @@ mod disposal_procedure_models;
 mod documents;
 mod email_providers;
 mod fractioning_procedure_models;
+mod freeze_drier_models;
 mod freeze_drying_procedure_models;
+mod freezer_models;
 mod freezing_procedure_models;
 mod instrument_models;
 mod instrument_states;
-mod instruments;
 mod into_iter;
 mod len;
 mod login_providers;
@@ -54,8 +58,6 @@ mod reagents;
 mod roles;
 mod rooms;
 mod sample_states;
-mod sampling_procedure_models;
-mod shaking_procedure_models;
 mod shared_procedure_model_trackables;
 mod spatial_ref_sys;
 mod spectra;
@@ -85,14 +87,19 @@ mod weighing_procedures;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Rows {
     Address(Vec<crate::codegen::structs_codegen::tables::addresses::Address>),
-    AliquotingInstrumentModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::aliquoting_instrument_models::AliquotingInstrumentModel,
-        >,
-    ),
     AliquotingProcedureModel(
         Vec<
             crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
+        >,
+    ),
+    BallMillContainerModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::ball_mill_container_models::BallMillContainerModel,
+        >,
+    ),
+    BallMillMachineModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
         >,
     ),
     BallMillProcedureModel(
@@ -108,6 +115,14 @@ pub enum Rows {
     ),
     CappingRule(
         Vec<crate::codegen::structs_codegen::tables::capping_rules::CappingRule>,
+    ),
+    CentrifugableContainerModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::centrifugable_container_models::CentrifugableContainerModel,
+        >,
+    ),
+    CentrifugeModel(
+        Vec<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel>,
     ),
     CentrifugeProcedureModel(
         Vec<
@@ -150,10 +165,18 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel,
         >,
     ),
+    FreezeDrierModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel,
+        >,
+    ),
     FreezeDryingProcedureModel(
         Vec<
             crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel,
         >,
+    ),
+    FreezerModel(
+        Vec<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel>,
     ),
     FreezingProcedureModel(
         Vec<
@@ -166,7 +189,6 @@ pub enum Rows {
     InstrumentState(
         Vec<crate::codegen::structs_codegen::tables::instrument_states::InstrumentState>,
     ),
-    Instrument(Vec<crate::codegen::structs_codegen::tables::instruments::Instrument>),
     LoginProvider(
         Vec<crate::codegen::structs_codegen::tables::login_providers::LoginProvider>,
     ),
@@ -256,16 +278,6 @@ pub enum Rows {
     Room(Vec<crate::codegen::structs_codegen::tables::rooms::Room>),
     SampleState(
         Vec<crate::codegen::structs_codegen::tables::sample_states::SampleState>,
-    ),
-    SamplingProcedureModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::sampling_procedure_models::SamplingProcedureModel,
-        >,
-    ),
-    ShakingProcedureModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::shaking_procedure_models::ShakingProcedureModel,
-        >,
     ),
     SharedProcedureModelTrackable(
         Vec<
@@ -360,15 +372,22 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::AliquotingInstrumentModel(aliquoting_instrument_models) => {
-                aliquoting_instrument_models
+            Rows::AliquotingProcedureModel(aliquoting_procedure_models) => {
+                aliquoting_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::AliquotingProcedureModel(aliquoting_procedure_models) => {
-                aliquoting_procedure_models
+            Rows::BallMillContainerModel(ball_mill_container_models) => {
+                ball_mill_container_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::BallMillMachineModel(ball_mill_machine_models) => {
+                ball_mill_machine_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -397,6 +416,20 @@ impl Rows {
             }
             Rows::CappingRule(capping_rules) => {
                 capping_rules
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CentrifugableContainerModel(centrifugable_container_models) => {
+                centrifugable_container_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CentrifugeModel(centrifuge_models) => {
+                centrifuge_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -493,8 +526,22 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::FreezeDrierModel(freeze_drier_models) => {
+                freeze_drier_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
                 freeze_drying_procedure_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::FreezerModel(freezer_models) => {
+                freezer_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -516,13 +563,6 @@ impl Rows {
             }
             Rows::InstrumentState(instrument_states) => {
                 instrument_states
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Instrument(instruments) => {
-                instruments
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -724,20 +764,6 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::SamplingProcedureModel(sampling_procedure_models) => {
-                sampling_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::ShakingProcedureModel(shaking_procedure_models) => {
-                shaking_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
             Rows::SharedProcedureModelTrackable(shared_procedure_model_trackables) => {
                 shared_procedure_model_trackables
                     .iter()
@@ -913,11 +939,14 @@ impl web_common_traits::prelude::Rows for Rows {
     fn primary_keys(&self) -> Vec<Self::PrimaryKey> {
         match self {
             Rows::Address(addresses) => addresses.primary_keys(),
-            Rows::AliquotingInstrumentModel(aliquoting_instrument_models) => {
-                aliquoting_instrument_models.primary_keys()
-            }
             Rows::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 aliquoting_procedure_models.primary_keys()
+            }
+            Rows::BallMillContainerModel(ball_mill_container_models) => {
+                ball_mill_container_models.primary_keys()
+            }
+            Rows::BallMillMachineModel(ball_mill_machine_models) => {
+                ball_mill_machine_models.primary_keys()
             }
             Rows::BallMillProcedureModel(ball_mill_procedure_models) => {
                 ball_mill_procedure_models.primary_keys()
@@ -927,6 +956,10 @@ impl web_common_traits::prelude::Rows for Rows {
                 capping_procedure_models.primary_keys()
             }
             Rows::CappingRule(capping_rules) => capping_rules.primary_keys(),
+            Rows::CentrifugableContainerModel(centrifugable_container_models) => {
+                centrifugable_container_models.primary_keys()
+            }
+            Rows::CentrifugeModel(centrifuge_models) => centrifuge_models.primary_keys(),
             Rows::CentrifugeProcedureModel(centrifuge_procedure_models) => {
                 centrifuge_procedure_models.primary_keys()
             }
@@ -948,15 +981,16 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::FractioningProcedureModel(fractioning_procedure_models) => {
                 fractioning_procedure_models.primary_keys()
             }
+            Rows::FreezeDrierModel(freeze_drier_models) => freeze_drier_models.primary_keys(),
             Rows::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
                 freeze_drying_procedure_models.primary_keys()
             }
+            Rows::FreezerModel(freezer_models) => freezer_models.primary_keys(),
             Rows::FreezingProcedureModel(freezing_procedure_models) => {
                 freezing_procedure_models.primary_keys()
             }
             Rows::InstrumentModel(instrument_models) => instrument_models.primary_keys(),
             Rows::InstrumentState(instrument_states) => instrument_states.primary_keys(),
-            Rows::Instrument(instruments) => instruments.primary_keys(),
             Rows::LoginProvider(login_providers) => login_providers.primary_keys(),
             Rows::Material(materials) => materials.primary_keys(),
             Rows::MixCountableProcedureModel(mix_countable_procedure_models) => {
@@ -1001,12 +1035,6 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::Role(roles) => roles.primary_keys(),
             Rows::Room(rooms) => rooms.primary_keys(),
             Rows::SampleState(sample_states) => sample_states.primary_keys(),
-            Rows::SamplingProcedureModel(sampling_procedure_models) => {
-                sampling_procedure_models.primary_keys()
-            }
-            Rows::ShakingProcedureModel(shaking_procedure_models) => {
-                shaking_procedure_models.primary_keys()
-            }
             Rows::SharedProcedureModelTrackable(shared_procedure_model_trackables) => {
                 shared_procedure_model_trackables.primary_keys()
             }

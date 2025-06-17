@@ -26,12 +26,13 @@ pub(crate) fn init_lcms_maintenance_procedure(
 		.unwrap()
 
     // Check that the solvents on top of the LCMS are full
-    // * Needle cleaner solvent
-    // * Column cleaner solvent
-    // * Mobile phase A solvent
-    // * Mobile phase B solvent
+    // * Needle cleaner solvent: Magic mix 1:1:1:1 ACN:H2O:MeOH:IPA
+    // * Column cleaner solvent: Rear seal wash (ACN:H20 90:10)
+    // * Mobile phase A solvent: H2O + 0.1 Formic Acid
+    // * Mobile phase B solvent: ACN + 0.1 Formic Acid
 
     // Clean the source
-    // Clean the column
+    // Prime LC system
+    // Conditioning the column
     // Register column pressure
 }

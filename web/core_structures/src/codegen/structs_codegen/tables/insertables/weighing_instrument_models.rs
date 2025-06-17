@@ -2,23 +2,11 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableWeighingInstrumentModelAttributes {
     Id(crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelAttributes),
-    ErrorKilograms,
-    MinimumMeasurableKilograms,
-    MaximumMeasurableKilograms,
 }
 impl core::fmt::Display for InsertableWeighingInstrumentModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertableWeighingInstrumentModelAttributes::Id(id) => write!(f, "{}", id),
-            InsertableWeighingInstrumentModelAttributes::ErrorKilograms => {
-                write!(f, "error_kilograms")
-            }
-            InsertableWeighingInstrumentModelAttributes::MinimumMeasurableKilograms => {
-                write!(f, "minimum_measurable_kilograms")
-            }
-            InsertableWeighingInstrumentModelAttributes::MaximumMeasurableKilograms => {
-                write!(f, "maximum_measurable_kilograms")
-            }
         }
     }
 }
@@ -32,9 +20,6 @@ impl core::fmt::Display for InsertableWeighingInstrumentModelAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableWeighingInstrumentModel {
     id: ::rosetta_uuid::Uuid,
-    error_kilograms: f32,
-    minimum_measurable_kilograms: f32,
-    maximum_measurable_kilograms: f32,
 }
 impl InsertableWeighingInstrumentModel {
     pub fn id<C: diesel::connection::LoadConnection>(
@@ -76,172 +61,8 @@ impl InsertableWeighingInstrumentModel {
 pub struct InsertableWeighingInstrumentModelBuilder {
     pub(crate) id:
         crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder,
-    pub(crate) error_kilograms: Option<f32>,
-    pub(crate) minimum_measurable_kilograms: Option<f32>,
-    pub(crate) maximum_measurable_kilograms: Option<f32>,
 }
 impl InsertableWeighingInstrumentModelBuilder {
-    pub fn error_kilograms<P>(
-        mut self,
-        error_kilograms: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableWeighingInstrumentModelAttributes>,
-    >
-    where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let error_kilograms =
-            error_kilograms.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
-                Into::into(err)
-                    .rename_field(InsertableWeighingInstrumentModelAttributes::ErrorKilograms)
-            })?;
-        if let Some(minimum_measurable_kilograms) = self.minimum_measurable_kilograms {
-            pgrx_validation::must_be_strictly_smaller_than_f32(
-                error_kilograms,
-                minimum_measurable_kilograms,
-            )
-            .map_err(|e| {
-                e.rename_fields(
-                    InsertableWeighingInstrumentModelAttributes::ErrorKilograms,
-                    InsertableWeighingInstrumentModelAttributes::MinimumMeasurableKilograms,
-                )
-            })?;
-        }
-        pgrx_validation::must_be_strictly_positive_f32(error_kilograms).map_err(|e| {
-            e.rename_field(InsertableWeighingInstrumentModelAttributes::ErrorKilograms)
-        })?;
-        self.error_kilograms = Some(error_kilograms);
-        Ok(self)
-    }
-    pub fn minimum_measurable_kilograms<P>(
-        mut self,
-        minimum_measurable_kilograms: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableWeighingInstrumentModelAttributes>,
-    >
-    where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let minimum_measurable_kilograms = minimum_measurable_kilograms.try_into().map_err(
-            |err: <P as TryInto<f32>>::Error| {
-                Into::into(err).rename_field(
-                    InsertableWeighingInstrumentModelAttributes::MinimumMeasurableKilograms,
-                )
-            },
-        )?;
-        if let Some(error_kilograms) = self.error_kilograms {
-            pgrx_validation::must_be_strictly_smaller_than_f32(
-                error_kilograms,
-                minimum_measurable_kilograms,
-            )
-            .map_err(|e| {
-                e.rename_fields(
-                    InsertableWeighingInstrumentModelAttributes::ErrorKilograms,
-                    InsertableWeighingInstrumentModelAttributes::MinimumMeasurableKilograms,
-                )
-            })?;
-        }
-        if let Some(maximum_measurable_kilograms) = self.maximum_measurable_kilograms {
-            pgrx_validation::must_be_strictly_smaller_than_f32(
-                minimum_measurable_kilograms,
-                maximum_measurable_kilograms,
-            )
-            .map_err(|e| {
-                e.rename_fields(
-                    InsertableWeighingInstrumentModelAttributes::MinimumMeasurableKilograms,
-                    InsertableWeighingInstrumentModelAttributes::MaximumMeasurableKilograms,
-                )
-            })?;
-        }
-        pgrx_validation::must_be_strictly_positive_f32(minimum_measurable_kilograms).map_err(
-            |e| {
-                e.rename_field(
-                    InsertableWeighingInstrumentModelAttributes::MinimumMeasurableKilograms,
-                )
-            },
-        )?;
-        self.minimum_measurable_kilograms = Some(minimum_measurable_kilograms);
-        Ok(self)
-    }
-    pub fn maximum_measurable_kilograms<P>(
-        mut self,
-        maximum_measurable_kilograms: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableWeighingInstrumentModelAttributes>,
-    >
-    where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let maximum_measurable_kilograms = maximum_measurable_kilograms.try_into().map_err(
-            |err: <P as TryInto<f32>>::Error| {
-                Into::into(err).rename_field(
-                    InsertableWeighingInstrumentModelAttributes::MaximumMeasurableKilograms,
-                )
-            },
-        )?;
-        if let Some(minimum_measurable_kilograms) = self.minimum_measurable_kilograms {
-            pgrx_validation::must_be_strictly_smaller_than_f32(
-                minimum_measurable_kilograms,
-                maximum_measurable_kilograms,
-            )
-            .map_err(|e| {
-                e.rename_fields(
-                    InsertableWeighingInstrumentModelAttributes::MinimumMeasurableKilograms,
-                    InsertableWeighingInstrumentModelAttributes::MaximumMeasurableKilograms,
-                )
-            })?;
-        }
-        pgrx_validation::must_be_strictly_positive_f32(maximum_measurable_kilograms).map_err(
-            |e| {
-                e.rename_field(
-                    InsertableWeighingInstrumentModelAttributes::MaximumMeasurableKilograms,
-                )
-            },
-        )?;
-        self.maximum_measurable_kilograms = Some(maximum_measurable_kilograms);
-        Ok(self)
-    }
-    pub fn deprecation_date<P>(
-        mut self,
-        deprecation_date: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableWeighingInstrumentModelAttributes>,
-    >
-    where
-        P: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
-        <P as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self
-            .id
-            .deprecation_date(deprecation_date)
-            .map_err(|err| err.into_field_name(InsertableWeighingInstrumentModelAttributes::Id))?;
-        Ok(self)
-    }
-    pub fn brand_id<P>(
-        mut self,
-        brand_id: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableWeighingInstrumentModelAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self
-            .id
-            .brand_id(brand_id)
-            .map_err(|err| err.into_field_name(InsertableWeighingInstrumentModelAttributes::Id))?;
-        Ok(self)
-    }
     pub fn id<P>(
         mut self,
         id: P,
@@ -423,30 +244,11 @@ impl InsertableWeighingInstrumentModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let error_kilograms =
-            self.error_kilograms.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableWeighingInstrumentModelAttributes::ErrorKilograms,
-            ))?;
-        let minimum_measurable_kilograms = self.minimum_measurable_kilograms.ok_or(
-            common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableWeighingInstrumentModelAttributes::MinimumMeasurableKilograms,
-            ),
-        )?;
-        let maximum_measurable_kilograms = self.maximum_measurable_kilograms.ok_or(
-            common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableWeighingInstrumentModelAttributes::MaximumMeasurableKilograms,
-            ),
-        )?;
         let id = self
             .id
             .insert(user_id, conn)
             .map_err(|err| err.into_field_name(InsertableWeighingInstrumentModelAttributes::Id))?
             .id();
-        Ok(InsertableWeighingInstrumentModel {
-            id,
-            error_kilograms,
-            minimum_measurable_kilograms,
-            maximum_measurable_kilograms,
-        })
+        Ok(InsertableWeighingInstrumentModel { id })
     }
 }

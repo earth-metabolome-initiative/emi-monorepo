@@ -1,7 +1,7 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableAliquotingProcedureModelAttributes {
-    Id(
+    ProcedureModelId(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
     ),
     Liters,
@@ -18,7 +18,9 @@ pub enum InsertableAliquotingProcedureModelAttributes {
 impl core::fmt::Display for InsertableAliquotingProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableAliquotingProcedureModelAttributes::Id(id) => write!(f, "{}", id),
+            InsertableAliquotingProcedureModelAttributes::ProcedureModelId(procedure_model_id) => {
+                write!(f, "{}", procedure_model_id)
+            }
             InsertableAliquotingProcedureModelAttributes::Liters => write!(f, "liters"),
             InsertableAliquotingProcedureModelAttributes::Source(source) => {
                 write!(f, "{}", source)
@@ -41,14 +43,14 @@ impl core::fmt::Display for InsertableAliquotingProcedureModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableAliquotingProcedureModel {
-    id: i32,
+    procedure_model_id: i32,
     liters: f32,
     source: i32,
     destination: i32,
     aliquoted_with: i32,
 }
 impl InsertableAliquotingProcedureModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn procedure_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -75,7 +77,7 @@ impl InsertableAliquotingProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
-                self.id,
+                self.procedure_model_id,
             ),
             conn,
         )
@@ -180,7 +182,7 @@ impl InsertableAliquotingProcedureModel {
 #[derive(Default, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableAliquotingProcedureModelBuilder {
-    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) procedure_model_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     pub(crate) liters: Option<f32>,
     pub(crate) source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     pub(crate) destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -204,6 +206,27 @@ impl InsertableAliquotingProcedureModelBuilder {
         pgrx_validation::must_be_strictly_positive_f32(liters)
             .map_err(|e| e.rename_field(InsertableAliquotingProcedureModelAttributes::Liters))?;
         self.liters = Some(liters);
+        Ok(self)
+    }
+    pub fn destination(
+        mut self,
+        destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
+    > {
+        if destination.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertableAliquotingProcedureModelAttributes::Destination(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        self.destination = destination;
         Ok(self)
     }
     pub fn aliquoted_with(
@@ -248,27 +271,6 @@ impl InsertableAliquotingProcedureModelBuilder {
         self.source = source;
         Ok(self)
     }
-    pub fn destination(
-        mut self,
-        destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
-    > {
-        if destination.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableAliquotingProcedureModelAttributes::Destination(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.destination = destination;
-        Ok(self)
-    }
     pub fn name<P>(
         mut self,
         name: P,
@@ -280,10 +282,9 @@ impl InsertableAliquotingProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .name(name)
-            .map_err(|err| err.into_field_name(InsertableAliquotingProcedureModelAttributes::Id))?;
+        self.procedure_model_id = self.procedure_model_id.name(name).map_err(|err| {
+            err.into_field_name(InsertableAliquotingProcedureModelAttributes::ProcedureModelId)
+        })?;
         Ok(self)
     }
     pub fn description<P>(
@@ -297,10 +298,10 @@ impl InsertableAliquotingProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .description(description)
-            .map_err(|err| err.into_field_name(InsertableAliquotingProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.description(description).map_err(|err| {
+                err.into_field_name(InsertableAliquotingProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn deprecated<P>(
@@ -314,10 +315,10 @@ impl InsertableAliquotingProcedureModelBuilder {
         P: TryInto<bool>,
         <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .deprecated(deprecated)
-            .map_err(|err| err.into_field_name(InsertableAliquotingProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.deprecated(deprecated).map_err(|err| {
+                err.into_field_name(InsertableAliquotingProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn photograph_id<P>(
@@ -332,10 +333,10 @@ impl InsertableAliquotingProcedureModelBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .photograph_id(photograph_id)
-            .map_err(|err| err.into_field_name(InsertableAliquotingProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.photograph_id(photograph_id).map_err(|err| {
+                err.into_field_name(InsertableAliquotingProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn icon<P>(
@@ -349,10 +350,9 @@ impl InsertableAliquotingProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .icon(icon)
-            .map_err(|err| err.into_field_name(InsertableAliquotingProcedureModelAttributes::Id))?;
+        self.procedure_model_id = self.procedure_model_id.icon(icon).map_err(|err| {
+            err.into_field_name(InsertableAliquotingProcedureModelAttributes::ProcedureModelId)
+        })?;
         Ok(self)
     }
     pub fn created_by<P>(
@@ -366,10 +366,10 @@ impl InsertableAliquotingProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .created_by(created_by)
-            .map_err(|err| err.into_field_name(InsertableAliquotingProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.created_by(created_by).map_err(|err| {
+                err.into_field_name(InsertableAliquotingProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn created_at<P>(
@@ -384,10 +384,10 @@ impl InsertableAliquotingProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .created_at(created_at)
-            .map_err(|err| err.into_field_name(InsertableAliquotingProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.created_at(created_at).map_err(|err| {
+                err.into_field_name(InsertableAliquotingProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn updated_by<P>(
@@ -401,10 +401,10 @@ impl InsertableAliquotingProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .updated_by(updated_by)
-            .map_err(|err| err.into_field_name(InsertableAliquotingProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.updated_by(updated_by).map_err(|err| {
+                err.into_field_name(InsertableAliquotingProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn updated_at<P>(
@@ -419,10 +419,10 @@ impl InsertableAliquotingProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .updated_at(updated_at)
-            .map_err(|err| err.into_field_name(InsertableAliquotingProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.updated_at(updated_at).map_err(|err| {
+                err.into_field_name(InsertableAliquotingProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
 }
@@ -460,14 +460,27 @@ impl InsertableAliquotingProcedureModelBuilder {
         let liters = self.liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
             InsertableAliquotingProcedureModelAttributes::Liters,
         ))?;
-        let id = self
-            .id
+        let procedure_model_id = self
+            .procedure_model_id
             .insert(user_id, conn)
-            .map_err(|err| err.into_field_name(InsertableAliquotingProcedureModelAttributes::Id))?
+            .map_err(|err| {
+                err.into_field_name(InsertableAliquotingProcedureModelAttributes::ProcedureModelId)
+            })?
+            .id();
+        let destination = self
+            .destination
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(InsertableAliquotingProcedureModelAttributes::Destination)
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(InsertableAliquotingProcedureModelAttributes::Destination)
+            })?
             .id();
         let aliquoted_with = self
             .aliquoted_with
-            .procedure_model_id(id)
+            .procedure_model_id(procedure_model_id)
             .map_err(|err| {
                 err.into_field_name(InsertableAliquotingProcedureModelAttributes::AliquotedWith)
             })?
@@ -478,7 +491,7 @@ impl InsertableAliquotingProcedureModelBuilder {
             .id();
         let source = self
             .source
-            .procedure_model_id(id)
+            .procedure_model_id(procedure_model_id)
             .map_err(|err| {
                 err.into_field_name(InsertableAliquotingProcedureModelAttributes::Source)
             })?
@@ -487,17 +500,12 @@ impl InsertableAliquotingProcedureModelBuilder {
                 err.into_field_name(InsertableAliquotingProcedureModelAttributes::Source)
             })?
             .id();
-        let destination = self
-            .destination
-            .procedure_model_id(id)
-            .map_err(|err| {
-                err.into_field_name(InsertableAliquotingProcedureModelAttributes::Destination)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableAliquotingProcedureModelAttributes::Destination)
-            })?
-            .id();
-        Ok(InsertableAliquotingProcedureModel { id, liters, source, destination, aliquoted_with })
+        Ok(InsertableAliquotingProcedureModel {
+            procedure_model_id,
+            liters,
+            source,
+            destination,
+            aliquoted_with,
+        })
     }
 }

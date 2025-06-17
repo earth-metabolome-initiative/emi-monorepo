@@ -8,12 +8,12 @@
     diesel::Identifiable,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(primary_key(id))]
+#[diesel(primary_key(procedure_model_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models
 )]
 pub struct MixSolidProcedureModel {
-    pub id: i32,
+    pub procedure_model_id: i32,
     pub measured_with: i32,
     pub source: i32,
     pub destination: i32,
@@ -33,11 +33,11 @@ where
 impl diesel::Identifiable for MixSolidProcedureModel {
     type Id = i32;
     fn id(self) -> Self::Id {
-        self.id
+        self.procedure_model_id
     }
 }
 impl MixSolidProcedureModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn procedure_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -64,7 +64,7 @@ impl MixSolidProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
-                self.id,
+                self.procedure_model_id,
             ),
             conn,
         )
@@ -175,7 +175,7 @@ impl MixSolidProcedureModel {
         use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
         Self::table()
             .filter(mix_solid_procedure_models::measured_with.eq(measured_with))
-            .order_by(mix_solid_procedure_models::id.asc())
+            .order_by(mix_solid_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -188,7 +188,7 @@ impl MixSolidProcedureModel {
         use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
         Self::table()
             .filter(mix_solid_procedure_models::source.eq(source))
-            .order_by(mix_solid_procedure_models::id.asc())
+            .order_by(mix_solid_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -201,13 +201,13 @@ impl MixSolidProcedureModel {
         use crate::codegen::diesel_codegen::tables::mix_solid_procedure_models::mix_solid_procedure_models;
         Self::table()
             .filter(mix_solid_procedure_models::destination.eq(destination))
-            .order_by(mix_solid_procedure_models::id.asc())
+            .order_by(mix_solid_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_measured_with_and_id(
+    pub fn from_measured_with_and_procedure_model_id(
         measured_with: &i32,
-        id: &i32,
+        procedure_model_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -219,15 +219,15 @@ impl MixSolidProcedureModel {
             .filter(
                 mix_solid_procedure_models::measured_with
                     .eq(measured_with)
-                    .and(mix_solid_procedure_models::id.eq(id)),
+                    .and(mix_solid_procedure_models::procedure_model_id.eq(procedure_model_id)),
             )
-            .order_by(mix_solid_procedure_models::id.asc())
+            .order_by(mix_solid_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_source_and_id(
+    pub fn from_source_and_procedure_model_id(
         source: &i32,
-        id: &i32,
+        procedure_model_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -239,15 +239,15 @@ impl MixSolidProcedureModel {
             .filter(
                 mix_solid_procedure_models::source
                     .eq(source)
-                    .and(mix_solid_procedure_models::id.eq(id)),
+                    .and(mix_solid_procedure_models::procedure_model_id.eq(procedure_model_id)),
             )
-            .order_by(mix_solid_procedure_models::id.asc())
+            .order_by(mix_solid_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_destination_and_id(
+    pub fn from_destination_and_procedure_model_id(
         destination: &i32,
-        id: &i32,
+        procedure_model_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -259,9 +259,9 @@ impl MixSolidProcedureModel {
             .filter(
                 mix_solid_procedure_models::destination
                     .eq(destination)
-                    .and(mix_solid_procedure_models::id.eq(id)),
+                    .and(mix_solid_procedure_models::procedure_model_id.eq(procedure_model_id)),
             )
-            .order_by(mix_solid_procedure_models::id.asc())
+            .order_by(mix_solid_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -280,10 +280,11 @@ impl MixSolidProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(mix_solid_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::name.eq(name))
-            .order_by(mix_solid_procedure_models::id.asc())
+            .order_by(mix_solid_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
             .optional()
@@ -304,10 +305,11 @@ impl MixSolidProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(mix_solid_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::description.eq(description))
-            .order_by(mix_solid_procedure_models::id.asc())
+            .order_by(mix_solid_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -327,10 +329,11 @@ impl MixSolidProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(mix_solid_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::deprecated.eq(deprecated))
-            .order_by(mix_solid_procedure_models::id.asc())
+            .order_by(mix_solid_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -350,10 +353,11 @@ impl MixSolidProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(mix_solid_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::photograph_id.eq(photograph_id))
-            .order_by(mix_solid_procedure_models::id.asc())
+            .order_by(mix_solid_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -373,10 +377,11 @@ impl MixSolidProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(mix_solid_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::icon.eq(icon))
-            .order_by(mix_solid_procedure_models::id.asc())
+            .order_by(mix_solid_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -396,10 +401,11 @@ impl MixSolidProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(mix_solid_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::created_by.eq(created_by))
-            .order_by(mix_solid_procedure_models::id.asc())
+            .order_by(mix_solid_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -419,10 +425,11 @@ impl MixSolidProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(mix_solid_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::created_at.eq(created_at))
-            .order_by(mix_solid_procedure_models::id.asc())
+            .order_by(mix_solid_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -442,10 +449,11 @@ impl MixSolidProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(mix_solid_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::updated_by.eq(updated_by))
-            .order_by(mix_solid_procedure_models::id.asc())
+            .order_by(mix_solid_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -465,10 +473,11 @@ impl MixSolidProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(mix_solid_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(mix_solid_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::updated_at.eq(updated_at))
-            .order_by(mix_solid_procedure_models::id.asc())
+            .order_by(mix_solid_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }

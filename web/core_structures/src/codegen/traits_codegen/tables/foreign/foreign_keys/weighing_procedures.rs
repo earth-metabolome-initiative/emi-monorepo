@@ -91,7 +91,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_model_id == weighing_procedure_models.id {
+                if self.procedure_model_id == weighing_procedure_models.procedure_model_id {
                     foreign_keys.procedure_model = Some(weighing_procedure_models);
                     updated = true;
                 }
@@ -100,7 +100,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::WeighingProcedureModel(weighing_procedure_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_model_id == weighing_procedure_models.id {
+                if self.procedure_model_id == weighing_procedure_models.procedure_model_id {
                     foreign_keys.procedure_model = None;
                     updated = true;
                 }

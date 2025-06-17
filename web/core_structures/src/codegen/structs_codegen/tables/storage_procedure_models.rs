@@ -8,12 +8,12 @@
     diesel::Identifiable,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(primary_key(id))]
+#[diesel(primary_key(procedure_model_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::storage_procedure_models::storage_procedure_models
 )]
 pub struct StorageProcedureModel {
-    pub id: i32,
+    pub procedure_model_id: i32,
     pub child_container_id: ::rosetta_uuid::Uuid,
     pub procedure_child_container_id: i32,
     pub parent_container_id: ::rosetta_uuid::Uuid,
@@ -33,11 +33,11 @@ where
 impl diesel::Identifiable for StorageProcedureModel {
     type Id = i32;
     fn id(self) -> Self::Id {
-        self.id
+        self.procedure_model_id
     }
 }
 impl StorageProcedureModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn procedure_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -64,7 +64,7 @@ impl StorageProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
-                self.id,
+                self.procedure_model_id,
             ),
             conn,
         )
@@ -207,7 +207,7 @@ impl StorageProcedureModel {
         use crate::codegen::diesel_codegen::tables::storage_procedure_models::storage_procedure_models;
         Self::table()
             .filter(storage_procedure_models::child_container_id.eq(child_container_id))
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -223,7 +223,7 @@ impl StorageProcedureModel {
                 storage_procedure_models::procedure_child_container_id
                     .eq(procedure_child_container_id),
             )
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -236,7 +236,7 @@ impl StorageProcedureModel {
         use crate::codegen::diesel_codegen::tables::storage_procedure_models::storage_procedure_models;
         Self::table()
             .filter(storage_procedure_models::parent_container_id.eq(parent_container_id))
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -252,13 +252,13 @@ impl StorageProcedureModel {
                 storage_procedure_models::procedure_parent_container_id
                     .eq(procedure_parent_container_id),
             )
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_parent_container_id_and_id(
+    pub fn from_procedure_parent_container_id_and_procedure_model_id(
         procedure_parent_container_id: &i32,
-        id: &i32,
+        procedure_model_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -270,15 +270,15 @@ impl StorageProcedureModel {
             .filter(
                 storage_procedure_models::procedure_parent_container_id
                     .eq(procedure_parent_container_id)
-                    .and(storage_procedure_models::id.eq(id)),
+                    .and(storage_procedure_models::procedure_model_id.eq(procedure_model_id)),
             )
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_child_container_id_and_id(
+    pub fn from_procedure_child_container_id_and_procedure_model_id(
         procedure_child_container_id: &i32,
-        id: &i32,
+        procedure_model_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -290,9 +290,9 @@ impl StorageProcedureModel {
             .filter(
                 storage_procedure_models::procedure_child_container_id
                     .eq(procedure_child_container_id)
-                    .and(storage_procedure_models::id.eq(id)),
+                    .and(storage_procedure_models::procedure_model_id.eq(procedure_model_id)),
             )
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -312,7 +312,7 @@ impl StorageProcedureModel {
                     .eq(procedure_parent_container_id)
                     .and(storage_procedure_models::parent_container_id.eq(parent_container_id)),
             )
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -332,7 +332,7 @@ impl StorageProcedureModel {
                     .eq(procedure_child_container_id)
                     .and(storage_procedure_models::child_container_id.eq(child_container_id)),
             )
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -352,7 +352,7 @@ impl StorageProcedureModel {
                     .eq(parent_container_id)
                     .and(storage_procedure_models::child_container_id.eq(child_container_id)),
             )
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -370,10 +370,11 @@ impl StorageProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(storage_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(storage_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::name.eq(name))
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
             .optional()
@@ -393,10 +394,11 @@ impl StorageProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(storage_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(storage_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::description.eq(description))
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -415,10 +417,11 @@ impl StorageProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(storage_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(storage_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::deprecated.eq(deprecated))
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -437,10 +440,11 @@ impl StorageProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(storage_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(storage_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::photograph_id.eq(photograph_id))
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -459,10 +463,11 @@ impl StorageProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(storage_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(storage_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::icon.eq(icon))
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -481,10 +486,11 @@ impl StorageProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(storage_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(storage_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::created_by.eq(created_by))
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -503,10 +509,11 @@ impl StorageProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(storage_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(storage_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::created_at.eq(created_at))
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -525,10 +532,11 @@ impl StorageProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(storage_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(storage_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::updated_by.eq(updated_by))
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -547,10 +555,11 @@ impl StorageProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(storage_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(storage_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::updated_at.eq(updated_at))
-            .order_by(storage_procedure_models::id.asc())
+            .order_by(storage_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }

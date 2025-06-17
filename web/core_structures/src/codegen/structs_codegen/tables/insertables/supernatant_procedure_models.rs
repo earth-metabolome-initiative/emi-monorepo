@@ -1,7 +1,7 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableSupernatantProcedureModelAttributes {
-    Id(
+    ProcedureModelId(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
     ),
     Liters,
@@ -18,7 +18,9 @@ pub enum InsertableSupernatantProcedureModelAttributes {
 impl core::fmt::Display for InsertableSupernatantProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableSupernatantProcedureModelAttributes::Id(id) => write!(f, "{}", id),
+            InsertableSupernatantProcedureModelAttributes::ProcedureModelId(procedure_model_id) => {
+                write!(f, "{}", procedure_model_id)
+            }
             InsertableSupernatantProcedureModelAttributes::Liters => write!(f, "liters"),
             InsertableSupernatantProcedureModelAttributes::StratifiedSource(stratified_source) => {
                 write!(f, "{}", stratified_source)
@@ -41,14 +43,14 @@ impl core::fmt::Display for InsertableSupernatantProcedureModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableSupernatantProcedureModel {
-    id: i32,
+    procedure_model_id: i32,
     liters: f32,
     stratified_source: i32,
     supernatant_destination: i32,
     transferred_with: i32,
 }
 impl InsertableSupernatantProcedureModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn procedure_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -75,7 +77,7 @@ impl InsertableSupernatantProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
-                self.id,
+                self.procedure_model_id,
             ),
             conn,
         )
@@ -180,7 +182,7 @@ impl InsertableSupernatantProcedureModel {
 #[derive(Default, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableSupernatantProcedureModelBuilder {
-    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) procedure_model_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     pub(crate) liters: Option<f32>,
     pub(crate) stratified_source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     pub(crate) supernatant_destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -204,27 +206,6 @@ impl InsertableSupernatantProcedureModelBuilder {
         pgrx_validation::must_be_strictly_positive_f32(liters)
             .map_err(|e| e.rename_field(InsertableSupernatantProcedureModelAttributes::Liters))?;
         self.liters = Some(liters);
-        Ok(self)
-    }
-    pub fn transferred_with(
-        mut self,
-        transferred_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
-    > {
-        if transferred_with.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableSupernatantProcedureModelAttributes::TransferredWith(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.transferred_with = transferred_with;
         Ok(self)
     }
     pub fn supernatant_destination(
@@ -269,6 +250,27 @@ impl InsertableSupernatantProcedureModelBuilder {
         self.stratified_source = stratified_source;
         Ok(self)
     }
+    pub fn transferred_with(
+        mut self,
+        transferred_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+    > {
+        if transferred_with.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertableSupernatantProcedureModelAttributes::TransferredWith(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        self.transferred_with = transferred_with;
+        Ok(self)
+    }
     pub fn name<P>(
         mut self,
         name: P,
@@ -280,8 +282,8 @@ impl InsertableSupernatantProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.name(name).map_err(|err| {
-            err.into_field_name(InsertableSupernatantProcedureModelAttributes::Id)
+        self.procedure_model_id = self.procedure_model_id.name(name).map_err(|err| {
+            err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
         })?;
         Ok(self)
     }
@@ -296,9 +298,10 @@ impl InsertableSupernatantProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.description(description).map_err(|err| {
-            err.into_field_name(InsertableSupernatantProcedureModelAttributes::Id)
-        })?;
+        self.procedure_model_id =
+            self.procedure_model_id.description(description).map_err(|err| {
+                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn deprecated<P>(
@@ -312,9 +315,10 @@ impl InsertableSupernatantProcedureModelBuilder {
         P: TryInto<bool>,
         <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.deprecated(deprecated).map_err(|err| {
-            err.into_field_name(InsertableSupernatantProcedureModelAttributes::Id)
-        })?;
+        self.procedure_model_id =
+            self.procedure_model_id.deprecated(deprecated).map_err(|err| {
+                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn photograph_id<P>(
@@ -329,9 +333,10 @@ impl InsertableSupernatantProcedureModelBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.photograph_id(photograph_id).map_err(|err| {
-            err.into_field_name(InsertableSupernatantProcedureModelAttributes::Id)
-        })?;
+        self.procedure_model_id =
+            self.procedure_model_id.photograph_id(photograph_id).map_err(|err| {
+                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn icon<P>(
@@ -345,8 +350,8 @@ impl InsertableSupernatantProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.icon(icon).map_err(|err| {
-            err.into_field_name(InsertableSupernatantProcedureModelAttributes::Id)
+        self.procedure_model_id = self.procedure_model_id.icon(icon).map_err(|err| {
+            err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
         })?;
         Ok(self)
     }
@@ -361,9 +366,10 @@ impl InsertableSupernatantProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_by(created_by).map_err(|err| {
-            err.into_field_name(InsertableSupernatantProcedureModelAttributes::Id)
-        })?;
+        self.procedure_model_id =
+            self.procedure_model_id.created_by(created_by).map_err(|err| {
+                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn created_at<P>(
@@ -378,9 +384,10 @@ impl InsertableSupernatantProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_at(created_at).map_err(|err| {
-            err.into_field_name(InsertableSupernatantProcedureModelAttributes::Id)
-        })?;
+        self.procedure_model_id =
+            self.procedure_model_id.created_at(created_at).map_err(|err| {
+                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn updated_by<P>(
@@ -394,9 +401,10 @@ impl InsertableSupernatantProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_by(updated_by).map_err(|err| {
-            err.into_field_name(InsertableSupernatantProcedureModelAttributes::Id)
-        })?;
+        self.procedure_model_id =
+            self.procedure_model_id.updated_by(updated_by).map_err(|err| {
+                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn updated_at<P>(
@@ -411,9 +419,10 @@ impl InsertableSupernatantProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_at(updated_at).map_err(|err| {
-            err.into_field_name(InsertableSupernatantProcedureModelAttributes::Id)
-        })?;
+        self.procedure_model_id =
+            self.procedure_model_id.updated_at(updated_at).map_err(|err| {
+                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
 }
@@ -451,25 +460,16 @@ impl InsertableSupernatantProcedureModelBuilder {
         let liters = self.liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
             InsertableSupernatantProcedureModelAttributes::Liters,
         ))?;
-        let id = self
-            .id
-            .insert(user_id, conn)
-            .map_err(|err| err.into_field_name(InsertableSupernatantProcedureModelAttributes::Id))?
-            .id();
-        let transferred_with = self
-            .transferred_with
-            .procedure_model_id(id)
-            .map_err(|err| {
-                err.into_field_name(InsertableSupernatantProcedureModelAttributes::TransferredWith)
-            })?
+        let procedure_model_id = self
+            .procedure_model_id
             .insert(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(InsertableSupernatantProcedureModelAttributes::TransferredWith)
+                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
             })?
             .id();
         let supernatant_destination = self
             .supernatant_destination
-            .procedure_model_id(id)
+            .procedure_model_id(procedure_model_id)
             .map_err(|err| {
                 err.into_field_name(
                     InsertableSupernatantProcedureModelAttributes::SupernatantDestination,
@@ -484,7 +484,7 @@ impl InsertableSupernatantProcedureModelBuilder {
             .id();
         let stratified_source = self
             .stratified_source
-            .procedure_model_id(id)
+            .procedure_model_id(procedure_model_id)
             .map_err(|err| {
                 err.into_field_name(InsertableSupernatantProcedureModelAttributes::StratifiedSource)
             })?
@@ -493,8 +493,19 @@ impl InsertableSupernatantProcedureModelBuilder {
                 err.into_field_name(InsertableSupernatantProcedureModelAttributes::StratifiedSource)
             })?
             .id();
+        let transferred_with = self
+            .transferred_with
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(InsertableSupernatantProcedureModelAttributes::TransferredWith)
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(InsertableSupernatantProcedureModelAttributes::TransferredWith)
+            })?
+            .id();
         Ok(InsertableSupernatantProcedureModel {
-            id,
+            procedure_model_id,
             liters,
             stratified_source,
             supernatant_destination,

@@ -1,7 +1,7 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertablePouringProcedureModelAttributes {
-    Id(
+    ProcedureModelId(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
     ),
     MeasuredWith(
@@ -18,7 +18,9 @@ pub enum InsertablePouringProcedureModelAttributes {
 impl core::fmt::Display for InsertablePouringProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertablePouringProcedureModelAttributes::Id(id) => write!(f, "{}", id),
+            InsertablePouringProcedureModelAttributes::ProcedureModelId(procedure_model_id) => {
+                write!(f, "{}", procedure_model_id)
+            }
             InsertablePouringProcedureModelAttributes::MeasuredWith(measured_with) => {
                 write!(f, "{}", measured_with)
             }
@@ -41,14 +43,14 @@ impl core::fmt::Display for InsertablePouringProcedureModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertablePouringProcedureModel {
-    id: i32,
+    procedure_model_id: i32,
     measured_with: i32,
     source: i32,
     destination: i32,
     liters: f32,
 }
 impl InsertablePouringProcedureModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn procedure_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -75,7 +77,7 @@ impl InsertablePouringProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
-                self.id,
+                self.procedure_model_id,
             ),
             conn,
         )
@@ -180,7 +182,7 @@ impl InsertablePouringProcedureModel {
 #[derive(Default, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertablePouringProcedureModelBuilder {
-    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) procedure_model_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     pub(crate) measured_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     pub(crate) source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     pub(crate) destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -206,25 +208,25 @@ impl InsertablePouringProcedureModelBuilder {
         self.liters = Some(liters);
         Ok(self)
     }
-    pub fn source(
+    pub fn measured_with(
         mut self,
-        source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        measured_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertablePouringProcedureModelAttributes>,
     > {
-        if source.procedure_model_id.is_some() {
+        if measured_with.procedure_model_id.is_some() {
             return Err(
                 web_common_traits::database::InsertError::BuilderError(
                     web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertablePouringProcedureModelAttributes::Source(
+                        InsertablePouringProcedureModelAttributes::MeasuredWith(
                             crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
                         ),
                     ),
                 ),
             );
         }
-        self.source = source;
+        self.measured_with = measured_with;
         Ok(self)
     }
     pub fn destination(
@@ -248,25 +250,25 @@ impl InsertablePouringProcedureModelBuilder {
         self.destination = destination;
         Ok(self)
     }
-    pub fn measured_with(
+    pub fn source(
         mut self,
-        measured_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertablePouringProcedureModelAttributes>,
     > {
-        if measured_with.procedure_model_id.is_some() {
+        if source.procedure_model_id.is_some() {
             return Err(
                 web_common_traits::database::InsertError::BuilderError(
                     web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertablePouringProcedureModelAttributes::MeasuredWith(
+                        InsertablePouringProcedureModelAttributes::Source(
                             crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
                         ),
                     ),
                 ),
             );
         }
-        self.measured_with = measured_with;
+        self.source = source;
         Ok(self)
     }
     pub fn name<P>(
@@ -280,10 +282,9 @@ impl InsertablePouringProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .name(name)
-            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Id))?;
+        self.procedure_model_id = self.procedure_model_id.name(name).map_err(|err| {
+            err.into_field_name(InsertablePouringProcedureModelAttributes::ProcedureModelId)
+        })?;
         Ok(self)
     }
     pub fn description<P>(
@@ -297,10 +298,10 @@ impl InsertablePouringProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .description(description)
-            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.description(description).map_err(|err| {
+                err.into_field_name(InsertablePouringProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn deprecated<P>(
@@ -314,10 +315,10 @@ impl InsertablePouringProcedureModelBuilder {
         P: TryInto<bool>,
         <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .deprecated(deprecated)
-            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.deprecated(deprecated).map_err(|err| {
+                err.into_field_name(InsertablePouringProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn photograph_id<P>(
@@ -332,10 +333,10 @@ impl InsertablePouringProcedureModelBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .photograph_id(photograph_id)
-            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.photograph_id(photograph_id).map_err(|err| {
+                err.into_field_name(InsertablePouringProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn icon<P>(
@@ -349,10 +350,9 @@ impl InsertablePouringProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .icon(icon)
-            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Id))?;
+        self.procedure_model_id = self.procedure_model_id.icon(icon).map_err(|err| {
+            err.into_field_name(InsertablePouringProcedureModelAttributes::ProcedureModelId)
+        })?;
         Ok(self)
     }
     pub fn created_by<P>(
@@ -366,10 +366,10 @@ impl InsertablePouringProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .created_by(created_by)
-            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.created_by(created_by).map_err(|err| {
+                err.into_field_name(InsertablePouringProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn created_at<P>(
@@ -384,10 +384,10 @@ impl InsertablePouringProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .created_at(created_at)
-            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.created_at(created_at).map_err(|err| {
+                err.into_field_name(InsertablePouringProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn updated_by<P>(
@@ -401,10 +401,10 @@ impl InsertablePouringProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .updated_by(updated_by)
-            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.updated_by(updated_by).map_err(|err| {
+                err.into_field_name(InsertablePouringProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn updated_at<P>(
@@ -419,10 +419,10 @@ impl InsertablePouringProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .updated_at(updated_at)
-            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.updated_at(updated_at).map_err(|err| {
+                err.into_field_name(InsertablePouringProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
 }
@@ -460,32 +460,16 @@ impl InsertablePouringProcedureModelBuilder {
         let liters = self.liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
             InsertablePouringProcedureModelAttributes::Liters,
         ))?;
-        let id = self
-            .id
-            .insert(user_id, conn)
-            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Id))?
-            .id();
-        let source = self
-            .source
-            .procedure_model_id(id)
-            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Source))?
-            .insert(user_id, conn)
-            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Source))?
-            .id();
-        let destination = self
-            .destination
-            .procedure_model_id(id)
-            .map_err(|err| {
-                err.into_field_name(InsertablePouringProcedureModelAttributes::Destination)
-            })?
+        let procedure_model_id = self
+            .procedure_model_id
             .insert(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(InsertablePouringProcedureModelAttributes::Destination)
+                err.into_field_name(InsertablePouringProcedureModelAttributes::ProcedureModelId)
             })?
             .id();
         let measured_with = self
             .measured_with
-            .procedure_model_id(id)
+            .procedure_model_id(procedure_model_id)
             .map_err(|err| {
                 err.into_field_name(InsertablePouringProcedureModelAttributes::MeasuredWith)
             })?
@@ -494,6 +478,30 @@ impl InsertablePouringProcedureModelBuilder {
                 err.into_field_name(InsertablePouringProcedureModelAttributes::MeasuredWith)
             })?
             .id();
-        Ok(InsertablePouringProcedureModel { id, measured_with, source, destination, liters })
+        let destination = self
+            .destination
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(InsertablePouringProcedureModelAttributes::Destination)
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(InsertablePouringProcedureModelAttributes::Destination)
+            })?
+            .id();
+        let source = self
+            .source
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Source))?
+            .insert(user_id, conn)
+            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Source))?
+            .id();
+        Ok(InsertablePouringProcedureModel {
+            procedure_model_id,
+            measured_with,
+            source,
+            destination,
+            liters,
+        })
     }
 }

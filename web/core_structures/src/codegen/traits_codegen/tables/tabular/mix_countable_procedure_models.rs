@@ -16,7 +16,7 @@ for crate::codegen::structs_codegen::tables::mix_countable_procedure_models::Mix
     type PrimaryKey = crate::codegen::tables::table_primary_keys::TablePrimaryKey;
     fn primary_key(&self) -> Self::PrimaryKey {
         crate::codegen::tables::table_primary_keys::TablePrimaryKey::MixCountableProcedureModel(
-            self.id,
+            self.procedure_model_id,
         )
     }
 }

@@ -1,7 +1,7 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MountTipProcedureModelForeignKeys {
-    pub id: Option<
+    pub procedure_model: Option<
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     >,
     pub pipette: Option<
@@ -21,7 +21,9 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(self.id),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(
+                self.procedure_model_id,
+            ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
@@ -35,7 +37,7 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.id.is_some()
+        foreign_keys.procedure_model.is_some()
             && foreign_keys.pipette.is_some()
             && foreign_keys.pipette_tip.is_some()
     }
@@ -85,8 +87,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.id == procedure_models.id {
-                    foreign_keys.id = Some(procedure_models);
+                if self.procedure_model_id == procedure_models.id {
+                    foreign_keys.procedure_model = Some(procedure_models);
                     updated = true;
                 }
             }
@@ -94,8 +96,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.id == procedure_models.id {
-                    foreign_keys.id = None;
+                if self.procedure_model_id == procedure_models.id {
+                    foreign_keys.procedure_model = None;
                     updated = true;
                 }
             }

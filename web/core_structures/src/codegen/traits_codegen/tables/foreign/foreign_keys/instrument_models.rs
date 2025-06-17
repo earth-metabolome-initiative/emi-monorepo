@@ -1,7 +1,7 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InstrumentModelForeignKeys {
-    pub id: Option<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct>,
+    pub id: Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel
@@ -13,7 +13,7 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialProduct(self.id),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Trackable(self.id),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
@@ -28,21 +28,21 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::CommercialProduct(commercial_products),
+                crate::codegen::tables::row::Row::Trackable(trackables),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.id == commercial_products.id {
-                    foreign_keys.id = Some(commercial_products);
+                if self.id == trackables.id {
+                    foreign_keys.id = Some(trackables);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::CommercialProduct(commercial_products),
+                crate::codegen::tables::row::Row::Trackable(trackables),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.id == commercial_products.id {
+                if self.id == trackables.id {
                     foreign_keys.id = None;
                     updated = true;
                 }

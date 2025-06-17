@@ -8,16 +8,18 @@
     diesel::Identifiable,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(primary_key(id))]
+#[diesel(primary_key(procedure_model_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::centrifuge_procedure_models::centrifuge_procedure_models
 )]
 pub struct CentrifugeProcedureModel {
-    pub id: i32,
+    pub procedure_model_id: i32,
     pub seconds: f32,
     pub rotation_per_minute: f32,
-    pub centrifuged_with: i32,
-    pub container_id: i32,
+    pub centrifuged_with: ::rosetta_uuid::Uuid,
+    pub procedure_centrifuged_with: i32,
+    pub container_id: ::rosetta_uuid::Uuid,
+    pub procedure_container_id: i32,
 }
 impl web_common_traits::prelude::TableName for CentrifugeProcedureModel {
     const TABLE_NAME: &'static str = "centrifuge_procedure_models";
@@ -33,11 +35,11 @@ where
 impl diesel::Identifiable for CentrifugeProcedureModel {
     type Id = i32;
     fn id(self) -> Self::Id {
-        self.id
+        self.procedure_model_id
     }
 }
 impl CentrifugeProcedureModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn procedure_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -64,7 +66,7 @@ impl CentrifugeProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
-                self.id,
+                self.procedure_model_id,
             ),
             conn,
         )
@@ -73,35 +75,36 @@ impl CentrifugeProcedureModel {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel::table(
+                ),
                 self.centrifuged_with,
             ),
             conn,
         )
     }
-    pub fn container<C: diesel::connection::LoadConnection>(
+    pub fn procedure_centrifuged_with<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -128,14 +131,78 @@ impl CentrifugeProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.procedure_centrifuged_with,
+            ),
+            conn,
+        )
+    }
+    pub fn container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
                 self.container_id,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.procedure_container_id,
             ),
             conn,
         )
     }
     #[cfg(feature = "postgres")]
     pub fn from_centrifuged_with(
-        centrifuged_with: &i32,
+        centrifuged_with: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
@@ -143,12 +210,28 @@ impl CentrifugeProcedureModel {
         use crate::codegen::diesel_codegen::tables::centrifuge_procedure_models::centrifuge_procedure_models;
         Self::table()
             .filter(centrifuge_procedure_models::centrifuged_with.eq(centrifuged_with))
-            .order_by(centrifuge_procedure_models::id.asc())
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_centrifuged_with(
+        procedure_centrifuged_with: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::centrifuge_procedure_models::centrifuge_procedure_models;
+        Self::table()
+            .filter(
+                centrifuge_procedure_models::procedure_centrifuged_with
+                    .eq(procedure_centrifuged_with),
+            )
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_container_id(
-        container_id: &i32,
+        container_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
@@ -156,13 +239,106 @@ impl CentrifugeProcedureModel {
         use crate::codegen::diesel_codegen::tables::centrifuge_procedure_models::centrifuge_procedure_models;
         Self::table()
             .filter(centrifuge_procedure_models::container_id.eq(container_id))
-            .order_by(centrifuge_procedure_models::id.asc())
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_centrifuged_with_and_id(
-        centrifuged_with: &i32,
-        id: &i32,
+    pub fn from_procedure_container_id(
+        procedure_container_id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::centrifuge_procedure_models::centrifuge_procedure_models;
+        Self::table()
+            .filter(centrifuge_procedure_models::procedure_container_id.eq(procedure_container_id))
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_centrifuged_with_and_centrifuged_with(
+        procedure_centrifuged_with: &i32,
+        centrifuged_with: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::centrifuge_procedure_models::centrifuge_procedure_models;
+        Self::table()
+            .filter(
+                centrifuge_procedure_models::procedure_centrifuged_with
+                    .eq(procedure_centrifuged_with)
+                    .and(centrifuge_procedure_models::centrifuged_with.eq(centrifuged_with)),
+            )
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_centrifuged_with_and_procedure_model_id(
+        procedure_centrifuged_with: &i32,
+        procedure_model_id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::centrifuge_procedure_models::centrifuge_procedure_models;
+        Self::table()
+            .filter(
+                centrifuge_procedure_models::procedure_centrifuged_with
+                    .eq(procedure_centrifuged_with)
+                    .and(centrifuge_procedure_models::procedure_model_id.eq(procedure_model_id)),
+            )
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_container_id_and_container_id(
+        procedure_container_id: &i32,
+        container_id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::centrifuge_procedure_models::centrifuge_procedure_models;
+        Self::table()
+            .filter(
+                centrifuge_procedure_models::procedure_container_id
+                    .eq(procedure_container_id)
+                    .and(centrifuge_procedure_models::container_id.eq(container_id)),
+            )
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_container_id_and_procedure_model_id(
+        procedure_container_id: &i32,
+        procedure_model_id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::centrifuge_procedure_models::centrifuge_procedure_models;
+        Self::table()
+            .filter(
+                centrifuge_procedure_models::procedure_container_id
+                    .eq(procedure_container_id)
+                    .and(centrifuge_procedure_models::procedure_model_id.eq(procedure_model_id)),
+            )
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_centrifuged_with_and_container_id(
+        centrifuged_with: &::rosetta_uuid::Uuid,
+        container_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -174,29 +350,9 @@ impl CentrifugeProcedureModel {
             .filter(
                 centrifuge_procedure_models::centrifuged_with
                     .eq(centrifuged_with)
-                    .and(centrifuge_procedure_models::id.eq(id)),
+                    .and(centrifuge_procedure_models::container_id.eq(container_id)),
             )
-            .order_by(centrifuge_procedure_models::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_container_id_and_id(
-        container_id: &i32,
-        id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::centrifuge_procedure_models::centrifuge_procedure_models;
-        Self::table()
-            .filter(
-                centrifuge_procedure_models::container_id
-                    .eq(container_id)
-                    .and(centrifuge_procedure_models::id.eq(id)),
-            )
-            .order_by(centrifuge_procedure_models::id.asc())
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -216,10 +372,10 @@ impl CentrifugeProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(centrifuge_procedure_models::id.eq(procedure_models::id)),
+                    .on(centrifuge_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::name.eq(name))
-            .order_by(centrifuge_procedure_models::id.asc())
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
             .optional()
@@ -241,10 +397,10 @@ impl CentrifugeProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(centrifuge_procedure_models::id.eq(procedure_models::id)),
+                    .on(centrifuge_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::description.eq(description))
-            .order_by(centrifuge_procedure_models::id.asc())
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -265,10 +421,10 @@ impl CentrifugeProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(centrifuge_procedure_models::id.eq(procedure_models::id)),
+                    .on(centrifuge_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::deprecated.eq(deprecated))
-            .order_by(centrifuge_procedure_models::id.asc())
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -289,10 +445,10 @@ impl CentrifugeProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(centrifuge_procedure_models::id.eq(procedure_models::id)),
+                    .on(centrifuge_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::photograph_id.eq(photograph_id))
-            .order_by(centrifuge_procedure_models::id.asc())
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -313,10 +469,10 @@ impl CentrifugeProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(centrifuge_procedure_models::id.eq(procedure_models::id)),
+                    .on(centrifuge_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::icon.eq(icon))
-            .order_by(centrifuge_procedure_models::id.asc())
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -337,10 +493,10 @@ impl CentrifugeProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(centrifuge_procedure_models::id.eq(procedure_models::id)),
+                    .on(centrifuge_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::created_by.eq(created_by))
-            .order_by(centrifuge_procedure_models::id.asc())
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -361,10 +517,10 @@ impl CentrifugeProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(centrifuge_procedure_models::id.eq(procedure_models::id)),
+                    .on(centrifuge_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::created_at.eq(created_at))
-            .order_by(centrifuge_procedure_models::id.asc())
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -385,10 +541,10 @@ impl CentrifugeProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(centrifuge_procedure_models::id.eq(procedure_models::id)),
+                    .on(centrifuge_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::updated_by.eq(updated_by))
-            .order_by(centrifuge_procedure_models::id.asc())
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -409,10 +565,10 @@ impl CentrifugeProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(centrifuge_procedure_models::id.eq(procedure_models::id)),
+                    .on(centrifuge_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::updated_at.eq(updated_at))
-            .order_by(centrifuge_procedure_models::id.asc())
+            .order_by(centrifuge_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }

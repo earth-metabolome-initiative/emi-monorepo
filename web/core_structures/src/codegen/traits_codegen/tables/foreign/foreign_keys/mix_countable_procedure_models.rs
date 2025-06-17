@@ -1,7 +1,7 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MixCountableProcedureModelForeignKeys {
-    pub id: Option<
+    pub procedure_model: Option<
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     >,
     pub source: Option<
@@ -23,7 +23,7 @@ for crate::codegen::structs_codegen::tables::mix_countable_procedure_models::Mix
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(
-                        self.id,
+                        self.procedure_model_id,
                     ),
                 ),
             );
@@ -45,7 +45,7 @@ for crate::codegen::structs_codegen::tables::mix_countable_procedure_models::Mix
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.id.is_some() && foreign_keys.source.is_some()
+        foreign_keys.procedure_model.is_some() && foreign_keys.source.is_some()
             && foreign_keys.destination.is_some()
     }
     fn update(
@@ -94,8 +94,8 @@ for crate::codegen::structs_codegen::tables::mix_countable_procedure_models::Mix
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.id == procedure_models.id {
-                    foreign_keys.id = Some(procedure_models);
+                if self.procedure_model_id == procedure_models.id {
+                    foreign_keys.procedure_model = Some(procedure_models);
                     updated = true;
                 }
             }
@@ -103,8 +103,8 @@ for crate::codegen::structs_codegen::tables::mix_countable_procedure_models::Mix
                 crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.id == procedure_models.id {
-                    foreign_keys.id = None;
+                if self.procedure_model_id == procedure_models.id {
+                    foreign_keys.procedure_model = None;
                     updated = true;
                 }
             }

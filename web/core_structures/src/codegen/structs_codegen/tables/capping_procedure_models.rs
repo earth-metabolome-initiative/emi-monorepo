@@ -8,12 +8,12 @@
     diesel::Identifiable,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(primary_key(id))]
+#[diesel(primary_key(procedure_model_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::capping_procedure_models::capping_procedure_models
 )]
 pub struct CappingProcedureModel {
-    pub id: i32,
+    pub procedure_model_id: i32,
     pub container_id: ::rosetta_uuid::Uuid,
     pub procedure_container_id: i32,
     pub capped_with: ::rosetta_uuid::Uuid,
@@ -33,11 +33,43 @@ where
 impl diesel::Identifiable for CappingProcedureModel {
     type Id = i32;
     fn id(self) -> Self::Id {
-        self.id
+        self.procedure_model_id
     }
 }
 impl CappingProcedureModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn capped_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                self.capped_with,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -64,7 +96,7 @@ impl CappingProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
-                self.id,
+                self.procedure_model_id,
             ),
             conn,
         )
@@ -133,38 +165,6 @@ impl CappingProcedureModel {
             conn,
         )
     }
-    pub fn capped_with<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::trackables::Trackable,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
-                self.capped_with,
-            ),
-            conn,
-        )
-    }
     pub fn procedure_capped_with<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -207,7 +207,7 @@ impl CappingProcedureModel {
         use crate::codegen::diesel_codegen::tables::capping_procedure_models::capping_procedure_models;
         Self::table()
             .filter(capping_procedure_models::container_id.eq(container_id))
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -220,7 +220,7 @@ impl CappingProcedureModel {
         use crate::codegen::diesel_codegen::tables::capping_procedure_models::capping_procedure_models;
         Self::table()
             .filter(capping_procedure_models::procedure_container_id.eq(procedure_container_id))
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -233,7 +233,7 @@ impl CappingProcedureModel {
         use crate::codegen::diesel_codegen::tables::capping_procedure_models::capping_procedure_models;
         Self::table()
             .filter(capping_procedure_models::capped_with.eq(capped_with))
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -246,13 +246,13 @@ impl CappingProcedureModel {
         use crate::codegen::diesel_codegen::tables::capping_procedure_models::capping_procedure_models;
         Self::table()
             .filter(capping_procedure_models::procedure_capped_with.eq(procedure_capped_with))
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_container_id_and_id(
+    pub fn from_procedure_container_id_and_procedure_model_id(
         procedure_container_id: &i32,
-        id: &i32,
+        procedure_model_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -264,15 +264,15 @@ impl CappingProcedureModel {
             .filter(
                 capping_procedure_models::procedure_container_id
                     .eq(procedure_container_id)
-                    .and(capping_procedure_models::id.eq(id)),
+                    .and(capping_procedure_models::procedure_model_id.eq(procedure_model_id)),
             )
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_capped_with_and_id(
+    pub fn from_procedure_capped_with_and_procedure_model_id(
         procedure_capped_with: &i32,
-        id: &i32,
+        procedure_model_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -284,9 +284,9 @@ impl CappingProcedureModel {
             .filter(
                 capping_procedure_models::procedure_capped_with
                     .eq(procedure_capped_with)
-                    .and(capping_procedure_models::id.eq(id)),
+                    .and(capping_procedure_models::procedure_model_id.eq(procedure_model_id)),
             )
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -306,7 +306,7 @@ impl CappingProcedureModel {
                     .eq(procedure_container_id)
                     .and(capping_procedure_models::container_id.eq(container_id)),
             )
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -326,7 +326,7 @@ impl CappingProcedureModel {
                     .eq(procedure_capped_with)
                     .and(capping_procedure_models::capped_with.eq(capped_with)),
             )
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -346,7 +346,7 @@ impl CappingProcedureModel {
                     .eq(container_id)
                     .and(capping_procedure_models::capped_with.eq(capped_with)),
             )
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -364,10 +364,11 @@ impl CappingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(capping_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(capping_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::name.eq(name))
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
             .optional()
@@ -387,10 +388,11 @@ impl CappingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(capping_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(capping_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::description.eq(description))
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -409,10 +411,11 @@ impl CappingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(capping_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(capping_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::deprecated.eq(deprecated))
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -431,10 +434,11 @@ impl CappingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(capping_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(capping_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::photograph_id.eq(photograph_id))
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -453,10 +457,11 @@ impl CappingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(capping_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(capping_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::icon.eq(icon))
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -475,10 +480,11 @@ impl CappingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(capping_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(capping_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::created_by.eq(created_by))
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -497,10 +503,11 @@ impl CappingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(capping_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(capping_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::created_at.eq(created_at))
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -519,10 +526,11 @@ impl CappingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(capping_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(capping_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::updated_by.eq(updated_by))
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -541,10 +549,11 @@ impl CappingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(capping_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(capping_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::updated_at.eq(updated_at))
-            .order_by(capping_procedure_models::id.asc())
+            .order_by(capping_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }

@@ -3,11 +3,14 @@ impl web_common_traits::prelude::Tabular for super::Row {
     fn table_name(&self) -> Self::TableName {
         match self {
             super::Row::Address(_) => crate::codegen::tables::table_names::TableName::Address,
-            super::Row::AliquotingInstrumentModel(_) => {
-                crate::codegen::tables::table_names::TableName::AliquotingInstrumentModel
-            }
             super::Row::AliquotingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::AliquotingProcedureModel
+            }
+            super::Row::BallMillContainerModel(_) => {
+                crate::codegen::tables::table_names::TableName::BallMillContainerModel
+            }
+            super::Row::BallMillMachineModel(_) => {
+                crate::codegen::tables::table_names::TableName::BallMillMachineModel
             }
             super::Row::BallMillProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::BallMillProcedureModel
@@ -18,6 +21,12 @@ impl web_common_traits::prelude::Tabular for super::Row {
             }
             super::Row::CappingRule(_) => {
                 crate::codegen::tables::table_names::TableName::CappingRule
+            }
+            super::Row::CentrifugableContainerModel(_) => {
+                crate::codegen::tables::table_names::TableName::CentrifugableContainerModel
+            }
+            super::Row::CentrifugeModel(_) => {
+                crate::codegen::tables::table_names::TableName::CentrifugeModel
             }
             super::Row::CentrifugeProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::CentrifugeProcedureModel
@@ -48,8 +57,14 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::FractioningProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::FractioningProcedureModel
             }
+            super::Row::FreezeDrierModel(_) => {
+                crate::codegen::tables::table_names::TableName::FreezeDrierModel
+            }
             super::Row::FreezeDryingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::FreezeDryingProcedureModel
+            }
+            super::Row::FreezerModel(_) => {
+                crate::codegen::tables::table_names::TableName::FreezerModel
             }
             super::Row::FreezingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::FreezingProcedureModel
@@ -60,7 +75,6 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::InstrumentState(_) => {
                 crate::codegen::tables::table_names::TableName::InstrumentState
             }
-            super::Row::Instrument(_) => crate::codegen::tables::table_names::TableName::Instrument,
             super::Row::LoginProvider(_) => {
                 crate::codegen::tables::table_names::TableName::LoginProvider
             }
@@ -128,12 +142,6 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::Room(_) => crate::codegen::tables::table_names::TableName::Room,
             super::Row::SampleState(_) => {
                 crate::codegen::tables::table_names::TableName::SampleState
-            }
-            super::Row::SamplingProcedureModel(_) => {
-                crate::codegen::tables::table_names::TableName::SamplingProcedureModel
-            }
-            super::Row::ShakingProcedureModel(_) => {
-                crate::codegen::tables::table_names::TableName::ShakingProcedureModel
             }
             super::Row::SharedProcedureModelTrackable(_) => {
                 crate::codegen::tables::table_names::TableName::SharedProcedureModelTrackable

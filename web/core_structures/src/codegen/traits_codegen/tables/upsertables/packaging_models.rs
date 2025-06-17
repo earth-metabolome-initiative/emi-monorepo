@@ -13,10 +13,10 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         use crate::codegen::diesel_codegen::tables::packaging_models::packaging_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(trackable_id)
             .do_update()
             .set(self)
-            .filter(kilograms.ne(excluded(kilograms)))
+            .filter(material_id.ne(excluded(material_id)))
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -36,10 +36,10 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         use crate::codegen::diesel_codegen::tables::packaging_models::packaging_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(trackable_id)
             .do_update()
             .set(self)
-            .filter(kilograms.ne(excluded(kilograms)))
+            .filter(material_id.ne(excluded(material_id)))
             .get_results(conn)
             .map(|mut result| result.pop())
     }

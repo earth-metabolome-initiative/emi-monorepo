@@ -1,9 +1,14 @@
 //! Submodule to initialize the `instruments` in the database.
 
-use core_structures::{ContainerModel, Trackable, User, VolumetricContainerModel};
+use core_structures::{
+    BallMillContainerModel, BallMillMachineModel, CentrifugableContainerModel, CentrifugeModel,
+    FreezeDrierModel, FreezerModel, Trackable, User, VolumetricContainerModel,
+    WeighingInstrumentModel,
+};
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
+use crate::trackables::containers::SAFELOCK_TUBE_2ML;
 pub mod ball_mill_instrument;
 pub mod centrifuge_instrument;
 pub mod pipette_1000;
@@ -34,7 +39,7 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) {
         .insert(user.id, conn)
         .unwrap();
 
-    let _freezer = Trackable::new()
+    let _freezer = FreezerModel::new()
         .name(Some(FREEZER.to_owned()))
         .unwrap()
         .description(Some("-80°C Freezer".to_owned()))
@@ -46,7 +51,7 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) {
         .insert(user.id, conn)
         .unwrap();
 
-    let _freeze_dryer = Trackable::new()
+    let _freeze_dryer = FreezeDrierModel::new()
         .name(Some(FREEZE_DRYER.to_owned()))
         .unwrap()
         .description(Some("Freeze dryer".to_owned()))
@@ -58,7 +63,7 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) {
         .insert(user.id, conn)
         .unwrap();
 
-    let _weighing_scale = Trackable::new()
+    let _weighing_scale = WeighingInstrumentModel::new()
         .name(Some(WEIGHING_SCALE.to_owned()))
         .unwrap()
         .description(Some("Weighing scale for weighing samples".to_owned()))
@@ -70,7 +75,7 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) {
         .insert(user.id, conn)
         .unwrap();
 
-    let _ball_mill_machine = Trackable::new()
+    let ball_mill_machine = BallMillMachineModel::new()
         .name(Some(BALL_MILL_MACHINE.to_owned()))
         .unwrap()
         .description(Some("Ball mill machine for grinding samples".to_owned()))
@@ -82,7 +87,18 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) {
         .insert(user.id, conn)
         .unwrap();
 
-    let _centrifuge = Trackable::new()
+    let safelock_2ml =
+        VolumetricContainerModel::from_name(SAFELOCK_TUBE_2ML, conn).unwrap().unwrap();
+
+    BallMillContainerModel::new()
+        .milled_with(ball_mill_machine.id)
+        .unwrap()
+        .container_model_id(safelock_2ml.id)
+        .unwrap()
+        .insert(user.id, conn)
+        .unwrap();
+
+    let safelock_centrifuge = CentrifugeModel::new()
         .name(Some(SAFELOCK_CENTRIFUGE.to_owned()))
         .unwrap()
         .description(Some("Centrifuge for separating samples".to_owned()))
@@ -90,6 +106,14 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) {
         .parent_id(Some(instrument.id))
         .unwrap()
         .created_by(user.id)
+        .unwrap()
+        .insert(user.id, conn)
+        .unwrap();
+
+    CentrifugableContainerModel::new()
+        .centrifuged_with(safelock_centrifuge.id)
+        .unwrap()
+        .container_model_id(safelock_2ml.id)
         .unwrap()
         .insert(user.id, conn)
         .unwrap();

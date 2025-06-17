@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS procedure_trackables (
 CREATE TABLE IF NOT EXISTS weighing_procedures (
 	procedure_id UUID PRIMARY KEY REFERENCES procedures(id),
 	-- We enforce that the model of this procedure must be a weighing procedure model.
-	procedure_model_id INTEGER NOT NULL REFERENCES weighing_procedure_models(id),
+	procedure_model_id INTEGER NOT NULL REFERENCES weighing_procedure_models(procedure_model_id),
 	-- The identifier of the instrument used for weighing.
 	instrument_id UUID NOT NULL REFERENCES trackables(id),
 	-- The measured weight, which must be strictly positive.

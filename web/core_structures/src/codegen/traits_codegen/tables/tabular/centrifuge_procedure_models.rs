@@ -16,7 +16,7 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_models::Centri
     type PrimaryKey = crate::codegen::tables::table_primary_keys::TablePrimaryKey;
     fn primary_key(&self) -> Self::PrimaryKey {
         crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeProcedureModel(
-            self.id,
+            self.procedure_model_id,
         )
     }
 }

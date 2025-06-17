@@ -14,7 +14,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         use crate::codegen::diesel_codegen::tables::mount_tip_procedure_models::mount_tip_procedure_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
             .filter(pipette.ne(excluded(pipette)).or(pipette_tip.ne(excluded(pipette_tip))))
@@ -38,7 +38,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         use crate::codegen::diesel_codegen::tables::mount_tip_procedure_models::mount_tip_procedure_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
             .filter(pipette.ne(excluded(pipette)).or(pipette_tip.ne(excluded(pipette_tip))))

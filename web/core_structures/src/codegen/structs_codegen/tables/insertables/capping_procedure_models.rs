@@ -1,7 +1,7 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableCappingProcedureModelAttributes {
-    Id(
+    ProcedureModelId(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
     ),
     ContainerId,
@@ -16,7 +16,9 @@ pub enum InsertableCappingProcedureModelAttributes {
 impl core::fmt::Display for InsertableCappingProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableCappingProcedureModelAttributes::Id(id) => write!(f, "{}", id),
+            InsertableCappingProcedureModelAttributes::ProcedureModelId(procedure_model_id) => {
+                write!(f, "{}", procedure_model_id)
+            }
             InsertableCappingProcedureModelAttributes::ContainerId => {
                 write!(f, "container_id")
             }
@@ -41,14 +43,46 @@ impl core::fmt::Display for InsertableCappingProcedureModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCappingProcedureModel {
-    id: i32,
+    procedure_model_id: i32,
     container_id: ::rosetta_uuid::Uuid,
     procedure_container_id: i32,
     capped_with: ::rosetta_uuid::Uuid,
     procedure_capped_with: i32,
 }
 impl InsertableCappingProcedureModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn capped_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                self.capped_with,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -75,7 +109,7 @@ impl InsertableCappingProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
-                self.id,
+                self.procedure_model_id,
             ),
             conn,
         )
@@ -144,38 +178,6 @@ impl InsertableCappingProcedureModel {
             conn,
         )
     }
-    pub fn capped_with<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::trackables::Trackable,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
-                self.capped_with,
-            ),
-            conn,
-        )
-    }
     pub fn procedure_capped_with<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -212,7 +214,7 @@ impl InsertableCappingProcedureModel {
 #[derive(Default, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCappingProcedureModelBuilder {
-    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) procedure_model_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     pub(crate) container_id: Option<::rosetta_uuid::Uuid>,
     pub(crate) procedure_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     pub(crate) capped_with: Option<::rosetta_uuid::Uuid>,
@@ -365,10 +367,9 @@ impl InsertableCappingProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .name(name)
-            .map_err(|err| err.into_field_name(InsertableCappingProcedureModelAttributes::Id))?;
+        self.procedure_model_id = self.procedure_model_id.name(name).map_err(|err| {
+            err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureModelId)
+        })?;
         Ok(self)
     }
     pub fn description<P>(
@@ -382,10 +383,10 @@ impl InsertableCappingProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .description(description)
-            .map_err(|err| err.into_field_name(InsertableCappingProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.description(description).map_err(|err| {
+                err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn deprecated<P>(
@@ -399,10 +400,10 @@ impl InsertableCappingProcedureModelBuilder {
         P: TryInto<bool>,
         <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .deprecated(deprecated)
-            .map_err(|err| err.into_field_name(InsertableCappingProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.deprecated(deprecated).map_err(|err| {
+                err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn photograph_id<P>(
@@ -417,10 +418,10 @@ impl InsertableCappingProcedureModelBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .photograph_id(photograph_id)
-            .map_err(|err| err.into_field_name(InsertableCappingProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.photograph_id(photograph_id).map_err(|err| {
+                err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn icon<P>(
@@ -434,10 +435,9 @@ impl InsertableCappingProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .icon(icon)
-            .map_err(|err| err.into_field_name(InsertableCappingProcedureModelAttributes::Id))?;
+        self.procedure_model_id = self.procedure_model_id.icon(icon).map_err(|err| {
+            err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureModelId)
+        })?;
         Ok(self)
     }
     pub fn created_by<P>(
@@ -451,10 +451,10 @@ impl InsertableCappingProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .created_by(created_by)
-            .map_err(|err| err.into_field_name(InsertableCappingProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.created_by(created_by).map_err(|err| {
+                err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn created_at<P>(
@@ -469,10 +469,10 @@ impl InsertableCappingProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .created_at(created_at)
-            .map_err(|err| err.into_field_name(InsertableCappingProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.created_at(created_at).map_err(|err| {
+                err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn updated_by<P>(
@@ -486,10 +486,10 @@ impl InsertableCappingProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .updated_by(updated_by)
-            .map_err(|err| err.into_field_name(InsertableCappingProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.updated_by(updated_by).map_err(|err| {
+                err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn updated_at<P>(
@@ -504,10 +504,10 @@ impl InsertableCappingProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .updated_at(updated_at)
-            .map_err(|err| err.into_field_name(InsertableCappingProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.updated_at(updated_at).map_err(|err| {
+                err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
 }
@@ -550,14 +550,16 @@ impl InsertableCappingProcedureModelBuilder {
             self.capped_with.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableCappingProcedureModelAttributes::CappedWith,
             ))?;
-        let id = self
-            .id
+        let procedure_model_id = self
+            .procedure_model_id
             .insert(user_id, conn)
-            .map_err(|err| err.into_field_name(InsertableCappingProcedureModelAttributes::Id))?
+            .map_err(|err| {
+                err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureModelId)
+            })?
             .id();
         let procedure_container_id = self
             .procedure_container_id
-            .procedure_model_id(id)
+            .procedure_model_id(procedure_model_id)
             .map_err(|err| {
                 err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureContainerId)
             })?
@@ -568,7 +570,7 @@ impl InsertableCappingProcedureModelBuilder {
             .id();
         let procedure_capped_with = self
             .procedure_capped_with
-            .procedure_model_id(id)
+            .procedure_model_id(procedure_model_id)
             .map_err(|err| {
                 err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureCappedWith)
             })?
@@ -578,7 +580,7 @@ impl InsertableCappingProcedureModelBuilder {
             })?
             .id();
         Ok(InsertableCappingProcedureModel {
-            id,
+            procedure_model_id,
             container_id,
             procedure_container_id,
             capped_with,

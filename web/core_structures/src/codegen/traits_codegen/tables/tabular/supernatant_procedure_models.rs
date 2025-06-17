@@ -16,7 +16,7 @@ for crate::codegen::structs_codegen::tables::supernatant_procedure_models::Super
     type PrimaryKey = crate::codegen::tables::table_primary_keys::TablePrimaryKey;
     fn primary_key(&self) -> Self::PrimaryKey {
         crate::codegen::tables::table_primary_keys::TablePrimaryKey::SupernatantProcedureModel(
-            self.id,
+            self.procedure_model_id,
         )
     }
 }

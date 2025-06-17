@@ -193,8 +193,7 @@ where
         {
             dot.push_str(&format!(
                 "    T{} [label=\"{}\", shape=box, color={GREEN}];\n",
-                procedure_trackable.id,
-                procedure_trackable.name.replace(' ', "\\n")
+                procedure_trackable.id, procedure_trackable.name
             ));
         }
 

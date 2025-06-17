@@ -8,12 +8,12 @@
     diesel::Identifiable,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(primary_key(id))]
+#[diesel(primary_key(procedure_model_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::aliquoting_procedure_models::aliquoting_procedure_models
 )]
 pub struct AliquotingProcedureModel {
-    pub id: i32,
+    pub procedure_model_id: i32,
     pub liters: f32,
     pub source: i32,
     pub destination: i32,
@@ -33,11 +33,11 @@ where
 impl diesel::Identifiable for AliquotingProcedureModel {
     type Id = i32;
     fn id(self) -> Self::Id {
-        self.id
+        self.procedure_model_id
     }
 }
 impl AliquotingProcedureModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn procedure_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -64,7 +64,7 @@ impl AliquotingProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
-                self.id,
+                self.procedure_model_id,
             ),
             conn,
         )
@@ -175,7 +175,7 @@ impl AliquotingProcedureModel {
         use crate::codegen::diesel_codegen::tables::aliquoting_procedure_models::aliquoting_procedure_models;
         Self::table()
             .filter(aliquoting_procedure_models::source.eq(source))
-            .order_by(aliquoting_procedure_models::id.asc())
+            .order_by(aliquoting_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -188,7 +188,7 @@ impl AliquotingProcedureModel {
         use crate::codegen::diesel_codegen::tables::aliquoting_procedure_models::aliquoting_procedure_models;
         Self::table()
             .filter(aliquoting_procedure_models::destination.eq(destination))
-            .order_by(aliquoting_procedure_models::id.asc())
+            .order_by(aliquoting_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -201,13 +201,13 @@ impl AliquotingProcedureModel {
         use crate::codegen::diesel_codegen::tables::aliquoting_procedure_models::aliquoting_procedure_models;
         Self::table()
             .filter(aliquoting_procedure_models::aliquoted_with.eq(aliquoted_with))
-            .order_by(aliquoting_procedure_models::id.asc())
+            .order_by(aliquoting_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_aliquoted_with_and_id(
+    pub fn from_aliquoted_with_and_procedure_model_id(
         aliquoted_with: &i32,
-        id: &i32,
+        procedure_model_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -219,15 +219,15 @@ impl AliquotingProcedureModel {
             .filter(
                 aliquoting_procedure_models::aliquoted_with
                     .eq(aliquoted_with)
-                    .and(aliquoting_procedure_models::id.eq(id)),
+                    .and(aliquoting_procedure_models::procedure_model_id.eq(procedure_model_id)),
             )
-            .order_by(aliquoting_procedure_models::id.asc())
+            .order_by(aliquoting_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_source_and_id(
+    pub fn from_source_and_procedure_model_id(
         source: &i32,
-        id: &i32,
+        procedure_model_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -239,15 +239,15 @@ impl AliquotingProcedureModel {
             .filter(
                 aliquoting_procedure_models::source
                     .eq(source)
-                    .and(aliquoting_procedure_models::id.eq(id)),
+                    .and(aliquoting_procedure_models::procedure_model_id.eq(procedure_model_id)),
             )
-            .order_by(aliquoting_procedure_models::id.asc())
+            .order_by(aliquoting_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_destination_and_id(
+    pub fn from_destination_and_procedure_model_id(
         destination: &i32,
-        id: &i32,
+        procedure_model_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -259,9 +259,9 @@ impl AliquotingProcedureModel {
             .filter(
                 aliquoting_procedure_models::destination
                     .eq(destination)
-                    .and(aliquoting_procedure_models::id.eq(id)),
+                    .and(aliquoting_procedure_models::procedure_model_id.eq(procedure_model_id)),
             )
-            .order_by(aliquoting_procedure_models::id.asc())
+            .order_by(aliquoting_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -281,10 +281,10 @@ impl AliquotingProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(aliquoting_procedure_models::id.eq(procedure_models::id)),
+                    .on(aliquoting_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::name.eq(name))
-            .order_by(aliquoting_procedure_models::id.asc())
+            .order_by(aliquoting_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
             .optional()
@@ -306,10 +306,10 @@ impl AliquotingProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(aliquoting_procedure_models::id.eq(procedure_models::id)),
+                    .on(aliquoting_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::description.eq(description))
-            .order_by(aliquoting_procedure_models::id.asc())
+            .order_by(aliquoting_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -330,10 +330,10 @@ impl AliquotingProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(aliquoting_procedure_models::id.eq(procedure_models::id)),
+                    .on(aliquoting_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::deprecated.eq(deprecated))
-            .order_by(aliquoting_procedure_models::id.asc())
+            .order_by(aliquoting_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -354,10 +354,10 @@ impl AliquotingProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(aliquoting_procedure_models::id.eq(procedure_models::id)),
+                    .on(aliquoting_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::photograph_id.eq(photograph_id))
-            .order_by(aliquoting_procedure_models::id.asc())
+            .order_by(aliquoting_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -378,10 +378,10 @@ impl AliquotingProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(aliquoting_procedure_models::id.eq(procedure_models::id)),
+                    .on(aliquoting_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::icon.eq(icon))
-            .order_by(aliquoting_procedure_models::id.asc())
+            .order_by(aliquoting_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -402,10 +402,10 @@ impl AliquotingProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(aliquoting_procedure_models::id.eq(procedure_models::id)),
+                    .on(aliquoting_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::created_by.eq(created_by))
-            .order_by(aliquoting_procedure_models::id.asc())
+            .order_by(aliquoting_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -426,10 +426,10 @@ impl AliquotingProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(aliquoting_procedure_models::id.eq(procedure_models::id)),
+                    .on(aliquoting_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::created_at.eq(created_at))
-            .order_by(aliquoting_procedure_models::id.asc())
+            .order_by(aliquoting_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -450,10 +450,10 @@ impl AliquotingProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(aliquoting_procedure_models::id.eq(procedure_models::id)),
+                    .on(aliquoting_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::updated_by.eq(updated_by))
-            .order_by(aliquoting_procedure_models::id.asc())
+            .order_by(aliquoting_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -474,10 +474,10 @@ impl AliquotingProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(aliquoting_procedure_models::id.eq(procedure_models::id)),
+                    .on(aliquoting_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::updated_at.eq(updated_at))
-            .order_by(aliquoting_procedure_models::id.asc())
+            .order_by(aliquoting_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }

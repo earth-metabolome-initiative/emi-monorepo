@@ -77,7 +77,7 @@ where
         use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModel = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.id(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.procedure_model(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),

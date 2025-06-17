@@ -1,6 +1,6 @@
 //! Submodule to initialize the sample containers in the database.
 
-use core_structures::{ContainerModel, StorageRule, Trackable, User, VolumetricContainerModel};
+use core_structures::{ContainerModel, StorageRule, User, VolumetricContainerModel};
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -10,11 +10,11 @@ pub const CONICAL_CENTRIFUGAL_TUBE_50ML_RACK: &str = "Conical Tube Rack 50ml";
 
 pub(super) fn init_conical_centrifugal_tubes(
     user: &User,
-    container: &Trackable,
-    wet_lab_container: &Trackable,
+    container: &ContainerModel,
+    wet_lab_container: &ContainerModel,
     conn: &mut PgConnection,
 ) {
-    let conical_tube = Trackable::new()
+    let conical_tube = ContainerModel::new()
         .name(Some(CONICAL_CENTRIFUGAL_TUBE.to_owned()))
         .unwrap()
         .description(Some("Conical tube, a common container for samples".to_owned()))

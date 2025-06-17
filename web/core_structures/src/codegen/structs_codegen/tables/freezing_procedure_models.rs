@@ -8,15 +8,16 @@
     diesel::Identifiable,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(primary_key(id))]
+#[diesel(primary_key(procedure_model_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::freezing_procedure_models::freezing_procedure_models
 )]
 pub struct FreezingProcedureModel {
-    pub id: i32,
+    pub procedure_model_id: i32,
     pub kelvin: f32,
     pub seconds: f32,
-    pub frozen_with: i32,
+    pub frozen_with: ::rosetta_uuid::Uuid,
+    pub procedure_frozen_with: i32,
     pub source_container: i32,
 }
 impl web_common_traits::prelude::TableName for FreezingProcedureModel {
@@ -33,11 +34,11 @@ where
 impl diesel::Identifiable for FreezingProcedureModel {
     type Id = i32;
     fn id(self) -> Self::Id {
-        self.id
+        self.procedure_model_id
     }
 }
 impl FreezingProcedureModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn procedure_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -64,12 +65,44 @@ impl FreezingProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
-                self.id,
+                self.procedure_model_id,
             ),
             conn,
         )
     }
     pub fn frozen_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::freezer_models::FreezerModel::table(),
+                self.frozen_with,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_frozen_with<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -96,7 +129,7 @@ impl FreezingProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
-                self.frozen_with,
+                self.procedure_frozen_with,
             ),
             conn,
         )
@@ -135,7 +168,7 @@ impl FreezingProcedureModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_frozen_with(
-        frozen_with: &i32,
+        frozen_with: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
@@ -143,7 +176,20 @@ impl FreezingProcedureModel {
         use crate::codegen::diesel_codegen::tables::freezing_procedure_models::freezing_procedure_models;
         Self::table()
             .filter(freezing_procedure_models::frozen_with.eq(frozen_with))
-            .order_by(freezing_procedure_models::id.asc())
+            .order_by(freezing_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_frozen_with(
+        procedure_frozen_with: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::freezing_procedure_models::freezing_procedure_models;
+        Self::table()
+            .filter(freezing_procedure_models::procedure_frozen_with.eq(procedure_frozen_with))
+            .order_by(freezing_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -156,13 +202,13 @@ impl FreezingProcedureModel {
         use crate::codegen::diesel_codegen::tables::freezing_procedure_models::freezing_procedure_models;
         Self::table()
             .filter(freezing_procedure_models::source_container.eq(source_container))
-            .order_by(freezing_procedure_models::id.asc())
+            .order_by(freezing_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_frozen_with_and_id(
-        frozen_with: &i32,
-        id: &i32,
+    pub fn from_procedure_frozen_with_and_frozen_with(
+        procedure_frozen_with: &i32,
+        frozen_with: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -172,17 +218,37 @@ impl FreezingProcedureModel {
         use crate::codegen::diesel_codegen::tables::freezing_procedure_models::freezing_procedure_models;
         Self::table()
             .filter(
-                freezing_procedure_models::frozen_with
-                    .eq(frozen_with)
-                    .and(freezing_procedure_models::id.eq(id)),
+                freezing_procedure_models::procedure_frozen_with
+                    .eq(procedure_frozen_with)
+                    .and(freezing_procedure_models::frozen_with.eq(frozen_with)),
             )
-            .order_by(freezing_procedure_models::id.asc())
+            .order_by(freezing_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_source_container_and_id(
+    pub fn from_procedure_frozen_with_and_procedure_model_id(
+        procedure_frozen_with: &i32,
+        procedure_model_id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::freezing_procedure_models::freezing_procedure_models;
+        Self::table()
+            .filter(
+                freezing_procedure_models::procedure_frozen_with
+                    .eq(procedure_frozen_with)
+                    .and(freezing_procedure_models::procedure_model_id.eq(procedure_model_id)),
+            )
+            .order_by(freezing_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_source_container_and_procedure_model_id(
         source_container: &i32,
-        id: &i32,
+        procedure_model_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -194,9 +260,9 @@ impl FreezingProcedureModel {
             .filter(
                 freezing_procedure_models::source_container
                     .eq(source_container)
-                    .and(freezing_procedure_models::id.eq(id)),
+                    .and(freezing_procedure_models::procedure_model_id.eq(procedure_model_id)),
             )
-            .order_by(freezing_procedure_models::id.asc())
+            .order_by(freezing_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -215,10 +281,11 @@ impl FreezingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(freezing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(freezing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::name.eq(name))
-            .order_by(freezing_procedure_models::id.asc())
+            .order_by(freezing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
             .optional()
@@ -239,10 +306,11 @@ impl FreezingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(freezing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(freezing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::description.eq(description))
-            .order_by(freezing_procedure_models::id.asc())
+            .order_by(freezing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -262,10 +330,11 @@ impl FreezingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(freezing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(freezing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::deprecated.eq(deprecated))
-            .order_by(freezing_procedure_models::id.asc())
+            .order_by(freezing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -285,10 +354,11 @@ impl FreezingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(freezing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(freezing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::photograph_id.eq(photograph_id))
-            .order_by(freezing_procedure_models::id.asc())
+            .order_by(freezing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -308,10 +378,11 @@ impl FreezingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(freezing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(freezing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::icon.eq(icon))
-            .order_by(freezing_procedure_models::id.asc())
+            .order_by(freezing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -331,10 +402,11 @@ impl FreezingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(freezing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(freezing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::created_by.eq(created_by))
-            .order_by(freezing_procedure_models::id.asc())
+            .order_by(freezing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -354,10 +426,11 @@ impl FreezingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(freezing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(freezing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::created_at.eq(created_at))
-            .order_by(freezing_procedure_models::id.asc())
+            .order_by(freezing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -377,10 +450,11 @@ impl FreezingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(freezing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(freezing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::updated_by.eq(updated_by))
-            .order_by(freezing_procedure_models::id.asc())
+            .order_by(freezing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -400,10 +474,11 @@ impl FreezingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(freezing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(freezing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::updated_at.eq(updated_at))
-            .order_by(freezing_procedure_models::id.asc())
+            .order_by(freezing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }

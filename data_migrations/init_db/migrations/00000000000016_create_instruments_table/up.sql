@@ -1,0 +1,43 @@
+CREATE TABLE
+	IF NOT EXISTS instrument_models (
+		id UUID PRIMARY KEY REFERENCES trackables (id) ON DELETE CASCADE
+	);
+
+CREATE TABLE
+	IF NOT EXISTS weighing_instrument_models (
+		id UUID PRIMARY KEY REFERENCES instrument_models (id) ON DELETE CASCADE
+	);
+
+CREATE TABLE
+	IF NOT EXISTS freezer_models (
+		id UUID PRIMARY KEY REFERENCES instrument_models (id) ON DELETE CASCADE
+	);
+
+CREATE TABLE
+	IF NOT EXISTS freeze_drier_models (
+		id UUID PRIMARY KEY REFERENCES instrument_models (id) ON DELETE CASCADE
+	);
+
+CREATE TABLE
+	IF NOT EXISTS centrifuge_models (
+		id UUID PRIMARY KEY REFERENCES instrument_models (id) ON DELETE CASCADE
+	);
+
+CREATE TABLE
+	IF NOT EXISTS centrifugable_container_models (
+		centrifuged_with UUID NOT NULL REFERENCES centrifuge_models (id) ON DELETE CASCADE,
+		container_model_id UUID NOT NULL REFERENCES container_models (id) ON DELETE CASCADE,
+		PRIMARY KEY (centrifuged_with, container_model_id)
+	);
+
+CREATE TABLE
+	IF NOT EXISTS ball_mill_machine_models (
+		id UUID PRIMARY KEY REFERENCES instrument_models (id) ON DELETE CASCADE
+	);
+
+CREATE TABLE
+	IF NOT EXISTS ball_mill_container_models (
+		milled_with UUID NOT NULL REFERENCES ball_mill_machine_models (id) ON DELETE CASCADE,
+		container_model_id UUID NOT NULL REFERENCES container_models (id) ON DELETE CASCADE,
+		PRIMARY KEY (milled_with, container_model_id)
+	);

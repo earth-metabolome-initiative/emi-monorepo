@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Copy)]
+#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(
     diesel::Selectable,
@@ -8,13 +8,13 @@
     diesel::Identifiable,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(primary_key(id))]
+#[diesel(primary_key(trackable_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::packaging_models::packaging_models
 )]
 pub struct PackagingModel {
-    pub id: ::rosetta_uuid::Uuid,
-    pub kilograms: f32,
+    pub trackable_id: ::rosetta_uuid::Uuid,
+    pub material_id: i16,
 }
 impl web_common_traits::prelude::TableName for PackagingModel {
     const TABLE_NAME: &'static str = "packaging_models";
@@ -27,52 +27,89 @@ where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-    > for PackagingModel
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
-{
-}
 impl diesel::Identifiable for PackagingModel {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {
-        self.id
+        self.trackable_id
     }
 }
 impl PackagingModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn trackable<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::table(),
-                self.id,
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                self.trackable_id,
             ),
             conn,
         )
+    }
+    pub fn material<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::materials::Material,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::materials::Material: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::materials::Material as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::materials::Material as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::materials::Material as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::materials::Material as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::materials::Material as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::materials::Material as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::materials::Material,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::materials::Material::table(),
+                self.material_id,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_material_id(
+        material_id: &i16,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::packaging_models::packaging_models;
+        Self::table()
+            .filter(packaging_models::material_id.eq(material_id))
+            .order_by(packaging_models::trackable_id.asc())
+            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(
@@ -88,9 +125,9 @@ impl PackagingModel {
             packaging_models::packaging_models, trackables::trackables,
         };
         Self::table()
-            .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
+            .inner_join(trackables::table.on(packaging_models::trackable_id.eq(trackables::id)))
             .filter(trackables::name.eq(name))
-            .order_by(packaging_models::id.asc())
+            .order_by(packaging_models::trackable_id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
             .optional()
@@ -109,9 +146,9 @@ impl PackagingModel {
             packaging_models::packaging_models, trackables::trackables,
         };
         Self::table()
-            .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
+            .inner_join(trackables::table.on(packaging_models::trackable_id.eq(trackables::id)))
             .filter(trackables::description.eq(description))
-            .order_by(packaging_models::id.asc())
+            .order_by(packaging_models::trackable_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -129,9 +166,9 @@ impl PackagingModel {
             packaging_models::packaging_models, trackables::trackables,
         };
         Self::table()
-            .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
+            .inner_join(trackables::table.on(packaging_models::trackable_id.eq(trackables::id)))
             .filter(trackables::photograph_id.eq(photograph_id))
-            .order_by(packaging_models::id.asc())
+            .order_by(packaging_models::trackable_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -149,9 +186,9 @@ impl PackagingModel {
             packaging_models::packaging_models, trackables::trackables,
         };
         Self::table()
-            .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
+            .inner_join(trackables::table.on(packaging_models::trackable_id.eq(trackables::id)))
             .filter(trackables::parent_id.eq(parent_id))
-            .order_by(packaging_models::id.asc())
+            .order_by(packaging_models::trackable_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -169,9 +206,9 @@ impl PackagingModel {
             packaging_models::packaging_models, trackables::trackables,
         };
         Self::table()
-            .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
+            .inner_join(trackables::table.on(packaging_models::trackable_id.eq(trackables::id)))
             .filter(trackables::created_by.eq(created_by))
-            .order_by(packaging_models::id.asc())
+            .order_by(packaging_models::trackable_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -189,9 +226,9 @@ impl PackagingModel {
             packaging_models::packaging_models, trackables::trackables,
         };
         Self::table()
-            .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
+            .inner_join(trackables::table.on(packaging_models::trackable_id.eq(trackables::id)))
             .filter(trackables::created_at.eq(created_at))
-            .order_by(packaging_models::id.asc())
+            .order_by(packaging_models::trackable_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -209,9 +246,9 @@ impl PackagingModel {
             packaging_models::packaging_models, trackables::trackables,
         };
         Self::table()
-            .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
+            .inner_join(trackables::table.on(packaging_models::trackable_id.eq(trackables::id)))
             .filter(trackables::updated_by.eq(updated_by))
-            .order_by(packaging_models::id.asc())
+            .order_by(packaging_models::trackable_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -229,53 +266,9 @@ impl PackagingModel {
             packaging_models::packaging_models, trackables::trackables,
         };
         Self::table()
-            .inner_join(trackables::table.on(packaging_models::id.eq(trackables::id)))
+            .inner_join(trackables::table.on(packaging_models::trackable_id.eq(trackables::id)))
             .filter(trackables::updated_at.eq(updated_at))
-            .order_by(packaging_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_deprecation_date(
-        deprecation_date: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            commercial_products::commercial_products, packaging_models::packaging_models,
-        };
-        Self::table()
-            .inner_join(
-                commercial_products::table.on(packaging_models::id.eq(commercial_products::id)),
-            )
-            .filter(commercial_products::deprecation_date.eq(deprecation_date))
-            .order_by(packaging_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_brand_id(
-        brand_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            commercial_products::commercial_products, packaging_models::packaging_models,
-        };
-        Self::table()
-            .inner_join(
-                commercial_products::table.on(packaging_models::id.eq(commercial_products::id)),
-            )
-            .filter(commercial_products::brand_id.eq(brand_id))
-            .order_by(packaging_models::id.asc())
+            .order_by(packaging_models::trackable_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }

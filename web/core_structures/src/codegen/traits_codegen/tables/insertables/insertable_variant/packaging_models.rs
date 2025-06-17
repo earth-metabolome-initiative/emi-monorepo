@@ -14,12 +14,12 @@ where
         C,
         crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
     >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder: web_common_traits::database::InsertableVariant<
+    crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder: web_common_traits::database::InsertableVariant<
         C,
         UserId = i32,
-        Row = crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+        Row = crate::codegen::structs_codegen::tables::trackables::Trackable,
         Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
         >,
     >,
 {

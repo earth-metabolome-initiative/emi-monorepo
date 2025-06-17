@@ -1,6 +1,6 @@
 //! Submodule defining containers commonly used in wet-lab environments.
 
-use core_structures::{Trackable, User};
+use core_structures::{ContainerModel, User};
 use diesel::PgConnection;
 
 pub mod conical_centrifugal_tubes;
@@ -16,8 +16,8 @@ pub(crate) use vials::{
 
 pub(super) fn init_wet_lab_containers(
     user: &User,
-    container: &Trackable,
-    wet_lab_container: &Trackable,
+    container: &ContainerModel,
+    wet_lab_container: &ContainerModel,
     conn: &mut PgConnection,
 ) {
     conical_centrifugal_tubes::init_conical_centrifugal_tubes(

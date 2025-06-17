@@ -15,11 +15,11 @@ pub const VIAL_BOX: &str = "Vial Box";
 
 pub(super) fn init_vials(
     user: &User,
-    container: &Trackable,
-    wet_lab_container: &Trackable,
+    container: &ContainerModel,
+    wet_lab_container: &ContainerModel,
     conn: &mut PgConnection,
 ) {
-    let vial = Trackable::new()
+    let vial = ContainerModel::new()
         .name(Some("Vial".to_owned()))
         .unwrap()
         .description(Some("Vials, used to store extracts".to_owned()))

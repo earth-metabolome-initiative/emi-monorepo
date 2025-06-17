@@ -13,7 +13,7 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
         use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
             .filter(
@@ -22,6 +22,10 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
                     .or(pascal.ne(excluded(pascal)))
                     .or(seconds.ne(excluded(seconds)))
                     .or(freeze_dried_with.ne(excluded(freeze_dried_with)))
+                    .or(
+                        procedure_freeze_dried_with
+                            .ne(excluded(procedure_freeze_dried_with)),
+                    )
                     .or(source_container.ne(excluded(source_container))),
             )
             .get_results(conn)
@@ -43,7 +47,7 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
         use crate::codegen::diesel_codegen::tables::freeze_drying_procedure_models::freeze_drying_procedure_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
             .filter(
@@ -52,6 +56,10 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
                     .or(pascal.ne(excluded(pascal)))
                     .or(seconds.ne(excluded(seconds)))
                     .or(freeze_dried_with.ne(excluded(freeze_dried_with)))
+                    .or(
+                        procedure_freeze_dried_with
+                            .ne(excluded(procedure_freeze_dried_with)),
+                    )
                     .or(source_container.ne(excluded(source_container))),
             )
             .get_results(conn)

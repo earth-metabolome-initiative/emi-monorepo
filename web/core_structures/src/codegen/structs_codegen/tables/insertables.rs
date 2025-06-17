@@ -1,14 +1,19 @@
 mod addresses;
 pub use addresses::{InsertableAddress, InsertableAddressAttributes, InsertableAddressBuilder};
-mod aliquoting_instrument_models;
-pub use aliquoting_instrument_models::{
-    InsertableAliquotingInstrumentModel, InsertableAliquotingInstrumentModelAttributes,
-    InsertableAliquotingInstrumentModelBuilder,
-};
 mod aliquoting_procedure_models;
 pub use aliquoting_procedure_models::{
     InsertableAliquotingProcedureModel, InsertableAliquotingProcedureModelAttributes,
     InsertableAliquotingProcedureModelBuilder,
+};
+mod ball_mill_container_models;
+pub use ball_mill_container_models::{
+    InsertableBallMillContainerModel, InsertableBallMillContainerModelAttributes,
+    InsertableBallMillContainerModelBuilder,
+};
+mod ball_mill_machine_models;
+pub use ball_mill_machine_models::{
+    InsertableBallMillMachineModel, InsertableBallMillMachineModelAttributes,
+    InsertableBallMillMachineModelBuilder,
 };
 mod ball_mill_procedure_models;
 pub use ball_mill_procedure_models::{
@@ -25,6 +30,16 @@ pub use capping_procedure_models::{
 mod capping_rules;
 pub use capping_rules::{
     InsertableCappingRule, InsertableCappingRuleAttributes, InsertableCappingRuleBuilder,
+};
+mod centrifugable_container_models;
+pub use centrifugable_container_models::{
+    InsertableCentrifugableContainerModel, InsertableCentrifugableContainerModelAttributes,
+    InsertableCentrifugableContainerModelBuilder,
+};
+mod centrifuge_models;
+pub use centrifuge_models::{
+    InsertableCentrifugeModel, InsertableCentrifugeModelAttributes,
+    InsertableCentrifugeModelBuilder,
 };
 mod centrifuge_procedure_models;
 pub use centrifuge_procedure_models::{
@@ -76,10 +91,19 @@ pub use fractioning_procedure_models::{
     InsertableFractioningProcedureModel, InsertableFractioningProcedureModelAttributes,
     InsertableFractioningProcedureModelBuilder,
 };
+mod freeze_drier_models;
+pub use freeze_drier_models::{
+    InsertableFreezeDrierModel, InsertableFreezeDrierModelAttributes,
+    InsertableFreezeDrierModelBuilder,
+};
 mod freeze_drying_procedure_models;
 pub use freeze_drying_procedure_models::{
     InsertableFreezeDryingProcedureModel, InsertableFreezeDryingProcedureModelAttributes,
     InsertableFreezeDryingProcedureModelBuilder,
+};
+mod freezer_models;
+pub use freezer_models::{
+    InsertableFreezerModel, InsertableFreezerModelAttributes, InsertableFreezerModelBuilder,
 };
 mod freezing_procedure_models;
 pub use freezing_procedure_models::{
@@ -95,10 +119,6 @@ mod instrument_states;
 pub use instrument_states::{
     InsertableInstrumentState, InsertableInstrumentStateAttributes,
     InsertableInstrumentStateBuilder,
-};
-mod instruments;
-pub use instruments::{
-    InsertableInstrument, InsertableInstrumentAttributes, InsertableInstrumentBuilder,
 };
 mod login_providers;
 pub use login_providers::{
@@ -209,16 +229,6 @@ pub use rooms::{InsertableRoom, InsertableRoomAttributes, InsertableRoomBuilder}
 mod sample_states;
 pub use sample_states::{
     InsertableSampleState, InsertableSampleStateAttributes, InsertableSampleStateBuilder,
-};
-mod sampling_procedure_models;
-pub use sampling_procedure_models::{
-    InsertableSamplingProcedureModel, InsertableSamplingProcedureModelAttributes,
-    InsertableSamplingProcedureModelBuilder,
-};
-mod shaking_procedure_models;
-pub use shaking_procedure_models::{
-    InsertableShakingProcedureModel, InsertableShakingProcedureModelAttributes,
-    InsertableShakingProcedureModelBuilder,
 };
 mod shared_procedure_model_trackables;
 pub use shared_procedure_model_trackables::{

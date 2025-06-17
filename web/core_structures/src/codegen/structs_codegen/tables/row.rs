@@ -1,10 +1,13 @@
 mod addresses;
-mod aliquoting_instrument_models;
 mod aliquoting_procedure_models;
+mod ball_mill_container_models;
+mod ball_mill_machine_models;
 mod ball_mill_procedure_models;
 mod brands;
 mod capping_procedure_models;
 mod capping_rules;
+mod centrifugable_container_models;
+mod centrifuge_models;
 mod centrifuge_procedure_models;
 mod cities;
 mod colors;
@@ -18,12 +21,13 @@ mod disposal_procedure_models;
 mod documents;
 mod email_providers;
 mod fractioning_procedure_models;
+mod freeze_drier_models;
 mod freeze_drying_procedure_models;
+mod freezer_models;
 mod freezing_procedure_models;
 mod from_row;
 mod instrument_models;
 mod instrument_states;
-mod instruments;
 mod login_providers;
 mod materials;
 mod mix_countable_procedure_models;
@@ -53,8 +57,6 @@ mod reagents;
 mod roles;
 mod rooms;
 mod sample_states;
-mod sampling_procedure_models;
-mod shaking_procedure_models;
 mod shared_procedure_model_trackables;
 mod spatial_ref_sys;
 mod spectra;
@@ -84,11 +86,14 @@ mod weighing_procedures;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Row {
     Address(crate::codegen::structs_codegen::tables::addresses::Address),
-    AliquotingInstrumentModel(
-        crate::codegen::structs_codegen::tables::aliquoting_instrument_models::AliquotingInstrumentModel,
-    ),
     AliquotingProcedureModel(
         crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
+    ),
+    BallMillContainerModel(
+        crate::codegen::structs_codegen::tables::ball_mill_container_models::BallMillContainerModel,
+    ),
+    BallMillMachineModel(
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
     ),
     BallMillProcedureModel(
         crate::codegen::structs_codegen::tables::ball_mill_procedure_models::BallMillProcedureModel,
@@ -98,6 +103,12 @@ pub enum Row {
         crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel,
     ),
     CappingRule(crate::codegen::structs_codegen::tables::capping_rules::CappingRule),
+    CentrifugableContainerModel(
+        crate::codegen::structs_codegen::tables::centrifugable_container_models::CentrifugableContainerModel,
+    ),
+    CentrifugeModel(
+        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
+    ),
     CentrifugeProcedureModel(
         crate::codegen::structs_codegen::tables::centrifuge_procedure_models::CentrifugeProcedureModel,
     ),
@@ -127,9 +138,13 @@ pub enum Row {
     FractioningProcedureModel(
         crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel,
     ),
+    FreezeDrierModel(
+        crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel,
+    ),
     FreezeDryingProcedureModel(
         crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel,
     ),
+    FreezerModel(crate::codegen::structs_codegen::tables::freezer_models::FreezerModel),
     FreezingProcedureModel(
         crate::codegen::structs_codegen::tables::freezing_procedure_models::FreezingProcedureModel,
     ),
@@ -139,7 +154,6 @@ pub enum Row {
     InstrumentState(
         crate::codegen::structs_codegen::tables::instrument_states::InstrumentState,
     ),
-    Instrument(crate::codegen::structs_codegen::tables::instruments::Instrument),
     LoginProvider(
         crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
     ),
@@ -198,12 +212,6 @@ pub enum Row {
     Role(crate::codegen::structs_codegen::tables::roles::Role),
     Room(crate::codegen::structs_codegen::tables::rooms::Room),
     SampleState(crate::codegen::structs_codegen::tables::sample_states::SampleState),
-    SamplingProcedureModel(
-        crate::codegen::structs_codegen::tables::sampling_procedure_models::SamplingProcedureModel,
-    ),
-    ShakingProcedureModel(
-        crate::codegen::structs_codegen::tables::shaking_procedure_models::ShakingProcedureModel,
-    ),
     SharedProcedureModelTrackable(
         crate::codegen::structs_codegen::tables::shared_procedure_model_trackables::SharedProcedureModelTrackable,
     ),
@@ -263,11 +271,14 @@ impl Row {
         use web_common_traits::database::Upsertable;
         Ok(match self {
             Row::Address(addresses) => addresses.upsert(conn)?.map(Row::from),
-            Row::AliquotingInstrumentModel(aliquoting_instrument_models) => {
-                aliquoting_instrument_models.upsert(conn)?.map(Row::from)
-            }
             Row::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 aliquoting_procedure_models.upsert(conn)?.map(Row::from)
+            }
+            Row::BallMillContainerModel(ball_mill_container_models) => {
+                ball_mill_container_models.upsert(conn)?.map(Row::from)
+            }
+            Row::BallMillMachineModel(ball_mill_machine_models) => {
+                ball_mill_machine_models.upsert(conn)?.map(Row::from)
             }
             Row::BallMillProcedureModel(ball_mill_procedure_models) => {
                 ball_mill_procedure_models.upsert(conn)?.map(Row::from)
@@ -277,6 +288,12 @@ impl Row {
                 capping_procedure_models.upsert(conn)?.map(Row::from)
             }
             Row::CappingRule(capping_rules) => capping_rules.upsert(conn)?.map(Row::from),
+            Row::CentrifugableContainerModel(centrifugable_container_models) => {
+                centrifugable_container_models.upsert(conn)?.map(Row::from)
+            }
+            Row::CentrifugeModel(centrifuge_models) => {
+                centrifuge_models.upsert(conn)?.map(Row::from)
+            }
             Row::CentrifugeProcedureModel(centrifuge_procedure_models) => {
                 centrifuge_procedure_models.upsert(conn)?.map(Row::from)
             }
@@ -302,9 +319,13 @@ impl Row {
             Row::FractioningProcedureModel(fractioning_procedure_models) => {
                 fractioning_procedure_models.upsert(conn)?.map(Row::from)
             }
+            Row::FreezeDrierModel(freeze_drier_models) => {
+                freeze_drier_models.upsert(conn)?.map(Row::from)
+            }
             Row::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
                 freeze_drying_procedure_models.upsert(conn)?.map(Row::from)
             }
+            Row::FreezerModel(freezer_models) => freezer_models.upsert(conn)?.map(Row::from),
             Row::FreezingProcedureModel(freezing_procedure_models) => {
                 freezing_procedure_models.upsert(conn)?.map(Row::from)
             }
@@ -314,7 +335,6 @@ impl Row {
             Row::InstrumentState(instrument_states) => {
                 instrument_states.upsert(conn)?.map(Row::from)
             }
-            Row::Instrument(instruments) => instruments.upsert(conn)?.map(Row::from),
             Row::LoginProvider(login_providers) => login_providers.upsert(conn)?.map(Row::from),
             Row::Material(materials) => materials.upsert(conn)?.map(Row::from),
             Row::MixCountableProcedureModel(mix_countable_procedure_models) => {
@@ -367,12 +387,6 @@ impl Row {
             Row::Role(roles) => roles.upsert(conn)?.map(Row::from),
             Row::Room(rooms) => rooms.upsert(conn)?.map(Row::from),
             Row::SampleState(sample_states) => sample_states.upsert(conn)?.map(Row::from),
-            Row::SamplingProcedureModel(sampling_procedure_models) => {
-                sampling_procedure_models.upsert(conn)?.map(Row::from)
-            }
-            Row::ShakingProcedureModel(shaking_procedure_models) => {
-                shaking_procedure_models.upsert(conn)?.map(Row::from)
-            }
             Row::SharedProcedureModelTrackable(shared_procedure_model_trackables) => {
                 shared_procedure_model_trackables.upsert(conn)?.map(Row::from)
             }
@@ -427,11 +441,14 @@ impl web_common_traits::prelude::Row for Row {
     fn primary_key(&self) -> Self::PrimaryKey {
         match self {
             Row::Address(addresses) => addresses.primary_key(),
-            Row::AliquotingInstrumentModel(aliquoting_instrument_models) => {
-                aliquoting_instrument_models.primary_key()
-            }
             Row::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 aliquoting_procedure_models.primary_key()
+            }
+            Row::BallMillContainerModel(ball_mill_container_models) => {
+                ball_mill_container_models.primary_key()
+            }
+            Row::BallMillMachineModel(ball_mill_machine_models) => {
+                ball_mill_machine_models.primary_key()
             }
             Row::BallMillProcedureModel(ball_mill_procedure_models) => {
                 ball_mill_procedure_models.primary_key()
@@ -441,6 +458,10 @@ impl web_common_traits::prelude::Row for Row {
                 capping_procedure_models.primary_key()
             }
             Row::CappingRule(capping_rules) => capping_rules.primary_key(),
+            Row::CentrifugableContainerModel(centrifugable_container_models) => {
+                centrifugable_container_models.primary_key()
+            }
+            Row::CentrifugeModel(centrifuge_models) => centrifuge_models.primary_key(),
             Row::CentrifugeProcedureModel(centrifuge_procedure_models) => {
                 centrifuge_procedure_models.primary_key()
             }
@@ -462,15 +483,16 @@ impl web_common_traits::prelude::Row for Row {
             Row::FractioningProcedureModel(fractioning_procedure_models) => {
                 fractioning_procedure_models.primary_key()
             }
+            Row::FreezeDrierModel(freeze_drier_models) => freeze_drier_models.primary_key(),
             Row::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
                 freeze_drying_procedure_models.primary_key()
             }
+            Row::FreezerModel(freezer_models) => freezer_models.primary_key(),
             Row::FreezingProcedureModel(freezing_procedure_models) => {
                 freezing_procedure_models.primary_key()
             }
             Row::InstrumentModel(instrument_models) => instrument_models.primary_key(),
             Row::InstrumentState(instrument_states) => instrument_states.primary_key(),
-            Row::Instrument(instruments) => instruments.primary_key(),
             Row::LoginProvider(login_providers) => login_providers.primary_key(),
             Row::Material(materials) => materials.primary_key(),
             Row::MixCountableProcedureModel(mix_countable_procedure_models) => {
@@ -513,12 +535,6 @@ impl web_common_traits::prelude::Row for Row {
             Row::Role(roles) => roles.primary_key(),
             Row::Room(rooms) => rooms.primary_key(),
             Row::SampleState(sample_states) => sample_states.primary_key(),
-            Row::SamplingProcedureModel(sampling_procedure_models) => {
-                sampling_procedure_models.primary_key()
-            }
-            Row::ShakingProcedureModel(shaking_procedure_models) => {
-                shaking_procedure_models.primary_key()
-            }
             Row::SharedProcedureModelTrackable(shared_procedure_model_trackables) => {
                 shared_procedure_model_trackables.primary_key()
             }

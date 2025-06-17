@@ -2,12 +2,15 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum TableName {
     Address,
-    AliquotingInstrumentModel,
     AliquotingProcedureModel,
+    BallMillContainerModel,
+    BallMillMachineModel,
     BallMillProcedureModel,
     Brand,
     CappingProcedureModel,
     CappingRule,
+    CentrifugableContainerModel,
+    CentrifugeModel,
     CentrifugeProcedureModel,
     City,
     Color,
@@ -21,11 +24,12 @@ pub enum TableName {
     Document,
     EmailProvider,
     FractioningProcedureModel,
+    FreezeDrierModel,
     FreezeDryingProcedureModel,
+    FreezerModel,
     FreezingProcedureModel,
     InstrumentModel,
     InstrumentState,
-    Instrument,
     LoginProvider,
     Material,
     MixCountableProcedureModel,
@@ -54,8 +58,6 @@ pub enum TableName {
     Role,
     Room,
     SampleState,
-    SamplingProcedureModel,
-    ShakingProcedureModel,
     SharedProcedureModelTrackable,
     SpatialRefSy,
     Spectrum,
@@ -85,11 +87,14 @@ impl core::fmt::Display for TableName {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             TableName::Address => write!(f, stringify!(Address)),
-            TableName::AliquotingInstrumentModel => {
-                write!(f, stringify!(AliquotingInstrumentModel))
-            }
             TableName::AliquotingProcedureModel => {
                 write!(f, stringify!(AliquotingProcedureModel))
+            }
+            TableName::BallMillContainerModel => {
+                write!(f, stringify!(BallMillContainerModel))
+            }
+            TableName::BallMillMachineModel => {
+                write!(f, stringify!(BallMillMachineModel))
             }
             TableName::BallMillProcedureModel => {
                 write!(f, stringify!(BallMillProcedureModel))
@@ -99,6 +104,10 @@ impl core::fmt::Display for TableName {
                 write!(f, stringify!(CappingProcedureModel))
             }
             TableName::CappingRule => write!(f, stringify!(CappingRule)),
+            TableName::CentrifugableContainerModel => {
+                write!(f, stringify!(CentrifugableContainerModel))
+            }
+            TableName::CentrifugeModel => write!(f, stringify!(CentrifugeModel)),
             TableName::CentrifugeProcedureModel => {
                 write!(f, stringify!(CentrifugeProcedureModel))
             }
@@ -120,15 +129,16 @@ impl core::fmt::Display for TableName {
             TableName::FractioningProcedureModel => {
                 write!(f, stringify!(FractioningProcedureModel))
             }
+            TableName::FreezeDrierModel => write!(f, stringify!(FreezeDrierModel)),
             TableName::FreezeDryingProcedureModel => {
                 write!(f, stringify!(FreezeDryingProcedureModel))
             }
+            TableName::FreezerModel => write!(f, stringify!(FreezerModel)),
             TableName::FreezingProcedureModel => {
                 write!(f, stringify!(FreezingProcedureModel))
             }
             TableName::InstrumentModel => write!(f, stringify!(InstrumentModel)),
             TableName::InstrumentState => write!(f, stringify!(InstrumentState)),
-            TableName::Instrument => write!(f, stringify!(Instrument)),
             TableName::LoginProvider => write!(f, stringify!(LoginProvider)),
             TableName::Material => write!(f, stringify!(Material)),
             TableName::MixCountableProcedureModel => {
@@ -171,12 +181,6 @@ impl core::fmt::Display for TableName {
             TableName::Role => write!(f, stringify!(Role)),
             TableName::Room => write!(f, stringify!(Room)),
             TableName::SampleState => write!(f, stringify!(SampleState)),
-            TableName::SamplingProcedureModel => {
-                write!(f, stringify!(SamplingProcedureModel))
-            }
-            TableName::ShakingProcedureModel => {
-                write!(f, stringify!(ShakingProcedureModel))
-            }
             TableName::SharedProcedureModelTrackable => {
                 write!(f, stringify!(SharedProcedureModelTrackable))
             }

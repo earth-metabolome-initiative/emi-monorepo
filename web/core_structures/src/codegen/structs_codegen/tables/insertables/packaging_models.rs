@@ -1,14 +1,18 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertablePackagingModelAttributes {
-    Id(crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes),
-    Kilograms,
+    TrackableId(
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
+    ),
+    MaterialId,
 }
 impl core::fmt::Display for InsertablePackagingModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertablePackagingModelAttributes::Id(id) => write!(f, "{}", id),
-            InsertablePackagingModelAttributes::Kilograms => write!(f, "kilograms"),
+            InsertablePackagingModelAttributes::TrackableId(trackable_id) => {
+                write!(f, "{}", trackable_id)
+            }
+            InsertablePackagingModelAttributes::MaterialId => write!(f, "material_id"),
         }
     }
 }
@@ -21,38 +25,70 @@ impl core::fmt::Display for InsertablePackagingModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertablePackagingModel {
-    id: ::rosetta_uuid::Uuid,
-    kilograms: f32,
+    trackable_id: ::rosetta_uuid::Uuid,
+    material_id: i16,
 }
 impl InsertablePackagingModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn trackable<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::table(),
-                self.id,
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                self.trackable_id,
+            ),
+            conn,
+        )
+    }
+    pub fn material<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::materials::Material,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::materials::Material: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::materials::Material as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::materials::Material as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::materials::Material as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::materials::Material as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::materials::Material as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::materials::Material as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::materials::Material,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::materials::Material::table(),
+                self.material_id,
             ),
             conn,
         )
@@ -61,54 +97,23 @@ impl InsertablePackagingModel {
 #[derive(Default, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertablePackagingModelBuilder {
-    pub(crate) id:
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder,
-    pub(crate) kilograms: Option<f32>,
+    pub(crate) trackable_id:
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    pub(crate) material_id: Option<i16>,
 }
 impl InsertablePackagingModelBuilder {
-    pub fn kilograms<P>(
+    pub fn material_id<P>(
         mut self,
-        kilograms: P,
+        material_id: P,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertablePackagingModelAttributes>>
     where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<i16>,
+        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let kilograms = kilograms.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
-            Into::into(err).rename_field(InsertablePackagingModelAttributes::Kilograms)
+        let material_id = material_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
+            Into::into(err).rename_field(InsertablePackagingModelAttributes::MaterialId)
         })?;
-        pgrx_validation::must_be_strictly_positive_f32(kilograms)
-            .map_err(|e| e.rename_field(InsertablePackagingModelAttributes::Kilograms))?;
-        self.kilograms = Some(kilograms);
-        Ok(self)
-    }
-    pub fn deprecation_date<P>(
-        mut self,
-        deprecation_date: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePackagingModelAttributes>>
-    where
-        P: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
-        <P as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self
-            .id
-            .deprecation_date(deprecation_date)
-            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::Id))?;
-        Ok(self)
-    }
-    pub fn brand_id<P>(
-        mut self,
-        brand_id: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePackagingModelAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self
-            .id
-            .brand_id(brand_id)
-            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::Id))?;
+        self.material_id = Some(material_id);
         Ok(self)
     }
     pub fn id<P>(
@@ -119,10 +124,10 @@ impl InsertablePackagingModelBuilder {
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
+        self.trackable_id = self
+            .trackable_id
             .id(id)
-            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::Id))?;
+            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::TrackableId))?;
         Ok(self)
     }
     pub fn name<P>(
@@ -133,10 +138,10 @@ impl InsertablePackagingModelBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
+        self.trackable_id = self
+            .trackable_id
             .name(name)
-            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::Id))?;
+            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::TrackableId))?;
         Ok(self)
     }
     pub fn description<P>(
@@ -147,10 +152,10 @@ impl InsertablePackagingModelBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
+        self.trackable_id = self
+            .trackable_id
             .description(description)
-            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::Id))?;
+            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::TrackableId))?;
         Ok(self)
     }
     pub fn photograph_id<P>(
@@ -162,10 +167,10 @@ impl InsertablePackagingModelBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
+        self.trackable_id = self
+            .trackable_id
             .photograph_id(photograph_id)
-            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::Id))?;
+            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::TrackableId))?;
         Ok(self)
     }
     pub fn parent_id<P>(
@@ -177,10 +182,10 @@ impl InsertablePackagingModelBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
+        self.trackable_id = self
+            .trackable_id
             .parent_id(parent_id)
-            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::Id))?;
+            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::TrackableId))?;
         Ok(self)
     }
     pub fn created_by<P>(
@@ -191,10 +196,10 @@ impl InsertablePackagingModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
+        self.trackable_id = self
+            .trackable_id
             .created_by(created_by)
-            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::Id))?;
+            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::TrackableId))?;
         Ok(self)
     }
     pub fn created_at<P>(
@@ -206,10 +211,10 @@ impl InsertablePackagingModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
+        self.trackable_id = self
+            .trackable_id
             .created_at(created_at)
-            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::Id))?;
+            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::TrackableId))?;
         Ok(self)
     }
     pub fn updated_by<P>(
@@ -220,10 +225,10 @@ impl InsertablePackagingModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
+        self.trackable_id = self
+            .trackable_id
             .updated_by(updated_by)
-            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::Id))?;
+            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::TrackableId))?;
         Ok(self)
     }
     pub fn updated_at<P>(
@@ -235,10 +240,10 @@ impl InsertablePackagingModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
+        self.trackable_id = self
+            .trackable_id
             .updated_at(updated_at)
-            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::Id))?;
+            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::TrackableId))?;
         Ok(self)
     }
 }
@@ -252,26 +257,26 @@ impl InsertablePackagingModelBuilder {
         web_common_traits::database::InsertError<InsertablePackagingModelAttributes>,
     >
     where
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder: web_common_traits::database::InsertableVariant<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+            Row = crate::codegen::structs_codegen::tables::trackables::Trackable,
             Error = web_common_traits::database::InsertError<
-                crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
+                crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
             >,
         >,
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let kilograms =
-            self.kilograms.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertablePackagingModelAttributes::Kilograms,
+        let material_id =
+            self.material_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertablePackagingModelAttributes::MaterialId,
             ))?;
-        let id = self
-            .id
+        let trackable_id = self
+            .trackable_id
             .insert(user_id, conn)
-            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::Id))?
+            .map_err(|err| err.into_field_name(InsertablePackagingModelAttributes::TrackableId))?
             .id();
-        Ok(InsertablePackagingModel { id, kilograms })
+        Ok(InsertablePackagingModel { trackable_id, material_id })
     }
 }

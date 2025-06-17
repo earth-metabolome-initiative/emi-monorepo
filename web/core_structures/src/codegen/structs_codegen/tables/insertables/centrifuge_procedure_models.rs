@@ -1,32 +1,42 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableCentrifugeProcedureModelAttributes {
-    Id(
+    ProcedureModelId(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
     ),
     Seconds,
     RotationPerMinute,
-    CentrifugedWith(
+    CentrifugedWith,
+    ProcedureCentrifugedWith(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
-    ContainerId(
+    ContainerId,
+    ProcedureContainerId(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
 impl core::fmt::Display for InsertableCentrifugeProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableCentrifugeProcedureModelAttributes::Id(id) => write!(f, "{}", id),
+            InsertableCentrifugeProcedureModelAttributes::ProcedureModelId(procedure_model_id) => {
+                write!(f, "{}", procedure_model_id)
+            }
             InsertableCentrifugeProcedureModelAttributes::Seconds => write!(f, "seconds"),
             InsertableCentrifugeProcedureModelAttributes::RotationPerMinute => {
                 write!(f, "rotation_per_minute")
             }
-            InsertableCentrifugeProcedureModelAttributes::CentrifugedWith(centrifuged_with) => {
-                write!(f, "{}", centrifuged_with)
+            InsertableCentrifugeProcedureModelAttributes::CentrifugedWith => {
+                write!(f, "centrifuged_with")
             }
-            InsertableCentrifugeProcedureModelAttributes::ContainerId(container_id) => {
-                write!(f, "{}", container_id)
+            InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith(
+                procedure_centrifuged_with,
+            ) => write!(f, "{}", procedure_centrifuged_with),
+            InsertableCentrifugeProcedureModelAttributes::ContainerId => {
+                write!(f, "container_id")
             }
+            InsertableCentrifugeProcedureModelAttributes::ProcedureContainerId(
+                procedure_container_id,
+            ) => write!(f, "{}", procedure_container_id),
         }
     }
 }
@@ -39,14 +49,16 @@ impl core::fmt::Display for InsertableCentrifugeProcedureModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCentrifugeProcedureModel {
-    id: i32,
+    procedure_model_id: i32,
     seconds: f32,
     rotation_per_minute: f32,
-    centrifuged_with: i32,
-    container_id: i32,
+    centrifuged_with: ::rosetta_uuid::Uuid,
+    procedure_centrifuged_with: i32,
+    container_id: ::rosetta_uuid::Uuid,
+    procedure_container_id: i32,
 }
 impl InsertableCentrifugeProcedureModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn procedure_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -73,7 +85,7 @@ impl InsertableCentrifugeProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
-                self.id,
+                self.procedure_model_id,
             ),
             conn,
         )
@@ -82,35 +94,36 @@ impl InsertableCentrifugeProcedureModel {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel::table(
+                ),
                 self.centrifuged_with,
             ),
             conn,
         )
     }
-    pub fn container<C: diesel::connection::LoadConnection>(
+    pub fn procedure_centrifuged_with<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -137,7 +150,71 @@ impl InsertableCentrifugeProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.procedure_centrifuged_with,
+            ),
+            conn,
+        )
+    }
+    pub fn container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
                 self.container_id,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.procedure_container_id,
             ),
             conn,
         )
@@ -146,20 +223,24 @@ impl InsertableCentrifugeProcedureModel {
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCentrifugeProcedureModelBuilder {
-    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    pub(crate) procedure_model_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     pub(crate) seconds: Option<f32>,
     pub(crate) rotation_per_minute: Option<f32>,
-    pub(crate) centrifuged_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    pub(crate) container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) centrifuged_with: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_centrifuged_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) container_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
 }
 impl Default for InsertableCentrifugeProcedureModelBuilder {
     fn default() -> Self {
         Self {
-            id: Default::default(),
+            procedure_model_id: Default::default(),
             seconds: Some(120f32),
             rotation_per_minute: Some(13000f32),
             centrifuged_with: Default::default(),
+            procedure_centrifuged_with: Default::default(),
             container_id: Default::default(),
+            procedure_container_id: Default::default(),
         }
     }
 }
@@ -210,46 +291,146 @@ impl InsertableCentrifugeProcedureModelBuilder {
         self.rotation_per_minute = Some(rotation_per_minute);
         Ok(self)
     }
-    pub fn centrifuged_with(
+    pub fn centrifuged_with<P>(
         mut self,
-        centrifuged_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        centrifuged_with: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
-    > {
-        if centrifuged_with.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableCentrifugeProcedureModelAttributes::CentrifugedWith(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.centrifuged_with = centrifuged_with;
+    >
+    where
+        P: TryInto<::rosetta_uuid::Uuid>,
+        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let centrifuged_with = centrifuged_with.try_into().map_err(
+            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableCentrifugeProcedureModelAttributes::CentrifugedWith)
+            },
+        )?;
+        self.centrifuged_with = Some(centrifuged_with);
+        self.procedure_centrifuged_with =
+            self.procedure_centrifuged_with.trackable_id(centrifuged_with).map_err(|err| {
+                err.into_field_name(
+                    InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith,
+                )
+            })?;
         Ok(self)
     }
-    pub fn container_id(
+    pub fn container_id<P>(
         mut self,
-        container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        container_id: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_uuid::Uuid>,
+        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let container_id = container_id.try_into().map_err(
+            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableCentrifugeProcedureModelAttributes::ContainerId)
+            },
+        )?;
+        self.container_id = Some(container_id);
+        self.procedure_container_id =
+            self.procedure_container_id.trackable_id(container_id).map_err(|err| {
+                err.into_field_name(
+                    InsertableCentrifugeProcedureModelAttributes::ProcedureContainerId,
+                )
+            })?;
+        Ok(self)
+    }
+    pub fn procedure_centrifuged_with(
+        mut self,
+        procedure_centrifuged_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
     > {
-        if container_id.procedure_model_id.is_some() {
+        if procedure_centrifuged_with.procedure_model_id.is_some() {
             return Err(
                 web_common_traits::database::InsertError::BuilderError(
                     web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableCentrifugeProcedureModelAttributes::ContainerId(
+                        InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith(
                             crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
                         ),
                     ),
                 ),
             );
         }
-        self.container_id = container_id;
+        if let (Some(local), Some(foreign)) =
+            (self.centrifuged_with, procedure_centrifuged_with.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_centrifuged_with.trackable_id {
+            self.centrifuged_with = Some(foreign);
+        } else if let Some(local) = self.centrifuged_with {
+            self.procedure_centrifuged_with =
+                self.procedure_centrifuged_with.trackable_id(local).map_err(|err| {
+                    err.into_field_name(
+                        InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith,
+                    )
+                })?;
+        }
+        self.procedure_centrifuged_with = procedure_centrifuged_with;
+        Ok(self)
+    }
+    pub fn procedure_container_id(
+        mut self,
+        procedure_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
+    > {
+        if procedure_container_id.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertableCentrifugeProcedureModelAttributes::ProcedureContainerId(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        if let (Some(local), Some(foreign)) =
+            (self.container_id, procedure_container_id.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            InsertableCentrifugeProcedureModelAttributes::ProcedureContainerId(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_container_id.trackable_id {
+            self.container_id = Some(foreign);
+        } else if let Some(local) = self.container_id {
+            self.procedure_container_id =
+                self.procedure_container_id.trackable_id(local).map_err(|err| {
+                    err.into_field_name(
+                        InsertableCentrifugeProcedureModelAttributes::ProcedureContainerId,
+                    )
+                })?;
+        }
+        self.procedure_container_id = procedure_container_id;
         Ok(self)
     }
     pub fn name<P>(
@@ -263,10 +444,9 @@ impl InsertableCentrifugeProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .name(name)
-            .map_err(|err| err.into_field_name(InsertableCentrifugeProcedureModelAttributes::Id))?;
+        self.procedure_model_id = self.procedure_model_id.name(name).map_err(|err| {
+            err.into_field_name(InsertableCentrifugeProcedureModelAttributes::ProcedureModelId)
+        })?;
         Ok(self)
     }
     pub fn description<P>(
@@ -280,10 +460,10 @@ impl InsertableCentrifugeProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .description(description)
-            .map_err(|err| err.into_field_name(InsertableCentrifugeProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.description(description).map_err(|err| {
+                err.into_field_name(InsertableCentrifugeProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn deprecated<P>(
@@ -297,10 +477,10 @@ impl InsertableCentrifugeProcedureModelBuilder {
         P: TryInto<bool>,
         <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .deprecated(deprecated)
-            .map_err(|err| err.into_field_name(InsertableCentrifugeProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.deprecated(deprecated).map_err(|err| {
+                err.into_field_name(InsertableCentrifugeProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn photograph_id<P>(
@@ -315,10 +495,10 @@ impl InsertableCentrifugeProcedureModelBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .photograph_id(photograph_id)
-            .map_err(|err| err.into_field_name(InsertableCentrifugeProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.photograph_id(photograph_id).map_err(|err| {
+                err.into_field_name(InsertableCentrifugeProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn icon<P>(
@@ -332,10 +512,9 @@ impl InsertableCentrifugeProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .icon(icon)
-            .map_err(|err| err.into_field_name(InsertableCentrifugeProcedureModelAttributes::Id))?;
+        self.procedure_model_id = self.procedure_model_id.icon(icon).map_err(|err| {
+            err.into_field_name(InsertableCentrifugeProcedureModelAttributes::ProcedureModelId)
+        })?;
         Ok(self)
     }
     pub fn created_by<P>(
@@ -349,10 +528,10 @@ impl InsertableCentrifugeProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .created_by(created_by)
-            .map_err(|err| err.into_field_name(InsertableCentrifugeProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.created_by(created_by).map_err(|err| {
+                err.into_field_name(InsertableCentrifugeProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn created_at<P>(
@@ -367,10 +546,10 @@ impl InsertableCentrifugeProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .created_at(created_at)
-            .map_err(|err| err.into_field_name(InsertableCentrifugeProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.created_at(created_at).map_err(|err| {
+                err.into_field_name(InsertableCentrifugeProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn updated_by<P>(
@@ -384,10 +563,10 @@ impl InsertableCentrifugeProcedureModelBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .updated_by(updated_by)
-            .map_err(|err| err.into_field_name(InsertableCentrifugeProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.updated_by(updated_by).map_err(|err| {
+                err.into_field_name(InsertableCentrifugeProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
     pub fn updated_at<P>(
@@ -402,10 +581,10 @@ impl InsertableCentrifugeProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .updated_at(updated_at)
-            .map_err(|err| err.into_field_name(InsertableCentrifugeProcedureModelAttributes::Id))?;
+        self.procedure_model_id =
+            self.procedure_model_id.updated_at(updated_at).map_err(|err| {
+                err.into_field_name(InsertableCentrifugeProcedureModelAttributes::ProcedureModelId)
+            })?;
         Ok(self)
     }
 }
@@ -448,39 +627,59 @@ impl InsertableCentrifugeProcedureModelBuilder {
                 InsertableCentrifugeProcedureModelAttributes::RotationPerMinute,
             ),
         )?;
-        let id = self
-            .id
+        let centrifuged_with =
+            self.centrifuged_with.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableCentrifugeProcedureModelAttributes::CentrifugedWith,
+            ))?;
+        let container_id =
+            self.container_id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableCentrifugeProcedureModelAttributes::ContainerId,
+            ))?;
+        let procedure_model_id = self
+            .procedure_model_id
             .insert(user_id, conn)
-            .map_err(|err| err.into_field_name(InsertableCentrifugeProcedureModelAttributes::Id))?
+            .map_err(|err| {
+                err.into_field_name(InsertableCentrifugeProcedureModelAttributes::ProcedureModelId)
+            })?
             .id();
-        let centrifuged_with = self
-            .centrifuged_with
-            .procedure_model_id(id)
+        let procedure_centrifuged_with = self
+            .procedure_centrifuged_with
+            .procedure_model_id(procedure_model_id)
             .map_err(|err| {
-                err.into_field_name(InsertableCentrifugeProcedureModelAttributes::CentrifugedWith)
+                err.into_field_name(
+                    InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith,
+                )
             })?
             .insert(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(InsertableCentrifugeProcedureModelAttributes::CentrifugedWith)
+                err.into_field_name(
+                    InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith,
+                )
             })?
             .id();
-        let container_id = self
-            .container_id
-            .procedure_model_id(id)
+        let procedure_container_id = self
+            .procedure_container_id
+            .procedure_model_id(procedure_model_id)
             .map_err(|err| {
-                err.into_field_name(InsertableCentrifugeProcedureModelAttributes::ContainerId)
+                err.into_field_name(
+                    InsertableCentrifugeProcedureModelAttributes::ProcedureContainerId,
+                )
             })?
             .insert(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(InsertableCentrifugeProcedureModelAttributes::ContainerId)
+                err.into_field_name(
+                    InsertableCentrifugeProcedureModelAttributes::ProcedureContainerId,
+                )
             })?
             .id();
         Ok(InsertableCentrifugeProcedureModel {
-            id,
+            procedure_model_id,
             seconds,
             rotation_per_minute,
             centrifuged_with,
+            procedure_centrifuged_with,
             container_id,
+            procedure_container_id,
         })
     }
 }

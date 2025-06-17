@@ -4,7 +4,7 @@ resolver = "2"
 members = [
   "bindings/sirius_bindings",
   "web/backend",
-  "web/frontend",
+  # "web/frontend",
   "web/web_common/web_common_traits",
   "web/web_common/webcodegen",
   "web/web_common/csqlv",
@@ -197,7 +197,4 @@ clone_on_copy = "forbid"
 pedantic = { level = "deny", priority = -1 }
 
 [profile.bench]
-debug = true # Include debug info.
-
-[profile.release]
 debug = true # Include debug info.

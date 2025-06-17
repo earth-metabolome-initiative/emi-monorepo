@@ -391,27 +391,6 @@ impl SharedProcedureModelTrackable {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_id_and_parent_trackable_id(
-        parent_id: &i32,
-        parent_trackable_id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::shared_procedure_model_trackables::shared_procedure_model_trackables;
-        Self::table()
-            .filter(shared_procedure_model_trackables::parent_id.eq(parent_id).and(
-                shared_procedure_model_trackables::parent_trackable_id.eq(parent_trackable_id),
-            ))
-            .order_by((
-                shared_procedure_model_trackables::parent_id.asc(),
-                shared_procedure_model_trackables::child_id.asc(),
-            ))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_child_id_and_child_trackable_id(
         child_id: &i32,
         child_trackable_id: &::rosetta_uuid::Uuid,
@@ -428,6 +407,27 @@ impl SharedProcedureModelTrackable {
                     shared_procedure_model_trackables::child_trackable_id.eq(child_trackable_id),
                 ),
             )
+            .order_by((
+                shared_procedure_model_trackables::parent_id.asc(),
+                shared_procedure_model_trackables::child_id.asc(),
+            ))
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_id_and_parent_trackable_id(
+        parent_id: &i32,
+        parent_trackable_id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::shared_procedure_model_trackables::shared_procedure_model_trackables;
+        Self::table()
+            .filter(shared_procedure_model_trackables::parent_id.eq(parent_id).and(
+                shared_procedure_model_trackables::parent_trackable_id.eq(parent_trackable_id),
+            ))
             .order_by((
                 shared_procedure_model_trackables::parent_id.asc(),
                 shared_procedure_model_trackables::child_id.asc(),

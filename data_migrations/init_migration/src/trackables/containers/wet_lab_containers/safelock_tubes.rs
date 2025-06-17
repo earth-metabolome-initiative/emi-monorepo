@@ -1,6 +1,6 @@
 //! Submodule to initialize the
 
-use core_structures::{Trackable, User, VolumetricContainerModel};
+use core_structures::{ContainerModel, User, VolumetricContainerModel};
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -9,10 +9,10 @@ pub const SAFELOCK_TUBE_2ML: &str = "Safelock Tube 2ml";
 
 pub(super) fn init_safelock_tubes(
     user: &User,
-    wet_lab_container: &Trackable,
+    wet_lab_container: &ContainerModel,
     conn: &mut PgConnection,
 ) {
-    let safelock_tube = Trackable::new()
+    let safelock_tube = ContainerModel::new()
         .name(Some(SAFELOCK_TUBE.to_owned()))
         .unwrap()
         .description(Some("Safelock Tube, used to perform extractions".to_owned()))

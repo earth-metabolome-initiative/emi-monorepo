@@ -561,31 +561,30 @@ impl KeyColumnUsage {
         // First, we check whether the foreign key is a composite foreign key
         if !self.is_composite(conn)? {
             // If the foreign key is not a composite foreign key, we skip it
-            println!("Not composite foreign key, skipping");
             return Ok(None);
         }
 
         // Next, we check whether the foreign key is referring to a UNIQUE constraint
         if !self.is_foreign_unique_key(conn)? {
-            println!("Not a foreign unique key, skipping");
             // If the foreign key is not referring to a UNIQUE constraint, we skip it
             return Ok(None);
         }
 
         let foreign_key_columns = self.foreign_columns(conn)?;
+
+        // Finally, if the UNIQUE constraint is composed of the primary key
+        // of the foreign table and the foreign column
+        // associated with the current column, we consider it a `same-as`
+        // constraint.
+        let Some(foreign_table) = self.foreign_table(conn)? else {
+            unreachable!(
+                "Column \"{}\".\"{}\" is part of a composite foreign key which refers to a UNIQUE constraint, but the foreign table could not be found.",
+                self.table_name, self.column_name
+            );
+        };
+
         // We identify the foreign column corresponding to the current column.
         for foreign_column in &foreign_key_columns {
-            // Finally, if the UNIQUE constraint is composed of the primary key
-            // of the foreign table and the foreign column
-            // associated with the current column, we consider it a `same-as`
-            // constraint.
-            let Some(foreign_table) = self.foreign_table(conn)? else {
-                unreachable!(
-                    "Column \"{}\".\"{}\" is part of a composite foreign key which refers to a UNIQUE constraint, but the foreign table could not be found.",
-                    self.table_name, self.column_name
-                );
-            };
-
             let mut expected_foreign_columns = foreign_table.primary_key_columns(conn)?;
 
             // If the foreign column is not part of the foreign table's primary key, we add

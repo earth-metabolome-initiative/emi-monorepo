@@ -2,12 +2,15 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum TablePrimaryKey {
     Address(i32),
-    AliquotingInstrumentModel(::rosetta_uuid::Uuid),
     AliquotingProcedureModel(i32),
+    BallMillContainerModel((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
+    BallMillMachineModel(::rosetta_uuid::Uuid),
     BallMillProcedureModel(i32),
     Brand(i32),
     CappingProcedureModel(i32),
     CappingRule((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
+    CentrifugableContainerModel((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
+    CentrifugeModel(::rosetta_uuid::Uuid),
     CentrifugeProcedureModel(i32),
     City(i32),
     Color(i16),
@@ -21,11 +24,12 @@ pub enum TablePrimaryKey {
     Document(::rosetta_uuid::Uuid),
     EmailProvider((i32, i16)),
     FractioningProcedureModel(i32),
+    FreezeDrierModel(::rosetta_uuid::Uuid),
     FreezeDryingProcedureModel(i32),
+    FreezerModel(::rosetta_uuid::Uuid),
     FreezingProcedureModel(i32),
     InstrumentModel(::rosetta_uuid::Uuid),
     InstrumentState(i16),
-    Instrument(::rosetta_uuid::Uuid),
     LoginProvider(i16),
     Material(i16),
     MixCountableProcedureModel(i32),
@@ -54,8 +58,6 @@ pub enum TablePrimaryKey {
     Role(i16),
     Room(i32),
     SampleState(i16),
-    SamplingProcedureModel(i32),
-    ShakingProcedureModel(i32),
     SharedProcedureModelTrackable((i32, i32)),
     SpatialRefSy(i32),
     Spectrum(i32),
@@ -86,11 +88,14 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
     fn table_name(&self) -> Self::TableName {
         match self {
             TablePrimaryKey::Address(_) => crate::codegen::tables::table_names::TableName::Address,
-            TablePrimaryKey::AliquotingInstrumentModel(_) => {
-                crate::codegen::tables::table_names::TableName::AliquotingInstrumentModel
-            }
             TablePrimaryKey::AliquotingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::AliquotingProcedureModel
+            }
+            TablePrimaryKey::BallMillContainerModel(_) => {
+                crate::codegen::tables::table_names::TableName::BallMillContainerModel
+            }
+            TablePrimaryKey::BallMillMachineModel(_) => {
+                crate::codegen::tables::table_names::TableName::BallMillMachineModel
             }
             TablePrimaryKey::BallMillProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::BallMillProcedureModel
@@ -101,6 +106,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::CappingRule(_) => {
                 crate::codegen::tables::table_names::TableName::CappingRule
+            }
+            TablePrimaryKey::CentrifugableContainerModel(_) => {
+                crate::codegen::tables::table_names::TableName::CentrifugableContainerModel
+            }
+            TablePrimaryKey::CentrifugeModel(_) => {
+                crate::codegen::tables::table_names::TableName::CentrifugeModel
             }
             TablePrimaryKey::CentrifugeProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::CentrifugeProcedureModel
@@ -135,8 +146,14 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::FractioningProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::FractioningProcedureModel
             }
+            TablePrimaryKey::FreezeDrierModel(_) => {
+                crate::codegen::tables::table_names::TableName::FreezeDrierModel
+            }
             TablePrimaryKey::FreezeDryingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::FreezeDryingProcedureModel
+            }
+            TablePrimaryKey::FreezerModel(_) => {
+                crate::codegen::tables::table_names::TableName::FreezerModel
             }
             TablePrimaryKey::FreezingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::FreezingProcedureModel
@@ -146,9 +163,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::InstrumentState(_) => {
                 crate::codegen::tables::table_names::TableName::InstrumentState
-            }
-            TablePrimaryKey::Instrument(_) => {
-                crate::codegen::tables::table_names::TableName::Instrument
             }
             TablePrimaryKey::LoginProvider(_) => {
                 crate::codegen::tables::table_names::TableName::LoginProvider
@@ -223,12 +237,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::Room(_) => crate::codegen::tables::table_names::TableName::Room,
             TablePrimaryKey::SampleState(_) => {
                 crate::codegen::tables::table_names::TableName::SampleState
-            }
-            TablePrimaryKey::SamplingProcedureModel(_) => {
-                crate::codegen::tables::table_names::TableName::SamplingProcedureModel
-            }
-            TablePrimaryKey::ShakingProcedureModel(_) => {
-                crate::codegen::tables::table_names::TableName::ShakingProcedureModel
             }
             TablePrimaryKey::SharedProcedureModelTrackable(_) => {
                 crate::codegen::tables::table_names::TableName::SharedProcedureModelTrackable

@@ -14,7 +14,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         use crate::codegen::diesel_codegen::tables::freezing_procedure_models::freezing_procedure_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
             .filter(
@@ -22,6 +22,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                     .ne(excluded(kelvin))
                     .or(seconds.ne(excluded(seconds)))
                     .or(frozen_with.ne(excluded(frozen_with)))
+                    .or(procedure_frozen_with.ne(excluded(procedure_frozen_with)))
                     .or(source_container.ne(excluded(source_container))),
             )
             .get_results(conn)
@@ -44,7 +45,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         use crate::codegen::diesel_codegen::tables::freezing_procedure_models::freezing_procedure_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
             .filter(
@@ -52,6 +53,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                     .ne(excluded(kelvin))
                     .or(seconds.ne(excluded(seconds)))
                     .or(frozen_with.ne(excluded(frozen_with)))
+                    .or(procedure_frozen_with.ne(excluded(procedure_frozen_with)))
                     .or(source_container.ne(excluded(source_container))),
             )
             .get_results(conn)

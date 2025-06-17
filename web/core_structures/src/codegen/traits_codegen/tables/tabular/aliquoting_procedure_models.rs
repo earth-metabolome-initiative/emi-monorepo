@@ -16,7 +16,7 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
     type PrimaryKey = crate::codegen::tables::table_primary_keys::TablePrimaryKey;
     fn primary_key(&self) -> Self::PrimaryKey {
         crate::codegen::tables::table_primary_keys::TablePrimaryKey::AliquotingProcedureModel(
-            self.id,
+            self.procedure_model_id,
         )
     }
 }

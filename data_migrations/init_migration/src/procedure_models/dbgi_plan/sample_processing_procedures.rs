@@ -1,11 +1,11 @@
 //! Submodule defining procedures which are re-used in sample processing.
 
 use core_structures::{
-    BallMillProcedureModel, CappingProcedureModel, CentrifugeProcedureModel, ContainerModel,
-    DisposalProcedureModel, FractioningProcedureModel, FreezeDryingProcedureModel,
-    FreezingProcedureModel, MixCountableProcedureModel, MountTipProcedureModel, ProcedureModel,
-    ProcedureModelTrackable, StorageProcedureModel, SupernatantProcedureModel, Trackable,
-    VolumetricContainerModel,
+    BallMillMachineModel, BallMillProcedureModel, CappingProcedureModel, CentrifugeModel,
+    CentrifugeProcedureModel, ContainerModel, DisposalProcedureModel, FractioningProcedureModel,
+    FreezeDryingProcedureModel, FreezingProcedureModel, MixCountableProcedureModel,
+    MountTipProcedureModel, ProcedureModel, ProcedureModelTrackable, StorageProcedureModel,
+    SupernatantProcedureModel, Trackable, VolumetricContainerModel, WeighingInstrumentModel,
     traits::{AppendProcedureModel, ParentProcedureModel},
 };
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -41,8 +41,8 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .insert(user.id, conn)
         .unwrap();
 
-    let weighing_scale = Trackable::from_name(WEIGHING_SCALE, conn).unwrap().unwrap();
-    let conical_tubes_box = Trackable::from_name(POLYSTYRENE_BOX, conn).unwrap().unwrap();
+    let weighing_scale = WeighingInstrumentModel::from_name(WEIGHING_SCALE, conn).unwrap().unwrap();
+    let conical_tubes_box = ContainerModel::from_name(POLYSTYRENE_BOX, conn).unwrap().unwrap();
 
     let conical_tube =
         VolumetricContainerModel::from_name(CONICAL_CENTRIFUGAL_TUBE_50ML, conn).unwrap().unwrap();
@@ -52,8 +52,8 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         VolumetricContainerModel::from_name(SAFELOCK_TUBE_2ML, conn).unwrap().unwrap();
     let vial = VolumetricContainerModel::from_name(VIAL_1_5ML, conn).unwrap().unwrap();
     let vial_box = ContainerModel::from_name(VIAL_BOX, conn).unwrap().unwrap();
-    let ball_mill = Trackable::from_name(BALL_MILL_MACHINE, conn).unwrap().unwrap();
-    let centrifuge = Trackable::from_name(SAFELOCK_CENTRIFUGE, conn).unwrap().unwrap();
+    let ball_mill = BallMillMachineModel::from_name(BALL_MILL_MACHINE, conn).unwrap().unwrap();
+    let centrifuge = CentrifugeModel::from_name(SAFELOCK_CENTRIFUGE, conn).unwrap().unwrap();
     let pipette_1000 = Trackable::from_name(PIPETTES_1000, conn).unwrap().unwrap();
     let pipette_tips_1000 = Trackable::from_name(PIPETTE_TIPS_1000, conn).unwrap().unwrap();
     let sealed_cap = Trackable::from_name(VIAL_1_5ML_SEALED_CAP, conn).unwrap().unwrap();
@@ -163,7 +163,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .unwrap()
         .source_container(procedure_conical_tubes_box_builder.clone())
         .unwrap()
-        .frozen_with(
+        .procedure_frozen_with(
             ProcedureModelTrackable::new()
                 .name("Sample Freezer")
                 .unwrap()
@@ -185,7 +185,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .unwrap()
         .source_container(procedure_conical_tubes_box_builder)
         .unwrap()
-        .freeze_dried_with(
+        .procedure_freeze_dried_with(
             ProcedureModelTrackable::new()
                 .name("Sample Freeze Dryer")
                 .unwrap()
@@ -229,7 +229,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .unwrap()
         .destination(procedure_safelock_tube_builder.clone())
         .unwrap()
-        .weighed_with(procedure_weighing_scale_builder)
+        .procedure_weighed_with(procedure_weighing_scale_builder)
         .unwrap()
         .insert(user.id, conn)
         .unwrap();
@@ -266,9 +266,9 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .container_id(procedure_safelock_tube_builder.clone())
+        .procedure_container_id(procedure_safelock_tube_builder.clone())
         .unwrap()
-        .milled_with(procedure_ball_mill_builder.clone())
+        .procedure_milled_with(procedure_ball_mill_builder.clone())
         .unwrap()
         .insert(user.id, conn)
         .unwrap();
@@ -280,9 +280,9 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .container_id(procedure_safelock_tube_builder.clone())
+        .procedure_container_id(procedure_safelock_tube_builder.clone())
         .unwrap()
-        .milled_with(procedure_ball_mill_builder)
+        .procedure_milled_with(procedure_ball_mill_builder)
         .unwrap()
         .insert(user.id, conn)
         .unwrap();
@@ -294,9 +294,9 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .container_id(procedure_safelock_tube_builder.clone())
+        .procedure_container_id(procedure_safelock_tube_builder.clone())
         .unwrap()
-        .centrifuged_with(procedure_centrifuge_builder)
+        .procedure_centrifuged_with(procedure_centrifuge_builder)
         .unwrap()
         .insert(user.id, conn)
         .unwrap();
@@ -387,22 +387,22 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .unwrap();
 
     let subprocedures = vec![
-        freezing_procedure.id(conn).unwrap(),
-        freeze_drying_procedure.id(conn).unwrap(),
-        falcon_storage_procedure.id(conn).unwrap(),
-        fractioning_procedure.id(conn).unwrap(),
-        metal_beads_procedure.id(conn).unwrap(),
-        first_ball_mill_procedure.id(conn).unwrap(),
+        freezing_procedure.procedure_model(conn).unwrap(),
+        freeze_drying_procedure.procedure_model(conn).unwrap(),
+        falcon_storage_procedure.procedure_model(conn).unwrap(),
+        fractioning_procedure.procedure_model(conn).unwrap(),
+        metal_beads_procedure.procedure_model(conn).unwrap(),
+        first_ball_mill_procedure.procedure_model(conn).unwrap(),
         // TODO!: Add the solvant step
-        second_ball_mill_procedure.id(conn).unwrap(),
-        centrifuge_procedure.id(conn).unwrap(),
-        mount_tip_1000_procedure.id(conn).unwrap(),
-        prelevate_supernatant_procedure.id(conn).unwrap(),
-        dispose_of_eppendorf_tube_procedure.id(conn).unwrap(),
-        dispose_of_pipette_tips_procedure.id(conn).unwrap(),
+        second_ball_mill_procedure.procedure_model(conn).unwrap(),
+        centrifuge_procedure.procedure_model(conn).unwrap(),
+        mount_tip_1000_procedure.procedure_model(conn).unwrap(),
+        prelevate_supernatant_procedure.procedure_model(conn).unwrap(),
+        dispose_of_eppendorf_tube_procedure.procedure_model(conn).unwrap(),
+        dispose_of_pipette_tips_procedure.procedure_model(conn).unwrap(),
         // TODO: potentially dispose of the conical tube if it is empty!
-        capping_procedure.id(conn).unwrap(),
-        long_term_storage_vial_storage_procedure.id(conn).unwrap(),
+        capping_procedure.procedure_model(conn).unwrap(),
+        long_term_storage_vial_storage_procedure.procedure_model(conn).unwrap(),
         // TODO: store the long term storage vial rack in a -80 freezer
         // TODO: store the non-disposed-of conical tube rack in a room temperature shelf
     ];

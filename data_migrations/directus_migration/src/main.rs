@@ -4,7 +4,7 @@ mod migrations;
 use diesel::{Connection, PgConnection};
 use migrations::{
     insert_directus_collection_procedures, insert_missing_brands, insert_missing_instrument_models,
-    insert_missing_instruments, insert_missing_users,
+    insert_missing_users,
 };
 
 const DIRECTUS_DATABASE_NAME: &str = "directus";
@@ -33,7 +33,6 @@ fn transact_migration(
     insert_missing_users(directus_conn, portal_conn)?;
     insert_missing_brands(directus_conn, portal_conn)?;
     insert_missing_instrument_models(directus_conn, portal_conn)?;
-    insert_missing_instruments(directus_conn, portal_conn)?;
     insert_directus_collection_procedures(directus_conn, portal_conn)?;
     Ok(())
 }

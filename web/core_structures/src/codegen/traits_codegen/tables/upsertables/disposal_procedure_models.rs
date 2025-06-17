@@ -13,7 +13,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         use crate::codegen::diesel_codegen::tables::disposal_procedure_models::disposal_procedure_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
             .filter(disposed_id.ne(excluded(disposed_id)))
@@ -36,7 +36,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         use crate::codegen::diesel_codegen::tables::disposal_procedure_models::disposal_procedure_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
             .filter(disposed_id.ne(excluded(disposed_id)))

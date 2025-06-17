@@ -2,11 +2,14 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
     fn from(value: super::Row) -> Self {
         match value {
             super::Row::Address(addresses) => crate::codegen::tables::rows::Rows::from(addresses),
-            super::Row::AliquotingInstrumentModel(aliquoting_instrument_models) => {
-                crate::codegen::tables::rows::Rows::from(aliquoting_instrument_models)
-            }
             super::Row::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(aliquoting_procedure_models)
+            }
+            super::Row::BallMillContainerModel(ball_mill_container_models) => {
+                crate::codegen::tables::rows::Rows::from(ball_mill_container_models)
+            }
+            super::Row::BallMillMachineModel(ball_mill_machine_models) => {
+                crate::codegen::tables::rows::Rows::from(ball_mill_machine_models)
             }
             super::Row::BallMillProcedureModel(ball_mill_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(ball_mill_procedure_models)
@@ -17,6 +20,12 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::CappingRule(capping_rules) => {
                 crate::codegen::tables::rows::Rows::from(capping_rules)
+            }
+            super::Row::CentrifugableContainerModel(centrifugable_container_models) => {
+                crate::codegen::tables::rows::Rows::from(centrifugable_container_models)
+            }
+            super::Row::CentrifugeModel(centrifuge_models) => {
+                crate::codegen::tables::rows::Rows::from(centrifuge_models)
             }
             super::Row::CentrifugeProcedureModel(centrifuge_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(centrifuge_procedure_models)
@@ -49,8 +58,14 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::FractioningProcedureModel(fractioning_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(fractioning_procedure_models)
             }
+            super::Row::FreezeDrierModel(freeze_drier_models) => {
+                crate::codegen::tables::rows::Rows::from(freeze_drier_models)
+            }
             super::Row::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(freeze_drying_procedure_models)
+            }
+            super::Row::FreezerModel(freezer_models) => {
+                crate::codegen::tables::rows::Rows::from(freezer_models)
             }
             super::Row::FreezingProcedureModel(freezing_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(freezing_procedure_models)
@@ -60,9 +75,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::InstrumentState(instrument_states) => {
                 crate::codegen::tables::rows::Rows::from(instrument_states)
-            }
-            super::Row::Instrument(instruments) => {
-                crate::codegen::tables::rows::Rows::from(instruments)
             }
             super::Row::LoginProvider(login_providers) => {
                 crate::codegen::tables::rows::Rows::from(login_providers)
@@ -133,12 +145,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::Room(rooms) => crate::codegen::tables::rows::Rows::from(rooms),
             super::Row::SampleState(sample_states) => {
                 crate::codegen::tables::rows::Rows::from(sample_states)
-            }
-            super::Row::SamplingProcedureModel(sampling_procedure_models) => {
-                crate::codegen::tables::rows::Rows::from(sampling_procedure_models)
-            }
-            super::Row::ShakingProcedureModel(shaking_procedure_models) => {
-                crate::codegen::tables::rows::Rows::from(shaking_procedure_models)
             }
             super::Row::SharedProcedureModelTrackable(shared_procedure_model_trackables) => {
                 crate::codegen::tables::rows::Rows::from(shared_procedure_model_trackables)
