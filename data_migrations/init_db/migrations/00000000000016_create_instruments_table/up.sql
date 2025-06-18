@@ -9,6 +9,23 @@ CREATE TABLE
 	);
 
 CREATE TABLE
+	IF NOT EXISTS positioning_device_models (
+		id UUID PRIMARY KEY REFERENCES instrument_models (id) ON DELETE CASCADE
+	);
+
+CREATE TABLE
+	IF NOT EXISTS camera_models (
+		id UUID PRIMARY KEY REFERENCES instrument_models (id) ON DELETE CASCADE
+	);
+
+-- CREATE TABLE
+-- 	IF NOT EXISTS phone_models (
+-- 		id UUID PRIMARY KEY,
+-- 		FOREIGN KEY (id) REFERENCES camera_models (id) ON DELETE CASCADE,
+-- 		FOREIGN KEY (id) REFERENCES positioning_device_models (id) ON DELETE CASCADE
+-- 	);
+
+CREATE TABLE
 	IF NOT EXISTS freezer_models (
 		id UUID PRIMARY KEY REFERENCES instrument_models (id) ON DELETE CASCADE
 	);

@@ -1,9 +1,6 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CappingProcedureModelForeignKeys {
-    pub capped_with: Option<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
-    >,
     pub procedure_model: Option<
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     >,
@@ -12,6 +9,9 @@ pub struct CappingProcedureModelForeignKeys {
     >,
     pub procedure_container: Option<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+    >,
+    pub capped_with: Option<
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
     >,
     pub procedure_capped_with: Option<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
@@ -26,11 +26,6 @@ impl web_common_traits::prelude::HasForeignKeys
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Trackable(
-                self.capped_with,
-            ),
-        ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(
                 self.procedure_model_id,
@@ -47,16 +42,21 @@ impl web_common_traits::prelude::HasForeignKeys
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Trackable(
+                self.capped_with,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
                 self.procedure_capped_with,
             ),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.capped_with.is_some()
-            && foreign_keys.procedure_model.is_some()
+        foreign_keys.procedure_model.is_some()
             && foreign_keys.container.is_some()
             && foreign_keys.procedure_container.is_some()
+            && foreign_keys.capped_with.is_some()
             && foreign_keys.procedure_capped_with.is_some()
     }
     fn update(

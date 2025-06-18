@@ -268,6 +268,27 @@ impl InsertableFreezingProcedureModelBuilder {
             })?;
         Ok(self)
     }
+    pub fn source_container(
+        mut self,
+        source_container: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
+    > {
+        if source_container.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertableFreezingProcedureModelAttributes::SourceContainer(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        self.source_container = source_container;
+        Ok(self)
+    }
     pub fn procedure_frozen_with(
         mut self,
         procedure_frozen_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -310,27 +331,6 @@ impl InsertableFreezingProcedureModelBuilder {
                 })?;
         }
         self.procedure_frozen_with = procedure_frozen_with;
-        Ok(self)
-    }
-    pub fn source_container(
-        mut self,
-        source_container: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
-    > {
-        if source_container.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableFreezingProcedureModelAttributes::SourceContainer(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.source_container = source_container;
         Ok(self)
     }
     pub fn name<P>(
@@ -536,17 +536,6 @@ impl InsertableFreezingProcedureModelBuilder {
                 err.into_field_name(InsertableFreezingProcedureModelAttributes::ProcedureModelId)
             })?
             .id();
-        let procedure_frozen_with = self
-            .procedure_frozen_with
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertableFreezingProcedureModelAttributes::ProcedureFrozenWith)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableFreezingProcedureModelAttributes::ProcedureFrozenWith)
-            })?
-            .id();
         let source_container = self
             .source_container
             .procedure_model_id(procedure_model_id)
@@ -556,6 +545,17 @@ impl InsertableFreezingProcedureModelBuilder {
             .insert(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(InsertableFreezingProcedureModelAttributes::SourceContainer)
+            })?
+            .id();
+        let procedure_frozen_with = self
+            .procedure_frozen_with
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(InsertableFreezingProcedureModelAttributes::ProcedureFrozenWith)
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(InsertableFreezingProcedureModelAttributes::ProcedureFrozenWith)
             })?
             .id();
         Ok(InsertableFreezingProcedureModel {

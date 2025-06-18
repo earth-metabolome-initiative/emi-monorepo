@@ -4,6 +4,7 @@ use core_structures::{ContainerModel, User};
 use diesel::PgConnection;
 
 pub mod conical_centrifugal_tubes;
+pub mod wrappers;
 pub(crate) use conical_centrifugal_tubes::{
     CONICAL_CENTRIFUGAL_TUBE_50ML, CONICAL_CENTRIFUGAL_TUBE_50ML_RACK,
 };
@@ -26,6 +27,7 @@ pub(super) fn init_wet_lab_containers(
         wet_lab_container,
         conn,
     );
+    wrappers::init_wrappers(user, wet_lab_container, conn);
     safelock_tubes::init_safelock_tubes(user, wet_lab_container, conn);
     vials::init_vials(user, container, wet_lab_container, conn);
 }

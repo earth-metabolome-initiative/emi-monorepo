@@ -22,6 +22,7 @@ mod collection_preparation_procedures;
 mod data_enrichment_procedures;
 pub(crate) use data_enrichment_procedures::init_data_enrichment_procedure;
 mod observation_procedures;
+pub(crate) use observation_procedures::init_organism_observation_procedure;
 mod sample_collection_procedures;
 pub(crate) use analysis_procedures::{
     init_negative_ionization_lcms_procedure, init_positive_ionization_lcms_procedure,

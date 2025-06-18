@@ -333,6 +333,50 @@ impl InsertableBallMillProcedureModelBuilder {
             })?;
         Ok(self)
     }
+    pub fn procedure_milled_with(
+        mut self,
+        procedure_milled_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableBallMillProcedureModelAttributes>,
+    > {
+        if procedure_milled_with.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertableBallMillProcedureModelAttributes::ProcedureMilledWith(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        if let (Some(local), Some(foreign)) = (self.milled_with, procedure_milled_with.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            InsertableBallMillProcedureModelAttributes::ProcedureMilledWith(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_milled_with.trackable_id {
+            self.milled_with = Some(foreign);
+        } else if let Some(local) = self.milled_with {
+            self.procedure_milled_with =
+                self.procedure_milled_with.trackable_id(local).map_err(|err| {
+                    err.into_field_name(
+                        InsertableBallMillProcedureModelAttributes::ProcedureMilledWith,
+                    )
+                })?;
+        }
+        self.procedure_milled_with = procedure_milled_with;
+        Ok(self)
+    }
     pub fn procedure_container_id(
         mut self,
         procedure_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -376,50 +420,6 @@ impl InsertableBallMillProcedureModelBuilder {
                 })?;
         }
         self.procedure_container_id = procedure_container_id;
-        Ok(self)
-    }
-    pub fn procedure_milled_with(
-        mut self,
-        procedure_milled_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableBallMillProcedureModelAttributes>,
-    > {
-        if procedure_milled_with.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableBallMillProcedureModelAttributes::ProcedureMilledWith(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        if let (Some(local), Some(foreign)) = (self.milled_with, procedure_milled_with.trackable_id)
-        {
-            if local != foreign {
-                return Err(
-                    web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            InsertableBallMillProcedureModelAttributes::ProcedureMilledWith(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
-                            ),
-                        ),
-                    ),
-                );
-            }
-        } else if let Some(foreign) = procedure_milled_with.trackable_id {
-            self.milled_with = Some(foreign);
-        } else if let Some(local) = self.milled_with {
-            self.procedure_milled_with =
-                self.procedure_milled_with.trackable_id(local).map_err(|err| {
-                    err.into_field_name(
-                        InsertableBallMillProcedureModelAttributes::ProcedureMilledWith,
-                    )
-                })?;
-        }
-        self.procedure_milled_with = procedure_milled_with;
         Ok(self)
     }
     pub fn name<P>(
@@ -629,6 +629,17 @@ impl InsertableBallMillProcedureModelBuilder {
                 err.into_field_name(InsertableBallMillProcedureModelAttributes::ProcedureModelId)
             })?
             .id();
+        let procedure_milled_with = self
+            .procedure_milled_with
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(InsertableBallMillProcedureModelAttributes::ProcedureMilledWith)
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(InsertableBallMillProcedureModelAttributes::ProcedureMilledWith)
+            })?
+            .id();
         let procedure_container_id = self
             .procedure_container_id
             .procedure_model_id(procedure_model_id)
@@ -642,17 +653,6 @@ impl InsertableBallMillProcedureModelBuilder {
                 err.into_field_name(
                     InsertableBallMillProcedureModelAttributes::ProcedureContainerId,
                 )
-            })?
-            .id();
-        let procedure_milled_with = self
-            .procedure_milled_with
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertableBallMillProcedureModelAttributes::ProcedureMilledWith)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableBallMillProcedureModelAttributes::ProcedureMilledWith)
             })?
             .id();
         Ok(InsertableBallMillProcedureModel {

@@ -3,7 +3,9 @@ mod aliquoting_procedure_models;
 mod ball_mill_container_models;
 mod ball_mill_machine_models;
 mod ball_mill_procedure_models;
+mod binary_question_procedure_models;
 mod brands;
+mod camera_models;
 mod capping_procedure_models;
 mod capping_rules;
 mod centrifugable_container_models;
@@ -26,6 +28,7 @@ mod freeze_drying_procedure_models;
 mod freezer_models;
 mod freezing_procedure_models;
 mod from_row;
+mod geolocation_procedure_models;
 mod instrument_models;
 mod instrument_states;
 mod login_providers;
@@ -35,14 +38,14 @@ mod mix_solid_procedure_models;
 mod mount_tip_procedure_models;
 mod next_procedure_models;
 mod observation_subjects;
-mod organism_observations;
 mod organism_taxa;
 mod organisms;
 mod organizations;
-mod packaging_models;
 mod packaging_procedure_models;
 mod parent_procedure_models;
 mod permanence_categories;
+mod photograph_procedure_models;
+mod positioning_device_models;
 mod pouring_procedure_models;
 mod procedure_model_trackables;
 mod procedure_models;
@@ -98,7 +101,11 @@ pub enum Row {
     BallMillProcedureModel(
         crate::codegen::structs_codegen::tables::ball_mill_procedure_models::BallMillProcedureModel,
     ),
+    BinaryQuestionProcedureModel(
+        crate::codegen::structs_codegen::tables::binary_question_procedure_models::BinaryQuestionProcedureModel,
+    ),
     Brand(crate::codegen::structs_codegen::tables::brands::Brand),
+    CameraModel(crate::codegen::structs_codegen::tables::camera_models::CameraModel),
     CappingProcedureModel(
         crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel,
     ),
@@ -148,6 +155,9 @@ pub enum Row {
     FreezingProcedureModel(
         crate::codegen::structs_codegen::tables::freezing_procedure_models::FreezingProcedureModel,
     ),
+    GeolocationProcedureModel(
+        crate::codegen::structs_codegen::tables::geolocation_procedure_models::GeolocationProcedureModel,
+    ),
     InstrumentModel(
         crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
     ),
@@ -173,15 +183,9 @@ pub enum Row {
     ObservationSubject(
         crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
     ),
-    OrganismObservation(
-        crate::codegen::structs_codegen::tables::organism_observations::OrganismObservation,
-    ),
     OrganismTaxon(crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon),
     Organism(crate::codegen::structs_codegen::tables::organisms::Organism),
     Organization(crate::codegen::structs_codegen::tables::organizations::Organization),
-    PackagingModel(
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
-    ),
     PackagingProcedureModel(
         crate::codegen::structs_codegen::tables::packaging_procedure_models::PackagingProcedureModel,
     ),
@@ -190,6 +194,12 @@ pub enum Row {
     ),
     PermanenceCategory(
         crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
+    ),
+    PhotographProcedureModel(
+        crate::codegen::structs_codegen::tables::photograph_procedure_models::PhotographProcedureModel,
+    ),
+    PositioningDeviceModel(
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
     ),
     PouringProcedureModel(
         crate::codegen::structs_codegen::tables::pouring_procedure_models::PouringProcedureModel,
@@ -283,7 +293,11 @@ impl Row {
             Row::BallMillProcedureModel(ball_mill_procedure_models) => {
                 ball_mill_procedure_models.upsert(conn)?.map(Row::from)
             }
+            Row::BinaryQuestionProcedureModel(binary_question_procedure_models) => {
+                binary_question_procedure_models.upsert(conn)?.map(Row::from)
+            }
             Row::Brand(brands) => brands.upsert(conn)?.map(Row::from),
+            Row::CameraModel(camera_models) => camera_models.upsert(conn)?.map(Row::from),
             Row::CappingProcedureModel(capping_procedure_models) => {
                 capping_procedure_models.upsert(conn)?.map(Row::from)
             }
@@ -329,6 +343,9 @@ impl Row {
             Row::FreezingProcedureModel(freezing_procedure_models) => {
                 freezing_procedure_models.upsert(conn)?.map(Row::from)
             }
+            Row::GeolocationProcedureModel(geolocation_procedure_models) => {
+                geolocation_procedure_models.upsert(conn)?.map(Row::from)
+            }
             Row::InstrumentModel(instrument_models) => {
                 instrument_models.upsert(conn)?.map(Row::from)
             }
@@ -352,13 +369,9 @@ impl Row {
             Row::ObservationSubject(observation_subjects) => {
                 observation_subjects.upsert(conn)?.map(Row::from)
             }
-            Row::OrganismObservation(organism_observations) => {
-                organism_observations.upsert(conn)?.map(Row::from)
-            }
             Row::OrganismTaxon(organism_taxa) => organism_taxa.upsert(conn)?.map(Row::from),
             Row::Organism(organisms) => organisms.upsert(conn)?.map(Row::from),
             Row::Organization(organizations) => organizations.upsert(conn)?.map(Row::from),
-            Row::PackagingModel(packaging_models) => packaging_models.upsert(conn)?.map(Row::from),
             Row::PackagingProcedureModel(packaging_procedure_models) => {
                 packaging_procedure_models.upsert(conn)?.map(Row::from)
             }
@@ -367,6 +380,12 @@ impl Row {
             }
             Row::PermanenceCategory(permanence_categories) => {
                 permanence_categories.upsert(conn)?.map(Row::from)
+            }
+            Row::PhotographProcedureModel(photograph_procedure_models) => {
+                photograph_procedure_models.upsert(conn)?.map(Row::from)
+            }
+            Row::PositioningDeviceModel(positioning_device_models) => {
+                positioning_device_models.upsert(conn)?.map(Row::from)
             }
             Row::PouringProcedureModel(pouring_procedure_models) => {
                 pouring_procedure_models.upsert(conn)?.map(Row::from)
@@ -453,7 +472,11 @@ impl web_common_traits::prelude::Row for Row {
             Row::BallMillProcedureModel(ball_mill_procedure_models) => {
                 ball_mill_procedure_models.primary_key()
             }
+            Row::BinaryQuestionProcedureModel(binary_question_procedure_models) => {
+                binary_question_procedure_models.primary_key()
+            }
             Row::Brand(brands) => brands.primary_key(),
+            Row::CameraModel(camera_models) => camera_models.primary_key(),
             Row::CappingProcedureModel(capping_procedure_models) => {
                 capping_procedure_models.primary_key()
             }
@@ -491,6 +514,9 @@ impl web_common_traits::prelude::Row for Row {
             Row::FreezingProcedureModel(freezing_procedure_models) => {
                 freezing_procedure_models.primary_key()
             }
+            Row::GeolocationProcedureModel(geolocation_procedure_models) => {
+                geolocation_procedure_models.primary_key()
+            }
             Row::InstrumentModel(instrument_models) => instrument_models.primary_key(),
             Row::InstrumentState(instrument_states) => instrument_states.primary_key(),
             Row::LoginProvider(login_providers) => login_providers.primary_key(),
@@ -506,11 +532,9 @@ impl web_common_traits::prelude::Row for Row {
             }
             Row::NextProcedureModel(next_procedure_models) => next_procedure_models.primary_key(),
             Row::ObservationSubject(observation_subjects) => observation_subjects.primary_key(),
-            Row::OrganismObservation(organism_observations) => organism_observations.primary_key(),
             Row::OrganismTaxon(organism_taxa) => organism_taxa.primary_key(),
             Row::Organism(organisms) => organisms.primary_key(),
             Row::Organization(organizations) => organizations.primary_key(),
-            Row::PackagingModel(packaging_models) => packaging_models.primary_key(),
             Row::PackagingProcedureModel(packaging_procedure_models) => {
                 packaging_procedure_models.primary_key()
             }
@@ -518,6 +542,12 @@ impl web_common_traits::prelude::Row for Row {
                 parent_procedure_models.primary_key()
             }
             Row::PermanenceCategory(permanence_categories) => permanence_categories.primary_key(),
+            Row::PhotographProcedureModel(photograph_procedure_models) => {
+                photograph_procedure_models.primary_key()
+            }
+            Row::PositioningDeviceModel(positioning_device_models) => {
+                positioning_device_models.primary_key()
+            }
             Row::PouringProcedureModel(pouring_procedure_models) => {
                 pouring_procedure_models.primary_key()
             }

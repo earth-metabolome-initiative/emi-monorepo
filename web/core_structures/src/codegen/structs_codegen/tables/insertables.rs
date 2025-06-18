@@ -20,8 +20,17 @@ pub use ball_mill_procedure_models::{
     InsertableBallMillProcedureModel, InsertableBallMillProcedureModelAttributes,
     InsertableBallMillProcedureModelBuilder,
 };
+mod binary_question_procedure_models;
+pub use binary_question_procedure_models::{
+    InsertableBinaryQuestionProcedureModel, InsertableBinaryQuestionProcedureModelAttributes,
+    InsertableBinaryQuestionProcedureModelBuilder,
+};
 mod brands;
 pub use brands::{InsertableBrand, InsertableBrandAttributes, InsertableBrandBuilder};
+mod camera_models;
+pub use camera_models::{
+    InsertableCameraModel, InsertableCameraModelAttributes, InsertableCameraModelBuilder,
+};
 mod capping_procedure_models;
 pub use capping_procedure_models::{
     InsertableCappingProcedureModel, InsertableCappingProcedureModelAttributes,
@@ -110,6 +119,11 @@ pub use freezing_procedure_models::{
     InsertableFreezingProcedureModel, InsertableFreezingProcedureModelAttributes,
     InsertableFreezingProcedureModelBuilder,
 };
+mod geolocation_procedure_models;
+pub use geolocation_procedure_models::{
+    InsertableGeolocationProcedureModel, InsertableGeolocationProcedureModelAttributes,
+    InsertableGeolocationProcedureModelBuilder,
+};
 mod instrument_models;
 pub use instrument_models::{
     InsertableInstrumentModel, InsertableInstrumentModelAttributes,
@@ -151,11 +165,6 @@ pub use observation_subjects::{
     InsertableObservationSubject, InsertableObservationSubjectAttributes,
     InsertableObservationSubjectBuilder,
 };
-mod organism_observations;
-pub use organism_observations::{
-    InsertableOrganismObservation, InsertableOrganismObservationAttributes,
-    InsertableOrganismObservationBuilder,
-};
 mod organism_taxa;
 pub use organism_taxa::{
     InsertableOrganismTaxon, InsertableOrganismTaxonAttributes, InsertableOrganismTaxonBuilder,
@@ -165,10 +174,6 @@ pub use organisms::{InsertableOrganism, InsertableOrganismAttributes, Insertable
 mod organizations;
 pub use organizations::{
     InsertableOrganization, InsertableOrganizationAttributes, InsertableOrganizationBuilder,
-};
-mod packaging_models;
-pub use packaging_models::{
-    InsertablePackagingModel, InsertablePackagingModelAttributes, InsertablePackagingModelBuilder,
 };
 mod packaging_procedure_models;
 pub use packaging_procedure_models::{
@@ -184,6 +189,16 @@ mod permanence_categories;
 pub use permanence_categories::{
     InsertablePermanenceCategory, InsertablePermanenceCategoryAttributes,
     InsertablePermanenceCategoryBuilder,
+};
+mod photograph_procedure_models;
+pub use photograph_procedure_models::{
+    InsertablePhotographProcedureModel, InsertablePhotographProcedureModelAttributes,
+    InsertablePhotographProcedureModelBuilder,
+};
+mod positioning_device_models;
+pub use positioning_device_models::{
+    InsertablePositioningDeviceModel, InsertablePositioningDeviceModelAttributes,
+    InsertablePositioningDeviceModelBuilder,
 };
 mod pouring_procedure_models;
 pub use pouring_procedure_models::{

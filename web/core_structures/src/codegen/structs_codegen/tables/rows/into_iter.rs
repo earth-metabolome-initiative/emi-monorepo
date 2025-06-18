@@ -24,8 +24,18 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::BallMillProcedureModel)
                     .collect::<Vec<_>>()
             }
+            super::Rows::BinaryQuestionProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::BinaryQuestionProcedureModel)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::Brand(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Brand).collect::<Vec<_>>()
+            }
+            super::Rows::CameraModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::CameraModel)
+                    .collect::<Vec<_>>()
             }
             super::Rows::CappingProcedureModel(rows) => {
                 rows.into_iter()
@@ -124,6 +134,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::FreezingProcedureModel)
                     .collect::<Vec<_>>()
             }
+            super::Rows::GeolocationProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::GeolocationProcedureModel)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::InstrumentModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::InstrumentModel)
@@ -167,11 +182,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::ObservationSubject)
                     .collect::<Vec<_>>()
             }
-            super::Rows::OrganismObservation(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::OrganismObservation)
-                    .collect::<Vec<_>>()
-            }
             super::Rows::OrganismTaxon(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::OrganismTaxon)
@@ -183,11 +193,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::Organization(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::Organization)
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::PackagingModel(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::PackagingModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::PackagingProcedureModel(rows) => {
@@ -203,6 +208,16 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::PermanenceCategory(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::PermanenceCategory)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::PhotographProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::PhotographProcedureModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::PositioningDeviceModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::PositioningDeviceModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::PouringProcedureModel(rows) => {

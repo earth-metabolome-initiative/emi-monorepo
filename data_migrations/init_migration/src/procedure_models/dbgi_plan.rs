@@ -8,8 +8,8 @@ use web_common_traits::database::{Insertable, InsertableVariant};
 
 use crate::procedure_models::{
     init_data_enrichment_procedure, init_full_organism_collection,
-    init_negative_ionization_lcms_procedure, init_part_of_organism_collection,
-    init_positive_ionization_lcms_procedure, observation_procedures,
+    init_negative_ionization_lcms_procedure, init_organism_observation_procedure,
+    init_part_of_organism_collection, init_positive_ionization_lcms_procedure,
 };
 mod dbgi_collection_preparation;
 mod sample_processing_procedures;
@@ -45,8 +45,7 @@ pub(super) fn init_dbgi_plan(user: &User, conn: &mut diesel::PgConnection) {
         sample_processing_procedures::init_dbgi_sample_processing_procedures(user, conn);
     let positive_lcms_procedure = init_positive_ionization_lcms_procedure(user, conn);
     let negative_lcms_procedure = init_negative_ionization_lcms_procedure(user, conn);
-    let observation_procedure =
-        observation_procedures::init_organism_observation_procedure(user, conn);
+    let observation_procedure = init_organism_observation_procedure(user, conn);
     let full_organism_collection = init_full_organism_collection(user, conn);
     let part_of_organism_collection = init_part_of_organism_collection(user, conn);
     let data_enrichment = init_data_enrichment_procedure(user, conn);

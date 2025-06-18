@@ -14,7 +14,13 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::BallMillProcedureModel(ball_mill_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(ball_mill_procedure_models)
             }
+            super::Row::BinaryQuestionProcedureModel(binary_question_procedure_models) => {
+                crate::codegen::tables::rows::Rows::from(binary_question_procedure_models)
+            }
             super::Row::Brand(brands) => crate::codegen::tables::rows::Rows::from(brands),
+            super::Row::CameraModel(camera_models) => {
+                crate::codegen::tables::rows::Rows::from(camera_models)
+            }
             super::Row::CappingProcedureModel(capping_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(capping_procedure_models)
             }
@@ -70,6 +76,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::FreezingProcedureModel(freezing_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(freezing_procedure_models)
             }
+            super::Row::GeolocationProcedureModel(geolocation_procedure_models) => {
+                crate::codegen::tables::rows::Rows::from(geolocation_procedure_models)
+            }
             super::Row::InstrumentModel(instrument_models) => {
                 crate::codegen::tables::rows::Rows::from(instrument_models)
             }
@@ -95,18 +104,12 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::ObservationSubject(observation_subjects) => {
                 crate::codegen::tables::rows::Rows::from(observation_subjects)
             }
-            super::Row::OrganismObservation(organism_observations) => {
-                crate::codegen::tables::rows::Rows::from(organism_observations)
-            }
             super::Row::OrganismTaxon(organism_taxa) => {
                 crate::codegen::tables::rows::Rows::from(organism_taxa)
             }
             super::Row::Organism(organisms) => crate::codegen::tables::rows::Rows::from(organisms),
             super::Row::Organization(organizations) => {
                 crate::codegen::tables::rows::Rows::from(organizations)
-            }
-            super::Row::PackagingModel(packaging_models) => {
-                crate::codegen::tables::rows::Rows::from(packaging_models)
             }
             super::Row::PackagingProcedureModel(packaging_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(packaging_procedure_models)
@@ -116,6 +119,12 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::PermanenceCategory(permanence_categories) => {
                 crate::codegen::tables::rows::Rows::from(permanence_categories)
+            }
+            super::Row::PhotographProcedureModel(photograph_procedure_models) => {
+                crate::codegen::tables::rows::Rows::from(photograph_procedure_models)
+            }
+            super::Row::PositioningDeviceModel(positioning_device_models) => {
+                crate::codegen::tables::rows::Rows::from(positioning_device_models)
             }
             super::Row::PouringProcedureModel(pouring_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(pouring_procedure_models)

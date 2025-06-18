@@ -6,7 +6,9 @@ pub enum TablePrimaryKey {
     BallMillContainerModel((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
     BallMillMachineModel(::rosetta_uuid::Uuid),
     BallMillProcedureModel(i32),
+    BinaryQuestionProcedureModel(i32),
     Brand(i32),
+    CameraModel(::rosetta_uuid::Uuid),
     CappingProcedureModel(i32),
     CappingRule((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
     CentrifugableContainerModel((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
@@ -28,6 +30,7 @@ pub enum TablePrimaryKey {
     FreezeDryingProcedureModel(i32),
     FreezerModel(::rosetta_uuid::Uuid),
     FreezingProcedureModel(i32),
+    GeolocationProcedureModel(i32),
     InstrumentModel(::rosetta_uuid::Uuid),
     InstrumentState(i16),
     LoginProvider(i16),
@@ -37,14 +40,14 @@ pub enum TablePrimaryKey {
     MountTipProcedureModel(i32),
     NextProcedureModel((i32, i32, i32)),
     ObservationSubject(i16),
-    OrganismObservation(::rosetta_uuid::Uuid),
     OrganismTaxon((::rosetta_uuid::Uuid, i32)),
     Organism(::rosetta_uuid::Uuid),
     Organization(i16),
-    PackagingModel(::rosetta_uuid::Uuid),
     PackagingProcedureModel(i32),
     ParentProcedureModel((i32, i32)),
     PermanenceCategory(i16),
+    PhotographProcedureModel(i32),
+    PositioningDeviceModel(::rosetta_uuid::Uuid),
     PouringProcedureModel(i32),
     ProcedureModelTrackable(i32),
     ProcedureModel(i32),
@@ -100,7 +103,13 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::BallMillProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::BallMillProcedureModel
             }
+            TablePrimaryKey::BinaryQuestionProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::BinaryQuestionProcedureModel
+            }
             TablePrimaryKey::Brand(_) => crate::codegen::tables::table_names::TableName::Brand,
+            TablePrimaryKey::CameraModel(_) => {
+                crate::codegen::tables::table_names::TableName::CameraModel
+            }
             TablePrimaryKey::CappingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::CappingProcedureModel
             }
@@ -158,6 +167,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::FreezingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::FreezingProcedureModel
             }
+            TablePrimaryKey::GeolocationProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::GeolocationProcedureModel
+            }
             TablePrimaryKey::InstrumentModel(_) => {
                 crate::codegen::tables::table_names::TableName::InstrumentModel
             }
@@ -185,9 +197,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::ObservationSubject(_) => {
                 crate::codegen::tables::table_names::TableName::ObservationSubject
             }
-            TablePrimaryKey::OrganismObservation(_) => {
-                crate::codegen::tables::table_names::TableName::OrganismObservation
-            }
             TablePrimaryKey::OrganismTaxon(_) => {
                 crate::codegen::tables::table_names::TableName::OrganismTaxon
             }
@@ -197,9 +206,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::Organization(_) => {
                 crate::codegen::tables::table_names::TableName::Organization
             }
-            TablePrimaryKey::PackagingModel(_) => {
-                crate::codegen::tables::table_names::TableName::PackagingModel
-            }
             TablePrimaryKey::PackagingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::PackagingProcedureModel
             }
@@ -208,6 +214,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::PermanenceCategory(_) => {
                 crate::codegen::tables::table_names::TableName::PermanenceCategory
+            }
+            TablePrimaryKey::PhotographProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::PhotographProcedureModel
+            }
+            TablePrimaryKey::PositioningDeviceModel(_) => {
+                crate::codegen::tables::table_names::TableName::PositioningDeviceModel
             }
             TablePrimaryKey::PouringProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::PouringProcedureModel

@@ -4,6 +4,8 @@ use core_structures::{ContainerModel, StorageRule, User, VolumetricContainerMode
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
+use crate::trackables::containers::POLYSTYRENE_BOX;
+
 const CONICAL_CENTRIFUGAL_TUBE: &str = "Conical Tube";
 pub const CONICAL_CENTRIFUGAL_TUBE_50ML: &str = "Conical Tube 50ml";
 pub const CONICAL_CENTRIFUGAL_TUBE_50ML_RACK: &str = "Conical Tube Rack 50ml";
@@ -59,6 +61,19 @@ pub(super) fn init_conical_centrifugal_tubes(
         .unwrap()
         // TODO! ACTUALLY SET THE CORRECT QUANTITY
         .quantity(24i16)
+        .unwrap()
+        .insert(user.id, conn)
+        .unwrap();
+
+    let polysterene_box = ContainerModel::from_name(POLYSTYRENE_BOX, conn).unwrap().unwrap();
+
+    StorageRule::new()
+        .parent_container_id(polysterene_box.id)
+        .unwrap()
+        .child_container_id(conical_tube_50ml.id)
+        .unwrap()
+        // TODO! ACTUALLY SET THE CORRECT QUANTITY
+        .quantity(100i16)
         .unwrap()
         .insert(user.id, conn)
         .unwrap();

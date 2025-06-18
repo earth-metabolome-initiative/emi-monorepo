@@ -252,6 +252,26 @@ impl BallMillProcedureModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_procedure_milled_with_and_milled_with(
+        procedure_milled_with: &i32,
+        milled_with: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::ball_mill_procedure_models::ball_mill_procedure_models;
+        Self::table()
+            .filter(
+                ball_mill_procedure_models::procedure_milled_with
+                    .eq(procedure_milled_with)
+                    .and(ball_mill_procedure_models::milled_with.eq(milled_with)),
+            )
+            .order_by(ball_mill_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_procedure_milled_with_and_procedure_model_id(
         procedure_milled_with: &i32,
         procedure_model_id: &i32,
@@ -287,26 +307,6 @@ impl BallMillProcedureModel {
                 ball_mill_procedure_models::procedure_container_id
                     .eq(procedure_container_id)
                     .and(ball_mill_procedure_models::container_id.eq(container_id)),
-            )
-            .order_by(ball_mill_procedure_models::procedure_model_id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_milled_with_and_milled_with(
-        procedure_milled_with: &i32,
-        milled_with: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::ball_mill_procedure_models::ball_mill_procedure_models;
-        Self::table()
-            .filter(
-                ball_mill_procedure_models::procedure_milled_with
-                    .eq(procedure_milled_with)
-                    .and(ball_mill_procedure_models::milled_with.eq(milled_with)),
             )
             .order_by(ball_mill_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)

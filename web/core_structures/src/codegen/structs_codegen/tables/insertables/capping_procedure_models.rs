@@ -50,38 +50,6 @@ pub struct InsertableCappingProcedureModel {
     procedure_capped_with: i32,
 }
 impl InsertableCappingProcedureModel {
-    pub fn capped_with<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::trackables::Trackable,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
-                self.capped_with,
-            ),
-            conn,
-        )
-    }
     pub fn procedure_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -178,6 +146,38 @@ impl InsertableCappingProcedureModel {
             conn,
         )
     }
+    pub fn capped_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                self.capped_with,
+            ),
+            conn,
+        )
+    }
     pub fn procedure_capped_with<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -267,6 +267,50 @@ impl InsertableCappingProcedureModelBuilder {
             })?;
         Ok(self)
     }
+    pub fn procedure_capped_with(
+        mut self,
+        procedure_capped_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableCappingProcedureModelAttributes>,
+    > {
+        if procedure_capped_with.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertableCappingProcedureModelAttributes::ProcedureCappedWith(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        if let (Some(local), Some(foreign)) = (self.capped_with, procedure_capped_with.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            InsertableCappingProcedureModelAttributes::ProcedureCappedWith(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_capped_with.trackable_id {
+            self.capped_with = Some(foreign);
+        } else if let Some(local) = self.capped_with {
+            self.procedure_capped_with =
+                self.procedure_capped_with.trackable_id(local).map_err(|err| {
+                    err.into_field_name(
+                        InsertableCappingProcedureModelAttributes::ProcedureCappedWith,
+                    )
+                })?;
+        }
+        self.procedure_capped_with = procedure_capped_with;
+        Ok(self)
+    }
     pub fn procedure_container_id(
         mut self,
         procedure_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -310,50 +354,6 @@ impl InsertableCappingProcedureModelBuilder {
                 })?;
         }
         self.procedure_container_id = procedure_container_id;
-        Ok(self)
-    }
-    pub fn procedure_capped_with(
-        mut self,
-        procedure_capped_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableCappingProcedureModelAttributes>,
-    > {
-        if procedure_capped_with.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableCappingProcedureModelAttributes::ProcedureCappedWith(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        if let (Some(local), Some(foreign)) = (self.capped_with, procedure_capped_with.trackable_id)
-        {
-            if local != foreign {
-                return Err(
-                    web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            InsertableCappingProcedureModelAttributes::ProcedureCappedWith(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
-                            ),
-                        ),
-                    ),
-                );
-            }
-        } else if let Some(foreign) = procedure_capped_with.trackable_id {
-            self.capped_with = Some(foreign);
-        } else if let Some(local) = self.capped_with {
-            self.procedure_capped_with =
-                self.procedure_capped_with.trackable_id(local).map_err(|err| {
-                    err.into_field_name(
-                        InsertableCappingProcedureModelAttributes::ProcedureCappedWith,
-                    )
-                })?;
-        }
-        self.procedure_capped_with = procedure_capped_with;
         Ok(self)
     }
     pub fn name<P>(
@@ -557,17 +557,6 @@ impl InsertableCappingProcedureModelBuilder {
                 err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureModelId)
             })?
             .id();
-        let procedure_container_id = self
-            .procedure_container_id
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureContainerId)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureContainerId)
-            })?
-            .id();
         let procedure_capped_with = self
             .procedure_capped_with
             .procedure_model_id(procedure_model_id)
@@ -577,6 +566,17 @@ impl InsertableCappingProcedureModelBuilder {
             .insert(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureCappedWith)
+            })?
+            .id();
+        let procedure_container_id = self
+            .procedure_container_id
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureContainerId)
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(InsertableCappingProcedureModelAttributes::ProcedureContainerId)
             })?
             .id();
         Ok(InsertableCappingProcedureModel {

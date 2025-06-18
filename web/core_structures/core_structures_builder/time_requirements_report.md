@@ -10,14 +10,14 @@ The slowest task was `Code generation` which took a minute (100.00% of all time)
 ## Time Report for Code generation
 
 The total time spent on all tasks was a minute.
-The slowest task was `Generate Structs` which took 41 seconds (82.00% of all time).
+The slowest task was `Generate Structs` which took a minute (85.33% of all time).
 
-| name                       | time       | percentage | comment |
-|----------------------------|------------|------------|---------|
-| Retrieving tables          | now        | 0.00%      |         |
-| Generating Diesel code     | now        | 16.00%     |         |
-| Generate Structs           | 41 seconds | 82.00%     |         |
-| Generate Web Common Traits | now        | 0.00%      |         |
+| name                       | time     | percentage | comment |
+|----------------------------|----------|------------|---------|
+| Retrieving tables          | now      | 0.00%      |         |
+| Generating Diesel code     | now      | 13.33%     |         |
+| Generate Structs           | a minute | 85.33%     |         |
+| Generate Web Common Traits | now      | 0.00%      |         |
 
 ### Time Report for Generating Diesel code
 
@@ -32,13 +32,13 @@ The slowest task was `Generating allow tables to appear in same query schema` wh
 
 ### Time Report for Generate Structs
 
-The total time spent on all tasks was 41 seconds.
-The slowest task was `Generate Table Structs` which took 41 seconds (100.00% of all time).
+The total time spent on all tasks was a minute.
+The slowest task was `Generate Table Structs` which took a minute (100.00% of all time).
 
-| name                   | time       | percentage | comment |
-|------------------------|------------|------------|---------|
-| Generate Types Structs | now        | 0.00%      |         |
-| Generate Table Structs | 41 seconds | 100.00%    |         |
+| name                   | time     | percentage | comment |
+|------------------------|----------|------------|---------|
+| Generate Types Structs | now      | 0.00%      |         |
+| Generate Table Structs | a minute | 100.00%    |         |
 
 ### Time Report for Generate Web Common Traits
 

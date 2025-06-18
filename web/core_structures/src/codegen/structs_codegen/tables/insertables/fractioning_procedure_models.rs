@@ -328,27 +328,6 @@ impl InsertableFractioningProcedureModelBuilder {
         self.source = source;
         Ok(self)
     }
-    pub fn destination(
-        mut self,
-        destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
-    > {
-        if destination.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableFractioningProcedureModelAttributes::Destination(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.destination = destination;
-        Ok(self)
-    }
     pub fn procedure_weighed_with(
         mut self,
         procedure_weighed_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -392,6 +371,27 @@ impl InsertableFractioningProcedureModelBuilder {
                 })?;
         }
         self.procedure_weighed_with = procedure_weighed_with;
+        Ok(self)
+    }
+    pub fn destination(
+        mut self,
+        destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
+    > {
+        if destination.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertableFractioningProcedureModelAttributes::Destination(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        self.destination = destination;
         Ok(self)
     }
     pub fn name<P>(
@@ -611,17 +611,6 @@ impl InsertableFractioningProcedureModelBuilder {
                 err.into_field_name(InsertableFractioningProcedureModelAttributes::Source)
             })?
             .id();
-        let destination = self
-            .destination
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertableFractioningProcedureModelAttributes::Destination)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableFractioningProcedureModelAttributes::Destination)
-            })?
-            .id();
         let procedure_weighed_with = self
             .procedure_weighed_with
             .procedure_model_id(procedure_model_id)
@@ -635,6 +624,17 @@ impl InsertableFractioningProcedureModelBuilder {
                 err.into_field_name(
                     InsertableFractioningProcedureModelAttributes::ProcedureWeighedWith,
                 )
+            })?
+            .id();
+        let destination = self
+            .destination
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(InsertableFractioningProcedureModelAttributes::Destination)
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(InsertableFractioningProcedureModelAttributes::Destination)
             })?
             .id();
         Ok(InsertableFractioningProcedureModel {

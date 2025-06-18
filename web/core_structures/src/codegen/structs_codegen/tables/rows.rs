@@ -3,8 +3,10 @@ mod aliquoting_procedure_models;
 mod ball_mill_container_models;
 mod ball_mill_machine_models;
 mod ball_mill_procedure_models;
+mod binary_question_procedure_models;
 mod bounded_read_dispatch;
 mod brands;
+mod camera_models;
 mod capping_procedure_models;
 mod capping_rules;
 mod centrifugable_container_models;
@@ -26,6 +28,7 @@ mod freeze_drier_models;
 mod freeze_drying_procedure_models;
 mod freezer_models;
 mod freezing_procedure_models;
+mod geolocation_procedure_models;
 mod instrument_models;
 mod instrument_states;
 mod into_iter;
@@ -37,14 +40,14 @@ mod mix_solid_procedure_models;
 mod mount_tip_procedure_models;
 mod next_procedure_models;
 mod observation_subjects;
-mod organism_observations;
 mod organism_taxa;
 mod organisms;
 mod organizations;
-mod packaging_models;
 mod packaging_procedure_models;
 mod parent_procedure_models;
 mod permanence_categories;
+mod photograph_procedure_models;
+mod positioning_device_models;
 mod pouring_procedure_models;
 mod procedure_model_trackables;
 mod procedure_models;
@@ -107,7 +110,15 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::ball_mill_procedure_models::BallMillProcedureModel,
         >,
     ),
+    BinaryQuestionProcedureModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::binary_question_procedure_models::BinaryQuestionProcedureModel,
+        >,
+    ),
     Brand(Vec<crate::codegen::structs_codegen::tables::brands::Brand>),
+    CameraModel(
+        Vec<crate::codegen::structs_codegen::tables::camera_models::CameraModel>,
+    ),
     CappingProcedureModel(
         Vec<
             crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel,
@@ -183,6 +194,11 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::freezing_procedure_models::FreezingProcedureModel,
         >,
     ),
+    GeolocationProcedureModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::geolocation_procedure_models::GeolocationProcedureModel,
+        >,
+    ),
     InstrumentModel(
         Vec<crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel>,
     ),
@@ -218,20 +234,12 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
         >,
     ),
-    OrganismObservation(
-        Vec<
-            crate::codegen::structs_codegen::tables::organism_observations::OrganismObservation,
-        >,
-    ),
     OrganismTaxon(
         Vec<crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon>,
     ),
     Organism(Vec<crate::codegen::structs_codegen::tables::organisms::Organism>),
     Organization(
         Vec<crate::codegen::structs_codegen::tables::organizations::Organization>,
-    ),
-    PackagingModel(
-        Vec<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel>,
     ),
     PackagingProcedureModel(
         Vec<
@@ -246,6 +254,16 @@ pub enum Rows {
     PermanenceCategory(
         Vec<
             crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
+        >,
+    ),
+    PhotographProcedureModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::photograph_procedure_models::PhotographProcedureModel,
+        >,
+    ),
+    PositioningDeviceModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
         >,
     ),
     PouringProcedureModel(
@@ -400,8 +418,22 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::BinaryQuestionProcedureModel(binary_question_procedure_models) => {
+                binary_question_procedure_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::Brand(brands) => {
                 brands
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CameraModel(camera_models) => {
+                camera_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -554,6 +586,13 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::GeolocationProcedureModel(geolocation_procedure_models) => {
+                geolocation_procedure_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::InstrumentModel(instrument_models) => {
                 instrument_models
                     .iter()
@@ -617,13 +656,6 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::OrganismObservation(organism_observations) => {
-                organism_observations
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
             Rows::OrganismTaxon(organism_taxa) => {
                 organism_taxa
                     .iter()
@@ -645,13 +677,6 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::PackagingModel(packaging_models) => {
-                packaging_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
             Rows::PackagingProcedureModel(packaging_procedure_models) => {
                 packaging_procedure_models
                     .iter()
@@ -668,6 +693,20 @@ impl Rows {
             }
             Rows::PermanenceCategory(permanence_categories) => {
                 permanence_categories
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::PhotographProcedureModel(photograph_procedure_models) => {
+                photograph_procedure_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::PositioningDeviceModel(positioning_device_models) => {
+                positioning_device_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -951,7 +990,11 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::BallMillProcedureModel(ball_mill_procedure_models) => {
                 ball_mill_procedure_models.primary_keys()
             }
+            Rows::BinaryQuestionProcedureModel(binary_question_procedure_models) => {
+                binary_question_procedure_models.primary_keys()
+            }
             Rows::Brand(brands) => brands.primary_keys(),
+            Rows::CameraModel(camera_models) => camera_models.primary_keys(),
             Rows::CappingProcedureModel(capping_procedure_models) => {
                 capping_procedure_models.primary_keys()
             }
@@ -989,6 +1032,9 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::FreezingProcedureModel(freezing_procedure_models) => {
                 freezing_procedure_models.primary_keys()
             }
+            Rows::GeolocationProcedureModel(geolocation_procedure_models) => {
+                geolocation_procedure_models.primary_keys()
+            }
             Rows::InstrumentModel(instrument_models) => instrument_models.primary_keys(),
             Rows::InstrumentState(instrument_states) => instrument_states.primary_keys(),
             Rows::LoginProvider(login_providers) => login_providers.primary_keys(),
@@ -1004,13 +1050,9 @@ impl web_common_traits::prelude::Rows for Rows {
             }
             Rows::NextProcedureModel(next_procedure_models) => next_procedure_models.primary_keys(),
             Rows::ObservationSubject(observation_subjects) => observation_subjects.primary_keys(),
-            Rows::OrganismObservation(organism_observations) => {
-                organism_observations.primary_keys()
-            }
             Rows::OrganismTaxon(organism_taxa) => organism_taxa.primary_keys(),
             Rows::Organism(organisms) => organisms.primary_keys(),
             Rows::Organization(organizations) => organizations.primary_keys(),
-            Rows::PackagingModel(packaging_models) => packaging_models.primary_keys(),
             Rows::PackagingProcedureModel(packaging_procedure_models) => {
                 packaging_procedure_models.primary_keys()
             }
@@ -1018,6 +1060,12 @@ impl web_common_traits::prelude::Rows for Rows {
                 parent_procedure_models.primary_keys()
             }
             Rows::PermanenceCategory(permanence_categories) => permanence_categories.primary_keys(),
+            Rows::PhotographProcedureModel(photograph_procedure_models) => {
+                photograph_procedure_models.primary_keys()
+            }
+            Rows::PositioningDeviceModel(positioning_device_models) => {
+                positioning_device_models.primary_keys()
+            }
             Rows::PouringProcedureModel(pouring_procedure_models) => {
                 pouring_procedure_models.primary_keys()
             }

@@ -5,6 +5,7 @@ use diesel::PgConnection;
 
 pub mod containers;
 pub mod instruments;
+pub mod organisms;
 pub mod products;
 pub mod reagents;
 pub mod tools;
@@ -24,4 +25,5 @@ pub(super) fn init_trackables(user: &User, conn: &mut PgConnection) {
     containers::init_containers(user, conn);
     instruments::init_instruments(user, conn);
     tools::init_tools(user, conn);
+    organisms::init_organisms(user, conn);
 }

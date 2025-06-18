@@ -15,7 +15,13 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::BallMillProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::BallMillProcedureModel
             }
+            super::Rows::BinaryQuestionProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::BinaryQuestionProcedureModel
+            }
             super::Rows::Brand(_) => crate::codegen::tables::table_names::TableName::Brand,
+            super::Rows::CameraModel(_) => {
+                crate::codegen::tables::table_names::TableName::CameraModel
+            }
             super::Rows::CappingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::CappingProcedureModel
             }
@@ -69,6 +75,9 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::FreezingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::FreezingProcedureModel
             }
+            super::Rows::GeolocationProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::GeolocationProcedureModel
+            }
             super::Rows::InstrumentModel(_) => {
                 crate::codegen::tables::table_names::TableName::InstrumentModel
             }
@@ -94,18 +103,12 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::ObservationSubject(_) => {
                 crate::codegen::tables::table_names::TableName::ObservationSubject
             }
-            super::Rows::OrganismObservation(_) => {
-                crate::codegen::tables::table_names::TableName::OrganismObservation
-            }
             super::Rows::OrganismTaxon(_) => {
                 crate::codegen::tables::table_names::TableName::OrganismTaxon
             }
             super::Rows::Organism(_) => crate::codegen::tables::table_names::TableName::Organism,
             super::Rows::Organization(_) => {
                 crate::codegen::tables::table_names::TableName::Organization
-            }
-            super::Rows::PackagingModel(_) => {
-                crate::codegen::tables::table_names::TableName::PackagingModel
             }
             super::Rows::PackagingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::PackagingProcedureModel
@@ -115,6 +118,12 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             }
             super::Rows::PermanenceCategory(_) => {
                 crate::codegen::tables::table_names::TableName::PermanenceCategory
+            }
+            super::Rows::PhotographProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::PhotographProcedureModel
+            }
+            super::Rows::PositioningDeviceModel(_) => {
+                crate::codegen::tables::table_names::TableName::PositioningDeviceModel
             }
             super::Rows::PouringProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::PouringProcedureModel

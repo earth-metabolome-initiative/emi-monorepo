@@ -6,7 +6,9 @@ pub enum TableName {
     BallMillContainerModel,
     BallMillMachineModel,
     BallMillProcedureModel,
+    BinaryQuestionProcedureModel,
     Brand,
+    CameraModel,
     CappingProcedureModel,
     CappingRule,
     CentrifugableContainerModel,
@@ -28,6 +30,7 @@ pub enum TableName {
     FreezeDryingProcedureModel,
     FreezerModel,
     FreezingProcedureModel,
+    GeolocationProcedureModel,
     InstrumentModel,
     InstrumentState,
     LoginProvider,
@@ -37,14 +40,14 @@ pub enum TableName {
     MountTipProcedureModel,
     NextProcedureModel,
     ObservationSubject,
-    OrganismObservation,
     OrganismTaxon,
     Organism,
     Organization,
-    PackagingModel,
     PackagingProcedureModel,
     ParentProcedureModel,
     PermanenceCategory,
+    PhotographProcedureModel,
+    PositioningDeviceModel,
     PouringProcedureModel,
     ProcedureModelTrackable,
     ProcedureModel,
@@ -99,7 +102,11 @@ impl core::fmt::Display for TableName {
             TableName::BallMillProcedureModel => {
                 write!(f, stringify!(BallMillProcedureModel))
             }
+            TableName::BinaryQuestionProcedureModel => {
+                write!(f, stringify!(BinaryQuestionProcedureModel))
+            }
             TableName::Brand => write!(f, stringify!(Brand)),
+            TableName::CameraModel => write!(f, stringify!(CameraModel)),
             TableName::CappingProcedureModel => {
                 write!(f, stringify!(CappingProcedureModel))
             }
@@ -137,6 +144,9 @@ impl core::fmt::Display for TableName {
             TableName::FreezingProcedureModel => {
                 write!(f, stringify!(FreezingProcedureModel))
             }
+            TableName::GeolocationProcedureModel => {
+                write!(f, stringify!(GeolocationProcedureModel))
+            }
             TableName::InstrumentModel => write!(f, stringify!(InstrumentModel)),
             TableName::InstrumentState => write!(f, stringify!(InstrumentState)),
             TableName::LoginProvider => write!(f, stringify!(LoginProvider)),
@@ -152,11 +162,9 @@ impl core::fmt::Display for TableName {
             }
             TableName::NextProcedureModel => write!(f, stringify!(NextProcedureModel)),
             TableName::ObservationSubject => write!(f, stringify!(ObservationSubject)),
-            TableName::OrganismObservation => write!(f, stringify!(OrganismObservation)),
             TableName::OrganismTaxon => write!(f, stringify!(OrganismTaxon)),
             TableName::Organism => write!(f, stringify!(Organism)),
             TableName::Organization => write!(f, stringify!(Organization)),
-            TableName::PackagingModel => write!(f, stringify!(PackagingModel)),
             TableName::PackagingProcedureModel => {
                 write!(f, stringify!(PackagingProcedureModel))
             }
@@ -164,6 +172,12 @@ impl core::fmt::Display for TableName {
                 write!(f, stringify!(ParentProcedureModel))
             }
             TableName::PermanenceCategory => write!(f, stringify!(PermanenceCategory)),
+            TableName::PhotographProcedureModel => {
+                write!(f, stringify!(PhotographProcedureModel))
+            }
+            TableName::PositioningDeviceModel => {
+                write!(f, stringify!(PositioningDeviceModel))
+            }
             TableName::PouringProcedureModel => {
                 write!(f, stringify!(PouringProcedureModel))
             }

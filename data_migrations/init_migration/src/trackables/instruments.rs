@@ -1,9 +1,9 @@
 //! Submodule to initialize the `instruments` in the database.
 
 use core_structures::{
-    BallMillContainerModel, BallMillMachineModel, CentrifugableContainerModel, CentrifugeModel,
-    FreezeDrierModel, FreezerModel, Trackable, User, VolumetricContainerModel,
-    WeighingInstrumentModel,
+    BallMillContainerModel, BallMillMachineModel, CameraModel, CentrifugableContainerModel,
+    CentrifugeModel, FreezeDrierModel, FreezerModel, PositioningDeviceModel, Trackable, User,
+    VolumetricContainerModel, WeighingInstrumentModel,
 };
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -27,6 +27,8 @@ pub const PIPETTES_1000: &str = "Pipettes 1000μl";
 pub const PIPETTE_TIPS_1000: &str = "Pipette Tips 1000μl";
 pub const PIPETTES_200: &str = "Pipettes 200μl";
 pub const PIPETTE_TIPS_200: &str = "Pipette Tips 200μl";
+pub const GEOLOCATION_INSTRUMENT: &str = "Geolocation Instrument";
+pub const CAMERA: &str = "Camera";
 
 pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) {
     let instrument = core_structures::Trackable::new()
@@ -114,6 +116,30 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) {
         .centrifuged_with(safelock_centrifuge.id)
         .unwrap()
         .container_model_id(safelock_2ml.id)
+        .unwrap()
+        .insert(user.id, conn)
+        .unwrap();
+
+    let _geolocation_instrument = PositioningDeviceModel::new()
+        .name(Some(GEOLOCATION_INSTRUMENT.to_owned()))
+        .unwrap()
+        .description(Some("Geolocation instrument for tracking positions".to_owned()))
+        .unwrap()
+        .parent_id(Some(instrument.id))
+        .unwrap()
+        .created_by(user.id)
+        .unwrap()
+        .insert(user.id, conn)
+        .unwrap();
+
+    let _camera_instrument = CameraModel::new()
+        .name(Some(CAMERA.to_owned()))
+        .unwrap()
+        .description(Some("Camera for capturing images".to_owned()))
+        .unwrap()
+        .parent_id(Some(instrument.id))
+        .unwrap()
+        .created_by(user.id)
         .unwrap()
         .insert(user.id, conn)
         .unwrap();
