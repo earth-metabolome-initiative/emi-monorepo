@@ -209,27 +209,6 @@ impl InsertablePackagingProcedureModelBuilder {
             })?;
         Ok(self)
     }
-    pub fn procedure_sample_id(
-        mut self,
-        procedure_sample_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertablePackagingProcedureModelAttributes>,
-    > {
-        if procedure_sample_id.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertablePackagingProcedureModelAttributes::ProcedureSampleId(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.procedure_sample_id = procedure_sample_id;
-        Ok(self)
-    }
     pub fn procedure_packaged_with(
         mut self,
         procedure_packaged_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -273,6 +252,27 @@ impl InsertablePackagingProcedureModelBuilder {
                 })?;
         }
         self.procedure_packaged_with = procedure_packaged_with;
+        Ok(self)
+    }
+    pub fn procedure_sample_id(
+        mut self,
+        procedure_sample_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertablePackagingProcedureModelAttributes>,
+    > {
+        if procedure_sample_id.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertablePackagingProcedureModelAttributes::ProcedureSampleId(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        self.procedure_sample_id = procedure_sample_id;
         Ok(self)
     }
     pub fn name<P>(
@@ -472,17 +472,6 @@ impl InsertablePackagingProcedureModelBuilder {
                 err.into_field_name(InsertablePackagingProcedureModelAttributes::ProcedureModelId)
             })?
             .id();
-        let procedure_sample_id = self
-            .procedure_sample_id
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertablePackagingProcedureModelAttributes::ProcedureSampleId)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertablePackagingProcedureModelAttributes::ProcedureSampleId)
-            })?
-            .id();
         let procedure_packaged_with = self
             .procedure_packaged_with
             .procedure_model_id(procedure_model_id)
@@ -496,6 +485,17 @@ impl InsertablePackagingProcedureModelBuilder {
                 err.into_field_name(
                     InsertablePackagingProcedureModelAttributes::ProcedurePackagedWith,
                 )
+            })?
+            .id();
+        let procedure_sample_id = self
+            .procedure_sample_id
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(InsertablePackagingProcedureModelAttributes::ProcedureSampleId)
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(InsertablePackagingProcedureModelAttributes::ProcedureSampleId)
             })?
             .id();
         Ok(InsertablePackagingProcedureModel {

@@ -70,20 +70,12 @@ pub(super) fn init_dbgi_plan(user: &User, conn: &mut diesel::PgConnection) {
             &[
                 &collection_preparation,
                 &observation_procedure,
-                &full_organism_collection,
+                &part_of_organism_collection,
                 &sample_processing_procedure,
                 &positive_lcms_procedure,
                 &negative_lcms_procedure,
                 &data_enrichment,
             ],
-            user,
-            conn,
-        )
-        .unwrap();
-
-    dbgi_plan
-        .extend(
-            &[&observation_procedure, &part_of_organism_collection, &sample_processing_procedure],
             user,
             conn,
         )

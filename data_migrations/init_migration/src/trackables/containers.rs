@@ -1,6 +1,6 @@
 //! Submodule to initialize the `reagents` in the database.
 
-use core_structures::{ContainerModel, Trackable, User};
+use core_structures::{ContainerModel, User};
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -10,6 +10,7 @@ pub(crate) use wet_lab_containers::{
     VIAL_1_5ML_SEALED_CAP, VIAL_INSERT_200UL,
 };
 
+pub const SHELF: &str = "Shelf";
 pub const BOTTLE: &str = "Bottle";
 pub const BOX: &str = "Box";
 pub const SAMPLE_CONTAINER: &str = "Sample Container";
@@ -71,6 +72,18 @@ pub(crate) fn init_containers(user: &User, conn: &mut PgConnection) {
         ))
         .unwrap()
         .parent_id(Some(r#box.id))
+        .unwrap()
+        .created_by(user.id)
+        .unwrap()
+        .insert(user.id, conn)
+        .unwrap();
+
+    let _shelf = ContainerModel::new()
+        .name(Some(SHELF.to_owned()))
+        .unwrap()
+        .description(Some("Shelf, a common container for storing other containers".to_owned()))
+        .unwrap()
+        .parent_id(Some(container.id))
         .unwrap()
         .created_by(user.id)
         .unwrap()

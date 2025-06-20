@@ -57,15 +57,15 @@ pub async fn main() {
         .await
         .expect("Failed to connect to the database");
 
+    // We ensure that the migrations directory has all expected properties.
+    let mut time_tracker = TimeTracker::new("Building Core Structures");
+
     // We initialize the database into the docker container
     if let Err(err) = init_database(DATABASE_NAME, &mut conn).await {
         docker.stop().await.expect("Failed to stop the docker container");
         eprintln!("Failed to initialize the database: {err:?}");
         return;
     }
-
-    // We ensure that the migrations directory has all expected properties.
-    let mut time_tracker = TimeTracker::new("Building Core Structures");
 
     // We save the time tracker
     time_tracker.save(Path::new("./time_tracker")).unwrap();

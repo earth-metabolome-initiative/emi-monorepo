@@ -9,11 +9,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::AliquotingProcedureModel)
                     .collect::<Vec<_>>()
             }
-            super::Rows::BallMillContainerModel(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::BallMillContainerModel)
-                    .collect::<Vec<_>>()
-            }
             super::Rows::BallMillMachineModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::BallMillMachineModel)
@@ -40,16 +35,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::CappingProcedureModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::CappingProcedureModel)
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::CappingRule(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::CappingRule)
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::CentrifugableContainerModel(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::CentrifugableContainerModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::CentrifugeModel(rows) => {
@@ -81,6 +66,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::CommercialReagent(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::CommercialReagent)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::CompatibilityRule(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::CompatibilityRule)
                     .collect::<Vec<_>>()
             }
             super::Rows::ContainerModel(rows) => {
@@ -215,6 +205,16 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::PhotographProcedureModel)
                     .collect::<Vec<_>>()
             }
+            super::Rows::PipetteModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::PipetteModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::PipetteTipModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::PipetteTipModel)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::PositioningDeviceModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::PositioningDeviceModel)
@@ -296,11 +296,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::StorageProcedureModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::StorageProcedureModel)
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::StorageRule(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::StorageRule)
                     .collect::<Vec<_>>()
             }
             super::Rows::SupernatantProcedureModel(rows) => {

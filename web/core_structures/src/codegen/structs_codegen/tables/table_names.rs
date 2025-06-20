@@ -3,15 +3,12 @@
 pub enum TableName {
     Address,
     AliquotingProcedureModel,
-    BallMillContainerModel,
     BallMillMachineModel,
     BallMillProcedureModel,
     BinaryQuestionProcedureModel,
     Brand,
     CameraModel,
     CappingProcedureModel,
-    CappingRule,
-    CentrifugableContainerModel,
     CentrifugeModel,
     CentrifugeProcedureModel,
     City,
@@ -19,6 +16,7 @@ pub enum TableName {
     CommercialProductLot,
     CommercialProduct,
     CommercialReagent,
+    CompatibilityRule,
     ContainerModel,
     Container,
     Country,
@@ -47,6 +45,8 @@ pub enum TableName {
     ParentProcedureModel,
     PermanenceCategory,
     PhotographProcedureModel,
+    PipetteModel,
+    PipetteTipModel,
     PositioningDeviceModel,
     PouringProcedureModel,
     ProcedureModelTrackable,
@@ -66,7 +66,6 @@ pub enum TableName {
     Spectrum,
     SpectraCollection,
     StorageProcedureModel,
-    StorageRule,
     SupernatantProcedureModel,
     Taxon,
     TeamMember,
@@ -93,9 +92,6 @@ impl core::fmt::Display for TableName {
             TableName::AliquotingProcedureModel => {
                 write!(f, stringify!(AliquotingProcedureModel))
             }
-            TableName::BallMillContainerModel => {
-                write!(f, stringify!(BallMillContainerModel))
-            }
             TableName::BallMillMachineModel => {
                 write!(f, stringify!(BallMillMachineModel))
             }
@@ -110,10 +106,6 @@ impl core::fmt::Display for TableName {
             TableName::CappingProcedureModel => {
                 write!(f, stringify!(CappingProcedureModel))
             }
-            TableName::CappingRule => write!(f, stringify!(CappingRule)),
-            TableName::CentrifugableContainerModel => {
-                write!(f, stringify!(CentrifugableContainerModel))
-            }
             TableName::CentrifugeModel => write!(f, stringify!(CentrifugeModel)),
             TableName::CentrifugeProcedureModel => {
                 write!(f, stringify!(CentrifugeProcedureModel))
@@ -125,6 +117,7 @@ impl core::fmt::Display for TableName {
             }
             TableName::CommercialProduct => write!(f, stringify!(CommercialProduct)),
             TableName::CommercialReagent => write!(f, stringify!(CommercialReagent)),
+            TableName::CompatibilityRule => write!(f, stringify!(CompatibilityRule)),
             TableName::ContainerModel => write!(f, stringify!(ContainerModel)),
             TableName::Container => write!(f, stringify!(Container)),
             TableName::Country => write!(f, stringify!(Country)),
@@ -175,6 +168,8 @@ impl core::fmt::Display for TableName {
             TableName::PhotographProcedureModel => {
                 write!(f, stringify!(PhotographProcedureModel))
             }
+            TableName::PipetteModel => write!(f, stringify!(PipetteModel)),
+            TableName::PipetteTipModel => write!(f, stringify!(PipetteTipModel)),
             TableName::PositioningDeviceModel => {
                 write!(f, stringify!(PositioningDeviceModel))
             }
@@ -204,7 +199,6 @@ impl core::fmt::Display for TableName {
             TableName::StorageProcedureModel => {
                 write!(f, stringify!(StorageProcedureModel))
             }
-            TableName::StorageRule => write!(f, stringify!(StorageRule)),
             TableName::SupernatantProcedureModel => {
                 write!(f, stringify!(SupernatantProcedureModel))
             }

@@ -3,15 +3,12 @@
 pub enum TablePrimaryKey {
     Address(i32),
     AliquotingProcedureModel(i32),
-    BallMillContainerModel((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
     BallMillMachineModel(::rosetta_uuid::Uuid),
     BallMillProcedureModel(i32),
     BinaryQuestionProcedureModel(i32),
     Brand(i32),
     CameraModel(::rosetta_uuid::Uuid),
     CappingProcedureModel(i32),
-    CappingRule((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
-    CentrifugableContainerModel((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
     CentrifugeModel(::rosetta_uuid::Uuid),
     CentrifugeProcedureModel(i32),
     City(i32),
@@ -19,6 +16,7 @@ pub enum TablePrimaryKey {
     CommercialProductLot(::rosetta_uuid::Uuid),
     CommercialProduct(::rosetta_uuid::Uuid),
     CommercialReagent(::rosetta_uuid::Uuid),
+    CompatibilityRule((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
     ContainerModel(::rosetta_uuid::Uuid),
     Container(::rosetta_uuid::Uuid),
     Country(::iso_codes::CountryCode),
@@ -47,6 +45,8 @@ pub enum TablePrimaryKey {
     ParentProcedureModel((i32, i32)),
     PermanenceCategory(i16),
     PhotographProcedureModel(i32),
+    PipetteModel(::rosetta_uuid::Uuid),
+    PipetteTipModel(::rosetta_uuid::Uuid),
     PositioningDeviceModel(::rosetta_uuid::Uuid),
     PouringProcedureModel(i32),
     ProcedureModelTrackable(i32),
@@ -66,7 +66,6 @@ pub enum TablePrimaryKey {
     Spectrum(i32),
     SpectraCollection(i32),
     StorageProcedureModel(i32),
-    StorageRule((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
     SupernatantProcedureModel(i32),
     Taxon(i32),
     TeamMember((i32, i32)),
@@ -94,9 +93,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::AliquotingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::AliquotingProcedureModel
             }
-            TablePrimaryKey::BallMillContainerModel(_) => {
-                crate::codegen::tables::table_names::TableName::BallMillContainerModel
-            }
             TablePrimaryKey::BallMillMachineModel(_) => {
                 crate::codegen::tables::table_names::TableName::BallMillMachineModel
             }
@@ -112,12 +108,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::CappingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::CappingProcedureModel
-            }
-            TablePrimaryKey::CappingRule(_) => {
-                crate::codegen::tables::table_names::TableName::CappingRule
-            }
-            TablePrimaryKey::CentrifugableContainerModel(_) => {
-                crate::codegen::tables::table_names::TableName::CentrifugableContainerModel
             }
             TablePrimaryKey::CentrifugeModel(_) => {
                 crate::codegen::tables::table_names::TableName::CentrifugeModel
@@ -135,6 +125,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::CommercialReagent(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialReagent
+            }
+            TablePrimaryKey::CompatibilityRule(_) => {
+                crate::codegen::tables::table_names::TableName::CompatibilityRule
             }
             TablePrimaryKey::ContainerModel(_) => {
                 crate::codegen::tables::table_names::TableName::ContainerModel
@@ -218,6 +211,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::PhotographProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::PhotographProcedureModel
             }
+            TablePrimaryKey::PipetteModel(_) => {
+                crate::codegen::tables::table_names::TableName::PipetteModel
+            }
+            TablePrimaryKey::PipetteTipModel(_) => {
+                crate::codegen::tables::table_names::TableName::PipetteTipModel
+            }
             TablePrimaryKey::PositioningDeviceModel(_) => {
                 crate::codegen::tables::table_names::TableName::PositioningDeviceModel
             }
@@ -264,9 +263,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::StorageProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::StorageProcedureModel
-            }
-            TablePrimaryKey::StorageRule(_) => {
-                crate::codegen::tables::table_names::TableName::StorageRule
             }
             TablePrimaryKey::SupernatantProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::SupernatantProcedureModel

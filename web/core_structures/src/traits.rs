@@ -6,3 +6,5 @@ pub mod track_procedure_model;
 pub use track_procedure_model::Track;
 pub mod procedure_model_dot;
 pub use procedure_model_dot::ProcedureModelDot;
+pub mod compatible_with;
+pub use compatible_with::CompatibleWith;

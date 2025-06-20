@@ -6,9 +6,6 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::AliquotingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::AliquotingProcedureModel
             }
-            super::Row::BallMillContainerModel(_) => {
-                crate::codegen::tables::table_names::TableName::BallMillContainerModel
-            }
             super::Row::BallMillMachineModel(_) => {
                 crate::codegen::tables::table_names::TableName::BallMillMachineModel
             }
@@ -24,12 +21,6 @@ impl web_common_traits::prelude::Tabular for super::Row {
             }
             super::Row::CappingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::CappingProcedureModel
-            }
-            super::Row::CappingRule(_) => {
-                crate::codegen::tables::table_names::TableName::CappingRule
-            }
-            super::Row::CentrifugableContainerModel(_) => {
-                crate::codegen::tables::table_names::TableName::CentrifugableContainerModel
             }
             super::Row::CentrifugeModel(_) => {
                 crate::codegen::tables::table_names::TableName::CentrifugeModel
@@ -47,6 +38,9 @@ impl web_common_traits::prelude::Tabular for super::Row {
             }
             super::Row::CommercialReagent(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialReagent
+            }
+            super::Row::CompatibilityRule(_) => {
+                crate::codegen::tables::table_names::TableName::CompatibilityRule
             }
             super::Row::ContainerModel(_) => {
                 crate::codegen::tables::table_names::TableName::ContainerModel
@@ -122,6 +116,12 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::PhotographProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::PhotographProcedureModel
             }
+            super::Row::PipetteModel(_) => {
+                crate::codegen::tables::table_names::TableName::PipetteModel
+            }
+            super::Row::PipetteTipModel(_) => {
+                crate::codegen::tables::table_names::TableName::PipetteTipModel
+            }
             super::Row::PositioningDeviceModel(_) => {
                 crate::codegen::tables::table_names::TableName::PositioningDeviceModel
             }
@@ -164,9 +164,6 @@ impl web_common_traits::prelude::Tabular for super::Row {
             }
             super::Row::StorageProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::StorageProcedureModel
-            }
-            super::Row::StorageRule(_) => {
-                crate::codegen::tables::table_names::TableName::StorageRule
             }
             super::Row::SupernatantProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::SupernatantProcedureModel

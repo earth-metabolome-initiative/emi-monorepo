@@ -1,9 +1,9 @@
 //! Submodule to initialize the `instruments` in the database.
 
 use core_structures::{
-    BallMillContainerModel, BallMillMachineModel, CameraModel, CentrifugableContainerModel,
-    CentrifugeModel, FreezeDrierModel, FreezerModel, PositioningDeviceModel, Trackable, User,
-    VolumetricContainerModel, WeighingInstrumentModel,
+    BallMillMachineModel, CameraModel, CentrifugeModel, FreezeDrierModel, FreezerModel,
+    PipetteModel, PipetteTipModel, PositioningDeviceModel, Trackable, User,
+    VolumetricContainerModel, WeighingInstrumentModel, traits::CompatibleWith,
 };
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -92,13 +92,7 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) {
     let safelock_2ml =
         VolumetricContainerModel::from_name(SAFELOCK_TUBE_2ML, conn).unwrap().unwrap();
 
-    BallMillContainerModel::new()
-        .milled_with(ball_mill_machine.id)
-        .unwrap()
-        .container_model_id(safelock_2ml.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+    ball_mill_machine.compatible_with(&safelock_2ml, user, conn).unwrap();
 
     let safelock_centrifuge = CentrifugeModel::new()
         .name(Some(SAFELOCK_CENTRIFUGE.to_owned()))
@@ -112,13 +106,7 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) {
         .insert(user.id, conn)
         .unwrap();
 
-    CentrifugableContainerModel::new()
-        .centrifuged_with(safelock_centrifuge.id)
-        .unwrap()
-        .container_model_id(safelock_2ml.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+    safelock_centrifuge.compatible_with(&safelock_2ml, user, conn).unwrap();
 
     let _geolocation_instrument = PositioningDeviceModel::new()
         .name(Some(GEOLOCATION_INSTRUMENT.to_owned()))
@@ -194,7 +182,7 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) {
         .insert(user.id, conn)
         .unwrap();
 
-    let _pipettes_200 = VolumetricContainerModel::new()
+    let _pipettes_200 = PipetteModel::new()
         .name(Some(PIPETTES_200.to_owned()))
         .unwrap()
         .description(Some("Pipettes for liquid handling".to_owned()))
@@ -202,8 +190,6 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) {
         .parent_id(Some(pipettes.id))
         .unwrap()
         .created_by(user.id)
-        .unwrap()
-        .liters(0.0002)
         .unwrap()
         .insert(user.id, conn)
         .unwrap();

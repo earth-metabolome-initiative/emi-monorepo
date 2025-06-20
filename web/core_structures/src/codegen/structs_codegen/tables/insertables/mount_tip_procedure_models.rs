@@ -4,10 +4,12 @@ pub enum InsertableMountTipProcedureModelAttributes {
     ProcedureModelId(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
     ),
-    Pipette(
+    Pipette,
+    ProcedurePipette(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
-    PipetteTip(
+    PipetteTip,
+    ProcedurePipetteTip(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
@@ -17,12 +19,16 @@ impl core::fmt::Display for InsertableMountTipProcedureModelAttributes {
             InsertableMountTipProcedureModelAttributes::ProcedureModelId(procedure_model_id) => {
                 write!(f, "{}", procedure_model_id)
             }
-            InsertableMountTipProcedureModelAttributes::Pipette(pipette) => {
-                write!(f, "{}", pipette)
+            InsertableMountTipProcedureModelAttributes::Pipette => write!(f, "pipette"),
+            InsertableMountTipProcedureModelAttributes::ProcedurePipette(procedure_pipette) => {
+                write!(f, "{}", procedure_pipette)
             }
-            InsertableMountTipProcedureModelAttributes::PipetteTip(pipette_tip) => {
-                write!(f, "{}", pipette_tip)
+            InsertableMountTipProcedureModelAttributes::PipetteTip => {
+                write!(f, "pipette_tip")
             }
+            InsertableMountTipProcedureModelAttributes::ProcedurePipetteTip(
+                procedure_pipette_tip,
+            ) => write!(f, "{}", procedure_pipette_tip),
         }
     }
 }
@@ -36,8 +42,10 @@ impl core::fmt::Display for InsertableMountTipProcedureModelAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableMountTipProcedureModel {
     procedure_model_id: i32,
-    pipette: i32,
-    pipette_tip: i32,
+    pipette: ::rosetta_uuid::Uuid,
+    procedure_pipette: i32,
+    pipette_tip: ::rosetta_uuid::Uuid,
+    procedure_pipette_tip: i32,
 }
 impl InsertableMountTipProcedureModel {
     pub fn procedure_model<C: diesel::connection::LoadConnection>(
@@ -76,35 +84,35 @@ impl InsertableMountTipProcedureModel {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                crate::codegen::structs_codegen::tables::pipette_models::PipetteModel::table(),
                 self.pipette,
             ),
             conn,
         )
     }
-    pub fn pipette_tip<C: diesel::connection::LoadConnection>(
+    pub fn procedure_pipette<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -131,7 +139,72 @@ impl InsertableMountTipProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.procedure_pipette,
+            ),
+            conn,
+        )
+    }
+    pub fn pipette_tip<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::table(
+                ),
                 self.pipette_tip,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_pipette_tip<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.procedure_pipette_tip,
             ),
             conn,
         )
@@ -141,50 +214,138 @@ impl InsertableMountTipProcedureModel {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableMountTipProcedureModelBuilder {
     pub(crate) procedure_model_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    pub(crate) pipette: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    pub(crate) pipette_tip: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) pipette: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_pipette: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) pipette_tip: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_pipette_tip: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
 }
 impl InsertableMountTipProcedureModelBuilder {
-    pub fn pipette(
+    pub fn pipette<P>(
         mut self,
-        pipette: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        pipette: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableMountTipProcedureModelAttributes>,
-    > {
-        if pipette.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableMountTipProcedureModelAttributes::Pipette(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.pipette = pipette;
+    >
+    where
+        P: TryInto<::rosetta_uuid::Uuid>,
+        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let pipette =
+            pipette.try_into().map_err(|err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
+                Into::into(err).rename_field(InsertableMountTipProcedureModelAttributes::Pipette)
+            })?;
+        self.pipette = Some(pipette);
+        self.procedure_pipette = self.procedure_pipette.trackable_id(pipette).map_err(|err| {
+            err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedurePipette)
+        })?;
         Ok(self)
     }
-    pub fn pipette_tip(
+    pub fn pipette_tip<P>(
         mut self,
-        pipette_tip: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        pipette_tip: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableMountTipProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_uuid::Uuid>,
+        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let pipette_tip = pipette_tip.try_into().map_err(
+            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
+                Into::into(err).rename_field(InsertableMountTipProcedureModelAttributes::PipetteTip)
+            },
+        )?;
+        self.pipette_tip = Some(pipette_tip);
+        self.procedure_pipette_tip =
+            self.procedure_pipette_tip.trackable_id(pipette_tip).map_err(|err| {
+                err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedurePipetteTip)
+            })?;
+        Ok(self)
+    }
+    pub fn procedure_pipette(
+        mut self,
+        procedure_pipette: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableMountTipProcedureModelAttributes>,
     > {
-        if pipette_tip.procedure_model_id.is_some() {
+        if procedure_pipette.procedure_model_id.is_some() {
             return Err(
                 web_common_traits::database::InsertError::BuilderError(
                     web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableMountTipProcedureModelAttributes::PipetteTip(
+                        InsertableMountTipProcedureModelAttributes::ProcedurePipette(
                             crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
                         ),
                     ),
                 ),
             );
         }
-        self.pipette_tip = pipette_tip;
+        if let (Some(local), Some(foreign)) = (self.pipette, procedure_pipette.trackable_id) {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            InsertableMountTipProcedureModelAttributes::ProcedurePipette(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_pipette.trackable_id {
+            self.pipette = Some(foreign);
+        } else if let Some(local) = self.pipette {
+            self.procedure_pipette = self.procedure_pipette.trackable_id(local).map_err(|err| {
+                err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedurePipette)
+            })?;
+        }
+        self.procedure_pipette = procedure_pipette;
+        Ok(self)
+    }
+    pub fn procedure_pipette_tip(
+        mut self,
+        procedure_pipette_tip: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableMountTipProcedureModelAttributes>,
+    > {
+        if procedure_pipette_tip.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertableMountTipProcedureModelAttributes::ProcedurePipetteTip(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        if let (Some(local), Some(foreign)) = (self.pipette_tip, procedure_pipette_tip.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            InsertableMountTipProcedureModelAttributes::ProcedurePipetteTip(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_pipette_tip.trackable_id {
+            self.pipette_tip = Some(foreign);
+        } else if let Some(local) = self.pipette_tip {
+            self.procedure_pipette_tip =
+                self.procedure_pipette_tip.trackable_id(local).map_err(|err| {
+                    err.into_field_name(
+                        InsertableMountTipProcedureModelAttributes::ProcedurePipetteTip,
+                    )
+                })?;
+        }
+        self.procedure_pipette_tip = procedure_pipette_tip;
         Ok(self)
     }
     pub fn name<P>(
@@ -373,6 +534,13 @@ impl InsertableMountTipProcedureModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
+        let pipette = self.pipette.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+            InsertableMountTipProcedureModelAttributes::Pipette,
+        ))?;
+        let pipette_tip =
+            self.pipette_tip.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableMountTipProcedureModelAttributes::PipetteTip,
+            ))?;
         let procedure_model_id = self
             .procedure_model_id
             .insert(user_id, conn)
@@ -380,28 +548,34 @@ impl InsertableMountTipProcedureModelBuilder {
                 err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedureModelId)
             })?
             .id();
-        let pipette = self
-            .pipette
+        let procedure_pipette = self
+            .procedure_pipette
             .procedure_model_id(procedure_model_id)
             .map_err(|err| {
-                err.into_field_name(InsertableMountTipProcedureModelAttributes::Pipette)
+                err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedurePipette)
             })?
             .insert(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(InsertableMountTipProcedureModelAttributes::Pipette)
+                err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedurePipette)
             })?
             .id();
-        let pipette_tip = self
-            .pipette_tip
+        let procedure_pipette_tip = self
+            .procedure_pipette_tip
             .procedure_model_id(procedure_model_id)
             .map_err(|err| {
-                err.into_field_name(InsertableMountTipProcedureModelAttributes::PipetteTip)
+                err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedurePipetteTip)
             })?
             .insert(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(InsertableMountTipProcedureModelAttributes::PipetteTip)
+                err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedurePipetteTip)
             })?
             .id();
-        Ok(InsertableMountTipProcedureModel { procedure_model_id, pipette, pipette_tip })
+        Ok(InsertableMountTipProcedureModel {
+            procedure_model_id,
+            pipette,
+            procedure_pipette,
+            pipette_tip,
+            procedure_pipette_tip,
+        })
     }
 }

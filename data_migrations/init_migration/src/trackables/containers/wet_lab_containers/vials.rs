@@ -1,7 +1,7 @@
 //! Submodule to initialize the
 
 use core_structures::{
-    CappingRule, ContainerModel, StorageRule, Trackable, User, VolumetricContainerModel,
+    ContainerModel, Trackable, User, VolumetricContainerModel, traits::CompatibleWith,
 };
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -112,13 +112,7 @@ pub(super) fn init_vials(
         .unwrap();
 
     // We register that the cap can be used with the vial
-    CappingRule::new()
-        .cap_id(vial_1_5ml_sealed_cap.id)
-        .unwrap()
-        .container_id(vial_1_5ml.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+    vial_1_5ml.compatible_with_quantity(&vial_1_5ml_sealed_cap, 1, user, conn).unwrap();
 
     let vial_insert = VolumetricContainerModel::new()
         .name(Some(VIAL_INSERT.to_owned()))
@@ -161,14 +155,5 @@ pub(super) fn init_vials(
         .insert(user.id, conn)
         .unwrap();
 
-    StorageRule::new()
-        .parent_container_id(vial_box.id)
-        .unwrap()
-        .child_container_id(vial_1_5ml.id)
-        .unwrap()
-        // TODO!: Set the correct quantity
-        .quantity(24i16)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+    vial_box.compatible_with_quantity(&vial_1_5ml, 24, user, conn).unwrap();
 }

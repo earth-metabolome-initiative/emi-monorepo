@@ -5,9 +5,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(aliquoting_procedure_models)
             }
-            super::Row::BallMillContainerModel(ball_mill_container_models) => {
-                crate::codegen::tables::rows::Rows::from(ball_mill_container_models)
-            }
             super::Row::BallMillMachineModel(ball_mill_machine_models) => {
                 crate::codegen::tables::rows::Rows::from(ball_mill_machine_models)
             }
@@ -23,12 +20,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::CappingProcedureModel(capping_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(capping_procedure_models)
-            }
-            super::Row::CappingRule(capping_rules) => {
-                crate::codegen::tables::rows::Rows::from(capping_rules)
-            }
-            super::Row::CentrifugableContainerModel(centrifugable_container_models) => {
-                crate::codegen::tables::rows::Rows::from(centrifugable_container_models)
             }
             super::Row::CentrifugeModel(centrifuge_models) => {
                 crate::codegen::tables::rows::Rows::from(centrifuge_models)
@@ -46,6 +37,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::CommercialReagent(commercial_reagents) => {
                 crate::codegen::tables::rows::Rows::from(commercial_reagents)
+            }
+            super::Row::CompatibilityRule(compatibility_rules) => {
+                crate::codegen::tables::rows::Rows::from(compatibility_rules)
             }
             super::Row::ContainerModel(container_models) => {
                 crate::codegen::tables::rows::Rows::from(container_models)
@@ -123,6 +117,12 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::PhotographProcedureModel(photograph_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(photograph_procedure_models)
             }
+            super::Row::PipetteModel(pipette_models) => {
+                crate::codegen::tables::rows::Rows::from(pipette_models)
+            }
+            super::Row::PipetteTipModel(pipette_tip_models) => {
+                crate::codegen::tables::rows::Rows::from(pipette_tip_models)
+            }
             super::Row::PositioningDeviceModel(positioning_device_models) => {
                 crate::codegen::tables::rows::Rows::from(positioning_device_models)
             }
@@ -167,9 +167,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::StorageProcedureModel(storage_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(storage_procedure_models)
-            }
-            super::Row::StorageRule(storage_rules) => {
-                crate::codegen::tables::rows::Rows::from(storage_rules)
             }
             super::Row::SupernatantProcedureModel(supernatant_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(supernatant_procedure_models)

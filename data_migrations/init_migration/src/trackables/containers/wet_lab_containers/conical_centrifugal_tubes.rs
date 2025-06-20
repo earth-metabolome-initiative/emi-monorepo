@@ -1,10 +1,10 @@
 //! Submodule to initialize the sample containers in the database.
 
-use core_structures::{ContainerModel, StorageRule, User, VolumetricContainerModel};
+use core_structures::{ContainerModel, User, VolumetricContainerModel, traits::CompatibleWith};
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-use crate::trackables::containers::POLYSTYRENE_BOX;
+use crate::trackables::containers::{POLYSTYRENE_BOX, SHELF};
 
 const CONICAL_CENTRIFUGAL_TUBE: &str = "Conical Tube";
 pub const CONICAL_CENTRIFUGAL_TUBE_50ML: &str = "Conical Tube 50ml";
@@ -54,27 +54,17 @@ pub(super) fn init_conical_centrifugal_tubes(
         .insert(user.id, conn)
         .unwrap();
 
-    StorageRule::new()
-        .parent_container_id(conical_tube_rack.id)
+    conical_tube_rack.compatible_with_quantity(&conical_tube_50ml, 24, user, conn).unwrap();
+
+    ContainerModel::from_name(POLYSTYRENE_BOX, conn)
         .unwrap()
-        .child_container_id(conical_tube_50ml.id)
         .unwrap()
-        // TODO! ACTUALLY SET THE CORRECT QUANTITY
-        .quantity(24i16)
-        .unwrap()
-        .insert(user.id, conn)
+        .compatible_with(&conical_tube_50ml, user, conn)
         .unwrap();
 
-    let polysterene_box = ContainerModel::from_name(POLYSTYRENE_BOX, conn).unwrap().unwrap();
-
-    StorageRule::new()
-        .parent_container_id(polysterene_box.id)
+    ContainerModel::from_name(SHELF, conn)
         .unwrap()
-        .child_container_id(conical_tube_50ml.id)
         .unwrap()
-        // TODO! ACTUALLY SET THE CORRECT QUANTITY
-        .quantity(100i16)
-        .unwrap()
-        .insert(user.id, conn)
+        .compatible_with(&conical_tube_rack, user, conn)
         .unwrap();
 }

@@ -21,10 +21,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                 seconds
                     .ne(excluded(seconds))
                     .or(hertz.ne(excluded(hertz)))
-                    .or(milled_with.ne(excluded(milled_with)))
-                    .or(procedure_milled_with.ne(excluded(procedure_milled_with)))
-                    .or(container_id.ne(excluded(container_id)))
-                    .or(procedure_container_id.ne(excluded(procedure_container_id))),
+                    .or(milled_with.ne(excluded(milled_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -53,10 +50,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                 seconds
                     .ne(excluded(seconds))
                     .or(hertz.ne(excluded(hertz)))
-                    .or(milled_with.ne(excluded(milled_with)))
-                    .or(procedure_milled_with.ne(excluded(procedure_milled_with)))
-                    .or(container_id.ne(excluded(container_id)))
-                    .or(procedure_container_id.ne(excluded(procedure_container_id))),
+                    .or(milled_with.ne(excluded(milled_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

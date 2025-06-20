@@ -27,22 +27,22 @@ subgraph cluster__1_0 {
 	label=<<U>DBGI Freezing</U>>;
 	style="rounded";
 	color="#EF3340";
-    T1 [label="DBGI Conical Tube Box", shape=box, color="#00ad43"];
+    T1 [label="Conical Tube Box", shape=box, color="#00ad43"];
     T2 [label="Sample Freezer", shape=box, color="#00ad43"];
 }
 subgraph cluster__1_1 {
 	label=<<U>DBGI Freeze Drying</U>>;
 	style="rounded";
 	color="#EF3340";
-    T3 [label="DBGI Conical Tube Box", shape=box, color="#00ad43"];
+    T3 [label="Conical Tube Box", shape=box, color="#00ad43"];
     T4 [label="Sample Freeze Dryer", shape=box, color="#00ad43"];
 }
 subgraph cluster__1_2 {
 	label=<<U>DBGI Falcon Storage</U>>;
 	style="rounded";
 	color="#EF3340";
-    T5 [label="DBGI Conical Tube Rack", shape=box, color="#00ad43"];
-    T6 [label="DBGI Conical Tube (Falcon)", shape=box, color="#00ad43"];
+    T5 [label="DBGI Conical Tube (Falcon)", shape=box, color="#00ad43"];
+    T6 [label="DBGI Conical Tube Rack", shape=box, color="#00ad43"];
 }
 subgraph cluster__1_3 {
 	label=<<U>DBGI Fractioning</U>>;
@@ -99,15 +99,15 @@ subgraph cluster__1_10 {
 	label=<<U>DBGI Capping</U>>;
 	style="rounded";
 	color="#EF3340";
-    T23 [label="DBGI Sealed Cap", shape=box, color="#00ad43"];
-    T24 [label="DBGI Long Term Storage Vial", shape=box, color="#00ad43"];
+    T23 [label="DBGI Long Term Storage Vial", shape=box, color="#00ad43"];
+    T24 [label="DBGI Sealed Cap", shape=box, color="#00ad43"];
 }
 subgraph cluster__1_11 {
 	label=<<U>DBGI Long Term Storage Vial Storage</U>>;
 	style="rounded";
 	color="#EF3340";
-    T25 [label="DBGI Long Term Storage Vial Box", shape=box, color="#00ad43"];
-    T26 [label="DBGI Long Term Storage Vial", shape=box, color="#00ad43"];
+    T25 [label="DBGI Long Term Storage Vial", shape=box, color="#00ad43"];
+    T26 [label="DBGI Long Term Storage Vial Box", shape=box, color="#00ad43"];
 }
 subgraph cluster__1_12 {
 	label=<<U>DBGI Dispose of Eppendorf Tube</U>>;
@@ -146,29 +146,29 @@ subgraph cluster__4_1 {
 	label=<<U>Organism in Ecosystem Picture</U>>;
 	style="rounded";
 	color="#EF3340";
-    T44 [label="Organism", shape=box, color="#00ad43"];
-    T45 [label="Camera", shape=box, color="#00ad43"];
+    T44 [label="Camera", shape=box, color="#00ad43"];
+    T45 [label="Organism", shape=box, color="#00ad43"];
 }
 subgraph cluster__4_2 {
 	label=<<U>Organism Picture</U>>;
 	style="rounded";
 	color="#EF3340";
-    T46 [label="Organism", shape=box, color="#00ad43"];
-    T47 [label="Camera", shape=box, color="#00ad43"];
+    T46 [label="Camera", shape=box, color="#00ad43"];
+    T47 [label="Organism", shape=box, color="#00ad43"];
 }
 subgraph cluster__4_3 {
 	label=<<U>Organism Details Picture</U>>;
 	style="rounded";
 	color="#EF3340";
-    T48 [label="Organism", shape=box, color="#00ad43"];
-    T49 [label="Camera", shape=box, color="#00ad43"];
+    T48 [label="Camera", shape=box, color="#00ad43"];
+    T49 [label="Organism", shape=box, color="#00ad43"];
 }
 subgraph cluster__4_4 {
 	label=<<U>Organism Geolocation</U>>;
 	style="rounded";
 	color="#EF3340";
-    T50 [label="Organism", shape=box, color="#00ad43"];
-    T51 [label="Geolocation Instrument", shape=box, color="#00ad43"];
+    T50 [label="Geolocation Instrument", shape=box, color="#00ad43"];
+    T51 [label="Organism", shape=box, color="#00ad43"];
 }
     P23:s -> T45:n [label="And then", color="#EF3340", lhead=cluster__4_1];
     T45:s -> T47:n [label="And then", color="#EF3340", ltail=cluster__4_1, lhead=cluster__4_2];
@@ -194,15 +194,15 @@ subgraph cluster__6_4 {
 	label=<<U>Place in conical centrifugal tube</U>>;
 	style="rounded";
 	color="#EF3340";
-    T57 [label="Sample Conical Centrifugal Tube", shape=box, color="#00ad43"];
-    T58 [label="Coffee filter wrapper", shape=box, color="#00ad43"];
+    T57 [label="Coffee filter wrapper", shape=box, color="#00ad43"];
+    T58 [label="Sample Conical Centrifugal Tube", shape=box, color="#00ad43"];
 }
 subgraph cluster__6_5 {
 	label=<<U>Place in storage box</U>>;
 	style="rounded";
 	color="#EF3340";
-    T59 [label="Liquid Nitrogen Box", shape=box, color="#00ad43"];
-    T60 [label="Sample Conical Centrifugal Tube", shape=box, color="#00ad43"];
+    T59 [label="Sample Conical Centrifugal Tube", shape=box, color="#00ad43"];
+    T60 [label="Conical Tube Box", shape=box, color="#00ad43"];
 }
     P30:s -> P31:n [label="And then", color="#EF3340"];
     P31:s -> P32:n [label="And then", color="#EF3340"];

@@ -14,8 +14,10 @@
 )]
 pub struct MountTipProcedureModel {
     pub procedure_model_id: i32,
-    pub pipette: i32,
-    pub pipette_tip: i32,
+    pub pipette: ::rosetta_uuid::Uuid,
+    pub procedure_pipette: i32,
+    pub pipette_tip: ::rosetta_uuid::Uuid,
+    pub procedure_pipette_tip: i32,
 }
 impl web_common_traits::prelude::TableName for MountTipProcedureModel {
     const TABLE_NAME: &'static str = "mount_tip_procedure_models";
@@ -71,35 +73,35 @@ impl MountTipProcedureModel {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                crate::codegen::structs_codegen::tables::pipette_models::PipetteModel::table(),
                 self.pipette,
             ),
             conn,
         )
     }
-    pub fn pipette_tip<C: diesel::connection::LoadConnection>(
+    pub fn procedure_pipette<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -126,14 +128,79 @@ impl MountTipProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.procedure_pipette,
+            ),
+            conn,
+        )
+    }
+    pub fn pipette_tip<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::table(
+                ),
                 self.pipette_tip,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_pipette_tip<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.procedure_pipette_tip,
             ),
             conn,
         )
     }
     #[cfg(feature = "postgres")]
     pub fn from_pipette(
-        pipette: &i32,
+        pipette: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
@@ -145,8 +212,21 @@ impl MountTipProcedureModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_procedure_pipette(
+        procedure_pipette: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::mount_tip_procedure_models::mount_tip_procedure_models;
+        Self::table()
+            .filter(mount_tip_procedure_models::procedure_pipette.eq(procedure_pipette))
+            .order_by(mount_tip_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_pipette_tip(
-        pipette_tip: &i32,
+        pipette_tip: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
@@ -158,9 +238,102 @@ impl MountTipProcedureModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_pipette_and_procedure_model_id(
-        pipette: &i32,
+    pub fn from_procedure_pipette_tip(
+        procedure_pipette_tip: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::mount_tip_procedure_models::mount_tip_procedure_models;
+        Self::table()
+            .filter(mount_tip_procedure_models::procedure_pipette_tip.eq(procedure_pipette_tip))
+            .order_by(mount_tip_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_pipette_and_procedure_model_id(
+        procedure_pipette: &i32,
         procedure_model_id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::mount_tip_procedure_models::mount_tip_procedure_models;
+        Self::table()
+            .filter(
+                mount_tip_procedure_models::procedure_pipette
+                    .eq(procedure_pipette)
+                    .and(mount_tip_procedure_models::procedure_model_id.eq(procedure_model_id)),
+            )
+            .order_by(mount_tip_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_pipette_tip_and_procedure_model_id(
+        procedure_pipette_tip: &i32,
+        procedure_model_id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::mount_tip_procedure_models::mount_tip_procedure_models;
+        Self::table()
+            .filter(
+                mount_tip_procedure_models::procedure_pipette_tip
+                    .eq(procedure_pipette_tip)
+                    .and(mount_tip_procedure_models::procedure_model_id.eq(procedure_model_id)),
+            )
+            .order_by(mount_tip_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_pipette_and_pipette(
+        procedure_pipette: &i32,
+        pipette: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::mount_tip_procedure_models::mount_tip_procedure_models;
+        Self::table()
+            .filter(
+                mount_tip_procedure_models::procedure_pipette
+                    .eq(procedure_pipette)
+                    .and(mount_tip_procedure_models::pipette.eq(pipette)),
+            )
+            .order_by(mount_tip_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_pipette_tip_and_pipette_tip(
+        procedure_pipette_tip: &i32,
+        pipette_tip: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::mount_tip_procedure_models::mount_tip_procedure_models;
+        Self::table()
+            .filter(
+                mount_tip_procedure_models::procedure_pipette_tip
+                    .eq(procedure_pipette_tip)
+                    .and(mount_tip_procedure_models::pipette_tip.eq(pipette_tip)),
+            )
+            .order_by(mount_tip_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_pipette_and_pipette_tip(
+        pipette: &::rosetta_uuid::Uuid,
+        pipette_tip: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -172,27 +345,7 @@ impl MountTipProcedureModel {
             .filter(
                 mount_tip_procedure_models::pipette
                     .eq(pipette)
-                    .and(mount_tip_procedure_models::procedure_model_id.eq(procedure_model_id)),
-            )
-            .order_by(mount_tip_procedure_models::procedure_model_id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_pipette_tip_and_procedure_model_id(
-        pipette_tip: &i32,
-        procedure_model_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::mount_tip_procedure_models::mount_tip_procedure_models;
-        Self::table()
-            .filter(
-                mount_tip_procedure_models::pipette_tip
-                    .eq(pipette_tip)
-                    .and(mount_tip_procedure_models::procedure_model_id.eq(procedure_model_id)),
+                    .and(mount_tip_procedure_models::pipette_tip.eq(pipette_tip)),
             )
             .order_by(mount_tip_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)

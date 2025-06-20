@@ -171,27 +171,6 @@ impl InsertableMixCountableProcedureModelBuilder {
         self.quantity = Some(quantity);
         Ok(self)
     }
-    pub fn source(
-        mut self,
-        source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableMixCountableProcedureModelAttributes>,
-    > {
-        if source.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableMixCountableProcedureModelAttributes::Source(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.source = source;
-        Ok(self)
-    }
     pub fn destination(
         mut self,
         destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -211,6 +190,27 @@ impl InsertableMixCountableProcedureModelBuilder {
             );
         }
         self.destination = destination;
+        Ok(self)
+    }
+    pub fn source(
+        mut self,
+        source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableMixCountableProcedureModelAttributes>,
+    > {
+        if source.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertableMixCountableProcedureModelAttributes::Source(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        self.source = source;
         Ok(self)
     }
     pub fn name<P>(
@@ -426,17 +426,6 @@ impl InsertableMixCountableProcedureModelBuilder {
                 )
             })?
             .id();
-        let source = self
-            .source
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertableMixCountableProcedureModelAttributes::Source)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableMixCountableProcedureModelAttributes::Source)
-            })?
-            .id();
         let destination = self
             .destination
             .procedure_model_id(procedure_model_id)
@@ -446,6 +435,17 @@ impl InsertableMixCountableProcedureModelBuilder {
             .insert(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(InsertableMixCountableProcedureModelAttributes::Destination)
+            })?
+            .id();
+        let source = self
+            .source
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(InsertableMixCountableProcedureModelAttributes::Source)
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(InsertableMixCountableProcedureModelAttributes::Source)
             })?
             .id();
         Ok(InsertableMixCountableProcedureModel {

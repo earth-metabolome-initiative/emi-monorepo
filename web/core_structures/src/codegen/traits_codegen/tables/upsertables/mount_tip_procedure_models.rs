@@ -17,7 +17,13 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
-            .filter(pipette.ne(excluded(pipette)).or(pipette_tip.ne(excluded(pipette_tip))))
+            .filter(
+                pipette
+                    .ne(excluded(pipette))
+                    .or(procedure_pipette.ne(excluded(procedure_pipette)))
+                    .or(pipette_tip.ne(excluded(pipette_tip)))
+                    .or(procedure_pipette_tip.ne(excluded(procedure_pipette_tip))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -41,7 +47,13 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
-            .filter(pipette.ne(excluded(pipette)).or(pipette_tip.ne(excluded(pipette_tip))))
+            .filter(
+                pipette
+                    .ne(excluded(pipette))
+                    .or(procedure_pipette.ne(excluded(procedure_pipette)))
+                    .or(pipette_tip.ne(excluded(pipette_tip)))
+                    .or(procedure_pipette_tip.ne(excluded(procedure_pipette_tip))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }

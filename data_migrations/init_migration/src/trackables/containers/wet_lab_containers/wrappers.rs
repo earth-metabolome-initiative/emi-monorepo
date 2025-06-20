@@ -1,6 +1,6 @@
 //! Submodule to initialize the
 
-use core_structures::{ContainerModel, StorageRule, User, VolumetricContainerModel};
+use core_structures::{ContainerModel, User, VolumetricContainerModel, traits::CompatibleWith};
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -28,16 +28,9 @@ pub(super) fn init_wrappers(
         .insert(user.id, conn)
         .unwrap();
 
-    let cct =
-        VolumetricContainerModel::from_name(CONICAL_CENTRIFUGAL_TUBE_50ML, conn).unwrap().unwrap();
-
-    StorageRule::new()
-        .parent_container_id(cct.id)
+    VolumetricContainerModel::from_name(CONICAL_CENTRIFUGAL_TUBE_50ML, conn)
         .unwrap()
-        .child_container_id(coffee_filter_wrapper.id)
         .unwrap()
-        .quantity(1i16)
-        .unwrap()
-        .insert(user.id, conn)
+        .compatible_with_quantity(&coffee_filter_wrapper, 1i16, user, conn)
         .unwrap();
 }

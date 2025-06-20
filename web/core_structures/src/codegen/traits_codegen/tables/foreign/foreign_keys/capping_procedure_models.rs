@@ -1,11 +1,11 @@
-#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CappingProcedureModelForeignKeys {
     pub procedure_model: Option<
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     >,
     pub container: Option<
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     >,
     pub procedure_container: Option<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
@@ -32,7 +32,7 @@ impl web_common_traits::prelude::HasForeignKeys
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
                 self.container_id,
             ),
         ));
@@ -67,26 +67,6 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
-            (
-                crate::codegen::tables::row::Row::ContainerModel(container_models),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.container_id == container_models.id {
-                    foreign_keys.container = Some(container_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ContainerModel(container_models),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.container_id == container_models.id {
-                    foreign_keys.container = None;
-                    updated = true;
-                }
-            }
             (
                 crate::codegen::tables::row::Row::ProcedureModelTrackable(
                     procedure_model_trackables,
@@ -156,6 +136,30 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if self.capped_with == trackables.id {
                     foreign_keys.capped_with = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::VolumetricContainerModel(
+                    volumetric_container_models,
+                ),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.container_id == volumetric_container_models.id {
+                    foreign_keys.container = Some(volumetric_container_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::VolumetricContainerModel(
+                    volumetric_container_models,
+                ),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.container_id == volumetric_container_models.id {
+                    foreign_keys.container = None;
                     updated = true;
                 }
             }

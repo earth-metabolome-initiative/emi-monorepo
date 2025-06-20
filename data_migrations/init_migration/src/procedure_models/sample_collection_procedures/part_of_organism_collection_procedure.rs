@@ -14,7 +14,7 @@ use crate::trackables::containers::{
 
 /// The name of the part of organism collection procedure model.
 const PART_OF_ORGANISM: &str = "Part-of organisms collection procedure";
-const LIQUID_NITROGEN_BOX: &str = "Liquid Nitrogen Box";
+pub(crate) const CONICAL_TUBE_BOX: &str = "Conical Tube Box";
 const SAMPLE_CCT: &str = "Sample Conical Centrifugal Tube";
 
 /// Initializes the part of organism collection procedure model in the database.
@@ -161,7 +161,7 @@ pub(crate) fn init_part_of_organism_collection(
         .unwrap()
         .procedure_parent_container_id(
             ProcedureModelTrackable::new()
-            .name(LIQUID_NITROGEN_BOX)
+            .name(CONICAL_TUBE_BOX)
             .unwrap()
             .trackable_id(ContainerModel::from_name(POLYSTYRENE_BOX, conn).unwrap().unwrap().id)
             .unwrap()

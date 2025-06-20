@@ -516,29 +516,45 @@ impl Codegen<'_> {
             if let (Some(extension_table), Some(extension_pk)) = (&extension_table, &extension_pk) {
                 let extension_pk_ident = extension_pk.snake_case_ident()?;
                 let column_camel_case_ident = extension_pk.camel_case_ident()?;
-                for column in extension_table.insertable_columns_with_extension(conn)? {
-                    let column_name = column.snake_case_ident()?;
-                    let column_type = column.rust_data_type(conn)?;
+                for extension_column in extension_table.insertable_columns_with_extension(conn)? {
+                    let column_name = extension_column.snake_case_ident()?;
 
                     // If the current column is part of a `same-as` unique constraint with the
                     // current table, we need to skip it as it is already handled by the current
                     // table's insertable builder.
-                    if same_as_extension_columns.contains(&column) {
+                    if same_as_extension_columns.contains(&extension_column) {
                         continue;
                     }
 
-                    insertable_builder_methods.push(quote::quote! {
-                        pub fn #column_name<P>(
-                            mut self, #column_name: P
-                        ) -> Result<Self, web_common_traits::database::InsertError<#insertable_enum>>
-                        where
-                            P: TryInto<#column_type>,
-                            <P as TryInto<#column_type>>::Error: Into<validation_errors::SingleFieldError>,
-                        {
-                            self.#extension_pk_ident = self.#extension_pk_ident.#column_name(#column_name).map_err(|err| {
-                                err.into_field_name(#insertable_enum::#column_camel_case_ident)
-                            })?;
-                            Ok(self)
+                    insertable_builder_methods.push(if let Some(foreign_key) = extension_column.requires_partial_builder(conn)? {
+                        let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
+                        let column_type = foreign_table.insertable_builder_ty()?;
+                        quote::quote! {
+                            pub fn #column_name(
+                                mut self, #column_name: #column_type
+                            ) -> Result<Self, web_common_traits::database::InsertError<#insertable_enum>>
+                            {
+                                self.#extension_pk_ident = self.#extension_pk_ident.#column_name(#column_name).map_err(|err| {
+                                    err.into_field_name(#insertable_enum::#column_camel_case_ident)
+                                })?;
+                                Ok(self)
+                            }
+                        }
+                    } else {
+                        let column_type = extension_column.rust_data_type(conn)?;
+                        quote::quote! {
+                            pub fn #column_name<P>(
+                                mut self, #column_name: P
+                            ) -> Result<Self, web_common_traits::database::InsertError<#insertable_enum>>
+                            where
+                                P: TryInto<#column_type>,
+                                <P as TryInto<#column_type>>::Error: Into<validation_errors::SingleFieldError>,
+                            {
+                                self.#extension_pk_ident = self.#extension_pk_ident.#column_name(#column_name).map_err(|err| {
+                                    err.into_field_name(#insertable_enum::#column_camel_case_ident)
+                                })?;
+                                Ok(self)
+                            }
                         }
                     });
                 }

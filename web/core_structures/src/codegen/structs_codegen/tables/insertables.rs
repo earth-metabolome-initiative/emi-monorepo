@@ -5,11 +5,6 @@ pub use aliquoting_procedure_models::{
     InsertableAliquotingProcedureModel, InsertableAliquotingProcedureModelAttributes,
     InsertableAliquotingProcedureModelBuilder,
 };
-mod ball_mill_container_models;
-pub use ball_mill_container_models::{
-    InsertableBallMillContainerModel, InsertableBallMillContainerModelAttributes,
-    InsertableBallMillContainerModelBuilder,
-};
 mod ball_mill_machine_models;
 pub use ball_mill_machine_models::{
     InsertableBallMillMachineModel, InsertableBallMillMachineModelAttributes,
@@ -35,15 +30,6 @@ mod capping_procedure_models;
 pub use capping_procedure_models::{
     InsertableCappingProcedureModel, InsertableCappingProcedureModelAttributes,
     InsertableCappingProcedureModelBuilder,
-};
-mod capping_rules;
-pub use capping_rules::{
-    InsertableCappingRule, InsertableCappingRuleAttributes, InsertableCappingRuleBuilder,
-};
-mod centrifugable_container_models;
-pub use centrifugable_container_models::{
-    InsertableCentrifugableContainerModel, InsertableCentrifugableContainerModelAttributes,
-    InsertableCentrifugableContainerModelBuilder,
 };
 mod centrifuge_models;
 pub use centrifuge_models::{
@@ -73,6 +59,11 @@ mod commercial_reagents;
 pub use commercial_reagents::{
     InsertableCommercialReagent, InsertableCommercialReagentAttributes,
     InsertableCommercialReagentBuilder,
+};
+mod compatibility_rules;
+pub use compatibility_rules::{
+    InsertableCompatibilityRule, InsertableCompatibilityRuleAttributes,
+    InsertableCompatibilityRuleBuilder,
 };
 mod container_models;
 pub use container_models::{
@@ -195,6 +186,15 @@ pub use photograph_procedure_models::{
     InsertablePhotographProcedureModel, InsertablePhotographProcedureModelAttributes,
     InsertablePhotographProcedureModelBuilder,
 };
+mod pipette_models;
+pub use pipette_models::{
+    InsertablePipetteModel, InsertablePipetteModelAttributes, InsertablePipetteModelBuilder,
+};
+mod pipette_tip_models;
+pub use pipette_tip_models::{
+    InsertablePipetteTipModel, InsertablePipetteTipModelAttributes,
+    InsertablePipetteTipModelBuilder,
+};
 mod positioning_device_models;
 pub use positioning_device_models::{
     InsertablePositioningDeviceModel, InsertablePositioningDeviceModelAttributes,
@@ -265,10 +265,6 @@ mod storage_procedure_models;
 pub use storage_procedure_models::{
     InsertableStorageProcedureModel, InsertableStorageProcedureModelAttributes,
     InsertableStorageProcedureModelBuilder,
-};
-mod storage_rules;
-pub use storage_rules::{
-    InsertableStorageRule, InsertableStorageRuleAttributes, InsertableStorageRuleBuilder,
 };
 mod supernatant_procedure_models;
 pub use supernatant_procedure_models::{

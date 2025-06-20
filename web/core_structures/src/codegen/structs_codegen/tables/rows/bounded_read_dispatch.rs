@@ -6,9 +6,6 @@ where
     crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
-    crate::codegen::structs_codegen::tables::ball_mill_container_models::BallMillContainerModel: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -25,12 +22,6 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::capping_rules::CappingRule: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::centrifugable_container_models::CentrifugableContainerModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel: web_common_traits::prelude::BoundedRead<
@@ -52,6 +43,9 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::container_models::ContainerModel: web_common_traits::prelude::BoundedRead<
@@ -138,6 +132,12 @@ where
     crate::codegen::structs_codegen::tables::photograph_procedure_models::PhotographProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
+    crate::codegen::structs_codegen::tables::pipette_models::PipetteModel: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -193,9 +193,6 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::storage_rules::StorageRule: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel: web_common_traits::prelude::BoundedRead<
@@ -278,14 +275,6 @@ where
                     )
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::BallMillContainerModel => {
-                crate::codegen::structs_codegen::tables::ball_mill_container_models::BallMillContainerModel::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
             crate::codegen::tables::table_names::TableName::BallMillMachineModel => {
                 crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel::bounded_read(
                         offset,
@@ -328,22 +317,6 @@ where
             }
             crate::codegen::tables::table_names::TableName::CappingProcedureModel => {
                 crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::CappingRule => {
-                crate::codegen::structs_codegen::tables::capping_rules::CappingRule::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::CentrifugableContainerModel => {
-                crate::codegen::structs_codegen::tables::centrifugable_container_models::CentrifugableContainerModel::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -400,6 +373,14 @@ where
             }
             crate::codegen::tables::table_names::TableName::CommercialReagent => {
                 crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::CompatibilityRule => {
+                crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -630,6 +611,22 @@ where
                     )
                     .map(super::Rows::from)
             }
+            crate::codegen::tables::table_names::TableName::PipetteModel => {
+                crate::codegen::structs_codegen::tables::pipette_models::PipetteModel::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::PipetteTipModel => {
+                crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
             crate::codegen::tables::table_names::TableName::PositioningDeviceModel => {
                 crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel::bounded_read(
                         offset,
@@ -776,14 +773,6 @@ where
             }
             crate::codegen::tables::table_names::TableName::StorageProcedureModel => {
                 crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::StorageRule => {
-                crate::codegen::structs_codegen::tables::storage_rules::StorageRule::bounded_read(
                         offset,
                         limit,
                         conn,

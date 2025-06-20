@@ -1,6 +1,6 @@
 //! Submodule for initializing the
 
-use core_structures::{CappingRule, CommercialProduct, StorageRule, Trackable, User};
+use core_structures::{CommercialProduct, Trackable, User};
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -95,16 +95,6 @@ pub(crate) fn init_macherey_nagel_splitted_cap(
         .brand_id(macherey_nagel.id)
         .unwrap()
         .parent_id(splitted_cap_trackable.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
-
-    // We register that the cap can be used with the vial
-    let init_macherey_nagel_vial = init_macherey_nagel_vial(user, conn);
-    CappingRule::new()
-        .cap_id(cap.id)
-        .unwrap()
-        .container_id(init_macherey_nagel_vial.id)
         .unwrap()
         .insert(user.id, conn)
         .unwrap();

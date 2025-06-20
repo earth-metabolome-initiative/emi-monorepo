@@ -6,9 +6,6 @@ where
     crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::ball_mill_container_models::BallMillContainerModel: web_common_traits::database::Read<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel: web_common_traits::database::Read<
         C,
     >,
@@ -25,12 +22,6 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::capping_rules::CappingRule: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::centrifugable_container_models::CentrifugableContainerModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel: web_common_traits::database::Read<
@@ -52,6 +43,9 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::container_models::ContainerModel: web_common_traits::database::Read<
@@ -138,6 +132,12 @@ where
     crate::codegen::structs_codegen::tables::photograph_procedure_models::PhotographProcedureModel: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::pipette_models::PipetteModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: web_common_traits::database::Read<
         C,
     >,
@@ -193,9 +193,6 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::storage_rules::StorageRule: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel: web_common_traits::database::Read<
@@ -279,15 +276,6 @@ where
                         )?
                         .map(super::Row::from)
                 }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillContainerModel(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::ball_mill_container_models::BallMillContainerModel::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillMachineModel(
                     primary_key,
                 ) => {
@@ -337,24 +325,6 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CappingRule(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::capping_rules::CappingRule::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugableContainerModel(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::centrifugable_container_models::CentrifugableContainerModel::read(
                             primary_key,
                             conn,
                         )?
@@ -418,6 +388,15 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CompatibilityRule(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule::read(
                             primary_key,
                             conn,
                         )?
@@ -675,6 +654,24 @@ where
                         )?
                         .map(super::Row::from)
                 }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::pipette_models::PipetteModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteTipModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PositioningDeviceModel(
                     primary_key,
                 ) => {
@@ -841,15 +838,6 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::StorageRule(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::storage_rules::StorageRule::read(
                             primary_key,
                             conn,
                         )?

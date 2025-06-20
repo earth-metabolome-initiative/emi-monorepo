@@ -1,6 +1,5 @@
 mod addresses;
 mod aliquoting_procedure_models;
-mod ball_mill_container_models;
 mod ball_mill_machine_models;
 mod ball_mill_procedure_models;
 mod binary_question_procedure_models;
@@ -8,8 +7,6 @@ mod bounded_read_dispatch;
 mod brands;
 mod camera_models;
 mod capping_procedure_models;
-mod capping_rules;
-mod centrifugable_container_models;
 mod centrifuge_models;
 mod centrifuge_procedure_models;
 mod cities;
@@ -17,6 +14,7 @@ mod colors;
 mod commercial_product_lots;
 mod commercial_products;
 mod commercial_reagents;
+mod compatibility_rules;
 mod container_models;
 mod containers;
 mod countries;
@@ -47,6 +45,8 @@ mod packaging_procedure_models;
 mod parent_procedure_models;
 mod permanence_categories;
 mod photograph_procedure_models;
+mod pipette_models;
+mod pipette_tip_models;
 mod positioning_device_models;
 mod pouring_procedure_models;
 mod procedure_model_trackables;
@@ -66,7 +66,6 @@ mod spatial_ref_sys;
 mod spectra;
 mod spectra_collections;
 mod storage_procedure_models;
-mod storage_rules;
 mod supernatant_procedure_models;
 mod tabular;
 mod taxa;
@@ -95,11 +94,6 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
         >,
     ),
-    BallMillContainerModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::ball_mill_container_models::BallMillContainerModel,
-        >,
-    ),
     BallMillMachineModel(
         Vec<
             crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
@@ -122,14 +116,6 @@ pub enum Rows {
     CappingProcedureModel(
         Vec<
             crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel,
-        >,
-    ),
-    CappingRule(
-        Vec<crate::codegen::structs_codegen::tables::capping_rules::CappingRule>,
-    ),
-    CentrifugableContainerModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::centrifugable_container_models::CentrifugableContainerModel,
         >,
     ),
     CentrifugeModel(
@@ -155,6 +141,11 @@ pub enum Rows {
     CommercialReagent(
         Vec<
             crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent,
+        >,
+    ),
+    CompatibilityRule(
+        Vec<
+            crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
         >,
     ),
     ContainerModel(
@@ -261,6 +252,12 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::photograph_procedure_models::PhotographProcedureModel,
         >,
     ),
+    PipetteModel(
+        Vec<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel>,
+    ),
+    PipetteTipModel(
+        Vec<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel>,
+    ),
     PositioningDeviceModel(
         Vec<
             crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
@@ -315,9 +312,6 @@ pub enum Rows {
         Vec<
             crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel,
         >,
-    ),
-    StorageRule(
-        Vec<crate::codegen::structs_codegen::tables::storage_rules::StorageRule>,
     ),
     SupernatantProcedureModel(
         Vec<
@@ -397,13 +391,6 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::BallMillContainerModel(ball_mill_container_models) => {
-                ball_mill_container_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
             Rows::BallMillMachineModel(ball_mill_machine_models) => {
                 ball_mill_machine_models
                     .iter()
@@ -441,20 +428,6 @@ impl Rows {
             }
             Rows::CappingProcedureModel(capping_procedure_models) => {
                 capping_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::CappingRule(capping_rules) => {
-                capping_rules
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::CentrifugableContainerModel(centrifugable_container_models) => {
-                centrifugable_container_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -504,6 +477,13 @@ impl Rows {
             }
             Rows::CommercialReagent(commercial_reagents) => {
                 commercial_reagents
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CompatibilityRule(compatibility_rules) => {
+                compatibility_rules
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -705,6 +685,20 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::PipetteModel(pipette_models) => {
+                pipette_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::PipetteTipModel(pipette_tip_models) => {
+                pipette_tip_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models
                     .iter()
@@ -833,13 +827,6 @@ impl Rows {
             }
             Rows::StorageProcedureModel(storage_procedure_models) => {
                 storage_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::StorageRule(storage_rules) => {
-                storage_rules
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -981,9 +968,6 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 aliquoting_procedure_models.primary_keys()
             }
-            Rows::BallMillContainerModel(ball_mill_container_models) => {
-                ball_mill_container_models.primary_keys()
-            }
             Rows::BallMillMachineModel(ball_mill_machine_models) => {
                 ball_mill_machine_models.primary_keys()
             }
@@ -998,10 +982,6 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::CappingProcedureModel(capping_procedure_models) => {
                 capping_procedure_models.primary_keys()
             }
-            Rows::CappingRule(capping_rules) => capping_rules.primary_keys(),
-            Rows::CentrifugableContainerModel(centrifugable_container_models) => {
-                centrifugable_container_models.primary_keys()
-            }
             Rows::CentrifugeModel(centrifuge_models) => centrifuge_models.primary_keys(),
             Rows::CentrifugeProcedureModel(centrifuge_procedure_models) => {
                 centrifuge_procedure_models.primary_keys()
@@ -1013,6 +993,7 @@ impl web_common_traits::prelude::Rows for Rows {
             }
             Rows::CommercialProduct(commercial_products) => commercial_products.primary_keys(),
             Rows::CommercialReagent(commercial_reagents) => commercial_reagents.primary_keys(),
+            Rows::CompatibilityRule(compatibility_rules) => compatibility_rules.primary_keys(),
             Rows::ContainerModel(container_models) => container_models.primary_keys(),
             Rows::Container(containers) => containers.primary_keys(),
             Rows::Country(countries) => countries.primary_keys(),
@@ -1063,6 +1044,8 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::PhotographProcedureModel(photograph_procedure_models) => {
                 photograph_procedure_models.primary_keys()
             }
+            Rows::PipetteModel(pipette_models) => pipette_models.primary_keys(),
+            Rows::PipetteTipModel(pipette_tip_models) => pipette_tip_models.primary_keys(),
             Rows::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models.primary_keys()
             }
@@ -1092,7 +1075,6 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::StorageProcedureModel(storage_procedure_models) => {
                 storage_procedure_models.primary_keys()
             }
-            Rows::StorageRule(storage_rules) => storage_rules.primary_keys(),
             Rows::SupernatantProcedureModel(supernatant_procedure_models) => {
                 supernatant_procedure_models.primary_keys()
             }

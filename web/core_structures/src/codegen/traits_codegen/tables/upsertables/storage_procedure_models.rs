@@ -18,11 +18,13 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .do_update()
             .set(self)
             .filter(
-                child_container_id
-                    .ne(excluded(child_container_id))
-                    .or(procedure_child_container_id.ne(excluded(procedure_child_container_id)))
+                kelvin
+                    .ne(excluded(kelvin))
+                    .or(kelvin_tolerance_percentage.ne(excluded(kelvin_tolerance_percentage)))
                     .or(parent_container_id.ne(excluded(parent_container_id)))
-                    .or(procedure_parent_container_id.ne(excluded(procedure_parent_container_id))),
+                    .or(procedure_parent_container_id.ne(excluded(procedure_parent_container_id)))
+                    .or(child_container_id.ne(excluded(child_container_id)))
+                    .or(procedure_child_container_id.ne(excluded(procedure_child_container_id))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -48,11 +50,13 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .do_update()
             .set(self)
             .filter(
-                child_container_id
-                    .ne(excluded(child_container_id))
-                    .or(procedure_child_container_id.ne(excluded(procedure_child_container_id)))
+                kelvin
+                    .ne(excluded(kelvin))
+                    .or(kelvin_tolerance_percentage.ne(excluded(kelvin_tolerance_percentage)))
                     .or(parent_container_id.ne(excluded(parent_container_id)))
-                    .or(procedure_parent_container_id.ne(excluded(procedure_parent_container_id))),
+                    .or(procedure_parent_container_id.ne(excluded(procedure_parent_container_id)))
+                    .or(child_container_id.ne(excluded(child_container_id)))
+                    .or(procedure_child_container_id.ne(excluded(procedure_child_container_id))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

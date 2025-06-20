@@ -1,14 +1,11 @@
 mod addresses;
 mod aliquoting_procedure_models;
-mod ball_mill_container_models;
 mod ball_mill_machine_models;
 mod ball_mill_procedure_models;
 mod binary_question_procedure_models;
 mod brands;
 mod camera_models;
 mod capping_procedure_models;
-mod capping_rules;
-mod centrifugable_container_models;
 mod centrifuge_models;
 mod centrifuge_procedure_models;
 mod cities;
@@ -16,6 +13,7 @@ mod colors;
 mod commercial_product_lots;
 mod commercial_products;
 mod commercial_reagents;
+mod compatibility_rules;
 mod container_models;
 mod containers;
 mod countries;
@@ -45,6 +43,8 @@ mod packaging_procedure_models;
 mod parent_procedure_models;
 mod permanence_categories;
 mod photograph_procedure_models;
+mod pipette_models;
+mod pipette_tip_models;
 mod positioning_device_models;
 mod pouring_procedure_models;
 mod procedure_model_trackables;
@@ -65,7 +65,6 @@ mod spatial_ref_sys;
 mod spectra;
 mod spectra_collections;
 mod storage_procedure_models;
-mod storage_rules;
 mod supernatant_procedure_models;
 mod tabular;
 mod taxa;
@@ -92,9 +91,6 @@ pub enum Row {
     AliquotingProcedureModel(
         crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
     ),
-    BallMillContainerModel(
-        crate::codegen::structs_codegen::tables::ball_mill_container_models::BallMillContainerModel,
-    ),
     BallMillMachineModel(
         crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
     ),
@@ -108,10 +104,6 @@ pub enum Row {
     CameraModel(crate::codegen::structs_codegen::tables::camera_models::CameraModel),
     CappingProcedureModel(
         crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel,
-    ),
-    CappingRule(crate::codegen::structs_codegen::tables::capping_rules::CappingRule),
-    CentrifugableContainerModel(
-        crate::codegen::structs_codegen::tables::centrifugable_container_models::CentrifugableContainerModel,
     ),
     CentrifugeModel(
         crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
@@ -129,6 +121,9 @@ pub enum Row {
     ),
     CommercialReagent(
         crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent,
+    ),
+    CompatibilityRule(
+        crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
     ),
     ContainerModel(
         crate::codegen::structs_codegen::tables::container_models::ContainerModel,
@@ -198,6 +193,10 @@ pub enum Row {
     PhotographProcedureModel(
         crate::codegen::structs_codegen::tables::photograph_procedure_models::PhotographProcedureModel,
     ),
+    PipetteModel(crate::codegen::structs_codegen::tables::pipette_models::PipetteModel),
+    PipetteTipModel(
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+    ),
     PositioningDeviceModel(
         crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
     ),
@@ -233,7 +232,6 @@ pub enum Row {
     StorageProcedureModel(
         crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel,
     ),
-    StorageRule(crate::codegen::structs_codegen::tables::storage_rules::StorageRule),
     SupernatantProcedureModel(
         crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel,
     ),
@@ -284,9 +282,6 @@ impl Row {
             Row::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 aliquoting_procedure_models.upsert(conn)?.map(Row::from)
             }
-            Row::BallMillContainerModel(ball_mill_container_models) => {
-                ball_mill_container_models.upsert(conn)?.map(Row::from)
-            }
             Row::BallMillMachineModel(ball_mill_machine_models) => {
                 ball_mill_machine_models.upsert(conn)?.map(Row::from)
             }
@@ -300,10 +295,6 @@ impl Row {
             Row::CameraModel(camera_models) => camera_models.upsert(conn)?.map(Row::from),
             Row::CappingProcedureModel(capping_procedure_models) => {
                 capping_procedure_models.upsert(conn)?.map(Row::from)
-            }
-            Row::CappingRule(capping_rules) => capping_rules.upsert(conn)?.map(Row::from),
-            Row::CentrifugableContainerModel(centrifugable_container_models) => {
-                centrifugable_container_models.upsert(conn)?.map(Row::from)
             }
             Row::CentrifugeModel(centrifuge_models) => {
                 centrifuge_models.upsert(conn)?.map(Row::from)
@@ -321,6 +312,9 @@ impl Row {
             }
             Row::CommercialReagent(commercial_reagents) => {
                 commercial_reagents.upsert(conn)?.map(Row::from)
+            }
+            Row::CompatibilityRule(compatibility_rules) => {
+                compatibility_rules.upsert(conn)?.map(Row::from)
             }
             Row::ContainerModel(container_models) => container_models.upsert(conn)?.map(Row::from),
             Row::Container(containers) => containers.upsert(conn)?.map(Row::from),
@@ -384,6 +378,10 @@ impl Row {
             Row::PhotographProcedureModel(photograph_procedure_models) => {
                 photograph_procedure_models.upsert(conn)?.map(Row::from)
             }
+            Row::PipetteModel(pipette_models) => pipette_models.upsert(conn)?.map(Row::from),
+            Row::PipetteTipModel(pipette_tip_models) => {
+                pipette_tip_models.upsert(conn)?.map(Row::from)
+            }
             Row::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models.upsert(conn)?.map(Row::from)
             }
@@ -417,7 +415,6 @@ impl Row {
             Row::StorageProcedureModel(storage_procedure_models) => {
                 storage_procedure_models.upsert(conn)?.map(Row::from)
             }
-            Row::StorageRule(storage_rules) => storage_rules.upsert(conn)?.map(Row::from),
             Row::SupernatantProcedureModel(supernatant_procedure_models) => {
                 supernatant_procedure_models.upsert(conn)?.map(Row::from)
             }
@@ -463,9 +460,6 @@ impl web_common_traits::prelude::Row for Row {
             Row::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 aliquoting_procedure_models.primary_key()
             }
-            Row::BallMillContainerModel(ball_mill_container_models) => {
-                ball_mill_container_models.primary_key()
-            }
             Row::BallMillMachineModel(ball_mill_machine_models) => {
                 ball_mill_machine_models.primary_key()
             }
@@ -480,10 +474,6 @@ impl web_common_traits::prelude::Row for Row {
             Row::CappingProcedureModel(capping_procedure_models) => {
                 capping_procedure_models.primary_key()
             }
-            Row::CappingRule(capping_rules) => capping_rules.primary_key(),
-            Row::CentrifugableContainerModel(centrifugable_container_models) => {
-                centrifugable_container_models.primary_key()
-            }
             Row::CentrifugeModel(centrifuge_models) => centrifuge_models.primary_key(),
             Row::CentrifugeProcedureModel(centrifuge_procedure_models) => {
                 centrifuge_procedure_models.primary_key()
@@ -495,6 +485,7 @@ impl web_common_traits::prelude::Row for Row {
             }
             Row::CommercialProduct(commercial_products) => commercial_products.primary_key(),
             Row::CommercialReagent(commercial_reagents) => commercial_reagents.primary_key(),
+            Row::CompatibilityRule(compatibility_rules) => compatibility_rules.primary_key(),
             Row::ContainerModel(container_models) => container_models.primary_key(),
             Row::Container(containers) => containers.primary_key(),
             Row::Country(countries) => countries.primary_key(),
@@ -545,6 +536,8 @@ impl web_common_traits::prelude::Row for Row {
             Row::PhotographProcedureModel(photograph_procedure_models) => {
                 photograph_procedure_models.primary_key()
             }
+            Row::PipetteModel(pipette_models) => pipette_models.primary_key(),
+            Row::PipetteTipModel(pipette_tip_models) => pipette_tip_models.primary_key(),
             Row::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models.primary_key()
             }
@@ -574,7 +567,6 @@ impl web_common_traits::prelude::Row for Row {
             Row::StorageProcedureModel(storage_procedure_models) => {
                 storage_procedure_models.primary_key()
             }
-            Row::StorageRule(storage_rules) => storage_rules.primary_key(),
             Row::SupernatantProcedureModel(supernatant_procedure_models) => {
                 supernatant_procedure_models.primary_key()
             }

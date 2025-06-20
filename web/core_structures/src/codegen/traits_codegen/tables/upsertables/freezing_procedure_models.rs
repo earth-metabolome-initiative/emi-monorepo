@@ -17,14 +17,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
-            .filter(
-                kelvin
-                    .ne(excluded(kelvin))
-                    .or(seconds.ne(excluded(seconds)))
-                    .or(frozen_with.ne(excluded(frozen_with)))
-                    .or(procedure_frozen_with.ne(excluded(procedure_frozen_with)))
-                    .or(source_container.ne(excluded(source_container))),
-            )
+            .filter(seconds.ne(excluded(seconds)).or(frozen_with.ne(excluded(frozen_with))))
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -48,14 +41,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
-            .filter(
-                kelvin
-                    .ne(excluded(kelvin))
-                    .or(seconds.ne(excluded(seconds)))
-                    .or(frozen_with.ne(excluded(frozen_with)))
-                    .or(procedure_frozen_with.ne(excluded(procedure_frozen_with)))
-                    .or(source_container.ne(excluded(source_container))),
-            )
+            .filter(seconds.ne(excluded(seconds)).or(frozen_with.ne(excluded(frozen_with))))
             .get_results(conn)
             .map(|mut result| result.pop())
     }

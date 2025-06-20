@@ -33,18 +33,13 @@ CREATE TABLE IF NOT EXISTS volumetric_container_models (
 	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters))
 );
 
-CREATE TABLE IF NOT EXISTS storage_rules (
-    parent_container_id UUID NOT NULL REFERENCES container_models(id),
-    child_container_id UUID NOT NULL REFERENCES container_models(id),
-    -- The quantity of child containers that can be stored in the parent container.
-    quantity SMALLINT NOT NULL CHECK (must_be_strictly_positive_i16(quantity)),
-    PRIMARY KEY (parent_container_id, child_container_id),
-    CHECK (must_be_distinct_uuid(parent_container_id, child_container_id))
-);
-
-CREATE TABLE IF NOT EXISTS capping_rules (
-    container_id UUID NOT NULL REFERENCES container_models(id),
-    cap_id UUID NOT NULL REFERENCES trackables(id),
-    PRIMARY KEY (container_id, cap_id),
-    CHECK (must_be_distinct_uuid(container_id, cap_id))
+CREATE TABLE IF NOT EXISTS compatibility_rules (
+    left_trackable_id UUID NOT NULL REFERENCES trackables(id),
+    right_trackable_id UUID NOT NULL REFERENCES trackables(id),
+    -- The maximal quantity of the right trackable that can be associated with the left trackable.
+    quantity SMALLINT CHECK (must_be_strictly_positive_i16(quantity)),
+    created_by INTEGER NOT NULL REFERENCES users(id),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (left_trackable_id, right_trackable_id),
+    CHECK (must_be_distinct_uuid(left_trackable_id, right_trackable_id))
 );
