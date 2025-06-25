@@ -5,6 +5,7 @@ extern crate quote;
 extern crate syn;
 
 mod codegen;
+mod column_same_as_network;
 mod custom_schema_constraints;
 pub mod errors;
 mod postgis;
@@ -15,6 +16,7 @@ mod table_metadata;
 mod utils;
 
 pub use codegen::Codegen;
+pub use column_same_as_network::ColumnSameAsNetwork;
 pub use custom_schema_constraints::{
     CompatibleForeignTypeConstraint, CompulsorySiblingColumnConstraint, ConstraintError,
     CustomColumnConstraint, CustomTableConstraint, HasSpecificTypeConstraint,

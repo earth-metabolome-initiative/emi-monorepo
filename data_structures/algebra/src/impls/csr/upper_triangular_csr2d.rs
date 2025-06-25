@@ -1,5 +1,6 @@
 //! Submodule providing a definition of a CSR matrix.
 use multi_ranged::Step;
+use num_traits::ConstZero;
 use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use crate::prelude::*;
@@ -90,6 +91,10 @@ where
         Self { matrix: SquareCSR2D::with_sparse_capacity(number_of_values) }
     }
 
+    fn with_sparse_shape(shape: Self::MinimalShape) -> Self {
+        Self::with_sparse_shaped_capacity(shape, M::SparseIndex::ZERO)
+    }
+
     fn with_sparse_shaped_capacity(
         shape: Self::MinimalShape,
         number_of_values: Self::SparseIndex,
@@ -162,6 +167,11 @@ where
 
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.matrix.sparse_row(row)
+    }
+
+    #[inline]
+    fn has_entry(&self, row: Self::RowIndex, column: Self::ColumnIndex) -> bool {
+        self.matrix.has_entry(row, column)
     }
 
     fn sparse_columns(&self) -> Self::SparseColumns<'_> {
@@ -281,6 +291,7 @@ where
             - self.number_of_defined_diagonal_values().into_usize())
             * 2
             + self.number_of_defined_diagonal_values().into_usize();
+
         let mut symmetric: CSR2D<SparseIndex, Idx, Idx> = CSR2D {
             offsets: vec![SparseIndex::ZERO; self.order().into_usize() + 1],
             number_of_columns: self.order(),

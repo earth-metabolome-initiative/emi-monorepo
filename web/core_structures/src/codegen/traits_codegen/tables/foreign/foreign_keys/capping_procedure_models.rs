@@ -16,6 +16,9 @@ pub struct CappingProcedureModelForeignKeys {
     pub procedure_capped_with: Option<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
+    pub capping_procedure_models_container_id_capped_with_fkey: Option<
+        crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
+    >,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel
@@ -51,6 +54,12 @@ impl web_common_traits::prelude::HasForeignKeys
                 self.procedure_capped_with,
             ),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CompatibilityRule((
+                self.container_id,
+                self.capped_with,
+            )),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure_model.is_some()
@@ -58,6 +67,7 @@ impl web_common_traits::prelude::HasForeignKeys
             && foreign_keys.procedure_container.is_some()
             && foreign_keys.capped_with.is_some()
             && foreign_keys.procedure_capped_with.is_some()
+            && foreign_keys.capping_procedure_models_container_id_capped_with_fkey.is_some()
     }
     fn update(
         &self,
@@ -67,6 +77,31 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
+            (
+                crate::codegen::tables::row::Row::CompatibilityRule(compatibility_rules),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.container_id == compatibility_rules.left_trackable_id
+                    && self.capped_with == compatibility_rules.right_trackable_id
+                {
+                    foreign_keys.capping_procedure_models_container_id_capped_with_fkey =
+                        Some(compatibility_rules);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::CompatibilityRule(compatibility_rules),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.container_id == compatibility_rules.left_trackable_id
+                    && self.capped_with == compatibility_rules.right_trackable_id
+                {
+                    foreign_keys.capping_procedure_models_container_id_capped_with_fkey = None;
+                    updated = true;
+                }
+            }
             (
                 crate::codegen::tables::row::Row::ProcedureModelTrackable(
                     procedure_model_trackables,

@@ -20,6 +20,9 @@ pub struct SharedProcedureModelTrackableForeignKeys {
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     >,
     pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub shared_procedure_model_tracka_parent_procedure_model_id_ch_fkey: Option<
+        crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel,
+    >,
 }
 impl web_common_traits::prelude::HasForeignKeys
 for crate::codegen::structs_codegen::tables::shared_procedure_model_trackables::SharedProcedureModelTrackable {
@@ -85,6 +88,15 @@ for crate::codegen::structs_codegen::tables::shared_procedure_model_trackables::
                     ),
                 ),
             );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ParentProcedureModel((
+                        self.parent_procedure_model_id,
+                        self.child_procedure_model_id,
+                    )),
+                ),
+            );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.parent.is_some() && foreign_keys.parent_trackable.is_some()
@@ -92,6 +104,9 @@ for crate::codegen::structs_codegen::tables::shared_procedure_model_trackables::
             && foreign_keys.child.is_some() && foreign_keys.child_trackable.is_some()
             && foreign_keys.child_procedure_model.is_some()
             && foreign_keys.created_by.is_some()
+            && foreign_keys
+                .shared_procedure_model_tracka_parent_procedure_model_id_ch_fkey
+                .is_some()
     }
     fn update(
         &self,
@@ -101,6 +116,42 @@ for crate::codegen::structs_codegen::tables::shared_procedure_model_trackables::
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
+            (
+                crate::codegen::tables::row::Row::ParentProcedureModel(
+                    parent_procedure_models,
+                ),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.parent_procedure_model_id
+                    == parent_procedure_models.parent_procedure_model_id
+                    && self.child_procedure_model_id
+                        == parent_procedure_models.child_procedure_model_id
+                {
+                    foreign_keys
+                        .shared_procedure_model_tracka_parent_procedure_model_id_ch_fkey = Some(
+                        parent_procedure_models,
+                    );
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ParentProcedureModel(
+                    parent_procedure_models,
+                ),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.parent_procedure_model_id
+                    == parent_procedure_models.parent_procedure_model_id
+                    && self.child_procedure_model_id
+                        == parent_procedure_models.child_procedure_model_id
+                {
+                    foreign_keys
+                        .shared_procedure_model_tracka_parent_procedure_model_id_ch_fkey = None;
+                    updated = true;
+                }
+            }
             (
                 crate::codegen::tables::row::Row::ProcedureModelTrackable(
                     procedure_model_trackables,

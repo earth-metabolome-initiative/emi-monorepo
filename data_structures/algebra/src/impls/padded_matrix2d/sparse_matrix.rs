@@ -104,6 +104,11 @@ where
     }
 
     #[inline]
+    fn has_entry(&self, _row: Self::RowIndex, _column: Self::ColumnIndex) -> bool {
+        true
+    }
+
+    #[inline]
     fn sparse_columns(&self) -> Self::SparseColumns<'_> {
         self.into()
     }

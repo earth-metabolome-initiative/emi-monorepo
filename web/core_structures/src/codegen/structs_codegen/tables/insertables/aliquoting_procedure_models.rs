@@ -208,27 +208,6 @@ impl InsertableAliquotingProcedureModelBuilder {
         self.liters = Some(liters);
         Ok(self)
     }
-    pub fn source(
-        mut self,
-        source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
-    > {
-        if source.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableAliquotingProcedureModelAttributes::Source(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.source = source;
-        Ok(self)
-    }
     pub fn destination(
         mut self,
         destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -248,6 +227,27 @@ impl InsertableAliquotingProcedureModelBuilder {
             );
         }
         self.destination = destination;
+        Ok(self)
+    }
+    pub fn source(
+        mut self,
+        source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
+    > {
+        if source.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertableAliquotingProcedureModelAttributes::Source(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        self.source = source;
         Ok(self)
     }
     pub fn aliquoted_with(
@@ -467,17 +467,6 @@ impl InsertableAliquotingProcedureModelBuilder {
                 err.into_field_name(InsertableAliquotingProcedureModelAttributes::ProcedureModelId)
             })?
             .id();
-        let source = self
-            .source
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertableAliquotingProcedureModelAttributes::Source)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableAliquotingProcedureModelAttributes::Source)
-            })?
-            .id();
         let destination = self
             .destination
             .procedure_model_id(procedure_model_id)
@@ -487,6 +476,17 @@ impl InsertableAliquotingProcedureModelBuilder {
             .insert(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(InsertableAliquotingProcedureModelAttributes::Destination)
+            })?
+            .id();
+        let source = self
+            .source
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(InsertableAliquotingProcedureModelAttributes::Source)
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(InsertableAliquotingProcedureModelAttributes::Source)
             })?
             .id();
         let aliquoted_with = self

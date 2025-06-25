@@ -36,6 +36,22 @@ pub trait MonoplexGraph: super::Graph {
     fn has_successors(&self, source_node_id: <Self::Edges as super::Edges>::SourceNodeId) -> bool {
         self.edges().has_successors(source_node_id)
     }
+
+    /// Returns whether the given source node has a successor with the given
+    /// destination node identifier.
+    ///
+    /// # Arguments
+    ///
+    /// * `source_node_id` - The identifier of the source node.
+    /// * `destination_node_id` - The identifier of the destination node.
+    fn has_successor(
+        &self,
+        source_node_id: <Self::Edges as super::Edges>::SourceNodeId,
+        destination_node_id: <Self::Edges as super::Edges>::DestinationNodeId,
+    ) -> bool {
+        self.edges().has_successor(source_node_id, destination_node_id)
+    }
+
     /// Returns the outbound degree of the node with the given identifier.
     ///
     /// # Arguments

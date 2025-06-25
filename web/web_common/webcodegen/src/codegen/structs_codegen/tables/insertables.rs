@@ -367,7 +367,7 @@ impl Codegen<'_> {
                 // to sub-dispatch the setting call to the respective sub-builders.
                 let mut same_as_exception = TokenStream::new();
                 for (same_as_constraint, foreign_same_as_column) in
-                    column.same_as_constraints(conn)?
+                    column.same_as_constraints(conn)?.into_iter().zip(column.same_as_columns(conn)?)
                 {
                     let foreign_table = same_as_constraint.foreign_table(conn)?.unwrap();
                     let same_as_constraint_columns = same_as_constraint.columns(conn)?;
@@ -517,7 +517,15 @@ impl Codegen<'_> {
                 let extension_pk_ident = extension_pk.snake_case_ident()?;
                 let column_camel_case_ident = extension_pk.camel_case_ident()?;
                 for extension_column in extension_table.insertable_columns_with_extension(conn)? {
-                    let column_name = extension_column.snake_case_ident()?;
+                    let extension_column_name = extension_column.snake_case_ident()?;
+                    // We need to retrieve the table associated with the extension column,
+                    // as it may be an ancestor extension table.
+                    let extension_column_table = extension_column.table(conn)?;
+                    // We retrieve the enum type for the insertable attributes of the
+                    // extension table.
+                    let extension_column_insertable_enum =
+                        extension_column_table.insertable_enum_ty()?;
+                    let camel_cased_extension_column_name = extension_column.camel_case_ident()?;
 
                     // If the current column is part of a `same-as` unique constraint with the
                     // current table, we need to skip it as it is already handled by the current
@@ -528,13 +536,67 @@ impl Codegen<'_> {
 
                     insertable_builder_methods.push(if let Some(foreign_key) = extension_column.requires_partial_builder(conn)? {
                         let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
+                        let foreign_insertable_enum = foreign_table.insertable_enum_ty()?;
                         let column_type = foreign_table.insertable_builder_ty()?;
+                        let mut attribute_checks = Vec::new();
+                        // We retrieve the set of foreign keys that include the `extension_column` and
+                        // are involved in a `same-as` unique constraint.
+                        let same_as_foreign_keys = extension_column.same_as_constraints(conn)?;
+                        // We determine which other column are included in the same `same-as` unique constraint.
+                        let mut other_same_as_columns = same_as_foreign_keys.into_iter().
+                            flat_map(|constraint| constraint.columns(conn).unwrap_or_default())
+                            .filter(|foreign_column| foreign_column != &extension_column)
+                            .collect::<Vec<_>>();
+
+                        other_same_as_columns.sort_unstable();
+                        other_same_as_columns.dedup();
+
+                        for other_same_as_column in other_same_as_columns {
+                            for (local_column, foreign_column) in self.column_same_as_network().unwrap().inferred_same_as_columns(&table, &foreign_table, &other_same_as_column) {
+                                // If the local column is the extension column, we skip it as it is already handled.
+                                if local_column == extension_pk {
+                                    continue;
+                                }
+                                let foreign_column_ident = foreign_column.snake_case_ident()?;
+                                let foreign_camel_cased = foreign_column.camel_case_ident()?;
+                                let local_column_ident = local_column.snake_case_ident()?;
+                                attribute_checks.push(quote::quote! {
+                                    if let (Some(local), Some(foreign)) = (self.#local_column_ident, #extension_column_name.#foreign_column_ident) {
+                                        if local != foreign {
+                                            return Err(
+                                                web_common_traits::database::InsertError::BuilderError(
+                                                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                                        #insertable_enum::#column_camel_case_ident(
+                                                            #extension_column_insertable_enum::#camel_cased_extension_column_name(
+                                                                #foreign_insertable_enum::#foreign_camel_cased
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            );
+                                        }
+                                    } else if let Some(foreign) = #extension_column_name.#foreign_column_ident {
+                                        self.#local_column_ident = Some(foreign);
+                                    } else if let Some(local) = self.#local_column_ident {
+                                        self.#extension_pk_ident.#extension_column_name = self.#extension_pk_ident.#extension_column_name.#foreign_column_ident(local).map_err(|err| {
+                                            err.into_field_name(
+                                                #extension_column_insertable_enum::#camel_cased_extension_column_name
+                                            ).into_field_name(
+                                                #insertable_enum::#column_camel_case_ident
+                                            )
+                                        })?;
+                                    }
+                                });
+                            }
+                        }
+
                         quote::quote! {
-                            pub fn #column_name(
-                                mut self, #column_name: #column_type
+                            pub fn #extension_column_name(
+                                mut self, #extension_column_name: #column_type
                             ) -> Result<Self, web_common_traits::database::InsertError<#insertable_enum>>
                             {
-                                self.#extension_pk_ident = self.#extension_pk_ident.#column_name(#column_name).map_err(|err| {
+                                #(#attribute_checks)*
+                                self.#extension_pk_ident = self.#extension_pk_ident.#extension_column_name(#extension_column_name).map_err(|err| {
                                     err.into_field_name(#insertable_enum::#column_camel_case_ident)
                                 })?;
                                 Ok(self)
@@ -543,14 +605,14 @@ impl Codegen<'_> {
                     } else {
                         let column_type = extension_column.rust_data_type(conn)?;
                         quote::quote! {
-                            pub fn #column_name<P>(
-                                mut self, #column_name: P
+                            pub fn #extension_column_name<P>(
+                                mut self, #extension_column_name: P
                             ) -> Result<Self, web_common_traits::database::InsertError<#insertable_enum>>
                             where
                                 P: TryInto<#column_type>,
                                 <P as TryInto<#column_type>>::Error: Into<validation_errors::SingleFieldError>,
                             {
-                                self.#extension_pk_ident = self.#extension_pk_ident.#column_name(#column_name).map_err(|err| {
+                                self.#extension_pk_ident = self.#extension_pk_ident.#extension_column_name(#extension_column_name).map_err(|err| {
                                     err.into_field_name(#insertable_enum::#column_camel_case_ident)
                                 })?;
                                 Ok(self)

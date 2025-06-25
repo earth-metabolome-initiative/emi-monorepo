@@ -538,6 +538,7 @@ allow_tables_to_appear_in_same_query!(
 allow_tables_to_appear_in_same_query!(check_constraints, table_constraints);
 allow_tables_to_appear_in_same_query!(pg_trigger, pg_namespace);
 allow_tables_to_appear_in_same_query!(pg_trigger, pg_class);
+allow_tables_to_appear_in_same_query!(tables, pg_class);
 allow_tables_to_appear_in_same_query!(
     pg_operator,
     pg_constraint,

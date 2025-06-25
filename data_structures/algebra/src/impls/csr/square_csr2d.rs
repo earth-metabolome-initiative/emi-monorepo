@@ -110,6 +110,10 @@ where
         }
     }
 
+    fn with_sparse_shape(order: Self::MinimalShape) -> Self {
+        Self::with_sparse_shaped_capacity(order, M::SparseIndex::ZERO)
+    }
+
     fn with_sparse_shaped_capacity(
         order: Self::MinimalShape,
         number_of_values: Self::SparseIndex,
@@ -186,6 +190,11 @@ where
     #[inline]
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.matrix.sparse_row(row)
+    }
+
+    #[inline]
+    fn has_entry(&self, row: Self::RowIndex, column: Self::ColumnIndex) -> bool {
+        self.matrix.has_entry(row, column)
     }
 
     #[inline]

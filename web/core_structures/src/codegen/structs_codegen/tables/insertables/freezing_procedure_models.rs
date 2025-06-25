@@ -207,6 +207,38 @@ impl InsertableFreezingProcedureModelBuilder {
         Self,
         web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
     > {
+        if let (Some(local), Some(foreign)) =
+            (self.frozen_with, procedure_parent_container_id.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            InsertableFreezingProcedureModelAttributes::ProcedureModelId(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::ProcedureParentContainerId(
+                                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                                ),
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_parent_container_id.trackable_id {
+            self.frozen_with = Some(foreign);
+        } else if let Some(local) = self.frozen_with {
+            self.procedure_model_id.procedure_parent_container_id = self
+                .procedure_model_id
+                .procedure_parent_container_id
+                .trackable_id(local)
+                .map_err(|err| {
+                    err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::ProcedureParentContainerId,
+                        )
+                        .into_field_name(
+                            InsertableFreezingProcedureModelAttributes::ProcedureModelId,
+                        )
+                })?;
+        }
         self.procedure_model_id = self
             .procedure_model_id
             .procedure_parent_container_id(procedure_parent_container_id)

@@ -208,25 +208,25 @@ impl InsertablePouringProcedureModelBuilder {
         self.liters = Some(liters);
         Ok(self)
     }
-    pub fn measured_with(
+    pub fn source(
         mut self,
-        measured_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertablePouringProcedureModelAttributes>,
     > {
-        if measured_with.procedure_model_id.is_some() {
+        if source.procedure_model_id.is_some() {
             return Err(
                 web_common_traits::database::InsertError::BuilderError(
                     web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertablePouringProcedureModelAttributes::MeasuredWith(
+                        InsertablePouringProcedureModelAttributes::Source(
                             crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
                         ),
                     ),
                 ),
             );
         }
-        self.measured_with = measured_with;
+        self.source = source;
         Ok(self)
     }
     pub fn destination(
@@ -250,25 +250,25 @@ impl InsertablePouringProcedureModelBuilder {
         self.destination = destination;
         Ok(self)
     }
-    pub fn source(
+    pub fn measured_with(
         mut self,
-        source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        measured_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertablePouringProcedureModelAttributes>,
     > {
-        if source.procedure_model_id.is_some() {
+        if measured_with.procedure_model_id.is_some() {
             return Err(
                 web_common_traits::database::InsertError::BuilderError(
                     web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertablePouringProcedureModelAttributes::Source(
+                        InsertablePouringProcedureModelAttributes::MeasuredWith(
                             crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
                         ),
                     ),
                 ),
             );
         }
-        self.source = source;
+        self.measured_with = measured_with;
         Ok(self)
     }
     pub fn name<P>(
@@ -467,16 +467,12 @@ impl InsertablePouringProcedureModelBuilder {
                 err.into_field_name(InsertablePouringProcedureModelAttributes::ProcedureModelId)
             })?
             .id();
-        let measured_with = self
-            .measured_with
+        let source = self
+            .source
             .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertablePouringProcedureModelAttributes::MeasuredWith)
-            })?
+            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Source))?
             .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertablePouringProcedureModelAttributes::MeasuredWith)
-            })?
+            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Source))?
             .id();
         let destination = self
             .destination
@@ -489,12 +485,16 @@ impl InsertablePouringProcedureModelBuilder {
                 err.into_field_name(InsertablePouringProcedureModelAttributes::Destination)
             })?
             .id();
-        let source = self
-            .source
+        let measured_with = self
+            .measured_with
             .procedure_model_id(procedure_model_id)
-            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Source))?
+            .map_err(|err| {
+                err.into_field_name(InsertablePouringProcedureModelAttributes::MeasuredWith)
+            })?
             .insert(user_id, conn)
-            .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Source))?
+            .map_err(|err| {
+                err.into_field_name(InsertablePouringProcedureModelAttributes::MeasuredWith)
+            })?
             .id();
         Ok(InsertablePouringProcedureModel {
             procedure_model_id,

@@ -209,27 +209,6 @@ impl InsertablePhotographProcedureModelBuilder {
             })?;
         Ok(self)
     }
-    pub fn trackable_id(
-        mut self,
-        trackable_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertablePhotographProcedureModelAttributes>,
-    > {
-        if trackable_id.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertablePhotographProcedureModelAttributes::TrackableId(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.trackable_id = trackable_id;
-        Ok(self)
-    }
     pub fn procedure_photographed_with(
         mut self,
         procedure_photographed_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -273,6 +252,27 @@ impl InsertablePhotographProcedureModelBuilder {
                 })?;
         }
         self.procedure_photographed_with = procedure_photographed_with;
+        Ok(self)
+    }
+    pub fn trackable_id(
+        mut self,
+        trackable_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertablePhotographProcedureModelAttributes>,
+    > {
+        if trackable_id.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertablePhotographProcedureModelAttributes::TrackableId(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        self.trackable_id = trackable_id;
         Ok(self)
     }
     pub fn name<P>(
@@ -472,17 +472,6 @@ impl InsertablePhotographProcedureModelBuilder {
                 err.into_field_name(InsertablePhotographProcedureModelAttributes::ProcedureModelId)
             })?
             .id();
-        let trackable_id = self
-            .trackable_id
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertablePhotographProcedureModelAttributes::TrackableId)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertablePhotographProcedureModelAttributes::TrackableId)
-            })?
-            .id();
         let procedure_photographed_with = self
             .procedure_photographed_with
             .procedure_model_id(procedure_model_id)
@@ -496,6 +485,17 @@ impl InsertablePhotographProcedureModelBuilder {
                 err.into_field_name(
                     InsertablePhotographProcedureModelAttributes::ProcedurePhotographedWith,
                 )
+            })?
+            .id();
+        let trackable_id = self
+            .trackable_id
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(InsertablePhotographProcedureModelAttributes::TrackableId)
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(InsertablePhotographProcedureModelAttributes::TrackableId)
             })?
             .id();
         Ok(InsertablePhotographProcedureModel {

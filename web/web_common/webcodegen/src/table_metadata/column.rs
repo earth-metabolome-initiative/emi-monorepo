@@ -142,8 +142,106 @@ fn geography(
         .optional()
 }
 
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}-{}", column.table_catalog, column.table_schema, column.table_name, column.column_name) }"#
+)]
+fn requires_partial_builder(
+    column: &Column,
+    conn: &mut PgConnection,
+) -> Result<Option<KeyColumnUsage>, WebCodeGenError> {
+    if column.is_nullable() {
+        // If the column is nullable, we do not need a partial builder
+        return Ok(None);
+    }
+    // First, we retrieve the table that contains the column
+    let table = column.table(conn)?;
+    // Then, we check if the table is an extension table
+    if table.extension_table(conn)?.is_none() {
+        return Ok(None);
+    }
+    // Next, we retrieve the foreign keys of the column
+    let foreign_keys = column.foreign_keys(conn)?;
+    // If there are no foreign keys, we return false
+    if foreign_keys.is_empty() {
+        return Ok(None);
+    }
+    // We check whether there exist a single column foreign key
+    // which refers to the primary key of the foreign table.
+    let mut single_column_fk_to_pk = None;
+    for foreign_key in &foreign_keys {
+        if foreign_key.is_foreign_primary_key(conn)? && foreign_key.number_of_columns(conn)? == 1 {
+            // If we have already found a single column foreign key to the
+            // primary key of the foreign table, we raise a unimplemented error
+            // as it is unclear how to handle this case.
+            if single_column_fk_to_pk.is_some() {
+                unimplemented!(
+                    "Column \"{}\".\"{}\" has multiple single-column foreign keys to the primary key of the foreign table. This is not supported yet.",
+                    column.table_name,
+                    column.column_name
+                );
+            }
+
+            single_column_fk_to_pk = Some(foreign_key);
+        }
+    }
+
+    let Some(single_column_fk_to_pk) = single_column_fk_to_pk else {
+        // If we have not found a single column foreign key to the primary key of the
+        // foreign table, we return false as we cannot handle this case.
+        return Ok(None);
+    };
+
+    // Now, after having identified the single column foreign key to the primary key
+    // of the foreign table, we try to identify a composite foreign key
+    // which is composed of the column and the primary key of the table that
+    // contains the column.
+    let primary_key_columns = table.primary_key_columns(conn)?;
+    let Some(foreign_table) = single_column_fk_to_pk.foreign_table(conn)? else {
+        return Ok(None);
+    };
+
+    // We expect the composite foreign key to be composed of the column
+    // and the primary key of the table that contains the column.
+    let mut expected_foreign_columns = vec![column.clone()];
+    expected_foreign_columns.extend(primary_key_columns);
+
+    let mut found_composite_fk = None;
+
+    for foreign_key in &foreign_keys {
+        if foreign_key == single_column_fk_to_pk {
+            // We skip the single column foreign key to the primary key of the foreign table
+            continue;
+        }
+        if foreign_key.foreign_table(conn)?.as_ref() != Some(&foreign_table) {
+            // We skip foreign keys which do not refer to the same foreign table
+            continue;
+        }
+        let columns = foreign_key.columns(conn)?;
+        if columns == expected_foreign_columns {
+            if found_composite_fk.is_some() {
+                // If we have already found a composite foreign key, we raise a
+                // unimplemented error as it is unclear how to handle this case.
+                unimplemented!(
+                    "Column \"{}\".\"{}\" has multiple composite foreign keys to the foreign table \"{}\". This is not supported yet: {foreign_keys:#?}",
+                    column.table_name,
+                    column.column_name,
+                    foreign_table.table_name
+                );
+            }
+
+            found_composite_fk = Some(foreign_key.clone());
+        }
+    }
+
+    Ok(found_composite_fk)
+}
+
 /// Struct defining the `information_schema.columns` table.
-#[derive(Queryable, QueryableByName, Selectable, PartialEq, Eq, Debug, Clone, Hash)]
+#[derive(
+    Queryable, QueryableByName, Selectable, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash,
+)]
 #[diesel(table_name = crate::schema::columns)]
 pub struct Column {
     /// Name of the database containing the table (always the current database)
@@ -1085,93 +1183,7 @@ impl Column {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Option<KeyColumnUsage>, WebCodeGenError> {
-        if self.is_nullable() {
-            // If the column is nullable, we do not need a partial builder
-            return Ok(None);
-        }
-        // First, we retrieve the table that contains the column
-        let table = self.table(conn)?;
-        // Then, we check if the table is an extension table
-        if table.extension_table(conn)?.is_none() {
-            return Ok(None);
-        }
-        // Next, we retrieve the foreign keys of the column
-        let foreign_keys = self.foreign_keys(conn)?;
-        // If there are no foreign keys, we return false
-        if foreign_keys.is_empty() {
-            return Ok(None);
-        }
-        // We check whether there exist a single column foreign key
-        // which refers to the primary key of the foreign table.
-        let mut single_column_fk_to_pk = None;
-        for foreign_key in &foreign_keys {
-            if foreign_key.is_foreign_primary_key(conn)?
-                && foreign_key.number_of_columns(conn)? == 1
-            {
-                // If we have already found a single column foreign key to the
-                // primary key of the foreign table, we raise a unimplemented error
-                // as it is unclear how to handle this case.
-                if single_column_fk_to_pk.is_some() {
-                    unimplemented!(
-                        "Column \"{}\".\"{}\" has multiple single-column foreign keys to the primary key of the foreign table. This is not supported yet.",
-                        self.table_name,
-                        self.column_name
-                    );
-                }
-
-                single_column_fk_to_pk = Some(foreign_key);
-            }
-        }
-
-        let Some(single_column_fk_to_pk) = single_column_fk_to_pk else {
-            // If we have not found a single column foreign key to the primary key of the
-            // foreign table, we return false as we cannot handle this case.
-            return Ok(None);
-        };
-
-        // Now, after having identified the single column foreign key to the primary key
-        // of the foreign table, we try to identify a composite foreign key
-        // which is composed of the column and the primary key of the table that
-        // contains the column.
-        let primary_key_columns = table.primary_key_columns(conn)?;
-        let Some(foreign_table) = single_column_fk_to_pk.foreign_table(conn)? else {
-            return Ok(None);
-        };
-
-        // We expect the composite foreign key to be composed of the column
-        // and the primary key of the table that contains the column.
-        let mut expected_foreign_columns = vec![self.clone()];
-        expected_foreign_columns.extend(primary_key_columns);
-
-        let mut found_composite_fk = None;
-
-        for foreign_key in &foreign_keys {
-            if foreign_key == single_column_fk_to_pk {
-                // We skip the single column foreign key to the primary key of the foreign table
-                continue;
-            }
-            if foreign_key.foreign_table(conn)?.as_ref() != Some(&foreign_table) {
-                // We skip foreign keys which do not refer to the same foreign table
-                continue;
-            }
-            let columns = foreign_key.columns(conn)?;
-            if columns == expected_foreign_columns {
-                if found_composite_fk.is_some() {
-                    // If we have already found a composite foreign key, we raise a
-                    // unimplemented error as it is unclear how to handle this case.
-                    unimplemented!(
-                        "Column \"{}\".\"{}\" has multiple composite foreign keys to the foreign table \"{}\". This is not supported yet: {foreign_keys:#?}",
-                        self.table_name,
-                        self.column_name,
-                        foreign_table.table_name
-                    );
-                }
-
-                found_composite_fk = Some(foreign_key.clone());
-            }
-        }
-
-        Ok(found_composite_fk)
+        requires_partial_builder(self, conn)
     }
 
     /// Returns the `same-as` UNIQUE constraints for the column, if any.
@@ -1204,15 +1216,49 @@ impl Column {
     pub fn same_as_constraints(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<(KeyColumnUsage, Column)>, WebCodeGenError> {
-        let foreign_keys = self.foreign_keys(conn)?;
-        let mut same_as_constraints = Vec::new();
-        for foreign_key in foreign_keys {
-            if let Some(foreign_column) = foreign_key.is_same_as_constraint(conn)? {
-                same_as_constraints.push((foreign_key, foreign_column));
-            }
-        }
+    ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
+        Ok(self
+            .foreign_keys(conn)?
+            .into_iter()
+            .filter(|foreign_key| foreign_key.is_same_as_constraint(conn).unwrap_or(false))
+            .collect())
+    }
 
-        Ok(same_as_constraints)
+    /// Returns the `same-as` foreign columns associated with the current
+    /// column.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    ///
+    /// # Implementation details
+    ///
+    /// See method `same_as_constraints` for the definition of `same-as`
+    /// constraints.
+    pub fn same_as_columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
+        let mut same_as_columns: Vec<Column> = self
+            .same_as_constraints(conn)?
+            .into_iter()
+            .filter_map(|same_as_constraint| {
+                let columns = same_as_constraint.columns(conn).ok()?;
+                let filter_columns = same_as_constraint.foreign_columns(conn).ok()?;
+                columns
+                    .iter()
+                    .zip(filter_columns)
+                    .filter_map(
+                        |(local_column, foreign_column)| {
+                            if local_column == self { Some(foreign_column) } else { None }
+                        },
+                    )
+                    .next()
+            })
+            .collect();
+        same_as_columns.sort_unstable();
+        same_as_columns.dedup();
+        Ok(same_as_columns)
     }
 }

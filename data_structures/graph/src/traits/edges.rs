@@ -53,6 +53,20 @@ pub trait Edges {
         self.matrix().sparse_row(source)
     }
 
+    /// Returns whether the given source has that successor.
+    ///
+    /// # Arguments
+    ///
+    /// * `source` - The identifier of the source node.
+    /// * `destination` - The identifier of the destination node.
+    fn has_successor(
+        &self,
+        source: Self::SourceNodeId,
+        destination: Self::DestinationNodeId,
+    ) -> bool {
+        self.matrix().has_entry(source, destination)
+    }
+
     /// Returns whether the given source node has successors.
     ///
     /// # Arguments
@@ -101,6 +115,14 @@ pub trait GrowableEdges: Edges<Matrix = <Self as GrowableEdges>::GrowableMatrix>
         shape: <Self::GrowableMatrix as SparseMatrixMut>::MinimalShape,
         number_of_edges: Self::EdgeId,
     ) -> Self;
+
+    /// Creates a new growable edges representation with the provided graph
+    /// shape.
+    ///
+    /// # Arguments
+    ///
+    /// * `shape` - The shape of the graph.
+    fn with_shape(shape: <Self::GrowableMatrix as SparseMatrixMut>::MinimalShape) -> Self;
 
     /// Creates a new growable edges representation with the provided graph
     /// shape.

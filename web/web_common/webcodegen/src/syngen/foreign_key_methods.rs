@@ -26,7 +26,7 @@ impl Table {
         let mut foreign_key_methods = TokenStream::new();
 
         for foreign_key_constraint in self.foreign_keys(conn)? {
-            if foreign_key_constraint.is_same_as_constraint(conn)?.is_some() {
+            if foreign_key_constraint.is_same_as_constraint(conn)? {
                 continue;
             }
 

@@ -16,6 +16,9 @@ pub struct MountTipProcedureModelForeignKeys {
     pub procedure_pipette_tip: Option<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
+    pub mount_tip_procedure_models_pipette_pipette_tip_fkey: Option<
+        crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
+    >,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::mount_tip_procedure_models::MountTipProcedureModel
@@ -49,6 +52,12 @@ impl web_common_traits::prelude::HasForeignKeys
                 self.procedure_pipette_tip,
             ),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CompatibilityRule((
+                self.pipette,
+                self.pipette_tip,
+            )),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure_model.is_some()
@@ -56,6 +65,7 @@ impl web_common_traits::prelude::HasForeignKeys
             && foreign_keys.procedure_pipette.is_some()
             && foreign_keys.pipette_tip.is_some()
             && foreign_keys.procedure_pipette_tip.is_some()
+            && foreign_keys.mount_tip_procedure_models_pipette_pipette_tip_fkey.is_some()
     }
     fn update(
         &self,
@@ -65,6 +75,31 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
+            (
+                crate::codegen::tables::row::Row::CompatibilityRule(compatibility_rules),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.pipette == compatibility_rules.left_trackable_id
+                    && self.pipette_tip == compatibility_rules.right_trackable_id
+                {
+                    foreign_keys.mount_tip_procedure_models_pipette_pipette_tip_fkey =
+                        Some(compatibility_rules);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::CompatibilityRule(compatibility_rules),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.pipette == compatibility_rules.left_trackable_id
+                    && self.pipette_tip == compatibility_rules.right_trackable_id
+                {
+                    foreign_keys.mount_tip_procedure_models_pipette_pipette_tip_fkey = None;
+                    updated = true;
+                }
+            }
             (
                 crate::codegen::tables::row::Row::PipetteModel(pipette_models),
                 web_common_traits::crud::CRUD::Read

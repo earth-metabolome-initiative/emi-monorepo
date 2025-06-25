@@ -24,12 +24,20 @@ pub trait SparseMatrix2D: Matrix2D + SparseMatrix {
     where
         Self: 'a;
 
-    /// Returns an iterator over the sparse columns of a row.
+    /// Returns an iterator over the sorted sparse columns of a row.
     ///
     /// # Arguments
     ///
     /// * `row`: The row index.
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_>;
+
+    /// Returns whether the provided row has an entry for the provided column.
+    ///
+    /// # Arguments
+    ///
+    /// * `row`: The row index.
+    /// * `column`: The column index.
+    fn has_entry(&self, row: Self::RowIndex, column: Self::ColumnIndex) -> bool;
 
     /// Returns an iterator over all the columns of the matrix.
     fn sparse_columns(&self) -> Self::SparseColumns<'_>;
@@ -55,6 +63,11 @@ impl<M: SparseMatrix2D> SparseMatrix2D for &M {
     #[inline]
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         (*self).sparse_row(row)
+    }
+
+    #[inline]
+    fn has_entry(&self, row: Self::RowIndex, column: Self::ColumnIndex) -> bool {
+        (*self).has_entry(row, column)
     }
 
     #[inline]

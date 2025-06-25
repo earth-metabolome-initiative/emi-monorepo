@@ -209,6 +209,40 @@ impl InsertableMountTipProcedureModel {
             conn,
         )
     }
+    pub fn mount_tip_procedure_models_pipette_pipette_tip_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule::table(),
+                (self.pipette, self.pipette_tip),
+            ),
+            conn,
+        )
+    }
 }
 #[derive(Default, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -264,46 +298,6 @@ impl InsertableMountTipProcedureModelBuilder {
             })?;
         Ok(self)
     }
-    pub fn procedure_pipette(
-        mut self,
-        procedure_pipette: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableMountTipProcedureModelAttributes>,
-    > {
-        if procedure_pipette.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableMountTipProcedureModelAttributes::ProcedurePipette(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        if let (Some(local), Some(foreign)) = (self.pipette, procedure_pipette.trackable_id) {
-            if local != foreign {
-                return Err(
-                    web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            InsertableMountTipProcedureModelAttributes::ProcedurePipette(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
-                            ),
-                        ),
-                    ),
-                );
-            }
-        } else if let Some(foreign) = procedure_pipette.trackable_id {
-            self.pipette = Some(foreign);
-        } else if let Some(local) = self.pipette {
-            self.procedure_pipette = self.procedure_pipette.trackable_id(local).map_err(|err| {
-                err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedurePipette)
-            })?;
-        }
-        self.procedure_pipette = procedure_pipette;
-        Ok(self)
-    }
     pub fn procedure_pipette_tip(
         mut self,
         procedure_pipette_tip: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -346,6 +340,46 @@ impl InsertableMountTipProcedureModelBuilder {
                 })?;
         }
         self.procedure_pipette_tip = procedure_pipette_tip;
+        Ok(self)
+    }
+    pub fn procedure_pipette(
+        mut self,
+        procedure_pipette: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableMountTipProcedureModelAttributes>,
+    > {
+        if procedure_pipette.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertableMountTipProcedureModelAttributes::ProcedurePipette(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        if let (Some(local), Some(foreign)) = (self.pipette, procedure_pipette.trackable_id) {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            InsertableMountTipProcedureModelAttributes::ProcedurePipette(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_pipette.trackable_id {
+            self.pipette = Some(foreign);
+        } else if let Some(local) = self.pipette {
+            self.procedure_pipette = self.procedure_pipette.trackable_id(local).map_err(|err| {
+                err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedurePipette)
+            })?;
+        }
+        self.procedure_pipette = procedure_pipette;
         Ok(self)
     }
     pub fn name<P>(
@@ -548,17 +582,6 @@ impl InsertableMountTipProcedureModelBuilder {
                 err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedureModelId)
             })?
             .id();
-        let procedure_pipette = self
-            .procedure_pipette
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedurePipette)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedurePipette)
-            })?
-            .id();
         let procedure_pipette_tip = self
             .procedure_pipette_tip
             .procedure_model_id(procedure_model_id)
@@ -568,6 +591,17 @@ impl InsertableMountTipProcedureModelBuilder {
             .insert(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedurePipetteTip)
+            })?
+            .id();
+        let procedure_pipette = self
+            .procedure_pipette
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedurePipette)
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(InsertableMountTipProcedureModelAttributes::ProcedurePipette)
             })?
             .id();
         Ok(InsertableMountTipProcedureModel {

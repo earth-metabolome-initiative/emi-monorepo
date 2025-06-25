@@ -151,6 +151,11 @@ where
         self.matrix.sparse_row(row)
     }
 
+    #[inline]
+    fn has_entry(&self, row: Self::RowIndex, column: Self::ColumnIndex) -> bool {
+        self.matrix.has_entry(row, column)
+    }
+
     fn sparse_columns(&self) -> Self::SparseColumns<'_> {
         self.matrix.sparse_columns()
     }

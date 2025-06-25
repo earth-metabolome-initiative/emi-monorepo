@@ -271,6 +271,21 @@ fn unique_indices(
         .load::<PgIndex>(conn)
 }
 
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}", table.table_catalog, table.table_schema, table.table_name) }"#
+)]
+fn same_as_indices(
+    table: &Table,
+    conn: &mut PgConnection,
+) -> Result<Vec<PgIndex>, diesel::result::Error> {
+    Ok(unique_indices(table, conn)?
+        .into_iter()
+        .filter(|pg_index| pg_index.is_same_as(conn).map(|fk| fk.is_some()).unwrap_or(false))
+        .collect())
+}
+
 /// Reserved Rust words that cannot be used as identifiers.
 pub const RESERVED_RUST_WORDS: [&str; 49] = [
     "as", "break", "const", "continue", "crate", "else", "enum", "extern", "false", "fn", "for",
@@ -768,6 +783,26 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<Vec<PgIndex>, diesel::result::Error> {
         unique_indices(self, conn)
+    }
+
+    /// Returns the same as indices for the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Returns
+    ///
+    /// A vector of indices.
+    ///
+    /// # Errors
+    ///
+    /// * If the indices cannot be loaded from the database.
+    pub fn same_as_indices(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<PgIndex>, diesel::result::Error> {
+        same_as_indices(self, conn)
     }
 
     /// Returns all tables in the database.
@@ -1388,5 +1423,148 @@ impl Table {
             table_name,
             self.struct_name()?
         ))?)
+    }
+
+    /// Returns whether the table must be inserted alongside ther `other` table
+    /// in a composited builder.
+    ///
+    /// # Arguments
+    ///
+    /// * `other` - A reference to another `Table`
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    ///
+    /// # Implementation details
+    ///
+    /// A table must be inserted alongside `other` if:
+    ///
+    /// * The table inherits the `other` table or vice versa.
+    /// * Either `A` or `B` table extends a third table `C`, (say `A`), and the
+    ///   `B` table has a unique constraint on the primary key of `C`, making it
+    ///   necessary to insert first `C`, then `B` and then `A`.
+    fn _must_be_inserted_alongside_with(
+        &self,
+        other: &Self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        let mut self_extension_tables = self.extension_tables(conn)?;
+        self_extension_tables.push(self.clone());
+        self_extension_tables.sort_unstable();
+        let mut other_extension_tables = other.extension_tables(conn)?;
+        other_extension_tables.push(other.clone());
+        other_extension_tables.sort_unstable();
+
+        // First simple case: if either table extends the other, we must insert them
+        // alongside.
+        if self_extension_tables.contains(other) || other_extension_tables.contains(self) {
+            return Ok(true);
+        }
+
+        // Otherwise, we need to determine whether there are any foreign keys in `other`
+        // or in the tables it extends that point to the primary key of any of the
+        // tables extended by `A` (or `A` itself).
+        //
+        //   +---------+         +---------+
+        //   |   C     |<--------|   B     |
+        //   +---------+   FK    +---------+
+        //        ^                 ^
+        //        |                 |
+        //   extends           extends
+        //        |                 |
+        //   +---------+       +---------+
+        //   |   A     |       |  (other)|
+        //   +---------+       +---------+
+        //
+        // Furthermore, the FK must also appear in a unique constraint defined in the
+        // `B` table which contains the primary key of `B` and then the primary
+        // key of `C`, therefore something like: `UNIQUE (b_id, c_id)`.
+        //
+        let other_foreign_keys: Vec<KeyColumnUsage> = other_extension_tables
+            .iter()
+            .flat_map(|other_extension_table| {
+                other_extension_table
+                    .same_as_indices(conn)
+                    .unwrap_or_default()
+                    .into_iter()
+                    .filter_map(|index| {
+                        let foreign_key = index.is_same_as(conn).ok().flatten()?;
+                        let foreign_table = foreign_key.foreign_table(conn).ok().flatten()?;
+                        if self_extension_tables.binary_search(&foreign_table).is_ok() {
+                            Some(foreign_key)
+                        } else {
+                            None
+                        }
+                    })
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>();
+
+        if other_foreign_keys.is_empty() {
+            // If there are no foreign keys in `self` that point to the primary key of any
+            // table that `other` extends, we can return false.
+            return Ok(false);
+        }
+
+        // We collect all the tables which contain the definition of the
+        // `other_foreign_keys`.
+        let mut other_foreign_key_tables: Vec<Table> =
+            other_foreign_keys.iter().map(|fk| fk.table(conn)).collect::<Result<Vec<_>, _>>()?;
+
+        other_foreign_key_tables.sort_unstable();
+        other_foreign_key_tables.dedup();
+
+        // Next, having identified such a foreign key constraint, we check whether there
+        // exist a same-as constraint between any of the tables extended by `A` (or `A`)
+        // and the tables which contain the foreign key constraint in `B`.
+        for self_extension_table in self_extension_tables {
+            for column in self_extension_table.columns(conn)? {
+                for same_as_constraint in column.same_as_constraints(conn)? {
+                    let Some(foreign_table) = same_as_constraint.foreign_table(conn)? else {
+                        continue;
+                    };
+
+                    if other_foreign_key_tables.binary_search(&foreign_table).is_ok() {
+                        // If we found a same-as constraint between the table extended by `A`
+                        // and the table containing the foreign key constraint in `B`, we must
+                        // insert them alongside.
+                        return Ok(true);
+                    }
+                }
+            }
+        }
+
+        Ok(false)
+    }
+
+    /// Returns whether the table must be inserted alongside ther `other` table
+    /// in a composited builder.
+    ///
+    /// # Arguments
+    ///
+    /// * `other` - A reference to another `Table`
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    ///
+    /// # Implementation details
+    ///
+    /// A table must be inserted alongside `other` if:
+    ///
+    /// * The table inherits the `other` table or vice versa.
+    /// * Either `A` or `B` table extends a third table `C`, (say `A`), and the
+    ///   `B` table has a unique constraint on the primary key of `C`, making it
+    ///   necessary to insert first `C`, then `B` and then `A`.
+    pub fn must_be_inserted_alongside_with(
+        &self,
+        other: &Self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        Ok(self._must_be_inserted_alongside_with(other, conn)?
+            || other._must_be_inserted_alongside_with(self, conn)?)
     }
 }

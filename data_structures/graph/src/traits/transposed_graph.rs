@@ -22,6 +22,20 @@ pub trait TransposedEdges: super::Edges<Matrix = <Self as TransposedEdges>::BiMa
         self.matrix().sparse_column(destination_node_id)
     }
 
+    /// Returns whether the given destination has that predecessor.
+    ///
+    /// # Arguments
+    ///
+    /// * `destination_node_id` - The identifier of the destination node.
+    /// * `source_node_id` - The identifier of the source node.
+    fn has_predecessor(
+        &self,
+        destination_node_id: Self::DestinationNodeId,
+        source_node_id: Self::SourceNodeId,
+    ) -> bool {
+        self.matrix().transposed().has_entry(destination_node_id, source_node_id)
+    }
+
     /// Returns the inbound degree of the node with the given identifier.
     ///
     /// # Arguments

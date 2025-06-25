@@ -15,7 +15,7 @@ pub use syntaxes::Syntax;
 use time_requirements::prelude::{Task, TimeTracker};
 
 use crate::{
-    Column, PgExtension, PgType, Table,
+    Column, ColumnSameAsNetwork, PgExtension, PgType, Table,
     errors::{CodeGenerationError, WebCodeGenError},
 };
 
@@ -101,9 +101,16 @@ pub struct Codegen<'a> {
     pub(super) enable_read_trait: bool,
     /// Whether to derive traits relative to the `yew` framework.
     pub(super) enable_yew: bool,
+    /// Graph representing the same-as relationships between columns.
+    column_same_as_network: Option<ColumnSameAsNetwork>,
 }
 
 impl<'a> Codegen<'a> {
+    /// Returns a reference to the column same-as network.
+    pub fn column_same_as_network(&self) -> Option<&ColumnSameAsNetwork> {
+        self.column_same_as_network.as_ref()
+    }
+
     #[must_use]
     /// Check wether traits should be generated for tables.
     pub fn should_generate_table_traits(&self) -> bool {
@@ -471,7 +478,7 @@ impl<'a> Codegen<'a> {
     /// * Returns an error if the generated code cannot be written to the output
     ///   file.
     pub fn generate(
-        &self,
+        &mut self,
         conn: &mut PgConnection,
         table_catalog: &str,
         table_schema: Option<&str>,
@@ -486,6 +493,11 @@ impl<'a> Codegen<'a> {
             .collect::<Vec<Table>>();
 
         tables.sort_unstable();
+
+        time_tracker.add_completed_task(task);
+
+        let task = Task::new("Creating column same-as network");
+        self.column_same_as_network = Some(ColumnSameAsNetwork::from_tables(conn, &tables)?);
         time_tracker.add_completed_task(task);
 
         let codegen_directory = self.get_output_directory()?.join(CODEGEN_DIRECTORY);
