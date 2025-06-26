@@ -65,6 +65,10 @@ where
         Self::with_sparse_shaped_capacity((RowIndex::ZERO, R::Step::ZERO), number_of_values)
     }
 
+    fn with_sparse_shape(shape: Self::MinimalShape) -> Self {
+        Self::with_sparse_shaped_capacity(shape, SparseIndex::ZERO)
+    }
+
     fn with_sparse_shaped_capacity(
         (number_of_rows, number_of_columns): Self::MinimalShape,
         _number_of_values: Self::SparseIndex,
@@ -204,6 +208,11 @@ where
     #[inline]
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.ranges[row.into_usize()].clone()
+    }
+
+    #[inline]
+    fn has_entry(&self, row: Self::RowIndex, column: Self::ColumnIndex) -> bool {
+        self.sparse_row(row).contains(column)
     }
 
     #[inline]

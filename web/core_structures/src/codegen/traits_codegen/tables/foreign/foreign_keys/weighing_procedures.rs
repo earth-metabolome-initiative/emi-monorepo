@@ -1,11 +1,13 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WeighingProcedureForeignKeys {
-    pub instrument: Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
     pub procedure: Option<crate::codegen::structs_codegen::tables::procedures::Procedure>,
     pub procedure_model: Option<
         crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel,
     >,
+    pub instrument: Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
+    pub weighing_procedures_procedure_id_instrument_id_fkey:
+        Option<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure
@@ -17,11 +19,6 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Trackable(
-                self.instrument_id,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(
                 self.procedure_id,
             ),
@@ -31,11 +28,23 @@ impl web_common_traits::prelude::HasForeignKeys
                 self.procedure_model_id,
             ),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Trackable(
+                self.instrument_id,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTrackable((
+                self.procedure_id,
+                self.instrument_id,
+            )),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.instrument.is_some()
-            && foreign_keys.procedure.is_some()
+        foreign_keys.procedure.is_some()
             && foreign_keys.procedure_model.is_some()
+            && foreign_keys.instrument.is_some()
+            && foreign_keys.weighing_procedures_procedure_id_instrument_id_fkey.is_some()
     }
     fn update(
         &self,
@@ -45,6 +54,31 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
+            (
+                crate::codegen::tables::row::Row::ProcedureTrackable(procedure_trackables),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.procedure_id == procedure_trackables.procedure_id
+                    && self.instrument_id == procedure_trackables.trackable_id
+                {
+                    foreign_keys.weighing_procedures_procedure_id_instrument_id_fkey =
+                        Some(procedure_trackables);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureTrackable(procedure_trackables),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.procedure_id == procedure_trackables.procedure_id
+                    && self.instrument_id == procedure_trackables.trackable_id
+                {
+                    foreign_keys.weighing_procedures_procedure_id_instrument_id_fkey = None;
+                    updated = true;
+                }
+            }
             (
                 crate::codegen::tables::row::Row::Procedure(procedures),
                 web_common_traits::crud::CRUD::Read
@@ -91,7 +125,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_model_id == weighing_procedure_models.id {
+                if self.procedure_model_id == weighing_procedure_models.procedure_model_id {
                     foreign_keys.procedure_model = Some(weighing_procedure_models);
                     updated = true;
                 }
@@ -100,7 +134,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::WeighingProcedureModel(weighing_procedure_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_model_id == weighing_procedure_models.id {
+                if self.procedure_model_id == weighing_procedure_models.procedure_model_id {
                     foreign_keys.procedure_model = None;
                     updated = true;
                 }

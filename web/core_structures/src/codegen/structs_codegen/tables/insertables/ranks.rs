@@ -23,7 +23,8 @@ pub struct InsertableRank {
     description: String,
 }
 impl InsertableRank {}
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableRankBuilder {
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,

@@ -1,22 +1,41 @@
 mod addresses;
 pub use addresses::{InsertableAddress, InsertableAddressAttributes, InsertableAddressBuilder};
-mod aliquoting_instrument_models;
-pub use aliquoting_instrument_models::{
-    InsertableAliquotingInstrumentModel, InsertableAliquotingInstrumentModelAttributes,
-    InsertableAliquotingInstrumentModelBuilder,
-};
 mod aliquoting_procedure_models;
 pub use aliquoting_procedure_models::{
     InsertableAliquotingProcedureModel, InsertableAliquotingProcedureModelAttributes,
     InsertableAliquotingProcedureModelBuilder,
+};
+mod ball_mill_machine_models;
+pub use ball_mill_machine_models::{
+    InsertableBallMillMachineModel, InsertableBallMillMachineModelAttributes,
+    InsertableBallMillMachineModelBuilder,
 };
 mod ball_mill_procedure_models;
 pub use ball_mill_procedure_models::{
     InsertableBallMillProcedureModel, InsertableBallMillProcedureModelAttributes,
     InsertableBallMillProcedureModelBuilder,
 };
+mod binary_question_procedure_models;
+pub use binary_question_procedure_models::{
+    InsertableBinaryQuestionProcedureModel, InsertableBinaryQuestionProcedureModelAttributes,
+    InsertableBinaryQuestionProcedureModelBuilder,
+};
 mod brands;
 pub use brands::{InsertableBrand, InsertableBrandAttributes, InsertableBrandBuilder};
+mod camera_models;
+pub use camera_models::{
+    InsertableCameraModel, InsertableCameraModelAttributes, InsertableCameraModelBuilder,
+};
+mod capping_procedure_models;
+pub use capping_procedure_models::{
+    InsertableCappingProcedureModel, InsertableCappingProcedureModelAttributes,
+    InsertableCappingProcedureModelBuilder,
+};
+mod centrifuge_models;
+pub use centrifuge_models::{
+    InsertableCentrifugeModel, InsertableCentrifugeModelAttributes,
+    InsertableCentrifugeModelBuilder,
+};
 mod centrifuge_procedure_models;
 pub use centrifuge_procedure_models::{
     InsertableCentrifugeProcedureModel, InsertableCentrifugeProcedureModelAttributes,
@@ -40,6 +59,11 @@ mod commercial_reagents;
 pub use commercial_reagents::{
     InsertableCommercialReagent, InsertableCommercialReagentAttributes,
     InsertableCommercialReagentBuilder,
+};
+mod compatibility_rules;
+pub use compatibility_rules::{
+    InsertableCompatibilityRule, InsertableCompatibilityRuleAttributes,
+    InsertableCompatibilityRuleBuilder,
 };
 mod container_models;
 pub use container_models::{
@@ -67,10 +91,29 @@ pub use fractioning_procedure_models::{
     InsertableFractioningProcedureModel, InsertableFractioningProcedureModelAttributes,
     InsertableFractioningProcedureModelBuilder,
 };
+mod freeze_drier_models;
+pub use freeze_drier_models::{
+    InsertableFreezeDrierModel, InsertableFreezeDrierModelAttributes,
+    InsertableFreezeDrierModelBuilder,
+};
 mod freeze_drying_procedure_models;
 pub use freeze_drying_procedure_models::{
     InsertableFreezeDryingProcedureModel, InsertableFreezeDryingProcedureModelAttributes,
     InsertableFreezeDryingProcedureModelBuilder,
+};
+mod freezer_models;
+pub use freezer_models::{
+    InsertableFreezerModel, InsertableFreezerModelAttributes, InsertableFreezerModelBuilder,
+};
+mod freezing_procedure_models;
+pub use freezing_procedure_models::{
+    InsertableFreezingProcedureModel, InsertableFreezingProcedureModelAttributes,
+    InsertableFreezingProcedureModelBuilder,
+};
+mod geolocation_procedure_models;
+pub use geolocation_procedure_models::{
+    InsertableGeolocationProcedureModel, InsertableGeolocationProcedureModelAttributes,
+    InsertableGeolocationProcedureModelBuilder,
 };
 mod instrument_models;
 pub use instrument_models::{
@@ -81,10 +124,6 @@ mod instrument_states;
 pub use instrument_states::{
     InsertableInstrumentState, InsertableInstrumentStateAttributes,
     InsertableInstrumentStateBuilder,
-};
-mod instruments;
-pub use instruments::{
-    InsertableInstrument, InsertableInstrumentAttributes, InsertableInstrumentBuilder,
 };
 mod login_providers;
 pub use login_providers::{
@@ -102,6 +141,11 @@ pub use mix_solid_procedure_models::{
     InsertableMixSolidProcedureModel, InsertableMixSolidProcedureModelAttributes,
     InsertableMixSolidProcedureModelBuilder,
 };
+mod mount_tip_procedure_models;
+pub use mount_tip_procedure_models::{
+    InsertableMountTipProcedureModel, InsertableMountTipProcedureModelAttributes,
+    InsertableMountTipProcedureModelBuilder,
+};
 mod next_procedure_models;
 pub use next_procedure_models::{
     InsertableNextProcedureModel, InsertableNextProcedureModelAttributes,
@@ -112,11 +156,6 @@ pub use observation_subjects::{
     InsertableObservationSubject, InsertableObservationSubjectAttributes,
     InsertableObservationSubjectBuilder,
 };
-mod organism_observations;
-pub use organism_observations::{
-    InsertableOrganismObservation, InsertableOrganismObservationAttributes,
-    InsertableOrganismObservationBuilder,
-};
 mod organism_taxa;
 pub use organism_taxa::{
     InsertableOrganismTaxon, InsertableOrganismTaxonAttributes, InsertableOrganismTaxonBuilder,
@@ -126,10 +165,6 @@ pub use organisms::{InsertableOrganism, InsertableOrganismAttributes, Insertable
 mod organizations;
 pub use organizations::{
     InsertableOrganization, InsertableOrganizationAttributes, InsertableOrganizationBuilder,
-};
-mod packaging_models;
-pub use packaging_models::{
-    InsertablePackagingModel, InsertablePackagingModelAttributes, InsertablePackagingModelBuilder,
 };
 mod packaging_procedure_models;
 pub use packaging_procedure_models::{
@@ -145,6 +180,25 @@ mod permanence_categories;
 pub use permanence_categories::{
     InsertablePermanenceCategory, InsertablePermanenceCategoryAttributes,
     InsertablePermanenceCategoryBuilder,
+};
+mod photograph_procedure_models;
+pub use photograph_procedure_models::{
+    InsertablePhotographProcedureModel, InsertablePhotographProcedureModelAttributes,
+    InsertablePhotographProcedureModelBuilder,
+};
+mod pipette_models;
+pub use pipette_models::{
+    InsertablePipetteModel, InsertablePipetteModelAttributes, InsertablePipetteModelBuilder,
+};
+mod pipette_tip_models;
+pub use pipette_tip_models::{
+    InsertablePipetteTipModel, InsertablePipetteTipModelAttributes,
+    InsertablePipetteTipModelBuilder,
+};
+mod positioning_device_models;
+pub use positioning_device_models::{
+    InsertablePositioningDeviceModel, InsertablePositioningDeviceModelAttributes,
+    InsertablePositioningDeviceModelBuilder,
 };
 mod pouring_procedure_models;
 pub use pouring_procedure_models::{
@@ -191,16 +245,6 @@ mod sample_states;
 pub use sample_states::{
     InsertableSampleState, InsertableSampleStateAttributes, InsertableSampleStateBuilder,
 };
-mod sampling_procedure_models;
-pub use sampling_procedure_models::{
-    InsertableSamplingProcedureModel, InsertableSamplingProcedureModelAttributes,
-    InsertableSamplingProcedureModelBuilder,
-};
-mod shaking_procedure_models;
-pub use shaking_procedure_models::{
-    InsertableShakingProcedureModel, InsertableShakingProcedureModelAttributes,
-    InsertableShakingProcedureModelBuilder,
-};
 mod shared_procedure_model_trackables;
 pub use shared_procedure_model_trackables::{
     InsertableSharedProcedureModelTrackable, InsertableSharedProcedureModelTrackableAttributes,
@@ -216,6 +260,16 @@ mod spectra_collections;
 pub use spectra_collections::{
     InsertableSpectraCollection, InsertableSpectraCollectionAttributes,
     InsertableSpectraCollectionBuilder,
+};
+mod storage_procedure_models;
+pub use storage_procedure_models::{
+    InsertableStorageProcedureModel, InsertableStorageProcedureModelAttributes,
+    InsertableStorageProcedureModelBuilder,
+};
+mod supernatant_procedure_models;
+pub use supernatant_procedure_models::{
+    InsertableSupernatantProcedureModel, InsertableSupernatantProcedureModelAttributes,
+    InsertableSupernatantProcedureModelBuilder,
 };
 mod taxa;
 pub use taxa::{InsertableTaxon, InsertableTaxonAttributes, InsertableTaxonBuilder};
@@ -259,6 +313,11 @@ pub use user_organizations::{
 };
 mod users;
 pub use users::{InsertableUser, InsertableUserAttributes, InsertableUserBuilder};
+mod volumetric_container_models;
+pub use volumetric_container_models::{
+    InsertableVolumetricContainerModel, InsertableVolumetricContainerModelAttributes,
+    InsertableVolumetricContainerModelBuilder,
+};
 mod volumetric_processables;
 pub use volumetric_processables::{
     InsertableVolumetricProcessable, InsertableVolumetricProcessableAttributes,

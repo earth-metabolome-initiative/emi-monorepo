@@ -95,14 +95,13 @@ where
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         let expected_number_of_edges = self.get_expected_number_of_edges();
-        let mut edges = if let Some(number_of_edges) = expected_number_of_edges {
-            if let Some(shape) = self.get_expected_shape() {
+        let mut edges = match (expected_number_of_edges, self.get_expected_shape()) {
+            (Some(number_of_edges), Some(shape)) => {
                 GE::with_shaped_capacity(shape, number_of_edges)
-            } else {
-                GE::with_capacity(number_of_edges)
             }
-        } else {
-            Default::default()
+            (Some(number_of_edges), None) => GE::with_capacity(number_of_edges),
+            (None, Some(shape)) => GE::with_shape(shape),
+            (None, None) => Default::default(),
         };
         let should_ignore_duplicates = self.should_ignore_duplicates();
         self.edges

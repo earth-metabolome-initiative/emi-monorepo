@@ -8,13 +8,15 @@
     diesel::Identifiable,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(primary_key(id))]
+#[diesel(primary_key(procedure_model_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models
 )]
 pub struct WeighingProcedureModel {
-    pub id: i32,
-    pub instrument_id: i32,
+    pub procedure_model_id: i32,
+    pub weighed_with: ::rosetta_uuid::Uuid,
+    pub procedure_weighed_with: i32,
+    pub sample_container: i32,
 }
 impl web_common_traits::prelude::TableName for WeighingProcedureModel {
     const TABLE_NAME: &'static str = "weighing_procedure_models";
@@ -30,11 +32,11 @@ where
 impl diesel::Identifiable for WeighingProcedureModel {
     type Id = i32;
     fn id(self) -> Self::Id {
-        self.id
+        self.procedure_model_id
     }
 }
 impl WeighingProcedureModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn procedure_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -61,12 +63,44 @@ impl WeighingProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
-                self.id,
+                self.procedure_model_id,
             ),
             conn,
         )
     }
-    pub fn instrument<C: diesel::connection::LoadConnection>(
+    pub fn weighed_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel::table(),
+                self.weighed_with,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_weighed_with<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -93,52 +127,86 @@ impl WeighingProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
-                self.instrument_id,
+                self.procedure_weighed_with,
+            ),
+            conn,
+        )
+    }
+    pub fn sample_container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.sample_container,
             ),
             conn,
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn weighing_procedure_models_instrument_id_id_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
-                    .eq(&self.instrument_id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
-                            .eq(&self.id),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_instrument_id(
-        instrument_id: &i32,
+    pub fn from_weighed_with(
+        weighed_with: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
         Self::table()
-            .filter(weighing_procedure_models::instrument_id.eq(instrument_id))
-            .order_by(weighing_procedure_models::id.asc())
+            .filter(weighing_procedure_models::weighed_with.eq(weighed_with))
+            .order_by(weighing_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_instrument_id_and_id(
-        instrument_id: &i32,
-        id: &i32,
+    pub fn from_procedure_weighed_with(
+        procedure_weighed_with: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
+        Self::table()
+            .filter(weighing_procedure_models::procedure_weighed_with.eq(procedure_weighed_with))
+            .order_by(weighing_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_sample_container(
+        sample_container: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
+        Self::table()
+            .filter(weighing_procedure_models::sample_container.eq(sample_container))
+            .order_by(weighing_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_weighed_with_and_weighed_with(
+        procedure_weighed_with: &i32,
+        weighed_with: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -148,11 +216,51 @@ impl WeighingProcedureModel {
         use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
         Self::table()
             .filter(
-                weighing_procedure_models::instrument_id
-                    .eq(instrument_id)
-                    .and(weighing_procedure_models::id.eq(id)),
+                weighing_procedure_models::procedure_weighed_with
+                    .eq(procedure_weighed_with)
+                    .and(weighing_procedure_models::weighed_with.eq(weighed_with)),
             )
-            .order_by(weighing_procedure_models::id.asc())
+            .order_by(weighing_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_weighed_with_and_procedure_model_id(
+        procedure_weighed_with: &i32,
+        procedure_model_id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
+        Self::table()
+            .filter(
+                weighing_procedure_models::procedure_weighed_with
+                    .eq(procedure_weighed_with)
+                    .and(weighing_procedure_models::procedure_model_id.eq(procedure_model_id)),
+            )
+            .order_by(weighing_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_sample_container_and_procedure_model_id(
+        sample_container: &i32,
+        procedure_model_id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models;
+        Self::table()
+            .filter(
+                weighing_procedure_models::sample_container
+                    .eq(sample_container)
+                    .and(weighing_procedure_models::procedure_model_id.eq(procedure_model_id)),
+            )
+            .order_by(weighing_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -171,10 +279,11 @@ impl WeighingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(weighing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::name.eq(name))
-            .order_by(weighing_procedure_models::id.asc())
+            .order_by(weighing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
             .optional()
@@ -195,10 +304,11 @@ impl WeighingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(weighing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::description.eq(description))
-            .order_by(weighing_procedure_models::id.asc())
+            .order_by(weighing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -218,10 +328,11 @@ impl WeighingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(weighing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::deprecated.eq(deprecated))
-            .order_by(weighing_procedure_models::id.asc())
+            .order_by(weighing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -241,10 +352,11 @@ impl WeighingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(weighing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::photograph_id.eq(photograph_id))
-            .order_by(weighing_procedure_models::id.asc())
+            .order_by(weighing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -264,10 +376,11 @@ impl WeighingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(weighing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::icon.eq(icon))
-            .order_by(weighing_procedure_models::id.asc())
+            .order_by(weighing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -287,10 +400,11 @@ impl WeighingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(weighing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::created_by.eq(created_by))
-            .order_by(weighing_procedure_models::id.asc())
+            .order_by(weighing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -310,10 +424,11 @@ impl WeighingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(weighing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::created_at.eq(created_at))
-            .order_by(weighing_procedure_models::id.asc())
+            .order_by(weighing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -333,10 +448,11 @@ impl WeighingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(weighing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::updated_by.eq(updated_by))
-            .order_by(weighing_procedure_models::id.asc())
+            .order_by(weighing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -356,10 +472,11 @@ impl WeighingProcedureModel {
         };
         Self::table()
             .inner_join(
-                procedure_models::table.on(weighing_procedure_models::id.eq(procedure_models::id)),
+                procedure_models::table
+                    .on(weighing_procedure_models::procedure_model_id.eq(procedure_models::id)),
             )
             .filter(procedure_models::updated_at.eq(updated_at))
-            .order_by(weighing_procedure_models::id.asc())
+            .order_by(weighing_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }

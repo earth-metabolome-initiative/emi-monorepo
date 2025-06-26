@@ -93,6 +93,13 @@ pub trait SparseMatrixMut: MatrixMut + SparseMatrix {
         number_of_values: Self::SparseIndex,
     ) -> Self;
 
+    /// Creates a new matrix with the given shape.
+    ///
+    /// # Arguments
+    ///
+    /// * `shape` - The shape of the matrix.
+    fn with_sparse_shape(shape: Self::MinimalShape) -> Self;
+
     /// Creates a new matrix with the given capacity and unknown shape.
     ///
     /// # Arguments

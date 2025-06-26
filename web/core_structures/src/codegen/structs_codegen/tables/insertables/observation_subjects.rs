@@ -66,7 +66,8 @@ impl InsertableObservationSubject {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableObservationSubjectBuilder {
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,

@@ -4,14 +4,14 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::Address(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Address).collect::<Vec<_>>()
             }
-            super::Rows::AliquotingInstrumentModel(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::AliquotingInstrumentModel)
-                    .collect::<Vec<_>>()
-            }
             super::Rows::AliquotingProcedureModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::AliquotingProcedureModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::BallMillMachineModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::BallMillMachineModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::BallMillProcedureModel(rows) => {
@@ -19,8 +19,28 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::BallMillProcedureModel)
                     .collect::<Vec<_>>()
             }
+            super::Rows::BinaryQuestionProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::BinaryQuestionProcedureModel)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::Brand(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Brand).collect::<Vec<_>>()
+            }
+            super::Rows::CameraModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::CameraModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::CappingProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::CappingProcedureModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::CentrifugeModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::CentrifugeModel)
+                    .collect::<Vec<_>>()
             }
             super::Rows::CentrifugeProcedureModel(rows) => {
                 rows.into_iter()
@@ -46,6 +66,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::CommercialReagent(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::CommercialReagent)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::CompatibilityRule(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::CompatibilityRule)
                     .collect::<Vec<_>>()
             }
             super::Rows::ContainerModel(rows) => {
@@ -79,9 +104,29 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::FractioningProcedureModel)
                     .collect::<Vec<_>>()
             }
+            super::Rows::FreezeDrierModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::FreezeDrierModel)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::FreezeDryingProcedureModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::FreezeDryingProcedureModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::FreezerModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::FreezerModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::FreezingProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::FreezingProcedureModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::GeolocationProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::GeolocationProcedureModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::InstrumentModel(rows) => {
@@ -92,11 +137,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::InstrumentState(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::InstrumentState)
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::Instrument(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::Instrument)
                     .collect::<Vec<_>>()
             }
             super::Rows::LoginProvider(rows) => {
@@ -117,6 +157,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::MixSolidProcedureModel)
                     .collect::<Vec<_>>()
             }
+            super::Rows::MountTipProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::MountTipProcedureModel)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::NextProcedureModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::NextProcedureModel)
@@ -125,11 +170,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::ObservationSubject(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::ObservationSubject)
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::OrganismObservation(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::OrganismObservation)
                     .collect::<Vec<_>>()
             }
             super::Rows::OrganismTaxon(rows) => {
@@ -145,11 +185,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::Organization)
                     .collect::<Vec<_>>()
             }
-            super::Rows::PackagingModel(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::PackagingModel)
-                    .collect::<Vec<_>>()
-            }
             super::Rows::PackagingProcedureModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::PackagingProcedureModel)
@@ -163,6 +198,26 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::PermanenceCategory(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::PermanenceCategory)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::PhotographProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::PhotographProcedureModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::PipetteModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::PipetteModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::PipetteTipModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::PipetteTipModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::PositioningDeviceModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::PositioningDeviceModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::PouringProcedureModel(rows) => {
@@ -220,16 +275,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::SampleState)
                     .collect::<Vec<_>>()
             }
-            super::Rows::SamplingProcedureModel(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::SamplingProcedureModel)
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::ShakingProcedureModel(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::ShakingProcedureModel)
-                    .collect::<Vec<_>>()
-            }
             super::Rows::SharedProcedureModelTrackable(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::SharedProcedureModelTrackable)
@@ -246,6 +291,16 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::SpectraCollection(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::SpectraCollection)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::StorageProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::StorageProcedureModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::SupernatantProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::SupernatantProcedureModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::Taxon(rows) => {
@@ -299,6 +354,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             }
             super::Rows::User(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::User).collect::<Vec<_>>()
+            }
+            super::Rows::VolumetricContainerModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::VolumetricContainerModel)
+                    .collect::<Vec<_>>()
             }
             super::Rows::VolumetricProcessable(rows) => {
                 rows.into_iter()

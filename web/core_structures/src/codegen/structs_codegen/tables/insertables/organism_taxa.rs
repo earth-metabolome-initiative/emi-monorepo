@@ -128,6 +128,8 @@ impl InsertableOrganismTaxon {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableOrganismTaxonBuilder {
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
@@ -137,10 +139,10 @@ pub struct InsertableOrganismTaxonBuilder {
 impl Default for InsertableOrganismTaxonBuilder {
     fn default() -> Self {
         Self {
-            created_by: None,
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            organism_id: None,
-            taxon_id: None,
+            organism_id: Default::default(),
+            taxon_id: Default::default(),
         }
     }
 }

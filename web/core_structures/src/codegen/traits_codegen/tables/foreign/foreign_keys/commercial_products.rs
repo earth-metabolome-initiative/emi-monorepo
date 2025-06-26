@@ -1,8 +1,8 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialProductForeignKeys {
-    pub brand: Option<crate::codegen::structs_codegen::tables::brands::Brand>,
     pub id: Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
+    pub brand: Option<crate::codegen::structs_codegen::tables::brands::Brand>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct
@@ -14,14 +14,14 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Brand(self.brand_id),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Trackable(self.id),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Trackable(self.id),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Brand(self.brand_id),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.brand.is_some() && foreign_keys.id.is_some()
+        foreign_keys.id.is_some() && foreign_keys.brand.is_some()
     }
     fn update(
         &self,

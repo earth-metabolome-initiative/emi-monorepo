@@ -96,7 +96,7 @@ impl Codegen<'_> {
                     // to avoid including functionally useless foreign keys.
                     foreign_keys.retain(|fk| fk != &foreign_key);
                 }
-                for (same_as_forein_keys, _) in column.same_as_constraints(conn)? {
+                for same_as_forein_keys in column.same_as_constraints(conn)? {
                     foreign_keys.retain(|fk| fk != &same_as_forein_keys);
                 }
             }

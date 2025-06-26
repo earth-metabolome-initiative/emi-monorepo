@@ -69,7 +69,7 @@ where
     /// * If the insertion fails, an `InsertError` is returned.
     fn extend<C>(
         &self,
-        children: &[C],
+        children: &[&C],
         user: &crate::User,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<crate::NextProcedureModel>, InsertError<InsertableNextProcedureModelAttributes>>
@@ -81,7 +81,7 @@ where
             .iter()
             .zip(children.iter().skip(1))
             .map(|(current_procedure, successor_procedure)| {
-                self.append(current_procedure, successor_procedure, user, conn)
+                self.append(*current_procedure, *successor_procedure, user, conn)
             })
             .collect()
     }

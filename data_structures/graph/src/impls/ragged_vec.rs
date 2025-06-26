@@ -48,6 +48,10 @@ where
         <Self as SparseMatrixMut>::with_sparse_capacity(number_of_edges)
     }
 
+    fn with_shape(shape: <Self::GrowableMatrix as SparseMatrixMut>::MinimalShape) -> Self {
+        <Self as SparseMatrixMut>::with_sparse_shape(shape)
+    }
+
     fn with_shaped_capacity(
         shape: <Self::GrowableMatrix as SparseMatrixMut>::MinimalShape,
         number_of_edges: Self::EdgeId,

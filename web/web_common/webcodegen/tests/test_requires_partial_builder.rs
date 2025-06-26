@@ -63,7 +63,7 @@ async fn test_requires_partial_builder() {
         .expect("Failed to find column `procedure_model_id` in table `specific_procedures`.");
 
     let mut procedure_model_id_same_as = procedure_model_id
-        .same_as_constraints(&mut conn)
+        .same_as_columns(&mut conn)
         .expect("Failed to check if column `procedure_model_id` is same as another column.");
 
     assert_eq!(
@@ -72,7 +72,7 @@ async fn test_requires_partial_builder() {
         "Column `procedure_model_id` should have exactly one `same-as` constraint."
     );
 
-    let Some((_, same_as_column)) = procedure_model_id_same_as.pop() else {
+    let Some(same_as_column) = procedure_model_id_same_as.pop() else {
         panic!("Expected at least one `same-as` constraint for column `procedure_model_id`.");
     };
 

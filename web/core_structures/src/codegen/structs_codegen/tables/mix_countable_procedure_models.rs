@@ -8,12 +8,12 @@
     diesel::Identifiable,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(primary_key(id))]
+#[diesel(primary_key(procedure_model_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models
 )]
 pub struct MixCountableProcedureModel {
-    pub id: i32,
+    pub procedure_model_id: i32,
     pub source: i32,
     pub destination: i32,
     pub quantity: i16,
@@ -32,67 +32,11 @@ where
 impl diesel::Identifiable for MixCountableProcedureModel {
     type Id = i32;
     fn id(self) -> Self::Id {
-        self.id
+        self.procedure_model_id
     }
 }
 impl MixCountableProcedureModel {
-    pub fn destination<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
-                self.destination,
-            ),
-            conn,
-        )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn mix_countable_procedure_models_destination_id_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
-                    .eq(&self.destination)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
-                            .eq(&self.id),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            >(conn)
-    }
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn procedure_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -119,7 +63,7 @@ impl MixCountableProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
-                self.id,
+                self.procedure_model_id,
             ),
             conn,
         )
@@ -156,29 +100,37 @@ impl MixCountableProcedureModel {
             conn,
         )
     }
-    #[cfg(feature = "postgres")]
-    pub fn mix_countable_procedure_models_source_id_fkey(
+    pub fn destination<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::id
-                    .eq(&self.source)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_model_trackables::procedure_model_trackables::dsl::procedure_model_id
-                            .eq(&self.id),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            >(conn)
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.destination,
+            ),
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn from_source(
@@ -190,7 +142,7 @@ impl MixCountableProcedureModel {
         use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
         Self::table()
             .filter(mix_countable_procedure_models::source.eq(source))
-            .order_by(mix_countable_procedure_models::id.asc())
+            .order_by(mix_countable_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -203,7 +155,7 @@ impl MixCountableProcedureModel {
         use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
         Self::table()
             .filter(mix_countable_procedure_models::destination.eq(destination))
-            .order_by(mix_countable_procedure_models::id.asc())
+            .order_by(mix_countable_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -216,33 +168,13 @@ impl MixCountableProcedureModel {
         use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
         Self::table()
             .filter(mix_countable_procedure_models::quantity.eq(quantity))
-            .order_by(mix_countable_procedure_models::id.asc())
+            .order_by(mix_countable_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_destination_and_id(
-        destination: &i32,
-        id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
-        Self::table()
-            .filter(
-                mix_countable_procedure_models::destination
-                    .eq(destination)
-                    .and(mix_countable_procedure_models::id.eq(id)),
-            )
-            .order_by(mix_countable_procedure_models::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_source_and_id(
+    pub fn from_source_and_procedure_model_id(
         source: &i32,
-        id: &i32,
+        procedure_model_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -254,9 +186,29 @@ impl MixCountableProcedureModel {
             .filter(
                 mix_countable_procedure_models::source
                     .eq(source)
-                    .and(mix_countable_procedure_models::id.eq(id)),
+                    .and(mix_countable_procedure_models::procedure_model_id.eq(procedure_model_id)),
             )
-            .order_by(mix_countable_procedure_models::id.asc())
+            .order_by(mix_countable_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_destination_and_procedure_model_id(
+        destination: &i32,
+        procedure_model_id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::mix_countable_procedure_models::mix_countable_procedure_models;
+        Self::table()
+            .filter(
+                mix_countable_procedure_models::destination
+                    .eq(destination)
+                    .and(mix_countable_procedure_models::procedure_model_id.eq(procedure_model_id)),
+            )
+            .order_by(mix_countable_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -276,10 +228,13 @@ impl MixCountableProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(mix_countable_procedure_models::id.eq(procedure_models::id)),
+                    .on(
+                        mix_countable_procedure_models::procedure_model_id
+                            .eq(procedure_models::id),
+                    ),
             )
             .filter(procedure_models::name.eq(name))
-            .order_by(mix_countable_procedure_models::id.asc())
+            .order_by(mix_countable_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
             .optional()
@@ -301,10 +256,13 @@ impl MixCountableProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(mix_countable_procedure_models::id.eq(procedure_models::id)),
+                    .on(
+                        mix_countable_procedure_models::procedure_model_id
+                            .eq(procedure_models::id),
+                    ),
             )
             .filter(procedure_models::description.eq(description))
-            .order_by(mix_countable_procedure_models::id.asc())
+            .order_by(mix_countable_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -325,10 +283,13 @@ impl MixCountableProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(mix_countable_procedure_models::id.eq(procedure_models::id)),
+                    .on(
+                        mix_countable_procedure_models::procedure_model_id
+                            .eq(procedure_models::id),
+                    ),
             )
             .filter(procedure_models::deprecated.eq(deprecated))
-            .order_by(mix_countable_procedure_models::id.asc())
+            .order_by(mix_countable_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -349,10 +310,13 @@ impl MixCountableProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(mix_countable_procedure_models::id.eq(procedure_models::id)),
+                    .on(
+                        mix_countable_procedure_models::procedure_model_id
+                            .eq(procedure_models::id),
+                    ),
             )
             .filter(procedure_models::photograph_id.eq(photograph_id))
-            .order_by(mix_countable_procedure_models::id.asc())
+            .order_by(mix_countable_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -373,10 +337,13 @@ impl MixCountableProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(mix_countable_procedure_models::id.eq(procedure_models::id)),
+                    .on(
+                        mix_countable_procedure_models::procedure_model_id
+                            .eq(procedure_models::id),
+                    ),
             )
             .filter(procedure_models::icon.eq(icon))
-            .order_by(mix_countable_procedure_models::id.asc())
+            .order_by(mix_countable_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -397,10 +364,13 @@ impl MixCountableProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(mix_countable_procedure_models::id.eq(procedure_models::id)),
+                    .on(
+                        mix_countable_procedure_models::procedure_model_id
+                            .eq(procedure_models::id),
+                    ),
             )
             .filter(procedure_models::created_by.eq(created_by))
-            .order_by(mix_countable_procedure_models::id.asc())
+            .order_by(mix_countable_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -421,10 +391,13 @@ impl MixCountableProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(mix_countable_procedure_models::id.eq(procedure_models::id)),
+                    .on(
+                        mix_countable_procedure_models::procedure_model_id
+                            .eq(procedure_models::id),
+                    ),
             )
             .filter(procedure_models::created_at.eq(created_at))
-            .order_by(mix_countable_procedure_models::id.asc())
+            .order_by(mix_countable_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -445,10 +418,13 @@ impl MixCountableProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(mix_countable_procedure_models::id.eq(procedure_models::id)),
+                    .on(
+                        mix_countable_procedure_models::procedure_model_id
+                            .eq(procedure_models::id),
+                    ),
             )
             .filter(procedure_models::updated_by.eq(updated_by))
-            .order_by(mix_countable_procedure_models::id.asc())
+            .order_by(mix_countable_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -469,10 +445,13 @@ impl MixCountableProcedureModel {
         Self::table()
             .inner_join(
                 procedure_models::table
-                    .on(mix_countable_procedure_models::id.eq(procedure_models::id)),
+                    .on(
+                        mix_countable_procedure_models::procedure_model_id
+                            .eq(procedure_models::id),
+                    ),
             )
             .filter(procedure_models::updated_at.eq(updated_at))
-            .order_by(mix_countable_procedure_models::id.asc())
+            .order_by(mix_countable_procedure_models::procedure_model_id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }

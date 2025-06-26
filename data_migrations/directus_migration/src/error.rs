@@ -4,9 +4,8 @@ use core_structures::{
     codegen::structs_codegen::tables::insertables::InsertableUserAttributes,
     tables::insertables::{
         InsertableAddressAttributes, InsertableBrandAttributes, InsertableCityAttributes,
-        InsertableCommercialProductAttributes, InsertableInstrumentAttributes,
-        InsertableInstrumentModelAttributes, InsertableRoomAttributes,
-        InsertableUserEmailAttributes,
+        InsertableCommercialProductAttributes, InsertableInstrumentModelAttributes,
+        InsertableRoomAttributes, InsertableUserEmailAttributes,
     },
 };
 use web_common_traits::database::InsertError;
@@ -67,8 +66,6 @@ pub enum Error {
     ProductInsert(InsertError<InsertableCommercialProductAttributes>),
     /// Failed to insert instrument model.
     InstrumentModelInsert(InsertError<InsertableInstrumentModelAttributes>),
-    /// Failed to insert instrument
-    InstrumentInsert(InsertError<InsertableInstrumentAttributes>),
     /// Failed to insert a new city
     CityInsert(InsertError<InsertableCityAttributes>),
     /// Failed to insert a new address
@@ -112,12 +109,6 @@ impl From<InsertError<InsertableBrandAttributes>> for Error {
 impl From<InsertError<InsertableInstrumentModelAttributes>> for Error {
     fn from(value: InsertError<InsertableInstrumentModelAttributes>) -> Self {
         Error::InstrumentModelInsert(value)
-    }
-}
-
-impl From<InsertError<InsertableInstrumentAttributes>> for Error {
-    fn from(value: InsertError<InsertableInstrumentAttributes>) -> Self {
-        Error::InstrumentInsert(value)
     }
 }
 

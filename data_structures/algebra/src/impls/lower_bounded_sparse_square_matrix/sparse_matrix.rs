@@ -66,6 +66,11 @@ where
     }
 
     #[inline]
+    fn has_entry(&self, row: Self::RowIndex, column: Self::ColumnIndex) -> bool {
+        self.sparse_row(row).any(|col| col == column)
+    }
+
+    #[inline]
     fn sparse_columns(&self) -> Self::SparseColumns<'_> {
         self.into()
     }

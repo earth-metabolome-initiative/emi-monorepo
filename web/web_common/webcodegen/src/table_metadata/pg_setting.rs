@@ -1,9 +1,16 @@
 //! Submodule providing the `PGSetting` struct representing a row of the
 //! `pg_settings` table in `PostgreSQL`.
 
+use cached::proc_macro::cached;
 use diesel::{
     ExpressionMethods, PgConnection, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
 };
+
+#[cached(result = true, key = "String", convert = r#"{ "TimeZone".to_owned() }"#)]
+fn time_zone(conn: &mut PgConnection) -> Result<PgSetting, diesel::result::Error> {
+    use crate::schema::pg_settings;
+    pg_settings::table.filter(pg_settings::dsl::name.eq("TimeZone")).first::<PgSetting>(conn)
+}
 
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Clone)]
 #[diesel(table_name = crate::schema::pg_settings)]
@@ -69,8 +76,6 @@ impl PgSetting {
     /// This function will return an error if the query to fetch the TIME ZONE
     /// setting fails.
     pub fn time_zone(conn: &mut PgConnection) -> Result<Self, diesel::result::Error> {
-        use crate::schema::pg_settings;
-
-        pg_settings::table.filter(pg_settings::dsl::name.eq("TimeZone")).first::<PgSetting>(conn)
+        time_zone(conn)
     }
 }

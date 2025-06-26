@@ -1,3 +1,4 @@
+use cached::proc_macro::cached;
 use diesel::{
     ExpressionMethods, PgConnection, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
 };
@@ -5,13 +6,145 @@ use proc_macro2::TokenStream;
 use syn::Ident;
 
 use super::{Column, Table};
-use crate::{ReferentialConstraint, errors::WebCodeGenError};
+use crate::{PgIndex, ReferentialConstraint, errors::WebCodeGenError};
+
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}-{}-{}-{}", key_column_usage.constraint_catalog, key_column_usage.constraint_schema, key_column_usage.constraint_name, key_column_usage.table_catalog, key_column_usage.table_schema, key_column_usage.table_name) }"#
+)]
+fn referential_constraint(
+    key_column_usage: &KeyColumnUsage,
+    conn: &mut PgConnection,
+) -> Result<ReferentialConstraint, diesel::result::Error> {
+    use diesel::SelectableHelper;
+
+    use crate::schema::referential_constraints;
+    referential_constraints::table
+        .filter(referential_constraints::constraint_name.eq(&key_column_usage.constraint_name))
+        .filter(referential_constraints::constraint_schema.eq(&key_column_usage.constraint_schema))
+        .filter(
+            referential_constraints::constraint_catalog.eq(&key_column_usage.constraint_catalog),
+        )
+        .select(ReferentialConstraint::as_select())
+        .first::<ReferentialConstraint>(conn)
+}
+
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}-{}-{}-{}", key_column_usage.constraint_catalog, key_column_usage.constraint_schema, key_column_usage.constraint_name, key_column_usage.table_catalog, key_column_usage.table_schema, key_column_usage.table_name) }"#
+)]
+fn foreign_columns(
+    key_column_usage: &KeyColumnUsage,
+    conn: &mut PgConnection,
+) -> Result<Vec<Column>, diesel::result::Error> {
+    use diesel::{BoolExpressionMethods, JoinOnDsl, SelectableHelper};
+
+    use crate::schema::{columns, constraint_column_usage};
+
+    // Find the referential constraint for this key_column_usage
+    let referential_constraint = key_column_usage.referential_constraint(conn)?;
+
+    // Find the columns in the referenced (unique) constraint
+    constraint_column_usage::table
+        .filter(
+            constraint_column_usage::constraint_catalog.eq(referential_constraint
+                .unique_constraint_catalog
+                .ok_or(diesel::result::Error::NotFound)?),
+        )
+        .filter(
+            constraint_column_usage::constraint_schema.eq(referential_constraint
+                .unique_constraint_schema
+                .ok_or(diesel::result::Error::NotFound)?),
+        )
+        .filter(constraint_column_usage::constraint_name.eq(
+            referential_constraint.unique_constraint_name.ok_or(diesel::result::Error::NotFound)?,
+        ))
+        .inner_join(
+            columns::table.on(columns::table_name
+                .eq(constraint_column_usage::table_name)
+                .and(columns::table_schema.eq(constraint_column_usage::table_schema))
+                .and(columns::table_catalog.eq(constraint_column_usage::table_catalog))
+                .and(columns::column_name.eq(constraint_column_usage::column_name))),
+        )
+        .order_by(columns::ordinal_position.asc())
+        .select(Column::as_select())
+        .load::<Column>(conn)
+}
+
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}-{}-{}-{}", key_column_usage.constraint_catalog, key_column_usage.constraint_schema, key_column_usage.constraint_name, key_column_usage.table_catalog, key_column_usage.table_schema, key_column_usage.table_name) }"#
+)]
+fn columns(
+    key_column_usage: &KeyColumnUsage,
+    conn: &mut PgConnection,
+) -> Result<Vec<Column>, diesel::result::Error> {
+    use diesel::{BoolExpressionMethods, JoinOnDsl, SelectableHelper};
+
+    use crate::schema::{columns, key_column_usage};
+    key_column_usage::table
+        .filter(key_column_usage::constraint_name.eq(&key_column_usage.constraint_name))
+        .filter(key_column_usage::constraint_schema.eq(&key_column_usage.constraint_schema))
+        .filter(key_column_usage::constraint_catalog.eq(&key_column_usage.constraint_catalog))
+        .inner_join(
+            columns::table.on(columns::table_name
+                .eq(key_column_usage::table_name)
+                .and(columns::table_schema.eq(key_column_usage::table_schema))
+                .and(columns::table_catalog.eq(key_column_usage::table_catalog))
+                .and(columns::column_name.eq(key_column_usage::column_name))),
+        )
+        .order_by(key_column_usage::ordinal_position.asc())
+        .select(Column::as_select())
+        .load::<Column>(conn)
+}
+
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}-{}-{}-{}", key_column_usage.constraint_catalog, key_column_usage.constraint_schema, key_column_usage.constraint_name, key_column_usage.table_catalog, key_column_usage.table_schema, key_column_usage.table_name) }"#
+)]
+/// Returns the foreign table associated with this key column usage
+///
+/// # Arguments
+///
+/// * `conn` - A mutable reference to a `PgConnection`
+///
+/// # Errors
+///
+/// * If an error occurs while loading the foreign table from the database
+fn foreign_table(
+    key_column_usage: &KeyColumnUsage,
+    conn: &mut PgConnection,
+) -> Result<Option<Table>, diesel::result::Error> {
+    use diesel::{BoolExpressionMethods, JoinOnDsl, OptionalExtension, SelectableHelper};
+
+    use crate::schema::{constraint_table_usage, tables};
+
+    let constraint = key_column_usage.referential_constraint(conn)?;
+
+    constraint_table_usage::table
+        .inner_join(
+            tables::table.on(tables::table_name
+                .eq(constraint_table_usage::table_name)
+                .and(tables::table_schema.eq(constraint_table_usage::table_schema))
+                .and(tables::table_catalog.eq(constraint_table_usage::table_catalog))),
+        )
+        .filter(constraint_table_usage::constraint_name.eq(&constraint.constraint_name))
+        .filter(constraint_table_usage::constraint_schema.eq(&constraint.constraint_schema))
+        .filter(constraint_table_usage::constraint_catalog.eq(&constraint.constraint_catalog))
+        .select(Table::as_select())
+        .first::<Table>(conn)
+        .optional()
+}
 
 /// Represents a row in the `key_column_usage` table, which contains information
 /// about columns that are constrained by a unique or primary key constraint.
 ///
 /// For more details, see [`PostgreSQL`](https://www.postgresql.org/docs/current/infoschema-key-column-usage.html)
-#[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone)]
+#[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
 #[diesel(table_name = crate::schema::key_column_usage)]
 pub struct KeyColumnUsage {
     /// The name of the database that contains the constraint.
@@ -104,15 +237,7 @@ impl KeyColumnUsage {
         &self,
         conn: &mut PgConnection,
     ) -> Result<ReferentialConstraint, diesel::result::Error> {
-        use diesel::SelectableHelper;
-
-        use crate::schema::referential_constraints;
-        referential_constraints::table
-            .filter(referential_constraints::constraint_name.eq(&self.constraint_name))
-            .filter(referential_constraints::constraint_schema.eq(&self.constraint_schema))
-            .filter(referential_constraints::constraint_catalog.eq(&self.constraint_catalog))
-            .select(ReferentialConstraint::as_select())
-            .first::<ReferentialConstraint>(conn)
+        referential_constraint(self, conn)
     }
 
     /// Returns the table associated with this key column usage
@@ -150,25 +275,7 @@ impl KeyColumnUsage {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Option<Table>, diesel::result::Error> {
-        use diesel::{BoolExpressionMethods, JoinOnDsl, OptionalExtension, SelectableHelper};
-
-        use crate::schema::{constraint_table_usage, tables};
-
-        let constraint = self.referential_constraint(conn)?;
-
-        constraint_table_usage::table
-            .inner_join(
-                tables::table.on(tables::table_name
-                    .eq(constraint_table_usage::table_name)
-                    .and(tables::table_schema.eq(constraint_table_usage::table_schema))
-                    .and(tables::table_catalog.eq(constraint_table_usage::table_catalog))),
-            )
-            .filter(constraint_table_usage::constraint_name.eq(&constraint.constraint_name))
-            .filter(constraint_table_usage::constraint_schema.eq(&constraint.constraint_schema))
-            .filter(constraint_table_usage::constraint_catalog.eq(&constraint.constraint_catalog))
-            .select(Table::as_select())
-            .first::<Table>(conn)
-            .optional()
+        foreign_table(self, conn)
     }
 
     /// Returns all the columns involved in the constraint
@@ -182,23 +289,7 @@ impl KeyColumnUsage {
     /// * If an error occurs while loading the key column usages from the
     ///   database
     pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
-        use diesel::{BoolExpressionMethods, JoinOnDsl, SelectableHelper};
-
-        use crate::schema::{columns, key_column_usage};
-        key_column_usage::table
-            .filter(key_column_usage::constraint_name.eq(&self.constraint_name))
-            .filter(key_column_usage::constraint_schema.eq(&self.constraint_schema))
-            .filter(key_column_usage::constraint_catalog.eq(&self.constraint_catalog))
-            .inner_join(
-                columns::table.on(columns::table_name
-                    .eq(key_column_usage::table_name)
-                    .and(columns::table_schema.eq(key_column_usage::table_schema))
-                    .and(columns::table_catalog.eq(key_column_usage::table_catalog))
-                    .and(columns::column_name.eq(key_column_usage::column_name))),
-            )
-            .order_by(key_column_usage::ordinal_position.asc())
-            .select(Column::as_select())
-            .load::<Column>(conn)
+        columns(self, conn)
     }
 
     /// Returns whether it is a composite key column usage
@@ -262,40 +353,7 @@ impl KeyColumnUsage {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<Column>, diesel::result::Error> {
-        use diesel::{BoolExpressionMethods, JoinOnDsl, SelectableHelper};
-
-        use crate::schema::{columns, constraint_column_usage};
-
-        // Find the referential constraint for this key_column_usage
-        let referential_constraint = self.referential_constraint(conn)?;
-
-        // Find the columns in the referenced (unique) constraint
-        constraint_column_usage::table
-            .filter(
-                constraint_column_usage::constraint_catalog.eq(referential_constraint
-                    .unique_constraint_catalog
-                    .ok_or(diesel::result::Error::NotFound)?),
-            )
-            .filter(
-                constraint_column_usage::constraint_schema.eq(referential_constraint
-                    .unique_constraint_schema
-                    .ok_or(diesel::result::Error::NotFound)?),
-            )
-            .filter(
-                constraint_column_usage::constraint_name.eq(referential_constraint
-                    .unique_constraint_name
-                    .ok_or(diesel::result::Error::NotFound)?),
-            )
-            .inner_join(
-                columns::table.on(columns::table_name
-                    .eq(constraint_column_usage::table_name)
-                    .and(columns::table_schema.eq(constraint_column_usage::table_schema))
-                    .and(columns::table_catalog.eq(constraint_column_usage::table_catalog))
-                    .and(columns::column_name.eq(constraint_column_usage::column_name))),
-            )
-            .order_by(columns::ordinal_position.asc())
-            .select(Column::as_select())
-            .load::<Column>(conn)
+        foreign_columns(self, conn)
     }
 
     /// Returns whether the key column usage refers to a foreign primary key
@@ -330,7 +388,10 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn is_foreign_unique_key(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+    pub fn is_foreign_unique_key(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<PgIndex>, WebCodeGenError> {
         let foreign_table = self.foreign_table(conn)?;
         let foreign_columns = self.foreign_columns(conn)?;
 
@@ -343,12 +404,12 @@ impl KeyColumnUsage {
                 if unique_columns.len() == foreign_columns.len()
                     && unique_columns.iter().all(|c| foreign_columns.contains(c))
                 {
-                    return Ok(true);
+                    return Ok(Some(unique_constraint));
                 }
             }
-            Ok(false)
+            Ok(None)
         } else {
-            Ok(false)
+            Ok(None)
         }
     }
 
@@ -479,5 +540,28 @@ impl KeyColumnUsage {
         }
 
         Ok(where_statement)
+    }
+
+    /// Returns whether this key column usage is a `same-as` constraint
+    ///
+    /// A `same-as` constraint is a composite foreign key that refers to a
+    /// UNIQUE constraint, where the foreign key's foreign columns are the same
+    /// as the primary key of the foreign table, and the foreign column
+    /// corresponding to the current column is part of the primary key of the
+    /// foreign table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn is_same_as_constraint(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        let Some(foreign_unique_constraint) = self.is_foreign_unique_key(conn)? else {
+            return Ok(false);
+        };
+
+        Ok(foreign_unique_constraint.is_same_as(conn)?.is_some())
     }
 }

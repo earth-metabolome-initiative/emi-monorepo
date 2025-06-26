@@ -16,7 +16,7 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
     type PrimaryKey = crate::codegen::tables::table_primary_keys::TablePrimaryKey;
     fn primary_key(&self) -> Self::PrimaryKey {
         crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryingProcedureModel(
-            self.id,
+            self.procedure_model_id,
         )
     }
 }

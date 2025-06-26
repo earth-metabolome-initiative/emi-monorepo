@@ -183,6 +183,15 @@ where
         slice.iter().copied()
     }
 
+    fn has_entry(&self, row: Self::RowIndex, column: Self::ColumnIndex) -> bool {
+        if row.into_usize() >= self.data.len() {
+            return false;
+        }
+
+        let columns_in_row = &self.data[row.into_usize()];
+        columns_in_row.binary_search(&column).is_ok()
+    }
+
     fn sparse_columns(&self) -> Self::SparseColumns<'_> {
         self.into()
     }
@@ -338,6 +347,10 @@ where
 
     fn with_sparse_capacity(number_of_values: Self::SparseIndex) -> Self {
         Self::with_sparse_shaped_capacity((RowIndex::ZERO, ColumnIndex::ZERO), number_of_values)
+    }
+
+    fn with_sparse_shape(shape: Self::MinimalShape) -> Self {
+        Self::with_sparse_shaped_capacity(shape, SparseIndex::ZERO)
     }
 
     fn with_sparse_shaped_capacity(

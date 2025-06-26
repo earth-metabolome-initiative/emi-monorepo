@@ -1,7 +1,11 @@
-#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CentrifugeProcedureModelForeignKeys {
-    pub id: Option<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
+    pub procedure_model: Option<
+        crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel,
+    >,
+    pub centrifuged_with:
+        Option<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel>,
 }
 impl web_common_traits::prelude::HasForeignKeys
 for crate::codegen::structs_codegen::tables::centrifuge_procedure_models::CentrifugeProcedureModel {
@@ -14,14 +18,22 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_models::Centri
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(
-                        self.id,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::StorageProcedureModel(
+                        self.procedure_model_id,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeModel(
+                        self.centrifuged_with,
                     ),
                 ),
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.id.is_some()
+        foreign_keys.procedure_model.is_some() && foreign_keys.centrifuged_with.is_some()
     }
     fn update(
         &self,
@@ -32,22 +44,48 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_models::Centri
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
+                crate::codegen::tables::row::Row::CentrifugeModel(centrifuge_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.id == procedure_models.id {
-                    foreign_keys.id = Some(procedure_models);
+                if self.centrifuged_with == centrifuge_models.id {
+                    foreign_keys.centrifuged_with = Some(centrifuge_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
+                crate::codegen::tables::row::Row::CentrifugeModel(centrifuge_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.id == procedure_models.id {
-                    foreign_keys.id = None;
+                if self.centrifuged_with == centrifuge_models.id {
+                    foreign_keys.centrifuged_with = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::StorageProcedureModel(
+                    storage_procedure_models,
+                ),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.procedure_model_id == storage_procedure_models.procedure_model_id
+                {
+                    foreign_keys.procedure_model = Some(storage_procedure_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::StorageProcedureModel(
+                    storage_procedure_models,
+                ),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.procedure_model_id == storage_procedure_models.procedure_model_id
+                {
+                    foreign_keys.procedure_model = None;
                     updated = true;
                 }
             }

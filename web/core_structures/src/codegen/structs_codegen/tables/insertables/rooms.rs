@@ -141,6 +141,8 @@ impl InsertableRoom {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableRoomBuilder {
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,
@@ -155,14 +157,14 @@ pub struct InsertableRoomBuilder {
 impl Default for InsertableRoomBuilder {
     fn default() -> Self {
         Self {
-            name: None,
-            description: None,
-            qrcode: None,
-            addresses_id: None,
-            geolocation: None,
-            created_by: None,
+            name: Default::default(),
+            description: Default::default(),
+            qrcode: Default::default(),
+            addresses_id: Default::default(),
+            geolocation: Default::default(),
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: None,
+            updated_by: Default::default(),
             updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
         }
     }

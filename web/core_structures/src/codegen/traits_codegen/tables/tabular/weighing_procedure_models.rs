@@ -18,6 +18,8 @@ impl web_common_traits::prelude::Row
 {
     type PrimaryKey = crate::codegen::tables::table_primary_keys::TablePrimaryKey;
     fn primary_key(&self) -> Self::PrimaryKey {
-        crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingProcedureModel(self.id)
+        crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingProcedureModel(
+            self.procedure_model_id,
+        )
     }
 }

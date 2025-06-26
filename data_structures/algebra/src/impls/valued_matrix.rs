@@ -154,6 +154,11 @@ where
     fn sparse_row(&self, row: Self::RowIndex) -> Self::SparseRow<'_> {
         self.csr.sparse_row(row)
     }
+
+    #[inline]
+    fn has_entry(&self, row: Self::RowIndex, column: Self::ColumnIndex) -> bool {
+        self.csr.has_entry(row, column)
+    }
 }
 
 impl<SparseIndex, RowIndex, ColumnIndex, Value> EmptyRows
@@ -351,6 +356,10 @@ where
             csr: CSR2D::with_sparse_capacity(number_of_values),
             values: Vec::with_capacity(number_of_values.into_usize()),
         }
+    }
+
+    fn with_sparse_shape(shape: Self::MinimalShape) -> Self {
+        Self { csr: CSR2D::with_sparse_shape(shape), values: Vec::new() }
     }
 
     #[inline]

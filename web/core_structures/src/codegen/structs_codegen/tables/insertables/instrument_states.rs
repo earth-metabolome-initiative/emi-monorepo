@@ -64,7 +64,8 @@ impl InsertableInstrumentState {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableInstrumentStateBuilder {
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,

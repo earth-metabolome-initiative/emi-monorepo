@@ -4,15 +4,6 @@ pub enum InsertableCommercialReagentAttributes {
     Id(crate::codegen::structs_codegen::tables::insertables::InsertableProcessableAttributes),
     CommercialProductLotId,
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcessableAttributes>
-    for InsertableCommercialReagentAttributes
-{
-    fn from(
-        extension: crate::codegen::structs_codegen::tables::insertables::InsertableProcessableAttributes,
-    ) -> Self {
-        Self::Id(extension)
-    }
-}
 impl core::fmt::Display for InsertableCommercialReagentAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -36,38 +27,6 @@ pub struct InsertableCommercialReagent {
     commercial_product_lot_id: ::rosetta_uuid::Uuid,
 }
 impl InsertableCommercialReagent {
-    pub fn commercial_product_lot<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::table(),
-                self.commercial_product_lot_id,
-            ),
-            conn,
-        )
-    }
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -100,8 +59,41 @@ impl InsertableCommercialReagent {
             conn,
         )
     }
+    pub fn commercial_product_lot<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::table(),
+                self.commercial_product_lot_id,
+            ),
+            conn,
+        )
+    }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialReagentBuilder {
     pub(crate) id:
         crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder,
@@ -133,7 +125,10 @@ impl InsertableCommercialReagentBuilder {
         P: TryInto<f32>,
         <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.kilograms(kilograms).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .kilograms(kilograms)
+            .map_err(|err| err.into_field_name(InsertableCommercialReagentAttributes::Id))?;
         Ok(self)
     }
     pub fn id<P>(
@@ -144,7 +139,10 @@ impl InsertableCommercialReagentBuilder {
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.id(id).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .id(id)
+            .map_err(|err| err.into_field_name(InsertableCommercialReagentAttributes::Id))?;
         Ok(self)
     }
     pub fn name<P>(
@@ -155,7 +153,10 @@ impl InsertableCommercialReagentBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.name(name).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .name(name)
+            .map_err(|err| err.into_field_name(InsertableCommercialReagentAttributes::Id))?;
         Ok(self)
     }
     pub fn description<P>(
@@ -166,7 +167,10 @@ impl InsertableCommercialReagentBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.description(description).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .description(description)
+            .map_err(|err| err.into_field_name(InsertableCommercialReagentAttributes::Id))?;
         Ok(self)
     }
     pub fn photograph_id<P>(
@@ -178,7 +182,10 @@ impl InsertableCommercialReagentBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.photograph_id(photograph_id).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .photograph_id(photograph_id)
+            .map_err(|err| err.into_field_name(InsertableCommercialReagentAttributes::Id))?;
         Ok(self)
     }
     pub fn parent_id<P>(
@@ -190,7 +197,10 @@ impl InsertableCommercialReagentBuilder {
         <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.parent_id(parent_id).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .parent_id(parent_id)
+            .map_err(|err| err.into_field_name(InsertableCommercialReagentAttributes::Id))?;
         Ok(self)
     }
     pub fn created_by<P>(
@@ -201,7 +211,10 @@ impl InsertableCommercialReagentBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_by(created_by).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .created_by(created_by)
+            .map_err(|err| err.into_field_name(InsertableCommercialReagentAttributes::Id))?;
         Ok(self)
     }
     pub fn created_at<P>(
@@ -213,7 +226,10 @@ impl InsertableCommercialReagentBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.created_at(created_at).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .created_at(created_at)
+            .map_err(|err| err.into_field_name(InsertableCommercialReagentAttributes::Id))?;
         Ok(self)
     }
     pub fn updated_by<P>(
@@ -224,7 +240,10 @@ impl InsertableCommercialReagentBuilder {
         P: TryInto<i32>,
         <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_by(updated_by).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .updated_by(updated_by)
+            .map_err(|err| err.into_field_name(InsertableCommercialReagentAttributes::Id))?;
         Ok(self)
     }
     pub fn updated_at<P>(
@@ -236,7 +255,10 @@ impl InsertableCommercialReagentBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self.id.updated_at(updated_at).map_err(|err| err.into_field_name())?;
+        self.id = self
+            .id
+            .updated_at(updated_at)
+            .map_err(|err| err.into_field_name(InsertableCommercialReagentAttributes::Id))?;
         Ok(self)
     }
 }
@@ -266,7 +288,11 @@ impl InsertableCommercialReagentBuilder {
                 InsertableCommercialReagentAttributes::CommercialProductLotId,
             ),
         )?;
-        let id = self.id.insert(user_id, conn).map_err(|err| err.into_field_name())?.id();
+        let id = self
+            .id
+            .insert(user_id, conn)
+            .map_err(|err| err.into_field_name(InsertableCommercialReagentAttributes::Id))?
+            .id();
         Ok(InsertableCommercialReagent { id, commercial_product_lot_id })
     }
 }

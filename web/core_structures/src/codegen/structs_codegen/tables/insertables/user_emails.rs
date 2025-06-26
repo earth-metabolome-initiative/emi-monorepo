@@ -62,6 +62,8 @@ impl InsertableUserEmail {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableUserEmailBuilder {
     pub(crate) email: Option<String>,
     pub(crate) created_by: Option<i32>,
@@ -71,8 +73,8 @@ pub struct InsertableUserEmailBuilder {
 impl Default for InsertableUserEmailBuilder {
     fn default() -> Self {
         Self {
-            email: None,
-            created_by: None,
+            email: Default::default(),
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             primary_email: Some(true),
         }

@@ -58,7 +58,8 @@ impl InsertableSpectrum {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableSpectrumBuilder {
     pub(crate) id: Option<i32>,
     pub(crate) spectra_collection_id: Option<i32>,

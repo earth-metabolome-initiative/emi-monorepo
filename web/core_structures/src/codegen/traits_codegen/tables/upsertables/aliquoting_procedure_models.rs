@@ -13,10 +13,16 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
         use crate::codegen::diesel_codegen::tables::aliquoting_procedure_models::aliquoting_procedure_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
-            .filter(liters.ne(excluded(liters)).or(error.ne(excluded(error))))
+            .filter(
+                liters
+                    .ne(excluded(liters))
+                    .or(source.ne(excluded(source)))
+                    .or(destination.ne(excluded(destination)))
+                    .or(aliquoted_with.ne(excluded(aliquoted_with))),
+            )
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }
@@ -36,10 +42,16 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
         use crate::codegen::diesel_codegen::tables::aliquoting_procedure_models::aliquoting_procedure_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
-            .filter(liters.ne(excluded(liters)).or(error.ne(excluded(error))))
+            .filter(
+                liters
+                    .ne(excluded(liters))
+                    .or(source.ne(excluded(source)))
+                    .or(destination.ne(excluded(destination)))
+                    .or(aliquoted_with.ne(excluded(aliquoted_with))),
+            )
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }

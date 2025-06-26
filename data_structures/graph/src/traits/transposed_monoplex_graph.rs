@@ -26,6 +26,21 @@ pub trait TransposedMonoplexGraph:
         self.edges().predecessors(destination_node_id)
     }
 
+    /// Returns whether the given destination node has a predecessor with the
+    /// given source node identifier.
+    ///
+    /// # Arguments
+    ///
+    /// * `destination_node_id` - The identifier of the destination node.
+    /// * `source_node_id` - The identifier of the source node.
+    fn has_predecessor(
+        &self,
+        destination_node_id: <Self::TransposedEdges as Edges>::DestinationNodeId,
+        source_node_id: <Self::TransposedEdges as Edges>::SourceNodeId,
+    ) -> bool {
+        self.edges().has_predecessor(destination_node_id, source_node_id)
+    }
+
     /// Returns the inbound degree of the node with the given identifier.
     ///
     /// # Arguments

@@ -3,16 +3,28 @@ where
     crate::codegen::structs_codegen::tables::addresses::Address: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::aliquoting_instrument_models::AliquotingInstrumentModel: web_common_traits::database::Read<
+    crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel: web_common_traits::database::Read<
+    crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::ball_mill_procedure_models::BallMillProcedureModel: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::binary_question_procedure_models::BinaryQuestionProcedureModel: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::brands::Brand: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::camera_models::CameraModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::centrifuge_procedure_models::CentrifugeProcedureModel: web_common_traits::database::Read<
@@ -31,6 +43,9 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::container_models::ContainerModel: web_common_traits::database::Read<
@@ -54,16 +69,25 @@ where
     crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::freezer_models::FreezerModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::freezing_procedure_models::FreezingProcedureModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::geolocation_procedure_models::GeolocationProcedureModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::instrument_states::InstrumentState: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::instruments::Instrument: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::login_providers::LoginProvider: web_common_traits::database::Read<
@@ -78,13 +102,13 @@ where
     crate::codegen::structs_codegen::tables::mix_solid_procedure_models::MixSolidProcedureModel: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::mount_tip_procedure_models::MountTipProcedureModel: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::next_procedure_models::NextProcedureModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::organism_observations::OrganismObservation: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon: web_common_traits::database::Read<
@@ -96,9 +120,6 @@ where
     crate::codegen::structs_codegen::tables::organizations::Organization: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::packaging_models::PackagingModel: web_common_traits::database::Read<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::packaging_procedure_models::PackagingProcedureModel: web_common_traits::database::Read<
         C,
     >,
@@ -106,6 +127,18 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::photograph_procedure_models::PhotographProcedureModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::pipette_models::PipetteModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::pouring_procedure_models::PouringProcedureModel: web_common_traits::database::Read<
@@ -147,12 +180,6 @@ where
     crate::codegen::structs_codegen::tables::sample_states::SampleState: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::sampling_procedure_models::SamplingProcedureModel: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::shaking_procedure_models::ShakingProcedureModel: web_common_traits::database::Read<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::shared_procedure_model_trackables::SharedProcedureModelTrackable: web_common_traits::database::Read<
         C,
     >,
@@ -163,6 +190,12 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::taxa::Taxon: web_common_traits::database::Read<
@@ -201,6 +234,9 @@ where
     crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable: web_common_traits::database::Read<
         C,
     >,
@@ -231,19 +267,19 @@ where
                         )?
                         .map(super::Row::from)
                 }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::AliquotingInstrumentModel(
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::AliquotingProcedureModel(
                     primary_key,
                 ) => {
-                    crate::codegen::structs_codegen::tables::aliquoting_instrument_models::AliquotingInstrumentModel::read(
+                    crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel::read(
                             primary_key,
                             conn,
                         )?
                         .map(super::Row::from)
                 }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::AliquotingProcedureModel(
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillMachineModel(
                     primary_key,
                 ) => {
-                    crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel::read(
+                    crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel::read(
                             primary_key,
                             conn,
                         )?
@@ -258,10 +294,46 @@ where
                         )?
                         .map(super::Row::from)
                 }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::BinaryQuestionProcedureModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::binary_question_procedure_models::BinaryQuestionProcedureModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Brand(
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::brands::Brand::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CameraModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::camera_models::CameraModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CappingProcedureModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel::read(
                             primary_key,
                             conn,
                         )?
@@ -316,6 +388,15 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CompatibilityRule(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule::read(
                             primary_key,
                             conn,
                         )?
@@ -384,10 +465,46 @@ where
                         )?
                         .map(super::Row::from)
                 }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDrierModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryingProcedureModel(
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezerModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::freezer_models::FreezerModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezingProcedureModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::freezing_procedure_models::FreezingProcedureModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::GeolocationProcedureModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::geolocation_procedure_models::GeolocationProcedureModel::read(
                             primary_key,
                             conn,
                         )?
@@ -406,15 +523,6 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::instrument_states::InstrumentState::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::Instrument(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::instruments::Instrument::read(
                             primary_key,
                             conn,
                         )?
@@ -456,6 +564,15 @@ where
                         )?
                         .map(super::Row::from)
                 }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::MountTipProcedureModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::mount_tip_procedure_models::MountTipProcedureModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::NextProcedureModel(
                     primary_key,
                 ) => {
@@ -469,15 +586,6 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::OrganismObservation(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::organism_observations::OrganismObservation::read(
                             primary_key,
                             conn,
                         )?
@@ -510,15 +618,6 @@ where
                         )?
                         .map(super::Row::from)
                 }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingModel(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingProcedureModel(
                     primary_key,
                 ) => {
@@ -541,6 +640,42 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhotographProcedureModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::photograph_procedure_models::PhotographProcedureModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::pipette_models::PipetteModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteTipModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PositioningDeviceModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel::read(
                             primary_key,
                             conn,
                         )?
@@ -663,24 +798,6 @@ where
                         )?
                         .map(super::Row::from)
                 }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::SamplingProcedureModel(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::sampling_procedure_models::SamplingProcedureModel::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::ShakingProcedureModel(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::shaking_procedure_models::ShakingProcedureModel::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::SharedProcedureModelTrackable(
                     primary_key,
                 ) => {
@@ -712,6 +829,24 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::StorageProcedureModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::SupernatantProcedureModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel::read(
                             primary_key,
                             conn,
                         )?
@@ -820,6 +955,15 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::users::User::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
                             primary_key,
                             conn,
                         )?

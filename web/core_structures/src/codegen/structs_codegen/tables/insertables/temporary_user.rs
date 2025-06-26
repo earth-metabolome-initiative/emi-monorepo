@@ -60,7 +60,8 @@ impl InsertableTemporaryUser {
         )
     }
 }
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTemporaryUserBuilder {
     pub(crate) email: Option<String>,
     pub(crate) login_provider_id: Option<i16>,

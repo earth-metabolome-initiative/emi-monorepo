@@ -72,7 +72,7 @@ impl crate::Table {
                 continue;
             }
 
-            same_as_constraints.extend(column.same_as_constraints(conn)?);
+            same_as_constraints.extend(column.same_as_columns(conn)?);
             from_methods.push((vec![self.clone()], vec![column], false, None));
         }
 
@@ -108,7 +108,7 @@ impl crate::Table {
 
                 let columns = index.columns(conn)?;
 
-                if columns.len() == 1 && same_as_constraints.iter().any(|(_, c)| c == &columns[0]) {
+                if columns.len() == 1 && same_as_constraints.iter().any(|c| c == &columns[0]) {
                     continue;
                 }
 
@@ -129,7 +129,7 @@ impl crate::Table {
 
                 // If the column appears in the same-as constraints,
                 // we skip it, as the method generation is already taken care of elsewhere.
-                if same_as_constraints.iter().any(|(_, c)| c == &column) {
+                if same_as_constraints.iter().any(|c| c == &column) {
                     continue;
                 }
 

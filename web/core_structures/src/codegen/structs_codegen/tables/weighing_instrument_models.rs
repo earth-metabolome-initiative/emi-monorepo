@@ -1,12 +1,6 @@
-#[derive(Debug, Clone, PartialEq, Copy)]
+#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(
-    diesel::Selectable,
-    diesel::Insertable,
-    diesel::AsChangeset,
-    diesel::Queryable,
-    diesel::Identifiable,
-)]
+#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -14,9 +8,6 @@
 )]
 pub struct WeighingInstrumentModel {
     pub id: ::rosetta_uuid::Uuid,
-    pub error_kilograms: f32,
-    pub minimum_measurable_kilograms: f32,
-    pub maximum_measurable_kilograms: f32,
 }
 impl web_common_traits::prelude::TableName for WeighingInstrumentModel {
     const TABLE_NAME: &'static str = "weighing_instrument_models";
@@ -24,14 +15,6 @@ impl web_common_traits::prelude::TableName for WeighingInstrumentModel {
 impl
     web_common_traits::prelude::ExtensionTable<
         crate::codegen::structs_codegen::tables::trackables::Trackable,
-    > for WeighingInstrumentModel
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
-{
-}
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
     > for WeighingInstrumentModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
@@ -242,54 +225,6 @@ impl WeighingInstrumentModel {
         Self::table()
             .inner_join(trackables::table.on(weighing_instrument_models::id.eq(trackables::id)))
             .filter(trackables::updated_at.eq(updated_at))
-            .order_by(weighing_instrument_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_deprecation_date(
-        deprecation_date: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            commercial_products::commercial_products,
-            weighing_instrument_models::weighing_instrument_models,
-        };
-        Self::table()
-            .inner_join(
-                commercial_products::table
-                    .on(weighing_instrument_models::id.eq(commercial_products::id)),
-            )
-            .filter(commercial_products::deprecation_date.eq(deprecation_date))
-            .order_by(weighing_instrument_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_brand_id(
-        brand_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            commercial_products::commercial_products,
-            weighing_instrument_models::weighing_instrument_models,
-        };
-        Self::table()
-            .inner_join(
-                commercial_products::table
-                    .on(weighing_instrument_models::id.eq(commercial_products::id)),
-            )
-            .filter(commercial_products::brand_id.eq(brand_id))
             .order_by(weighing_instrument_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

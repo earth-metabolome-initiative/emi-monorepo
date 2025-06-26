@@ -29,6 +29,8 @@ pub struct InsertableUser {
     updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableUser {}
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableUserBuilder {
     pub(crate) first_name: Option<String>,
     pub(crate) last_name: Option<String>,
@@ -38,8 +40,8 @@ pub struct InsertableUserBuilder {
 impl Default for InsertableUserBuilder {
     fn default() -> Self {
         Self {
-            first_name: None,
-            last_name: None,
+            first_name: Default::default(),
+            last_name: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
         }

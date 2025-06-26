@@ -100,6 +100,8 @@ impl InsertableDocument {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableDocumentBuilder {
     pub(crate) id: Option<::rosetta_uuid::Uuid>,
     pub(crate) mime_type: Option<::media_types::MediaType>,
@@ -112,10 +114,10 @@ impl Default for InsertableDocumentBuilder {
     fn default() -> Self {
         Self {
             id: Some(rosetta_uuid::Uuid::new_v4()),
-            mime_type: None,
-            created_by: None,
+            mime_type: Default::default(),
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: None,
+            updated_by: Default::default(),
             updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
         }
     }

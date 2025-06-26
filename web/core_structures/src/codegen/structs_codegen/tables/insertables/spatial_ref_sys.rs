@@ -34,7 +34,8 @@ pub struct InsertableSpatialRefSy {
     proj4text: Option<String>,
 }
 impl InsertableSpatialRefSy {}
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableSpatialRefSyBuilder {
     pub(crate) srid: Option<i32>,
     pub(crate) auth_name: Option<String>,

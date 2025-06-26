@@ -9,14 +9,20 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         use diesel::ExpressionMethods;
         use diesel::query_dsl::methods::FilterDsl;
         use diesel::upsert::excluded;
+        use diesel::BoolExpressionMethods;
         use diesel::RunQueryDsl;
         use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
-            .filter(instrument_id.ne(excluded(instrument_id)))
+            .filter(
+                weighed_with
+                    .ne(excluded(weighed_with))
+                    .or(procedure_weighed_with.ne(excluded(procedure_weighed_with)))
+                    .or(sample_container.ne(excluded(sample_container))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -32,14 +38,20 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         use diesel::ExpressionMethods;
         use diesel::query_dsl::methods::FilterDsl;
         use diesel::upsert::excluded;
+        use diesel::BoolExpressionMethods;
         use diesel::RunQueryDsl;
         use crate::codegen::diesel_codegen::tables::weighing_procedure_models::weighing_procedure_models::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
-            .filter(instrument_id.ne(excluded(instrument_id)))
+            .filter(
+                weighed_with
+                    .ne(excluded(weighed_with))
+                    .or(procedure_weighed_with.ne(excluded(procedure_weighed_with)))
+                    .or(sample_container.ne(excluded(sample_container))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }

@@ -20,38 +20,6 @@ impl diesel::Identifiable for UserOrganization {
     }
 }
 impl UserOrganization {
-    pub fn organization<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::organizations::Organization,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::organizations::Organization: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::organizations::Organization as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::organizations::Organization as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::organizations::Organization,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::organizations::Organization::table(),
-                self.organization_id,
-            ),
-            conn,
-        )
-    }
     pub fn user<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -80,6 +48,38 @@ impl UserOrganization {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
                 self.user_id,
+            ),
+            conn,
+        )
+    }
+    pub fn organization<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::organizations::Organization,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::organizations::Organization: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::organizations::Organization as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::organizations::Organization as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::organizations::Organization as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::organizations::Organization,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::organizations::Organization::table(),
+                self.organization_id,
             ),
             conn,
         )

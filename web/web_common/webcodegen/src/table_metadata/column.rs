@@ -7,6 +7,7 @@ use proc_macro2::TokenStream;
 use syn::{Ident, Type};
 
 mod default_types;
+use cached::proc_macro::cached;
 pub use default_types::DefaultTypes;
 
 use super::{
@@ -19,8 +20,228 @@ use crate::{
     table_metadata::pg_type::postgres_type_to_diesel,
 };
 
+#[cached(
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}-{}", column.table_catalog, column.table_schema, column.table_name, column.column_name) }"#
+)]
+fn is_foreign_key_on_delete_cascade(column: &Column, conn: &mut PgConnection) -> bool {
+    use crate::schema::{key_column_usage, referential_constraints};
+    key_column_usage::table
+        .inner_join(
+            referential_constraints::table.on(key_column_usage::constraint_name
+                .eq(referential_constraints::constraint_name)
+                .and(
+                    key_column_usage::constraint_schema
+                        .eq(referential_constraints::constraint_schema),
+                )
+                .and(
+                    key_column_usage::constraint_catalog
+                        .eq(referential_constraints::constraint_catalog),
+                )),
+        )
+        .filter(key_column_usage::column_name.eq(&column.column_name))
+        .filter(key_column_usage::table_name.eq(&column.table_name))
+        .filter(key_column_usage::table_schema.eq(&column.table_schema))
+        .filter(key_column_usage::table_catalog.eq(&column.table_catalog))
+        .filter(referential_constraints::delete_rule.eq("CASCADE"))
+        .select(KeyColumnUsage::as_select())
+        .first::<KeyColumnUsage>(conn)
+        .is_ok()
+}
+
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}-{}", column.table_catalog, column.table_schema, column.table_name, column.column_name) }"#
+)]
+fn foreign_keys(
+    column: &Column,
+    conn: &mut PgConnection,
+) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
+    use crate::schema::{
+        columns, constraint_column_usage, key_column_usage, table_constraints, tables,
+    };
+    table_constraints::table
+            .inner_join(
+                key_column_usage::table.on(table_constraints::constraint_name
+                    .eq(key_column_usage::constraint_name)
+                    .and(
+                        table_constraints::constraint_schema
+                            .eq(key_column_usage::constraint_schema),
+                    )
+                    .and(
+                        table_constraints::constraint_catalog
+                            .eq(key_column_usage::constraint_catalog),
+                    )
+                    .and(table_constraints::table_name.eq(key_column_usage::table_name))
+                    .and(table_constraints::table_schema.eq(key_column_usage::table_schema))
+                    .and(table_constraints::table_catalog.eq(key_column_usage::table_catalog))),
+            )
+            .inner_join(constraint_column_usage::table.on(
+                constraint_column_usage::constraint_name.eq(table_constraints::constraint_name),
+            ))
+            .inner_join(
+                tables::table.on(tables::table_name
+                    .eq(constraint_column_usage::table_name)
+                    .and(tables::table_schema.eq(constraint_column_usage::table_schema))
+                    .and(tables::table_catalog.eq(constraint_column_usage::table_catalog))),
+            )
+            .inner_join(
+                columns::table.on(columns::table_name
+                    .eq(constraint_column_usage::table_name)
+                    .and(columns::table_schema.eq(constraint_column_usage::table_schema))
+                    .and(columns::table_catalog.eq(constraint_column_usage::table_catalog))
+                    .and(columns::column_name.eq(constraint_column_usage::column_name))),
+            )
+            .filter(table_constraints::constraint_type.eq("FOREIGN KEY"))
+            .filter(table_constraints::table_name.eq(&column.table_name))
+            .filter(table_constraints::table_schema.eq(&column.table_schema))
+            .filter(table_constraints::table_catalog.eq(&column.table_catalog))
+            .filter(key_column_usage::column_name.eq(&column.column_name))
+            .order_by(key_column_usage::constraint_name.asc())
+            .select(KeyColumnUsage::as_select())
+            .distinct()
+            .load::<KeyColumnUsage>(conn)
+}
+
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}-{}", column.table_catalog, column.table_schema, column.table_name, column.column_name) }"#
+)]
+fn geometry(
+    column: &Column,
+    conn: &mut PgConnection,
+) -> Result<Option<crate::GeometryColumn>, diesel::result::Error> {
+    use crate::schema::geometry_columns;
+
+    geometry_columns::table
+        .filter(geometry_columns::f_table_name.eq(&column.table_name))
+        .filter(geometry_columns::f_table_schema.eq(&column.table_schema))
+        .filter(geometry_columns::f_geometry_column.eq(&column.column_name))
+        .first::<crate::GeometryColumn>(conn)
+        .optional()
+}
+
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}-{}", column.table_catalog, column.table_schema, column.table_name, column.column_name) }"#
+)]
+fn geography(
+    column: &Column,
+    conn: &mut PgConnection,
+) -> Result<Option<crate::GeographyColumn>, diesel::result::Error> {
+    use crate::schema::geography_columns;
+
+    geography_columns::table
+        .filter(geography_columns::f_table_name.eq(&column.table_name))
+        .filter(geography_columns::f_table_schema.eq(&column.table_schema))
+        .filter(geography_columns::f_geography_column.eq(&column.column_name))
+        .first::<crate::GeographyColumn>(conn)
+        .optional()
+}
+
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}-{}", column.table_catalog, column.table_schema, column.table_name, column.column_name) }"#
+)]
+fn requires_partial_builder(
+    column: &Column,
+    conn: &mut PgConnection,
+) -> Result<Option<KeyColumnUsage>, WebCodeGenError> {
+    if column.is_nullable() {
+        // If the column is nullable, we do not need a partial builder
+        return Ok(None);
+    }
+    // First, we retrieve the table that contains the column
+    let table = column.table(conn)?;
+    // Then, we check if the table is an extension table
+    if table.extension_table(conn)?.is_none() {
+        return Ok(None);
+    }
+    // Next, we retrieve the foreign keys of the column
+    let foreign_keys = column.foreign_keys(conn)?;
+    // If there are no foreign keys, we return false
+    if foreign_keys.is_empty() {
+        return Ok(None);
+    }
+    // We check whether there exist a single column foreign key
+    // which refers to the primary key of the foreign table.
+    let mut single_column_fk_to_pk = None;
+    for foreign_key in &foreign_keys {
+        if foreign_key.is_foreign_primary_key(conn)? && foreign_key.number_of_columns(conn)? == 1 {
+            // If we have already found a single column foreign key to the
+            // primary key of the foreign table, we raise a unimplemented error
+            // as it is unclear how to handle this case.
+            if single_column_fk_to_pk.is_some() {
+                unimplemented!(
+                    "Column \"{}\".\"{}\" has multiple single-column foreign keys to the primary key of the foreign table. This is not supported yet.",
+                    column.table_name,
+                    column.column_name
+                );
+            }
+
+            single_column_fk_to_pk = Some(foreign_key);
+        }
+    }
+
+    let Some(single_column_fk_to_pk) = single_column_fk_to_pk else {
+        // If we have not found a single column foreign key to the primary key of the
+        // foreign table, we return false as we cannot handle this case.
+        return Ok(None);
+    };
+
+    // Now, after having identified the single column foreign key to the primary key
+    // of the foreign table, we try to identify a composite foreign key
+    // which is composed of the column and the primary key of the table that
+    // contains the column.
+    let primary_key_columns = table.primary_key_columns(conn)?;
+    let Some(foreign_table) = single_column_fk_to_pk.foreign_table(conn)? else {
+        return Ok(None);
+    };
+
+    // We expect the composite foreign key to be composed of the column
+    // and the primary key of the table that contains the column.
+    let mut expected_foreign_columns = vec![column.clone()];
+    expected_foreign_columns.extend(primary_key_columns);
+
+    let mut found_composite_fk = None;
+
+    for foreign_key in &foreign_keys {
+        if foreign_key == single_column_fk_to_pk {
+            // We skip the single column foreign key to the primary key of the foreign table
+            continue;
+        }
+        if foreign_key.foreign_table(conn)?.as_ref() != Some(&foreign_table) {
+            // We skip foreign keys which do not refer to the same foreign table
+            continue;
+        }
+        let columns = foreign_key.columns(conn)?;
+        if columns == expected_foreign_columns {
+            if found_composite_fk.is_some() {
+                // If we have already found a composite foreign key, we raise a
+                // unimplemented error as it is unclear how to handle this case.
+                unimplemented!(
+                    "Column \"{}\".\"{}\" has multiple composite foreign keys to the foreign table \"{}\". This is not supported yet: {foreign_keys:#?}",
+                    column.table_name,
+                    column.column_name,
+                    foreign_table.table_name
+                );
+            }
+
+            found_composite_fk = Some(foreign_key.clone());
+        }
+    }
+
+    Ok(found_composite_fk)
+}
+
 /// Struct defining the `information_schema.columns` table.
-#[derive(Queryable, QueryableByName, Selectable, PartialEq, Eq, Debug, Clone, Hash)]
+#[derive(
+    Queryable, QueryableByName, Selectable, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash,
+)]
 #[diesel(table_name = crate::schema::columns)]
 pub struct Column {
     /// Name of the database containing the table (always the current database)
@@ -122,7 +343,7 @@ impl Column {
 
     /// Returns whether the column contains `PostGIS` geometry data
     pub fn is_geometry(&self, conn: &mut PgConnection) -> bool {
-        self.geometry(conn).is_ok()
+        self.geometry(conn).ok().flatten().is_some()
     }
 
     /// Returns all the check constraint associated to the current column.
@@ -182,14 +403,8 @@ impl Column {
     pub fn geometry(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<crate::GeometryColumn, WebCodeGenError> {
-        use crate::schema::geometry_columns;
-
-        Ok(geometry_columns::table
-            .filter(geometry_columns::f_table_name.eq(&self.table_name))
-            .filter(geometry_columns::f_table_schema.eq(&self.table_schema))
-            .filter(geometry_columns::f_geometry_column.eq(&self.column_name))
-            .first::<crate::GeometryColumn>(conn)?)
+    ) -> Result<Option<crate::GeometryColumn>, diesel::result::Error> {
+        geometry(self, conn)
     }
 
     /// Returns the associated geography column if the column is a geography
@@ -205,14 +420,8 @@ impl Column {
     pub fn geography(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<crate::GeographyColumn, WebCodeGenError> {
-        use crate::schema::geography_columns;
-
-        Ok(geography_columns::table
-            .filter(geography_columns::f_table_name.eq(&self.table_name))
-            .filter(geography_columns::f_table_schema.eq(&self.table_schema))
-            .filter(geography_columns::f_geography_column.eq(&self.column_name))
-            .first::<crate::GeographyColumn>(conn)?)
+    ) -> Result<Option<crate::GeographyColumn>, diesel::result::Error> {
+        geography(self, conn)
     }
 
     /// Returns the data type associated with the column as repo
@@ -279,10 +488,10 @@ impl Column {
     ///
     /// * If an error occurs while querying the database
     pub fn str_rust_data_type(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
-        if let Ok(geometry) = self.geometry(conn) {
+        if let Ok(Some(geometry)) = self.geometry(conn) {
             return Ok(geometry.str_rust_type().to_owned());
         }
-        if let Ok(geography) = self.geography(conn) {
+        if let Ok(Some(geography)) = self.geography(conn) {
             return Ok(geography.str_rust_type().to_owned());
         }
         match rust_type_str(self.data_type_str(conn)?, conn) {
@@ -330,10 +539,10 @@ impl Column {
     ///
     /// If an error occurs while querying the database
     pub fn rust_data_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
-        if let Ok(geometry) = self.geometry(conn) {
+        if let Ok(Some(geometry)) = self.geometry(conn) {
             return geometry.rust_type(self.is_nullable());
         }
-        if let Ok(geography) = self.geography(conn) {
+        if let Ok(Some(geography)) = self.geography(conn) {
             return geography.rust_type(self.is_nullable());
         }
         match rust_type_str(self.data_type_str(conn)?, conn) {
@@ -513,10 +722,10 @@ impl Column {
     ///
     /// * If an error occurs while querying the database
     pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        if let Ok(geometry) = self.geometry(conn) {
+        if let Ok(Some(geometry)) = self.geometry(conn) {
             return Ok(geometry.supports_copy());
         }
-        if let Ok(geography) = self.geography(conn) {
+        if let Ok(Some(geography)) = self.geography(conn) {
             return Ok(geography.supports_copy());
         }
         match rust_type_str(self.data_type_str(conn)?, conn) {
@@ -541,7 +750,9 @@ impl Column {
     ///
     /// * If an error occurs while querying the database
     pub fn supports_hash(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        if self.geometry(conn).is_ok() || self.geography(conn).is_ok() {
+        if self.geometry(conn).ok().flatten().is_some()
+            || self.geography(conn).ok().flatten().is_some()
+        {
             return Ok(false);
         }
         match rust_type_str(self.data_type_str(conn)?, conn) {
@@ -566,7 +777,9 @@ impl Column {
     ///
     /// * If an error occurs while querying the database
     pub fn supports_eq(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        if self.geometry(conn).is_ok() || self.geography(conn).is_ok() {
+        if self.geometry(conn).ok().flatten().is_some()
+            || self.geography(conn).ok().flatten().is_some()
+        {
             return Ok(false);
         }
         match rust_type_str(self.data_type_str(conn)?, conn) {
@@ -591,7 +804,9 @@ impl Column {
     ///
     /// * If an error occurs while querying the database
     pub fn supports_ord(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        if self.geometry(conn).is_ok() || self.geography(conn).is_ok() {
+        if self.geometry(conn).ok().flatten().is_some()
+            || self.geography(conn).ok().flatten().is_some()
+        {
             return Ok(false);
         }
         match rust_type_str(self.data_type_str(conn)?, conn) {
@@ -866,40 +1081,6 @@ impl Column {
             .optional()?)
     }
 
-    /// Returns whether the column is a foreign key
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while querying the database
-    pub fn is_foreign_key(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        use crate::schema::{key_column_usage, referential_constraints};
-        Ok(key_column_usage::table
-            .inner_join(
-                referential_constraints::table.on(key_column_usage::constraint_name
-                    .eq(referential_constraints::constraint_name)
-                    .and(
-                        key_column_usage::constraint_schema
-                            .eq(referential_constraints::constraint_schema),
-                    )
-                    .and(
-                        key_column_usage::constraint_catalog
-                            .eq(referential_constraints::constraint_catalog),
-                    )),
-            )
-            .filter(key_column_usage::column_name.eq(&self.column_name))
-            .filter(key_column_usage::table_name.eq(&self.table_name))
-            .filter(key_column_usage::table_schema.eq(&self.table_schema))
-            .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
-            .select(KeyColumnUsage::as_select())
-            .first::<KeyColumnUsage>(conn)
-            .optional()?
-            .is_some())
-    }
-
     /// Returns the foreign table of the column if it is a foreign key.
     /// If the column is not a foreign key, returns `None`.
     ///
@@ -920,50 +1101,7 @@ impl Column {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<KeyColumnUsage>, DieselError> {
-        use crate::schema::{
-            columns, constraint_column_usage, key_column_usage, table_constraints, tables,
-        };
-        table_constraints::table
-            .inner_join(
-                key_column_usage::table.on(table_constraints::constraint_name
-                    .eq(key_column_usage::constraint_name)
-                    .and(
-                        table_constraints::constraint_schema
-                            .eq(key_column_usage::constraint_schema),
-                    )
-                    .and(
-                        table_constraints::constraint_catalog
-                            .eq(key_column_usage::constraint_catalog),
-                    )
-                    .and(table_constraints::table_name.eq(key_column_usage::table_name))
-                    .and(table_constraints::table_schema.eq(key_column_usage::table_schema))
-                    .and(table_constraints::table_catalog.eq(key_column_usage::table_catalog))),
-            )
-            .inner_join(constraint_column_usage::table.on(
-                constraint_column_usage::constraint_name.eq(table_constraints::constraint_name),
-            ))
-            .inner_join(
-                tables::table.on(tables::table_name
-                    .eq(constraint_column_usage::table_name)
-                    .and(tables::table_schema.eq(constraint_column_usage::table_schema))
-                    .and(tables::table_catalog.eq(constraint_column_usage::table_catalog))),
-            )
-            .inner_join(
-                columns::table.on(columns::table_name
-                    .eq(constraint_column_usage::table_name)
-                    .and(columns::table_schema.eq(constraint_column_usage::table_schema))
-                    .and(columns::table_catalog.eq(constraint_column_usage::table_catalog))
-                    .and(columns::column_name.eq(constraint_column_usage::column_name))),
-            )
-            .filter(table_constraints::constraint_type.eq("FOREIGN KEY"))
-            .filter(table_constraints::table_name.eq(&self.table_name))
-            .filter(table_constraints::table_schema.eq(&self.table_schema))
-            .filter(table_constraints::table_catalog.eq(&self.table_catalog))
-            .filter(key_column_usage::column_name.eq(&self.column_name))
-            .order_by(key_column_usage::constraint_name.asc())
-            .select(KeyColumnUsage::as_select())
-            .distinct()
-            .load::<KeyColumnUsage>(conn)
+        foreign_keys(self, conn)
     }
 
     /// Returns whether the column is a foreign key with `ON DELETE CASCADE`
@@ -982,28 +1120,7 @@ impl Column {
     /// A `bool` indicating whether the column is a foreign key with `ON DELETE
     /// CASCADE` constraint
     pub fn is_foreign_key_on_delete_cascade(&self, conn: &mut PgConnection) -> bool {
-        use crate::schema::{key_column_usage, referential_constraints};
-        key_column_usage::table
-            .inner_join(
-                referential_constraints::table.on(key_column_usage::constraint_name
-                    .eq(referential_constraints::constraint_name)
-                    .and(
-                        key_column_usage::constraint_schema
-                            .eq(referential_constraints::constraint_schema),
-                    )
-                    .and(
-                        key_column_usage::constraint_catalog
-                            .eq(referential_constraints::constraint_catalog),
-                    )),
-            )
-            .filter(key_column_usage::column_name.eq(&self.column_name))
-            .filter(key_column_usage::table_name.eq(&self.table_name))
-            .filter(key_column_usage::table_schema.eq(&self.table_schema))
-            .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
-            .filter(referential_constraints::delete_rule.eq("CASCADE"))
-            .select(KeyColumnUsage::as_select())
-            .first::<KeyColumnUsage>(conn)
-            .is_ok()
+        is_foreign_key_on_delete_cascade(self, conn)
     }
 
     /// Returns the getter method name for the column.
@@ -1066,93 +1183,7 @@ impl Column {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Option<KeyColumnUsage>, WebCodeGenError> {
-        if self.is_nullable() {
-            // If the column is nullable, we do not need a partial builder
-            return Ok(None);
-        }
-        // First, we retrieve the table that contains the column
-        let table = self.table(conn)?;
-        // Then, we check if the table is an extension table
-        if table.extension_table(conn)?.is_none() {
-            return Ok(None);
-        }
-        // Next, we retrieve the foreign keys of the column
-        let foreign_keys = self.foreign_keys(conn)?;
-        // If there are no foreign keys, we return false
-        if foreign_keys.is_empty() {
-            return Ok(None);
-        }
-        // We check whether there exist a single column foreign key
-        // which refers to the primary key of the foreign table.
-        let mut single_column_fk_to_pk = None;
-        for foreign_key in &foreign_keys {
-            if foreign_key.is_foreign_primary_key(conn)?
-                && foreign_key.number_of_columns(conn)? == 1
-            {
-                // If we have already found a single column foreign key to the
-                // primary key of the foreign table, we raise a unimplemented error
-                // as it is unclear how to handle this case.
-                if single_column_fk_to_pk.is_some() {
-                    unimplemented!(
-                        "Column \"{}\".\"{}\" has multiple single-column foreign keys to the primary key of the foreign table. This is not supported yet.",
-                        self.table_name,
-                        self.column_name
-                    );
-                }
-
-                single_column_fk_to_pk = Some(foreign_key);
-            }
-        }
-
-        let Some(single_column_fk_to_pk) = single_column_fk_to_pk else {
-            // If we have not found a single column foreign key to the primary key of the
-            // foreign table, we return false as we cannot handle this case.
-            return Ok(None);
-        };
-
-        // Now, after having identified the single column foreign key to the primary key
-        // of the foreign table, we try to identify a composite foreign key
-        // which is composed of the column and the primary key of the table that
-        // contains the column.
-        let primary_key_columns = table.primary_key_columns(conn)?;
-        let Some(foreign_table) = single_column_fk_to_pk.foreign_table(conn)? else {
-            return Ok(None);
-        };
-
-        // We expect the composite foreign key to be composed of the column
-        // and the primary key of the table that contains the column.
-        let mut expected_foreign_columns = vec![self.clone()];
-        expected_foreign_columns.extend(primary_key_columns);
-
-        let mut found_composite_fk = None;
-
-        for foreign_key in &foreign_keys {
-            if foreign_key == single_column_fk_to_pk {
-                // We skip the single column foreign key to the primary key of the foreign table
-                continue;
-            }
-            if foreign_key.foreign_table(conn)?.as_ref() != Some(&foreign_table) {
-                // We skip foreign keys which do not refer to the same foreign table
-                continue;
-            }
-            let columns = foreign_key.columns(conn)?;
-            if columns == expected_foreign_columns {
-                if found_composite_fk.is_some() {
-                    // If we have already found a composite foreign key, we raise a
-                    // unimplemented error as it is unclear how to handle this case.
-                    unimplemented!(
-                        "Column \"{}\".\"{}\" has multiple composite foreign keys to the foreign table \"{}\". This is not supported yet: {foreign_keys:#?}",
-                        self.table_name,
-                        self.column_name,
-                        foreign_table.table_name
-                    );
-                }
-
-                found_composite_fk = Some(foreign_key.clone());
-            }
-        }
-
-        Ok(found_composite_fk)
+        requires_partial_builder(self, conn)
     }
 
     /// Returns the `same-as` UNIQUE constraints for the column, if any.
@@ -1185,69 +1216,49 @@ impl Column {
     pub fn same_as_constraints(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<(KeyColumnUsage, Column)>, WebCodeGenError> {
-        let foreign_keys = self.foreign_keys(conn)?;
-        let mut same_as_constraints = Vec::new();
-        for foreign_key in foreign_keys {
-            // First, we check whether the foreign key is a composite foreign key
-            if !foreign_key.is_composite(conn)? {
-                // If the foreign key is not a composite foreign key, we skip it
-                continue;
-            }
+    ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
+        Ok(self
+            .foreign_keys(conn)?
+            .into_iter()
+            .filter(|foreign_key| foreign_key.is_same_as_constraint(conn).unwrap_or(false))
+            .collect())
+    }
 
-            // Next, we check whether the foreign key is referring to a UNIQUE constraint
-            if !foreign_key.is_foreign_unique_key(conn)? {
-                // If the foreign key is not referring to a UNIQUE constraint, we skip it
-                continue;
-            };
-
-            let foreign_key_columns = foreign_key.foreign_columns(conn)?;
-            // We identify the foreign column curresponding to the current column.
-            let Some(foreign_column) =
-                foreign_key.columns(conn)?.into_iter().zip(foreign_key_columns.iter()).find_map(
-                    |(col, foreign_col)| {
-                        if col.column_name == self.column_name { Some(foreign_col) } else { None }
-                    },
-                )
-            else {
-                // If we cannot find the foreign column corresponding to the current column,
-                // Something is wrong with the current implementation and we panic.
-                panic!(
-                    "Column \"{}\".\"{}\" is part of a composite foreign key which refers to a UNIQUE constraint, but the foreign column could not be found.",
-                    self.table_name, self.column_name
-                );
-            };
-
-            // Finally, if the UNIQUE constraint is composed of the primary key
-            // of the foreign table and the foreign column
-            // associated with the current column, we consider it a `same-as`
-            // constraint.
-            let Some(foreign_table) = foreign_key.foreign_table(conn)? else {
-                unreachable!(
-                    "Column \"{}\".\"{}\" is part of a composite foreign key which refers to a UNIQUE constraint, but the foreign table could not be found.",
-                    self.table_name, self.column_name
-                );
-            };
-
-            let mut expected_foreign_columns = foreign_table.primary_key_columns(conn)?;
-
-            // If the foreign column is not part of the foreign table's primary key, we add
-            // it
-            if !expected_foreign_columns.contains(&foreign_column) {
-                expected_foreign_columns.push(foreign_column.clone());
-            }
-
-            // If the foreign key's foreign columns are not the same as the expected foreign
-            // columns, then this constraint is not a `same-as` constraint.
-            if foreign_key_columns != expected_foreign_columns {
-                continue;
-            }
-
-            // Otherwise, we have identified a `same-as` constraint and we add it to the
-            // list
-            same_as_constraints.push((foreign_key, foreign_column.clone()));
-        }
-
-        Ok(same_as_constraints)
+    /// Returns the `same-as` foreign columns associated with the current
+    /// column.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    ///
+    /// # Implementation details
+    ///
+    /// See method `same_as_constraints` for the definition of `same-as`
+    /// constraints.
+    pub fn same_as_columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
+        let mut same_as_columns: Vec<Column> = self
+            .same_as_constraints(conn)?
+            .into_iter()
+            .filter_map(|same_as_constraint| {
+                let columns = same_as_constraint.columns(conn).ok()?;
+                let filter_columns = same_as_constraint.foreign_columns(conn).ok()?;
+                columns
+                    .iter()
+                    .zip(filter_columns)
+                    .filter_map(
+                        |(local_column, foreign_column)| {
+                            if local_column == self { Some(foreign_column) } else { None }
+                        },
+                    )
+                    .next()
+            })
+            .collect();
+        same_as_columns.sort_unstable();
+        same_as_columns.dedup();
+        Ok(same_as_columns)
     }
 }

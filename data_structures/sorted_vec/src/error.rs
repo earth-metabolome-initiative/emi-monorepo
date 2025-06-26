@@ -8,18 +8,18 @@ pub enum Error<V> {
     UnsortedEntry(V),
 }
 
-impl<V: core::fmt::Display> core::fmt::Display for Error<V> {
+impl<V: core::fmt::Debug> core::fmt::Display for Error<V> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Error::UnsortedEntry(v) => write!(f, "Found unsorted entry: {v}"),
+            Error::UnsortedEntry(v) => write!(f, "Found unsorted entry: {v:?}"),
         }
     }
 }
 
-impl<V: core::fmt::Display> core::fmt::Debug for Error<V> {
+impl<V: core::fmt::Debug> core::fmt::Debug for Error<V> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         <Error<V> as core::fmt::Display>::fmt(self, f)
     }
 }
 
-impl<V: core::fmt::Display> core::error::Error for Error<V> {}
+impl<V: core::fmt::Debug> core::error::Error for Error<V> {}

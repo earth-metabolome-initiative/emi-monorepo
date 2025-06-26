@@ -22,3 +22,24 @@ CREATE TABLE IF NOT EXISTS trackable_locations (
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	created_by INTEGER NOT NULL REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS container_models (
+	id UUID PRIMARY KEY REFERENCES trackables(id)
+);
+
+CREATE TABLE IF NOT EXISTS volumetric_container_models (
+	id UUID PRIMARY KEY REFERENCES container_models(id),
+    -- The maximum volume of the container in liters.
+	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters))
+);
+
+CREATE TABLE IF NOT EXISTS compatibility_rules (
+    left_trackable_id UUID NOT NULL REFERENCES trackables(id),
+    right_trackable_id UUID NOT NULL REFERENCES trackables(id),
+    -- The maximal quantity of the right trackable that can be associated with the left trackable.
+    quantity SMALLINT CHECK (must_be_strictly_positive_i16(quantity)),
+    created_by INTEGER NOT NULL REFERENCES users(id),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (left_trackable_id, right_trackable_id),
+    CHECK (must_be_distinct_uuid(left_trackable_id, right_trackable_id))
+);

@@ -97,6 +97,8 @@ impl InsertableBrand {
         )
     }
 }
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableBrandBuilder {
     pub(crate) name: Option<String>,
     pub(crate) created_by: Option<i32>,
@@ -107,10 +109,10 @@ pub struct InsertableBrandBuilder {
 impl Default for InsertableBrandBuilder {
     fn default() -> Self {
         Self {
-            name: None,
-            created_by: None,
+            name: Default::default(),
+            created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: None,
+            updated_by: Default::default(),
             updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
         }
     }

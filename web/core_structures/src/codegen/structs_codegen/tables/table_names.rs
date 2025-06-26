@@ -2,16 +2,21 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum TableName {
     Address,
-    AliquotingInstrumentModel,
     AliquotingProcedureModel,
+    BallMillMachineModel,
     BallMillProcedureModel,
+    BinaryQuestionProcedureModel,
     Brand,
+    CameraModel,
+    CappingProcedureModel,
+    CentrifugeModel,
     CentrifugeProcedureModel,
     City,
     Color,
     CommercialProductLot,
     CommercialProduct,
     CommercialReagent,
+    CompatibilityRule,
     ContainerModel,
     Container,
     Country,
@@ -19,24 +24,30 @@ pub enum TableName {
     Document,
     EmailProvider,
     FractioningProcedureModel,
+    FreezeDrierModel,
     FreezeDryingProcedureModel,
+    FreezerModel,
+    FreezingProcedureModel,
+    GeolocationProcedureModel,
     InstrumentModel,
     InstrumentState,
-    Instrument,
     LoginProvider,
     Material,
     MixCountableProcedureModel,
     MixSolidProcedureModel,
+    MountTipProcedureModel,
     NextProcedureModel,
     ObservationSubject,
-    OrganismObservation,
     OrganismTaxon,
     Organism,
     Organization,
-    PackagingModel,
     PackagingProcedureModel,
     ParentProcedureModel,
     PermanenceCategory,
+    PhotographProcedureModel,
+    PipetteModel,
+    PipetteTipModel,
+    PositioningDeviceModel,
     PouringProcedureModel,
     ProcedureModelTrackable,
     ProcedureModel,
@@ -50,12 +61,12 @@ pub enum TableName {
     Role,
     Room,
     SampleState,
-    SamplingProcedureModel,
-    ShakingProcedureModel,
     SharedProcedureModelTrackable,
     SpatialRefSy,
     Spectrum,
     SpectraCollection,
+    StorageProcedureModel,
+    SupernatantProcedureModel,
     Taxon,
     TeamMember,
     TeamProject,
@@ -68,6 +79,7 @@ pub enum TableName {
     UserEmail,
     UserOrganization,
     User,
+    VolumetricContainerModel,
     VolumetricProcessable,
     WeighingInstrumentModel,
     WeighingProcedureModel,
@@ -77,16 +89,24 @@ impl core::fmt::Display for TableName {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             TableName::Address => write!(f, stringify!(Address)),
-            TableName::AliquotingInstrumentModel => {
-                write!(f, stringify!(AliquotingInstrumentModel))
-            }
             TableName::AliquotingProcedureModel => {
                 write!(f, stringify!(AliquotingProcedureModel))
+            }
+            TableName::BallMillMachineModel => {
+                write!(f, stringify!(BallMillMachineModel))
             }
             TableName::BallMillProcedureModel => {
                 write!(f, stringify!(BallMillProcedureModel))
             }
+            TableName::BinaryQuestionProcedureModel => {
+                write!(f, stringify!(BinaryQuestionProcedureModel))
+            }
             TableName::Brand => write!(f, stringify!(Brand)),
+            TableName::CameraModel => write!(f, stringify!(CameraModel)),
+            TableName::CappingProcedureModel => {
+                write!(f, stringify!(CappingProcedureModel))
+            }
+            TableName::CentrifugeModel => write!(f, stringify!(CentrifugeModel)),
             TableName::CentrifugeProcedureModel => {
                 write!(f, stringify!(CentrifugeProcedureModel))
             }
@@ -97,6 +117,7 @@ impl core::fmt::Display for TableName {
             }
             TableName::CommercialProduct => write!(f, stringify!(CommercialProduct)),
             TableName::CommercialReagent => write!(f, stringify!(CommercialReagent)),
+            TableName::CompatibilityRule => write!(f, stringify!(CompatibilityRule)),
             TableName::ContainerModel => write!(f, stringify!(ContainerModel)),
             TableName::Container => write!(f, stringify!(Container)),
             TableName::Country => write!(f, stringify!(Country)),
@@ -108,12 +129,19 @@ impl core::fmt::Display for TableName {
             TableName::FractioningProcedureModel => {
                 write!(f, stringify!(FractioningProcedureModel))
             }
+            TableName::FreezeDrierModel => write!(f, stringify!(FreezeDrierModel)),
             TableName::FreezeDryingProcedureModel => {
                 write!(f, stringify!(FreezeDryingProcedureModel))
             }
+            TableName::FreezerModel => write!(f, stringify!(FreezerModel)),
+            TableName::FreezingProcedureModel => {
+                write!(f, stringify!(FreezingProcedureModel))
+            }
+            TableName::GeolocationProcedureModel => {
+                write!(f, stringify!(GeolocationProcedureModel))
+            }
             TableName::InstrumentModel => write!(f, stringify!(InstrumentModel)),
             TableName::InstrumentState => write!(f, stringify!(InstrumentState)),
-            TableName::Instrument => write!(f, stringify!(Instrument)),
             TableName::LoginProvider => write!(f, stringify!(LoginProvider)),
             TableName::Material => write!(f, stringify!(Material)),
             TableName::MixCountableProcedureModel => {
@@ -122,13 +150,14 @@ impl core::fmt::Display for TableName {
             TableName::MixSolidProcedureModel => {
                 write!(f, stringify!(MixSolidProcedureModel))
             }
+            TableName::MountTipProcedureModel => {
+                write!(f, stringify!(MountTipProcedureModel))
+            }
             TableName::NextProcedureModel => write!(f, stringify!(NextProcedureModel)),
             TableName::ObservationSubject => write!(f, stringify!(ObservationSubject)),
-            TableName::OrganismObservation => write!(f, stringify!(OrganismObservation)),
             TableName::OrganismTaxon => write!(f, stringify!(OrganismTaxon)),
             TableName::Organism => write!(f, stringify!(Organism)),
             TableName::Organization => write!(f, stringify!(Organization)),
-            TableName::PackagingModel => write!(f, stringify!(PackagingModel)),
             TableName::PackagingProcedureModel => {
                 write!(f, stringify!(PackagingProcedureModel))
             }
@@ -136,6 +165,14 @@ impl core::fmt::Display for TableName {
                 write!(f, stringify!(ParentProcedureModel))
             }
             TableName::PermanenceCategory => write!(f, stringify!(PermanenceCategory)),
+            TableName::PhotographProcedureModel => {
+                write!(f, stringify!(PhotographProcedureModel))
+            }
+            TableName::PipetteModel => write!(f, stringify!(PipetteModel)),
+            TableName::PipetteTipModel => write!(f, stringify!(PipetteTipModel)),
+            TableName::PositioningDeviceModel => {
+                write!(f, stringify!(PositioningDeviceModel))
+            }
             TableName::PouringProcedureModel => {
                 write!(f, stringify!(PouringProcedureModel))
             }
@@ -153,18 +190,18 @@ impl core::fmt::Display for TableName {
             TableName::Role => write!(f, stringify!(Role)),
             TableName::Room => write!(f, stringify!(Room)),
             TableName::SampleState => write!(f, stringify!(SampleState)),
-            TableName::SamplingProcedureModel => {
-                write!(f, stringify!(SamplingProcedureModel))
-            }
-            TableName::ShakingProcedureModel => {
-                write!(f, stringify!(ShakingProcedureModel))
-            }
             TableName::SharedProcedureModelTrackable => {
                 write!(f, stringify!(SharedProcedureModelTrackable))
             }
             TableName::SpatialRefSy => write!(f, stringify!(SpatialRefSy)),
             TableName::Spectrum => write!(f, stringify!(Spectrum)),
             TableName::SpectraCollection => write!(f, stringify!(SpectraCollection)),
+            TableName::StorageProcedureModel => {
+                write!(f, stringify!(StorageProcedureModel))
+            }
+            TableName::SupernatantProcedureModel => {
+                write!(f, stringify!(SupernatantProcedureModel))
+            }
             TableName::Taxon => write!(f, stringify!(Taxon)),
             TableName::TeamMember => write!(f, stringify!(TeamMember)),
             TableName::TeamProject => write!(f, stringify!(TeamProject)),
@@ -177,6 +214,9 @@ impl core::fmt::Display for TableName {
             TableName::UserEmail => write!(f, stringify!(UserEmail)),
             TableName::UserOrganization => write!(f, stringify!(UserOrganization)),
             TableName::User => write!(f, stringify!(User)),
+            TableName::VolumetricContainerModel => {
+                write!(f, stringify!(VolumetricContainerModel))
+            }
             TableName::VolumetricProcessable => {
                 write!(f, stringify!(VolumetricProcessable))
             }

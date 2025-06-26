@@ -5,7 +5,7 @@ use diesel::PgConnection;
 use init_db::init_database;
 use reference_docker::reference_docker_with_connection;
 use time_requirements::prelude::*;
-use webcodegen::{Codegen, PgExtension, Table, errors::WebCodeGenError};
+use webcodegen::{Codegen, ColumnSameAsNetwork, PgExtension, Table, errors::WebCodeGenError};
 
 pub(crate) const DATABASE_NAME: &str = "development.db";
 pub(crate) const DATABASE_PORT: u16 = 17032;
@@ -57,6 +57,9 @@ pub async fn main() {
         .await
         .expect("Failed to connect to the database");
 
+    // We ensure that the migrations directory has all expected properties.
+    let mut time_tracker = TimeTracker::new("Building Core Structures");
+
     // We initialize the database into the docker container
     if let Err(err) = init_database(DATABASE_NAME, &mut conn).await {
         docker.stop().await.expect("Failed to stop the docker container");
@@ -64,11 +67,18 @@ pub async fn main() {
         return;
     }
 
-    // We ensure that the migrations directory has all expected properties.
-    let mut time_tracker = TimeTracker::new("Building Core Structures");
-
     // We save the time tracker
     time_tracker.save(Path::new("./time_tracker")).unwrap();
+
+    let same_as_graph = ColumnSameAsNetwork::new(&mut conn, DATABASE_NAME, None)
+        .expect("Failed to build the column same-as network");
+
+    let same_as_dot = same_as_graph
+        .to_dot(&mut conn)
+        .expect("Failed to convert the column same-as network to dot format");
+    let same_as_path = Path::new("column_same_as_network.dot");
+    std::fs::write(same_as_path, same_as_dot)
+        .expect("Failed to write the column same-as network dot file");
 
     match build_core_structures(&mut conn) {
         Ok(tracker) => {

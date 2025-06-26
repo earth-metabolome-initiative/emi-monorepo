@@ -64,6 +64,10 @@ where
         Self::with_sparse_shaped_capacity((RowIndex::ZERO, ColumnIndex::ZERO), number_of_values)
     }
 
+    fn with_sparse_shape((number_of_rows, number_of_columns): Self::MinimalShape) -> Self {
+        Self::with_sparse_shaped_capacity((number_of_rows, number_of_columns), SparseIndex::ZERO)
+    }
+
     fn with_sparse_shaped_capacity(
         (number_of_rows, number_of_columns): Self::MinimalShape,
         number_of_values: Self::SparseIndex,
@@ -249,6 +253,12 @@ impl<
         self.column_indices[start..end].iter().copied()
     }
 
+    fn has_entry(&self, row: Self::RowIndex, column: Self::ColumnIndex) -> bool {
+        let start = self.rank_row(row).into_usize();
+        let end = self.rank_row(row + RowIndex::ONE).into_usize();
+        self.column_indices[start..end].binary_search(&column).is_ok()
+    }
+
     fn sparse_columns(&self) -> Self::SparseColumns<'_> {
         self.column_indices.iter().copied()
     }
@@ -301,7 +311,7 @@ where
         if self.offsets.len() <= row.into_usize() && row <= self.number_of_rows() {
             return self.number_of_defined_values();
         }
-        debug_assert!(
+        assert!(
             row <= self.number_of_rows(),
             "The matrix is in an illegal state where the row index {row} is greater than the number of rows {}, with number of columns {}, with offset size {}.",
             self.number_of_rows(),
