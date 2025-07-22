@@ -21,6 +21,53 @@ pub trait Insertable {
     }
 }
 
+/// A trait for Row Builder types which allow for the setting of a primary key
+/// in the insertable variant.
+pub trait SetPrimaryKey {
+    /// The associated primary key type.
+    type PrimaryKey;
+
+    /// Sets the primary key for the insertable variant.
+    fn set_primary_key(self, primary_key: Self::PrimaryKey) -> Self;
+}
+
+/// Macro implementation for the `SetPrimaryKey` trait for all types that
+/// are commonly used as primary keys, such as `i16`, `i32`, `i64` and `Uuid`.
+macro_rules! impl_set_primary_key_for_primitive {
+    ($($type:ty),*) => {
+        $(
+            impl SetPrimaryKey for $type {
+                type PrimaryKey = Self;
+
+                /// Sets the primary key for the insertable variant.
+                fn set_primary_key(self, primary_key: Self::PrimaryKey) -> Self {
+                    primary_key
+                }
+            }
+        )*
+    };
+}
+
+impl_set_primary_key_for_primitive!(i16, i32, i64, rosetta_uuid::Uuid);
+
+/// Implementation of `SetPrimaryKey` for all `Option<T>` types where `T`
+/// implements `SetPrimaryKey`. This allows for setting the primary key on an
+/// optional insertable variant.
+impl<T> SetPrimaryKey for Option<T>
+where
+    T: SetPrimaryKey<PrimaryKey = T>,
+{
+    type PrimaryKey = T;
+
+    /// Sets the primary key for the insertable variant.
+    fn set_primary_key(self, primary_key: Self::PrimaryKey) -> Self {
+        match self {
+            Some(inner) => Some(inner.set_primary_key(primary_key)),
+            None => Some(primary_key),
+        }
+    }
+}
+
 /// A trait for types that can be constructed in the frontend or backend to
 /// execute the insert operation.
 pub trait InsertableVariant<C>: Sized {

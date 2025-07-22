@@ -19,7 +19,7 @@ pub use extension::ExtensionTable;
 pub use foreign::{ForeignKeys, HasForeignKeys};
 #[cfg(feature = "postgres")]
 pub use insertable::UncheckedInsertableVariant;
-pub use insertable::{InsertError, Insertable, InsertableVariant};
+pub use insertable::{InsertError, Insertable, InsertableVariant, SetPrimaryKey};
 pub use read::{BoundedRead, BoundedReadDispatch, Read, ReadDispatch};
 pub use table_name::TableName;
 pub use tabular::{Row, Rows, StaticTabular, Tabular};

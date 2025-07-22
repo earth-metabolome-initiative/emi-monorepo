@@ -33,6 +33,42 @@ pub trait MonoplexMonopartiteGraph: MonoplexGraph<Edges = <Self as MonoplexMonop
         self.sparse_coordinates().all(|(src, dst)| src < dst)
     }
 
+    /// Returns the set of unique paths from the provided source node.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `source` - The identifier of the source node.
+    fn unique_paths_from(
+        &self,
+        source: Self::NodeId,
+    ) -> Vec<Vec<Self::NodeId>> {
+        let mut growing_paths = vec![vec![source]];
+        let mut growing_paths_tmp = Vec::new();
+        let mut paths = Vec::new();
+
+        while !growing_paths.is_empty() {
+            for growing_path in &growing_paths {
+                let last_node = growing_path[growing_path.len() - 1];
+                let mut found_successors = false;
+                for successor in self.successors(last_node) {
+                    growing_paths_tmp.push({
+                        let mut new_path = growing_path.clone();
+                        new_path.push(successor);
+                        new_path
+                    });
+                    found_successors = true;
+                }
+                if !found_successors {
+                    paths.push(growing_path.clone());
+                }
+            }
+            std::mem::swap(&mut growing_paths, &mut growing_paths_tmp);
+            growing_paths_tmp.clear();
+        }
+
+        paths
+    }
+
     /// Returns the set of nodes reachable from the given source node.
     ///
     /// # Arguments
