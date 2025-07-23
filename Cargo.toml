@@ -53,7 +53,7 @@ members = [
   "utils/diesel_pgrx/example_extension",
   "web/web_common/molecular_formulas",
   "utils/numeric_common_traits",
-  "data_structures/multi_ranged",
+  "data_structures/multi_ranged", "utils/mermaid",
 ]
 
 [workspace.dependencies]
