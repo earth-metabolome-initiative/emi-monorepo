@@ -8,7 +8,7 @@ use core_structures::{
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-use crate::trackables::containers::SAFELOCK_TUBE_2ML;
+use crate::trackables::containers::{POLYSTYRENE_BOX, SAFELOCK_TUBE_2ML};
 pub mod ball_mill_instrument;
 pub mod centrifuge_instrument;
 pub mod pipette_1000;
@@ -41,7 +41,7 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) {
         .insert(user.id, conn)
         .unwrap();
 
-    let _freezer = FreezerModel::new()
+    let freezer = FreezerModel::new()
         .name(Some(FREEZER.to_owned()))
         .unwrap()
         .description(Some("-80°C Freezer".to_owned()))
@@ -51,6 +51,10 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) {
         .created_by(user.id)
         .unwrap()
         .insert(user.id, conn)
+        .unwrap();
+
+    freezer
+        .compatible_with(&Trackable::from_name(POLYSTYRENE_BOX, conn).unwrap().unwrap(), user, conn)
         .unwrap();
 
     let _freeze_dryer = FreezeDrierModel::new()

@@ -19,9 +19,14 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
             .filter(
                 liters
                     .ne(excluded(liters))
-                    .or(source.ne(excluded(source)))
-                    .or(destination.ne(excluded(destination)))
-                    .or(aliquoted_with.ne(excluded(aliquoted_with))),
+                    .or(aliquoted_from.ne(excluded(aliquoted_from)))
+                    .or(procedure_aliquoted_from.ne(excluded(procedure_aliquoted_from)))
+                    .or(aliquoted_into.ne(excluded(aliquoted_into)))
+                    .or(procedure_aliquoted_into.ne(excluded(procedure_aliquoted_into)))
+                    .or(aliquoted_with.ne(excluded(aliquoted_with)))
+                    .or(procedure_aliquoted_with.ne(excluded(procedure_aliquoted_with)))
+                    .or(pipette_tip.ne(excluded(pipette_tip)))
+                    .or(procedure_pipette_tip.ne(excluded(procedure_pipette_tip))),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })
@@ -48,9 +53,14 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
             .filter(
                 liters
                     .ne(excluded(liters))
-                    .or(source.ne(excluded(source)))
-                    .or(destination.ne(excluded(destination)))
-                    .or(aliquoted_with.ne(excluded(aliquoted_with))),
+                    .or(aliquoted_from.ne(excluded(aliquoted_from)))
+                    .or(procedure_aliquoted_from.ne(excluded(procedure_aliquoted_from)))
+                    .or(aliquoted_into.ne(excluded(aliquoted_into)))
+                    .or(procedure_aliquoted_into.ne(excluded(procedure_aliquoted_into)))
+                    .or(aliquoted_with.ne(excluded(aliquoted_with)))
+                    .or(procedure_aliquoted_with.ne(excluded(procedure_aliquoted_with)))
+                    .or(pipette_tip.ne(excluded(pipette_tip)))
+                    .or(procedure_pipette_tip.ne(excluded(procedure_pipette_tip))),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })

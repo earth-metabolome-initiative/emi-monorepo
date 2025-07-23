@@ -6,6 +6,9 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::AliquotingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::AliquotingProcedureModel
             }
+            super::Rows::AliquotingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::AliquotingProcedure
+            }
             super::Rows::BallMillMachineModel(_) => {
                 crate::codegen::tables::table_names::TableName::BallMillMachineModel
             }
@@ -82,14 +85,8 @@ impl web_common_traits::prelude::Tabular for super::Rows {
                 crate::codegen::tables::table_names::TableName::LoginProvider
             }
             super::Rows::Material(_) => crate::codegen::tables::table_names::TableName::Material,
-            super::Rows::MixCountableProcedureModel(_) => {
-                crate::codegen::tables::table_names::TableName::MixCountableProcedureModel
-            }
-            super::Rows::MixSolidProcedureModel(_) => {
-                crate::codegen::tables::table_names::TableName::MixSolidProcedureModel
-            }
-            super::Rows::MountTipProcedureModel(_) => {
-                crate::codegen::tables::table_names::TableName::MountTipProcedureModel
+            super::Rows::MixingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::MixingProcedureModel
             }
             super::Rows::NextProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::NextProcedureModel
@@ -121,6 +118,9 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             }
             super::Rows::PipetteTipModel(_) => {
                 crate::codegen::tables::table_names::TableName::PipetteTipModel
+            }
+            super::Rows::PlacingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::PlacingProcedureModel
             }
             super::Rows::PositioningDeviceModel(_) => {
                 crate::codegen::tables::table_names::TableName::PositioningDeviceModel
@@ -167,6 +167,9 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             }
             super::Rows::SupernatantProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::SupernatantProcedureModel
+            }
+            super::Rows::SupernatantProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::SupernatantProcedure
             }
             super::Rows::Taxon(_) => crate::codegen::tables::table_names::TableName::Taxon,
             super::Rows::TeamMember(_) => {

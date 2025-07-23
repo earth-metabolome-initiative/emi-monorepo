@@ -5,6 +5,11 @@ pub use aliquoting_procedure_models::{
     InsertableAliquotingProcedureModel, InsertableAliquotingProcedureModelAttributes,
     InsertableAliquotingProcedureModelBuilder,
 };
+mod aliquoting_procedures;
+pub use aliquoting_procedures::{
+    InsertableAliquotingProcedure, InsertableAliquotingProcedureAttributes,
+    InsertableAliquotingProcedureBuilder,
+};
 mod ball_mill_machine_models;
 pub use ball_mill_machine_models::{
     InsertableBallMillMachineModel, InsertableBallMillMachineModelAttributes,
@@ -131,20 +136,10 @@ pub use login_providers::{
 };
 mod materials;
 pub use materials::{InsertableMaterial, InsertableMaterialAttributes, InsertableMaterialBuilder};
-mod mix_countable_procedure_models;
-pub use mix_countable_procedure_models::{
-    InsertableMixCountableProcedureModel, InsertableMixCountableProcedureModelAttributes,
-    InsertableMixCountableProcedureModelBuilder,
-};
-mod mix_solid_procedure_models;
-pub use mix_solid_procedure_models::{
-    InsertableMixSolidProcedureModel, InsertableMixSolidProcedureModelAttributes,
-    InsertableMixSolidProcedureModelBuilder,
-};
-mod mount_tip_procedure_models;
-pub use mount_tip_procedure_models::{
-    InsertableMountTipProcedureModel, InsertableMountTipProcedureModelAttributes,
-    InsertableMountTipProcedureModelBuilder,
+mod mixing_procedure_models;
+pub use mixing_procedure_models::{
+    InsertableMixingProcedureModel, InsertableMixingProcedureModelAttributes,
+    InsertableMixingProcedureModelBuilder,
 };
 mod next_procedure_models;
 pub use next_procedure_models::{
@@ -194,6 +189,11 @@ mod pipette_tip_models;
 pub use pipette_tip_models::{
     InsertablePipetteTipModel, InsertablePipetteTipModelAttributes,
     InsertablePipetteTipModelBuilder,
+};
+mod placing_procedure_models;
+pub use placing_procedure_models::{
+    InsertablePlacingProcedureModel, InsertablePlacingProcedureModelAttributes,
+    InsertablePlacingProcedureModelBuilder,
 };
 mod positioning_device_models;
 pub use positioning_device_models::{
@@ -270,6 +270,11 @@ mod supernatant_procedure_models;
 pub use supernatant_procedure_models::{
     InsertableSupernatantProcedureModel, InsertableSupernatantProcedureModelAttributes,
     InsertableSupernatantProcedureModelBuilder,
+};
+mod supernatant_procedures;
+pub use supernatant_procedures::{
+    InsertableSupernatantProcedure, InsertableSupernatantProcedureAttributes,
+    InsertableSupernatantProcedureBuilder,
 };
 mod taxa;
 pub use taxa::{InsertableTaxon, InsertableTaxonAttributes, InsertableTaxonBuilder};

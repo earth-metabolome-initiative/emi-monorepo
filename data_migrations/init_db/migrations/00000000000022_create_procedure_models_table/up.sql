@@ -300,7 +300,7 @@ CREATE TABLE IF NOT EXISTS disposal_procedure_models (
 CREATE TABLE IF NOT EXISTS storage_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
 	-- The storage temperature in Kelvin.
-	kelvin REAL NOT NULL CHECK (must_be_strictly_positive_f32(kelvin)),
+	kelvin REAL NOT NULL DEFAULT 293.15 CHECK (must_be_strictly_positive_f32(kelvin)),
 	-- Tolerance percentage for the storage temperature.
 	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 5.0 CHECK (
 		must_be_strictly_positive_f32(kelvin_tolerance_percentage)
@@ -332,7 +332,7 @@ CREATE TABLE IF NOT EXISTS storage_procedure_models (
 CREATE TABLE IF NOT EXISTS freezing_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
 	-- The storage temperature in Kelvin.
-	kelvin REAL NOT NULL CHECK (must_be_strictly_positive_f32(kelvin)),
+	kelvin REAL NOT NULL DEFAULT 203.15 CHECK (must_be_strictly_positive_f32(kelvin)),
 	-- Tolerance percentage for the storage temperature.
 	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 5.0 CHECK (
 		must_be_strictly_positive_f32(kelvin_tolerance_percentage)
@@ -364,12 +364,12 @@ CREATE TABLE IF NOT EXISTS freezing_procedure_models (
 		frozen_container_id
 	) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
 	-- We check that the `frozen_with` is indeed a container that can hold the `frozen_container_id`.
-	FOREIGN KEY (frozen_with, frozen_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
+	CONSTRAINT "freezing_procedure_compatibility_rule" FOREIGN KEY (frozen_with, frozen_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS centrifuge_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
 	-- The storage temperature in Kelvin.
-	kelvin REAL NOT NULL CHECK (must_be_strictly_positive_f32(kelvin)),
+	kelvin REAL NOT NULL DEFAULT 293.15 CHECK (must_be_strictly_positive_f32(kelvin)),
 	-- Tolerance percentage for the storage temperature.
 	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 5.0 CHECK (
 		must_be_strictly_positive_f32(kelvin_tolerance_percentage)
@@ -405,7 +405,7 @@ CREATE TABLE IF NOT EXISTS centrifuge_procedure_models (
 CREATE TABLE IF NOT EXISTS ball_mill_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
 	-- The storage temperature in Kelvin.
-	kelvin REAL NOT NULL CHECK (must_be_strictly_positive_f32(kelvin)),
+	kelvin REAL NOT NULL DEFAULT 293.15 CHECK (must_be_strictly_positive_f32(kelvin)),
 	-- Tolerance percentage for the storage temperature.
 	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 5.0 CHECK (
 		must_be_strictly_positive_f32(kelvin_tolerance_percentage)
@@ -441,7 +441,7 @@ CREATE TABLE IF NOT EXISTS ball_mill_procedure_models (
 CREATE TABLE IF NOT EXISTS freeze_drying_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
 	-- The storage temperature in Kelvin.
-	kelvin REAL NOT NULL CHECK (must_be_strictly_positive_f32(kelvin)),
+	kelvin REAL NOT NULL DEFAULT 223.15 CHECK (must_be_strictly_positive_f32(kelvin)),
 	-- Tolerance percentage for the storage temperature.
 	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 5.0 CHECK (
 		must_be_strictly_positive_f32(kelvin_tolerance_percentage)

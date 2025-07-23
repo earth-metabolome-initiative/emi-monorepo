@@ -1,0 +1,9 @@
+name,description
+weighting,An operation to weight something in the lab
+pipetting,Opertion of taking a certain amount of liquid in the pipette
+cutting,Cutting something
+freezing,"Opertion of freezing something (liquid N2, freezer, etc)"
+sampling,Operation
+extracting,TODO
+diluting,TODO
+disolving,TODO

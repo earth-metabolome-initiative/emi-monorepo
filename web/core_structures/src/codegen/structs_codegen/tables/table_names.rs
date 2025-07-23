@@ -3,6 +3,7 @@
 pub enum TableName {
     Address,
     AliquotingProcedureModel,
+    AliquotingProcedure,
     BallMillMachineModel,
     BallMillProcedureModel,
     BinaryQuestionProcedureModel,
@@ -33,9 +34,7 @@ pub enum TableName {
     InstrumentState,
     LoginProvider,
     Material,
-    MixCountableProcedureModel,
-    MixSolidProcedureModel,
-    MountTipProcedureModel,
+    MixingProcedureModel,
     NextProcedureModel,
     ObservationSubject,
     OrganismTaxon,
@@ -47,6 +46,7 @@ pub enum TableName {
     PhotographProcedureModel,
     PipetteModel,
     PipetteTipModel,
+    PlacingProcedureModel,
     PositioningDeviceModel,
     PouringProcedureModel,
     ProcedureModelTrackable,
@@ -67,6 +67,7 @@ pub enum TableName {
     SpectraCollection,
     StorageProcedureModel,
     SupernatantProcedureModel,
+    SupernatantProcedure,
     Taxon,
     TeamMember,
     TeamProject,
@@ -92,6 +93,7 @@ impl core::fmt::Display for TableName {
             TableName::AliquotingProcedureModel => {
                 write!(f, stringify!(AliquotingProcedureModel))
             }
+            TableName::AliquotingProcedure => write!(f, stringify!(AliquotingProcedure)),
             TableName::BallMillMachineModel => {
                 write!(f, stringify!(BallMillMachineModel))
             }
@@ -144,14 +146,8 @@ impl core::fmt::Display for TableName {
             TableName::InstrumentState => write!(f, stringify!(InstrumentState)),
             TableName::LoginProvider => write!(f, stringify!(LoginProvider)),
             TableName::Material => write!(f, stringify!(Material)),
-            TableName::MixCountableProcedureModel => {
-                write!(f, stringify!(MixCountableProcedureModel))
-            }
-            TableName::MixSolidProcedureModel => {
-                write!(f, stringify!(MixSolidProcedureModel))
-            }
-            TableName::MountTipProcedureModel => {
-                write!(f, stringify!(MountTipProcedureModel))
+            TableName::MixingProcedureModel => {
+                write!(f, stringify!(MixingProcedureModel))
             }
             TableName::NextProcedureModel => write!(f, stringify!(NextProcedureModel)),
             TableName::ObservationSubject => write!(f, stringify!(ObservationSubject)),
@@ -170,6 +166,9 @@ impl core::fmt::Display for TableName {
             }
             TableName::PipetteModel => write!(f, stringify!(PipetteModel)),
             TableName::PipetteTipModel => write!(f, stringify!(PipetteTipModel)),
+            TableName::PlacingProcedureModel => {
+                write!(f, stringify!(PlacingProcedureModel))
+            }
             TableName::PositioningDeviceModel => {
                 write!(f, stringify!(PositioningDeviceModel))
             }
@@ -201,6 +200,9 @@ impl core::fmt::Display for TableName {
             }
             TableName::SupernatantProcedureModel => {
                 write!(f, stringify!(SupernatantProcedureModel))
+            }
+            TableName::SupernatantProcedure => {
+                write!(f, stringify!(SupernatantProcedure))
             }
             TableName::Taxon => write!(f, stringify!(Taxon)),
             TableName::TeamMember => write!(f, stringify!(TeamMember)),

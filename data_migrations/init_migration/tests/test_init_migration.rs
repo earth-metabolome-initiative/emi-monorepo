@@ -52,6 +52,8 @@ async fn test_init_migration() {
         .to_dot(&mut conn)
         .expect("Failed to convert the procedure model to DOT format");
 
+    // let mermaid = procedure_model.to_mermaid(&mut conn);
+
     // We write out the DOT file to a file.
     std::fs::write("test_init_migration.dot", dot).expect("Failed to write the DOT file");
 

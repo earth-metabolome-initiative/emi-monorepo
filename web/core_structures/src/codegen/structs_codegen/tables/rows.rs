@@ -1,5 +1,6 @@
 mod addresses;
 mod aliquoting_procedure_models;
+mod aliquoting_procedures;
 mod ball_mill_machine_models;
 mod ball_mill_procedure_models;
 mod binary_question_procedure_models;
@@ -33,9 +34,7 @@ mod into_iter;
 mod len;
 mod login_providers;
 mod materials;
-mod mix_countable_procedure_models;
-mod mix_solid_procedure_models;
-mod mount_tip_procedure_models;
+mod mixing_procedure_models;
 mod next_procedure_models;
 mod observation_subjects;
 mod organism_taxa;
@@ -47,6 +46,7 @@ mod permanence_categories;
 mod photograph_procedure_models;
 mod pipette_models;
 mod pipette_tip_models;
+mod placing_procedure_models;
 mod positioning_device_models;
 mod pouring_procedure_models;
 mod procedure_model_trackables;
@@ -67,6 +67,7 @@ mod spectra;
 mod spectra_collections;
 mod storage_procedure_models;
 mod supernatant_procedure_models;
+mod supernatant_procedures;
 mod tabular;
 mod taxa;
 mod team_members;
@@ -92,6 +93,11 @@ pub enum Rows {
     AliquotingProcedureModel(
         Vec<
             crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
+        >,
+    ),
+    AliquotingProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure,
         >,
     ),
     BallMillMachineModel(
@@ -200,19 +206,9 @@ pub enum Rows {
         Vec<crate::codegen::structs_codegen::tables::login_providers::LoginProvider>,
     ),
     Material(Vec<crate::codegen::structs_codegen::tables::materials::Material>),
-    MixCountableProcedureModel(
+    MixingProcedureModel(
         Vec<
-            crate::codegen::structs_codegen::tables::mix_countable_procedure_models::MixCountableProcedureModel,
-        >,
-    ),
-    MixSolidProcedureModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::mix_solid_procedure_models::MixSolidProcedureModel,
-        >,
-    ),
-    MountTipProcedureModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::mount_tip_procedure_models::MountTipProcedureModel,
+            crate::codegen::structs_codegen::tables::mixing_procedure_models::MixingProcedureModel,
         >,
     ),
     NextProcedureModel(
@@ -257,6 +253,11 @@ pub enum Rows {
     ),
     PipetteTipModel(
         Vec<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel>,
+    ),
+    PlacingProcedureModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::placing_procedure_models::PlacingProcedureModel,
+        >,
     ),
     PositioningDeviceModel(
         Vec<
@@ -316,6 +317,11 @@ pub enum Rows {
     SupernatantProcedureModel(
         Vec<
             crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel,
+        >,
+    ),
+    SupernatantProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
         >,
     ),
     Taxon(Vec<crate::codegen::structs_codegen::tables::taxa::Taxon>),
@@ -386,6 +392,13 @@ impl Rows {
             }
             Rows::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 aliquoting_procedure_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::AliquotingProcedure(aliquoting_procedures) => {
+                aliquoting_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -601,22 +614,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::MixCountableProcedureModel(mix_countable_procedure_models) => {
-                mix_countable_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::MixSolidProcedureModel(mix_solid_procedure_models) => {
-                mix_solid_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::MountTipProcedureModel(mount_tip_procedure_models) => {
-                mount_tip_procedure_models
+            Rows::MixingProcedureModel(mixing_procedure_models) => {
+                mixing_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -694,6 +693,13 @@ impl Rows {
             }
             Rows::PipetteTipModel(pipette_tip_models) => {
                 pipette_tip_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::PlacingProcedureModel(placing_procedure_models) => {
+                placing_procedure_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -839,6 +845,13 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::SupernatantProcedure(supernatant_procedures) => {
+                supernatant_procedures
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::Taxon(taxa) => {
                 taxa.iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
@@ -968,6 +981,9 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 aliquoting_procedure_models.primary_keys()
             }
+            Rows::AliquotingProcedure(aliquoting_procedures) => {
+                aliquoting_procedures.primary_keys()
+            }
             Rows::BallMillMachineModel(ball_mill_machine_models) => {
                 ball_mill_machine_models.primary_keys()
             }
@@ -1020,14 +1036,8 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::InstrumentState(instrument_states) => instrument_states.primary_keys(),
             Rows::LoginProvider(login_providers) => login_providers.primary_keys(),
             Rows::Material(materials) => materials.primary_keys(),
-            Rows::MixCountableProcedureModel(mix_countable_procedure_models) => {
-                mix_countable_procedure_models.primary_keys()
-            }
-            Rows::MixSolidProcedureModel(mix_solid_procedure_models) => {
-                mix_solid_procedure_models.primary_keys()
-            }
-            Rows::MountTipProcedureModel(mount_tip_procedure_models) => {
-                mount_tip_procedure_models.primary_keys()
+            Rows::MixingProcedureModel(mixing_procedure_models) => {
+                mixing_procedure_models.primary_keys()
             }
             Rows::NextProcedureModel(next_procedure_models) => next_procedure_models.primary_keys(),
             Rows::ObservationSubject(observation_subjects) => observation_subjects.primary_keys(),
@@ -1046,6 +1056,9 @@ impl web_common_traits::prelude::Rows for Rows {
             }
             Rows::PipetteModel(pipette_models) => pipette_models.primary_keys(),
             Rows::PipetteTipModel(pipette_tip_models) => pipette_tip_models.primary_keys(),
+            Rows::PlacingProcedureModel(placing_procedure_models) => {
+                placing_procedure_models.primary_keys()
+            }
             Rows::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models.primary_keys()
             }
@@ -1077,6 +1090,9 @@ impl web_common_traits::prelude::Rows for Rows {
             }
             Rows::SupernatantProcedureModel(supernatant_procedure_models) => {
                 supernatant_procedure_models.primary_keys()
+            }
+            Rows::SupernatantProcedure(supernatant_procedures) => {
+                supernatant_procedures.primary_keys()
             }
             Rows::Taxon(taxa) => taxa.primary_keys(),
             Rows::TeamMember(team_members) => team_members.primary_keys(),

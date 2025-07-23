@@ -17,10 +17,24 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_models::Centri
             .do_update()
             .set(self)
             .filter(
-                seconds
-                    .ne(excluded(seconds))
+                kelvin
+                    .ne(excluded(kelvin))
+                    .or(
+                        kelvin_tolerance_percentage
+                            .ne(excluded(kelvin_tolerance_percentage)),
+                    )
+                    .or(seconds.ne(excluded(seconds)))
                     .or(rotation_per_minute.ne(excluded(rotation_per_minute)))
-                    .or(centrifuged_with.ne(excluded(centrifuged_with))),
+                    .or(centrifuged_with.ne(excluded(centrifuged_with)))
+                    .or(
+                        procedure_centrifuged_with
+                            .ne(excluded(procedure_centrifuged_with)),
+                    )
+                    .or(centrifuged_container_id.ne(excluded(centrifuged_container_id)))
+                    .or(
+                        procedure_centrifuged_container_id
+                            .ne(excluded(procedure_centrifuged_container_id)),
+                    ),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })
@@ -45,10 +59,24 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_models::Centri
             .do_update()
             .set(self)
             .filter(
-                seconds
-                    .ne(excluded(seconds))
+                kelvin
+                    .ne(excluded(kelvin))
+                    .or(
+                        kelvin_tolerance_percentage
+                            .ne(excluded(kelvin_tolerance_percentage)),
+                    )
+                    .or(seconds.ne(excluded(seconds)))
                     .or(rotation_per_minute.ne(excluded(rotation_per_minute)))
-                    .or(centrifuged_with.ne(excluded(centrifuged_with))),
+                    .or(centrifuged_with.ne(excluded(centrifuged_with)))
+                    .or(
+                        procedure_centrifuged_with
+                            .ne(excluded(procedure_centrifuged_with)),
+                    )
+                    .or(centrifuged_container_id.ne(excluded(centrifuged_container_id)))
+                    .or(
+                        procedure_centrifuged_container_id
+                            .ne(excluded(procedure_centrifuged_container_id)),
+                    ),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })

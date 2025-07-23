@@ -20,7 +20,8 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 procedure_model_id
                     .ne(excluded(procedure_model_id))
-                    .or(instrument_id.ne(excluded(instrument_id)))
+                    .or(weighted_with.ne(excluded(weighted_with)))
+                    .or(weighted_container_id.ne(excluded(weighted_container_id)))
                     .or(kilograms.ne(excluded(kilograms))),
             )
             .get_results(conn)
@@ -49,7 +50,8 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 procedure_model_id
                     .ne(excluded(procedure_model_id))
-                    .or(instrument_id.ne(excluded(instrument_id)))
+                    .or(weighted_with.ne(excluded(weighted_with)))
+                    .or(weighted_container_id.ne(excluded(weighted_container_id)))
                     .or(kilograms.ne(excluded(kilograms))),
             )
             .get_results(conn)

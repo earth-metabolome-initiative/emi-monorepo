@@ -18,10 +18,15 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .do_update()
             .set(self)
             .filter(
-                seconds
-                    .ne(excluded(seconds))
+                kelvin
+                    .ne(excluded(kelvin))
+                    .or(kelvin_tolerance_percentage.ne(excluded(kelvin_tolerance_percentage)))
+                    .or(seconds.ne(excluded(seconds)))
                     .or(hertz.ne(excluded(hertz)))
-                    .or(milled_with.ne(excluded(milled_with))),
+                    .or(milled_with.ne(excluded(milled_with)))
+                    .or(procedure_milled_with.ne(excluded(procedure_milled_with)))
+                    .or(milled_container_id.ne(excluded(milled_container_id)))
+                    .or(procedure_milled_container_id.ne(excluded(procedure_milled_container_id))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -47,10 +52,15 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .do_update()
             .set(self)
             .filter(
-                seconds
-                    .ne(excluded(seconds))
+                kelvin
+                    .ne(excluded(kelvin))
+                    .or(kelvin_tolerance_percentage.ne(excluded(kelvin_tolerance_percentage)))
+                    .or(seconds.ne(excluded(seconds)))
                     .or(hertz.ne(excluded(hertz)))
-                    .or(milled_with.ne(excluded(milled_with))),
+                    .or(milled_with.ne(excluded(milled_with)))
+                    .or(procedure_milled_with.ne(excluded(procedure_milled_with)))
+                    .or(milled_container_id.ne(excluded(milled_container_id)))
+                    .or(procedure_milled_container_id.ne(excluded(procedure_milled_container_id))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

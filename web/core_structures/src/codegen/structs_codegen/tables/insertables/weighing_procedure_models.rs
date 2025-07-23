@@ -8,7 +8,8 @@ pub enum InsertableWeighingProcedureModelAttributes {
     ProcedureWeighedWith(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
-    SampleContainer(
+    SampleContainerId,
+    ProcedureSampleContainer(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
@@ -24,9 +25,12 @@ impl core::fmt::Display for InsertableWeighingProcedureModelAttributes {
             InsertableWeighingProcedureModelAttributes::ProcedureWeighedWith(
                 procedure_weighed_with,
             ) => write!(f, "{}", procedure_weighed_with),
-            InsertableWeighingProcedureModelAttributes::SampleContainer(sample_container) => {
-                write!(f, "{}", sample_container)
+            InsertableWeighingProcedureModelAttributes::SampleContainerId => {
+                write!(f, "sample_container_id")
             }
+            InsertableWeighingProcedureModelAttributes::ProcedureSampleContainer(
+                procedure_sample_container,
+            ) => write!(f, "{}", procedure_sample_container),
         }
     }
 }
@@ -42,7 +46,8 @@ pub struct InsertableWeighingProcedureModel {
     procedure_model_id: i32,
     weighed_with: ::rosetta_uuid::Uuid,
     procedure_weighed_with: i32,
-    sample_container: i32,
+    sample_container_id: ::rosetta_uuid::Uuid,
+    procedure_sample_container: i32,
 }
 impl InsertableWeighingProcedureModel {
     pub fn procedure_model<C: diesel::connection::LoadConnection>(
@@ -145,6 +150,38 @@ impl InsertableWeighingProcedureModel {
         &self,
         conn: &mut C,
     ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
+                self.sample_container_id,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_sample_container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >
@@ -168,7 +205,7 @@ impl InsertableWeighingProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
-                self.sample_container,
+                self.procedure_sample_container,
             ),
             conn,
         )
@@ -180,7 +217,8 @@ pub struct InsertableWeighingProcedureModelBuilder {
     pub(crate) procedure_model_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     pub(crate) weighed_with: Option<::rosetta_uuid::Uuid>,
     pub(crate) procedure_weighed_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    pub(crate) sample_container: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) sample_container_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_sample_container: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
 }
 impl InsertableWeighingProcedureModelBuilder {
     pub fn weighed_with<P>(
@@ -207,6 +245,77 @@ impl InsertableWeighingProcedureModelBuilder {
                     InsertableWeighingProcedureModelAttributes::ProcedureWeighedWith,
                 )
             })?;
+        Ok(self)
+    }
+    pub fn sample_container_id<P>(
+        mut self,
+        sample_container_id: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_uuid::Uuid>,
+        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let sample_container_id = sample_container_id.try_into().map_err(
+            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableWeighingProcedureModelAttributes::SampleContainerId)
+            },
+        )?;
+        self.sample_container_id = Some(sample_container_id);
+        self.procedure_sample_container =
+            self.procedure_sample_container.trackable_id(sample_container_id).map_err(|err| {
+                err.into_field_name(
+                    InsertableWeighingProcedureModelAttributes::ProcedureSampleContainer,
+                )
+            })?;
+        Ok(self)
+    }
+    pub fn procedure_sample_container(
+        mut self,
+        procedure_sample_container: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
+    > {
+        if procedure_sample_container.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertableWeighingProcedureModelAttributes::ProcedureSampleContainer(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        if let (Some(local), Some(foreign)) =
+            (self.sample_container_id, procedure_sample_container.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            InsertableWeighingProcedureModelAttributes::ProcedureSampleContainer(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_sample_container.trackable_id {
+            self.sample_container_id = Some(foreign);
+        } else if let Some(local) = self.sample_container_id {
+            self.procedure_sample_container =
+                self.procedure_sample_container.trackable_id(local).map_err(|err| {
+                    err.into_field_name(
+                        InsertableWeighingProcedureModelAttributes::ProcedureSampleContainer,
+                    )
+                })?;
+        }
+        self.procedure_sample_container = procedure_sample_container;
         Ok(self)
     }
     pub fn procedure_weighed_with(
@@ -252,27 +361,6 @@ impl InsertableWeighingProcedureModelBuilder {
                 })?;
         }
         self.procedure_weighed_with = procedure_weighed_with;
-        Ok(self)
-    }
-    pub fn sample_container(
-        mut self,
-        sample_container: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
-    > {
-        if sample_container.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableWeighingProcedureModelAttributes::SampleContainer(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.sample_container = sample_container;
         Ok(self)
     }
     pub fn name<P>(
@@ -465,11 +553,31 @@ impl InsertableWeighingProcedureModelBuilder {
             self.weighed_with.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                 InsertableWeighingProcedureModelAttributes::WeighedWith,
             ))?;
+        let sample_container_id = self.sample_container_id.ok_or(
+            common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertableWeighingProcedureModelAttributes::SampleContainerId,
+            ),
+        )?;
         let procedure_model_id = self
             .procedure_model_id
             .insert(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(InsertableWeighingProcedureModelAttributes::ProcedureModelId)
+            })?
+            .id();
+        let procedure_sample_container = self
+            .procedure_sample_container
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    InsertableWeighingProcedureModelAttributes::ProcedureSampleContainer,
+                )
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    InsertableWeighingProcedureModelAttributes::ProcedureSampleContainer,
+                )
             })?
             .id();
         let procedure_weighed_with = self
@@ -487,22 +595,12 @@ impl InsertableWeighingProcedureModelBuilder {
                 )
             })?
             .id();
-        let sample_container = self
-            .sample_container
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertableWeighingProcedureModelAttributes::SampleContainer)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableWeighingProcedureModelAttributes::SampleContainer)
-            })?
-            .id();
         Ok(InsertableWeighingProcedureModel {
             procedure_model_id,
             weighed_with,
             procedure_weighed_with,
-            sample_container,
+            sample_container_id,
+            procedure_sample_container,
         })
     }
 }

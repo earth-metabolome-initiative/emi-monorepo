@@ -95,7 +95,7 @@ where
                     .into(),
             );
         }
-        if !insertable_struct.destination(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.procedure_poured_into(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),

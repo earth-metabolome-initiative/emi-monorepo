@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PouringProcedureModelForeignKeys {
     pub procedure_model: Option<
@@ -10,7 +10,10 @@ pub struct PouringProcedureModelForeignKeys {
     pub source: Option<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
-    pub destination: Option<
+    pub poured_into: Option<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+    >,
+    pub procedure_poured_into: Option<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
 }
@@ -39,8 +42,13 @@ impl web_common_traits::prelude::HasForeignKeys
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+                self.poured_into,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
-                self.destination,
+                self.procedure_poured_into,
             ),
         ));
     }
@@ -48,7 +56,8 @@ impl web_common_traits::prelude::HasForeignKeys
         foreign_keys.procedure_model.is_some()
             && foreign_keys.measured_with.is_some()
             && foreign_keys.source.is_some()
-            && foreign_keys.destination.is_some()
+            && foreign_keys.poured_into.is_some()
+            && foreign_keys.procedure_poured_into.is_some()
     }
     fn update(
         &self,
@@ -74,8 +83,8 @@ impl web_common_traits::prelude::HasForeignKeys
                     foreign_keys.source = Some(procedure_model_trackables.clone());
                     updated = true;
                 }
-                if self.destination == procedure_model_trackables.id {
-                    foreign_keys.destination = Some(procedure_model_trackables.clone());
+                if self.procedure_poured_into == procedure_model_trackables.id {
+                    foreign_keys.procedure_poured_into = Some(procedure_model_trackables.clone());
                     updated = true;
                 }
             }
@@ -93,8 +102,8 @@ impl web_common_traits::prelude::HasForeignKeys
                     foreign_keys.source = None;
                     updated = true;
                 }
-                if self.destination == procedure_model_trackables.id {
-                    foreign_keys.destination = None;
+                if self.procedure_poured_into == procedure_model_trackables.id {
+                    foreign_keys.procedure_poured_into = None;
                     updated = true;
                 }
             }
@@ -115,6 +124,30 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if self.procedure_model_id == procedure_models.id {
                     foreign_keys.procedure_model = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::VolumetricContainerModel(
+                    volumetric_container_models,
+                ),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.poured_into == volumetric_container_models.id {
+                    foreign_keys.poured_into = Some(volumetric_container_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::VolumetricContainerModel(
+                    volumetric_container_models,
+                ),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.poured_into == volumetric_container_models.id {
+                    foreign_keys.poured_into = None;
                     updated = true;
                 }
             }

@@ -10,7 +10,8 @@ pub enum InsertablePouringProcedureModelAttributes {
     Source(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
-    Destination(
+    PouredInto,
+    ProcedurePouredInto(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
     Liters,
@@ -27,9 +28,12 @@ impl core::fmt::Display for InsertablePouringProcedureModelAttributes {
             InsertablePouringProcedureModelAttributes::Source(source) => {
                 write!(f, "{}", source)
             }
-            InsertablePouringProcedureModelAttributes::Destination(destination) => {
-                write!(f, "{}", destination)
+            InsertablePouringProcedureModelAttributes::PouredInto => {
+                write!(f, "poured_into")
             }
+            InsertablePouringProcedureModelAttributes::ProcedurePouredInto(
+                procedure_poured_into,
+            ) => write!(f, "{}", procedure_poured_into),
             InsertablePouringProcedureModelAttributes::Liters => write!(f, "liters"),
         }
     }
@@ -46,7 +50,8 @@ pub struct InsertablePouringProcedureModel {
     procedure_model_id: i32,
     measured_with: i32,
     source: i32,
-    destination: i32,
+    poured_into: ::rosetta_uuid::Uuid,
+    procedure_poured_into: i32,
     liters: f32,
 }
 impl InsertablePouringProcedureModel {
@@ -146,7 +151,39 @@ impl InsertablePouringProcedureModel {
             conn,
         )
     }
-    pub fn destination<C: diesel::connection::LoadConnection>(
+    pub fn poured_into<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
+                self.poured_into,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_poured_into<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -173,7 +210,7 @@ impl InsertablePouringProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
-                self.destination,
+                self.procedure_poured_into,
             ),
             conn,
         )
@@ -185,10 +222,34 @@ pub struct InsertablePouringProcedureModelBuilder {
     pub(crate) procedure_model_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     pub(crate) measured_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     pub(crate) source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    pub(crate) destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) poured_into: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_poured_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     pub(crate) liters: Option<f32>,
 }
 impl InsertablePouringProcedureModelBuilder {
+    pub fn poured_into<P>(
+        mut self,
+        poured_into: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertablePouringProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_uuid::Uuid>,
+        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let poured_into = poured_into.try_into().map_err(
+            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
+                Into::into(err).rename_field(InsertablePouringProcedureModelAttributes::PouredInto)
+            },
+        )?;
+        self.poured_into = Some(poured_into);
+        self.procedure_poured_into =
+            self.procedure_poured_into.trackable_id(poured_into).map_err(|err| {
+                err.into_field_name(InsertablePouringProcedureModelAttributes::ProcedurePouredInto)
+            })?;
+        Ok(self)
+    }
     pub fn liters<P>(
         mut self,
         liters: P,
@@ -229,27 +290,6 @@ impl InsertablePouringProcedureModelBuilder {
         self.source = source;
         Ok(self)
     }
-    pub fn destination(
-        mut self,
-        destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertablePouringProcedureModelAttributes>,
-    > {
-        if destination.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertablePouringProcedureModelAttributes::Destination(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.destination = destination;
-        Ok(self)
-    }
     pub fn measured_with(
         mut self,
         measured_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
@@ -269,6 +309,50 @@ impl InsertablePouringProcedureModelBuilder {
             );
         }
         self.measured_with = measured_with;
+        Ok(self)
+    }
+    pub fn procedure_poured_into(
+        mut self,
+        procedure_poured_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertablePouringProcedureModelAttributes>,
+    > {
+        if procedure_poured_into.procedure_model_id.is_some() {
+            return Err(
+                web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        InsertablePouringProcedureModelAttributes::ProcedurePouredInto(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                        ),
+                    ),
+                ),
+            );
+        }
+        if let (Some(local), Some(foreign)) = (self.poured_into, procedure_poured_into.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            InsertablePouringProcedureModelAttributes::ProcedurePouredInto(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_poured_into.trackable_id {
+            self.poured_into = Some(foreign);
+        } else if let Some(local) = self.poured_into {
+            self.procedure_poured_into =
+                self.procedure_poured_into.trackable_id(local).map_err(|err| {
+                    err.into_field_name(
+                        InsertablePouringProcedureModelAttributes::ProcedurePouredInto,
+                    )
+                })?;
+        }
+        self.procedure_poured_into = procedure_poured_into;
         Ok(self)
     }
     pub fn name<P>(
@@ -457,6 +541,10 @@ impl InsertablePouringProcedureModelBuilder {
     {
         use diesel::associations::Identifiable;
         use web_common_traits::database::InsertableVariant;
+        let poured_into =
+            self.poured_into.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                InsertablePouringProcedureModelAttributes::PouredInto,
+            ))?;
         let liters = self.liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
             InsertablePouringProcedureModelAttributes::Liters,
         ))?;
@@ -474,17 +562,6 @@ impl InsertablePouringProcedureModelBuilder {
             .insert(user_id, conn)
             .map_err(|err| err.into_field_name(InsertablePouringProcedureModelAttributes::Source))?
             .id();
-        let destination = self
-            .destination
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertablePouringProcedureModelAttributes::Destination)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertablePouringProcedureModelAttributes::Destination)
-            })?
-            .id();
         let measured_with = self
             .measured_with
             .procedure_model_id(procedure_model_id)
@@ -496,11 +573,23 @@ impl InsertablePouringProcedureModelBuilder {
                 err.into_field_name(InsertablePouringProcedureModelAttributes::MeasuredWith)
             })?
             .id();
+        let procedure_poured_into = self
+            .procedure_poured_into
+            .procedure_model_id(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(InsertablePouringProcedureModelAttributes::ProcedurePouredInto)
+            })?
+            .insert(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(InsertablePouringProcedureModelAttributes::ProcedurePouredInto)
+            })?
+            .id();
         Ok(InsertablePouringProcedureModel {
             procedure_model_id,
             measured_with,
             source,
-            destination,
+            poured_into,
+            procedure_poured_into,
             liters,
         })
     }
