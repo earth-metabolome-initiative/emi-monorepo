@@ -61,10 +61,5 @@ mod tests {
         let node = Node::default();
         let expected = "0@{label: \"hello\", shape: rect}\nstyle 0 fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000\n";
         assert_eq!(format!("{}", node), expected);
-
-        // write this to markdown file
-        let mut file = std::fs::File::create("node_test.md").unwrap();
-        use std::io::Write;
-        file.write_all(expected.as_bytes()).unwrap();
     }
 }
