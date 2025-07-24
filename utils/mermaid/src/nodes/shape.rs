@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-enum NodeShape {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum NodeShape {
     Rectangle,
     RoundEdges,
     StadiumShape,
