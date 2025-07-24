@@ -1,9 +1,8 @@
 use std::fmt::Display;
 
-use crate::colors::Colors;
-
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub(crate) enum LinkShape {
+    #[default]
     ArrowHead,
     ArrowHeadBidirectional,
     Open,
@@ -34,11 +33,5 @@ impl Display for LinkShape {
             Self::CrossEdge => write!(f, "--x"),
             Self::CrossEdgeBidirectional => write!(f, "x--x"),
         }
-    }
-}
-
-impl Default for LinkShape {
-    fn default() -> Self {
-        LinkShape::ArrowHead
     }
 }

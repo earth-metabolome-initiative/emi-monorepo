@@ -25,7 +25,7 @@ impl MermaidGraph {
         let mut file = std::fs::File::create(file_path)?;
         // we add the quotes for the markdown file
         writeln!(file, "```mermaid")?;
-        write!(file, "{}", self)?;
+        write!(file, "{self}")?;
         write!(file, "```")?;
         Ok(())
     }
@@ -38,7 +38,7 @@ impl Display for MermaidGraph {
             GraphDirection::LeftToRight => writeln!(f, "flowchart LR"),
         }?;
         for pair in &self.pairs {
-            writeln!(f, "{}", pair)?;
+            writeln!(f, "{pair}")?;
         }
         Ok(())
     }

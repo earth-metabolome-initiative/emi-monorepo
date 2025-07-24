@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub(crate) enum Colors {
     Red,
     Maroon,
@@ -23,6 +23,7 @@ pub(crate) enum Colors {
     Grey,
     Silver,
     White,
+    #[default]
     Black,
 }
 
@@ -52,11 +53,5 @@ impl Display for Colors {
             Self::White => write!(f, "#ffffff"),
             Self::Black => write!(f, "#000000"),
         }
-    }
-}
-
-impl Default for Colors {
-    fn default() -> Self {
-        Colors::Black
     }
 }
