@@ -1,12 +1,12 @@
 mod shape;
 use std::fmt::Display;
 
-use shape::NodeShape;
+pub(crate) use shape::NodeShape;
 
 use crate::colors::Colors;
 
 #[derive(Debug, Clone)]
-struct Node {
+pub(crate) struct Node {
     node_id: u32,
     shape: NodeShape,
     label: String,
@@ -14,6 +14,24 @@ struct Node {
     text_color: Colors,
     fill_color: Colors,
     stroke_width: u8,
+}
+
+impl Node {
+    pub fn new(
+        node_id: u32,
+        shape: NodeShape,
+        label: String,
+        stroke_color: Colors,
+        text_color: Colors,
+        fill_color: Colors,
+        stroke_width: u8,
+    ) -> Self {
+        Node { node_id, shape, label, stroke_color, text_color, fill_color, stroke_width }
+    }
+
+    pub fn get_id(&self) -> u32 {
+        self.node_id
+    }
 }
 
 impl Default for Node {
@@ -43,7 +61,7 @@ impl Display for Node {
         )?;
         // Second line is the node styling : style 2
         // fill:#bbf,stroke:#ff0000,stroke-width:2px,color:#ff0000
-        writeln!(
+        write!(
             f,
             "style {} fill:{},stroke:{},stroke-width:{}px,color:{}",
             self.node_id, self.fill_color, self.stroke_color, self.stroke_width, self.text_color
@@ -59,7 +77,7 @@ mod tests {
     #[test]
     fn test_node_display_default() {
         let node = Node::default();
-        let expected = "0@{label: \"hello\", shape: rect}\nstyle 0 fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000\n";
+        let expected = "0@{label: \"hello\", shape: rect}\nstyle 0 fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000";
         assert_eq!(format!("{}", node), expected);
     }
 }

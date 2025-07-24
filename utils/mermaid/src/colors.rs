@@ -18,7 +18,7 @@ pub(crate) enum Colors {
     Blue,
     Navy,
     Purple,
-    Magena,
+    Magenta,
     Pink,
     Grey,
     Silver,
@@ -45,12 +45,18 @@ impl Display for Colors {
             Self::Blue => write!(f, "#0000ff"),
             Self::Navy => write!(f, "#000080"),
             Self::Purple => write!(f, "#800080"),
-            Self::Magena => write!(f, "#ff00ff"),
+            Self::Magenta => write!(f, "#ff00ff"),
             Self::Pink => write!(f, "#ffc0cb"),
             Self::Grey => write!(f, "#808080"),
             Self::Silver => write!(f, "#c0c0c0"),
             Self::White => write!(f, "#ffffff"),
             Self::Black => write!(f, "#000000"),
         }
+    }
+}
+
+impl Default for Colors {
+    fn default() -> Self {
+        Colors::Black
     }
 }
