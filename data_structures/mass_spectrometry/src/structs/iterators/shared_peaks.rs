@@ -141,6 +141,10 @@ where
     type Error = BuilderError<Self::Attribute>;
     type Attribute = GreedySharedPeaksAttribute;
 
+    fn is_complete(&self) -> bool {
+        self.left.is_some() && self.right.is_some() && self.tolerance.is_some()
+    }
+
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {
             left: self

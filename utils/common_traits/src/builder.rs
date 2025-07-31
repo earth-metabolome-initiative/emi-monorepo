@@ -9,6 +9,10 @@ pub trait Builder: Default {
     /// The enumeration of the attributes that can be set.
     type Attribute;
 
+    /// Returns whether the builder is complete, meaning all required attributes
+    /// have been set.
+    fn is_complete(&self) -> bool;
+
     /// Builds the object.
     ///
     /// # Errors

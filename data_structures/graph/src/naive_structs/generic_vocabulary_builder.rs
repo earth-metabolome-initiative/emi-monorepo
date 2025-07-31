@@ -79,6 +79,9 @@ where
     >;
     type Attribute = VocabularyBuilderOptions;
 
+    fn is_complete(&self) -> bool {
+        self.symbols.is_some()
+    }
     fn build(self) -> Result<Self::Object, Self::Error> {
         let expected_number_of_symbols = self.get_expected_number_of_symbols();
         let mut vocabulary = if let Some(number_of_symbols) = expected_number_of_symbols {

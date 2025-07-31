@@ -103,6 +103,10 @@ where
     type Error = EdgesBuilderError<UE>;
     type Attribute = EdgesBuilderOptions;
 
+    fn is_complete(&self) -> bool {
+        self.builder.is_complete()
+    }
+
     fn build(self) -> Result<Self::Object, Self::Error> {
         let directed_edges: GE = self.builder.build()?;
         let undirected_edges: UE = UE::from_directed_edges(directed_edges);

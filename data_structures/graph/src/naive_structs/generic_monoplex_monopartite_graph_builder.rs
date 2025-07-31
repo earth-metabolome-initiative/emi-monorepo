@@ -100,6 +100,10 @@ where
     type Error = MonoplexMonopartiteGraphBuilderError;
     type Attribute = MonoplexMonopartiteGraphBuilder;
 
+    fn is_complete(&self) -> bool {
+        self.nodes.is_some() && self.edges.is_some()
+    }
+
     fn build(self) -> Result<Self::Object, Self::Error> {
         G::try_from((
             self.nodes

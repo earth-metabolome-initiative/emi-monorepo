@@ -93,6 +93,12 @@ where
     type Error = EdgesBuilderError<GE>;
     type Attribute = EdgesBuilderOptions;
 
+    fn is_complete(&self) -> bool {
+        self.edges.is_some()
+            && self.expected_number_of_edges.is_some()
+            && self.expected_shape.is_some()
+    }
+
     fn build(self) -> Result<Self::Object, Self::Error> {
         let expected_number_of_edges = self.get_expected_number_of_edges();
         let mut edges = match (expected_number_of_edges, self.get_expected_shape()) {
